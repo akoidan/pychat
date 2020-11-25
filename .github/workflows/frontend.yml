@@ -2,10 +2,15 @@ name: FE:pychat.org
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
     paths: 
       - 'frontend/**'
-
+  pull_request:
+    branches:
+      - master
+    paths: 
+      - 'frontend/**'
 jobs:
   upload_frontend:
     runs-on: ubuntu-latest
