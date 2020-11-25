@@ -88,7 +88,7 @@ class WebSocketLoadTest(TestCase):
 			sleep(random())
 			ws.send(json.dumps({
 				VarNames.CONTENT: "{}".format(i),
-				VarNames.EVENT: Actions.SEND_MESSAGE,
+				VarNames.EVENT: Actions.PRINT_MESSAGE,
 				VarNames.ROOM_ID: settings.ALL_ROOM_ID
 			}))
 

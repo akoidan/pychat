@@ -44,7 +44,6 @@ EMAIL_SUBJECT_PREFIX = '[Pychat] '
 REDIS_PORT = 6379
 REDIS_HOST ='localhost'
 REDIS_DB = 0
-REDIS_SESSION_DB = 3
 
 
 LOGGING = {
@@ -147,14 +146,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
 MEDIA_URL = "/photo/"
 
-JS_CONSOLE_LOGS = True
+JS_CONSOLE_LOGS = 'debug'
 
 # If this options is set, on every oncoming request chat will gather info about user location
 
 IP_API_URL = 'http://ip-api.com/json/%s'
 
 ALL_REDIS_ROOM = 'all'
-WEBRTC_CONNECTION = 'webrtc_conn'
 ALL_ROOM_ID = 1
 
 PING_CLOSE_JS_DELAY = 10000  # milliseconds

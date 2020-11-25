@@ -6,7 +6,7 @@ import logging.config
 ########################################################################################################################
 ############################################# START REQUIRED SECTION ###################################################
 
-
+### Uncomment a SINGLE import from 3 below
 # from chat.settings_docker import * # If you run pychat inside of docker container uncomment this
 # from chat.settings_local import * # If you run development server on your local machine uncomment this one
 # from chat.settings_prod import * # if you run this in production without docker uncomment this
@@ -96,7 +96,6 @@ GIPHY_API_KEY = 'thZMTtWsaBQAPDIAY461GzYTctuYIeIj'
 
 
 ### For facebook auth:
-# FACEBOOK_ACCESS_TOKEN = '************************************************************************************************************************************************************************************' # USER TOKEN from  https://developers.facebook.com/tools/access_token/
-# FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
+# FACEBOOK_ACCESS_TOKEN = '**' # https://developers.facebook.com/apps/ -> click on app -> settings -> basic "App ID|App Secret" e.g. FACEBOOK_ACCESS_TOKEN = "91237|bf86sd3"
 
 logging.config.dictConfig(LOGGING)

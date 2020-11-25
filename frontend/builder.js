@@ -14,6 +14,7 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const name = '[name].[ext]?[sha512:hash:base64:6]';
 const child_process = require('child_process');
+const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin')
 const ELECTRON_DIST_DIRNAME = 'electron_dist';
 const MAIN_DIST_DIRNAME = 'dist';
@@ -144,6 +145,11 @@ const {options, definePlugin, optimization, configFile, startCordova, linting} =
     usedExports: true,
     sideEffects: true
   };
+  if (!isProd) {
+    // otherwise in webpack-dev-server we always have the error:  Uncaught ReferenceError: webpackHotUpdate is not defined
+    // if this error is not present on startup, we can remove this option
+    optimization.runtimeChunk= true; // https://github.com/webpack/webpack/issues/6693
+  }
 
   const configFile = options.IS_WEB && !options.IS_DEBUG ? 'tsconfig.json' : 'tsconfig.esnext.json' ;
   let definePlugin = new webpack.DefinePlugin({PYCHAT_CONSTS: JSON.stringify(options)});
@@ -165,13 +171,13 @@ const getConfig = async () => {
     }
     return res;
   }
-  const entry = ['reflect-metadata', './src/main.ts'];
+  const entry = ['reflect-metadata', './src/ts/main.ts'];
 
 
   let webpackOptions = {
     hash: true,
     favicon: 'src/assets/img/favicon.ico',
-    template: 'src/index.ejs',
+    template: 'src/assets/index.ejs',
     inject: false
   };
   if (options.MANIFEST && options.IS_WEB) {
@@ -197,6 +203,7 @@ const getConfig = async () => {
   plugins = [
     definePlugin,
     new VueLoaderPlugin(),
+    new CleanTerminalPlugin(),
     new CopyWebpackPlugin([
       {from: './src/assets/manifest.json', to: ''},
       {from: './src/assets/recaptcha.html', to: ''},
@@ -220,7 +227,7 @@ const getConfig = async () => {
     plugins.push(new SaveHtmlToFile('/tmp/electron.html'));
   }
   if (!options.IS_DEBUG && options.IS_WEB) {
-    entry.unshift('./src/polyfills/inputEvent.ts')
+    entry.unshift('./src/ts/polyfills/inputEvent.ts')
   }
   if (options.IS_PROD) {
     const SriPlugin = require('webpack-subresource-integrity');
@@ -561,7 +568,8 @@ async function setup() {
 
     ['SIGINT', 'SIGTERM'].forEach(signal => {
       process.on(signal, () => {
-        server.close()
+        server.close();
+        process.exit(); // otherwise `yarn run dev is killed but` `node ./builder.js` is still there
       });
     });
 
@@ -570,7 +578,7 @@ async function setup() {
     let config = getSimpleConfig(
       'electron.js',
       options.IS_PROD ? getDist() : '/tmp/',
-      ['./src/electron.ts'],
+      ['./src/devices/electron.ts'],
       'electron-main',
     );
     await runWebpack(config);
@@ -588,7 +596,7 @@ async function setup() {
     let config = getSimpleConfig(
       'sw.js',
       options.IS_PROD ? getDist() : '/tmp/',
-      ['./src/sw.ts']
+      ['./src/ts/sw.ts']
     );
     await runWebpack(config);
   }

@@ -5,7 +5,6 @@ class Actions(object):
 	LOGIN = 'addOnlineUser'
 	SET_WS_ID = 'setWsId'
 	LOGOUT = 'removeOnlineUser'
-	SEND_MESSAGE = 'sendMessage'
 	PRINT_MESSAGE = 'printMessage'
 	WEBRTC = 'sendRtcData'
 	CLOSE_FILE_CONNECTION = 'destroyFileConnection'
@@ -32,6 +31,7 @@ class Actions(object):
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_FILE_CONNECTION = 'offerFile'
 	OFFER_CALL_CONNECTION = 'offerCall'
+	OFFER_P2P_CONNECTION = 'offerMessage'
 	REPLY_FILE_CONNECTION = 'replyFile'
 	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
@@ -55,7 +55,7 @@ class VarNames(object):
 	FILE_URL = 'url'
 	FILE_TYPE = 'type'
 	EVENT = 'action'
-	JS_MESSAGE_ID = 'messageId'
+	JS_MESSAGE_ID = 'cbId'
 	MESSAGE_ID = 'id'
 	IMAGE_ID = 'id'
 	GENDER = 'sex'
@@ -86,7 +86,7 @@ class VarNames(object):
 	LOAD_MESSAGES_HISTORY = 'history'
 	LOAD_MESSAGES_OFFLINE = 'offline'
 	ONLINE = 'online'
-	TIME_DIFF ='timeDiff'
+	TIME_DIFF = 'timeDiff'
 	EDITED_TIMES = 'edited'
 	PREVIEW = 'preview'
 	DELETED = 'deleted'
@@ -141,6 +141,8 @@ class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
 	PARSABLE_PREFIX = 'p'
 	ONLINE_VAR = 'online'
+	P2P_MESSAGE_VAR = 'p2p'
+	WEBRTC_CONNECTION = 'webrtc_conn'
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@classmethod

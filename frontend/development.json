@@ -1,5 +1,5 @@
 {
-  "BACKEND_ADDRESS": "localhost:8888",
+  "BACKEND_ADDRESS": "{}:8888",
   "IS_DEBUG": true,
   "UGLIFY": false,
   "ELECTRON_IGNORE_SSL": true,

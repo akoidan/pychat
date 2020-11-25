@@ -213,9 +213,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
  3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv`. For ubuntu you can omit `--system-site-packages `. Activate it: `source .venv/bin/activate`
- 4. Install python packages with `pip install -r requirements.txt`.
- 5. From **root** user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
- 6. Fill database with tables: `bash ../download_content.sh create_django_tables`
+ 4. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
+ 5. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 6. Fill database with tables: `bash ../download_content.sh create_django_tables`. (Remember you're still in `backend` dir)
 
 ## Build frontend
 Change to frontend directory `cd frontend` I would recommend to use node version specified in nvm, so  `nvm install; nvm use`.
@@ -461,11 +461,13 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* FB login doesn't return email refactor for google_id and fb_id in user_profile . It only returns email for me
+* when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
 * if users joins a room that already has call in progress, he should be able to join this call
+* create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module
 * opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
-* ctrl+c on builder leaves the process in foreground
 * .stylelintignore @for loops doesn't work in linter https://github.com/AleshaOleg/postcss-sass/issues/53
 * https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * get\s+(\w+)\(\):\s+((\w|\[|\])+)\s+\{\s+return\s+store\.\w+\;?\s+\}\;?        @State\n    public readonly $1!: $2;

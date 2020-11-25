@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from chat.settings import WEBRTC_CONNECTION
+from chat.tornado.constants import RedisPrefix
 
 
 class Command(BaseCommand):
@@ -11,10 +11,10 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		from chat.global_redis import sync_redis
-		webrtc_connections = sync_redis.hgetall(WEBRTC_CONNECTION)
+		webrtc_connections = sync_redis.hgetall(RedisPrefix.WEBRTC_CONNECTION)
 		if webrtc_connections:
 			sync_redis.delete(*webrtc_connections.keys())
-			sync_redis.delete(WEBRTC_CONNECTION)
+			sync_redis.delete(RedisPrefix.WEBRTC_CONNECTION)
 			print('Flushed webrtc connections: {}'.format(webrtc_connections))
 		else:
-			print("There're no connections to flush in '{}' redis key, skipping...".format(WEBRTC_CONNECTION))
+			print("There're no connections to flush in '{}' redis key, skipping...".format(RedisPrefix.WEBRTC_CONNECTION))
