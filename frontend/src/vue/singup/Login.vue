@@ -33,7 +33,7 @@
       Forgot Password?
     </router-link>
     <div>
-      <social-auth />
+      <social-auth-sign-up/>
       <captcha-component v-model="running" />
       <app-submit
         class="submit-button"
@@ -49,12 +49,12 @@ import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 
-import SocialAuth from '@/vue/singup/SocialAuth.vue';
 import CaptchaComponent from '@/vue/singup/CaptchaComponent.vue';
 import {sub} from '@/ts/instances/subInstance'
 import { LoginMessage } from '@/ts/types/messages/innerMessages';
+import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
 
-@Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
+@Component({components: {SocialAuthSignUp, CaptchaComponent, AppSubmit}})
 export default class Login extends Vue {
 
   @Ref()

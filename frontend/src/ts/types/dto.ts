@@ -91,6 +91,10 @@ export interface UserProfileDto {
   userId: number;
 }
 
+export interface OauthStatus {
+  google: boolean;
+  facebook: boolean;
+}
 export interface FileModelDto {
   url: string;
   type: BlobType;

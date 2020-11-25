@@ -109,7 +109,7 @@
         </option>
       </select>
     </register-field-set>
-    <social-auth />
+    <social-auth-sign-up/>
     <app-submit
       class="submit-button"
       value="REGISTER"
@@ -120,18 +120,24 @@
 
 <script lang='ts'>
 
-  import {Vue, Component, Prop, Watch, Ref} from "vue-property-decorator";
-  import {State, ApplyGrowlErr} from '@/ts/instances/storeInstance';
-  import AppSubmit from '@/vue/ui/AppSubmit.vue'
-  import RegisterFieldSet from '@/vue/singup/RegisterFieldSet.vue'
-  import debounce from 'lodash.debounce';
-  import {IconColor} from '@/ts/types/types';
-  import SocialAuth from '@/vue/singup/SocialAuth.vue';
-  import {SexModelString} from '@/ts/types/model';
-  import {sub} from '@/ts/instances/subInstance'
-  import { LoginMessage } from '@/ts/types/messages/innerMessages';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch
+} from "vue-property-decorator";
+import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
+import AppSubmit from '@/vue/ui/AppSubmit.vue'
+import RegisterFieldSet from '@/vue/singup/RegisterFieldSet.vue'
+import debounce from 'lodash.debounce';
+import { IconColor } from '@/ts/types/types';
+import { SexModelString } from '@/ts/types/model';
+import { sub } from '@/ts/instances/subInstance'
+import { LoginMessage } from '@/ts/types/messages/innerMessages';
+import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
 
-  @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
+@Component({components: {SocialAuthSignUp, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
 
     @Prop() public oauth_token!: string;
