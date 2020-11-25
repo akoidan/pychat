@@ -461,17 +461,13 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
-* RUN git-diff to check if I need to deploy Frontend and backend separately.
 * FB login doesn't return email refactor for google_id and fb_id in user_profile . It only returns email for me
-* remove builder.js cause it leaves daemons on process exit. use vue-webpack-typescript structure
 * when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
 * if users joins a room that already has call in progress, he should be able to join this call
 * create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module
-* Call icon is missing if call in some room is in progress
 * opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
-* ctrl+c on builder leaves the process in foreground
 * .stylelintignore @for loops doesn't work in linter https://github.com/AleshaOleg/postcss-sass/issues/53
 * https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * get\s+(\w+)\(\):\s+((\w|\[|\])+)\s+\{\s+return\s+store\.\w+\;?\s+\}\;?        @State\n    public readonly $1!: $2;

@@ -99,8 +99,12 @@ export default class SocialAuth extends Vue {
     // @ts-ignore: next-line
     const googleUser = auth2.currentUser.get();
     const profile = googleUser.getBasicProfile();
-    this.$logger.log('Signed as {} with id {} and email {}  ',
-                    profile.getName(), profile.getId(), profile.getEmail())();
+    this.$logger.log(
+        'Signed as {} with id {} and email {}  ',
+        profile.getName(),
+        profile.getId(),
+        profile.getEmail()
+    )();
     this.googleToken = googleUser.getAuthResponse().id_token;
     const session: string = await this.$api.googleAuth(this.googleToken!);
     let message: LoginMessage = {action: 'login', handler: 'router', session};
@@ -134,8 +138,14 @@ export default class SocialAuth extends Vue {
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
       this.$store.growlInfo('Successfully logged in into facebook, proceeding...');
-      // TODO
-      // @ts-ignore: next-line
+      // the code below doesn't return an email. so fb login would be emailess
+      // let emailResponse = await new Promise((resolve, reject) => {
+      //   FB.api('/me?scope=email', resolve, (a: any,b: any,c: any) => {
+      //     console.error(a,b,c)
+      //     reject();
+      //   })
+      // });
+      // @ts-expect-error
       const s = await this.$api.facebookAuth(response.authResponse.accessToken);
       let message: LoginMessage = {action: 'login', handler: 'router', session: s};
       sub.notify(message)
@@ -163,15 +173,9 @@ export default class SocialAuth extends Vue {
       this.$logger.log('Fblogin')();
       const response: {status: string} = await new Promise((resolve, reject) => {
         FB.login(resolve, {
-          auth_type: 'reauthenticate',
-          scope: 'email'
+          auth_type: 'reauthenticate'
         });
       });
-      let emailResponse = await new Promise((resolve, reject) => {
-        FB.api('/me?scope=email', resolve, reject)
-      });
-      // TODO
-      debugger
       await this.fbStatusChangeIfReAuth(response);
     }
   }
