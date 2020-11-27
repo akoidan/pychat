@@ -104,7 +104,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       // see https://bugzilla.mozilla.org/show_bug.cgi?id=1540614
       // otherwise `WebRTC: ICE failed, add a TURN server and see about:webrtc for more details`
       // Note not all Firefox browsers are affected.
-      if (event.candidate && event.candidate.candidate?.length > 0) {
+      if (event.candidate) {
         this.sendWebRtcEvent(event.candidate);
       }
     };
