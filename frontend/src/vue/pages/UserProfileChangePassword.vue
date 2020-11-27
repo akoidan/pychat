@@ -7,7 +7,7 @@
     <table>
       <tbody>
         <tr>
-          <th>Old password:</th>
+          <th title="Leave empty if you signed up with oauth">Old password:</th>
           <td>
             <input
               v-show="false"

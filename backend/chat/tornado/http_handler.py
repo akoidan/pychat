@@ -336,6 +336,10 @@ class HttpHandler(MethodDispatcher):
 		user_profile = handler.generate_user_profile(token)
 		return self.__generate_session__(user_profile.id)
 
+	@run_on_executor
+	def __get_oauth_identifier(self, token, handler):
+		return handler.get_oauth_identifier(token)
+
 	@require_http_method('POST')
 	def facebook_auth(self, token):
 		return (yield self.__oauth(token, FacebookAuth(self.logger)))
@@ -397,7 +401,7 @@ class HttpHandler(MethodDispatcher):
 	@login_required_no_redirect
 	def change_password(self, password, old_password):
 		user = UserProfile.objects.get(id=self.user_id)
-		if not user.check_password(old_password):
+		if user.password and not user.check_password(old_password):
 			raise ValidationError("Invalid old password")
 		self.__check_password(password)
 		hash_pass = make_password(password)
@@ -406,6 +410,36 @@ class HttpHandler(MethodDispatcher):
 		)
 		if user.email is not None:
 			yield from self.__send_password_changed(user.username, user.email)
+		return settings.VALIDATION_IS_OK
+
+	@login_required_no_redirect
+	def oauth_status(self):
+		user = UserProfile.objects.get(id=self.user_id)
+		return {'google': user.google_id is not None, 'facebook': user.facebook_id is not None}
+
+
+	@require_http_method('POST')
+	@login_required_no_redirect
+	def set_google_oauth(self, token):
+		if token:
+			google_token = yield self.__get_oauth_identifier(token, GoogleAuth(self.logger))
+		else:
+			google_token = None
+		up = UserProfile.objects.get(id=self.user_id)
+		up.google_id = google_token
+		up.save()
+		return settings.VALIDATION_IS_OK
+
+	@require_http_method('POST')
+	@login_required_no_redirect
+	def set_facebook_oauth(self, token):
+		if token:
+			facebook_token = yield self.__get_oauth_identifier(token, FacebookAuth(self.logger))
+		else:
+			facebook_token = None
+		up = UserProfile.objects.get(id=self.user_id)
+		up.facebook_id = facebook_token
+		up.save()
 		return settings.VALIDATION_IS_OK
 
 	# @transaction.atomic TODO, is this works in single thread?

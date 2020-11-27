@@ -11,7 +11,7 @@
   "ISSUES": true,
   "STATISTICS": true,
   "GITHUB_LINK": true,
-  "PAINTER": false,
+  "PAINTER": true,
   "FLAGS": true,
   "PUBLIC_PATH": "https://static.pychat.org/"
 }

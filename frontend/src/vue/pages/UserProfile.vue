@@ -16,6 +16,9 @@
       <router-link to="/profile/change-email">
         Change email
       </router-link>
+      <router-link to="/profile/oauth-settings" v-if="GOOGLE_OAUTH_2_CLIENT_ID && FACEBOOK_APP_ID">
+        Social accounts
+      </router-link>
     </div>
     <div class="container">
       <keep-alive>
@@ -25,10 +28,15 @@
   </div>
 </template>
 <script lang="ts">
+import { GOOGLE_OAUTH_2_CLIENT_ID , FACEBOOK_APP_ID} from '@/ts/utils/consts';
 import {Component, Vue} from 'vue-property-decorator';
+
 
 @Component
 export default class UserProfile extends Vue {
+  private readonly GOOGLE_OAUTH_2_CLIENT_ID = GOOGLE_OAUTH_2_CLIENT_ID;
+  private readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
+
 }
 </script>
 
@@ -45,7 +53,7 @@ export default class UserProfile extends Vue {
 
   .links
     display: flex
-    max-width: 550px
+    max-width: 680px
     margin: auto
     margin-top: 10px
     padding: 8px

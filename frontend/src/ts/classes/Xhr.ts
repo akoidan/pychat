@@ -40,7 +40,7 @@ export default class Xhr extends Http {
         xobj.overrideMimeType('application/json');
       }
       xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
-
+      xobj.setRequestHeader('session_id', this.sessionHolder.session!);
       xobj.onreadystatechange = this.getOnreadystatechange(
           xobj,
           isJsonDecoded || false,

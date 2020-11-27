@@ -44,6 +44,7 @@ import {
   LogoutMessage,
   RouterNavigateMessage
 } from '@/ts/types/messages/innerMessages';
+import UserProfileOauthSettings from '@/vue/pages/UserProfileOauthSettings.vue';
 
 Vue.use(VueRouter);
 
@@ -123,6 +124,10 @@ export const router = new VueRouter({
             {
               path: 'change-email',
               component: UserProfileChangeEmail
+            },
+            {
+              path: 'oauth-settings',
+              component: UserProfileOauthSettings
             },
             {
               path: 'image',

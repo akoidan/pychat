@@ -33,14 +33,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Deathangel908/pychat.git"
+    "url": "git+https://github.com/akoidan/pychat.git"
   },
   "author": "Andrew Koidan <deathangel908@gmail.com",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Deathangel908/pychat/issues"
+    "url": "https://github.com/akoidan/pychat/issues"
   },
-  "homepage": "https://github.com/Deathangel908/pychat#readme",
+  "homepage": "https://github.com/akoidan/pychat#readme",
   "devDependencies": {
     "@fimbul/valtyr": "^0.21.0",
     "@fimbul/ve": "^0.21.0",

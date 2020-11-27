@@ -1,6 +1,6 @@
 import { Logger } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
-import { XHR_API_URL } from '@/ts/utils/runtimeConsts';
+import { BACKEND_ADDRESS } from '@/ts/utils/consts';
 
 declare var clients: any;
 
@@ -48,7 +48,15 @@ async function getPlayBack(event: unknown) {
   if (!subScr) {
     throw Error('Unable to get subscription');
   }
-  const response = await fetch(`${XHR_API_URL}/get_firebase_playback`, {
+  let address;
+  // it's always https, since SW doesn't work in http.
+  if (BACKEND_ADDRESS.indexOf('{}') >= 0) {
+    // self.registration returns "https://pychat.org/"
+    address = BACKEND_ADDRESS.replace('{}', (self as any).registration.scope.slice(0, -1));
+  } else {
+    address = `https://${BACKEND_ADDRESS}`;
+  }
+  const response = await fetch(`${address}/get_firebase_playback`.replace('{}', window.location.host), {
     credentials: 'omit',
     headers: {auth: subScr}
   });

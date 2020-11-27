@@ -7,6 +7,7 @@ import {
 } from '@/ts/types/types';
 import {
   MessageModelDto,
+  OauthStatus,
   SaveFileResponse,
   ViewUserProfileDto
 } from '@/ts/types/dto';
@@ -104,6 +105,26 @@ export default class Api extends MessageHandler {
     return this.xhr.doPost<string>({
       url: '/register',
       params: {username, password}
+    });
+  }
+
+  public async getOauthStatus(): Promise<OauthStatus> {
+    return this.xhr.doGet<OauthStatus>('/oauth_status', true);
+  }
+
+  public async setGoogleOauth(token: string): Promise<void> {
+    return this.xhr.doPost<void>({
+      url: '/set_google_oauth',
+      checkOkString: true,
+      params: {token}
+    });
+  }
+
+  public async setFacebookOauth(token: string): Promise<void> {
+    return this.xhr.doPost<void>({
+      url: '/set_facebook_oauth',
+      checkOkString: true,
+      params: {token}
     });
   }
 

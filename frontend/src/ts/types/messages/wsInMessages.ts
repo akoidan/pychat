@@ -139,7 +139,6 @@ export interface SetUserProfileMessage extends DefaultWsInMessage<'setUserProfil
   content: UserProfileDto;
 }
 
-
 export interface SetProfileImageMessage extends DefaultWsInMessage<'setProfileImage', 'ws'> {
   content: string;
 }

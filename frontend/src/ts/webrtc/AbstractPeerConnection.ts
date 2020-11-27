@@ -99,8 +99,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
     this.pc!.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc!.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-      this.logger.debug('onicecandidate')();
-      if (event.candidate) {
+      this.logger.debug('Got ice candidate {}', event.candidate)();
+      // the hack with candidate length is required to make connection work on some firefox devices
+      // see https://bugzilla.mozilla.org/show_bug.cgi?id=1540614
+      // otherwise `WebRTC: ICE failed, add a TURN server and see about:webrtc for more details`
+      // Note not all Firefox browsers are affected.
+      if (event.candidate && event.candidate.candidate?.length > 0) {
         this.sendWebRtcEvent(event.candidate);
       }
     };
@@ -190,6 +194,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
   }
 
+  // this event comes from websocket from server, which is created by another PC
   public async sendRtcData(message: SendRtcDataMessage) {
     if (!this.connectedToRemote) {
       this.logger.warn('Putting sendrtc data event to the queue')();

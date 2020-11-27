@@ -1,11 +1,13 @@
-name: Update pychat.org
+name: FE:pychat.org
 
 on:
   push:
     branches: [ master ]
+    paths: 
+      - 'frontend/**'
 
 jobs:
-  frontend:
+  upload_frontend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -37,19 +39,3 @@ jobs:
         run: |
           cd frontend
           tar c dist/ | ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/"
-  backend:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Setup ssh
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.ID_RSA }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p ${{ secrets.PORT }} ${{ secrets.HOST }} >> ~/.ssh/known_hosts
-      - name: Update master branch
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "cd /srv/http/pychat/backend && git pull"
-      - name: Update database
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "cd /srv/http/pychat/backend && ./.venv/bin/python ./manage.py makemigrations && ./.venv/bin/python ./manage.py migrate"
-      - name: Restart tornado service
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "sudo /usr/bin/systemctl restart tornado"
