@@ -161,7 +161,7 @@ class UserProfile(User):
 	online_change_sound = BooleanField(null=False, default=True)
 	incoming_file_call_sound = BooleanField(null=False, default=True)
 	message_sound = BooleanField(null=False, default=True)
-	send_logs = BooleanField(null=False, default=True)
+	send_logs = BooleanField(null=False, default=False)
 
 	email_verification = ForeignKey(Verification, CASCADE, null=True, blank=True)
 
