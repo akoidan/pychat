@@ -149,7 +149,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     onEmitDeleteMessage() {
-      this.editMessageWs(null, this.editedMessage.messageId, this.editedMessage.roomId, null, null, Date.now(), this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1);
+      this.editMessageWs(null, this.editedMessage.messageId, this.editedMessage.roomId, null, null, this.editingMessageModel.time, this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1);
       this.$store.setEditedMessage(null);
     }
 
@@ -208,7 +208,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.activeRoomId,
             md.currSymbol,
             md.files,
-            this.activeRoom.p2p ? Date.now(): Date.now() - this.$ws.timeDiff,
+            Date.now(),
             0
           );
         }
