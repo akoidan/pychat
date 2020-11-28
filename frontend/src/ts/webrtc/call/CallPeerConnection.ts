@@ -111,10 +111,6 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.createPeerConnection(stream);
   }
 
-  public ondatachannelclose(text: string): void {
-  }
-
-
   public oniceconnectionstatechange() {
     this.logger.log(`iceconnectionstate has been changed to ${this.pc!.iceConnectionState}`)();
     if (this.pc!.iceConnectionState === 'disconnected' ||
@@ -265,11 +261,9 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
   public unsubscribeAndRemoveFromParent(reason?: string) {
-    this.logger.log('Destroying {}, because', this.constructor.name, reason)();
-    this.remoteStream = null;
-    this.closePeerConnection();
-    this.removeAudioProcessor();
     super.unsubscribeAndRemoveFromParent();
+    this.remoteStream = null;
+    this.removeAudioProcessor();
     const payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,

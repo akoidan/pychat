@@ -1,9 +1,14 @@
 import {
   AddSendingFileTransfer,
+  SetReceivingFileStatus,
   SetSendingFileStatus,
   SetSendingFileUploaded
 } from '@/ts/types/types';
-import { FileTransferStatus } from '@/ts/types/model';
+import {
+  FileTransferStatus,
+  SendingFile,
+  SendingFileTransfer
+} from '@/ts/types/model';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import {
   bytesToSize,
@@ -30,7 +35,6 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     destroyFileConnection: <HandlerType<'destroyFileConnection', 'peerConnection:*'>>this.destroyFileConnection,
     acceptFile: <HandlerType<'acceptFile', 'peerConnection:*'>>this.acceptFile,
     sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
-    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.destroy,
     declineSending: <HandlerType<'declineSending', 'peerConnection:*'>>this.declineSending
   };
 
@@ -38,6 +42,24 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   private reader: FileReader | null = null;
   private offset: number = 0;
   private lastPrinted: number = 0;
+  private sendDataTimeout: number = 0;
+  private trackTimeout: number = 0;
+
+  public oniceconnectionstatechange() {
+    super.oniceconnectionstatechange();
+    if (this.pc!.iceConnectionState === 'disconnected' ||
+        this.pc!.iceConnectionState === 'failed' ||
+        this.pc!.iceConnectionState === 'closed') {
+      if (this.sendDataTimeout) {
+        this.logger.log('clearing sendDataTimeout {}', this.sendDataTimeout)();
+        window.clearTimeout(this.sendDataTimeout);  // should this be in destroy?
+      }
+      if (this.trackTimeout)  {
+        this.logger.log('clearing trackTimeout {}', this.trackTimeout)();
+        window.clearTimeout(this.trackTimeout);
+      }
+    }
+  }
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
@@ -118,9 +140,11 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       });
     } else {
       const trackTransfer = () => {
+        this.trackTimeout = 0;
+        this.logger.debug('trackTransfer')();
         if (this.sendChannel!.readyState === 'open' && this.sendChannel!.bufferedAmount > 0) {
           this.setTranseferdAmount(this.offset - this.sendChannel!.bufferedAmount);
-          setTimeout(trackTransfer, 500);
+          this.trackTimeout = window.setTimeout(trackTransfer, 500);
         } else if (this.sendChannel!.bufferedAmount === 0) {
           this.setTranseferdAmount(this.offset);
         }
@@ -131,14 +155,12 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   }
 
   public destroyFileConnection(message: DestroyFileConnectionMessage) {
-    const isDecline = message.content === 'decline';
-    const isSuccess = message.content === 'success';
     let isError = false;
     let status;
-    if (isDecline) {
+    if (message.content === 'decline') {
       status = FileTransferStatus.DECLINED_BY_OPPONENT;
       this.unsubscribeAndRemoveFromParent();
-    } else if (isSuccess) {
+    } else if (message.content === 'success') {
       status = FileTransferStatus.FINISHED;
       this.unsubscribeAndRemoveFromParent();
     } else {
@@ -155,13 +177,6 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     this.store.setSendingFileStatus(payload);
   }
 
-  public ondatachannelclose(error: string): void {
-    // channel could be closed in success and in error, we don't know why it was closed
-    if (this.store.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId].status !== FileTransferStatus.FINISHED) {
-      this.commitErrorIntoStore(error);
-    }
-  }
-
   public declineSending() {
     this.unsubscribeAndRemoveFromParent();
     const ssfs: SetSendingFileStatus = {
@@ -176,6 +191,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   }
 
   private sendData(data: ArrayBuffer, offset: number, cb: () => void): void {
+    this.sendDataTimeout = 0;
     try {
       if (this.sendChannel!.readyState === 'open') {
         if (this.sendChannel!.bufferedAmount > 10000000) { // prevent chrome buffer overfill
@@ -183,10 +199,12 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
           const now = Date.now();
           if (now - this.lastPrinted > 1000) {
             this.lastPrinted = now;
-            this.logger.debug('Buffer overflow by {}bytes, waiting to flush...',
-                              bytesToSize(this.sendChannel!.bufferedAmount))();
+            this.logger.debug(
+                'Buffer overflow by {}, waiting to flush...',
+                bytesToSize(this.sendChannel!.bufferedAmount)
+            )();
           }
-          setTimeout(this.sendData.bind(this), 100, data, offset, cb);
+          this.sendDataTimeout = setTimeout(this.sendData.bind(this), 100, data, offset, cb);
 
           return;
         } else {
@@ -204,13 +222,19 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
         throw Error(`Can't write data into ${this.sendChannel!.readyState} channel`);
       }
     } catch (error) {
-      this.commitErrorIntoStore('Connection has been lost');
-      this.closeEvents(String(error));
+      this.commitErrorIntoStore(`Internal error: ${error?.message}`);
+      this.unsubscribeAndRemoveFromParent();
       this.logger.error('sendData {}', error)();
     }
   }
+  get sendingFileTransfer(): SendingFileTransfer {
+    return this.store.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId];
+  }
 
-  private commitErrorIntoStore(error: string) {
+  commitErrorIntoStore(error: string, onlyIfNotFinished: boolean = false): void {
+    if (onlyIfNotFinished && this.sendingFileTransfer.status === FileTransferStatus.FINISHED) {
+      return
+    }
     const ssfs: SetSendingFileStatus = {
       status: FileTransferStatus.ERROR,
       roomId: this.roomId,
@@ -220,4 +244,5 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     };
     this.store.setSendingFileStatus(ssfs);
   }
+
 }

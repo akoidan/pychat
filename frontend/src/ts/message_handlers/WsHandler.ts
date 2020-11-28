@@ -477,9 +477,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   // }
 
   private setStatus(isOnline: boolean) {
-    if (this.store.isOnline !== isOnline) {
-      this.store.setIsOnline(isOnline);
-    }
+    this.store.setIsOnline(isOnline);
+    this.logger.debug('Setting online to {}', isOnline)();
   }
 
   private close() {

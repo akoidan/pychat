@@ -54,7 +54,7 @@ import { sub } from '@/ts/instances/subInstance';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 import {
-  ChangeDevicesMessage,
+  ChangeP2pRoomInfoMessage,
   InternetAppearMessage,
   LogoutMessage,
   PubSetRooms,
@@ -353,7 +353,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
   }
 
   private notifyDevicesChanged(userId: number|null, roomId: number, type: ChangeDeviceType) {
-    let message: ChangeDevicesMessage = {
+    let message: ChangeP2pRoomInfoMessage = {
       handler: 'webrtc',
       action: 'changeDevices',
       changeType: type,
@@ -434,11 +434,16 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
   }
 
   public saveRoomSettings(message: SaveRoomSettingsMessage) {
-    if (!this.store.roomsDict[message.roomId]) {
+    let oldRoom = this.store.roomsDict[message.roomId];
+    if (!oldRoom) {
       this.logger.error('Unable to find channel to edit {} to kick user, available are {}', message.roomId, Object.keys(this.store.roomsDict))();
     } else {
       const r: RoomSettingsModel = getRoom(message);
+      const oldRoomP2p: boolean = oldRoom.p2p;
       this.store.setRoomSettings(r);
+      if (oldRoomP2p !== message.p2p) {
+        this.notifyDevicesChanged(null, message.roomId, message.p2p ? 'room_created' : 'i_deleted')
+      }
     }
   }
 

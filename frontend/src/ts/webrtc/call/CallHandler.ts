@@ -416,7 +416,7 @@ export default class CallHandler extends FileAndCallTransfer {
         const timedCB = setTimeout(function () {
           !triggered && reject(error);
           triggered = true;
-        },                         500);
+        }, 500);
 
         chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
           type: 'PYCHAT_SCREEN_SHARE_PING'

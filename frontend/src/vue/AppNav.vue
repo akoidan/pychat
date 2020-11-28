@@ -149,7 +149,7 @@ export default class AppNav extends Vue {
   }
 
   public sendFile(event: FileList) {
-    this.$webrtcApi.offerFile(this.inputFile.files![0], this.activeRoom.id);
+    this.$webrtcApi.sendFileOffer(this.inputFile.files![0], this.activeRoom.id);
   }
 
   public invertSearch() {

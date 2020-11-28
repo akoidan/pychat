@@ -92,7 +92,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
         this.pc!.iceConnectionState === 'failed' ||
         this.pc!.iceConnectionState === 'closed') {
       this.logger.error('Connection has changed to state {}', this.pc!.iceConnectionState)();
-      // this.closeEvents('Connection has been lost');
+      //TODO do we need to close?
     } else {
       this.logger.debug('ice connection -> ', this.pc!.iceConnectionState)();
     }
@@ -130,10 +130,10 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   public checkDestroy() {
     //destroy only if user has left this room, if he's offline but connections is stil in progress,
     // maybe he has jost connection to server but not to us
-    if (!this.room) {
-      this.unsubscribeAndRemoveFromParent('Room has been removed')
+    if (!this.room || !this.room.p2p) {
+      this.unsubscribeAndRemoveFromParent();
     } else if (this.room.users.indexOf(this.opponentUserId) < 0) {
-      this.unsubscribeAndRemoveFromParent('User has left this room')
+      this.unsubscribeAndRemoveFromParent();
     }
   }
 
@@ -203,21 +203,10 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  public closeEvents(text?: string | DefaultWsInMessage<string, HandlerName>) {
-    this.messageProc.onDropConnection('data channel lost')
-    if (text) {
-      this.ondatachannelclose(<string>text); // TODO
-    }
-    this.logger.error('Closing event from {}', text)();
-    this.closePeerConnection();
-    if (this.sendChannel && this.sendChannel.readyState !== 'closed') {
-      this.logger.log('Closing chanel')();
-      this.sendChannel.close();
-    } else {
-      this.logger.log('No channels to close')();
-    }
+  public unsubscribeAndRemoveFromParent() {
+    super.unsubscribeAndRemoveFromParent();
+    this.messageProc.onDropConnection('data channel lost');
   }
-
 
   public getWsConnectionId(): string {
     return this.wsHandler.getWsConnectionId();

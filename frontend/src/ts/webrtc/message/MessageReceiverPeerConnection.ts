@@ -4,10 +4,6 @@ import MessagePeerConnection from '@/ts/webrtc/message/MessagePeerConnection';
 // CALL this.waitForAnswer()
 export default class MessageReceiverPeerConnection extends MessagePeerConnection {
 
-  public ondatachannelclose(text: string): void {
-   // TODO
-  }
-
   public makeConnection() {
     if (this.status !== 'not_inited') {
       return

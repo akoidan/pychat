@@ -138,7 +138,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.$store.growlError(err);
           });
         } else {
-          this.$webrtcApi.offerFile(file, this.activeRoomId);
+          this.$webrtcApi.sendFileOffer(file, this.activeRoomId);
         }
       }
     }

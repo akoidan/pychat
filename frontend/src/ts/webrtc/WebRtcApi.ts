@@ -32,7 +32,7 @@ import {
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { VideoType } from '@/ts/types/types';
 import {
-  ChangeDevicesMessage,
+  ChangeP2pRoomInfoMessage,
   InternetAppearMessage,
   LogoutMessage
 } from '@/ts/types/messages/innerMessages';
@@ -43,7 +43,7 @@ export default class WebRtcApi extends MessageHandler {
   protected logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WebRtcApi, 'webrtc'>  = {
-    offerFile: <HandlerType<'offerFile', 'webrtc'>>this.onofferFile,
+    offerFile: <HandlerType<'offerFile', 'webrtc'>>this.offerFile,
     changeDevices: <HandlerType<'changeDevices', 'webrtc'>>this.changeDevices,
     offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
     offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
@@ -72,7 +72,7 @@ export default class WebRtcApi extends MessageHandler {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
-  public async changeDevices(m: ChangeDevicesMessage): Promise<void> {
+  public async changeDevices(m: ChangeP2pRoomInfoMessage): Promise<void> {
     this.logger.log('change devices {}', m)();
     if (m.changeType === 'i_deleted') { // destroy my room
       let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
@@ -107,7 +107,6 @@ export default class WebRtcApi extends MessageHandler {
 
   public acceptFile(connId: string, webRtcOpponentId: string) {
     sub.notify({action: 'acceptFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
-
   }
 
   public declineSending(connId: string, webRtcOpponentId: string) {
@@ -118,7 +117,7 @@ export default class WebRtcApi extends MessageHandler {
     sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
-  public async offerFile(file: File, channel: number) {
+  public async sendFileOffer(file: File, channel: number) {
     if (file.size > 0) {
       const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
       new FileHandler(channel, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
@@ -182,7 +181,7 @@ export default class WebRtcApi extends MessageHandler {
     }
   }
 
-  private onofferFile(message: OfferFile): void {
+  public offerFile(message: OfferFile): void {
     const limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     const payload: ReceivingFile = {
       roomId: message.roomId,

@@ -41,7 +41,7 @@ export interface RouterNavigateMessage extends DefaultInnerSystemMessage<'naviga
   to: string;
 }
 
-export interface ChangeDevicesMessage extends DefaultInnerSystemMessage<'changeDevices', 'webrtc'>  {
+export interface ChangeP2pRoomInfoMessage extends DefaultInnerSystemMessage<'changeDevices', 'webrtc'>  {
   allowZeroSubscribers: true;
   changeType: ChangeDeviceType;
   roomId: number;
