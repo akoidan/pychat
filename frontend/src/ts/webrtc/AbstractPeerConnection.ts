@@ -6,16 +6,14 @@ import { bytesToSize } from '@/ts/utils/pureFunctions';
 import { sub } from '@/ts/instances/subInstance';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import Subscription from '@/ts/classes/Subscription';
-import {
-  ConnectionStatus,
-} from '@/ts/types/types';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
-  ConnectToRemoteMessage,
   CheckTransferDestroy,
+  ConnectToRemoteMessage,
 } from '@/ts/types/messages/innerMessages';
 import { SendRtcDataMessage } from '@/ts/types/messages/wsInMessages';
+import { WEBRTC_STUNT_URL } from '@/ts/utils/consts';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -30,6 +28,17 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly roomId: number;
   protected sendChannel: RTCDataChannel | null = null;
 
+  private readonly pc_config = {
+    iceServers: [{
+      urls: [WEBRTC_STUNT_URL]
+    }]
+  };
+  private readonly pc_constraints: unknown = {
+    optional: [/*Firefox*/
+      /*{DtlsSrtpKeyAgreement: true},*/
+      {RtpDataChannels: false /*true*/}
+    ]
+  };
 
   constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore) {
     super();
@@ -77,12 +86,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   public createPeerConnection(arg?: ConnectToRemoteMessage) {
-    this.logger.log('Creating RTCPeerConnection')();
+    this.logger.log('Creating RTCPeerConnection with config {} {}', this.pc_config, this.pc_constraints)();
     if (!window.RTCPeerConnection) {
       throw Error('Your browser doesn\'t support RTCPeerConnection');
     }
 
-    this.pc = new (<any>RTCPeerConnection)({});
+    this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
     this.pc!.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc!.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
       this.logger.debug('Got ice candidate {}', event.candidate)();
