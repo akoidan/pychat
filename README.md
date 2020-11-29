@@ -5,7 +5,8 @@
 
 ## Table of contents
 - [About](#about)
-- [When should I use pychat:](#when-should-i-use-pychat-)
+- [When should I use pychat](#when-should-i-use-pychat)
+- [How to host pychat](#how-to-host-pychat)
   * [Run test docker image](#run-test-docker-image)
   * [Run prod docker image](#run-prod-docker-image)
   * [Native setup](#native-setup)
@@ -43,7 +44,7 @@ This is free web (browser) chat, that features:
  - Login with social media
  - Sending offline messages with Firebase push notifications
 
-# When should I use pychat:
+# When should I use pychat
 |                        | Pychat | Slack | Skype | Telegram | Viber |
 |------------------------|--------|-------|-------|----------|-------|
 | Open Source            | +      | -     | -     | -        | -     |
@@ -68,6 +69,8 @@ None of other client use p2p for message exchange or file sharing which makes th
  - I would never use viber/skype/whatsapp or any other messages in 2021. They have a lot of disadvantages comparing to discord/telegram/slack.
 
 If you still feel enthusiastic for bleeding-edge opensource project, try pychat with instructions bellow!
+
+# How to host pychat
 
 ## Run test docker image
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
