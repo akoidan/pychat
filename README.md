@@ -469,6 +469,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* Add ability to make a call like in google meet with a link
 * https://webrtc.github.io/samples/src/content/getusermedia/resolution/
 * when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
 * if users joins a room that already has call in progress, he should be able to join this call
