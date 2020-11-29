@@ -45,6 +45,7 @@ import {
   RouterNavigateMessage
 } from '@/ts/types/messages/innerMessages';
 import UserProfileOauthSettings from '@/vue/pages/UserProfileOauthSettings.vue';
+import PainterPage from '@/vue/pages/PainterPage.vue';
 
 Vue.use(VueRouter);
 
@@ -76,7 +77,7 @@ export const router = new VueRouter({
           path: '/chat/:id'
         },
         ...PAINTER ? [{
-          component: () => import(/* webpackChunkName: 'spainter' */'@/vue/pages/PainterPage.vue'),
+          component: PainterPage,
           path: '/painter'
         }]: [],
         ...STATISTICS ? [{

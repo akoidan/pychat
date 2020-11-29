@@ -8,7 +8,7 @@ import {
   Ref,
   Vue
 } from 'vue-property-decorator';
-import Painter from 'spainter';
+import Spainter from 'spainter';
 
 import loggerFactory from '@/ts/instances/loggerFactory';
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
@@ -22,15 +22,15 @@ function getUniqueId() {
 
 
 @Component
-export default class PainterPage extends Vue {
+export default class Painter extends Vue {
 
   @Ref()
   public div!: HTMLElement;
 
-  public painter!: Painter;
+  public painter!: Spainter;
 
   public mounted() {
-    this.painter = new Painter(this.div, {
+    this.painter = new Spainter(this.div, {
       textClass: 'input',
       buttonClass: 'lor-btn',
       logger: loggerFactory.getLogger('painter'),
@@ -46,6 +46,3 @@ export default class PainterPage extends Vue {
   }
 }
 </script>
-<style lang="sass">
-  @import "~spainter/no-fonts.sass"
-</style>

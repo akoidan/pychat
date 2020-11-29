@@ -66,7 +66,6 @@ import {
   Mutation,
   VuexModule
 } from 'vuex-module-decorators';
-import { AddRoomMessage } from '@/ts/types/messages/wsInMessages';
 
 const logger = loggerFactory.getLogger('store');
 
@@ -264,6 +263,18 @@ export class DefaultStore extends VuexModule {
     } else {
       return null;
     }
+  }
+
+  get activeRoomOnline(): string[] {
+    let online: string[] = [];
+    if (this.activeRoom) {
+      this.activeRoom.users.forEach(u => {
+        if (this.onlineDict[u]) {
+          online.push(...this.onlineDict[u]);
+        }
+      });
+    }
+    return online;
   }
 
   get activeUser(): UserModel | null {

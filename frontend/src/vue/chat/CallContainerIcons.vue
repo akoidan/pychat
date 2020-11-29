@@ -29,6 +29,12 @@
         @click="paintClick"
       />
       <i
+        v-show="callInfo.callActive"
+        class="icon-popup"
+        title="Hide/Show videos"
+        @click="invertShowVideoContainer"
+      />
+      <i
         class="icon-cog"
         @click="invertShowSettings"
       />
@@ -75,6 +81,7 @@ export default class CallContainerIcons extends Vue {
   @Emit() invertShowSettings() {}
   @Emit() enterFullscreen() {}
   @Emit() paintClick() {}
+  @Emit() invertShowVideoContainer() {}
 
   get videoTitle() {
     return `Turn ${this.callInfo.showVideo ? 'off' : 'on'} your webcam`;

@@ -8,7 +8,7 @@
     <div
       ref="chatbox"
       class="chatbox"
-      :class="{'display-search-only': room.search.searchActive, 'hidden': room.callInfo.sharePaint}"
+      :class="{'display-search-only': room.search.searchActive, 'hidden': room.callInfo.callContainer && room.callInfo.sharePaint}"
       tabindex="1"
       @keydown="keyDownLoadUp"
       @mousewheel="onScroll"

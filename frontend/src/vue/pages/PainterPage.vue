@@ -66,9 +66,6 @@ export default class PainterPage extends Vue {
   }
 }
 </script>
-<style lang="sass">
-  @import "~spainter/no-fonts.sass"
-</style>
 <style lang="sass" scoped>
 
   @import "~@/assets/sass/partials/abstract_classes"

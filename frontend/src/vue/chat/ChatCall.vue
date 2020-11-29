@@ -8,6 +8,7 @@
       :class="{fullscreen}"
     >
       <video-container
+        v-show="showVideoContainer && !showSettings && callInfo.callActive"
         ref="videoContainer"
         :call-info="callInfo"
         :room-id="roomId"
@@ -33,6 +34,7 @@
         @invert-show-settings="invertShowSetings"
         @desktop-click="desktopClick"
         @enter-fullscreen="enterFullscreen"
+        @invert-show-video-container="invertShowVideoContainer"
       />
       <div class="spainter">
         <painter @canvas="onCanvas" v-show="callInfo.sharePaint"/>
@@ -83,6 +85,15 @@ export default class ChatCall extends Vue {
   @Prop() public callInfo!: CallsInfoModel;
   @Prop() public roomId!: number;
   public showSettings: boolean = false;
+  public showVideoContainer: boolean = true;
+
+
+  @Watch('callInfo.callActive')
+  onCallActive(newValue: boolean) {
+    if (newValue) {
+      this.showVideoContainer = true;
+    }
+  }
 
   @Ref()
   public videoContainer!: Vue;
@@ -99,7 +110,11 @@ export default class ChatCall extends Vue {
   }
 
   invertShowSetings() {
-    this.showSettings = !this.showSettings
+    this.showSettings = !this.showSettings;
+  }
+
+  private invertShowVideoContainer() {
+    this.showVideoContainer = !this.showVideoContainer;
   }
 
   public fullScreenChange() {
@@ -233,7 +248,7 @@ export default class ChatCall extends Vue {
       cursor: pointer
       @include hover-click(#c72727)
 
-    .icon-cog, .icon-webrtc-fullscreen
+    .icon-cog, .icon-webrtc-fullscreen, .icon-popup
       cursor: pointer
       @include hover-click(#2a8f9c)
 
