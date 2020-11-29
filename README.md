@@ -35,15 +35,13 @@
 
 # About
 This is free web (browser) chat, that features:
- - Sending instant text messages via websockets.
- - Sending images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/)
- - Making calls and video conference using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
- - Sharing screen during call or conference
- - Sending files directly to another PC (p2p) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
- - Drawing images and stream drawing during video calls with [spainter](https://github.com/akoidan/spainter)
- - Login in with facebook/google oauth.
+ - Sending instant text messages, images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/) using selfhosted server and websockets
+ - Making calls and video conferences using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
+ - Sharing screen during call or conference.
+ - Drawing images and stream them during video calls with [spainter](https://github.com/akoidan/spainter)
+ - Sending files or text messages directly to another PC (bypassing server) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
+ - Login with social media
  - Sending offline messages with Firebase push notifications
- - Responsive interface (bs like)+ themes
 
 # When should I use pychat:
 |                        | Pychat | Slack | Skype | Telegram | Viber |
@@ -51,17 +49,25 @@ This is free web (browser) chat, that features:
 | Open Source            | +      | -     | -     | -        | -     |
 | Free                   | +      | +/-   | +/-   | +        | +/-   |
 | Screen sharing         | +      | +     | -     | -        | -     |
+| Stream drawing         | +      | -     | -     | -        | -     |
 | Syntax highlight       | +      | -     | -     | -        | -     |
 | Unlimited history      | +      | +/-   | +     | +        | +     |
 | Audio/Video conference | +      | +     | +     | +        | -     |
 | Can run on your server | +      | -     | -     | -        | -     |
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
+| P2P messaging*         | +      | -     | -     | -        | -     |
 | Desktop client         | +      | +     | +     | +        | +/-   |
 | Mobile client          | +      | +     | +     | +        | +     |
 | GCM phone call         | -      | -     | +/-   | -        | +/-   |
 | 3rd-party integration  | -      | +     | -     | -        | -     | 
 
+None of other client use p2p for message exchange or file sharing which makes them less secure (you can verify that by opening devtools and checking chrome://webrtc-internals/). Also they lack features like drawing during the conference and screen sharing (but slack). If you don't care that your message store on another server and you could miss some features above from pychat I would personally chose clients bellow instead of pychat:
+ - Slack. But be aware it will make you pay by pushing features like unlimited history and other things in the end of the day.
+ - If slack is not an option, go with telegram/discord. But be aware that it has a lot of other users and bots that may interfere with your busines.
+ - I would never use viber/skype/whatsapp or any other messages in 2021. They have a lot of disadvantages comparing to discord/telegram/slack.
+
+If you still feel enthusiastic for bleeding-edge opensource project, try pychat with instructions bellow!
 
 ## Run test docker image
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
