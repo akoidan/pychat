@@ -82,11 +82,4 @@ export default class PainterPage extends Vue {
     .active-icon
       color: red
 
-
-  @media screen and (max-height: 600px)
-    .container /deep/ .painterTools
-      width: 80px !important
-      flex-direction: row !important
-      flex-wrap: wrap
-
 </style>

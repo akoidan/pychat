@@ -29,10 +29,14 @@
         @mic-click="micClick"
         @hang-up-call="hangUpCall"
         @video-click="videoClick"
+        @paint-click="paintClick"
         @invert-show-settings="invertShowSetings"
         @desktop-click="desktopClick"
         @enter-fullscreen="enterFullscreen"
       />
+      <div class="spainter">
+        <painter @canvas="onCanvas" v-show="callInfo.sharePaint"/>
+      </div>
     </div>
   </div>
 </template>
@@ -48,6 +52,7 @@ import {
 import { CallsInfoModel } from '@/ts/types/model';
 import {
   BooleanIdentifier,
+  ShareIdentifier,
   StringIdentifier,
   VideoType
 } from '@/ts/types/types';
@@ -58,9 +63,19 @@ import VideoObject from '@/vue/chat/VideoObject.vue';
 import InputDevicesSettings from '@/vue/chat/InputDevicesSettings.vue';
 import VideoContainer from '@/vue/chat/VideoContainer.vue';
 import CallContainerIcons from '@/vue/chat/CallContainerIcons.vue';
+import PainterPage from '@/vue/pages/PainterPage.vue';
+import Painter from '@/vue/chat/Painter.vue';
 
 @Component({
-  components: {CallContainerIcons, VideoContainer, InputDevicesSettings, VideoObject, ChatRemotePeer}
+  components: {
+    Painter,
+    PainterPage,
+    CallContainerIcons,
+    VideoContainer,
+    InputDevicesSettings,
+    VideoObject,
+    ChatRemotePeer
+  }
 })
 export default class ChatCall extends Vue {
 
@@ -79,6 +94,9 @@ export default class ChatCall extends Vue {
 
   public listener = this.fullScreenChange.bind(this);
 
+  onCanvas(canvas: HTMLCanvasElement) {
+    this.$webrtcApi.setCanvas(this.roomId, canvas);
+  }
 
   invertShowSetings() {
     this.showSettings = !this.showSettings
@@ -122,20 +140,34 @@ export default class ChatCall extends Vue {
   }
 
   public desktopClick() {
-    const payload: BooleanIdentifier = {
+    const payload: ShareIdentifier = {
       state: !this.callInfo.shareScreen,
-      id: this.roomId
+      id: this.roomId,
+      type: 'desktop'
     };
-    this.$store.setShareScreenToState(payload);
+    this.$store.setVideoToState(payload);
     if (this.callInfo.callActive) {
       this.$webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
     }
   }
 
+  public paintClick() {
+    const payload: ShareIdentifier = {
+      state: !this.callInfo.sharePaint,
+      id: this.roomId,
+      type: 'paint'
+    };
+    this.$store.setVideoToState(payload);
+    if (this.callInfo.callActive) {
+      this.$webrtcApi.toggleDevice(this.roomId, VideoType.PAINT);
+    }
+  }
+
   public videoClick() {
-    const payload: BooleanIdentifier = {
+    const payload: ShareIdentifier = {
       state: !this.callInfo.showVideo,
-      id: this.roomId
+      id: this.roomId,
+      type: 'webcam'
     };
     this.$store.setVideoToState(payload);
     if (this.callInfo.callActive) {
@@ -188,6 +220,7 @@ export default class ChatCall extends Vue {
     border-right: 7.5px solid #1a1a1a
     display: inline-block
     max-width: 100%
+    max-height: 100%
     text-align: center
 
     label
@@ -219,8 +252,32 @@ export default class ChatCall extends Vue {
       display: block
 
   .callContainerContent
-    padding: 5px
-    display: inline-block
+    padding: 0 // it should not have padding otherwise we would have scroll in painter container
+    display: flex
+    height: 100%
+    flex-direction: column
     min-width: 150px
+
+  .spainter
+    padding: 10px
+    min-height: 0
+    @media screen and (max-height: 850px)
+      /deep/ .painterTools
+        width: 60px !important
+        flex-direction: row !important
+        flex-wrap: wrap
+    @media screen and (max-height: 650px)
+        /deep/ .painterTools
+          width: 80px !important
+          flex-direction: row !important
+          flex-wrap: wrap
+
+    /deep/
+      .active-icon
+        color: red
+      > div
+        height: 100%
+      .toolsAndCanvas
+        height: 100%
 
 </style>

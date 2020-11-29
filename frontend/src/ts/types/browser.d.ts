@@ -42,6 +42,7 @@ declare class MediaRecorder {
 
 declare interface MediaStreamTrack {
   isShare: boolean;
+  isCanvas: boolean;
 }
 
 declare class MediaRecorderDataAvailableEvent {

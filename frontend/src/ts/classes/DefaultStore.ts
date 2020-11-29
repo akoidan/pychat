@@ -51,7 +51,8 @@ import {
   SetUploadProgress,
   StringIdentifier,
   LiveConnectionLocation,
-  RoomMessagesIds
+  RoomMessagesIds,
+  ShareIdentifier
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
@@ -401,10 +402,18 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setVideoToState(payload: BooleanIdentifier) {
+  public setVideoToState(payload: ShareIdentifier) {
     const ci = this.roomsDict[payload.id].callInfo;
-    ci.showVideo = payload.state;
     ci.shareScreen = false;
+    ci.sharePaint = false;
+    ci.showVideo = false;
+    if (payload.type === 'desktop') {
+      ci.shareScreen = payload.state;
+    } else if (payload.type === 'webcam') {
+      ci.showVideo = payload.state;
+    }  else if (payload.type === 'paint') {
+      ci.sharePaint = payload.state;
+    }
   }
 
   @Mutation
@@ -412,13 +421,6 @@ export class DefaultStore extends VuexModule {
     this.microphones = payload.microphones;
     this.webcams = payload.webcams;
     this.speakers = payload.speakers;
-  }
-
-  @Mutation
-  public setShareScreenToState(payload: BooleanIdentifier) {
-    const ci = this.roomsDict[payload.id].callInfo;
-    ci.shareScreen = payload.state;
-    ci.showVideo = false;
   }
 
   @Mutation

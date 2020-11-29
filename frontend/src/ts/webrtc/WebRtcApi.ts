@@ -171,6 +171,10 @@ export default class WebRtcApi extends MessageHandler {
     this.callHandlers[roomId].updateConnection();
   }
 
+  public setCanvas(roomId: number, canvas: HTMLCanvasElement) {
+    this.getCallHandler(roomId).setCanvasElement(canvas);
+  }
+
   public toggleDevice(roomId: number, videoType: VideoType) {
     this.callHandlers[roomId].toggleDevice(videoType);
   }
@@ -179,6 +183,10 @@ export default class WebRtcApi extends MessageHandler {
     for (const k in this.callHandlers) {
       this.callHandlers[k].hangCall();
     }
+    for (const k in this.messageHandlers) {
+      this.messageHandlers[k].destroyThisTransferHandler();
+    }
+
   }
 
   public offerFile(message: OfferFile): void {

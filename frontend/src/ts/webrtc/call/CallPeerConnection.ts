@@ -17,7 +17,10 @@ import {
   ConnectToRemoteMessage,
   DestroyPeerConnectionMessage
 } from '@/ts/types/messages/innerMessages';
-import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
+import {
+  DefaultWsInMessage,
+  DestroyCallConnection
+} from '@/ts/types/messages/wsInMessages';
 import {
   HandlerType,
   HandlerTypes
@@ -30,24 +33,28 @@ import {
   CallInfoModel,
   RoomModel
 } from '@/ts/types/model';
+import Subscription from '@/ts/classes/Subscription';
+import { sub } from '@/ts/instances/subInstance';
+import { stopVideo } from '@/ts/utils/htmlApi';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
 
 
   protected _connectedToRemote: boolean = false;
+
+  protected readonly handlers: HandlerTypes<keyof CallPeerConnection, 'peerConnection:*'> = {
+    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.destroy,
+    streamChanged: <HandlerType<'streamChanged', 'peerConnection:*'>>this.streamChanged,
+    connectToRemote: <HandlerType<'connectToRemote', 'peerConnection:*'>>this.connectToRemote,
+    sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
+    destroyCallConnection: <HandlerType<'destroyCallConnection', 'peerConnection:*'>>this.destroyCallConnection
+  };
+
   private audioProcessor: any;
   // ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
   private remoteStream: MediaStream|null = null;
   private localStream: MediaStream|null = null;
-  private streamTrackApi : 'stream' | 'track' = 'track';
-
-
-  protected readonly handlers: HandlerTypes<keyof CallPeerConnection, 'peerConnection:*'> = {
-    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.destroy,
-    streamChanged:  <HandlerType<'streamChanged', 'peerConnection:*'>>this.streamChanged,
-    connectToRemote:  <HandlerType<'connectToRemote', 'peerConnection:*'>>this.connectToRemote,
-    sendRtcData:  <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData
-  };
+  private readonly streamTrackApi: 'stream' | 'track' = 'track';
 
   constructor(
       roomId: number,
@@ -178,7 +185,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       //   // coz it initialized from network instead of user gesture
       //   p.catch(Utils.clickToPlay(this.dom.remote))
       // }
-      this.removeAudioProcessor();
+      removeAudioProcesssor(this.audioProcessor);
       this.audioProcessor = createMicrophoneLevelVoice(this.remoteStream!, this.processAudio.bind(this));
     } else {
       this.logger.log('onstream has been called already for this stream. So skipping this cb')()
@@ -186,9 +193,13 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
   private changeStreams(stream: MediaStream|null) {
+    let prevStream = this.localStream;
     this.localStream = stream;
     if (this.streamTrackApi === 'stream') {
       this.logger.log('Adding local stream {} to remote', getStreamLog(stream))();
+      if (prevStream) {
+        this.pc!.removeStream(prevStream);
+      }
       this.pc!.addStream(stream!);
     } else {
       this.logger.log('Rewriting tracks to remote for stream {}', getStreamLog(stream))();
@@ -252,18 +263,34 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     };
   }
 
-  public removeAudioProcessor () {
-    removeAudioProcesssor(this.audioProcessor);
-  }
-
-  public destroy(message: DestroyPeerConnectionMessage) {
+  public destroy(message: DestroyPeerConnectionMessage) { // called by transfer
     this.unsubscribeAndRemoveFromParent();
   }
 
-  public unsubscribeAndRemoveFromParent(reason?: string) {
+  destroyCallConnection(m: DestroyCallConnection) { // called by opponent devices via ws
+    this.unsubscribeAndRemoveFromParent();
+  }
+
+  public unsubscribeAndRemoveFromParent() {
+    // this seems to be redundant
+    // if (this.streamTrackApi === 'stream') {
+    //   if (this.localStream && this.pc) {
+    //     this.pc!.removeStream(this.localStream);
+    //   }
+    //   this.localStream = null;
+    // } else if (this.pc) {
+    //   const senders = this.pc!.getSenders();
+    //   for (let sender of senders) {
+    //     this.logger.debug('Remove track from sender {}', sender)();
+    //     this.pc!.removeTrack(sender);
+    //   }
+    // }
+    if (this.remoteStream) {
+      stopVideo(this.remoteStream);
+      this.remoteStream = null;
+    }
+    removeAudioProcesssor(this.audioProcessor);
     super.unsubscribeAndRemoveFromParent();
-    this.remoteStream = null;
-    this.removeAudioProcessor();
     const payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,

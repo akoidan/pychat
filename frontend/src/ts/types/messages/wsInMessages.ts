@@ -124,6 +124,10 @@ export interface ReplyCallMessage  extends ReplyWebRtc, DefaultWsInMessage<'repl
 
 }
 
+export interface DestroyCallConnection extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'destroyCallConnection', 'peerConnection:*'> {
+  content: string;
+}
+
 export interface OfferMessage extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'offerMessage', 'webrtc'> {
   content: BrowserBase;
   roomId: number;

@@ -338,9 +338,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public declineCall(connId: string) {
+  public destroyCallConnection(connId: string, content: 'decline'| 'hangup') {
     this.sendToServer({
-      content: 'decline',
+      content: content,
       action: 'destroyCallConnection',
       connId
     });

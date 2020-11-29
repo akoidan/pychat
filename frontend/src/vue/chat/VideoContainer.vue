@@ -174,6 +174,7 @@ export default class VideoContainer extends Vue {
 
   .videoContainer
     min-height: 100px
+    flex-shrink: 0
     position: relative
     width: 100%
     text-align: center

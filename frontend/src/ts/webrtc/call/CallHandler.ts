@@ -1,4 +1,3 @@
-import BaseTransferHandler from '@/ts/webrtc/BaseTransferHandler';
 import {
   browserVersion,
   isChrome,
@@ -47,12 +46,15 @@ import {
 import {
   ChangeStreamMessage,
   ConnectToRemoteMessage,
+  DestroyPeerConnectionMessage,
   RouterNavigateMessage
 } from '@/ts/types/messages/innerMessages';
 import { FileAndCallTransfer } from '@/ts/webrtc/FileAndCallTransfer';
+import { stopVideo } from '@/ts/utils/htmlApi';
 
 
 export default class CallHandler extends FileAndCallTransfer {
+  private canvas: HTMLCanvasElement|null = null;
 
   private get callInfo(): CallsInfoModel {
     return this.store.roomsDict[this.roomId].callInfo;
@@ -144,8 +146,9 @@ export default class CallHandler extends FileAndCallTransfer {
     // and browsers like safari won't let capture userMedia w/o existing user gesture
     let micPromise = this.captureMic();
     let shareScreenPromise = this.captureScreenShare();
+    let painterPromise = this.capturePainterShare();
     // end
-    let streams: (MediaStream|null)[] = await Promise.all([micPromise, shareScreenPromise]);
+    let streams: (MediaStream|null)[] = await Promise.all([micPromise, shareScreenPromise, painterPromise]);
     let stream = this.combineStreams(...streams)
     return stream;
   }
@@ -174,6 +177,10 @@ export default class CallHandler extends FileAndCallTransfer {
     };
   }
 
+  setCanvasElement(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
+  }
+
   public async toggleDevice(videoType: VideoType) {
     const track = this.getTrack(videoType);
     if (track && track.readyState === 'live') {
@@ -185,6 +192,8 @@ export default class CallHandler extends FileAndCallTransfer {
         state = this.callInfo.shareScreen;
       } else if (videoType === VideoType.VIDEO) {
         state = this.callInfo.showVideo;
+      } else if (videoType === VideoType.PAINT) {
+        state = this.callInfo.sharePaint;
       }
       track.enabled = state;
     } else {
@@ -215,11 +224,11 @@ export default class CallHandler extends FileAndCallTransfer {
     // }
   }
 
-  public getTrack(kind: VideoType) {
+  public getTrack(kind: VideoType) { // TODO
     let track = null;
     let tracks = [];
     if (this.localStream) {
-      if (kind === VideoType.VIDEO || kind === VideoType.SHARE) {
+      if (kind === VideoType.VIDEO || kind === VideoType.SHARE || kind === VideoType.PAINT) {
         tracks = this.localStream.getVideoTracks();
       } else if (kind === VideoType.AUDIO) {
         tracks = this.localStream.getAudioTracks();
@@ -228,9 +237,12 @@ export default class CallHandler extends FileAndCallTransfer {
       }
       if (tracks.length > 0) {
         const isShare = tracks[0].isShare;
+        const isCanvas = tracks[0].isCanvas;
         if (isShare && kind === VideoType.SHARE) {
           track = tracks[0];
-        } else if (!isShare && kind === VideoType.VIDEO) {
+        }  if (isCanvas && kind === VideoType.PAINT) {
+          track = tracks[0];
+        }  else if (!isShare && !isCanvas && kind === VideoType.VIDEO) {
           track = tracks[0];
         } else if (kind === VideoType.AUDIO) {
           track = tracks[0];
@@ -329,19 +341,24 @@ export default class CallHandler extends FileAndCallTransfer {
   }
 
   public async doAnswer(withVideo: boolean) {
-    const trueBoolean: BooleanIdentifier = {
-      state: true,
-      id: this.roomId
-    };
-    const falseBoolean: BooleanIdentifier = {
-      state: false,
-      id: this.roomId
-    };
     this.store.setIncomingCall(null);
-    this.store.setCallActiveToState(trueBoolean);
-    this.store.setContainerToState(trueBoolean);
-    this.store.setVideoToState(withVideo ? trueBoolean : falseBoolean);
-    this.store.setMicToState(trueBoolean);
+    this.store.setCallActiveToState({
+      id: this.roomId,
+      state: true
+    });
+    this.store.setContainerToState({
+      id: this.roomId,
+      state: true
+    });
+    this.store.setVideoToState({
+      type: 'webcam',
+      id: this.roomId,
+      state: withVideo
+    });
+    this.store.setMicToState({
+      id: this.roomId,
+      state: true
+    });
     this.setCallStatus('accepted');
     const stream = await this.captureInput();
     this.attachLocalStream(stream);
@@ -374,7 +391,7 @@ export default class CallHandler extends FileAndCallTransfer {
 
   public stopLocalStream() {
     this.destroyAudioProcessor();
-    this.destroyStreamData(this.localStream);
+    stopVideo(this.localStream);
   }
 
   public onDestroy() {
@@ -394,15 +411,29 @@ export default class CallHandler extends FileAndCallTransfer {
 
   public declineCall() {
     this.store.setIncomingCall(null);
-    this.wsHandler.declineCall(this.connectionId!);
+    this.wsHandler.destroyCallConnection(this.connectionId!, 'decline');
     this.onDestroy();
   }
 
   public hangCall() {
     this.logger.debug('on hangCall called')();
+    if (this.connectionId) {
+      this.wsHandler.destroyCallConnection(this.connectionId!, 'hangup');
+    } else {
+      this.logger.warn('Current call doesnt have conenctionId yet, skipping hangup')();
+    }
     const hadConnections = this.connectionId && sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId!)) > 0;
     if (hadConnections) {
-      this.closeAllPeerConnections();
+      if (!this.connectionId) {
+        this.logger.error(`Can't close connections since it's null`)();
+        return;
+      }
+      let message: DestroyPeerConnectionMessage = {
+        action: 'destroy',
+        handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+        allowZeroSubscribers: true
+      };
+      sub.notify(message);
     } else {
       this.onDestroy();
     }
@@ -460,6 +491,25 @@ export default class CallHandler extends FileAndCallTransfer {
       }
     }
     return stream;
+  }
+
+  private async capturePainterShare(): Promise<MediaStream|null> {
+    if (this.callInfo.sharePaint) {
+      // TODO install definitely type
+      // @ts-expect-error
+      if (!this.canvas.captureStream) {
+        throw Error('Current browser doesn\'t support canvas stream');
+      }
+      // @ts-expect-error
+      let stream = this.canvas.captureStream();
+      const tracks: any[] = stream.getVideoTracks();
+      if (!(tracks && tracks.length > 0)) {
+        throw Error('No video tracks from captured from canvas');
+      }
+      tracks[0].isCanvas = true;
+      return stream;
+    }
+    return null;
   }
 
   private async captureScreenShare(): Promise<MediaStream|null> {
@@ -524,18 +574,9 @@ export default class CallHandler extends FileAndCallTransfer {
       what.push('screenshare');
     }
     const message = `<span>Failed to capture ${what.join(', ')} source</span>, because ${extractError(e)}`;
-    this.destroyStreamData(endStream);
+    stopVideo(endStream);
     this.store.growlErrorRaw(message);
     this.logger.error('onFailedCaptureSource {}', e)();
-  }
-
-  private destroyStreamData(endStream: MediaStream|null) {
-    if (endStream) {
-      const tracks: MediaStreamTrack[] = endStream.getTracks();
-      if (tracks) {
-        tracks.forEach(e => e.stop());
-      }
-    }
   }
 
   private attachLocalStream(stream: MediaStream|null) {

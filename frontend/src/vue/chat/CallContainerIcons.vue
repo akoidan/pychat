@@ -23,19 +23,21 @@
         @click="desktopClick"
       />
       <i
+        class="icon-brush"
+        :class="callInfo.sharePaint ? 'activeIcon' : 'noactiveIcon'"
+        title="Share painter canvas"
+        @click="paintClick"
+      />
+      <i
         class="icon-cog"
         @click="invertShowSettings"
       />
-      <div
+      <i
         v-show="callInfo.callActive"
-        class="enterFullScreenHolder"
+        class="icon-webrtc-fullscreen"
         @click="enterFullscreen"
-      >
-        <i
-          class="icon-webrtc-fullscreen"
-          title="Fullscreen"
-        />
-      </div>
+        title="Fullscreen"
+      />
       <div
         v-show="callInfo.callActive"
         class="hangUpHolder"
@@ -72,6 +74,7 @@ export default class CallContainerIcons extends Vue {
   @Emit() desktopClick() {}
   @Emit() invertShowSettings() {}
   @Emit() enterFullscreen() {}
+  @Emit() paintClick() {}
 
   get videoTitle() {
     return `Turn ${this.callInfo.showVideo ? 'off' : 'on'} your webcam`;
@@ -103,16 +106,11 @@ export default class CallContainerIcons extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
   @import "~@/assets/sass/partials/mixins.sass"
-  .enterFullScreenHolder
-    position: relative
-    display: inline
-    margin-left: 20px
-    padding-left: 5px
+
   .icon-webrtc-fullscreen
-    position: absolute
-    left: -30px
-    font-size: 40px
-    top: -10px
+    padding-top: 1px
+    margin-bottom: -1px
+    transform: scale(2)
 
   .callContainerIcons
     display: flex
@@ -124,7 +122,10 @@ export default class CallContainerIcons extends Vue {
 
     .callContainerIconsInner
       display: flex
+      margin: auto
       justify-content: space-between
+      > *
+        margin: 0 5px
 
     .hangUpHolder
       display: inline-block

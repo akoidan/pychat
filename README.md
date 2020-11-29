@@ -40,7 +40,7 @@ This is free web (browser) chat, that features:
  - Making calls and video conference using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
  - Sharing screen during call or conference
  - Sending files directly to another PC (p2p) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
- - Editing images with [integrated painter](https://github.com/akoidan/spainter)
+ - Drawing images and stream drawing during video calls with [spainter](https://github.com/akoidan/spainter)
  - Login in with facebook/google oauth.
  - Sending offline messages with Firebase push notifications
  - Responsive interface (bs like)+ themes
@@ -382,6 +382,8 @@ The string `rsok33GN:0005:EJAd` describes:
  - `0005` is Id of user
  - `EJAd` id of connection (`TornadoHandler.id`)
  
+TO see current connections and their info check chrome://webrtc-internals/
+ 
 ## Frontend Stack
 The technologies stack used in project:
 - Typescript
@@ -461,7 +463,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
-* FB login doesn't return email refactor for google_id and fb_id in user_profile . It only returns email for me
+* https://webrtc.github.io/samples/src/content/getusermedia/resolution/
 * when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
 * if users joins a room that already has call in progress, he should be able to join this call
 * create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module

@@ -341,8 +341,7 @@ export function stopVideo(stream: MediaStream | null) {
     if (stream.stop) {
       stream.stop();
     } else {
-      stream.getVideoTracks().forEach(e => e.stop());
-      stream.getAudioTracks().forEach(e => e.stop());
+      stream.getTracks().forEach(e => e.stop());
     }
   }
 }
