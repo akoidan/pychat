@@ -51,7 +51,8 @@ import {
   SetUploadProgress,
   StringIdentifier,
   LiveConnectionLocation,
-  RoomMessagesIds
+  RoomMessagesIds,
+  ShareIdentifier
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
@@ -65,7 +66,6 @@ import {
   Mutation,
   VuexModule
 } from 'vuex-module-decorators';
-import { AddRoomMessage } from '@/ts/types/messages/wsInMessages';
 
 const logger = loggerFactory.getLogger('store');
 
@@ -265,6 +265,18 @@ export class DefaultStore extends VuexModule {
     }
   }
 
+  get activeRoomOnline(): string[] {
+    let online: string[] = [];
+    if (this.activeRoom) {
+      this.activeRoom.users.forEach(u => {
+        if (this.onlineDict[u]) {
+          online.push(...this.onlineDict[u]);
+        }
+      });
+    }
+    return online;
+  }
+
   get activeUser(): UserModel | null {
     return this.activeUserId ? this.allUsersDict[this.activeUserId] : null;
   }
@@ -401,10 +413,18 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setVideoToState(payload: BooleanIdentifier) {
+  public setVideoToState(payload: ShareIdentifier) {
     const ci = this.roomsDict[payload.id].callInfo;
-    ci.showVideo = payload.state;
     ci.shareScreen = false;
+    ci.sharePaint = false;
+    ci.showVideo = false;
+    if (payload.type === 'desktop') {
+      ci.shareScreen = payload.state;
+    } else if (payload.type === 'webcam') {
+      ci.showVideo = payload.state;
+    }  else if (payload.type === 'paint') {
+      ci.sharePaint = payload.state;
+    }
   }
 
   @Mutation
@@ -412,13 +432,6 @@ export class DefaultStore extends VuexModule {
     this.microphones = payload.microphones;
     this.webcams = payload.webcams;
     this.speakers = payload.speakers;
-  }
-
-  @Mutation
-  public setShareScreenToState(payload: BooleanIdentifier) {
-    const ci = this.roomsDict[payload.id].callInfo;
-    ci.shareScreen = payload.state;
-    ci.showVideo = false;
   }
 
   @Mutation

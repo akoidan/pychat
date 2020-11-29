@@ -341,8 +341,7 @@ export function stopVideo(stream: MediaStream | null) {
     if (stream.stop) {
       stream.stop();
     } else {
-      stream.getVideoTracks().forEach(e => e.stop());
-      stream.getAudioTracks().forEach(e => e.stop());
+      stream.getTracks().forEach(e => e.stop());
     }
   }
 }
@@ -449,7 +448,6 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
   const files: Record<string, FileModel>| null = {}; // return array from nodeList
   const images = userMessage.querySelectorAll(`.${PASTED_IMG_CLASS}`);
   forEach(images, img => {
-    debugger
     let oldSymbol = img.getAttribute('symbol');
     let src = img.getAttribute('src');
     const assVideo = img.getAttribute('associatedVideo') ?? null;

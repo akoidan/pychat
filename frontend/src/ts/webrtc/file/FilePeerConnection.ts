@@ -1,7 +1,4 @@
 import AbstractPeerConnection from '@/ts/webrtc/AbstractPeerConnection';
-import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
-import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
-import { DestroyPeerConnectionMessage } from "@/ts/types/messages/innerMessages";
 
 export default abstract class FilePeerConnection extends AbstractPeerConnection {
 
@@ -12,25 +9,10 @@ export default abstract class FilePeerConnection extends AbstractPeerConnection 
     if (this.pc!.iceConnectionState === 'disconnected' ||
         this.pc!.iceConnectionState === 'failed' ||
         this.pc!.iceConnectionState === 'closed') {
-      this.closeEvents('Connection has been lost');
+      this.commitErrorIntoStore('Connection has been lost', true);
+      // do not destroy peer connection here, opponent may want to retry
     }
   }
 
-  public destroy(message: DestroyPeerConnectionMessage) {
-    this.closeEvents()
-  }
-
-  public closeEvents (text?: string) {
-    if (text) {
-      this.ondatachannelclose(<string>text); // TODO
-    }
-    this.logger.error('Closing event from {}', text)();
-    this.closePeerConnection();
-    if (this.sendChannel && this.sendChannel.readyState !== 'closed') {
-      this.logger.log('Closing chanel')();
-      this.sendChannel.close();
-    } else {
-      this.logger.log('No channels to close')();
-    }
-  }
+  public abstract commitErrorIntoStore(error: string, onlyIfNotFinished: boolean): void;
 }

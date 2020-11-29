@@ -38,21 +38,6 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     }
   }
 
-  protected closeAllPeerConnections() { // calls on destroy
-    if (!this.connectionId) {
-      this.logger.error(`Can't close connections since it's null`)();
-      return;
-    }
-    let message: DestroyPeerConnectionMessage = {
-      action: 'destroy',
-      handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
-      allowZeroSubscribers: true // TODO this is weird that this connection is desrtoyed already, should nto be destroyed twice
-      // applying hotfix , this should be fixed in another way
-      // Can't handle message  {action: "destroy", handler: "peerConnection:fzELFAhC:0001:AVmb"}  because no channels found, available channels
-    };
-    sub.notify(message);
-  }
-
   protected setConnectionId(connId: string|null) {
     this.connectionId = connId;
     if (connId != null) {

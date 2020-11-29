@@ -11,11 +11,7 @@
       </tr>
       <tr>
         <th>Status:</th>
-        <td>{{ status }}</td>
-      </tr>
-      <tr v-if="receivingFile.error">
-        <th>Error:</th>
-        <td>{{ receivingFile.error }}</td>
+        <td :class="cls">{{ status }}</td>
       </tr>
       <tr v-if="receivingFile.anchor">
         <th>Download:</th>
@@ -67,10 +63,17 @@ export default class ReceivingFileInfo extends Vue {
     this.$webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
 
+  get cls() {
+    return {
+      success: FileTransferStatus.FINISHED === this.receivingFile.status,
+      error: FileTransferStatus.ERROR === this.receivingFile.status
+    };
+  }
+
   get status(): string {
     switch (this.receivingFile.status) {
       case FileTransferStatus.ERROR:
-        return 'Error';
+        return this.receivingFile.error!;
       case FileTransferStatus.IN_PROGRESS:
         return 'Downloading...';
       case FileTransferStatus.DECLINED_BY_OPPONENT:
@@ -88,6 +91,10 @@ export default class ReceivingFileInfo extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
+  .error
+    color: red
+  .success
+    color: #3eb22b
   table
     width: 100%
     text-align: left

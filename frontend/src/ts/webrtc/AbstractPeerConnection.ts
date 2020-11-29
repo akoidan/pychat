@@ -25,7 +25,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly connectionId: string;
   protected logger: Logger;
   protected pc: RTCPeerConnection | null = null;
-  protected connectionStatus: ConnectionStatus = 'new';
   protected webRtcUrl = WEBRTC_STUNT_URL;
   protected sdpConstraints: any;
   protected readonly wsHandler: WsHandler;
@@ -65,29 +64,29 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     return Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId);
   }
 
-  public setConnectionStatus(newStatus: ConnectionStatus) {
-    this.connectionStatus = newStatus;
-    this.logger.log('Setting connection status to {}', newStatus)();
-  }
-
-  public getConnectionStatus() {
-    return this.connectionStatus;
-  }
-
-  public unsubscribeAndRemoveFromParent(reason?: string) {
-    this.logger.log('Destroying {}, because {}', this.constructor.name, reason)();
+  public unsubscribeAndRemoveFromParent() {
+    this.logger.log('Destroying {}', this.constructor.name)();
+    if (this.sendChannel && this.sendChannel.readyState !== 'closed') {
+      this.logger.log('Closing channel from state {}', this.sendChannel.readyState)();
+      this.sendChannel.close();
+    } else {
+      this.logger.log('No channels to close')();
+    }
+    if (this.pc && this.pc.signalingState !== 'closed') {
+      this.logger.log('Closing peer connection')();
+      this.pc.close();
+      this.pc = null;
+    } else {
+      this.logger.log('No peer connection to close')();
+    }
     sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
     sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
-    const message: CheckTransferDestroy = {
+    const message: CheckTransferDestroy = { // Destroy parent TransferHandler
       handler: Subscription.getTransferId(this.connectionId),
       action: 'checkTransferDestroy',
-      allowZeroSubscribers: true,
+      allowZeroSubscribers: true
     };
     sub.notify(message);
-  }
-
-  public print(message: string) {
-    this.logger.log('Call message {}', message)();
   }
 
   public createPeerConnection(arg?: ConnectToRemoteMessage) {
@@ -111,18 +110,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   public abstract oniceconnectionstatechange(): void;
-
-  public abstract ondatachannelclose(text: string): void;
-
-  public closePeerConnection(text?: string) {
-    this.setConnectionStatus('closed');
-    if (this.pc && this.pc.signalingState !== 'closed') {
-      this.logger.log('Closing peer connection')();
-      this.pc.close();
-    } else {
-      this.logger.log('No peer connection to close')();
-    }
-  }
 
   public sendWebRtcEvent(message: RTCSessionDescriptionInit| RTCIceCandidate) {
     this.wsHandler.sendRtcData(message, this.connectionId, this.opponentWsId);

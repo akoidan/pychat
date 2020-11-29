@@ -200,6 +200,7 @@ export interface CallsInfoModel {
   currentWebcam: string|null;
   showVideo: boolean;
   shareScreen: boolean;
+  sharePaint: boolean;
   callActive: boolean;
 }
 

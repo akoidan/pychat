@@ -2,7 +2,10 @@ import {
   SetReceivingFileStatus,
   SetReceivingFileUploaded
 } from '@/ts/types/types';
-import { FileTransferStatus } from '@/ts/types/model';
+import {
+  FileTransferStatus,
+  ReceivingFile
+} from '@/ts/types/model';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { requestFileSystem } from '@/ts/utils/htmlApi';
@@ -70,31 +73,17 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     try {
       await this.initFileSystemApi();
     } catch (e) {
+      this.logger.error('Error initing fs {}', e);
         if (this.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
           const content = `Browser doesn't support accepting file sizes over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}`;
           this.wsHandler.destroyFileConnection(this.connectionId, content);
+          this.commitErrorIntoStore(content);
           this.unsubscribeAndRemoveFromParent();
           throw e;
         }
     }
+    this.commitErrorIntoStore('Establishing connection...');
     this.waitForAnswer();
-    const rf: SetReceivingFileStatus = {
-      roomId: this.roomId,
-      connId: this.connectionId,
-      error: 'Establishing connection...',
-      status: FileTransferStatus.ERROR
-    };
-    this.store.setReceivingFileStatus(rf);
-  }
-
-  public ondatachannelclose(text: string): void {
-    const rf: SetReceivingFileStatus = {
-      roomId: this.roomId,
-      connId: this.connectionId,
-      status: FileTransferStatus.ERROR,
-      error: text
-    };
-    this.store.setReceivingFileStatus(rf);
   }
 
   protected onChannelMessage(event: MessageEvent) {
@@ -210,7 +199,6 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
         roomId: this.roomId
       };
       this.store.setReceivingFileStatus(payload);
-      this.closeEvents();
       this.unsubscribeAndRemoveFromParent();
     }
   }
@@ -245,6 +233,23 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.createPeerConnection();
     this.pc!.ondatachannel = this.gotReceiveChannel.bind(this);
     this.wsHandler.acceptFile(this.connectionId, this.receivedSize);
+  }
+
+  get receivingFile() : ReceivingFile {
+    return this.store.roomsDict[this.roomId].receivingFiles[this.connectionId];
+  }
+
+  commitErrorIntoStore(error: string, onlyIfNotFinished: boolean = false): void {
+    if (onlyIfNotFinished && this.receivingFile.status === FileTransferStatus.FINISHED) {
+      return
+    }
+    const ssfs: SetReceivingFileStatus = {
+      status: FileTransferStatus.ERROR,
+      roomId: this.roomId,
+      error,
+      connId: this.connectionId
+    };
+    this.store.setReceivingFileStatus(ssfs);
   }
 
 }

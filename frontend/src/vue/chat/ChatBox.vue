@@ -8,7 +8,7 @@
     <div
       ref="chatbox"
       class="chatbox"
-      :class="{'display-search-only': room.search.searchActive}"
+      :class="{'display-search-only': room.search.searchActive, 'hidden': room.callInfo.callContainer && room.callInfo.sharePaint}"
       tabindex="1"
       @keydown="keyDownLoadUp"
       @mousewheel="onScroll"
@@ -262,6 +262,8 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
     font-size: 18px
     @include flex(1) // Fix Safari's 0 height
 
+    &.hidden
+      display: none
     &:focus
       outline: none
 

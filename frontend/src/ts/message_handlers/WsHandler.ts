@@ -63,8 +63,10 @@ enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
 }
 
-export default class WsHandler extends MessageHandler implements MessageSupplier{
-  public timeDiff: number = 0;
+export default class WsHandler extends MessageHandler implements MessageSupplier {
+  // how much current time is ahead of the server time
+  // if current time is in the past it will be negative
+  private timeDiffWithServer: number = 0;
 
   protected readonly logger: Logger;
 
@@ -336,9 +338,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public declineCall(connId: string) {
+  public destroyCallConnection(connId: string, content: 'decline'| 'hangup') {
     this.sendToServer({
-      content: 'decline',
+      content: content,
       action: 'destroyCallConnection',
       connId
     });
@@ -374,12 +376,16 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.setUserImage(m.content);
   }
 
+  public convertServerTimeToPC(serverTime: number) {
+    return serverTime + this.timeDiffWithServer; // serverTime + (Date.now - serverTime) === Date.now
+  }
+
   public setWsId(message: SetWsIdMessage) {
     this.wsConnectionId = message.opponentWsId;
     this.setUserInfo(message.userInfo);
     this.setUserSettings(message.userSettings);
     this.setUserImage(message.userImage);
-    this.setTime(message.time);
+    this.timeDiffWithServer = Date.now() - message.time;
     const pubSetRooms: PubSetRooms = {
       action: 'init',
       channels: message.channels,
@@ -471,9 +477,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   // }
 
   private setStatus(isOnline: boolean) {
-    if (this.store.isOnline !== isOnline) {
-      this.store.setIsOnline(isOnline);
-    }
+    this.store.setIsOnline(isOnline);
+    this.logger.debug('Setting online to {}', isOnline)();
   }
 
   private close() {
@@ -579,10 +584,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
         this.logger.error('Force closing socket coz server didn\'t ping us')();
         this.ws.close(1000, 'Sever didn\'t ping us');
       }
-    },                                    CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
-  }
-
-  private setTime(time: number) {
-    this.timeDiff = Date.now() - time;
+    }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
   }
 }

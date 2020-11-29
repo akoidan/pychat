@@ -35,13 +35,13 @@
       <span class="mText">Statistics</span>
     </router-link>
     <i
-      v-if="$route.name === 'chat'"
+      v-if="showCallIcon"
       class="icon-phone"
       title="Make a video/mic call"
       @click="toggleContainer(activeRoom.id)"
     ><span class="mText">Call</span></i>
     <i
-      v-if="activeRoom && $route.name === 'chat'"
+      v-if="showSearchIcon"
       class="icon-search"
       title="Search messages in current room (Shift+Ctrl+F)"
       @click="invertSearch"
@@ -50,7 +50,7 @@
     >Search</span>
     </i>
     <i
-      v-if="$route.name === 'chat'"
+      v-if="$route.name === 'chat' && activeRoomOnline.length > 1"
       class="icon-doc-inv"
       @click="sendFileClick"
     >
@@ -119,6 +119,9 @@ export default class AppNav extends Vue {
   @State
   public readonly activeRoom!: RoomModel;
 
+  @State
+  public readonly activeRoomOnline!: string[];
+
   @Ref()
   public inputFile!: HTMLInputElement;
 
@@ -137,6 +140,15 @@ export default class AppNav extends Vue {
     }
   }
 
+  private get showCallIcon() {
+    let callShouldShown = this.activeRoomOnline.length > 1 || this.activeRoom?.callInfo?.callActive;
+    return this.$route.name === 'chat' && callShouldShown;
+  }
+
+  private get showSearchIcon() {
+   return this.activeRoom && this.$route.name === 'chat' && !this.activeRoom.p2p;
+  }
+
   public expanded: boolean = false;
 
   public toggleContainer(roomd: number) {
@@ -149,7 +161,7 @@ export default class AppNav extends Vue {
   }
 
   public sendFile(event: FileList) {
-    this.$webrtcApi.offerFile(this.inputFile.files![0], this.activeRoom.id);
+    this.$webrtcApi.sendFileOffer(this.inputFile.files![0], this.activeRoom.id);
   }
 
   public invertSearch() {

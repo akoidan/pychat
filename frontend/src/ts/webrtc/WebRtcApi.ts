@@ -22,7 +22,8 @@ import { bytesToSize } from '@/ts/utils/pureFunctions';
 import {
   OfferCall,
   OfferFile,
-  OfferMessage
+  OfferMessage,
+  WebRtcSetConnectionIdMessage
 } from '@/ts/types/messages/wsInMessages';
 import {
   HandlerName,
@@ -31,7 +32,7 @@ import {
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { VideoType } from '@/ts/types/types';
 import {
-  ChangeDevicesMessage,
+  ChangeP2pRoomInfoMessage,
   InternetAppearMessage,
   LogoutMessage
 } from '@/ts/types/messages/innerMessages';
@@ -42,7 +43,7 @@ export default class WebRtcApi extends MessageHandler {
   protected logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WebRtcApi, 'webrtc'>  = {
-    offerFile: <HandlerType<'offerFile', 'webrtc'>>this.onofferFile,
+    offerFile: <HandlerType<'offerFile', 'webrtc'>>this.offerFile,
     changeDevices: <HandlerType<'changeDevices', 'webrtc'>>this.changeDevices,
     offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
     offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
@@ -71,7 +72,7 @@ export default class WebRtcApi extends MessageHandler {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
-  public async changeDevices(m: ChangeDevicesMessage): Promise<void> {
+  public async changeDevices(m: ChangeP2pRoomInfoMessage): Promise<void> {
     this.logger.log('change devices {}', m)();
     if (m.changeType === 'i_deleted') { // destroy my room
       let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
@@ -106,7 +107,6 @@ export default class WebRtcApi extends MessageHandler {
 
   public acceptFile(connId: string, webRtcOpponentId: string) {
     sub.notify({action: 'acceptFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
-
   }
 
   public declineSending(connId: string, webRtcOpponentId: string) {
@@ -117,10 +117,10 @@ export default class WebRtcApi extends MessageHandler {
     sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
-  public async offerFile(file: File, channel: number) {
+  public async sendFileOffer(file: File, channel: number) {
     if (file.size > 0) {
-      const e = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
-      new FileHandler(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
+      const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
+      new FileHandler(channel, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }
@@ -171,6 +171,10 @@ export default class WebRtcApi extends MessageHandler {
     this.callHandlers[roomId].updateConnection();
   }
 
+  public setCanvas(roomId: number, canvas: HTMLCanvasElement) {
+    this.getCallHandler(roomId).setCanvasElement(canvas);
+  }
+
   public toggleDevice(roomId: number, videoType: VideoType) {
     this.callHandlers[roomId].toggleDevice(videoType);
   }
@@ -179,9 +183,13 @@ export default class WebRtcApi extends MessageHandler {
     for (const k in this.callHandlers) {
       this.callHandlers[k].hangCall();
     }
+    for (const k in this.messageHandlers) {
+      this.messageHandlers[k].destroyThisTransferHandler();
+    }
+
   }
 
-  private onofferFile(message: OfferFile): void {
+  public offerFile(message: OfferFile): void {
     const limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     const payload: ReceivingFile = {
       roomId: message.roomId,
@@ -192,7 +200,7 @@ export default class WebRtcApi extends MessageHandler {
       error: limitExceeded ? `Your browser doesn't support receiving files over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}` : null,
       connId: message.connId,
       fileName: message.content.name,
-      time: message.time,
+      time: this.wsHandler.convertServerTimeToPC(message.time),
       upload: {
         uploaded: 0,
         total: message.content.size

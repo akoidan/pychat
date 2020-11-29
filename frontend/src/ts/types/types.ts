@@ -55,7 +55,7 @@ export interface MessageDataEncode {
 }
 
 export enum VideoType {
-  AUDIO, VIDEO, SHARE
+  AUDIO, VIDEO, SHARE, PAINT
 }
 
 export interface SetDevices {
@@ -112,6 +112,12 @@ export interface SetOpponentAnchor {
 
 export interface BooleanIdentifier {
   id: number;
+  state: boolean;
+}
+
+export interface ShareIdentifier {
+  id: number;
+  type: 'webcam' | 'desktop'| 'paint';
   state: boolean;
 }
 

@@ -17,7 +17,7 @@ import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
 import { MessageModelDto } from '@/ts/types/dto';
 import {
-  ChangeDevicesMessage,
+  ChangeP2pRoomInfoMessage,
   InternetAppearMessage,
   SyncP2PMessage
 } from '@/ts/types/messages/innerMessages';
