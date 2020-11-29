@@ -259,7 +259,14 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         opponentWsId: this.opponentWsId,
         roomId: this.roomId
       };
-      this.store.setOpponentVoice(payload);
+      try { // EAFP: Easier to ask for forgiveness than permission.
+        this.store.setOpponentVoice(payload); // if call is deleted long ago but audioProcess stil exists
+        // TODO find the spot that produces this situation and fix it there
+      } catch (e) {
+        this.logger.error('Error during setting opponent\'s voice {}', e)()
+        removeAudioProcesssor(this.audioProcessor);
+      }
+
     };
   }
 
