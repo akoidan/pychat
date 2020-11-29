@@ -24,7 +24,7 @@ export const browserVersion: string = (function () {
   return M.join(' ');
 })() + (isMobile ? ' mobile' : '');
 export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
-export const WEBRTC_STUNT_URL = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
+export const WEBRTC_STUNT_URL = 'stun:stun.l.google.com:19302';
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
 const BACKEND_CURRENT_ADDRESS = BACKEND_ADDRESS.replace('{}', window.location.hostname)
 export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/ws`;
