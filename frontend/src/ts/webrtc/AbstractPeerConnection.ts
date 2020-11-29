@@ -10,7 +10,6 @@ import {
   ConnectionStatus,
 } from '@/ts/types/types';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
 import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   ConnectToRemoteMessage,
@@ -25,24 +24,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly connectionId: string;
   protected logger: Logger;
   protected pc: RTCPeerConnection | null = null;
-  protected webRtcUrl = WEBRTC_STUNT_URL;
   protected sdpConstraints: any;
   protected readonly wsHandler: WsHandler;
   protected readonly store: DefaultStore;
   protected readonly roomId: number;
   protected sendChannel: RTCDataChannel | null = null;
 
-  private readonly pc_config = {
-    iceServers: [{
-      urls: this.webRtcUrl
-    }]
-  };
-  private readonly pc_constraints: unknown = {
-    optional: [/*Firefox*/
-      /*{DtlsSrtpKeyAgreement: true},*/
-      {RtpDataChannels: false /*true*/}
-    ]
-  };
 
   constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore) {
     super();
@@ -95,7 +82,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       throw Error('Your browser doesn\'t support RTCPeerConnection');
     }
 
-    this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
+    this.pc = new (<any>RTCPeerConnection)({});
     this.pc!.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc!.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
       this.logger.debug('Got ice candidate {}', event.candidate)();
