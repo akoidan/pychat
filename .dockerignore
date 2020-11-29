@@ -6,6 +6,7 @@
 !backend/chat
 !backend/templates
 !frontend/src
+!frontend/patches
 !frontend/package.json
 !frontend/tsconfig.json
 !frontend/DefaultSmilies.cfpack

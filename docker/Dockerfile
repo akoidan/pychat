@@ -123,7 +123,7 @@ RUN set -x && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
     ln -sf /data/migrations ./backend/chat &&\
     cd frontend &&\
-    yarn install
+    yarn install --frozen-lockfile
 
 VOLUME [ "/sys/fs/cgroup" ]
 
