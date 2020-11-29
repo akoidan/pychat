@@ -6,17 +6,14 @@ import { bytesToSize } from '@/ts/utils/pureFunctions';
 import { sub } from '@/ts/instances/subInstance';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import Subscription from '@/ts/classes/Subscription';
-import {
-  ConnectionStatus,
-} from '@/ts/types/types';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
 import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
-  ConnectToRemoteMessage,
   CheckTransferDestroy,
+  ConnectToRemoteMessage,
 } from '@/ts/types/messages/innerMessages';
 import { SendRtcDataMessage } from '@/ts/types/messages/wsInMessages';
+import { WEBRTC_STUNT_URL } from '@/ts/utils/consts';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -25,7 +22,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly connectionId: string;
   protected logger: Logger;
   protected pc: RTCPeerConnection | null = null;
-  protected webRtcUrl = WEBRTC_STUNT_URL;
   protected sdpConstraints: any;
   protected readonly wsHandler: WsHandler;
   protected readonly store: DefaultStore;
@@ -34,7 +30,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   private readonly pc_config = {
     iceServers: [{
-      urls: this.webRtcUrl
+      urls: [WEBRTC_STUNT_URL]
     }]
   };
   private readonly pc_constraints: unknown = {
@@ -90,7 +86,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   public createPeerConnection(arg?: ConnectToRemoteMessage) {
-    this.logger.log('Creating RTCPeerConnection')();
+    this.logger.log('Creating RTCPeerConnection with config {} {}', this.pc_config, this.pc_constraints)();
     if (!window.RTCPeerConnection) {
       throw Error('Your browser doesn\'t support RTCPeerConnection');
     }
