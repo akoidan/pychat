@@ -317,17 +317,22 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     public onImagePaste(evt: ClipboardEvent) {
-      if (evt.clipboardData && evt.clipboardData.files && evt.clipboardData.files.length) {
+      let preventDefault = false;
+      if (evt.clipboardData?.files?.length) {
         this.$logger.debug('Clipboard has {} files', evt.clipboardData!.files.length)();
         for (let i = 0; i < evt.clipboardData!.files.length; i++) {
           const file = evt.clipboardData!.files[i];
           this.$logger.debug('loop {}', file)();
           if (file.type.indexOf('image') >= 0) {
+            preventDefault = true;
             pasteImgToTextArea(file, this.userMessage, (err: string) => {
               this.$store.growlError(err);
             });
           }
         }
+      }
+      if (preventDefault) {
+        evt.preventDefault();
       }
     }
 

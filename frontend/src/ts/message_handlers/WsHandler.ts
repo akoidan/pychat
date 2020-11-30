@@ -481,15 +481,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.logger.debug('Setting online to {}', isOnline)();
   }
 
-  private close() {
-    if (this.ws) {
-      this.ws.onclose = null;
-      this.ws.close();
-    }
-  }
-
 
   private onWsClose(e: CloseEvent) {
+    this.logger.log('Got onclose event')();
     this.ws = null;
     this.setStatus(false);
     // tornado drops connection if exception occurs during processing an event we send from WsHandler
