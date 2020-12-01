@@ -282,23 +282,26 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     public async addImage() {
-      if (window.showOpenFilePicker) {
-        let filesHandles: FileSystemFileHandle[] = await window.showOpenFilePicker({
-          multiple: true,
-          types: [
-            {
-              description: 'Images',
-              accept: {
-                'image/*': ['.png', '.gif', '.jpeg', '.jpg']
-              }
-            }
-          ]
-        })
-        let files = await Promise.all(filesHandles.map(a => a.getFile()))
-        this.pasteFilesToTextArea(files);
-      } else {
+      // TODO seems like filePicker has limited about of time which file lives.
+      //  Sometimes it errors `net::ERR_FILE_NOT_FOUND` on upload
+      // if (window.showOpenFilePicker) {
+      //   let filesHandles: FileSystemFileHandle[] = await window.showOpenFilePicker({
+      //     multiple: true,
+      //     types: [
+      //       {
+      //         description: 'Images',
+      //         accept: {
+      //           'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+      //         }
+      //       }
+      //     ]
+      //   })
+      //   let files = await Promise.all(filesHandles.map(a => a.getFile()))
+      //
+      //   this.pasteFilesToTextArea(files);
+      // } else {
         this.imgInput.click();
-      }
+      // }
     }
 
     public  handleFileSelect (evt: Event) {
