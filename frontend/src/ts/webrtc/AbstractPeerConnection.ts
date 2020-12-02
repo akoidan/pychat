@@ -91,7 +91,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       throw Error('Your browser doesn\'t support RTCPeerConnection');
     }
 
-    this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
+    this.pc = new (<any>RTCPeerConnection)({"iceServers":[{"urls":["turn:numb.viagenie.ca"],"username":"muazkh","credential":"webrtc@live.com"}]}, this.pc_constraints);
     this.pc!.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc!.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
       this.logger.debug('Got ice candidate {}', event.candidate)();
@@ -138,37 +138,38 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   // TODO is this required in 2020?
   public setMediaBitrate(sdp: string, bitrate: number) {
-    const lines = sdp.split('\n');
-    let line = -1;
-    for (let i = 0; i < lines.length; i++) {
-      if (lines[i].indexOf('m=') === 0) {
-        line = i + 1;
-        break;
-      }
-    }
-    if (line === -1) {
-      this.logger.debug('Could not find the m line for {}', sdp)();
-
-      return sdp;
-    }
-    // Skip i and c lines
-    while (lines[line].indexOf('i=') === 0 || lines[line].indexOf('c=') === 0) {
-      line++;
-    }
-    if (lines[line].indexOf('b') === 0) {
-      this.logger.debug('Replaced b line at line {}', line)();
-      lines[line] = 'b=AS:' + bitrate;
-
-      return lines.join('\n');
-    } else {
-      // Add a new b line
-      this.logger.debug('Adding new b line before line {}', line)();
-      let newLines = lines.slice(0, line);
-      newLines.push('b=AS:' + bitrate);
-      newLines = newLines.concat(lines.slice(line, lines.length));
-
-      return newLines.join('\n');
-    }
+    return sdp;
+    // const lines = sdp.split('\n');
+    // let line = -1;
+    // for (let i = 0; i < lines.length; i++) {
+    //   if (lines[i].indexOf('m=') === 0) {
+    //     line = i + 1;
+    //     break;
+    //   }
+    // }
+    // if (line === -1) {
+    //   this.logger.debug('Could not find the m line for {}', sdp)();
+    //
+    //   return sdp;
+    // }
+    // // Skip i and c lines
+    // while (lines[line].indexOf('i=') === 0 || lines[line].indexOf('c=') === 0) {
+    //   line++;
+    // }
+    // if (lines[line].indexOf('b') === 0) {
+    //   this.logger.debug('Replaced b line at line {}', line)();
+    //   lines[line] = 'b=AS:' + bitrate;
+    //
+    //   return lines.join('\n');
+    // } else {
+    //   // Add a new b line
+    //   this.logger.debug('Adding new b line before line {}', line)();
+    //   let newLines = lines.slice(0, line);
+    //   newLines.push('b=AS:' + bitrate);
+    //   newLines = newLines.concat(lines.slice(line, lines.length));
+    //
+    //   return newLines.join('\n');
+    // }
   }
 
   // destroy(Des)
