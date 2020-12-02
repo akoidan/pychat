@@ -107,7 +107,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   public abstract oniceconnectionstatechange(): void;
 
-  public sendWebRtcEvent(message: RTCSessionDescriptionInit| RTCIceCandidate) {
+  public sendWebRtcEvent(message: RTCSessionDescriptionInit| RTCIceCandidate|RTCSessionDescription) {
     this.wsHandler.sendRtcData(message, this.connectionId, this.opponentWsId);
   }
 
@@ -133,7 +133,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     }
     this.logger.log('Sending answer')();
     await this.pc!.setLocalDescription(answer);
-    this.sendWebRtcEvent(answer);
+    this.sendWebRtcEvent(this.pc!.localDescription!);
   }
 
   // TODO is this required in 2020?
@@ -185,7 +185,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       this.sendRtcDataQueue.push(message);
       return;
     } else {
-      const data: RTCSessionDescriptionInit | RTCIceCandidateInit | { message: unknown } = message.content;
+      const data: RTCSessionDescriptionInit | RTCIceCandidateInit | RTCSessionDescription| { message: unknown } = message.content;
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== 'closed') {
         if ((<RTCSessionDescriptionInit>data).sdp) {
           this.logger.log('Creating answer')();
