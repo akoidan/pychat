@@ -36,6 +36,7 @@ RUN set -x &&\
             python3 \
             openrc \
             mariadb \
+            coturn-openrc \
             curl \
             bash \
             libffi-dev \
@@ -108,11 +109,13 @@ RUN set -x && \
     rc-update add populate default &&\
     rc-update add tornado default &&\
     rc-update add redis default &&\
+    rc-update add turnserver default &&\
     chown -R http:http . &&\
     rm -rf /var/lib/redis &&\
     mv ./backend/chat/migrations . &&\
     ln -sf /data/settings.py ./backend/chat/settings.py && \
     ln -sf /data/production.json ./frontend/production.json && \
+    ln -sf /data/turnserver.conf /etc/coturn/turnserver.conf && \
     mkdir /etc/nginx/ssl &&\
     ln -sf /data/certificate.crt /etc/nginx/ssl && \
     ln -sf /data/server.key /etc/nginx/ssl && \
