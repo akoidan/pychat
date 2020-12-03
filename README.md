@@ -88,13 +88,15 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
  - Download [settings.py](https://github.com/akoidan/pychat/blob/master/backend/chat/settings_example.py) and edit it according comments in it.
- - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json)  and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config)
+ - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json) and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config) Replace WEBRTC_CONFIG turnserver realm and server-name to your domain one
+ - Download [turnserver.conf](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/turnserver.conf) Replace server-name and realm to your domain. Otherwise you will have low connection quality
  - Create volume and copy files there
  ```bash
  docker volume create pychat_data
  containerid=`docker container create --name dummy -v pychat_data:/data hello-world`
  docker cp settings.py dummy:/data/settings.py
  docker cp production.json dummy:/data/production.json
+ docker cp turnserver.conf dummy:/data/turnserver.conf
  docker cp certificate.crt dummy:/data/certificate.crt
  docker cp server.key dummy:/data/server.key
  docker rm dummy
