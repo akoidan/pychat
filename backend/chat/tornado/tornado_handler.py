@@ -13,7 +13,7 @@ from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProf
 from chat.py2_3 import str_type
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
-from chat.tornado.message_creator import MessagesCreator
+from chat.tornado.message_creator import MessagesCreator, WebRtcMessageCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
 from chat.utils import execute_query, get_message_images_videos, get_history_message_query, create_id, \
 	get_or_create_ip_model
@@ -61,7 +61,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
 			self.process_ws_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
-			error_message = self.default(str(e.message), Actions.GROWL_ERROR_MESSAGE, HandlerNames.WS)
+			error_message = self.message_creator.default(str(e.message), Actions.GROWL_ERROR_MESSAGE, HandlerNames.WS)
 			if message:
 				error_message[VarNames.JS_MESSAGE_ID] = message.get(VarNames.JS_MESSAGE_ID, None)
 			self.ws_write(error_message)
@@ -78,7 +78,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		if self.id in my_online:
 			my_online.remove(self.id)
 		if self.connected:
-			message = self.room_online_logout(online)
+			message = self.message_creator.room_online_logout(online)
 			self.publish(message, settings.ALL_ROOM_ID)
 			res = execute_query(settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
@@ -126,6 +126,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		self.ip = self.get_client_ip()
 		user_db = UserProfile.objects.get(id=self.user_id)
 		self.generate_self_id()
+		self.message_creator = WebRtcMessageCreator(self.user_id, self.id)
 		self._logger = logging.LoggerAdapter(parent_logger, {
 			'id': self.id,
 			'ip': self.ip
@@ -200,8 +201,8 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				user['sex']
 			) for user in fetched_users]
 
-		self.ws_write(self.set_room(room_users, user_dict, online, user_db, channels))
-		online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
+		self.ws_write(self.message_creator.set_room(room_users, user_dict, online, user_db, channels))
+		online_user_names_mes = self.message_creator.room_online_login(online, user_db.username, user_db.sex_str)
 		self.logger.info('!! First tab, sending refresh online for all')
 		self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
 		self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)
@@ -236,7 +237,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	def set_video_images_messages(self, imv, inm, outm):
 		for message in inm:
 			files = MessagesCreator.prepare_img_video(imv, message.id)
-			prep_m = self.create_message(message, files)
+			prep_m = self.message_creator.create_message(message, files)
 			outm.setdefault(message.room_id, []).append(prep_m)
 
 	def check_origin(self, origin):

@@ -41,10 +41,11 @@ GIPHY_API_KEY = getattr(settings, "GIPHY_API_KEY", None)
 FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 
 
-class MessagesHandler(MessagesCreator):
+class MessagesHandler():
 
 	def __init__(self, *args, **kwargs):
 		self.closed_channels = None
+		self.message_creator = WebRtcMessageCreator(None, None)
 		super(MessagesHandler, self).__init__()
 		self.webrtc_ids = {}
 		self.id = None  # child init
@@ -109,6 +110,10 @@ class MessagesHandler(MessagesCreator):
 				raise e
 
 		self.async_redis.connection.readline = fabric(new_read, self.async_redis.connection)
+
+	@property
+	def channel(self):
+		return RedisPrefix.generate_user(self.user_id)
 
 	@property
 	def connected(self):
@@ -292,7 +297,7 @@ class MessagesHandler(MessagesCreator):
 			if files:
 				images = up_files_to_img(files, message_db.id)
 				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
-			prepared_message = self.create_send_message(
+			prepared_message = self.message_creator.create_send_message(
 				message_db,
 				Actions.PRINT_MESSAGE,
 				res_files,
@@ -536,7 +541,7 @@ class MessagesHandler(MessagesCreator):
 			send_logs=message[UserSettingsVarNames.SEND_LOGS],
 			theme=message[UserSettingsVarNames.THEME],
 		)
-		self.publish(self.set_settings(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
+		self.publish(self.message_creator.set_settings(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
 
 	def profile_save_user(self, in_message):
 		message = in_message[VarNames.CONTENT]
@@ -555,9 +560,9 @@ class MessagesHandler(MessagesCreator):
 			contacts=message[UserProfileVarNames.CONTACTS],
 			sex=settings.GENDERS_STR[sex],
 		)
-		self.publish(self.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
+		self.publish(self.message_creator.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
 		if userprofile.sex_str != sex or userprofile.username != un:
-			self.publish(self.changed_user_profile(sex, self.user_id, un), settings.ALL_ROOM_ID)
+			self.publish(self.message_creator.changed_user_profile(sex, self.user_id, un), settings.ALL_ROOM_ID)
 
 	def profile_save_image(self, request):
 		pass
@@ -630,7 +635,7 @@ class MessagesHandler(MessagesCreator):
 		self.publish(invite, room_id, True)
 
 	def respond_ping(self, message):
-		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))
+		self.ws_write(self.message_creator.responde_pong(message[VarNames.JS_MESSAGE_ID]))
 
 	def process_pong_message(self, message):
 		self.last_client_ping = message[VarNames.TIME]
@@ -678,7 +683,7 @@ class MessagesHandler(MessagesCreator):
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
-		message = self.unsubscribe_direct_message(room_id, js_id, self.id, ru, room.name)
+		message = self.message_creator.unsubscribe_direct_message(room_id, js_id, self.id, ru, room.name)
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
@@ -694,7 +699,7 @@ class MessagesHandler(MessagesCreator):
 				edited_times=message.edited_times,
 				content=None
 			)
-			self.publish(self.create_send_message(message, Actions.DELETE_MESSAGE, None), message.room_id)
+			self.publish(self.message_creator.create_send_message(message, Actions.DELETE_MESSAGE, None), message.room_id)
 		elif giphy_match is not None:
 			self.edit_message_giphy(giphy_match, message)
 		else:
@@ -709,7 +714,7 @@ class MessagesHandler(MessagesCreator):
 				edited_times=message.edited_times
 			)
 			message.giphy = giphy
-			self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
+			self.publish(self.message_creator.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
 
 		self.search_giphy(message, giphy_match, edit_glyphy)
 
@@ -726,7 +731,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			prep_files = None
 		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
-		self.publish(self.create_send_message(message, action, prep_files), message.room_id)
+		self.publish(self.message_creator.create_send_message(message, action, prep_files), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -767,11 +772,11 @@ class MessagesHandler(MessagesCreator):
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
 		imv = get_message_images_videos(messages)
-		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
+		response = self.message_creator.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
 		self.ws_write(response)
 
 
-class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
+class WebRtcMessageHandler(MessagesHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(WebRtcMessageHandler, self).__init__(*args, **kwargs)
@@ -814,8 +819,8 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		# use list because sets dont have 1st element which is offerer
 		self.async_redis_publisher.hset(RedisPrefix.WEBRTC_CONNECTION, connection_id, self.id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-		opponents_message = self.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
-		self_message = self.set_connection_id(js_id, connection_id)
+		opponents_message = self.message_creator.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
+		self_message = self.message_creator.set_connection_id(js_id, connection_id)
 		self.ws_write(self_message)
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)
 		self.publish(opponents_message, room_id, True)
@@ -834,7 +839,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		opponent_ws_id = in_message[VarNames.WEBRTC_OPPONENT_ID]
 		sender_ws_id = self.sync_redis.shget(RedisPrefix.WEBRTC_CONNECTION, connection_id)
 		if sender_ws_id == self.id:
-			self.publish(self.retry_file(connection_id), opponent_ws_id)
+			self.publish(self.message_creator.retry_file(connection_id), opponent_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
 
@@ -845,7 +850,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
 		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.OFFERED:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
-			self.publish(self.reply_webrtc(
+			self.publish(self.message_creator.reply_webrtc(
 				Actions.REPLY_FILE_CONNECTION,
 				connection_id,
 				HandlerNames.WEBRTC_TRANSFER.format(connection_id),
@@ -895,7 +900,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		if self_channel_status != WebRtcRedisStates.CLOSED:
 			sender_id = self.sync_redis.shget(RedisPrefix.WEBRTC_CONNECTION, connection_id)
 			if sender_id == self.id:
-				message = self.get_close_file_sender_message(connection_id)
+				message = self.message_creator.get_close_file_sender_message(connection_id)
 				self.async_redis_publisher.hset(connection_id, opponent_id, WebRtcRedisStates.CLOSED)
 				self.publish(message, opponent_id)
 			else:
@@ -940,7 +945,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		if sender_ws_status == WebRtcRedisStates.READY \
 				and self_ws_status in [WebRtcRedisStates.RESPONDED, WebRtcRedisStates.READY]:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-			self.publish(self.get_accept_file_message(connection_id, content), sender_ws_id)
+			self.publish(self.message_creator.get_accept_file_message(connection_id, content), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status")
 
@@ -978,7 +983,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 	def publish_call_answer(self, conn_users, connection_id, message_handler, reply_action, status_set, content):
 		self.async_redis_publisher.hset(connection_id, self.id, status_set)
 		del conn_users[self.id]
-		message = self.reply_webrtc(reply_action, connection_id, message_handler, content)
+		message = self.message_creator.reply_webrtc(reply_action, connection_id, message_handler, content)
 		for user in conn_users:
 			if conn_users[user] != WebRtcRedisStates.CLOSED:
 				self.publish(message, user)

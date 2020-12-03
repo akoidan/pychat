@@ -5,6 +5,10 @@ from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix,
 
 class MessagesCreator(object):
 
+	def __init__(self, user_id, id):
+		self.user_id = user_id
+		self.id = id
+
 	def default(self, content, event, handler):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
@@ -14,14 +18,6 @@ class MessagesCreator(object):
 			VarNames.CONTENT: content,
 			VarNames.USER_ID: self.user_id,
 			VarNames.TIME: get_milliseconds(),
-			VarNames.HANDLER_NAME: handler
-		}
-
-	@staticmethod
-	def base_default(event, content, handler):
-		return {
-			VarNames.EVENT: event,
-			VarNames.CONTENT: content,
 			VarNames.HANDLER_NAME: handler
 		}
 
@@ -99,7 +95,7 @@ class MessagesCreator(object):
 			UserProfileVarNames.CITY: up.city,
 			UserProfileVarNames.SEX: up.sex_str,
 			UserProfileVarNames.CONTACTS: up.contacts,
-			UserProfileVarNames.BIRTHDAY: str(up.birthday),
+			UserProfileVarNames.BIRTHDAY: str(up.birthday) if up.birthday else None,
 			UserProfileVarNames.EMAIL: up.email,
 			UserProfileVarNames.SURNAME: up.surname,
 		}
@@ -203,16 +199,27 @@ class MessagesCreator(object):
 				VarNames.IMAGE_ID: x.id
 			} for x in files if x.message_id == message_id}
 
-	@property
-	def channel(self):
-		return RedisPrefix.generate_user(self.user_id)
-
 	def responde_pong(self, js_id):
 		return {
 			VarNames.EVENT: Actions.PONG,
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.JS_MESSAGE_ID: js_id
 		}
+
+	@staticmethod
+	def get_session(session_id):
+		return {
+			'session': session_id,
+		}
+
+	@staticmethod
+	def get_oauth_session(session_id, username, is_new):
+		return {
+			'session': session_id,
+			'username': username,
+			'isNewAccount': is_new,
+		}
+
 
 	def unsubscribe_direct_message(self, room_id, js_id, myws_id, users, name):
 		"""
@@ -230,7 +237,7 @@ class MessagesCreator(object):
 		}
 
 
-class WebRtcMessageCreator(object):
+class WebRtcMessageCreator(MessagesCreator):
 
 	def offer_webrtc(self, content, connection_id, room_id, action):
 		"""

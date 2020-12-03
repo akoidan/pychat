@@ -257,6 +257,7 @@ class MethodDispatcher(tornado.web.RequestHandler):
 						result = json.dumps(result)
 					self.finish(result)
 				except ValidationError as e:
+					self.set_status(409)
 					self.finish(str(e.message))
 			else:
 				raise tornado.web.HTTPError(404)
