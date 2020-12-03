@@ -83,13 +83,15 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 
 ## Run prod docker image
 
- - You need create ssl certificates: `server.key` and `certificate.crt`. For example 
+Please run each step very carefully. **Do not skip editing files, reading comments or any instructions**. This may lead to bugs in the future. 
+
+ - Ssl is required for webrtc (to make calls) and secure connection. Put your ssl certificates in the current directory: `server.key` and `certificate.crt`. If you don't own a domain you can create self-signed certificates with command below, with self-signed certificate browser will warn users with broken ssl.
 ```bash
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
  - Download [settings.py](https://github.com/akoidan/pychat/blob/master/backend/chat/settings_example.py) and edit it according comments in it.
- - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json) and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config) Replace WEBRTC_CONFIG turnserver realm and server-name to your domain one
- - Download [turnserver.conf](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/turnserver.conf) Replace server-name and realm to your domain. Otherwise you will have low connection quality
+ - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json) and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config)
+ - Download [turnserver.conf](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/turnserver.conf) Replace server-name and realm to your domain. 
  - Create volume and copy files there
  ```bash
  docker volume create pychat_data
@@ -107,7 +109,7 @@ docker run -i -t -v pychat_data:/tmp -it alpine /bin/sh
 ```
  - Run image with:
 ```bash
-docker run -t -v pychat_data:/data -p 443:443 deathangel908/pychat
+docker run -t -v pychat_data:/data -p 443:443 -p 3478:3478 deathangel908/pychat
 ```
  - Open [https://localhost](https://localhost) and enjoy it!
 
@@ -457,7 +459,7 @@ development.json and production.json have the following format:
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
   "PAINTER": "if true chat will contain a link to painter page in the navbar. This you can draw any images and send to chat",
   "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",
-  "WEBRTC_CONFIG": "Sometimes webrtc stun server doesn't work in establishing a connection. This variable defines a variable that RtcPeerConnection accepts as a first argument, you can use {'iceServers':[{'urls':['stun:turn2.l.google.com']}]}' Or specify your turn/stun server see https://github.com/coturn/coturn project for more info"
+  "WEBRTC_CONFIG": "This variable defines the first argument of RtcPeerConnection constructor. Sometimes webrtc stun server doesn't work in establishing a connection. Especially for this you can use turn server instead of it. Docker prod docker image already comes with a turn server, example of configuration for it  `{iceServers:[{urls:['turn:YOUR_DOMAIN'],username:'pychat',credential:'pypass'}]}`. replace YOUR_DOMAIN with your real domain name/public ip. You other scenarios use your server like coturn (https://github.com/coturn/coturn). See more info of this variable at docs: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#RTCConfiguration_dictionary"
 }
 ```
 

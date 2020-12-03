@@ -1,7 +1,8 @@
 import mobile from 'is-mobile';
 import {
   BACKEND_ADDRESS,
-  IS_SSL
+  IS_SSL,
+  WEBRTC_CONFIG
 } from '@/ts/utils/consts';
 
 export const isMobile: boolean = mobile.isMobile();
@@ -25,7 +26,19 @@ export const browserVersion: string = (function () {
 })() + (isMobile ? ' mobile' : '');
 export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
-const BACKEND_CURRENT_ADDRESS = BACKEND_ADDRESS.replace('{}', window.location.hostname)
+const BACKEND_CURRENT_ADDRESS = BACKEND_ADDRESS.replace('{}', window.location.hostname);
+export const WEBRTC_RUNTIME_CONFIG = (function() {
+  // replaces {} in the realm for hostname
+  let result = JSON.parse(JSON.stringify(WEBRTC_CONFIG))
+  if (result.iceServers) {
+    result.iceServers.forEach((ic: {urls: string[]}) => {
+      if (ic.urls) {
+        ic.urls = ic.urls.map((i: string) => i.replace('{}', window.location.hostname))
+      }
+    })
+  }
+  return result;
+})()
 export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/ws`;
 export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/api`;
 export const MEDIA_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}`;

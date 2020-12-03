@@ -37,6 +37,7 @@ declare global {
     savedFiles: { [id: string]: Blob };
     sub: Subscription;
     consts: {};
+    runtimeConsts: {};
   }
 }
 

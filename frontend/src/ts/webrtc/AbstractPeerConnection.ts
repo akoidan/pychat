@@ -13,9 +13,8 @@ import {
   ConnectToRemoteMessage,
 } from '@/ts/types/messages/innerMessages';
 import { SendRtcDataMessage } from '@/ts/types/messages/wsInMessages';
-import {
-  WEBRTC_CONFIG,
-} from '@/ts/utils/consts';
+import { WEBRTC_RUNTIME_CONFIG } from '@/ts/utils/runtimeConsts';
+
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -83,12 +82,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   public createPeerConnection(arg?: ConnectToRemoteMessage) {
-    this.logger.log('Creating RTCPeerConnection with config {} {}', WEBRTC_CONFIG, this.pc_constraints)();
+    this.logger.log('Creating RTCPeerConnection with config {} {}', WEBRTC_RUNTIME_CONFIG, this.pc_constraints)();
     if (!window.RTCPeerConnection) {
       throw Error('Your browser doesn\'t support RTCPeerConnection');
     }
 
-    this.pc = new (<any>RTCPeerConnection)(WEBRTC_CONFIG, this.pc_constraints);
+    this.pc = new (<any>RTCPeerConnection)(WEBRTC_RUNTIME_CONFIG, this.pc_constraints);
     this.pc!.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc!.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
       this.logger.debug('Got ice candidate {}', event.candidate)();

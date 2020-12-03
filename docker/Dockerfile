@@ -36,6 +36,7 @@ RUN set -x &&\
             python3 \
             openrc \
             mariadb \
+            coturn \
             coturn-openrc \
             curl \
             bash \

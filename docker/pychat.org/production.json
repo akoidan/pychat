@@ -12,5 +12,5 @@
     "GITHUB_LINK": "https://github.com/Deathangel908/pychat",
     "PAINTER": true,
     "FLAGS": false,
-    "WEBRTC_CONFIG": {"iceServers":[{"urls":["turn:pychat.org"],"username":"pychat","credential":"pypass"}]}
+    "WEBRTC_CONFIG": {"iceServers":[{"urls":["stun:turn2.l.google.com"]}]}
 }

@@ -1,6 +1,7 @@
 import '@/ts/utils/classComponentHooks.ts';
 import '@/assets/sass/common.sass';
 import * as constants from '@/ts/utils/consts';
+import * as runtimeConsts from '@/ts/utils/runtimeConsts';
 import {
   GIT_HASH,
   IS_ANDROID,
@@ -195,6 +196,7 @@ async function init() {
     window.webrtcApi = webrtcApi;
     window.sub = sub;
     window.consts = constants;
+    window.runtimeConsts = runtimeConsts;
     logger.log('Constants {}', constants)();
   }
 
