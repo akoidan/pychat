@@ -411,6 +411,7 @@ copy_docker_prod_files() {
     safeRunCommand docker cp ./docker/pychat.org/production-prod.json dummy:/data/production.json
     safeRunCommand docker cp ./docker/pychat.org/turnserver-prod.conf dummy:/data/turnserver.conf
     safeRunCommand rm ./docker/pychat.org/production-prod.json
+    safeRunCommand rm ./docker/pychat.org/turnserver-prod.conf
     safeRunCommand docker rm dummy
     printSuccess "ALl files have been succesfully copied. To start docker container use:"
     printOut "docker run -t -v pychat_data:/data -p 443:443 -p 3478:3478 deathangel908/pychat"
