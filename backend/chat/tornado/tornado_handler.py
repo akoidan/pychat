@@ -106,8 +106,12 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		and TornadoHandler can restore webrtc_connections to previous state
 		"""
 		conn_arg = self.get_argument('id', None)
-		self.id, random = create_id(self.user_id, conn_arg)
-		self.restored_connection =  random == conn_arg
+		if conn_arg:
+			random = conn_arg.split(":")[1]
+		else:
+			random = None
+		self.id, random = create_id(self.user_id, random)
+		self.restored_connection = random == conn_arg
 		self.restored_connection = False
 		self.save_ip()
 

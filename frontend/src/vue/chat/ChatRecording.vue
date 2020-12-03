@@ -29,7 +29,6 @@ import { State } from '@/ts/instances/storeInstance';
 @Component
   export default class ChatRecording extends Vue {
 
-
     @State
     public readonly dim!: boolean;
 
@@ -37,14 +36,14 @@ import { State } from '@/ts/instances/storeInstance';
     public video!: HTMLVideoElement;
 
     @Prop()
-    public readonly srcVideo!: string;
+    public readonly srcVideo!: MediaStream;
 
     @Prop()
     public readonly recordingNow!: boolean;
 
 
     @Watch('srcVideo')
-    public onSrcChange(value: MediaStream | MediaSource | Blob | null) {
+    public onSrcChange(value: MediaStream) {
       if (this.video) {
         this.video.srcObject = value;
       }

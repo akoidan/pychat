@@ -5,7 +5,8 @@
 
 ## Table of contents
 - [About](#about)
-- [When should I use pychat:](#when-should-i-use-pychat-)
+- [When should I use pychat](#when-should-i-use-pychat)
+- [How to host pychat](#how-to-host-pychat)
   * [Run test docker image](#run-test-docker-image)
   * [Run prod docker image](#run-prod-docker-image)
   * [Native setup](#native-setup)
@@ -43,7 +44,7 @@ This is free web (browser) chat, that features:
  - Login with social media
  - Sending offline messages with Firebase push notifications
 
-# When should I use pychat:
+# When should I use pychat
 |                        | Pychat | Slack | Skype | Telegram | Viber |
 |------------------------|--------|-------|-------|----------|-------|
 | Open Source            | +      | -     | -     | -        | -     |
@@ -68,6 +69,8 @@ None of other client use p2p for message exchange or file sharing which makes th
  - I would never use viber/skype/whatsapp or any other messages in 2021. They have a lot of disadvantages comparing to discord/telegram/slack.
 
 If you still feel enthusiastic for bleeding-edge opensource project, try pychat with instructions bellow!
+
+# How to host pychat
 
 ## Run test docker image
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
@@ -389,6 +392,8 @@ The string `rsok33GN:0005:EJAd` describes:
  - `EJAd` id of connection (`TornadoHandler.id`)
  
 TO see current connections and their info check chrome://webrtc-internals/
+Read [this](https://www.html5rocks.com/en/tutorials/webrtc/infrastructure) article to understand how JSEP architecture works.
+SEE  WEBRTC_CONFIG at development.json. I personally use turn server coturn, It needs ports 3478 to be exposed.
  
 ## Frontend Stack
 The technologies stack used in project:
@@ -449,7 +454,8 @@ development.json and production.json have the following format:
   "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
   "PAINTER": "if true chat will contain a link to painter page in the navbar. This you can draw any images and send to chat",
-  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen"
+  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",
+  "WEBRTC_CONFIG": "Sometimes webrtc stun server doesn't work in establishing a connection. This variable defines a variable that RtcPeerConnection accepts as a first argument, you can use {'iceServers':[{'urls':['stun:turn2.l.google.com']}]}' Or specify your turn/stun server see https://github.com/coturn/coturn project for more info"
 }
 ```
 

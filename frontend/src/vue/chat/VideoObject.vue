@@ -61,15 +61,39 @@ export default class VideoObject extends Vue {
     const stream: MediaStream = this.$store.mediaObjects[newValue];
     this.$logger.debug('Video #{} scheduling stream update-> {} {}', this.userId, newValue, getStreamLog(stream))();
     if (stream) {
-        this.video.srcObject = stream;
-        this.video.play();
-      } else {
-        // we should not use src like below, since on safari this would throw en exception by aborting promise in current operation
-        // this.video.src = '';
-        this.video.srcObject = null;
-        this.video.pause();
+      this.video.srcObject = stream;
+      this.video.play();
+    } else {
+      // we should not use src like below, since on safari this would throw en exception by aborting promise in current operation
+      // this.video.src = '';
+      this.video.srcObject = null;
+      this.video.pause();
     }
   }
+
+  // private timeout: number = 0;
+  //
+  // @Watch('mediaStreamLink')
+  // public onMediaStreamChanged(newValue: string) {
+  //   const stream: MediaStream = this.$store.mediaObjects[newValue];
+  //   this.$logger.debug('Video #{} scheduling stream update-> {} {}', this.userId, newValue, getStreamLog(stream))();
+  //   if (this.timeout) {
+  //     clearTimeout(this.timeout);
+  //   }
+  //   this.$logger.log("Scgedykubg settubgs vudei src")();
+  //   this.timeout = setTimeout(() => {
+  //     this.$logger.log("Firing setting video src")();
+  //     if (stream) {
+  //       this.video.srcObject = stream;
+  //       this.video.play();
+  //     } else {
+  //       // we should not use src like below, since on safari this would throw en exception by aborting promise in current operation
+  //       // this.video.src = '';
+  //       this.video.srcObject = null;
+  //       this.video.pause();
+  //     }
+  //   }, 1000)
+  // }
 }
 </script>
 <style lang="sass" scoped>

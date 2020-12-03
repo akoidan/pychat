@@ -23,10 +23,10 @@ export const {
   ELECTRON_MAIN_FILE,
   SERVICE_WORKER_URL,
   ELECTRON_IGNORE_SSL,
-  CAPTCHA_IFRAME
+  CAPTCHA_IFRAME,
+  WEBRTC_CONFIG,
 } = allConsts;
 
-export const WEBRTC_STUNT_URL = 'stun:turn2.l.google.com';
 export const PING_CLOSE_JS_DELAY = 5000;
 export const CONNECTION_RETRY_TIME = 5000;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;
