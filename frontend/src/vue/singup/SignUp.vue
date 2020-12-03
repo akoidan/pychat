@@ -266,7 +266,7 @@ import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
         this.currentValidateEmailRequest = null;
       }
       try {
-         await this.$api.validateEmail(username, r => this.currentValidateEmailRequest = r);
+        await this.$api.validateEmail(username, r => this.currentValidateEmailRequest = r);
         this.emailCheckValue = IconColor.SUCCESS;
         this.emailDescription = `Email is ok!`;
         this.emailValidity = '';
@@ -324,7 +324,7 @@ import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
 
     @ApplyGrowlErr({runningProp: 'running', message: `Can't sign up`})
     async register() {
-      let session: string = await this.$api.register(this.form);
+      let {session} = await this.$api.register(this.form);
       let message: LoginMessage = {action: 'login', handler: 'router', session};
       sub.notify(message)
     }

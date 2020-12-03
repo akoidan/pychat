@@ -21,6 +21,15 @@ export interface RoomNoUsersDto {
   roomCreatorId: number;
 }
 
+export interface SessionResponse {
+  session: string;
+}
+
+export interface OauthSessionResponse extends SessionResponse {
+  isNewAccount: boolean;
+  username: string;
+}
+
 export interface RoomDto  extends  RoomNoUsersDto {
   users: number[];
 }

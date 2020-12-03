@@ -788,31 +788,31 @@ export class DefaultStore extends VuexModule {
   }
 
   @Action
-  public async showGrowl({html, type}: { html: string; type: GrowlType }) {
+  public async showGrowl({html, type, time}: { html: string; type: GrowlType; time: number }) {
     const growl: GrowlModel = {id: Date.now(), html, type};
     this.addGrowl(growl);
-    await sleep(4000);
+    await sleep(time);
     this.removeGrowl(growl);
   }
 
   @Action
   public async growlErrorRaw(html: string) {
-    await this.showGrowl({html, type: GrowlType.ERROR});
+    await this.showGrowl({html, type: GrowlType.ERROR, time: 6000});
   }
 
   @Action
   public async growlError(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.ERROR});
+    await this.showGrowl({html: encodeHTML(title), type: GrowlType.ERROR, time: 6000});
   }
 
   @Action
   public async growlInfo(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO});
+    await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO, time: 5000});
   }
 
   @Action
   public async growlSuccess(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.SUCCESS});
+    await this.showGrowl({html: encodeHTML(title), type: GrowlType.SUCCESS, time: 4000});
   }
 
 }

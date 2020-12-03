@@ -7,8 +7,10 @@ import {
 } from '@/ts/types/types';
 import {
   MessageModelDto,
+  OauthSessionResponse,
   OauthStatus,
   SaveFileResponse,
+  SessionResponse,
   ViewUserProfileDto
 } from '@/ts/types/dto';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
@@ -41,9 +43,10 @@ export default class Api extends MessageHandler {
     this.xhr = xhr;
   }
 
-  public async login(form: HTMLFormElement): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async login(form: HTMLFormElement): Promise<SessionResponse> {
+    return this.xhr.doPost<SessionResponse>({
       url: '/auth',
+      isJsonDecoded: true,
       formData: new FormData(form)
     });
   }
@@ -94,16 +97,18 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async register(form: HTMLFormElement): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async register(form: HTMLFormElement): Promise<SessionResponse> {
+    return this.xhr.doPost<SessionResponse>({
       url: '/register',
+      isJsonDecoded: true,
       formData: new FormData(form)
     });
   }
 
-  public async registerDict(password: string, username: string): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async registerDict(password: string, username: string): Promise<SessionResponse> {
+    return this.xhr.doPost<SessionResponse>({
       url: '/register',
+      isJsonDecoded: true,
       params: {username, password}
     });
   }
@@ -128,18 +133,20 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async googleAuth(token: string): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async googleAuth(token: string): Promise<OauthSessionResponse> {
+    return this.xhr.doPost<OauthSessionResponse>({
       url: '/google_auth',
+      isJsonDecoded: true,
       params: {
         token
       }
     });
   }
 
-  public async facebookAuth(token: string): Promise<string> {
-    return  this.xhr.doPost<string>({
+  public async facebookAuth(token: string): Promise<OauthSessionResponse> {
+    return  this.xhr.doPost<OauthSessionResponse>({
       url: '/facebook_auth',
+      isJsonDecoded: true,
       params: {
         token
       }

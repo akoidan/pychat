@@ -231,8 +231,8 @@ sub.subscribe('router', new class RouterProcesssor extends MessageHandler {
   }
 
   login(a: LoginMessage) {
-    if (!/\w{32}/.exec(a.session)) {
-      throw a.session;
+    if (!a.session) {
+      throw Error(`Invalid session ${a.session}`);
     }
     sessionHolder.session = a.session;
     router.replace(`/chat/${ALL_ROOM_ID}`);

@@ -15,6 +15,7 @@ import { sub } from '@/ts/instances/subInstance';
 import FacebookAuth from '@/vue/singup/FacebookAuth.vue';
 import GoogleAuth from '@/vue/singup/GoogleAuth.vue';
 import { GOOGLE_OAUTH_2_CLIENT_ID, FACEBOOK_APP_ID } from "@/ts/utils/consts";
+import { OauthSessionResponse } from '@/ts/types/dto';
 
 @Component({
   components: {GoogleAuth, FacebookAuth}
@@ -25,24 +26,20 @@ export default class SocialAuthSignUp extends Vue {
   private readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
 
   async googleAuth({resolve, reject, token}: {token: string; resolve: Function; reject: Function}) {
-    let session: string|undefined;
-    try {
-      session = await this.$api.googleAuth(token);
-      let message: LoginMessage = {action: 'login', handler: 'router', session};
-      sub.notify(message); // sub should be here, since we it throws an expection if session is an error that we show later in growl
-    } catch (e) {
-      reject(e);
-
-      return;
-    }
-    resolve();
+    await this.makeAuth(resolve, reject, this.$api.googleAuth(token));
   }
 
   async facebookAuth({resolve, reject, token}: {token: string; resolve: Function; reject: Function}) {
-    let session: string|undefined;
+    await this.makeAuth(resolve, reject, this.$api.facebookAuth(token));
+  }
+
+  async makeAuth(resolve: Function, reject: Function, method: Promise<OauthSessionResponse>) {
     try {
-      session = await this.$api.facebookAuth(token);
-      let message: LoginMessage = {action: 'login', handler: 'router', session};
+      let oauthSessionResponse = await method;
+      if (oauthSessionResponse.isNewAccount) {
+        this.$store.growlInfo(`Username ${oauthSessionResponse.username} has been generated while signing up via Social auth. You can change it in UserProfile settings.`);
+      }
+      let message: LoginMessage = {action: 'login', handler: 'router', session: oauthSessionResponse.session};
       sub.notify(message);
     } catch (e) {
       reject(e);

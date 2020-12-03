@@ -2,6 +2,8 @@ import { getModule } from 'vuex-module-decorators';
 import { stateDecoratorFactory } from 'vuex-module-decorators-state';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { IS_DEBUG } from '@/ts/utils/consts';
+import { encodeHTML } from '@/ts/utils/htmlApi';
+import { GrowlType } from '@/ts/types/model';
 
 export const store: DefaultStore = getModule(DefaultStore);
 export const State = stateDecoratorFactory(store);
@@ -22,17 +24,18 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     }
 ) {
   const processError = function (e: Error|string) {
+
     const strError: string = String((<Error>e)?.message || e || 'Unknown error');
     if (vueProperty && message) {
       // @ts-ignore: next-line
       this[vueProperty] = `${message}: ${strError}`;
     } else if (message) {
-      store.growlError(`${message}:  ${strError}`);
+      store.showGrowl({html: encodeHTML(`${message}:  ${strError}`), type: GrowlType.ERROR, time: 20000 });
     } else if (vueProperty) {
       // @ts-ignore: next-line
       this[vueProperty] = `Error: ${strError}`;
     } else {
-      store.growlError(strError);
+      store.showGrowl({html: encodeHTML(strError), type: GrowlType.ERROR, time: 20000 });
     }
   };
 

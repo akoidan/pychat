@@ -289,7 +289,7 @@ class HttpHandler(MethodDispatcher):
 		except User.DoesNotExist:
 			raise ValidationError("User {} doesn't exist".format(username))
 
-		return self.__generate_session__(user.id)
+		return MessagesCreator.get_session(self.__generate_session__(user.id))
 
 	@add_missing_fields('email', 'sex')
 	# @transaction.atomic TODO, is this works in single thread?
@@ -303,7 +303,7 @@ class HttpHandler(MethodDispatcher):
 		RoomUsers(user_id=user_profile.id, room_id=settings.ALL_ROOM_ID, notifications=False).save()
 		if email:
 			yield from self.__send_sign_up_email(user_profile)
-		return self.__generate_session__(user_profile.id)
+		return MessagesCreator.get_session(self.__generate_session__(user_profile.id))
 
 	@require_http_method('GET')
 	def confirm_email(self, token):
@@ -333,8 +333,8 @@ class HttpHandler(MethodDispatcher):
 
 	@run_on_executor
 	def __oauth(self, token, handler):
-		user_profile = handler.generate_user_profile(token)
-		return self.__generate_session__(user_profile.id)
+		user_profile, is_new = handler.generate_user_profile(token)
+		return MessagesCreator.get_oauth_session(self.__generate_session__(user_profile.id), user_profile.username, is_new)
 
 	@run_on_executor
 	def __get_oauth_identifier(self, token, handler):

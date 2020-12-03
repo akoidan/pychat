@@ -68,7 +68,7 @@ export default class Login extends Vue {
 
   @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
   public async login() {
-    const session: string = await this.$api.login(this.form);
+    const {session} = await this.$api.login(this.form);
     let message: LoginMessage = {action: 'login', handler: 'router', session};
     sub.notify(message)
   }

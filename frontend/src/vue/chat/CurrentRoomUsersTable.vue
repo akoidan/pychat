@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="activeRoom && activeRoom.name">
     <span class="header">
       <span
         :class="onlineClass"
@@ -31,7 +31,10 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { State } from '@/ts/instances/storeInstance';
-import { UserModel } from '@/ts/types/model';
+import {
+  RoomModel,
+  UserModel
+} from '@/ts/types/model';
 import RoomUsersUser from '@/vue/chat/RoomUsersUser.vue';
 
 @Component({
@@ -43,6 +46,9 @@ export default class CurrentRoomUsersTable extends Vue {
 
   @State
   public readonly activeRoomId!: number;
+
+  @State
+  public readonly activeRoom!: RoomModel;
 
   public onlineShowOnlyOnline: boolean = false;
 
