@@ -393,7 +393,7 @@ The string `rsok33GN:0005:EJAd` describes:
  
 TO see current connections and their info check chrome://webrtc-internals/
 Read [this](https://www.html5rocks.com/en/tutorials/webrtc/infrastructure) article to understand how JSEP architecture works.
-SEE  WEBRTC_CONFIG at development.json. I personally use turn server coturn, It needs ports 3478 and 5349 to be exposed.
+SEE  WEBRTC_CONFIG at development.json. I personally use turn server coturn, It needs ports 3478 to be exposed.
  
 ## Frontend Stack
 The technologies stack used in project:
