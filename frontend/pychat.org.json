@@ -13,5 +13,6 @@
   "GITHUB_LINK": true,
   "PAINTER": true,
   "FLAGS": true,
-  "PUBLIC_PATH": "https://static.pychat.org/"
+  "PUBLIC_PATH": "https://static.pychat.org/",
+  "WEBRTC_CONFIG": {"iceServers":[{"urls":["turn:pychat.org"],"username":"pychat","credential":"pypass"}]}
 }

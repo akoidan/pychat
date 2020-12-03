@@ -392,6 +392,8 @@ The string `rsok33GN:0005:EJAd` describes:
  - `EJAd` id of connection (`TornadoHandler.id`)
  
 TO see current connections and their info check chrome://webrtc-internals/
+Read [this](https://www.html5rocks.com/en/tutorials/webrtc/infrastructure) article to understand how JSEP architecture works.
+SEE  WEBRTC_CONFIG at development.json. I personally use turn server coturn, It needs ports 3478 and 5349 to be exposed.
  
 ## Frontend Stack
 The technologies stack used in project:
@@ -452,7 +454,8 @@ development.json and production.json have the following format:
   "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
   "PAINTER": "if true chat will contain a link to painter page in the navbar. This you can draw any images and send to chat",
-  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen"
+  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",
+  "WEBRTC_CONFIG": "Sometimes webrtc stun server doesn't work in establishing a connection. This variable defines a variable that RtcPeerConnection accepts as a first argument, you can use {'iceServers':[{'urls':['stun:turn2.l.google.com']}]}' Or specify your turn/stun server see https://github.com/coturn/coturn project for more info"
 }
 ```
 

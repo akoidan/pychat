@@ -13,7 +13,9 @@ import {
   ConnectToRemoteMessage,
 } from '@/ts/types/messages/innerMessages';
 import { SendRtcDataMessage } from '@/ts/types/messages/wsInMessages';
-import { WEBRTC_STUNT_URL } from '@/ts/utils/consts';
+import {
+  WEBRTC_CONFIG,
+} from '@/ts/utils/consts';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -28,11 +30,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly roomId: number;
   protected sendChannel: RTCDataChannel | null = null;
 
-  private readonly pc_config = {
-    iceServers: [{
-      urls: [WEBRTC_STUNT_URL]
-    }]
-  };
   private readonly pc_constraints: unknown = {
     optional: [/*Firefox*/
       /*{DtlsSrtpKeyAgreement: true},*/
@@ -86,12 +83,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   public createPeerConnection(arg?: ConnectToRemoteMessage) {
-    this.logger.log('Creating RTCPeerConnection with config {} {}', this.pc_config, this.pc_constraints)();
+    this.logger.log('Creating RTCPeerConnection with config {} {}', WEBRTC_CONFIG, this.pc_constraints)();
     if (!window.RTCPeerConnection) {
       throw Error('Your browser doesn\'t support RTCPeerConnection');
     }
 
-    this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
+    this.pc = new (<any>RTCPeerConnection)(WEBRTC_CONFIG, this.pc_constraints);
     this.pc!.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc!.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
       this.logger.debug('Got ice candidate {}', event.candidate)();
