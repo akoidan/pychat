@@ -122,7 +122,8 @@ class UserProfileVarNames(object):
 	SEX = 'sex'
 
 class HandlerNames:
-	CHANNELS = 'channels'
+	ROOM = 'room'
+	WS_MESSAGE = 'ws-message'
 	WEBRTC = 'webrtc'
 	PEER_CONNECTION = 'peerConnection:{}:{}'
 	WEBRTC_TRANSFER = 'webrtcTransfer:{}'

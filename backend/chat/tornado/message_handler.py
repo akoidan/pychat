@@ -334,7 +334,7 @@ class MessagesHandler():
 			VarNames.EVENT: Actions.SAVE_CHANNEL_SETTINGS,
 			VarNames.CHANNEL_ID: channel_id,
 			VarNames.CB_BY_SENDER: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.CHANNEL_NAME: channel_name,
 			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
 			VarNames.TIME: get_milliseconds(),
@@ -356,7 +356,7 @@ class MessagesHandler():
 			VarNames.CHANNEL_ID: channel_id,
 			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
 			VarNames.CB_BY_SENDER: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.CHANNEL_NAME: channel_name,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
@@ -426,7 +426,7 @@ class MessagesHandler():
 			VarNames.ROOM_USERS: users,
 			VarNames.CB_BY_SENDER: self.id,
 			VarNames.INVITER_USER_ID: self.user_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.VOLUME: message[VarNames.VOLUME],
 			VarNames.P2P: message[VarNames.P2P],
 			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
@@ -494,7 +494,7 @@ class MessagesHandler():
 					VarNames.EVENT: Actions.SAVE_ROOM_SETTINGS,
 					VarNames.CHANNEL_ID: room.channel_id,
 					VarNames.CB_BY_SENDER: self.id,
-					VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+					VarNames.HANDLER_NAME: HandlerNames.ROOM,
 					VarNames.CHANNEL_NAME: channel_name,
 					VarNames.CHANNEL_CREATOR_ID: channel_creator_id,
 					VarNames.ROOM_CREATOR_ID: room.creator_id,
@@ -513,7 +513,7 @@ class MessagesHandler():
 				VarNames.CB_BY_SENDER: self.id,
 				VarNames.CHANNEL_CREATOR_ID: channel_creator_id,
 				VarNames.ROOM_CREATOR_ID: room.creator_id,
-				VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+				VarNames.HANDLER_NAME: HandlerNames.ROOM,
 				VarNames.CHANNEL_NAME: channel_name,
 				VarNames.ROOM_ID: room.id,
 				VarNames.VOLUME: message[VarNames.VOLUME],
@@ -612,7 +612,7 @@ class MessagesHandler():
 			VarNames.ROOM_NAME: room.name,
 			VarNames.INVITEE_USER_ID: users,
 			VarNames.INVITER_USER_ID: self.user_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.VOLUME: 1,
 			VarNames.NOTIFICATIONS: False,
@@ -626,7 +626,7 @@ class MessagesHandler():
 			VarNames.ROOM_ID: room_id,
 			VarNames.INVITEE_USER_ID: users,
 			VarNames.INVITER_USER_ID: self.user_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.ROOM_USERS: users_in_room,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.CB_BY_SENDER: self.id,
@@ -662,7 +662,7 @@ class MessagesHandler():
 		message = {
 			VarNames.EVENT: Actions.DELETE_CHANNEL,
 			VarNames.CHANNEL_ID: channel_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.CB_BY_SENDER: self.id,
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID]
@@ -745,7 +745,7 @@ class MessagesHandler():
 			channels = {
 				VarNames.EVENT: Actions.DELETE_MY_ROOM,
 				VarNames.ROOM_ID: room_id,
-				VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+				VarNames.HANDLER_NAME: HandlerNames.ROOM,
 				VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
 			}
 			self.ws_write(channels)
@@ -755,7 +755,7 @@ class MessagesHandler():
 				VarNames.ROOM_ID: room_id,
 				VarNames.USER_ID: message[VarNames.USER_ID],
 				VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
-				VarNames.HANDLER_NAME: HandlerNames.CHANNELS
+				VarNames.HANDLER_NAME: HandlerNames.ROOM
 			})
 		return True
 
