@@ -147,7 +147,7 @@ export default class ChatAttachments extends Vue {
     position: absolute
     left: 0
     padding: 10px 10px 3px 5px
-    bottom: 0
+    bottom: 2px // otherwise there would be scroll
     font-size: 40px
     border-radius: 10px
     [class^="icon-"]
