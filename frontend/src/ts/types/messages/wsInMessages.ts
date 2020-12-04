@@ -34,58 +34,58 @@ export interface DefaultWsInMessage<A extends string, H extends HandlerName> ext
   cbId?: number;
 }
 
-export interface LoadMessages extends DefaultWsInMessage<'loadMessages', 'channels'> {
+export interface LoadMessages extends DefaultWsInMessage<'loadMessages', 'ws-message'> {
   content: MessageModelDto[];
   roomId: number;
 }
 
-export interface DeleteMessage extends DefaultWsInMessage<'deleteMessage', 'channels'> {
+export interface DeleteMessage extends DefaultWsInMessage<'deleteMessage', 'ws-message'> {
   roomId: number;
   id: number;
   edited: number;
 }
 
-export interface EditMessage extends DefaultWsInMessage<'editMessage', 'channels'> , MessageModelDto  {
+export interface EditMessage extends DefaultWsInMessage<'editMessage', 'ws-message'> , MessageModelDto  {
 }
 
-export interface PrintMessage extends DefaultWsInMessage<'printMessage', 'channels'> , MessageModelDto  {
+export interface PrintMessage extends DefaultWsInMessage<'printMessage', 'ws-message'> , MessageModelDto  {
 }
 
-export interface AddOnlineUserMessage extends DefaultWsInMessage<'addOnlineUser', 'channels'>, ChangeUserOnlineBase {
+export interface AddOnlineUserMessage extends DefaultWsInMessage<'addOnlineUser', 'room'>, ChangeUserOnlineBase {
 }
 
-export interface RemoveOnlineUserMessage extends DefaultWsInMessage<'removeOnlineUser', 'channels'>, ChangeUserOnlineBase {
+export interface RemoveOnlineUserMessage extends DefaultWsInMessage<'removeOnlineUser', 'room'>, ChangeUserOnlineBase {
 }
 
-export interface DeleteRoomMessage extends DefaultWsInMessage<'deleteRoom', 'channels'> {
+export interface DeleteRoomMessage extends DefaultWsInMessage<'deleteRoom', 'room'> {
   roomId: number;
 }
 
-export interface LeaveUserMessage extends DefaultWsInMessage<'leaveUser', 'channels'> {
+export interface LeaveUserMessage extends DefaultWsInMessage<'leaveUser', 'room'> {
   roomId: number;
   userId: number;
   users: number[];
 }
 
-export interface AddChannelMessage extends DefaultWsInMessage<'addChannel', 'channels'> , ChannelDto {
+export interface AddChannelMessage extends DefaultWsInMessage<'addChannel', 'room'> , ChannelDto {
 }
 
-export interface InviteUserMessage extends NewRoom, RoomExistedBefore, DefaultWsInMessage<'inviteUser', 'channels'> {
+export interface InviteUserMessage extends NewRoom, RoomExistedBefore, DefaultWsInMessage<'inviteUser', 'room'> {
   roomId: number;
   users: number[];
 }
 
-export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore, DefaultWsInMessage<'addInvite', 'channels'>  {
+export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore, DefaultWsInMessage<'addInvite', 'room'>  {
 }
 
-export interface SaveChannelSettingsMessage extends DefaultWsInMessage<'saveChannelSettings', 'channels'>, ChannelDto {
+export interface SaveChannelSettingsMessage extends DefaultWsInMessage<'saveChannelSettings', 'room'>, ChannelDto {
 }
 
-export interface DeleteChannelMessage extends DefaultWsInMessage<'deleteChannel', 'channels'> {
+export interface DeleteChannelMessage extends DefaultWsInMessage<'deleteChannel', 'room'> {
   channelId: number;
 }
 
-export interface SaveRoomSettingsMessage extends DefaultWsInMessage<'saveRoomSettings', 'channels'>, RoomNoUsersDto {
+export interface SaveRoomSettingsMessage extends DefaultWsInMessage<'saveRoomSettings', 'room'>, RoomNoUsersDto {
 }
 
 export interface SetWsIdMessage extends DefaultWsInMessage<'setWsId', 'ws'>, OpponentWsId {
@@ -103,7 +103,7 @@ export interface WebRtcSetConnectionIdMessage extends WebRtcDefaultMessage, Defa
   time: number;
 }
 
-export interface AddRoomMessage extends AddRoomBase, DefaultWsInMessage<'addRoom', 'channels'> {
+export interface AddRoomMessage extends AddRoomBase, DefaultWsInMessage<'addRoom', 'room'> {
 }
 
 export interface OfferFile extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'offerFile', 'webrtc'> {
@@ -163,7 +163,6 @@ export interface PingMessage extends DefaultWsInMessage<'ping', 'ws'> {
 export interface PongMessage extends DefaultWsInMessage<'pong', 'ws'> {
   time: string;
 }
-
 
 export interface ReplyFileMessage extends ReplyWebRtc, DefaultWsInMessage<'replyFile', 'webrtcTransfer:*'> {
 

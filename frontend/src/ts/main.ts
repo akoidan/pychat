@@ -31,7 +31,7 @@ import {
 import { VNode } from 'vue/types/vnode';
 import Xhr from '@/ts/classes/Xhr';
 import WsHandler from '@/ts/message_handlers/WsHandler';
-import ChannelsHandler from '@/ts/message_handlers/ChannelsHandler';
+import WsMessageHandler from '@/ts/message_handlers/WsMessageHandler';
 import DatabaseWrapper from '@/ts/classes/DatabaseWrapper';
 import LocalStorage from '@/ts/classes/LocalStorage';
 import Api from '@/ts/message_handlers/Api';
@@ -45,6 +45,7 @@ import { WebPlatformUtils } from '@/ts/devices/WebPlatformUtils';
 import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 import { SetStateFromStorage } from '@/ts/types/dto';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import { RoomHandler } from '@/ts/message_handlers/RomHandler';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -155,10 +156,11 @@ async function init() {
   const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
   const messageBus = new Vue();
   const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
-  const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, audioPlayer, messageHelper);
+  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
+  const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
-  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler);
+  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
 
   Vue.prototype.$api = api;
   Vue.prototype.$ws = ws;
@@ -188,7 +190,8 @@ async function init() {
   window.GIT_VERSION = GIT_HASH;
   if (IS_DEBUG) {
     window.vue = vue;
-    window.channelsHandler = channelsHandler;
+    window.wsMessageHandler = wsMessageHandler;
+    window.roomHandler = roomHandler;
     window.ws = ws;
     window.api = api;
     window.xhr = xhr;

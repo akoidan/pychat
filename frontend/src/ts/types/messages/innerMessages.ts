@@ -19,7 +19,7 @@ export interface DefaultInnerSystemMessage<A extends string, H extends HandlerNa
   allowZeroSubscribers?: boolean; // if true, no errors should be present on handeling this message by sucrcription if nothing was notified
 }
 
-export interface PubSetRooms extends DefaultInnerSystemMessage<'init', 'channels'> {
+export interface PubSetRooms extends DefaultInnerSystemMessage<'init', 'room'> {
   rooms:  RoomDto[];
   channels: ChannelDto[];
   users: UserDto[];

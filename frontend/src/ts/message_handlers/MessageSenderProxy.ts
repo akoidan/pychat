@@ -4,23 +4,23 @@ import {
   IStorage,
   MessageSender
 } from '@/ts/types/types';
-import ChannelsHandler from '@/ts/message_handlers/ChannelsHandler';
+import WsMessageHandler from '@/ts/message_handlers/WsMessageHandler';
 
 export class MessageSenderProxy {
 
   private readonly store: DefaultStore;
   private readonly webrtcApi: WebRtcApi;
-  private readonly channelsHandler: ChannelsHandler;
+  private readonly wsMessageHandler: WsMessageHandler;
 
 
   constructor(
       store: DefaultStore,
       webrtcApi: WebRtcApi,
-      channelsHandler: ChannelsHandler
+      wsMessageHandler: WsMessageHandler
   ) {
     this.store = store;
     this.webrtcApi = webrtcApi;
-    this.channelsHandler = channelsHandler;
+    this.wsMessageHandler = wsMessageHandler;
   }
 
   private getRandomInt(max: number) {
@@ -43,7 +43,7 @@ export class MessageSenderProxy {
     if (this.store.roomsDict[roomId].p2p) {
       return this.webrtcApi.getMessageHandler(roomId);
     } else {
-      return this.channelsHandler;
+      return this.wsMessageHandler;
     }
   }
 

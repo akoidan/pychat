@@ -389,7 +389,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     const pubSetRooms: PubSetRooms = {
       action: 'init',
       channels: message.channels,
-      handler: 'channels',
+      handler: 'room',
       rooms: message.rooms,
       online: message.online,
       users: message.users

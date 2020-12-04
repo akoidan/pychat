@@ -34,7 +34,7 @@ import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
  */
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
-  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'message'> = {
+  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'webrtc-message'> = {
   };
 
   private state: 'not_inited' |'initing' | 'ready' = 'not_inited';

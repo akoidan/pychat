@@ -104,14 +104,14 @@ class MessagesCreator(object):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
-		room_less = self.default(online, Actions.LOGOUT, HandlerNames.CHANNELS)
+		room_less = self.default(online, Actions.LOGOUT, HandlerNames.ROOM)
 		return room_less
 
 	def room_online_login(self, online, sender_name, sex):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
-		room_less = self.default(online, Actions.LOGIN, HandlerNames.CHANNELS)
+		room_less = self.default(online, Actions.LOGIN, HandlerNames.ROOM)
 		room_less[VarNames.USER] = sender_name
 		room_less[VarNames.GENDER] = sex
 		return room_less
@@ -147,7 +147,7 @@ class MessagesCreator(object):
 		res = self.create_message(message, files)
 		res[VarNames.EVENT] = event
 		res[VarNames.CB_BY_SENDER] = self.id
-		res[VarNames.HANDLER_NAME] = HandlerNames.CHANNELS
+		res[VarNames.HANDLER_NAME] = HandlerNames.WS_MESSAGE
 		return res
 
 	@classmethod
@@ -220,7 +220,6 @@ class MessagesCreator(object):
 			'isNewAccount': is_new,
 		}
 
-
 	def unsubscribe_direct_message(self, room_id, js_id, myws_id, users, name):
 		"""
 		:param name: so we can determine on pubsub message if it's private
@@ -231,7 +230,7 @@ class MessagesCreator(object):
 			VarNames.ROOM_NAME: name,
 			VarNames.JS_MESSAGE_ID: js_id,
 			VarNames.USER_ID: self.user_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.CB_BY_SENDER: myws_id,
 			VarNames.ROOM_USERS: users
 		}
