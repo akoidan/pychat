@@ -58,11 +58,17 @@ import { State } from '@/ts/instances/storeInstance';
     +wrapper-inner
     justify-content: center
     position: relative
+    > div
+      display: flex
+      align-items: center
+      justify-content: center
     video, .audio-recording-now
       position: relative
       top: 50%
       transform: translateY(-50%)
     video
+      max-width: 100%
+      max-height: 100%
       border: 1px solid rgba(126, 126, 126, 0.5)
     .audio-recording-now
       height: 200px
