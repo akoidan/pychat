@@ -63,7 +63,7 @@ export interface Location {
   countryCode: string|null;
   region: string|null;
 }
-export type BlobType = 'v' | 'm' | 'a' | 'i';
+export type BlobType = 'v' | 'm' | 'a' | 'i' | 'f';
 
 export interface FileModel {
   url: string|null;
@@ -127,10 +127,10 @@ export interface ChannelsDictUIModel {
 }
 
 export interface SearchModel {
-  searchActive: boolean;
-  searchedIds: number[];
+  searchActive: boolean; // if true search panel is shown
+  messages: Record<number, MessageModel>;
   searchText: string;
-  locked: boolean;
+  locked: boolean; // if true, no more messages with this search is available from the server
 }
 
 export interface RoomLog {

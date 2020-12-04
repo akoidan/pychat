@@ -45,14 +45,16 @@ import {
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
   SetRoomsUsers,
-  SetSearchTo,
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
   StringIdentifier,
   LiveConnectionLocation,
   RoomMessagesIds,
-  ShareIdentifier
+  ShareIdentifier,
+  SetSearchStateTo,
+  SetSearchTextTo,
+  ToogleSearch
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
@@ -128,6 +130,7 @@ export class DefaultStore extends VuexModule {
   public onlineDict: Record<string, string[]> = {};
   public roomsDict: RoomDictModel = {};
   public showSmileys: boolean = false;
+  public showAttachments: boolean = false;
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
 
@@ -580,14 +583,34 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public addSearchMessages(ml: MessagesLocation) {
+    const om: Record<number, MessageModel> = this.roomsDict[ml.roomId].search.messages;
+    ml.messages.forEach(m => {
+      Vue.set(om, String(m.id), m);
+    });
+  }
+
+  @Mutation
+  public setSearchTextTo(ml: SetSearchTextTo) {
+    this.roomsDict[ml.roomId].search.messages = [];
+    this.roomsDict[ml.roomId].search.searchText = ml.searchText;
+    this.roomsDict[ml.roomId].search.locked = false;
+  }
+
+  @Mutation
   public setEditedMessage(editedMessage: EditingMessage|null) {
     this.editedMessage = editedMessage;
     this.activeUserId = null;
   }
 
   @Mutation
-  public setSearchTo(payload: SetSearchTo) {
-    this.roomsDict[payload.roomId].search = payload.search;
+  public setSearchStateTo(payload: SetSearchStateTo) {
+    this.roomsDict[payload.roomId].search.locked = payload.lock;
+  }
+
+  @Mutation
+  public toogleSearch(payload: ToogleSearch) {
+    this.roomsDict[payload.roomId].search.searchActive = !this.roomsDict[payload.roomId].search.searchActive;
   }
 
   @Mutation
@@ -765,6 +788,11 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setShowSmileys(value: boolean) {
     this.showSmileys = value;
+  }
+
+  @Mutation
+  public setShowAttachments(value: boolean) {
+    this.showAttachments = value;
   }
 
   @Mutation

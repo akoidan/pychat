@@ -13,6 +13,7 @@ import {
   MessageModel
 } from '@/ts/types/model';
 import recordIcon from '@/assets/img/audio.svg';
+import fileIcon from '@/assets/img/file.svg';
 import { getFlag } from '@/ts/utils/flags';
 import {
   Smile,
@@ -192,7 +193,9 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
 
           return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-          return `<img src='${recordIcon}'  symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+          return `<img src='${recordIcon}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+        } else if (v.type === 'f') {
+          return `<a href="${resolveMediaUrl(v.url!)}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
         } else {
           logger.error('Invalid type {}', v.type)();
         }
@@ -399,7 +402,7 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
         'image/jpeg',
         0.95
       );
-    },                     false);
+    }, false);
     video.src = src;
   } else {
     errCb(`Browser doesn't support playing ${file.type}`);
@@ -415,6 +418,26 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
   savedFiles[associatedAudio] = file;
   img.src = recordIcon as string;
   pasteNodeAtCaret(img, textArea);
+}
+
+export function pasteBlobFileToTextArea(file: Blob, textArea: HTMLElement) {
+  const img = document.createElement('img');
+  const associatedFile = URL.createObjectURL(file);
+  img.setAttribute('associatedFile', associatedFile);
+  img.className = `uploading-file ${PASTED_IMG_CLASS}`;
+  setBlobName(file);
+  savedFiles[associatedFile] = file;
+  img.src = fileIcon as string;
+  pasteNodeAtCaret(img, textArea);
+}
+
+
+export function pasteFileToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
+  if (file.size > 10_000_000) {
+    errCb(`Can't upload file greater than 10MB`);
+  } else {
+    pasteBlobFileToTextArea(file, textArea);
+  }
 }
 
 export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
@@ -452,6 +475,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     let src = img.getAttribute('src');
     const assVideo = img.getAttribute('associatedVideo') ?? null;
     const assAudio = img.getAttribute('associatedAudio')  ?? null;
+    const assFile = img.getAttribute('associatedFile')  ?? null;
     const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
 
     let elSymbol = oldSymbol;
@@ -470,11 +494,32 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
         return;
       }
     }
+    let type: BlobType;
+    if (videoType) {
+      type = videoType;
+    } else if (assAudio) {
+      type = 'a'
+    } else if (assFile) {
+      type = 'f'
+    } else {
+      type = 'i'
+    }
+
+    let url: string;
+    if (assAudio) {
+      url = assAudio;
+    } else if (assFile) {
+      url = assFile;
+    } else if (assVideo) {
+      url = assVideo;
+    } else {
+      url = src!;
+    }
 
     files[elSymbol] = {
-      type: videoType ?? (assAudio ? 'a' : 'i'),
+      type,
       preview: assVideo ? src : assVideo,
-      url: assAudio ?? (assVideo ?? src),
+      url,
       sending: true,
       fileId: null,
       previewFileId: null,

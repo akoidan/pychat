@@ -6,9 +6,34 @@
     />
     <search-messages :room="room" />
     <div
+      ref="chatboxSearch"
+      class="chatbox"
+      :class="{'hidden': !room.search.searchActive}"
+      tabindex="1"
+      @keydown="keyDownSearchLoadUp"
+      @mousewheel="onSearchScroll"
+    >
+      <template
+        v-for="message in searchMessages">
+        <fieldset
+          v-if="message.fieldDay"
+          :key="message.fieldDay"
+        >
+          <legend align="center">
+            {{ message.fieldDay }}
+          </legend>
+        </fieldset>
+        <chat-sending-message
+          v-else
+          :key="message.id"
+          :message="message"
+        />
+      </template>
+    </div>
+    <div
       ref="chatbox"
       class="chatbox"
-      :class="{'display-search-only': room.search.searchActive, 'hidden': room.callInfo.callContainer && room.callInfo.sharePaint}"
+      :class="{'hidden': room.search.searchActive || (room.callInfo.callContainer && room.callInfo.sharePaint)}"
       tabindex="1"
       @keydown="keyDownLoadUp"
       @mousewheel="onScroll"
@@ -83,7 +108,7 @@ import ChatReceivingFile from '@/vue/chat/ChatReceivingFile.vue';
 import ChatCall from '@/vue/chat/ChatCall.vue';
 import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 
-@Component({
+  @Component({
     components: {
       ChatChangeNameMessage,
       ChatCall,
@@ -99,15 +124,19 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
   export default class ChatBox extends Vue {
     @Prop() room!: RoomModel;
 
-    loading: boolean = false;
+    messageLoading: boolean = false;
+    searchMessageLoading: boolean = false;
 
     @Ref()
     private readonly chatbox!: HTMLElement;
 
+    @Ref()
+    private readonly chatboxSearch!: HTMLElement;
+
     scrollBottom: boolean = false;
 
     beforeUpdate() {
-      let el = this.chatbox;
+      let el = this.room.search.searchActive ? this.chatboxSearch : this.chatbox;
       if (el) { // checked, el could be missing
         this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
       } else {
@@ -117,9 +146,14 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 
     onEmitScroll() {
       this.$nextTick(function () {
-        if (this.chatbox && this.scrollBottom) {
-          this.chatbox.scrollTop = this.chatbox.scrollHeight;
-          this.$logger.debug("Scrolling to bottom")();
+        if (this.scrollBottom) {
+          if (this.room.search.searchActive && this.chatboxSearch) {
+            this.$logger.debug("Scrolling chatboxSearch to bottom")();
+            this.chatboxSearch.scrollTop = this.chatboxSearch.scrollHeight;
+          } else if (this.chatbox) {
+            this.$logger.debug("Scrolling chatbox to bottom")();
+            this.chatbox.scrollTop = this.chatbox.scrollHeight;
+          }
         }
       });
     }
@@ -134,6 +168,22 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 
     get id() {
       return this.room.id;
+    }
+
+    get searchMessages() {
+      let dates: {[id: string]: boolean} = {};
+      let newArray: any[] = [];
+      for (let m in this.room.search.messages) {
+        let message = this.room.search.messages[m];
+        let d = new Date(message.time).toDateString();
+        if (!dates[d]) {
+          dates[d] = true;
+          newArray.push({fieldDay: d, time: Date.parse(d)});
+        }
+        newArray.push(message);
+      }
+      newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+      return newArray;
     }
 
     get messages() {
@@ -166,63 +216,66 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
     }
 
     keyDownLoadUp(e: KeyboardEvent) {
+      this.loadHistoryWithEvent(e, n => this.loadUpHistory(n));
+    }
+
+    keyDownSearchLoadUp(e: KeyboardEvent) {
+      this.loadHistoryWithEvent(e, n => this.loadUpSearchHistory(n));
+    }
+
+    loadHistoryWithEvent(e: KeyboardEvent, callback: (a: number) => void) {
       if (e.which === 33) {    // page up
-        this.loadUpHistory(25);
+        callback(25);
       } else if (e.which === 38) { // up
-        this.loadUpHistory(10);
+        callback(10);
       } else if (e.ctrlKey && e.which === 36) {
-        this.loadUpHistory(35);
+        callback(35);
       } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
-        let s = this.room.search;
-        this.$store.setSearchTo({
-          roomId: this.room.id,
-          search: {
-            searchActive: !s.searchActive,
-            searchedIds: s.searchedIds,
-            locked: s.locked,
-            searchText: s.searchText
-          }
+        this.$store.toogleSearch({
+          roomId: this.room.id
         });
       }
-    };
+    }
 
     get minIdCalc(): number|undefined {
       return this.$store.minId(this.room.id);
     }
 
-    @ApplyGrowlErr({runningProp: 'loading', message: 'Unable to load history'})
+    @ApplyGrowlErr({runningProp: 'searchMessageLoading',  preventStacking: true, message: 'Unable to load history'})
+    private async loadUpSearchHistory(n: number) {
+      if (this.chatboxSearch.scrollTop !== 0) {
+        return; // we're just scrolling up
+      }
+      let search = this.room.search;
+      if (!search.locked) {
+        let messagesDto: MessageModelDto[] = await this.$api.search(search.searchText, this.room.id, Object.keys(search.messages).length);
+        this.$logger.log("Got {} messages from the server", messagesDto.length)()
+        if (messagesDto.length) {
+          this.$messageSenderProxy.getMessageSender(this.room.id).addSearchMessages(this.room.id, messagesDto);
+        }
+        this.$store.setSearchStateTo({roomId: this.room.id, lock: messagesDto.length < MESSAGES_PER_SEARCH});
+      }
+    }
+
+    @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})
     private async loadUpHistory(n: number) {
       if (this.chatbox.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-      let s = this.room.search;
-      if (s.searchActive && !s.locked) {
-        let a: MessageModelDto[] = await this.$api.search(s.searchText, this.room.id, s.searchedIds.length);
-        if (a.length) {
-          this.$messageSenderProxy.getMessageSender(this.room.id).addMessages(this.room.id, a);
-          let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
-          this.$store.setSearchTo({
-            roomId: this.room.id,
-            search: {
-              searchActive: s.searchActive,
-              searchedIds,
-              locked: a.length < MESSAGES_PER_SEARCH,
-              searchText: s.searchText
-            } as SearchModel
-          });
+     if (!this.room.allLoaded) {
+        let lm = await this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n);
+        if (lm.content.length > 0) {
+          this.$messageSenderProxy.getMessageSender(lm.roomId).addMessages(lm.roomId, lm.content);
         } else {
-          this.$store.setSearchTo({
-            roomId: this.room.id,
-            search: {
-              searchActive: s.searchActive,
-              searchedIds: s.searchedIds,
-              locked: true,
-              searchText: s.searchText
-            }
-          });
+          this.$store.setAllLoaded(lm.roomId);
         }
-      } else if (!s.searchActive && !this.room.allLoaded) {
-        await this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n);
+      }
+    }
+
+    onSearchScroll(e: WheelEvent) {
+      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
+      if (e.detail < 0 || e.deltaY < 0) {
+        this.loadUpSearchHistory(10);
       }
     }
 
@@ -266,10 +319,6 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
       display: none
     &:focus
       outline: none
-
-    &.display-search-only /deep/
-      >:not(.filter-search)
-        display: none
 
   fieldset
     border-top: 1px solid #e8e8e8

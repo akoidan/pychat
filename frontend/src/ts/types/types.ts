@@ -67,6 +67,7 @@ export interface SetDevices {
 export interface MessageSender {
   syncMessage(roomId: number, messageId: number):  Promise<void>;
   addMessages(roomId: number, messages: MessageModelDto[]): void;
+  addSearchMessages(roomId: number, messages: MessageModelDto[]): void;
 }
 
 export interface JsAudioAnalyzer {
@@ -268,15 +269,22 @@ export interface RemoveMessageProgress {
   roomId: number;
 }
 
-
-
 export interface SetMessageProgress extends RemoveMessageProgress {
   uploaded: number;
 }
 
-export interface SetSearchTo {
+export interface SetSearchStateTo {
   roomId: number;
-  search: SearchModel;
+  lock: boolean;
+}
+
+export interface ToogleSearch {
+  roomId: number;
+}
+
+export interface SetSearchTextTo {
+  roomId: number;
+  searchText: string;
 }
 
 export enum IconColor {

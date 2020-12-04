@@ -11,14 +11,6 @@
       <span class="mText">Home</span>
     </router-link>
     <router-link
-      v-if="consts.PAINTER"
-      to="/painter"
-      class="icon-brush"
-      title="Draw an Image"
-    >
-      <span class="mText">Painter</span>
-    </router-link>
-    <router-link
       v-if="consts.ISSUES"
       to="/report-issue"
       class="icon-pencil"
@@ -48,19 +40,6 @@
     ><span
       class="mText"
     >Search</span>
-    </i>
-    <i
-      v-if="$route.name === 'chat' && activeRoomOnline.length > 1"
-      class="icon-doc-inv"
-      @click="sendFileClick"
-    >
-      <input
-        v-show="false"
-        ref="inputFile"
-        type="file"
-        @change="sendFile"
-      >
-      <span class="mText">Send File</span>
     </i>
     <i
       v-if="false"
@@ -106,7 +85,7 @@
 import {State} from '@/ts/instances/storeInstance';
 import {Component, Vue, Ref} from 'vue-property-decorator';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/ts/types/model';
-import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/ts/utils/consts';
+import {ISSUES, GITHUB_LINK, STATISTICS} from '@/ts/utils/consts';
 import {sub} from '@/ts/instances/subInstance'
 import { LogoutMessage } from '@/ts/types/messages/innerMessages';
 
@@ -122,9 +101,6 @@ export default class AppNav extends Vue {
   @State
   public readonly activeRoomOnline!: string[];
 
-  @Ref()
-  public inputFile!: HTMLInputElement;
-
   @State
   public readonly isOnline!: boolean;
 
@@ -134,7 +110,6 @@ export default class AppNav extends Vue {
   public get consts(): object {
     return {
       GITHUB_LINK,
-      PAINTER,
       ISSUES,
       STATISTICS
     }
@@ -155,20 +130,10 @@ export default class AppNav extends Vue {
     this.$store.toggleContainer(roomd);
   }
 
-  public sendFileClick() {
-    this.inputFile.value = '';
-    this.inputFile.click();
-  }
-
-  public sendFile(event: FileList) {
-    this.$webrtcApi.sendFileOffer(this.inputFile.files![0], this.activeRoom.id);
-  }
-
   public invertSearch() {
-    this.$store.setSearchTo({
-      roomId: this.activeRoom.id,
-      search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
-      });
+    this.$store.toogleSearch({
+      roomId: this.activeRoom.id
+    });
   }
 
   public toggle() {
@@ -244,8 +209,6 @@ export default class AppNav extends Vue {
 
     .icon-home
       color: rgb(51, 122, 183)
-    .icon-brush
-      color: #960000
     .icon-pencil
       color: rgb(85, 26, 139)
     .icon-santa-hat
@@ -260,8 +223,6 @@ export default class AppNav extends Vue {
       color: rgb(70, 133, 117)
     .icon-phone
       color: #136C00
-    .icon-doc-inv
-      color: #40b2b2
     .icon-popup
       color: #c58446
   .color-white
@@ -277,8 +238,6 @@ export default class AppNav extends Vue {
   .color-white
     .icon-home
       color: #20A0FF
-    .icon-brush
-      color: #c51900
     .icon-pencil
       color: #ae49ff
     .icon-chart-pie
@@ -289,8 +248,6 @@ export default class AppNav extends Vue {
       color: #67C8B0
     .icon-phone
       color: #257517 /*override .		color-lor :link*/
-    .icon-doc-inv
-      color: #0095ad
     .icon-popup
       color: #ff9900
   .color-reg
@@ -303,8 +260,6 @@ export default class AppNav extends Vue {
       @include hover-click(#bbbbbb)
     .icon-home
       @include hover-click(#20A0FF)
-    .icon-brush
-      @include hover-click(#ee0000)
     .icon-pencil
       @include hover-click(#8D28DE)
     .icon-trash-circled
@@ -318,8 +273,6 @@ export default class AppNav extends Vue {
 
     .icon-phone
       @include hover-click(#37BB21) /*override .		color-lor :link*/
-    .icon-doc-inv
-      @include hover-click(#15dfff)
     .icon-popup
       @include hover-click(#ff9900)
 

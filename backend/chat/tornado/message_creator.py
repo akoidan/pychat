@@ -174,7 +174,7 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.ROOM_ID: channel,
 			VarNames.JS_MESSAGE_ID: message_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
+			VarNames.HANDLER_NAME: HandlerNames.NULL
 		}
 
 	@staticmethod

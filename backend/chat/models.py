@@ -270,6 +270,7 @@ class Message(Model):
 class UploadedFile(Model):
 	class UploadedFileChoices(Enum):
 		video = 'v'
+		file = 'f'
 		media_record= 'm'
 		audio_record = 'a'
 		image = 'i'

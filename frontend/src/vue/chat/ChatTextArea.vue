@@ -1,17 +1,9 @@
 <template>
   <div class="userMessageWrapper">
-    <input
-      v-show="false"
-      ref="imgInput"
-      type="file"
-      accept="image/*,video/*"
-      multiple="multiple"
-      @change="handleFileSelect"
-    >
     <i
-      class="icon-picture"
-      title="Share Video/Image"
-      @click="addImage"
+      class="icon-attach-outline"
+      title="Add attachment"
+      @click="setShowAttachments"
     />
     <i
       class="icon-smile"
@@ -47,6 +39,7 @@ import {
   pasteBlobAudioToTextArea,
   pasteBlobToContentEditable,
   pasteBlobVideoToTextArea,
+  pasteFileToTextArea,
   pasteHtmlAtCaret,
   pasteImgToTextArea,
   placeCaretAtEnd,
@@ -90,6 +83,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     public readonly showSmileys!: boolean;
 
     @State
+    public readonly showAttachments!: boolean;
+
+    @State
     public readonly editingMessageModel!: MessageModel;
 
     @State
@@ -97,9 +93,6 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     @Ref()
     public userMessage!: HTMLElement;
-
-    @Ref()
-    public imgInput!: HTMLInputElement;
 
     @State
     public readonly allUsersDict!: UserDictModel;
@@ -113,12 +106,18 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     @State
     public readonly activeRoom!: RoomModel;
 
+    private setShowAttachments() {
+      this.$store.setShowAttachments(!this.showAttachments);
+    }
+
 
     public created() {
       this.$messageBus.$on('drop-photo', this.onEmitDropPhoto);
       this.$messageBus.$on('add-smile', this.onEmitAddSmile);
       this.$messageBus.$on('delete-message', this.onEmitDeleteMessage);
       this.$messageBus.$on('quote', this.onEmitQuote);
+      this.$messageBus.$on('paste-images', this.pasteImagesToTextArea);
+      this.$messageBus.$on('paste-files', this.pasteFilesToTextArea);
     }
 
     public destroyed() {
@@ -126,6 +125,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       this.$messageBus.$off('add-smile', this.onEmitAddSmile);
       this.$messageBus.$off('delete-message', this.onEmitDeleteMessage);
       this.$messageBus.$off('quote', this.onEmitQuote);
+      this.$messageBus.$off('paste-images', this.pasteImagesToTextArea);
+      this.$messageBus.$off('paste-files', this.pasteFilesToTextArea);
     }
 
 
@@ -281,39 +282,17 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
-    public async addImage() {
-      // TODO seems like filePicker has limited about of time which file lives.
-      //  Sometimes it errors `net::ERR_FILE_NOT_FOUND` on upload
-      // if (window.showOpenFilePicker) {
-      //   let filesHandles: FileSystemFileHandle[] = await window.showOpenFilePicker({
-      //     multiple: true,
-      //     types: [
-      //       {
-      //         description: 'Images',
-      //         accept: {
-      //           'image/*': ['.png', '.gif', '.jpeg', '.jpg']
-      //         }
-      //       }
-      //     ]
-      //   })
-      //   let files = await Promise.all(filesHandles.map(a => a.getFile()))
-      //
-      //   this.pasteFilesToTextArea(files);
-      // } else {
-        this.imgInput.click();
-      // }
+    private pasteImagesToTextArea(files: FileList| File[]) {
+      for (let i = 0; i < files.length; i++) {
+        pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
+          this.$store.growlError(err);
+        });
+      }
     }
-
-    public  handleFileSelect (evt: Event) {
-      const files: FileList = (evt.target as HTMLInputElement).files!;
-      this.pasteFilesToTextArea(files);
-      this.imgInput.value = '';
-    }
-
 
     private pasteFilesToTextArea(files: FileList| File[]) {
       for (let i = 0; i < files.length; i++) {
-        pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
+        pasteFileToTextArea(files[i], this.userMessage, (err: string) => {
           this.$store.growlError(err);
         });
       }
@@ -378,6 +357,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     position: relative
     width: calc(100% - 16px)
 
+    .icon-attach-outline
+      @extend %chat-icon
+      left: 15px
     .icon-smile
       @extend %chat-icon
       right: 10px
@@ -392,7 +374,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       color: #7b7979
 
 
-  .usermsg /deep/ img[code]
+  .usermsg /deep/ img[alt] //smile
     @extend %img-code
 
 
@@ -418,6 +400,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         min-width: 200px
         min-height: 100px
     /deep/ .audio-record
+      height: 50px
+    /deep/ .uploading-file
       height: 50px
 
     /deep/ *

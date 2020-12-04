@@ -12,7 +12,6 @@
   "ISSUES": true,
   "STATISTICS": true,
   "GITHUB_LINK": "https://github.com/Deathangel908/pychat",
-  "PAINTER": true,
   "FLAGS": true,
   "WEBRTC_CONFIG": {"iceServers":[{"urls":["stun:turn2.l.google.com"]}]}
 }

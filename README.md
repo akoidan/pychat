@@ -457,7 +457,6 @@ development.json and production.json have the following format:
   "ISSUES": "if true navigation bar will display link to reporting a issue page",
   "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
-  "PAINTER": "if true chat will contain a link to painter page in the navbar. This you can draw any images and send to chat",
   "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",
   "WEBRTC_CONFIG": "This variable defines the first argument of RtcPeerConnection constructor. Sometimes webrtc stun server doesn't work in establishing a connection. Especially for this you can use turn server instead of it. Docker prod docker image already comes with a turn server, example of configuration for it  `{iceServers:[{urls:['turn:YOUR_DOMAIN'],username:'pychat',credential:'pypass'}]}`. replace YOUR_DOMAIN with your real domain name/public ip. You other scenarios use your server like coturn (https://github.com/coturn/coturn). See more info of this variable at docs: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#RTCConfiguration_dictionary"
 }
@@ -479,23 +478,20 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* Refactor UX on navbar, move report issue and amchart to somewhere, they just eat place for nothing. Move Signout to dropdown like in fb or vk. Do something with call, it's not intuitive. Right bar is nto required check how telegram does UX 
 * Add ability to make a call like in google meet with a link
 * https://webrtc.github.io/samples/src/content/getusermedia/resolution/
 * when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
 * if users joins a room that already has call in progress, he should be able to join this call
-* create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module
 * opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
 * .stylelintignore @for loops doesn't work in linter https://github.com/AleshaOleg/postcss-sass/issues/53
-* https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * get\s+(\w+)\(\):\s+((\w|\[|\])+)\s+\{\s+return\s+store\.\w+\;?\s+\}\;?        @State\n    public readonly $1!: $2;
-* purge all callbacks to async code
 * npm run stats
 * Add google and fb auth via iframe 
 * compile to bytenode for electron https://github.com/OsamaAbbas/bytenode
 * Add codepart to live code
-* https://static.pychat.org/main.js?5db3927a045ba970fade:17390:17 Uncaught Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null} OBJ:  Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null}
 * "unable to begin transaction (3850 disk I/O error)" when 2 tabs are opened
 * Add search for roomname in rooms list and username for user in direct messages and user in room
 * Save message upon typing in localstorage and restore it on page load, be aware of pasted files
@@ -503,89 +499,46 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 * Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976
 * https://stackoverflow.com/questions/33170016/how-to-use-django-1-8-5-orm-without-creating-a-django-project
 * tornado uses blocking operation like django orm or sync_redis (strict redis). While this operations are executed main thread awaits IO and prevents new messages and connections from execution. async_redis create cb wrapper. django orm: https://docs.djangoproject.com/en/dev/releases/3.0/#asgi-support
-* Replace email login to google_user_id and fb_user_id so we could detach oauth2 account
 * Add smile reaction to the message below it, like in slack
 * https://www.w3.org/TR/css-scrollbars-1/
 * Search add user to room should container user icon
 * add webhooks, move giphy to webhooks, add help command
-* https://www.nginx.com/resources/wiki/modules/upload/
 * Store image in filstream api
 * add srcset and minify uploaded image 
 * Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976
 * https://stackoverflow.com/questions/33170016/how-to-use-django-1-8-5-orm-without-creating-a-django-project
 * tornado uses blocking operation like django orm or sync_redis (strict redis). While this operations are executed main thread awaits IO and prevents new messages and connections from execution. async_redis create cb wrapper. django orm: https://docs.djangoproject.com/en/dev/releases/3.0/#asgi-support
-* autoupdate pychat.org from github webhook and expose port http to build
 * If self assigned certificate was used, mb add user an option to click on iframe or smth?
 * Giphy: The gif-picture won't change after editing and leaving it's name. But there are tons of other gifs under every tag. 
 * If user A was online in Brower BA and he didn't have any history, when he joins online from browser B and send the message, it won't appear on browser BA when he opens ba.
 * RoomUsers should have disabled instead of Room, so when user leaves direct messages, another one doesn't exit it. But in case of new message, user just doesn't receive any... Mb we can make them hidden in UI
-* Merge base.js into chat.js so 1 request less
 * https://github.com/tornadoweb/tornado/issues/2243
-* Add sound/video messages like in telegram
-* Add webrtc peer to peer secure chats (like telegrams)
-* output logs to kibana
-* Store userOnline in a single list, refactor All channel for online storing
 * Add "last seen" feature and status afk/online/dnd
 * blink icon in title on new message
 * Add message to favorite
 * Ability to quote any code
-* Paint errors
 * Add ability to show growls messages to channel from ADMIN
-* gitb don't backup files larger than 10MB
-* Add "last seen" feature
-* Add video/voice record to chat like in telegram
 * https://static.pychat.org/photo/uEXCJWJH_image.png
 * Add go down button if scroll is not in the botom for chatbox
 * Firefox doesn't google support fcm push
-* Transfer file should be inside of chatbox instead of being a separate window
-* Messages should appear in chat instantly with automatic resend when connection is up
 * signup verification emails is sent to admin instead of current user.
 * Add avatar to notifications and users 
 * update service worker if its version changed with registration.update()
-* setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
 * giphy search should return random image
 * Add payback to firebase
-* Fix all broken painter event in mobile
-* https://static.pychat.org/photo/xE9bSyvC_image.png
 * https://developers.google.com/web/updates/2015/12/background-sync
 * Added bad code stub for: Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
 * No sound in call https://bugs.chromium.org/p/chromium/issues/detail?id=604523
 * paste event doesn't fire at all most of the times on painter canvasHolder, mb try to move it to <canvas>
-* Replaced email oauth with fb\google id and add them to profile
-* Add applying zoom to method that trigger via keyboard in canvas
 * add queued messaged to wsHandler, if ws is offline messages goes to array. userMessage input clears after we press enter and we don't restore its state we just put message to queue. When webrtc is disconnected we send reconnect event to this ws.queue
-* Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
-* remove setHeaderTest, highlight current page icos. Always display username in right top
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
-* file transfer - add ability to click on user on receivehandler popup (draggable)
-* add message queue if socketed is currently disconnected ???
 * Add link to gihub in console
-* Add title for room.
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
-* !!!IMPORTANT Debug call dialog by switching channels while calling and no.
-* shape-inside for contentteditable 
 * Add multi-language support.
 * remember if user has camera/mic and autoset values after second call
-* android play() can only be initiated by a user gesture.
-* add 404page
-* https://code.djangoproject.com/ticket/25489
-* http://stackoverflow.com/a/18843553/3872976
-* add antispam system
-* move loading messages on startup to single function? 
-* add antiflood settings to nginx
+* add antispam system 
 * tornado redis connection reset prevents user from deleting its entry in online_users
 * add media query for register and usersettings to adjust for phone's width
-* file upload http://stackoverflow.com/a/14605593/3872976
-* add pictures preview if user post an url that's content-type =image
 * SELECT_SELF_ROOM  https://github.com/Deathangel908/pychat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
 * also admin email wasn't triggered while SELECT_SELF_ROOM has failed
-* Remove django server and leave only tornado
-* send image to chat if error on server or inet goes down while uploading - we don't have an option to retry
-* Add linters like on webpack-vue-typescript
-* ADD ability to change theme during registration
-* add ability to cancel filetransfer on sender side
-* add aliases to webpack
-* add test
-* add tslint
-* add sass-lint
 * resolve sw.ts imports doesn't work with ts-loader + file-loaders

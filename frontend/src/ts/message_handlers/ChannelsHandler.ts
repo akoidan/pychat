@@ -98,7 +98,6 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   protected readonly handlers: HandlerTypes<keyof ChannelsHandler, 'channels'> = {
     init:  <HandlerType<'init', 'channels'>>this.init,
-    loadMessages:  <HandlerType<'loadMessages', 'channels'>>this.loadMessages,
     deleteMessage:  <HandlerType<'deleteMessage', 'channels'>>this.deleteMessage,
     editMessage:  <HandlerType<'editMessage', 'channels'>>this.editMessage,
     addOnlineUser:  <HandlerType<'addOnlineUser', 'channels'>>this.addOnlineUser,
@@ -243,9 +242,16 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
   }
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
     const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].messages;
-    const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]); // TODO this doesn't work probably, because we use sending instead of id
+    const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
     const messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
     this.store.addMessages({messages, roomId: roomId});
+  }
+
+  public addSearchMessages(roomId: number, inMessages: MessageModelDto[]) {
+    const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].search.messages;
+    const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
+    const messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
+    this.store.addSearchMessages({messages, roomId: roomId});
   }
 
   public init(m: PubSetRooms) {
@@ -291,14 +297,6 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   protected getMethodHandlers() {
     return this.handlers;
-  }
-
-  public loadMessages(lm: LoadMessages) {
-    if (lm.content.length > 0) {
-      this.addMessages(lm.roomId, lm.content);
-    } else {
-      this.store.setAllLoaded(lm.roomId);
-    }
   }
 
   public deleteMessage(inMessage: DeleteMessage) {

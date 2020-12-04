@@ -15,7 +15,6 @@ export const {
   ISSUES,
   STATISTICS,
   GITHUB_LINK,
-  PAINTER,
   FLAGS,
   GIT_HASH,
   IS_PROD,

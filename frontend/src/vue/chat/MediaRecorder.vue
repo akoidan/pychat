@@ -96,5 +96,7 @@ import {
   .icon-webrtc-video, .icon-mic-1
     @extend %chat-icon
     z-index: 2
-    right: 30px
+    right: 35px
+  .icon-webrtc-video
+    top: 11px // otherwise it's not squar and it's closer to top
 </style>

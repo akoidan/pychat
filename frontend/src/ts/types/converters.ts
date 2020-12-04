@@ -130,7 +130,7 @@ export function getRoomsBaseDict(
     search: databaseRestoredRoom ? databaseRestoredRoom.search : {
       searchActive: false,
       searchText: '',
-      searchedIds: [],
+      messages: [],
       locked: false
     },
     users

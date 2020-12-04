@@ -178,5 +178,10 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     throw Error('unsupported');
   }
 
+  addSearchMessages(roomId: number, messages: MessageModelDto[]): void {
+    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
+    throw Error('unsupported');
+  }
+
 
 }

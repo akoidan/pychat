@@ -188,7 +188,7 @@ export default class ChatMessage extends Vue {
       &:hover
         text-decoration: underline
 
-    /deep/ img[code]
+    /deep/ img[alt] // smile
       @extend %img-code
 
     /deep/ .quote
@@ -238,6 +238,10 @@ export default class ChatMessage extends Vue {
       div
         background-color: transparent
     /deep/ .audio-record
+      vertical-align: middle
+      height: 50px
+      cursor: pointer
+    /deep/ .uploading-file
       vertical-align: middle
       height: 50px
       cursor: pointer

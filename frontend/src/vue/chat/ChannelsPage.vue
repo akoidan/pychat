@@ -9,6 +9,7 @@
         :recording-now="recordingNow"
       />
       <chat-right-section />
+      <chat-attachments/>
       <smiley-holder />
     </div>
     <chat-text-area
@@ -36,9 +37,11 @@ import {
 import ChatRecording from '@/vue/chat/ChatRecording.vue';
 import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
 import ChatBoxes from '@/vue/chat/ChatBoxes.vue';
+import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
 
 
 @Component({components: {
+    ChatAttachments,
   ChatBoxes,
   ChatTextArea,
   ChatRecording,

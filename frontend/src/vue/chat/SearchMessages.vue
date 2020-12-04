@@ -33,8 +33,6 @@ import {
   SearchModel
 } from '@/ts/types/model';
 import { MessageModelDto } from '@/ts/types/dto';
-
-import { SetSearchTo } from '@/ts/types/types';
 import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
 
 const START_TYPING = 'Start typing and messages will appear';
@@ -48,7 +46,7 @@ export default class SearchMessages extends Vue {
     } else if (!this.room.search.locked) {
       return 'More messages are available, scroll top to load them';
     } else {
-      return '';
+      return 'No more messages are available on this search';
     }
   }
 
@@ -88,48 +86,32 @@ export default class SearchMessages extends Vue {
   public async doSearch(search: string) {
     if (search) {
       try {
-       const a: MessageModelDto[] = await  this.$api.search(search, this.room.id, this.offset, r => this.currentRequest = r);
-       this.$logger.debug('http response {} {}', a)();
+       const messagesDto: MessageModelDto[] = await  this.$api.search(search, this.room.id, this.offset, r => this.currentRequest = r);
+       this.$logger.debug('http response {} {}', messagesDto)();
        this.currentRequest = null;
-       if (a.length) {
-          this.$messageSenderProxy.getMessageSender(this.room.id).addMessages(this.room.id, a); // TODO this should be separate messages, otherwise we would have history with holes
-          const ids = this.room.search.searchedIds.concat([]);
-          this.mutateSearchedIds(a.map(a => a.id), search);
+       if (messagesDto.length) {
+          this.$messageSenderProxy.getMessageSender(this.room.id).addSearchMessages(this.room.id, messagesDto);
           this.searchResult = '';
         } else {
-          this.mutateSearchedIds([], search);
           this.searchResult = 'No results found';
         }
+        this.$store.setSearchStateTo({roomId: this.room.id, lock: messagesDto.length < MESSAGES_PER_SEARCH});
       } catch (e) {
         this.searchResult = e;
-        this.mutateSearchedIds([], search);
       }
     } else {
-      this.mutateSearchedIds([], search);
       this.searchResult = START_TYPING;
     }
   }
 
   @Watch('search')
   public onSearchChange(search: string) {
+    this.$store.setSearchTextTo({searchText: search, roomId: this.room.id})
     if (this.currentRequest) {
       this.currentRequest.abort();
       this.currentRequest = null;
     }
     this.debouncedSearch(search);
-  }
-
-  private mutateSearchedIds(searchedIds: number[], searchText: string) {
-    const search: SearchModel = {
-      searchActive: this.searchActive,
-      searchedIds,
-      searchText,
-      locked: searchedIds.length < MESSAGES_PER_SEARCH
-    };
-    this.$store.setSearchTo({
-      roomId: this.room.id,
-      search
-    } as SetSearchTo);
   }
 }
 </script>

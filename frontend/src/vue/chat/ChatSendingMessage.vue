@@ -43,10 +43,6 @@ export default class ChatSendingMessage extends Vue {
   @State
   public readonly roomsDict!: RoomDictModel;
 
-  get searchedIds() {
-    return this.roomsDict[this.message.roomId].search.searchedIds;
-  }
-
   get filesExist() {
     return this.message.files && Object.keys(this.message.files).length > 0;
   }
@@ -65,7 +61,6 @@ export default class ChatSendingMessage extends Vue {
     return {
       sendingMessage: this.message.transfer && !this.message.transfer.upload,
       uploadMessage: this.message.transfer && !!this.message.transfer.upload,
-      'filter-search': this.searchedIds.indexOf(this.message.id) >= 0,
       'message-self': this.isSelf,
       'message-others': !this.isSelf,
       'removed-message': this.message.deleted,

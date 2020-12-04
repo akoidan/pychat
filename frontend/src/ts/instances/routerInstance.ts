@@ -22,7 +22,6 @@ import RoomSettings from '@/vue/pages/RoomSettings.vue';
 import ApplyResetPassword from '@/vue/singup/ApplyResetPassword.vue';
 import {
   ALL_ROOM_ID,
-  PAINTER,
   STATISTICS
 } from '@/ts/utils/consts';
 import ConfirmMail from '@/vue/email/ConfirmMail.vue';
@@ -76,10 +75,10 @@ export const router = new VueRouter({
           name: 'chat',
           path: '/chat/:id'
         },
-        ...PAINTER ? [{
+        {
           component: PainterPage,
           path: '/painter'
-        }]: [],
+        },
         ...STATISTICS ? [{
           component: () => import(/* webpackChunkName: 'amchart' */ '@/vue/pages/AmChart.vue'),
           path: '/statistics'

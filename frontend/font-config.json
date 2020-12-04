@@ -979,8 +979,20 @@
     {
       "uid": "db112402805d9dadc01ce009fbfdb914",
       "css": "paper-plane",
-      "code": 59291,
+      "code": 59470,
       "src": "entypo"
+    },
+    {
+      "uid": "de2fc7a5c986ab8c622f63455d7cf814",
+      "css": "upload-cloud",
+      "code": 61678,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "6310fc4804f3ffaebc4436ee30f3856e",
+      "css": "attach-outline",
+      "code": 59471,
+      "src": "typicons"
     },
     {
       "uid": "918bda80304f8b29c37dbd7322fef131",
