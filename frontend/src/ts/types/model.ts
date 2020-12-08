@@ -192,6 +192,7 @@ export interface P2pMessageModel {
 export interface CallsInfoModel {
   calls: Record<string, CallInfoModel>;
   callContainer: boolean;
+  callActiveButNotJoinedYet: boolean;
   showMic: boolean;
   currentMicLevel: number; // voice
   mediaStreamLink: string|null;

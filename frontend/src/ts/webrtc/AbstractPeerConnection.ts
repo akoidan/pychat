@@ -76,7 +76,8 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     const message: CheckTransferDestroy = { // Destroy parent TransferHandler
       handler: Subscription.getTransferId(this.connectionId),
       action: 'checkTransferDestroy',
-      allowZeroSubscribers: true
+      allowZeroSubscribers: true,
+      wsOpponentId: this.opponentWsId
     };
     sub.notify(message);
   }

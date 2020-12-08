@@ -41,6 +41,12 @@ export interface RouterNavigateMessage extends DefaultInnerSystemMessage<'naviga
   to: string;
 }
 
+export interface ChangeUserOnlineInfoMessage extends DefaultInnerSystemMessage<'changeOnline', 'webrtc'>  {
+  opponentWsId: string;
+  userId: number;
+  type: 'appear_online' | 'gone_offline';
+}
+
 export interface ChangeP2pRoomInfoMessage extends DefaultInnerSystemMessage<'changeDevices', 'webrtc'>  {
   allowZeroSubscribers: true;
   changeType: ChangeDeviceType;
@@ -53,6 +59,7 @@ export interface ConnectToRemoteMessage extends DefaultInnerSystemMessage<'conne
 }
 
 export interface CheckTransferDestroy extends DefaultInnerSystemMessage<'checkTransferDestroy', 'webrtcTransfer:*'> {
+  wsOpponentId: string;
 }
 
 export interface ChangeStreamMessage extends DefaultInnerSystemMessage<'streamChanged', 'peerConnection:*'> {

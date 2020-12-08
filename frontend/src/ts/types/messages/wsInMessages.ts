@@ -28,6 +28,7 @@ import {
   RoomExistedBefore,
   WebRtcDefaultMessage
 } from '@/ts/types/messages/baseMessagesInterfaces';
+import { DefaultInnerSystemMessage } from '@/ts/types/messages/innerMessages';
 
 export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H>, CallBackMessage {
   cbBySender?: string;
@@ -52,6 +53,7 @@ export interface PrintMessage extends DefaultWsInMessage<'printMessage', 'ws-mes
 }
 
 export interface AddOnlineUserMessage extends DefaultWsInMessage<'addOnlineUser', 'room'>, ChangeUserOnlineBase {
+  opponentWsId: string;
 }
 
 export interface RemoveOnlineUserMessage extends DefaultWsInMessage<'removeOnlineUser', 'room'>, ChangeUserOnlineBase {
@@ -122,6 +124,11 @@ export interface OfferCall extends WebRtcDefaultMessage, OpponentWsId, DefaultWs
 
 export interface ReplyCallMessage  extends ReplyWebRtc, DefaultWsInMessage<'replyCall', 'webrtcTransfer:*'>  {
 
+}
+
+export interface NotifyCallActiveMessage extends DefaultWsInMessage<'notifyCallActive', 'webrtc'>, WebRtcDefaultMessage, OpponentWsId {
+  roomId: number;
+  userId: number;
 }
 
 export interface DestroyCallConnection extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'destroyCallConnection', 'peerConnection:*'> {

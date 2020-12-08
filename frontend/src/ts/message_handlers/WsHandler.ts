@@ -360,6 +360,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
+  public joinCall(connId: string) {
+    this.sendToServer({
+      action: 'joinCall',
+      connId
+    });
+  }
+
 
   public setSettings(m: SetSettingsMessage) {
     const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
@@ -579,5 +586,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
         this.ws.close(1000, 'Sever didn\'t ping us');
       }
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
+  }
+
+  notifyCallActive(param: { connectionId: string | null; opponentWsId: string; roomId: number }) {
+    this.sendToServer({
+      action: 'notifyCallActive',
+      connId: param.connectionId,
+      opponentWsId: param.opponentWsId,
+      roomId: param.roomId
+    })
   }
 }

@@ -45,6 +45,7 @@ import {
 } from '@/ts/types/messages/wsInMessages';
 import {
   ChangeStreamMessage,
+  CheckTransferDestroy,
   ConnectToRemoteMessage,
   DestroyPeerConnectionMessage,
   RouterNavigateMessage
@@ -54,11 +55,6 @@ import { stopVideo } from '@/ts/utils/htmlApi';
 
 
 export default class CallHandler extends FileAndCallTransfer {
-  private canvas: HTMLCanvasElement|null = null;
-
-  private get callInfo(): CallsInfoModel {
-    return this.store.roomsDict[this.roomId].callInfo;
-  }
   protected readonly handlers: HandlerTypes<keyof CallHandler, 'webrtcTransfer:*'> = {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
@@ -67,10 +63,20 @@ export default class CallHandler extends FileAndCallTransfer {
     acceptCall: <HandlerType<'acceptCall', 'webrtcTransfer:*'>>this.acceptCall,
     checkTransferDestroy: <HandlerType<'checkTransferDestroy', 'webrtcTransfer:*'>>this.checkTransferDestroy
   };
+  private canvas: HTMLCanvasElement|null = null;
   private localStream: MediaStream | null = null;
   private audioProcessor: JsAudioAnalyzer | null = null;
   private callStatus: CallStatus = 'not_inited';
   private readonly acceptedPeers: string[] = [];
+
+  private get callInfo(): CallsInfoModel {
+    return this.store.roomsDict[this.roomId].callInfo;
+  }
+
+  public checkTransferDestroy(payload: CheckTransferDestroy) {
+    this.removeOpponent(payload.wsOpponentId);
+    super.checkTransferDestroy(payload);
+  }
 
   public inflateDevices(devices: MediaDeviceInfo[]): void {
     let n: number, k: number, c: number = 0;
@@ -97,6 +103,10 @@ export default class CallHandler extends FileAndCallTransfer {
       });
     }
     this.store.setDevices(payload);
+  }
+
+  public getConnectionId(): string | null {
+    return this.connectionId;
   }
 
   public acceptCall(message: AcceptCallMessage) {
@@ -299,17 +309,52 @@ export default class CallHandler extends FileAndCallTransfer {
       this.store.setCallActiveToState(payload);
       let e = await this.wsHandler.offerCall(this.roomId, browserVersion);
       this.setConnectionId(e.connId);
-      sub.subscribe(Subscription.getTransferId(e.connId), this);
     } catch (e) {
       this.handleStream(e, stream);
     }
   }
 
   public createCallPeerConnection({ opponentWsId, userId }: { opponentWsId: string; userId: number }) {
+    if (sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) !== 0) {
+      this.logger.warn(`Peer connection ${opponentWsId} won't be created as it's already exists`)();
+      return
+    }
     if (opponentWsId > this.wsHandler.getWsConnectionId()) {
       new CallSenderPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store);
     } else {
       new CallReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store);
+    }
+  }
+
+  protected setConnectionId(connId: string | null) {
+    if (this.connectionId ) {
+      if (!connId) {
+        sub.unsubscribe(Subscription.getTransferId(this.connectionId), this)
+      } else {
+        this.logger.error('Received new connectionId while old one stil exists')();
+      }
+    }
+    if (this.connectionId !== connId && connId) {
+      sub.subscribe(Subscription.getTransferId(connId), this);
+    }
+    super.setConnectionId(connId);
+  }
+
+  public addOpponent(connId: string, userId: number, opponentWsId: string): void {
+    this.logger.debug(`Adding opponent ${connId} ${userId} ${opponentWsId}`)();
+    this.setConnectionId(connId);
+    this.acceptedPeers.push(opponentWsId);
+    this.createCallPeerConnection({opponentWsId, userId});
+    this.store.setCallActiveButNotJoinedYet({state: true, id: this.roomId});
+  }
+
+  public removeOpponent(opponentWsId: string): void {
+    let index = this.acceptedPeers.indexOf(opponentWsId);
+    if (index >= 0) {
+      this.acceptedPeers.splice(index);
+    }
+    if (this.acceptedPeers.length === 0) {
+      this.store.setCallActiveButNotJoinedYet({state: false, id: this.roomId});
     }
   }
 
@@ -323,7 +368,6 @@ export default class CallHandler extends FileAndCallTransfer {
       this.logger.error('Old connId still exists {}', this.connectionId)();
     }
     this.setConnectionId(message.connId);
-    sub.subscribe(Subscription.getTransferId(message.connId), this);
     this.logger.log('CallHandler initialized')();
     this.wsHandler.replyCall(message.connId, browserVersion);
     const payload2: IncomingCallModel = {
@@ -363,6 +407,36 @@ export default class CallHandler extends FileAndCallTransfer {
     const stream = await this.captureInput();
     this.attachLocalStream(stream);
     this.wsHandler.acceptCall(this.connectionId!);
+    this.connectToRemote();
+    let message1: RouterNavigateMessage = {
+      handler: 'router',
+      action: 'navigate',
+      to: `/chat/${this.roomId}`
+    };
+    sub.notify(message1);
+  }
+
+  public async joinCall() {
+    this.store.setCallActiveButNotJoinedYet({
+      id: this.roomId,
+      state: false
+    });
+    this.store.setCallActiveToState({
+      id: this.roomId,
+      state: true
+    });
+    this.store.setContainerToState({
+      id: this.roomId,
+      state: true
+    });
+    this.setCallStatus('accepted');
+    const stream = await this.captureInput();
+    this.attachLocalStream(stream);
+    this.wsHandler.joinCall(this.connectionId!);
+    this.connectToRemote();
+  }
+
+  private connectToRemote() {
     this.acceptedPeers.forEach((e) => {
       const message: ConnectToRemoteMessage = {
         action: 'connectToRemote',
@@ -371,12 +445,6 @@ export default class CallHandler extends FileAndCallTransfer {
       };
       sub.notify(message);
     });
-    let message1: RouterNavigateMessage = {
-      handler: 'router',
-      action: 'navigate',
-      to: `/chat/${this.roomId}`
-    };
-    sub.notify(message1);
   }
 
   public videoAnswerCall() {
@@ -407,6 +475,11 @@ export default class CallHandler extends FileAndCallTransfer {
       id: this.roomId
     };
     this.store.setCallActiveToState(payload);
+    this.store.setCallActiveButNotJoinedYet({
+      id: this.roomId,
+      state: false
+    });
+    this.acceptedPeers.length = 0; // = []
   }
 
   public declineCall() {

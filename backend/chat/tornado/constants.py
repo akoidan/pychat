@@ -11,6 +11,7 @@ class Actions(object):
 	CLOSE_CALL_CONNECTION = 'destroyCallConnection'
 	CANCEL_CALL_CONNECTION = 'cancelCallConnection'
 	ACCEPT_CALL = 'acceptCall'
+	JOIN_CALL = 'joinCall'
 	ACCEPT_FILE = 'acceptFile'
 	GROWL_ERROR_MESSAGE = 'growlError'
 	GET_MESSAGES = 'loadMessages'
@@ -35,6 +36,7 @@ class Actions(object):
 	REPLY_FILE_CONNECTION = 'replyFile'
 	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
+	NOTIFY_CALL_ACTIVE = 'notifyCallActive'
 	PING = 'ping'
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
@@ -98,6 +100,7 @@ class IpVarNames(object):
 	REGION = 'region'
 	CITY = 'city'
 	COUNTRY_CODE = 'countryCode'
+
 
 class UserSettingsVarNames(object):
 	SUGGESTIONS = 'suggestions'

@@ -786,6 +786,7 @@ class WebRtcMessageHandler(MessagesHandler):
 			Actions.CLOSE_CALL_CONNECTION: self.close_call_connection,
 			Actions.CANCEL_CALL_CONNECTION: self.cancel_call_connection,
 			Actions.ACCEPT_CALL: self.accept_call,
+			Actions.JOIN_CALL: self.join_call,
 			Actions.ACCEPT_FILE: self.accept_file,
 			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
 			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
@@ -793,12 +794,18 @@ class WebRtcMessageHandler(MessagesHandler):
 			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
+			Actions.NOTIFY_CALL_ACTIVE: self.notify_call_active,
 		})
 		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
 			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel,
-			Actions.OFFER_P2P_CONNECTION: self.set_opponent_p2p_channel
+			Actions.OFFER_P2P_CONNECTION: self.set_opponent_p2p_channel,
+			Actions.NOTIFY_CALL_ACTIVE: self.set_opponent_notify_call,
 		})
+
+	def set_opponent_notify_call(self, message):
+		connection_id = message[VarNames.CONNECTION_ID]
+		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.OFFERED)
 
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
@@ -858,6 +865,21 @@ class WebRtcMessageHandler(MessagesHandler):
 			), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
+
+	def notify_call_active(self, in_message):
+		# check connectionid , roomId is checked on_message
+		if in_message[VarNames.CONNECTION_ID]:
+			self_channel_status = self.sync_redis.shget(in_message[VarNames.CONNECTION_ID], self.id)
+			if self_channel_status not in [WebRtcRedisStates.READY, WebRtcRedisStates.OFFERED, WebRtcRedisStates.RESPONDED]:
+				raise ValidationError(f"Invalid status to to send this message {self_channel_status}")
+		self.publish({
+			VarNames.ROOM_ID: in_message[VarNames.ROOM_ID],
+			VarNames.CONNECTION_ID: in_message[VarNames.CONNECTION_ID],
+			VarNames.EVENT: in_message[VarNames.EVENT],
+			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
+			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.USER_ID: self.user_id
+		}, in_message[VarNames.WEBRTC_OPPONENT_ID], True)
 
 	def reply_call_connection(self, in_message):
 		self.send_call_answer(
@@ -949,27 +971,32 @@ class WebRtcMessageHandler(MessagesHandler):
 		else:
 			raise ValidationError("Invalid channel status")
 
+	def accept_call(self, in_message):
+		self.establish_response_connection(in_message, WebRtcRedisStates.RESPONDED)
+
+	def join_call(self, in_message):
+		self.establish_response_connection(in_message, WebRtcRedisStates.OFFERED)
+
 	# todo
 	# we can use channel_status = self.sync_redis.shgetall(connection_id)
 	# and then self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
 	# if we shgetall and only then do async hset
 	# we can catch an issue when 2 concurrent users accepted the call
 	# but we didn't  send them ACCEPT_CALL as they both were in status 'offered'
-	def accept_call(self, in_message):
+	def establish_response_connection(self, in_message, allowed_status):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		self_status = self.sync_redis.shget(connection_id, self.id)
-		if self_status == WebRtcRedisStates.RESPONDED:
-			conn_users = self.sync_redis.shgetall(connection_id)
-			self.publish_call_answer(
-				conn_users,
-				connection_id,
-				HandlerNames.WEBRTC_TRANSFER,
-				Actions.ACCEPT_CALL,
-				WebRtcRedisStates.READY,
-				{}
-			)
-		else:
+		if self_status != allowed_status:
 			raise ValidationError("Invalid channel status")
+		conn_users = self.sync_redis.shgetall(connection_id)
+		self.publish_call_answer(
+			conn_users,
+			connection_id,
+			HandlerNames.WEBRTC_TRANSFER,
+			Actions.ACCEPT_CALL,
+			WebRtcRedisStates.READY,
+			{}
+		)
 
 	def send_call_answer(self, in_message, status_set, reply_action, allowed_state, message_handler):
 		connection_id = in_message[VarNames.CONNECTION_ID]
