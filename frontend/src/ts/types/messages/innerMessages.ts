@@ -10,6 +10,7 @@ import {
 } from '@/ts/types/dto';
 import {
   ChangeDeviceType,
+  ChangeOnlineType,
   DefaultInMessage,
   HandlerName
 } from '@/ts/types/messages/baseMessagesInterfaces';
@@ -44,7 +45,7 @@ export interface RouterNavigateMessage extends DefaultInnerSystemMessage<'naviga
 export interface ChangeUserOnlineInfoMessage extends DefaultInnerSystemMessage<'changeOnline', 'webrtc'>  {
   opponentWsId: string;
   userId: number;
-  type: 'appear_online' | 'gone_offline';
+  changeType: ChangeOnlineType;
 }
 
 export interface ChangeP2pRoomInfoMessage extends DefaultInnerSystemMessage<'changeDevices', 'webrtc'>  {
@@ -54,7 +55,7 @@ export interface ChangeP2pRoomInfoMessage extends DefaultInnerSystemMessage<'cha
   userId: number|null;
 }
 
-export interface ConnectToRemoteMessage extends DefaultInnerSystemMessage<'connectToRemote', HandlerName>  {
+export interface ConnectToRemoteMessage extends DefaultInnerSystemMessage<'connectToRemote', HandlerName> {
   stream: MediaStream|null;
 }
 

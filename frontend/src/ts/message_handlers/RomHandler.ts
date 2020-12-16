@@ -175,7 +175,7 @@ export class RoomHandler extends MessageHandler  {
       handler: 'webrtc',
       allowZeroSubscribers: true,
       action: 'changeOnline',
-      type: 'appear_online',
+      changeType: 'appear_online',
       userId: message.userId,
       opponentWsId: message.opponentWsId,
     }

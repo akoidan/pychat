@@ -60,6 +60,7 @@ export interface OfferFileContent extends BrowserBase {
   name: string;
 }
 export type ChangeDeviceType = 'someone_left'| 'room_created' | 'i_deleted' | 'someone_joined' | 'invited';
+export type ChangeOnlineType = 'appear_online' | 'gone_offline';
 
 export interface BrowserBase {
   browser: string;

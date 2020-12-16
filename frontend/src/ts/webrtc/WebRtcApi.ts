@@ -82,13 +82,41 @@ export default class WebRtcApi extends MessageHandler {
 
   public async changeDevices(m: ChangeP2pRoomInfoMessage): Promise<void> {
     this.logger.log('change devices {}', m)();
+    this.updateCallTransfer(m);
+    await this.updateMessagesTransfer(m);
+  }
+
+  private updateCallTransfer(m: ChangeP2pRoomInfoMessage) {
+    if (m.changeType === 'someone_joined' || m.changeType === 'someone_left') {
+      this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(m.userId!)).forEach(r => {
+        if (m.changeType === 'someone_joined') {
+          if (this.store.onlineDict[m.userId!]) {
+            this.store.onlineDict[m.userId!].forEach((opponentWsId: string) => {
+              this.getCallHandler(r.id).createCallPeerConnection({opponentWsId, userId: m.userId!});
+              this.wsHandler.notifyCallActive({
+                opponentWsId,
+                connectionId: this.getCallHandler(r.id).getConnectionId(),
+                roomId: r.id
+              });
+            })
+          }
+        } else {
+          // we dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
+          if (this.callHandlers[r.id]) {
+            this.callHandlers[r.id].removeUserOpponent(m.userId!);
+          }
+        }
+      })
+    }
+  }
+
+  private async updateMessagesTransfer(m: ChangeP2pRoomInfoMessage) {
     if (m.changeType === 'i_deleted') { // destroy my room
       let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
       if (mh) {
         mh.destroyThisTransferHandler();
       }
       delete this.messageHandlers[m.roomId!];
-      return;
     } else if (this.store.roomsDict[m.roomId!]?.p2p) {
       //  'someone_left' - destroy peer connection in this room
       //  'room_created' - send to everyone when new room is created
@@ -113,9 +141,9 @@ export default class WebRtcApi extends MessageHandler {
     this.getCallHandler(m.roomId).addOpponent(m.connId, m.userId, m.opponentWsId);
   }
 
-  public changeOnline (message: ChangeUserOnlineInfoMessage) {
+  public changeOnline(message: ChangeUserOnlineInfoMessage) {
     this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(message.userId)).forEach(r => {
-      if (message.type === 'appear_online') {
+      if (message.changeType === 'appear_online') {
         this.getCallHandler(r.id).createCallPeerConnection({opponentWsId: message.opponentWsId, userId: message.userId});
         this.wsHandler.notifyCallActive({opponentWsId: message.opponentWsId, connectionId: this.getCallHandler(r.id).getConnectionId(), roomId: r.id});
       } else {

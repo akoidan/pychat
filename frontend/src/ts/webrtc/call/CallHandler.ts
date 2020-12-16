@@ -67,7 +67,7 @@ export default class CallHandler extends FileAndCallTransfer {
   private localStream: MediaStream | null = null;
   private audioProcessor: JsAudioAnalyzer | null = null;
   private callStatus: CallStatus = 'not_inited';
-  private readonly acceptedPeers: string[] = [];
+  private acceptedPeers: string[] = [];
 
   private get callInfo(): CallsInfoModel {
     return this.store.roomsDict[this.roomId].callInfo;
@@ -346,6 +346,11 @@ export default class CallHandler extends FileAndCallTransfer {
     this.acceptedPeers.push(opponentWsId);
     this.createCallPeerConnection({opponentWsId, userId});
     this.store.setCallActiveButNotJoinedYet({state: true, id: this.roomId});
+  }
+
+  public removeUserOpponent(userId: number): void {
+    debugger
+    this.acceptedPeers = this.acceptedPeers.filter(wsId => parseInt(wsId.split(":")[0], 10) != userId);
   }
 
   public removeOpponent(opponentWsId: string): void {
