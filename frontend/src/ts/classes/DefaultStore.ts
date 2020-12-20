@@ -711,6 +711,11 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public setCallActiveButNotJoinedYet(payload: BooleanIdentifier) {
+    this.roomsDict[payload.id].callInfo.callActiveButNotJoinedYet = payload.state;
+  }
+
+  @Mutation
   public setOnline(ids: Record<string, string[]>) {
     Object.keys(ids).forEach(k => {
       if (ids[k].length === 0) {

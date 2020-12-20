@@ -107,6 +107,7 @@ export function getRoomsBaseDict(
     },
     callInfo: {
       calls: {},
+      callActiveButNotJoinedYet: false,
       mediaStreamLink: null,
       showMic: true,
       sharePaint: false,

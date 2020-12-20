@@ -478,11 +478,13 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* appear online messages also appear is channel non-relatedto user .e.g. pychat pdr
+* edit message doesn't appear after pasting image from painter. (in editing mode)
+* replace array.indexOf >= 0 to array.includes
 * Refactor UX on navbar, move report issue and amchart to somewhere, they just eat place for nothing. Move Signout to dropdown like in fb or vk. Do something with call, it's not intuitive. Right bar is nto required check how telegram does UX 
 * Add ability to make a call like in google meet with a link
 * https://webrtc.github.io/samples/src/content/getusermedia/resolution/
 * when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
-* if users joins a room that already has call in progress, he should be able to join this call
 * opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers

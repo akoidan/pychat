@@ -20,6 +20,7 @@ import { browserVersion } from '@/ts/utils/runtimeConsts';
 import MessageTransferHandler from '@/ts/webrtc/message/MessageTransferHandler';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
 import {
+  NotifyCallActiveMessage,
   OfferCall,
   OfferFile,
   OfferMessage,
@@ -33,6 +34,7 @@ import {
 import { VideoType } from '@/ts/types/types';
 import {
   ChangeP2pRoomInfoMessage,
+  ChangeUserOnlineInfoMessage,
   InternetAppearMessage,
   LogoutMessage
 } from '@/ts/types/messages/innerMessages';
@@ -47,8 +49,10 @@ export default class WebRtcApi extends MessageHandler {
     changeDevices: <HandlerType<'changeDevices', 'webrtc'>>this.changeDevices,
     offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
     offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
+    changeOnline: <HandlerType<'changeOnline', 'webrtc'>>this.changeOnline,
     logout: <HandlerType<'logout', HandlerName>>this.logout,
-    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear
+    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
+    notifyCallActive:  <HandlerType<'notifyCallActive', HandlerName>>this.notifyCallActive
   };
 
   private readonly wsHandler: WsHandler;
@@ -72,15 +76,47 @@ export default class WebRtcApi extends MessageHandler {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
+  public joinCall(roomId: number) {
+    this.getCallHandler(roomId).joinCall();
+  }
+
   public async changeDevices(m: ChangeP2pRoomInfoMessage): Promise<void> {
     this.logger.log('change devices {}', m)();
+    this.updateCallTransfer(m);
+    await this.updateMessagesTransfer(m);
+  }
+
+  private updateCallTransfer(m: ChangeP2pRoomInfoMessage) {
+    if (m.changeType === 'someone_joined' || m.changeType === 'someone_left') {
+      this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(m.userId!)).forEach(r => {
+        if (m.changeType === 'someone_joined') {
+          if (this.store.onlineDict[m.userId!]) {
+            this.store.onlineDict[m.userId!].forEach((opponentWsId: string) => {
+              this.getCallHandler(r.id).createCallPeerConnection({opponentWsId, userId: m.userId!});
+              this.wsHandler.notifyCallActive({
+                opponentWsId,
+                connectionId: this.getCallHandler(r.id).getConnectionId(),
+                roomId: r.id
+              });
+            })
+          }
+        } else {
+          // we dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
+          if (this.callHandlers[r.id]) {
+            this.callHandlers[r.id].removeUserOpponent(m.userId!);
+          }
+        }
+      })
+    }
+  }
+
+  private async updateMessagesTransfer(m: ChangeP2pRoomInfoMessage) {
     if (m.changeType === 'i_deleted') { // destroy my room
       let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
       if (mh) {
         mh.destroyThisTransferHandler();
       }
       delete this.messageHandlers[m.roomId!];
-      return;
     } else if (this.store.roomsDict[m.roomId!]?.p2p) {
       //  'someone_left' - destroy peer connection in this room
       //  'room_created' - send to everyone when new room is created
@@ -99,6 +135,24 @@ export default class WebRtcApi extends MessageHandler {
 
   public internetAppear(m: InternetAppearMessage) {
     this.initAndSyncMessages();
+  }
+
+  public notifyCallActive(m: NotifyCallActiveMessage) {
+    this.getCallHandler(m.roomId).addOpponent(m.connId, m.userId, m.opponentWsId);
+  }
+
+  public changeOnline(message: ChangeUserOnlineInfoMessage) {
+    this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(message.userId)).forEach(r => {
+      if (message.changeType === 'appear_online') {
+        this.getCallHandler(r.id).createCallPeerConnection({opponentWsId: message.opponentWsId, userId: message.userId});
+        this.wsHandler.notifyCallActive({opponentWsId: message.opponentWsId, connectionId: this.getCallHandler(r.id).getConnectionId(), roomId: r.id});
+      } else {
+        // we dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
+        if (this.callHandlers[r.id]) {
+          this.callHandlers[r.id].removeOpponent(message.opponentWsId);
+        }
+      }
+    })
   }
 
   public offerMessage(message: OfferMessage) {

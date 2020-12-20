@@ -11,6 +11,7 @@ import {
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   ChangeP2pRoomInfoMessage,
+  ChangeUserOnlineInfoMessage,
   LogoutMessage,
   PubSetRooms,
   RouterNavigateMessage
@@ -170,7 +171,15 @@ export class RoomHandler extends MessageHandler  {
       this.addChangeOnlineEntry(message.userId, message.time, 'appeared online');
     }
     this.store.setOnline(message.content);
-
+    let payload: ChangeUserOnlineInfoMessage = {
+      handler: 'webrtc',
+      allowZeroSubscribers: true,
+      action: 'changeOnline',
+      changeType: 'appear_online',
+      userId: message.userId,
+      opponentWsId: message.opponentWsId,
+    }
+    sub.notify(payload);
   }
 
   public saveChannelSettings(message: SaveChannelSettingsMessage) {

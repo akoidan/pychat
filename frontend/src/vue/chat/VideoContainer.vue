@@ -33,16 +33,19 @@
       />
     </div>
     <div class="micVideoHolder">
-      <chat-remote-peer
-        v-for="(call, id) in callInfo.calls"
-        :key="id"
-        :call-info="call"
-        :class="{'current-video-active': id === currentVideoActive, 'current-video-inactive': currentVideoActive && currentVideoActive !== id}"
-        @click.native="setCurrentVideo(id)"
-      />
+      <template v-for="(call, id) in callInfo.calls">
+        <chat-remote-peer
+          v-if="call.connected"
+          :key="id"
+          :call-info="call"
+          :class="{'current-video-active': id === currentVideoActive, 'current-video-inactive': currentVideoActive && currentVideoActive !== id}"
+          @click.native="setCurrentVideo(id)"
+        />
+      </template>
       <video-object
         ref="localVideo"
         muted="muted"
+        v-show="!currentVideoActive"
         :media-stream-link="callInfo.mediaStreamLink"
         :user-id="myId"
         class="localVideo"

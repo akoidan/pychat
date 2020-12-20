@@ -1,6 +1,8 @@
 <template>
   <div class="callContainerIcons">
+    <div v-if="callInfo.callActiveButNotJoinedYet" class="call-is-active">Call in this room is active already</div>
     <div class="callContainerIconsInner">
+      <button v-if="callInfo.callActiveButNotJoinedYet" @click="joinCall" class="green-btn">Join call</button>
       <i
         v-show="!callInfo.callActive"
         class="icon-phone-circled"
@@ -98,6 +100,10 @@ export default class CallContainerIcons extends Vue {
     };
   }
 
+  private joinCall() {
+    this.$webrtcApi.joinCall(this.roomId);
+  }
+
   get iconMicClass (): {} {
     return {
       'icon-mic': this.callInfo.showMic,
@@ -114,6 +120,8 @@ export default class CallContainerIcons extends Vue {
 <style lang="sass" scoped>
   @import "~@/assets/sass/partials/mixins.sass"
 
+  .call-is-active
+    font-size: 10px
   .icon-webrtc-fullscreen
     padding-top: 1px
     margin-bottom: -1px

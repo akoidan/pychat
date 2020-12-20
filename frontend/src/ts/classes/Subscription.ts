@@ -28,7 +28,7 @@ export default class Subscription {
   public static getTransferId(connectionId: string): 'webrtcTransfer:*' {
     return `webrtcTransfer:${connectionId}` as 'webrtcTransfer:*';
   }
-  
+
   public getNumberOfSubscribers(channel: HandlerName): number {
     return this.suscribers[channel]?.length ?? 0;
   }
@@ -38,7 +38,7 @@ export default class Subscription {
       this.suscribers[channel] = [];
     }
     if (this.suscribers[channel]!.indexOf(messageHandler) < 0) {
-      this.logger.debug('subscribing to {}, subscriber {}', channel, messageHandler)();
+      this.logger.log('subscribing to {}, handler {}', channel, messageHandler)();
       this.suscribers[channel]!.push(messageHandler);
     }
   }
@@ -49,8 +49,11 @@ export default class Subscription {
     if (c) {
       let index = c.indexOf(handler);
       if (index >= 0) {
-        this.logger.debug('Unsubscribing from channel {}', channel)();
+        this.logger.log('Unsubscribing from {} from handler {}', handler, channel)();
         c.splice(index, 1);
+        if (c.length === 0) {
+          delete this.suscribers[channel]; // delete key
+        }
         return;
       }
     }
@@ -63,6 +66,7 @@ export default class Subscription {
       Object.values(this.suscribers).forEach(channel => {
         channel!.forEach((h: IMessageHandler) => {
           if (h.getHandler(message)) {
+            this.logger.debug(`Notifying (${message.handler}).[${message.action}] {}`, h)();
             h.handle(message);
           }
         });
@@ -70,6 +74,7 @@ export default class Subscription {
       return true;
     } else if (this.suscribers[message.handler]?.length) {
       this.suscribers[message.handler]!.forEach((h: IMessageHandler) => {
+        this.logger.debug(`Notifying (${message.handler}).[${message.action}] {}`, h)();
         h.handle(message);
       });
 

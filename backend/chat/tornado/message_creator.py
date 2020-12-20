@@ -114,6 +114,7 @@ class MessagesCreator(object):
 		room_less = self.default(online, Actions.LOGIN, HandlerNames.ROOM)
 		room_less[VarNames.USER] = sender_name
 		room_less[VarNames.GENDER] = sex
+		room_less[VarNames.WEBRTC_OPPONENT_ID] = self.id
 		return room_less
 
 	@classmethod
