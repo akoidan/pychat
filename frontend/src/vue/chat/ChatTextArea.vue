@@ -50,7 +50,7 @@ import {
   CurrentUserInfoModel,
   EditingMessage,
   FileModel,
-  MessageModel,
+  MessageModel, RoomDictModel,
   RoomModel,
   UserDictModel
 } from '@/ts/types/model';
@@ -96,6 +96,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     @State
     public readonly allUsersDict!: UserDictModel;
+
+    @State
+    public readonly roomsDict!: RoomDictModel;
 
     @State
     public readonly activeRoomId!: number;
@@ -149,8 +152,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
     }
 
-    onEmitDeleteMessage() {
-      this.editMessageWs(null, this.editedMessage.messageId, this.editedMessage.roomId, null, null, this.editingMessageModel.time, this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1);
+    onEmitDeleteMessage(editingMessage: EditingMessage) {
+      let message: MessageModel = this.roomsDict[editingMessage.roomId].messages[editingMessage.messageId];
+      this.editMessageWs(null, editingMessage.messageId, editingMessage.roomId, null, null, message.time, message.edited ? message.edited + 1 : 1);
       this.$store.setEditedMessage(null);
     }
 
@@ -229,6 +233,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
               maxTime = messages[m];
             }
           }
+          event.preventDefault();
           sem(event, maxTime!, true, this.userInfo, this.$store.setEditedMessage);
         }
       }
@@ -243,6 +248,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         time: number,
         edited: number
     ): void {
+      let shouldBeSynced: boolean = messageId >0 || !!messageContent;
       const mm: MessageModel = {
         roomId,
         deleted: !messageContent,
@@ -253,7 +259,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
           upload: null
         } : null,
         time,
-        sending: true,
+        sending: shouldBeSynced,
         content: messageContent,
         symbol: symbol,
         giphy: null,
@@ -262,7 +268,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         userId: this.userInfo.userId
       };
       this.$store.addMessage(mm);
-      this.messageSender.syncMessage(roomId, messageId);
+      if (shouldBeSynced) { // message hasn't been sync to server and was deleted localy
+        this.messageSender.syncMessage(roomId, messageId);
+      }
     }
 
     @Watch('editedMessage')

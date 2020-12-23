@@ -37,11 +37,21 @@ export default class NavEditMessage extends Vue {
 
 
   public m2DeleteMessage() {
-    this.$messageBus.$emit('delete-message');
+    let payload: EditingMessage = {
+      messageId: this.editedMessage.messageId,
+      roomId: this.editedMessage.roomId,
+      isEditingNow: false
+    };
+    this.$messageBus.$emit('delete-message', payload);
   }
 
   public m2EditMessage() {
-    this.$store.setEditedMessage({...this.editedMessage, isEditingNow: true});
+    let payload: EditingMessage = {
+      messageId: this.editedMessage.messageId,
+      roomId: this.editedMessage.roomId,
+      isEditingNow: true
+    };
+    this.$store.setEditedMessage(payload);
   }
 
   public m2Close() {

@@ -75,8 +75,6 @@ export function sem(
       && !message.deleted
       && message.time + ONE_DAY > Date.now()
   ) {
-    event.preventDefault();
-    event.stopPropagation();
     const newlet: EditingMessage = {
       messageId: message.id,
       isEditingNow,

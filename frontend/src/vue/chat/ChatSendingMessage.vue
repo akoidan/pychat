@@ -1,6 +1,6 @@
 <template>
   <div :class="cls" @mouseover.passive="removeUnread">
-    <chat-message :message="message" />
+    <chat-message :message="message" class="message-content" />
     <template v-if="message.transfer">
       <app-progress-bar
         v-if="message.transfer.upload && !message.transfer.error"
@@ -12,7 +12,11 @@
         @click="retry"
       >{{ message.transfer.error }}</i>
     </template>
-    <div class="spinner" v-if="message.sending" />
+    <div class="absolute-right">
+      <!--      IF message doesnt have content it's deleted-->
+      <chat-message-tool-tip class="message-tooltip" :message="message" v-if="message.content"/>
+      <div class="spinner" v-if="message.sending" />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -31,9 +35,10 @@ import {
   MessageModel,
   RoomDictModel
 } from '@/ts/types/model';
+import ChatMessageToolTip from '@/vue/chat/ChatMessageToolTip.vue';
 
 @Component({
-  components: {AppProgressBar, ChatMessage}
+  components: {ChatMessageToolTip, AppProgressBar, ChatMessage}
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;
@@ -63,6 +68,8 @@ export default class ChatSendingMessage extends Vue {
       uploadMessage: this.message.transfer && !!this.message.transfer.upload,
       'message-self': this.isSelf,
       'message-others': !this.isSelf,
+      'message-wrapper': true,
+      'message-is-being-sent': this.message.sending,
       'removed-message': this.message.deleted,
       'unread-message': this.message.isHighlighted,
     };
@@ -88,6 +95,33 @@ export default class ChatSendingMessage extends Vue {
 <style lang="sass" scoped>
 
   @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/variables"
+
+  .message-tooltip
+    display: none
+    margin-right: 5px
+  .absolute-right
+    position: absolute
+    right: 0
+    top: 0
+  .spinner
+    display: inline-block
+    margin: -4px 8px
+    @include spinner(3px, white)
+
+  .message-wrapper
+    position: relative
+    &:hover
+      background-color: rgba(255, 255, 255, 0.11)
+      .absolute-right
+        top: $space-between-messages/2
+      .message-tooltip
+        display: inline-block
+      .message-content
+        margin-top: -$space-between-messages*0.5
+        padding-top: $space-between-messages*0.5
+        padding-bottom: $space-between-messages*0.5
+        margin-bottom: -$space-between-messages*0.5
 
   .sendingMessage
     position: relative
@@ -104,13 +138,6 @@ export default class ChatSendingMessage extends Vue {
     z-index: -1
     padding: 4px 0
 
-  .spinner
-    position: absolute
-    right: 0
-    top: 3px
-    display: inline-block
-    margin: -4px 10px -4px 10px
-    @include spinner(3px, white)
   .icon-repeat
     display: block
     text-align: center

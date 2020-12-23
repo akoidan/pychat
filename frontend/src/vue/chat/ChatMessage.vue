@@ -41,6 +41,7 @@ import {
 import { sem } from '@/ts/utils/pureFunctions';
 
 import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
+import {isMobile} from '@/ts/utils/runtimeConsts';
 
 @Component({
   components: {ChatMessageHeader}
@@ -82,7 +83,11 @@ export default class ChatMessage extends Vue {
   }
 
   public contextmenu(event: Event) {
-    sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
+    if (isMobile) {
+      event.preventDefault();
+      event.stopPropagation();
+      sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
+    }
   }
 
   public updated() {

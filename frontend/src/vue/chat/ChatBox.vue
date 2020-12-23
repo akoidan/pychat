@@ -15,14 +15,7 @@
     >
       <template
         v-for="message in searchMessages">
-        <fieldset
-          v-if="message.fieldDay"
-          :key="message.fieldDay"
-        >
-          <legend align="center">
-            {{ message.fieldDay }}
-          </legend>
-        </fieldset>
+        <app-separator :day="message.fieldDay"   v-if="message.fieldDay" :key="message.fieldDay"/>
         <chat-sending-message
           v-else
           :key="message.id"
@@ -53,14 +46,7 @@
           :old-name="message.oldName"
           :new-name="message.newName"
         />
-        <fieldset
-          v-else-if="message.fieldDay"
-          :key="message.fieldDay"
-        >
-          <legend align="center">
-            {{ message.fieldDay }}
-          </legend>
-        </fieldset>
+        <app-separator :day="message.fieldDay" v-if="message.fieldDay" :key="message.fieldDay"/>
         <chat-sending-file
           v-else-if="message.transfers"
           :key="message.id"
@@ -107,9 +93,11 @@ import ChatSendingFile from '@/vue/chat/ChatSendingFile.vue';
 import ChatReceivingFile from '@/vue/chat/ChatReceivingFile.vue';
 import ChatCall from '@/vue/chat/ChatCall.vue';
 import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
+import AppSeparator from '@/vue/ui/AppSeparator.vue';
 
   @Component({
     components: {
+      AppSeparator,
       ChatChangeNameMessage,
       ChatCall,
       ChatReceivingFile,
@@ -292,14 +280,14 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 
   @import "~@/assets/sass/partials/mixins"
   @import "~@/assets/sass/partials/abstract_classes"
-
+  @import "~@/assets/sass/partials/variables"
   .holder
     height: 100%
     display: flex
     flex-direction: column // otherwise chat-call is not full width
     /deep/ p
-      margin-top: 0.8em
-      margin-bottom: 0.8em
+      margin-top: $space-between-messages
+      margin-bottom: $space-between-messages
     /deep/ .message-header
       font-weight: bold
 
@@ -320,20 +308,6 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
     &:focus
       outline: none
 
-  fieldset
-    border-top: 1px solid #e8e8e8
-    border-bottom: none
-    border-left: none
-    border-right: none
-    display: block
-    text-align: center
-    padding: 0
-    margin-left: 3px
-    margin-right: 10px
-
-    legend
-      padding: 0 10px
-      font-weight: bold
 
   .color-white
     .message-self, .message-system, .message-others
@@ -341,10 +315,10 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
       color: black
       display: table
-      padding: 0.4em
+      padding: $space-between-messages/2
       border-radius: 4px
-      margin-top: 0.4em
-      margin-bottom: 0.4em
+      margin-top: $space-between-messages/2
+      margin-bottom: $space-between-messages/2
       /deep/ p
         margin: 0 !important
     .message-self
@@ -359,8 +333,6 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
       color: #e29722
     .message-system .message-header
       color: #9DD3DD
-    fieldset legend
-      color: #9DD3DD
 
   .color-reg .holder /deep/
     .message-others .message-header
@@ -369,8 +341,6 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
       color: #e29722
     .message-system .message-header
       color: #84B7C0
-    fieldset legend
-      color: #9DD3DD
 
 
 
