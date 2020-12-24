@@ -63,13 +63,13 @@ export default class Api extends MessageHandler {
       data: string,
       room: number,
       offset: number,
-      requestInterceptor?: (a: XMLHttpRequest) => void
+      process?: (a: XMLHttpRequest) => void
   ): Promise<MessageModelDto[]> {
    return this.xhr.doPost<MessageModelDto[]>({
       url: '/search_messages',
       params: {data, room, offset},
       isJsonDecoded: true,
-      requestInterceptor
+      process
     });
   }
 
@@ -192,12 +192,12 @@ export default class Api extends MessageHandler {
     }
   }
 
-  public async validateUsername(username: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
+  public async validateUsername(username: string, process: (r: XMLHttpRequest) => void): Promise<void> {
     return this.xhr.doPost({
       url: '/validate_user',
       params: {username},
       checkOkString: true,
-      requestInterceptor
+      process
     });
   }
 
@@ -246,12 +246,12 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async validateEmail(email: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
+  public async validateEmail(email: string, process: (r: XMLHttpRequest) => void): Promise<void> {
     return this.xhr.doPost({
       url: '/validate_email',
       params: {email},
       checkOkString: true,
-      requestInterceptor
+      process,
     });
   }
 

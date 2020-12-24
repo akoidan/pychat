@@ -4,13 +4,16 @@
     class="search"
     :class="{'loading': !!currentRequest}"
   >
-    <input
-      ref="inputSearch"
-      v-model.trim="search"
-      type="search"
-      class="input"
-    >
-    <div class="search-loading" />
+    <div class="input-holder">
+      <input
+        ref="inputSearch"
+        v-model.trim="search"
+        type="search"
+        class="input"
+      >
+      <i class="icon-cancel-circled-outline" @click="close"/>
+      <div class="search-loading" />
+    </div>
     <div
       v-if="searchResultText"
       class="search_result"
@@ -50,6 +53,12 @@ export default class SearchMessages extends Vue {
     }
   }
 
+  close() {
+    this.$store.toogleSearch({
+      roomId: this.room.id
+    });
+  }
+
   get searchActive() {
     return this.room.search.searchActive;
   }
@@ -61,10 +70,8 @@ export default class SearchMessages extends Vue {
 
   public debouncedSearch!: Function;
   public search: string = '';
-  public offset: number = 0;
   public currentRequest: XMLHttpRequest|null = null;
   public searchResult: string = '';
-  public searchedIds = [];
 
   @Watch('searchActive')
   public onSearchActiveChange(value: boolean) {
@@ -86,16 +93,17 @@ export default class SearchMessages extends Vue {
   public async doSearch(search: string) {
     if (search) {
       try {
-       const messagesDto: MessageModelDto[] = await  this.$api.search(search, this.room.id, this.offset, r => this.currentRequest = r);
-       this.$logger.debug('http response {} {}', messagesDto)();
-       this.currentRequest = null;
-       if (messagesDto.length) {
-          this.$messageSenderProxy.getMessageSender(this.room.id).addSearchMessages(this.room.id, messagesDto);
+        let found = await this.$messageSenderProxy
+            .getMessageSender(this.room.id)
+            .loadUpSearchMessages(this.room.id, 10, r => {
+              this.currentRequest = r
+            });
+        this.currentRequest = null;
+        if (found) {
           this.searchResult = '';
         } else {
           this.searchResult = 'No results found';
         }
-        this.$store.setSearchStateTo({roomId: this.room.id, lock: messagesDto.length < MESSAGES_PER_SEARCH});
       } catch (e) {
         this.searchResult = e;
       }
@@ -118,20 +126,23 @@ export default class SearchMessages extends Vue {
 
 <style lang="sass" scoped>
   @import "~@/assets/sass/partials/mixins"
+
+  .icon-cancel-circled-outline
+    @include hover-click(red)
+    cursor: pointer
+  .input-holder
+    display: flex
+    width: 100%
+    .input
+      flex-grow: 1
   .search
     padding: 5px
-    > *
-      display: inline-block
-    input
-      width: calc(100% - 10px)
     &.loading
       .search-loading
         margin-left: 5px
         margin-bottom: -5px
         margin-top: -3px
         @include spinner(3px, white)
-      input
-        width: calc(100% - 40px)
 
   .search_result
     display: flex

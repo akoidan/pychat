@@ -107,16 +107,19 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.addMessages(roomId, respones.content);
   }
 
-  async loadUpSearchMessages(roomId: number, count: number) {
+  async loadUpSearchMessages(roomId: number, count: number, requestInterceptor?: (a: XMLHttpRequest) => void) {
     let room: RoomModel = this.store.roomsDict[roomId];
+    let result = false;
     if (!room.search.locked) {
-      let messagesDto: MessageModelDto[] = await this.api.search(room.search.searchText, roomId, Object.keys(room.search.messages).length);
+      let messagesDto: MessageModelDto[] = await this.api.search(room.search.searchText, roomId, Object.keys(room.search.messages).length, requestInterceptor);
       this.logger.log("Got {} messages from the server", messagesDto.length)();
       if (messagesDto.length) {
+        result = true;
         this.addSearchMessages(roomId, messagesDto);
       }
       this.store.setSearchStateTo({roomId, lock: messagesDto.length < MESSAGES_PER_SEARCH});
     }
+    return result;
   }
 
   async loadUpMessages(roomId: number, count: number): Promise<void> {
