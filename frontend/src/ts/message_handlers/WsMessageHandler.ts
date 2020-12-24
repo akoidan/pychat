@@ -26,7 +26,10 @@ import WsHandler from '@/ts/message_handlers/WsHandler';
 import { sub } from '@/ts/instances/subInstance';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 
-import { InternetAppearMessage } from '@/ts/types/messages/innerMessages';
+import {
+  InternetAppearMessage,
+  LogoutMessage
+} from '@/ts/types/messages/innerMessages';
 import {
   HandlerName,
   HandlerType,
@@ -35,7 +38,8 @@ import {
 import {
   DeleteMessage,
   EditMessage,
-  PrintMessage
+  PrintMessage,
+  SyncMessagesMessage
 } from '@/ts/types/messages/wsInMessages';
 import { savedFiles } from '@/ts/utils/htmlApi';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
@@ -50,7 +54,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     deleteMessage:  <HandlerType<'deleteMessage', 'ws-message'>>this.deleteMessage,
     editMessage:  <HandlerType<'editMessage', 'ws-message'>>this.editMessage,
     printMessage:  <HandlerType<'printMessage', 'ws-message'>>this.printMessage,
-    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear
+    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
+    logout:  <HandlerType<'logout', HandlerName>>this.logout,
   };
 
   // messageRetrier uses MessageModel.id as unique identifier, do NOT use it with any types but
@@ -59,6 +64,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private readonly api: Api;
   private readonly ws: WsHandler;
   private syncMessageLock: boolean = false;
+  private LAST_SYNCED = 'lastSynced';
   private readonly messageHelper: MessageHelper;
 
   constructor(
@@ -101,13 +107,13 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   }
 
 
-  async loadMessages(roomId: number, messageIds: number[]): Promise<void> {
+  public async loadMessages(roomId: number, messageIds: number[]): Promise<void> {
     this.logger.log("Asking for messages {}", messageIds)();
     let respones = await this.ws.sendLoadMessagesByIds(roomId, messageIds);
     this.addMessages(roomId, respones.content);
   }
 
-  async loadUpSearchMessages(roomId: number, count: number, requestInterceptor?: (a: XMLHttpRequest) => void) {
+  public async loadUpSearchMessages(roomId: number, count: number, requestInterceptor?: (a: XMLHttpRequest) => void) {
     let room: RoomModel = this.store.roomsDict[roomId];
     let result = false;
     if (!room.search.locked) {
@@ -122,7 +128,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     return result;
   }
 
-  async loadUpMessages(roomId: number, count: number): Promise<void> {
+  public async loadUpMessages(roomId: number, count: number): Promise<void> {
     if (!this.store.roomsDict[roomId].allLoaded) {
       let lm = await this.ws.sendLoadMessages(roomId, this.store.minId(roomId), count);
       if (lm.content.length > 0) {
@@ -217,11 +223,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.store.addSearchMessages({messages, roomId: roomId});
   }
 
-
-  protected getMethodHandlers() {
-    return this.handlers;
-  }
-
   public deleteMessage(inMessage: DeleteMessage) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
@@ -268,6 +269,14 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   }
 
+  public async internetAppear(m : InternetAppearMessage) {
+    this.syncMessages(); // if message was edited, or changed by server
+    this.syncHistory(); // if some messages were sent during offline
+  }
+
+  public logout(m: LogoutMessage) {
+    localStorage.removeItem(this.LAST_SYNCED);
+  }
 
   private getFileIdsFromMessage(storeMessage: MessageModel): number[] {
     let files: number[] = []
@@ -348,7 +357,31 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     };
   }
 
-  public async internetAppear(m : InternetAppearMessage) {
-    this.syncMessages();
+  private async syncHistory() {
+    let content = this.store.roomsArray.map(r => ({
+      roomId: r.id,
+      messagesIds: Object.keys(r.messages)
+    }));
+    let joined: any = localStorage.getItem(this.LAST_SYNCED);
+    if (!joined) {
+      localStorage.setItem(this.LAST_SYNCED, Date.now().toString())
+      return ;
+    }
+
+    let result: SyncMessagesMessage = await this.ws.syncHistory(content, Date.now() - joined);
+
+    let groupBY : Record<string, MessageModelDto[]> = result.content.reduce((rv, x) => {
+      if (!rv[x.roomId]) {
+        rv[x.roomId] = [];
+      }
+      rv[x.roomId].push(x);
+      return rv;
+    }, {} as Record<number, MessageModelDto[]>);
+    Object.keys(groupBY).forEach(k => {
+      this.addMessages(parseInt(k), groupBY[k]);
+    })
+
+    localStorage.setItem(this.LAST_SYNCED, Date.now().toString())
   }
+
 }

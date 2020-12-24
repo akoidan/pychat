@@ -40,6 +40,10 @@ export interface LoadMessages extends DefaultWsInMessage<'loadMessages', 'ws-mes
   roomId: number;
 }
 
+export interface SyncMessagesMessage {
+  content: MessageModelDto[];
+}
+
 export interface DeleteMessage extends DefaultWsInMessage<'deleteMessage', 'ws-message'> {
   roomId: number;
   id: number;

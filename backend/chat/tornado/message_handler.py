@@ -814,6 +814,7 @@ class WebRtcMessageHandler(MessagesHandler):
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 			Actions.NOTIFY_CALL_ACTIVE: self.notify_call_active,
+			Actions.SYNC_HISTORY: self.sync_history,
 		})
 		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
@@ -884,6 +885,27 @@ class WebRtcMessageHandler(MessagesHandler):
 			), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
+
+	def sync_history(self, in_message):
+		room_ids = list(map(lambda d: d['roomId'], in_message[VarNames.CONTENT]))
+		if RoomUsers.objects.filter(room_id__in=room_ids, user_id=self.user_id).count() < len(room_ids):
+			raise ValidationError("GTFO")
+
+		messages_ids = []
+		for l in in_message[VarNames.CONTENT]:
+			messages_ids += l[VarNames.MESSAGE_IDS]
+		messages = Message.objects.filter(
+			Q(room_id__in=room_ids)
+			& ~Q(id__in=messages_ids)
+			& Q(time__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+		)
+		content = MessagesCreator.message_model_to_dto(messages)
+		self.ws_write({
+			VarNames.CONTENT: content,
+			VarNames.JS_MESSAGE_ID: in_message[VarNames.JS_MESSAGE_ID],
+			VarNames.HANDLER_NAME: HandlerNames.NULL
+		})
+
 
 	def notify_call_active(self, in_message):
 		# check connectionid , roomId is checked on_message

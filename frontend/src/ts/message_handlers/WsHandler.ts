@@ -46,6 +46,7 @@ import {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
+  SyncMessagesMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage
 } from '@/ts/types/messages/wsInMessages';
@@ -85,7 +86,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private pingTimeoutFunction: number|null = null;
   private ws: WebSocket | null = null;
   private noServerPingTimeout: any;
-  private readonly loadHistoryFromWs: boolean = false;
   private readonly store: DefaultStore;
   private readonly sessionHolder: SessionHolder;
   private listenWsTimeout: number|null = null;
@@ -222,6 +222,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       action: 'addRoom',
       volume,
       notifications
+    });
+  }
+
+  public async syncHistory(content: { roomId: number; messagesIds: string[] }[], lastSynced: number): Promise<SyncMessagesMessage> {
+    return this.messageProc.sendToServerAndAwait({
+      content,
+      lastSynced: lastSynced,
+      action: 'syncHistory'
     });
   }
 
@@ -541,12 +549,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   private listenWS() {
-    if (typeof WebSocket === 'undefined') {
-      // TODO
-      // alert('Your browser ({}) doesn\'t support webSockets. Supported browsers: ' +
-      //     'Android, Chrome, Opera, Safari, IE11, Edge, Firefox'.format(window.browserVersion));
-      return;
-    }
 
     const ids: { [id: string]: number } = {};
     for (const k in this.store.roomsDict) {
@@ -556,12 +558,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       }
     }
     let s = this.API_URL + `?id=${this.wsConnectionId}`;
-    if (Object.keys(ids).length > 0) {
-      s += `&messages=${encodeURI(JSON.stringify(ids))}`;
-    }
-    if (this.loadHistoryFromWs && this.wsState !== WsState.CONNECTION_IS_LOST) {
-      s += '&history=true';
-    }
+
     s += `&sessionId=${this.sessionHolder.session}`;
 
     this.ws = new WebSocket(s);

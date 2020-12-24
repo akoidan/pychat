@@ -38,6 +38,7 @@ class Actions(object):
 	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
 	NOTIFY_CALL_ACTIVE = 'notifyCallActive'
+	SYNC_HISTORY = 'syncHistory'
 	PING = 'ping'
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
@@ -97,6 +98,8 @@ class VarNames(object):
 	PREVIEW = 'preview'
 	DELETED = 'deleted'
 	P2P = 'p2p'
+	LAST_SYNCED = 'lastSynced'
+	MESSAGE_IDS = 'messagesIds'
 
 
 class IpVarNames(object):

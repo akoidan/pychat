@@ -602,14 +602,9 @@ class HttpHandler(MethodDispatcher):
 		if not RoomUsers.objects.filter(room_id=room, user_id=self.user_id).exists():
 			raise ValidationError("You can't access this room")
 		messages = Message.objects.filter(content__icontains=data, room_id=room).order_by('-id')[
-					  offset:offset + settings.MESSAGES_PER_SEARCH]
-		imv = get_message_images_videos(messages)
-		result = []
-		for message in messages:
-			files = MessagesCreator.prepare_img_video(imv, message.id)
-			prep_m = MessagesCreator.create_message(message, files)
-			result.append(prep_m)
-		return result
+		  offset:offset + settings.MESSAGES_PER_SEARCH
+	    ]
+		return MessagesCreator.message_model_to_dto(messages)
 
 	@require_http_method('POST')
 	@login_required_no_redirect

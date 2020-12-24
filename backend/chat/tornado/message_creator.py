@@ -1,6 +1,7 @@
 from chat.models import get_milliseconds
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, UserSettingsVarNames, \
 	UserProfileVarNames
+from chat.utils import get_message_images_videos
 
 
 class MessagesCreator(object):
@@ -44,6 +45,16 @@ class MessagesCreator(object):
 			VarNames.JS_MESSAGE_ID: js_message_id,
 			VarNames.CONTENT: message,
 		}
+
+	@classmethod
+	def message_model_to_dto(cls, messages):
+		imv = get_message_images_videos(messages)
+		result = []
+		for message in messages:
+			files = cls.prepare_img_video(imv, message.id)
+			prep_m = cls.create_message(message, files)
+			result.append(prep_m)
+		return result
 
 	@staticmethod
 	def set_profile_image(url):
