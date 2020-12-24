@@ -19,6 +19,11 @@ export interface EditingMessage {
   isEditingNow: boolean;
 }
 
+export interface EditingThread {
+  messageId: number;
+  roomId: number;
+}
+
 export interface CurrentUserSettingsModel {
   embeddedYoutube: boolean;
   highlightCode: boolean;
@@ -87,6 +92,7 @@ export interface MessageTransferInfo {
 export  interface MessageModel {
   id: number;
   time: number;
+  parentMessage: number|null;
   files: Record<string, FileModel>| null; // THIS IS STRING, not number!!
   content: string|null;
   isHighlighted: boolean;

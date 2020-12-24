@@ -284,10 +284,15 @@ class MessagesHandler():
 			symbol = get_max_key(files)
 			channel = message[VarNames.ROOM_ID]
 			js_id = message[VarNames.JS_MESSAGE_ID]
+			parent_message_id = message[VarNames.PARENT_MESSAGE]
+			if parent_message_id:
+				if not RoomUsers.objects.filter(user_id=self.user_id, room_id=Message.objects.get(id=parent_message_id).room_id).exists():
+					raise ValidationError("You don't have access to this room message")
 			message_db = Message(
 				sender_id=self.user_id,
 				content=message[VarNames.CONTENT],
 				symbol=symbol,
+				parent_message_id=parent_message_id,
 				giphy=giphy,
 				room_id=channel
 			)

@@ -184,13 +184,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.sendToServer(newVar, true);
   }
 
-  public async sendPrintMessage(content: string, roomId: number, files: number[], id: number, timeDiff: number): Promise<PrintMessage> {
+  public async sendPrintMessage(content: string, roomId: number, files: number[], id: number, timeDiff: number, parentMessage: number|null): Promise<PrintMessage> {
     const newVar = {
       files,
       id,
       timeDiff,
       action: 'printMessage',
       content,
+      parentMessage,
       roomId
     };
     return this.messageProc.sendToServerAndAwait(newVar);

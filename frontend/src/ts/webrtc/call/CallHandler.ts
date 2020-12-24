@@ -349,7 +349,6 @@ export default class CallHandler extends FileAndCallTransfer {
   }
 
   public removeUserOpponent(userId: number): void {
-    debugger
     this.acceptedPeers = this.acceptedPeers.filter(wsId => parseInt(wsId.split(":")[0], 10) != userId);
   }
 

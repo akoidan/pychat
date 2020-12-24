@@ -995,6 +995,12 @@
       "src": "typicons"
     },
     {
+      "uid": "21f6a88daf13c62e5a70f5ef6ad9e23f",
+      "css": "chat",
+      "code": 59472,
+      "src": "websymbols"
+    },
+    {
       "uid": "918bda80304f8b29c37dbd7322fef131",
       "css": "webrtc-nomic",
       "code": 59465,

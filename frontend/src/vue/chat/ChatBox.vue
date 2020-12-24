@@ -46,7 +46,11 @@
           :old-name="message.oldName"
           :new-name="message.newName"
         />
-        <app-separator :day="message.fieldDay" v-if="message.fieldDay" :key="message.fieldDay"/>
+        <app-separator
+          v-else-if="message.fieldDay"
+          :key="message.fieldDay"
+          :day="message.fieldDay"
+        />
         <chat-sending-file
           v-else-if="message.transfers"
           :key="message.id"
@@ -56,6 +60,12 @@
           v-else-if="message.connId"
           :key="message.id"
           :receiving-file="message"
+        />
+        <chat-thread
+          v-else-if="message.thread"
+          :key="message.parent.id"
+          :message="message.parent"
+          :messages="message.messages"
         />
         <chat-sending-message
           v-else
@@ -78,6 +88,7 @@ import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
 import ChatMessage from '@/vue/chat/ChatMessage.vue';
 import SearchMessages from '@/vue/chat/SearchMessages.vue';
 import {
+  MessageModel,
   ReceivingFile,
   RoomModel,
   SearchModel,
@@ -94,9 +105,11 @@ import ChatReceivingFile from '@/vue/chat/ChatReceivingFile.vue';
 import ChatCall from '@/vue/chat/ChatCall.vue';
 import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 import AppSeparator from '@/vue/ui/AppSeparator.vue';
+import ChatThread from '@/vue/chat/ChatThread.vue';
 
   @Component({
     components: {
+      ChatThread,
       AppSeparator,
       ChatChangeNameMessage,
       ChatCall,
@@ -189,15 +202,34 @@ import AppSeparator from '@/vue/ui/AppSeparator.vue';
         let receivingFile: ReceivingFile = this.room.receivingFiles[m];
         newArray.push(receivingFile);
       }
+      let messageDict: Record<number, {parent?: MessageModel, messages: MessageModel[]}> = {};
       for (let m in this.room.messages) {
         let message = this.room.messages[m];
-        let d = new Date(message.time).toDateString();
-        if (!dates[d]) {
-          dates[d] = true;
-          newArray.push({fieldDay: d, time: Date.parse(d)});
+        if (message.parentMessage) {
+          if (!messageDict[message.parentMessage]) {
+            messageDict[message.parentMessage] = {messages: []}
+          }
+          messageDict[message.parentMessage].messages.push(message)
+        } else {
+          if (!messageDict[message.id]) {
+            messageDict[message.id] = {messages: []}
+          }
+          messageDict[message.id].parent = message;
+          let d = new Date(message.time).toDateString();
+          if (!dates[d]) {
+            dates[d] = true;
+            newArray.push({fieldDay: d, time: Date.parse(d)});
+          }
         }
-        newArray.push(message);
       }
+      Object.values(messageDict).forEach(v => {
+        if (v.messages.length) {
+          v.messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+          newArray.push({parent: v.parent, thread: true, messages: v.messages});
+        } else {
+          newArray.push(v.parent)
+        }
+      });
       newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
       this.$logger.debug("Reevaluating messages in room #{}: {}", this.room.id, newArray)();
       return newArray;
@@ -286,8 +318,8 @@ import AppSeparator from '@/vue/ui/AppSeparator.vue';
     display: flex
     flex-direction: column // otherwise chat-call is not full width
     /deep/ p
-      margin-top: $space-between-messages
-      margin-bottom: $space-between-messages
+      padding: $space-between-messages $space-between-messages/4
+      margin: 0
     /deep/ .message-header
       font-weight: bold
 
@@ -315,16 +347,18 @@ import AppSeparator from '@/vue/ui/AppSeparator.vue';
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
       color: black
       display: table
-      padding: $space-between-messages/2
+      //padding: $space-between-messages/2
       border-radius: 4px
-      margin-top: $space-between-messages/2
-      margin-bottom: $space-between-messages/2
+      //margin-top: $space-between-messages/2
+      //margin-bottom: $space-between-messages/2
       /deep/ p
         margin: 0 !important
     .message-self
       margin-left: auto
       margin-right: 5px
 
+  //.dummy //w/o this dim last message would jump on hover if we have scroll
+    //margin-top: $space-between-messages
 
   .color-lor .holder /deep/
     .message-others .message-header

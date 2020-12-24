@@ -238,7 +238,7 @@ class Message(Model):
 	"""
 	Contains all public messages
 	"""
-	sender = ForeignKey(User, CASCADE, related_name='sender')
+	sender = ForeignKey(User, CASCADE)
 	room = ForeignKey(Room, CASCADE, null=True)
 	# DateField.auto_now
 	time = BigIntegerField(default=get_milliseconds)
@@ -249,6 +249,7 @@ class Message(Model):
 	# - images that refers same message always have unique symbols
 	symbol = CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
+	parent_message = ForeignKey('self', CASCADE, null=True, blank=True)
 	giphy = URLField(null=True, blank=True)
 	edited_times = IntegerField(default=0, null=False)
 
@@ -298,7 +299,7 @@ class Image(Model):
 
 	# character in Message.content that will be replaced with this image
 	symbol = CharField(null=False, max_length=1)
-	message = ForeignKey(Message, CASCADE, related_name='message', null=False)
+	message = ForeignKey(Message, CASCADE, null=False)
 	img = FileField(upload_to=get_random_path, null=True)
 	preview = FileField(upload_to=get_random_path, null=True)
 	type = CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
@@ -349,7 +350,7 @@ class IssueDetails(Model):
 	browser = CharField(null=True, max_length=32, blank=True)
 	version = CharField(null=True, max_length=32, blank=True)
 	time = DateField(default=datetime.datetime.now, blank=True)
-	issue = ForeignKey(Issue, CASCADE, related_name='issue')
+	issue = ForeignKey(Issue, CASCADE)
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_issue_detail'))

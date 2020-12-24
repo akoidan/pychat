@@ -72,6 +72,7 @@ class VarNames(object):
 	CURRENT_USER_INFO = 'userInfo'
 	CURRENT_USER_SETTINGS = 'userSettings'
 	ROOM_ID = 'roomId'
+	PARENT_MESSAGE = 'parentMessage'
 	ROOMS = 'rooms'
 	CHANNELS = 'channels'
 	ROOM_USERS = 'users'

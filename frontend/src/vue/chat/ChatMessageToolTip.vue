@@ -2,11 +2,18 @@
   <div class="message-tooltip">
     <i
       class="icon-pencil"
+      v-if="isMine"
       @click.stop="m2EditMessage"
     />
     <i
+      v-if="isMine"
       class="icon-trash-circled"
       @click.stop="m2DeleteMessage"
+    />
+    <i
+      v-if="!message.parentMessage"
+      class="icon-comment"
+      @click.stop="m2Comment"
     />
   </div>
 </template>
@@ -20,6 +27,14 @@ export default class ChatMessageToolTip extends Vue {
   @Prop()
   public readonly message!: MessageModel;
 
+  @State
+  public readonly myId!: number;
+
+
+  private get isMine(): boolean {
+    return this.message.userId === this.myId;
+  }
+
   public m2DeleteMessage() {
     let payload: EditingMessage = {
       messageId: this.message.id,
@@ -27,6 +42,10 @@ export default class ChatMessageToolTip extends Vue {
       isEditingNow: false,
     }
     this.$messageBus.$emit('delete-message', payload);
+  }
+
+  public m2Comment() {
+    this.$store.setCurrentThread({messageId: this.message.id, roomId: this.message.roomId});
   }
 
   public m2EditMessage() {
@@ -50,5 +69,8 @@ export default class ChatMessageToolTip extends Vue {
 
   .icon-pencil
     @include hover-click(#396eff)
+
+  .icon-comment
+    @include hover-click(#23ff00)
 
 </style>

@@ -1,5 +1,7 @@
 <template>
-  <div :class="cls" @mouseover.passive="removeUnread">
+  <div :class="cls" @mouseover.passive="removeUnread" @contextmenu="contextmenu">
+    <div v-if="isEditing" class="editing-background"></div>
+    <div v-if="isCurrentThreadEditing" class="thread-background"></div>
     <chat-message :message="message" class="message-content" />
     <template v-if="message.transfer">
       <app-progress-bar
@@ -31,11 +33,13 @@ import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
 import {
-  CurrentUserInfoModel,
+  CurrentUserInfoModel, EditingMessage, EditingThread,
   MessageModel,
   RoomDictModel
 } from '@/ts/types/model';
 import ChatMessageToolTip from '@/vue/chat/ChatMessageToolTip.vue';
+import {isMobile} from '@/ts/utils/runtimeConsts';
+import {sem} from '@/ts/utils/pureFunctions';
 
 @Component({
   components: {ChatMessageToolTip, AppProgressBar, ChatMessage}
@@ -45,8 +49,18 @@ export default class ChatSendingMessage extends Vue {
 
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
+  @State
+  public readonly editedMessage!: EditingMessage;
+
+  @State
+  public readonly editingThread!: EditingThread;
+
+
   @State
   public readonly roomsDict!: RoomDictModel;
+
+
 
   get filesExist() {
     return this.message.files && Object.keys(this.message.files).length > 0;
@@ -55,11 +69,12 @@ export default class ChatSendingMessage extends Vue {
   get id() {
     return this.message.id;
   }
+  get isCurrentThreadEditing() {
+    return this.editingThread && this.editingThread.messageId === this.message.id;
+  }
 
-  removeUnread() {
-    if (this.message.isHighlighted) {
-      this.$store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
-    }
+  get isEditing() {
+    return this.editedMessage && this.editedMessage.messageId === this.message.id;
   }
 
   get cls() {
@@ -77,6 +92,20 @@ export default class ChatSendingMessage extends Vue {
 
   get isSelf() {
     return this.message.userId === this.userInfo.userId;
+  }
+
+   contextmenu(event: Event) {
+    if (isMobile) {
+      event.preventDefault();
+      event.stopPropagation();
+      sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
+    }
+  }
+
+  removeUnread() {
+    if (this.message.isHighlighted) {
+      this.$store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
+    }
   }
 
   public retry() {
@@ -97,9 +126,25 @@ export default class ChatSendingMessage extends Vue {
   @import "~@/assets/sass/partials/mixins"
   @import "~@/assets/sass/partials/variables"
 
+  .editing-background
+    border: 1px solid $editing-border-color
+    background-color: rgba(255, 255, 255, 0.11)
+  .thread-background
+    border: 1px solid $thread-border-color
+  .editing-background, .thread-background
+    position: absolute
+    top: 0 //-$space-between-messages/2
+    right: 0
+    left: 0
+    bottom: 0 //-$space-between-messages/2
+  .color-white
+    .editing-background
+      border: 1px solid #3f3f3f
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
   .message-tooltip
     display: none
     margin-right: 5px
+    margin-top: $space-between-messages/2
   .absolute-right
     position: absolute
     right: 0
@@ -114,14 +159,14 @@ export default class ChatSendingMessage extends Vue {
     &:hover
       background-color: rgba(255, 255, 255, 0.11)
       .absolute-right
-        top: $space-between-messages/2
+        top: 0 // $space-between-messages/2
       .message-tooltip
         display: inline-block
-      .message-content
-        margin-top: -$space-between-messages*0.5
-        padding-top: $space-between-messages*0.5
-        padding-bottom: $space-between-messages*0.5
-        margin-bottom: -$space-between-messages*0.5
+      //.message-content
+      //  margin-top: 0 //-$space-between-messages/2
+      //  padding-top: 0 // $space-between-messages/2
+      //  padding-bottom: 0 //$space-between-messages/2
+      //  margin-bottom: 0 //-$space-between-messages/2
 
   .sendingMessage
     position: relative

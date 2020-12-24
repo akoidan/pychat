@@ -1,8 +1,5 @@
 <template>
-  <p
-    :class="mainCls"
-    @contextmenu="contextmenu"
-  >
+  <p :class="mainCls">
     <chat-message-header
       :time="message.time"
       :user-id="message.userId"
@@ -48,6 +45,15 @@ import {isMobile} from '@/ts/utils/runtimeConsts';
 })
 export default class ChatMessage extends Vue {
 
+  @Prop()
+  public message!: MessageModel;
+
+  @State
+  public readonly userSettings!: CurrentUserSettingsModel;
+
+  @Ref()
+  public content!: HTMLElement;
+
   get id() {
     return this.message.id;
   }
@@ -59,35 +65,11 @@ export default class ChatMessage extends Vue {
   get mainCls() {
     return {
       'removed-message': this.message.deleted,
-      highLightMessage: this.isEditing
     };
   }
 
-  get isEditing() {
-    return this.editedMessage && this.editedMessage.messageId === this.message.id;
-  }
-
-  @State
-  public readonly userSettings!: CurrentUserSettingsModel;
-  @State
-  public readonly userInfo!: CurrentUserInfoModel;
-  @Prop() public message!: MessageModel;
-  @State
-  public readonly editedMessage!: EditingMessage;
-
-  @Ref()
-  public content!: HTMLElement;
-
   public quote() {
     this.$messageBus.$emit('quote', this.message);
-  }
-
-  public contextmenu(event: Event) {
-    if (isMobile) {
-      event.preventDefault();
-      event.stopPropagation();
-      sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
-    }
   }
 
   public updated() {
@@ -131,13 +113,6 @@ export default class ChatMessage extends Vue {
     max-width: calc(100% - 25px)
     max-height: 400px
     display: block
-
-  .highLightMessage
-    border: 1px solid grey
-    border-radius: 3px
-    margin-right: 6px
-    padding: 5px
-
 
   .removed-message .message-text-style
     color: #5d5d5d
@@ -257,11 +232,6 @@ export default class ChatMessage extends Vue {
     @import "~highlightjs/styles/railscasts"
   .color-white p /deep/
     @import "~highlightjs/styles/default"
-
-  .color-white
-    .highLightMessage
-      border: 1px solid #3f3f3f
-      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
     .message-others
       background-color: white
 </style>

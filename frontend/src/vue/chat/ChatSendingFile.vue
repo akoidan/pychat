@@ -54,6 +54,11 @@ export default class ChatSendingFile extends Vue {
 </script>
 
 <style lang="sass" scoped>
+
+  @import "~@/assets/sass/partials/variables"
+
+  .message-self
+    padding: $space-between-messages $space-between-messages/4
   table /deep/
     width: 100%
     th, td

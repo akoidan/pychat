@@ -31,11 +31,12 @@ export  interface ChannelDB {
   creator: number;
 }
 
-export  interface MessageDB {
+export interface MessageDB {
   id: number;
   time: number;
   content: string;
   symbol: string;
+  parent_message_id: number|null;
   deleted: BooleanDB;
   giphy: string;
   edited: number;

@@ -1,5 +1,5 @@
 <template>
-  <div class="userMessageWrapper">
+  <div class="userMessageWrapper" :class="cls">
     <i
       class="icon-attach-outline"
       title="Add attachment"
@@ -49,8 +49,10 @@ import {
 import {
   CurrentUserInfoModel,
   EditingMessage,
+  EditingThread,
   FileModel,
-  MessageModel, RoomDictModel,
+  MessageModel,
+  RoomDictModel,
   RoomModel,
   UserDictModel
 } from '@/ts/types/model';
@@ -104,6 +106,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     public readonly activeRoomId!: number;
 
     @State
+    public readonly editingThread!: EditingThread;
+
+    @State
     public readonly pastingImagesQueue!: string[];
 
     @State
@@ -111,6 +116,13 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     private setShowAttachments() {
       this.$store.setShowAttachments(!this.showAttachments);
+    }
+
+    get cls() {
+      return {
+        'edit-message-mode': !!this.editedMessage,
+        'in-channel-mode': !!this.editingThread
+      }
     }
 
 
@@ -154,7 +166,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     onEmitDeleteMessage(editingMessage: EditingMessage) {
       let message: MessageModel = this.roomsDict[editingMessage.roomId].messages[editingMessage.messageId];
-      this.editMessageWs(null, editingMessage.messageId, editingMessage.roomId, null, null, message.time, message.edited ? message.edited + 1 : 1);
+      this.editMessageWs(null, editingMessage.messageId, editingMessage.roomId, null, null, message.time, message.edited ? message.edited + 1 : 1, message.parentMessage);
       this.$store.setEditedMessage(null);
     }
 
@@ -199,7 +211,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             md.currSymbol,
             md.files,
             this.editingMessageModel.time,
-            this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1
+            this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1,
+            this.editingMessageModel.parentMessage,
           );
           this.$store.setEditedMessage(null);
         } else {
@@ -214,15 +227,20 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             md.currSymbol,
             md.files,
             Date.now(),
-            0
+            0,
+            this.editingThread ? this.editingThread.messageId : null
           );
         }
       } else if (event.keyCode === 27) { // 27 = escape
-        this.$store.setShowSmileys(false);
-        if (this.editedMessage) {
+        if (this.showSmileys) { // do not cancel all at once, cancel one by one
+          this.$store.setShowSmileys(false);
+        } else if (this.showAttachments) {
+          this.$store.setShowAttachments(false);
+        } else if (this.editedMessage) {
           this.userMessage.innerHTML = '';
           this.$store.setEditedMessage(null);
-
+        } else if (this.editingThread) {
+          this.$store.setCurrentThread(null);
         }
       } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
         const messages = this.activeRoom.messages;
@@ -246,7 +264,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         symbol: string|null,
         files: {[id: number]: FileModel}|null,
         time: number,
-        edited: number
+        edited: number,
+        parentMessage: number|null,
     ): void {
       let shouldBeSynced: boolean = messageId >0 || !!messageContent;
       const mm: MessageModel = {
@@ -259,6 +278,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
           upload: null
         } : null,
         time,
+        parentMessage,
         sending: shouldBeSynced,
         content: messageContent,
         symbol: symbol,
@@ -358,12 +378,17 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/abstract_classes"
 
-
+  .edit-message-mode
+    border: 1px solid $editing-border-color
+  .in-channel-mode
+    border: 1px solid $thread-border-color
 
   .userMessageWrapper
     padding: 8px
     position: relative
     width: calc(100% - 16px)
+    &.in-channel-mode, &.edit-message-mode
+      width: calc(100% - 18px) // border 1px
 
     .icon-attach-outline
       @extend %chat-icon
@@ -387,6 +412,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
 
   .usermsg
+    z-index: 2
     margin-left: 4px
     padding-left: 25px
     color: #c1c1c1

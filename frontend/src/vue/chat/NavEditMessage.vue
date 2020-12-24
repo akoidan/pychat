@@ -8,6 +8,12 @@
       class="mText"
     >Edit</span></i>
     <i
+      class="icon-comment"
+      @click.stop="m2Comment"
+    ><span
+      class="mText"
+    >Comment</span></i>
+    <i
       v-if="!editedMessage.isEditingNow"
       class="icon-trash-circled"
       @click.stop="m2DeleteMessage"
@@ -43,6 +49,11 @@ export default class NavEditMessage extends Vue {
       isEditingNow: false
     };
     this.$messageBus.$emit('delete-message', payload);
+  }
+
+  public m2Comment() {
+    this.$store.setEditedMessage(null);
+    this.$store.setCurrentThread({messageId: this.editedMessage.messageId, roomId: this.editedMessage.roomId});
   }
 
   public m2EditMessage() {

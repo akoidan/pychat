@@ -108,7 +108,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     storeMessage = this.store.roomsDict[roomId].messages[messageId];
     let fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
-      await this.ws.sendPrintMessage(storeMessage.content, roomId, fileIds, storeMessage.id, Date.now() - storeMessage.time);
+      await this.ws.sendPrintMessage(storeMessage.content, roomId, fileIds, storeMessage.id, Date.now() - storeMessage.time, storeMessage.parentMessage);
       const rmMes: RoomMessageIds = {
         messageId: storeMessage.id,
         roomId: storeMessage.roomId
@@ -196,7 +196,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         id: message.id,
         time: message.time,
         files: message.files,
-        content: message.content || null,
+        content: null,
+        parentMessage: message.parentMessage,
         symbol: message.symbol || null,
         isHighlighted: false,
         sending: false,
@@ -301,6 +302,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       roomId: message.roomId,
       userId: message.userId,
       transfer: null,
+      parentMessage: message.parentMessage,
       sending: false, // this code is only called from WsInMessagew which means it's synced
       giphy: message.giphy || null,
       deleted: message.deleted || false

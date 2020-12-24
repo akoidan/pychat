@@ -10,6 +10,7 @@ import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
+  EditingThread,
   GrowlModel,
   GrowlType,
   IncomingCallModel,
@@ -120,6 +121,7 @@ export class DefaultStore extends VuexModule {
   public speakers: { [id: string]: string } = {};
   public webcams: { [id: string]: string } = {};
   public editedMessage: EditingMessage | null = null;
+  public editingThread: EditingThread | null = null;
   public activeRoomId: number | null = null;
   public activeUserId: number | null = null;
   public userInfo: CurrentUserInfoModel | null = null;
@@ -601,6 +603,15 @@ export class DefaultStore extends VuexModule {
   public setEditedMessage(editedMessage: EditingMessage|null) {
     this.editedMessage = editedMessage;
     this.activeUserId = null;
+  }
+
+  @Mutation
+  public setCurrentThread(editingThread: EditingThread|null) {
+    if (editingThread && this.editingThread && editingThread.messageId === this.editingThread.messageId) {
+      this.editingThread = null; //invert if clicked twice
+    } else {
+      this.editingThread = editingThread;
+    }
   }
 
   @Mutation

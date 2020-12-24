@@ -28,7 +28,8 @@
     display: block
     text-align: center
     padding: 0
-    margin: $space-between-messages 10px $space-between-messages 3px
+    //margin: $space-between-messages 10px $space-between-messages 3px
+    margin: 0 10px 0 3px
 
     legend
       padding: 0 10px

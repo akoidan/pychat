@@ -180,6 +180,7 @@ export function messageModelToP2p(m: MessageModel): MessageP2pDto {
     files: {},
     giphy: m.giphy,
     id: m.id,
+    parentMessage: m.parentMessage,
     symbol: m.symbol,
     timeAgo: Date.now() - m.time,
     userId: m.userId
@@ -191,6 +192,7 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     content: m.content,
     deleted: m.deleted,
     edited: m.edited,
+    parentMessage: m.parentMessage,
     files: {},
     giphy: m.giphy,
     id: m.id,
