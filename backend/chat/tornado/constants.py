@@ -15,6 +15,7 @@ class Actions(object):
 	ACCEPT_FILE = 'acceptFile'
 	GROWL_ERROR_MESSAGE = 'growlError'
 	GET_MESSAGES = 'loadMessages'
+	GET_MESSAGES_BY_IDS = 'loadMessagesByIds'
 	DELETE_ROOM = 'deleteRoom'
 	DELETE_MY_ROOM = DELETE_ROOM
 	USER_LEAVES_ROOM = 'leaveUser'
@@ -52,6 +53,7 @@ class VarNames(object):
 	INVITER_USER_ID = 'inviterUserId'
 	INVITEE_USER_ID = 'inviteeUserId'
 	TIME = 'time'
+	THREAD_ID = 'threadId'
 	CONTENT = 'content'
 	FILES = 'files'
 	FILE_URL = 'url'
@@ -81,6 +83,7 @@ class VarNames(object):
 	CB_BY_SENDER = 'cbBySender'
 	GET_MESSAGES_COUNT = 'count'
 	GET_MESSAGES_HEADER_ID = 'headerId'
+	GET_MESSAGES_MESSAGES_IDS = 'messagesIds'
 	IS_ROOM_PRIVATE = 'private'
 	CONNECTION_ID = 'connId'
 	HANDLER_NAME = 'handler'

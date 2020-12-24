@@ -17,6 +17,7 @@ import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
+  Emit,
   Ref,
   Vue
 } from 'vue-property-decorator';
@@ -68,8 +69,8 @@ export default class ChatMessage extends Vue {
     };
   }
 
+  @Emit()
   public quote() {
-    this.$messageBus.$emit('quote', this.message);
   }
 
   public updated() {

@@ -1,8 +1,10 @@
 import {
   CurrentUserInfoModel,
-  EditingMessage,
+  EditingMessage, FileModel,
   MessageModel
 } from '@/ts/types/model';
+import {DefaultStore} from '@/ts/classes/DefaultStore';
+import {MessageSender} from '@/ts/types/types';
 
 export function bytesToSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -84,6 +86,50 @@ export function sem(
   }
 }
 
+export function editMessageWs(
+    messageContent: string|null,
+    messageId: number,
+    roomId: number,
+    symbol: string|null,
+    files: {[id: number]: FileModel}|null,
+    time: number,
+    edited: number,
+    parentMessage: number|null,
+    store: DefaultStore,
+    ms: MessageSender
+): void {
+  let shouldBeSynced: boolean = messageId >0 || !!messageContent;
+  const mm: MessageModel = {
+    roomId,
+    deleted: !messageContent,
+    id: messageId,
+    isHighlighted: false,
+    transfer: !!messageContent || messageId > 0 ? { // TODO can this be simplified?
+      error: null,
+      upload: null
+    } : null,
+    time,
+    isEditingActive: false,
+    isThreadOpened: false, // TODO do not close thread
+    parentMessage,
+    sending: shouldBeSynced,
+    content: messageContent,
+    symbol: symbol,
+    giphy: null,
+    edited,
+    files,
+    userId: store.userInfo?.userId!
+  };
+   store.addMessage(mm);
+  if (shouldBeSynced) { // message hasn't been sync to server and was deleted localy
+    ms.syncMessage(roomId, messageId);
+  }
+}
+export function buildQueryParams(params: Record<string, string|number>) {
+  return Object.keys(params)
+      .map(k => encodeURIComponent(k) + '=' + encodeURIComponent(params[k]))
+      .join('&');
+}
 export function bounce(ms: number): (cb: Function) => void {
   let stack: number | null;
   let lastCall: Function;

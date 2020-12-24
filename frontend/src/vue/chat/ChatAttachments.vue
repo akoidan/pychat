@@ -1,5 +1,5 @@
 <template>
-  <div v-show="showAttachments" class="attachments-div">
+  <div class="attachments-div">
     <input
       v-show="false"
       ref="imgInput"
@@ -22,8 +22,8 @@
       @change="uploadFile"
     >
     <router-link
-      to="/painter"
-      @click.native="$store.setShowAttachments(false)"
+      @click.native="close"
+      :to="paintUrl"
       class="icon-brush"
       title="Draw an Image"
     >
@@ -46,6 +46,22 @@
       title="Share Video/Image"
       @click="addImage"
     />
+    <i
+      class="icon-webrtc-video"
+      @click="addVideo"
+      title="Record and send a video message"
+    />
+    <i
+      class="icon-mic-1"
+      @click="addAudio"
+      title="Record and send an audio message"
+    />
+
+    <i
+      class="icon-cancel-circled-outline"
+      title="Close this window"
+      @click="close"
+    />
   </div>
 </template>
 
@@ -55,10 +71,12 @@ import {
   Prop,
   Vue,
   Watch,
+  Emit,
   Ref
 } from "vue-property-decorator";
 import { State } from '@/ts/instances/storeInstance';
 import { RoomModel } from '@/ts/types/model';
+import {buildQueryParams} from '@/ts/utils/pureFunctions';
 
 @Component
 export default class ChatAttachments extends Vue {
@@ -72,14 +90,48 @@ export default class ChatAttachments extends Vue {
   @Ref()
   public inputFileUpload!: HTMLInputElement;
 
-  @State
-  public readonly activeRoomId!: number;
 
-  @State
-  public readonly showAttachments!: boolean;
+  @Prop({default: null})
+  public readonly editMessageId!: number;
+
+  @Prop({default: null})
+  public readonly threadMessageId!: number;
+
+  @Prop()
+  public readonly roomId!: number;
+
+  @Emit()
+  close() {}
+
+  @Emit()
+  public addVideo() {
+    this.close();
+  }
+
+  @Emit()
+  public addAudio() {
+    this.close();
+  }
+
+  get paintUrl() {
+    let params: Record<string, number|string> = {
+      roomId: this.roomId
+    };
+    if (this.editMessageId) {
+      params.editedMessageId = this.editMessageId;
+    }
+    if (this.threadMessageId) {
+      params.openedThreadId = this.threadMessageId;
+    }
+    let queryParams = buildQueryParams(params);
+
+    return `/painter?${queryParams}`;
+  }
+
+
 
   public async addImage() {
-    this.$store.setShowAttachments(false);
+    // this.$store.setShowAttachments(false);
     // TODO seems like filePicker has limited about of time which file lives.
     //  Sometimes it errors `net::ERR_FILE_NOT_FOUND` on upload
     // if (window.showOpenFilePicker) {
@@ -104,36 +156,46 @@ export default class ChatAttachments extends Vue {
 
   public uploadFileClick() {
     this.inputFileUpload.value = '';
-    this.$store.setShowAttachments(false);
+    // this.$store.setShowAttachments(false);
     this.inputFileUpload.click();
   }
 
   public sendFileClick() {
     this.inputFileSend.value = '';
-    this.$store.setShowAttachments(false);
+    // this.$store.setShowAttachments(false);
     this.inputFileSend.click();
   }
 
+  @Emit()
   public uploadImage(evt: Event) {
     this.$logger.log("Got images to send: {}",  (evt.target as HTMLInputElement).files)();
     const files: FileList = (evt.target as HTMLInputElement).files!;
-    this.$messageBus.$emit('paste-images', files);
+    // save files before clearing input.
+    // if we avoid array.from, default obect filelist is live, meaning it would have size 0 after clearing
+    let result = Array.from(files);
     this.imgInput.value = '';
+    return result;
   }
 
+  @Emit()
   public uploadFile() {
     this.$logger.log("Got files to send: {}", this.inputFileUpload.files)();
     const files: FileList = this.inputFileUpload.files!;
-    this.$messageBus.$emit('paste-files', files);
+    let result = Array.from(files);
+    // save files before clearing input.
+    // if we avoid array.from, default obect filelist is live, meaning it would have size 0 after clearing
+    this.inputFileUpload.value = '';
+    return result;
   }
 
   public sendFile() {
     this.$logger.log("Got files to send: {}", this.inputFileSend.files)();
     if (this.inputFileSend.files) {
       for (let i = 0; i < this.inputFileSend.files!.length; i++) {
-        this.$webrtcApi.sendFileOffer(this.inputFileSend.files![i], this.activeRoomId);
+        this.$webrtcApi.sendFileOffer(this.inputFileSend.files![i], this.roomId, this.threadMessageId);
       }
     }
+    this.close();
   }
 
 }
@@ -143,15 +205,17 @@ export default class ChatAttachments extends Vue {
 
   @import "~@/assets/sass/partials/abstract_classes"
 
+  .icon-cancel-circled-outline
+    margin-left: auto
   .attachments-div
-    position: absolute
-    left: 0
     padding: 10px 10px 3px 5px
     bottom: 2px // otherwise there would be scroll
     font-size: 40px
+    display: flex
     border-radius: 10px
     [class^="icon-"]
       padding: 5px
+      display: inline-block
       cursor: pointer
 
   .color-lor
@@ -168,6 +232,10 @@ export default class ChatAttachments extends Vue {
 
 
   .color-reg
+    .icon-mic-1
+      @include hover-click(#b87300)
+    .icon-webrtc-video
+      @include hover-click(#c149b7)
     .icon-doc-inv
       @include hover-click(#b8b800)
     .icon-upload-cloud
@@ -175,6 +243,8 @@ export default class ChatAttachments extends Vue {
     .attachments-div
       @extend %window-reg
     .icon-brush
+      @include hover-click(#6b75ff)
+    .icon-cancel-circled-outline
       @include hover-click(#ee0000)
     .icon-picture
       @include hover-click(#37ce00)

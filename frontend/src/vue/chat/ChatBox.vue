@@ -1,5 +1,5 @@
 <template>
-  <div class="holder">
+  <div class="holder" @drop.prevent="dropPhoto">
     <chat-call
       :call-info="room.callInfo"
       :room-id="room.id"
@@ -15,7 +15,11 @@
     >
       <template
         v-for="message in searchMessages">
-        <app-separator :day="message.fieldDay"   v-if="message.fieldDay" :key="message.fieldDay"/>
+        <app-separator
+          v-if="message.fieldDay"
+          :key="message.fieldDay"
+          :day="message.fieldDay"
+        />
         <chat-sending-message
           v-else
           :key="message.id"
@@ -69,11 +73,13 @@
         />
         <chat-sending-message
           v-else
+          @quote="onquote"
           :key="message.id"
           :message="message"
         />
       </template>
     </div>
+    <chat-text-area :room-id="room.id" ref="textarea"/>
   </div>
 </template>
 <script lang="ts">
@@ -82,9 +88,10 @@ import {
   Component,
   Prop,
   Ref,
+  Watch,
   Vue
 } from "vue-property-decorator";
-import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
+import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import ChatMessage from '@/vue/chat/ChatMessage.vue';
 import SearchMessages from '@/vue/chat/SearchMessages.vue';
 import {
@@ -106,9 +113,11 @@ import ChatCall from '@/vue/chat/ChatCall.vue';
 import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 import AppSeparator from '@/vue/ui/AppSeparator.vue';
 import ChatThread from '@/vue/chat/ChatThread.vue';
+import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
 
   @Component({
     components: {
+      ChatTextArea,
       ChatThread,
       AppSeparator,
       ChatChangeNameMessage,
@@ -125,11 +134,17 @@ import ChatThread from '@/vue/chat/ChatThread.vue';
   export default class ChatBox extends Vue {
     @Prop() room!: RoomModel;
 
+    @State
+    public readonly activeRoomId!: number;
+
     messageLoading: boolean = false;
     searchMessageLoading: boolean = false;
 
     @Ref()
     private readonly chatbox!: HTMLElement;
+
+    @Ref()
+    public textarea!: ChatTextArea;
 
     @Ref()
     private readonly chatboxSearch!: HTMLElement;
@@ -142,6 +157,27 @@ import ChatThread from '@/vue/chat/ChatThread.vue';
         this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
       } else {
         this.scrollBottom = false;
+      }
+    }
+
+    @Watch('activeRoomId')
+    public onActivate() {
+      if (this.activeRoomId === this.room.id) {
+       this.$nextTick(() => {
+         this.textarea.userMessage.focus();
+       })
+      }
+    }
+
+    onquote(m: MessageModel) {
+      this.textarea.onEmitQuote(m);
+    }
+
+    dropPhoto(evt: DragEvent) {
+      const files: FileList = (evt.dataTransfer?.files) as FileList;
+      this.$logger.debug('Drop photo {} ', files)();
+      if (files) {
+        this.textarea.onEmitDropPhoto(files)
       }
     }
 
@@ -194,15 +230,7 @@ import ChatThread from '@/vue/chat/ChatThread.vue';
       }));
       newArray.push(...this.room.changeName.map(value => ({isChangeName: true, ...value})));
       let dates: {[id: string]: boolean} = {};
-      for (let m in this.room.sendingFiles) {
-        let sendingFile: SendingFile = this.room.sendingFiles[m];
-        newArray.push(sendingFile);
-      }
-      for (let m in this.room.receivingFiles) {
-        let receivingFile: ReceivingFile = this.room.receivingFiles[m];
-        newArray.push(receivingFile);
-      }
-      let messageDict: Record<number, {parent?: MessageModel, messages: MessageModel[]}> = {};
+      let messageDict: Record<number, {parent?: MessageModel, messages: (MessageModel|ReceivingFile|SendingFile)[]}> = {};
       for (let m in this.room.messages) {
         let message = this.room.messages[m];
         if (message.parentMessage) {
@@ -222,14 +250,52 @@ import ChatThread from '@/vue/chat/ChatThread.vue';
           }
         }
       }
+      let missingThreadIds: number[]= [];
+      for (let m in this.room.sendingFiles) {
+        let sendingFile: SendingFile = this.room.sendingFiles[m];
+        if (sendingFile.threadId) {
+          if (messageDict[sendingFile.threadId]) {
+            messageDict[sendingFile.threadId].messages.push(sendingFile);
+          } else {
+            missingThreadIds.push(sendingFile.threadId)
+            this.$logger.warn(`Receiving file {} won't be dispayed as thread ${sendingFile.threadId} is not loaded yet`)();
+          }
+        } else {
+          newArray.push(sendingFile);
+        }
+      }
+      for (let m in this.room.receivingFiles) {
+        let receivingFile: ReceivingFile = this.room.receivingFiles[m];
+        if (receivingFile.threadId) {
+          if (messageDict[receivingFile.threadId]) {
+            messageDict[receivingFile.threadId].messages.push(receivingFile);
+          } else {
+            missingThreadIds.push(receivingFile.threadId)
+            this.$logger.warn(`Receiving file {} won't be dispayed as thread ${receivingFile.threadId} is not loaded yet`)();
+          }
+        } else {
+          newArray.push(receivingFile);
+        }
+      }
       Object.values(messageDict).forEach(v => {
-        if (v.messages.length) {
-          v.messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
-          newArray.push({parent: v.parent, thread: true, messages: v.messages});
+        if (v.messages.length || v.parent?.isThreadOpened) {
+          if (v.parent) {
+            v.messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+            newArray.push({parent: v.parent, thread: true, messages: v.messages, time: v.parent.time});
+          } else {
+            let mesasges: MessageModel[] = v.messages.filter(m => (m as MessageModel)?.id) as MessageModel[];
+            if (mesasges.length) {
+              missingThreadIds.push(mesasges[0].parentMessage as number);
+            }
+            this.$logger.warn(`Skipping rendering messages ${mesasges.map(m => m.id)} as parent is not loaded yet`)()
+          }
         } else {
           newArray.push(v.parent)
         }
       });
+      if (missingThreadIds.length) {
+        this.$messageSenderProxy.getMessageSender(this.room.id).loadMessages(this.room.id, missingThreadIds);
+      }
       newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
       this.$logger.debug("Reevaluating messages in room #{}: {}", this.room.id, newArray)();
       return newArray;
@@ -257,24 +323,12 @@ import ChatThread from '@/vue/chat/ChatThread.vue';
       }
     }
 
-    get minIdCalc(): number|undefined {
-      return this.$store.minId(this.room.id);
-    }
-
     @ApplyGrowlErr({runningProp: 'searchMessageLoading',  preventStacking: true, message: 'Unable to load history'})
     private async loadUpSearchHistory(n: number) {
       if (this.chatboxSearch.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-      let search = this.room.search;
-      if (!search.locked) {
-        let messagesDto: MessageModelDto[] = await this.$api.search(search.searchText, this.room.id, Object.keys(search.messages).length);
-        this.$logger.log("Got {} messages from the server", messagesDto.length)()
-        if (messagesDto.length) {
-          this.$messageSenderProxy.getMessageSender(this.room.id).addSearchMessages(this.room.id, messagesDto);
-        }
-        this.$store.setSearchStateTo({roomId: this.room.id, lock: messagesDto.length < MESSAGES_PER_SEARCH});
-      }
+      this.$messageSenderProxy.getMessageSender(this.room.id).loadUpSearchMessages(this.room.id, n);
     }
 
     @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})
@@ -282,14 +336,7 @@ import ChatThread from '@/vue/chat/ChatThread.vue';
       if (this.chatbox.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-     if (!this.room.allLoaded) {
-        let lm = await this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n);
-        if (lm.content.length > 0) {
-          this.$messageSenderProxy.getMessageSender(lm.roomId).addMessages(lm.roomId, lm.content);
-        } else {
-          this.$store.setAllLoaded(lm.roomId);
-        }
-      }
+      this.$messageSenderProxy.getMessageSender(this.room.id).loadUpMessages(this.room.id, n);
     }
 
     onSearchScroll(e: WheelEvent) {

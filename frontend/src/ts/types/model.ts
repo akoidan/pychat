@@ -19,10 +19,6 @@ export interface EditingMessage {
   isEditingNow: boolean;
 }
 
-export interface EditingThread {
-  messageId: number;
-  roomId: number;
-}
 
 export interface CurrentUserSettingsModel {
   embeddedYoutube: boolean;
@@ -39,6 +35,14 @@ export interface CurrentUserSettingsModel {
 export interface GoogleCaptcha {
   render(div: HTMLElement): void;
   reset(): void;
+}
+
+export interface PastingTextAreaElement {
+  elType: 'blob';
+  content: string;
+  roomId: number;
+  editedMessageId: number|null;
+  openedThreadId: number|null;
 }
 
 export interface CurrentUserInfoModel {
@@ -89,13 +93,15 @@ export interface MessageTransferInfo {
   error: string|null;
 }
 
-export  interface MessageModel {
+export interface MessageModel {
   id: number;
   time: number;
   parentMessage: number|null;
   files: Record<string, FileModel>| null; // THIS IS STRING, not number!!
   content: string|null;
-  isHighlighted: boolean;
+  isHighlighted: boolean; // if not read
+  isEditingActive: boolean; // if textarea is opened for this message to edit it
+  isThreadOpened: boolean; // if thread is opened for this message
   symbol: string|null;
   deleted: boolean;
   sending: boolean;
@@ -167,6 +173,7 @@ export interface ReceivingFile {
   upload: UploadProgressModel;
   status: FileTransferStatus;
   fileName: string;
+  threadId: number|null;
   opponentWsId: string;
   roomId: number;
   connId: string;
@@ -178,6 +185,7 @@ export interface ReceivingFile {
 export interface SendingFile {
   time: number;
   fileName: string;
+  threadId: number|null;
   roomId: number;
   connId: string;
   fileSize: number;

@@ -12,7 +12,8 @@ import {
 } from '@/ts/types/types';
 import {
   FileModel,
-  MessageModel
+  MessageModel,
+  RoomModel
 } from '@/ts/types/model';
 import { Logger } from 'lines-logger';
 
@@ -38,6 +39,7 @@ import {
 } from '@/ts/types/messages/wsInMessages';
 import { savedFiles } from '@/ts/utils/htmlApi';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import {MESSAGES_PER_SEARCH} from '@/ts/utils/consts';
 
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
@@ -95,6 +97,36 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       this.logger.error('Can\'t send messages because {}', e)();
     } finally {
       this.syncMessageLock = false;
+    }
+  }
+
+
+  async loadMessages(roomId: number, messageIds: number[]): Promise<void> {
+    this.logger.log("Asking for messages {}", messageIds)();
+    let respones = await this.ws.sendLoadMessagesByIds(roomId, messageIds);
+    this.addMessages(roomId, respones.content);
+  }
+
+  async loadUpSearchMessages(roomId: number, count: number) {
+    let room: RoomModel = this.store.roomsDict[roomId];
+    if (!room.search.locked) {
+      let messagesDto: MessageModelDto[] = await this.api.search(room.search.searchText, roomId, Object.keys(room.search.messages).length);
+      this.logger.log("Got {} messages from the server", messagesDto.length)();
+      if (messagesDto.length) {
+        this.addSearchMessages(roomId, messagesDto);
+      }
+      this.store.setSearchStateTo({roomId, lock: messagesDto.length < MESSAGES_PER_SEARCH});
+    }
+  }
+
+  async loadUpMessages(roomId: number, count: number): Promise<void> {
+    if (!this.store.roomsDict[roomId].allLoaded) {
+      let lm = await this.ws.sendLoadMessages(roomId, this.store.minId(roomId), count);
+      if (lm.content.length > 0) {
+        this.addMessages(lm.roomId, lm.content);
+      } else {
+        this.store.setAllLoaded(lm.roomId);
+      }
     }
   }
 
@@ -197,6 +229,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         time: message.time,
         files: message.files,
         content: null,
+        isThreadOpened: false,
+        isEditingActive: false,
         parentMessage: message.parentMessage,
         symbol: message.symbol || null,
         isHighlighted: false,
@@ -299,6 +333,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       content: message.content || null,
       symbol: message.symbol || null,
       edited: message.edited || null,
+      isEditingActive: false,
+      isThreadOpened: false,
       roomId: message.roomId,
       userId: message.userId,
       transfer: null,

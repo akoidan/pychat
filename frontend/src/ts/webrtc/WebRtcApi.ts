@@ -171,10 +171,10 @@ export default class WebRtcApi extends MessageHandler {
     sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
-  public async sendFileOffer(file: File, channel: number) {
+  public async sendFileOffer(file: File, channel: number, threadId: number|null) {
     if (file.size > 0) {
-      const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
-      new FileHandler(channel, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
+      const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, threadId);
+      new FileHandler(channel, threadId, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }
@@ -249,6 +249,7 @@ export default class WebRtcApi extends MessageHandler {
       roomId: message.roomId,
       opponentWsId: message.opponentWsId,
       anchor: null,
+      threadId: message.threadId,
       status: limitExceeded ? FileTransferStatus.ERROR : FileTransferStatus.NOT_DECIDED_YET,
       userId: message.userId,
       error: limitExceeded ? `Your browser doesn't support receiving files over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}` : null,

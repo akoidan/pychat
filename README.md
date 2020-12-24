@@ -478,6 +478,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* history loading messages should be fully refactored,it has a lot of glitches, I consider linked list of messages
 * appear online messages also appear is channel non-relatedto user .e.g. pychat pdr
 * edit message doesn't appear after pasting image from painter. (in editing mode)
 * replace array.indexOf >= 0 to array.includes

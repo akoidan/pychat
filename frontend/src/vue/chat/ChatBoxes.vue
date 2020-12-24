@@ -1,5 +1,5 @@
 <template>
-  <div v-show="!dim" class="chatBoxHolder" @drop.prevent="dropPhoto">
+  <div class="chatBoxHolder">
     <template v-for="room in roomsArray">
       <chat-box
         v-show="activeRoomId === room.id"
@@ -31,34 +31,22 @@ import { RoomModel } from '@/ts/types/model';
 
 
 @Component({
-    components: {ChatBox}
-  })
-  export default class ChatBoxes extends Vue {
+  components: {ChatBox}
+})
+export default class ChatBoxes extends Vue {
 
+  @State
+  public readonly roomsArray!: RoomModel[];
 
-    @State
-    public readonly dim!: boolean;
+  get ALL_ROOM_ID(): number {
+    return ALL_ROOM_ID;
+  }
 
-    @State
-    public readonly roomsArray!: RoomModel[];
+  @State
+  public readonly activeRoom!: RoomModel;
 
-    get ALL_ROOM_ID(): number {
-      return ALL_ROOM_ID;
-    }
-
-    dropPhoto(evt: DragEvent) {
-      const files: FileList = (evt.dataTransfer?.files) as FileList;
-      this.$logger.debug('Drop photo {} ', files)();
-      if (files) {
-        this.$messageBus.$emit('drop-photo', files);
-      }
-    }
-
-    @State
-    public readonly activeRoom!: RoomModel;
-
-    @State
-    public readonly activeRoomId!: number;
+  @State
+  public readonly activeRoomId!: number;
   }
 </script>
 <!-- eslint-disable -->

@@ -1,9 +1,5 @@
 <template>
   <div class="flex">
-    <div
-      v-if="dim"
-      class="wait"
-    />
     <app-nav v-show="showNav" />
     <incoming-call
       v-if="incomingCall"
@@ -45,8 +41,6 @@ export default class MainPage extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
   @State
   public readonly incomingCall!: IncomingCallModel;
-  @State
-  public readonly dim!: boolean;
 
   get inited() {
     return this.userInfo;

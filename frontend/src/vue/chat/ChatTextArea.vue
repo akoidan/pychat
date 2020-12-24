@@ -1,27 +1,42 @@
 <template>
-  <div class="userMessageWrapper" :class="cls">
-    <i
-      class="icon-attach-outline"
-      title="Add attachment"
-      @click="setShowAttachments"
+  <div class="userMessageWrapper">
+    <chat-attachments
+      v-if="showAttachments"
+      :room-id="roomId"
+      :edit-message-id="editMessageId"
+      :thread-message-id="threadMessageId"
+      @close="showAttachments = false"
+      @upload-file="pasteFilesToTextArea"
+      @upload-image="pasteImagesToTextArea"
+      @add-audio="addAudio"
+      @add-video="addVideo"
     />
-    <i
-      class="icon-smile"
-      title="Add a smile :)"
-      @click="showSmileysChange"
-    />
+    <smiley-holder v-if="showSmileys" @close="showSmileys = false" @add-smiley="onEmitAddSmile"/>
     <media-recorder
-      @record="handleRecord"
+      ref="mediaRecorder"
+      :is-video="isRecordingVideo"
       @video="handleAddVideo"
       @audio="handleAddAudio"
     />
-    <div
-      ref="userMessage"
-      contenteditable="true"
-      class="usermsg input"
-      @keydown="checkAndSendMessage"
-      @paste="onImagePaste"
-    />
+    <div>
+      <i
+        class="icon-attach-outline"
+        title="Add attachment"
+        @click="showAttachments = !showAttachments"
+      />
+      <i
+        class="icon-smile"
+        title="Add a smile :)"
+        @click="showSmileys = !showSmileys"
+      />
+      <div
+        ref="userMessage"
+        contenteditable="true"
+        class="usermsg input"
+        @keydown="checkAndSendMessage"
+        @paste="onImagePaste"
+      />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -29,7 +44,8 @@ import {
   Component,
   Ref,
   Vue,
-  Watch
+  Watch,
+  Prop,
 } from 'vue-property-decorator';
 import {
   encodeHTML,
@@ -49,9 +65,8 @@ import {
 import {
   CurrentUserInfoModel,
   EditingMessage,
-  EditingThread,
   FileModel,
-  MessageModel,
+  MessageModel, PastingTextAreaElement,
   RoomDictModel,
   RoomModel,
   UserDictModel
@@ -64,6 +79,7 @@ import {
   UploadFile
 } from '@/ts/types/types';
 import {
+  editMessageWs,
   sem
 } from '@/ts/utils/pureFunctions';
 import MediaRecorder from '@/vue/chat/MediaRecorder.vue';
@@ -71,30 +87,32 @@ import {
   RawLocation,
   Route
 } from "vue-router";
+import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
+import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
 
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-  @Component({components: {MediaRecorder}})
+  @Component({components: {SmileyHolder, ChatAttachments, MediaRecorder}})
   export default class ChatTextArea extends Vue {
 
     @State
     public readonly userInfo!: CurrentUserInfoModel;
 
-    @State
-    public readonly showSmileys!: boolean;
+    @Prop({default: null})
+    public readonly editMessageId!: number;
 
-    @State
-    public readonly showAttachments!: boolean;
+    @Prop({default: null})
+    public readonly threadMessageId!: number;
 
-    @State
-    public readonly editingMessageModel!: MessageModel;
-
-    @State
-    public readonly editedMessage!: EditingMessage;
+    @Prop()
+    public readonly roomId!: number;
 
     @Ref()
     public userMessage!: HTMLElement;
+
+    @Ref()
+    public mediaRecorder!: MediaRecorder;
 
     @State
     public readonly allUsersDict!: UserDictModel;
@@ -103,49 +121,43 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     public readonly roomsDict!: RoomDictModel;
 
     @State
-    public readonly activeRoomId!: number;
-
-    @State
-    public readonly editingThread!: EditingThread;
-
-    @State
-    public readonly pastingImagesQueue!: string[];
+    public readonly pastingTextAreaQueue!: PastingTextAreaElement[];
 
     @State
     public readonly activeRoom!: RoomModel;
 
-    private setShowAttachments() {
-      this.$store.setShowAttachments(!this.showAttachments);
+    private showAttachments: boolean = false;
+    private showSmileys: boolean = false;
+    private isRecordingVideo: boolean = true;
+
+    get room() {
+      return this.roomsDict[this.roomId];
     }
 
-    get cls() {
-      return {
-        'edit-message-mode': !!this.editedMessage,
-        'in-channel-mode': !!this.editingThread
+    get editMessage(): MessageModel|null {
+      if (this.editMessageId) {
+        return this.room.messages[this.editMessageId]
+      } else {
+        return null
       }
     }
 
-
-    public created() {
-      this.$messageBus.$on('drop-photo', this.onEmitDropPhoto);
-      this.$messageBus.$on('add-smile', this.onEmitAddSmile);
-      this.$messageBus.$on('delete-message', this.onEmitDeleteMessage);
-      this.$messageBus.$on('quote', this.onEmitQuote);
-      this.$messageBus.$on('paste-images', this.pasteImagesToTextArea);
-      this.$messageBus.$on('paste-files', this.pasteFilesToTextArea);
+    get threadMesage(): MessageModel|null {
+      if (this.threadMessageId) {
+        return this.room.messages[this.threadMessageId]
+      } else {
+        return null
+      }
     }
 
-    public destroyed() {
-      this.$messageBus.$off('drop-photo', this.onEmitDropPhoto);
-      this.$messageBus.$off('add-smile', this.onEmitAddSmile);
-      this.$messageBus.$off('delete-message', this.onEmitDeleteMessage);
-      this.$messageBus.$off('quote', this.onEmitQuote);
-      this.$messageBus.$off('paste-images', this.pasteImagesToTextArea);
-      this.$messageBus.$off('paste-files', this.pasteFilesToTextArea);
+    public mounted() {
+      if (this.editMessage) {
+        this.userMessage.innerHTML = encodeP(this.editMessage)
+        placeCaretAtEnd(this.userMessage);;
+      }
     }
 
-
-    onEmitDropPhoto(files: FileList) {
+    public onEmitDropPhoto(files: FileList) {
       for (let i = 0; i < files.length; i++) {
         this.$logger.debug('loop')();
         const file = files[i];
@@ -154,7 +166,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.$store.growlError(err);
           });
         } else {
-          this.$webrtcApi.sendFileOffer(file, this.activeRoomId);
+          this.$webrtcApi.sendFileOffer(file, this.roomId, this.threadMessageId);
         }
       }
     }
@@ -162,12 +174,6 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     onEmitAddSmile(code:string) {
       this.$logger.log('Adding smiley {}', code)();
       pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
-    }
-
-    onEmitDeleteMessage(editingMessage: EditingMessage) {
-      let message: MessageModel = this.roomsDict[editingMessage.roomId].messages[editingMessage.messageId];
-      this.editMessageWs(null, editingMessage.messageId, editingMessage.roomId, null, null, message.time, message.edited ? message.edited + 1 : 1, message.parentMessage);
-      this.$store.setEditedMessage(null);
     }
 
     onEmitQuote(message: MessageModel) {
@@ -181,66 +187,82 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
 
-    @Watch('pastingImagesQueue')
+    @Watch('pastingTextAreaQueue')
     onBlob()  {
-      if (this.pastingImagesQueue.length > 0) {
-        this.$logger.log('Pasting blob {}', this.pastingImagesQueue)();
-        this.pastingImagesQueue.forEach(id => {
-          pasteBlobToContentEditable(savedFiles[id], this.userMessage);
-          delete savedFiles[id]
+      if (this.pastingTextAreaQueue.length > 0) {
+        this.$logger.log('Pasting blob {}', this.pastingTextAreaQueue)();
+        this.pastingTextAreaQueue.forEach(id => {
+          if (id.elType === 'blob' && id.openedThreadId == this.threadMessageId && id.roomId == this.roomId && id.editedMessageId === this.editMessageId) {
+            pasteBlobToContentEditable(savedFiles[id.content], this.userMessage);
+            delete savedFiles[id.content]
+            this.$store.setPastingQueue(this.pastingTextAreaQueue.filter(el => el != id));
+          }
         })
         placeCaretAtEnd(this.userMessage);
-        this.$store.setPastingQueue([]);
       }
     }
 
     get messageSender(): MessageSender { // todo does vuew cache this?
-      return this.$messageSenderProxy.getMessageSender(this.activeRoomId);
+      return this.$messageSenderProxy.getMessageSender(this.roomId);
     }
 
     public checkAndSendMessage(event: KeyboardEvent) {
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
         event.preventDefault();
         this.$logger.debug('Checking sending message')();
-        if (this.editedMessage && this.editedMessage.isEditingNow) {
-          const md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel);
-          this.editMessageWs(
+        if (this.editMessage) {
+          const md: MessageDataEncode = getMessageData(this.userMessage, this.editMessage!);
+          editMessageWs(
             md.messageContent,
-            this.editedMessage.messageId,
-            this.activeRoomId,
+            this.editMessage.id,
+            this.roomId,
             md.currSymbol,
             md.files,
-            this.editingMessageModel.time,
-            this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1,
-            this.editingMessageModel.parentMessage,
+            this.editMessage.time,
+            this.editMessage.edited ? this.editMessage.edited + 1 : 1,
+            this.editMessage.parentMessage,
+            this.$store,
+            this.messageSender
           );
-          this.$store.setEditedMessage(null);
+          this.$store.setEditedMessage({
+            roomId: this.roomId,
+            isEditingNow: false,
+            messageId: this.editMessage.id
+          });
         } else {
           const md: MessageDataEncode = getMessageData(this.userMessage, undefined);
           if (!md.messageContent) { // && !md.files.length // but file content is emppty is symbols are not present
             return;
           }
-          this.editMessageWs(
+          editMessageWs(
             md.messageContent,
             this.$messageSenderProxy.getUniqueNegativeMessageId(),
-            this.activeRoomId,
+            this.roomId,
             md.currSymbol,
             md.files,
             Date.now(),
             0,
-            this.editingThread ? this.editingThread.messageId : null
+            this.threadMessageId  ?? null,
+            this.$store,
+            this.messageSender
           );
         }
       } else if (event.keyCode === 27) { // 27 = escape
-        if (this.showSmileys) { // do not cancel all at once, cancel one by one
-          this.$store.setShowSmileys(false);
-        } else if (this.showAttachments) {
-          this.$store.setShowAttachments(false);
-        } else if (this.editedMessage) {
+        if (this.editMessageId) {
           this.userMessage.innerHTML = '';
-          this.$store.setEditedMessage(null);
-        } else if (this.editingThread) {
-          this.$store.setCurrentThread(null);
+          this.$store.setEditedMessage({
+            messageId: this.editMessageId,
+            isEditingNow: false,
+            roomId: this.roomId
+          });
+        } else if (this.threadMessageId) {
+          this.$store.setCurrentThread({
+            roomId: this.roomId,
+            isEditingNow: false,
+            messageId: this.threadMessageId
+          });
+        } else if (this.showSmileys) { // do not cancel all at once, cancel one by one
+          this.showSmileys = false;
         }
       } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
         const messages = this.activeRoom.messages;
@@ -252,65 +274,16 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             }
           }
           event.preventDefault();
+          event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
           sem(event, maxTime!, true, this.userInfo, this.$store.setEditedMessage);
         }
       }
     }
 
-    private editMessageWs(
-        messageContent: string|null,
-        messageId: number,
-        roomId: number,
-        symbol: string|null,
-        files: {[id: number]: FileModel}|null,
-        time: number,
-        edited: number,
-        parentMessage: number|null,
-    ): void {
-      let shouldBeSynced: boolean = messageId >0 || !!messageContent;
-      const mm: MessageModel = {
-        roomId,
-        deleted: !messageContent,
-        id: messageId,
-        isHighlighted: false,
-        transfer: !!messageContent || messageId > 0 ? { // TODO can this be simplified?
-          error: null,
-          upload: null
-        } : null,
-        time,
-        parentMessage,
-        sending: shouldBeSynced,
-        content: messageContent,
-        symbol: symbol,
-        giphy: null,
-        edited,
-        files,
-        userId: this.userInfo.userId
-      };
-      this.$store.addMessage(mm);
-      if (shouldBeSynced) { // message hasn't been sync to server and was deleted localy
-        this.messageSender.syncMessage(roomId, messageId);
-      }
-    }
-
-    @Watch('editedMessage')
-    public onActiveRoomIdChange(val: EditingMessage) {
-      this.$logger.log('editedMessage changed')();
-      if (val && val.isEditingNow) {
-        this.userMessage.innerHTML = encodeP(this.editingMessageModel);
-        placeCaretAtEnd(this.userMessage);
-      }
-    }
-
-
-    public handleRecord({src, isVideo}: {src: string; isVideo: boolean}) {
-      this.$emit("update:recordingNow", true);
-      if (isVideo) {
-        this.$emit("update:srcVideo", src);
-      }
-    }
 
     private pasteImagesToTextArea(files: FileList| File[]) {
+      console.error(files);
+      this.showAttachments = false;
       for (let i = 0; i < files.length; i++) {
         pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
           this.$store.growlError(err);
@@ -318,7 +291,18 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
+    private addVideo() {
+      this.isRecordingVideo = true;
+      this.mediaRecorder.startRecord();
+    }
+
+    private addAudio() {
+      this.isRecordingVideo = false;
+      this.mediaRecorder.startRecord();
+    }
+
     private pasteFilesToTextArea(files: FileList| File[]) {
+      this.showAttachments = false;
       for (let i = 0; i < files.length; i++) {
         pasteFileToTextArea(files[i], this.userMessage, (err: string) => {
           this.$store.growlError(err);
@@ -347,20 +331,12 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     public handleAddAudio(file: Blob) {
-      this.$emit("update:recordingNow", false);
       if (file) {
         pasteBlobAudioToTextArea(file, this.userMessage);
       }
     }
 
-    showSmileysChange() {
-      this.$store.setShowSmileys(!this.showSmileys)
-    }
-
     public handleAddVideo(file: Blob) {
-      this.$emit("update:srcVideo", null);
-      this.$emit("update:recordingNow", false);
-      this.$emit('pause-video');
       if (file) {
         pasteBlobVideoToTextArea(file, this.userMessage, 'm', (e: string) => {
           this.$store.growlError(e);
@@ -378,17 +354,10 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/abstract_classes"
 
-  .edit-message-mode
-    border: 1px solid $editing-border-color
-  .in-channel-mode
-    border: 1px solid $thread-border-color
-
   .userMessageWrapper
     padding: 8px
     position: relative
     width: calc(100% - 16px)
-    &.in-channel-mode, &.edit-message-mode
-      width: calc(100% - 18px) // border 1px
 
     .icon-attach-outline
       @extend %chat-icon

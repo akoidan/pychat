@@ -111,6 +111,7 @@ export interface AddRoomMessage extends AddRoomBase, DefaultWsInMessage<'addRoom
 export interface OfferFile extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'offerFile', 'webrtc'> {
   content: OfferFileContent;
   roomId: number;
+  threadId: number|null;
   userId: number;
   time: number;
 }

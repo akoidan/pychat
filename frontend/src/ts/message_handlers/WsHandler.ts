@@ -23,6 +23,7 @@ import {
   userSettingsDtoToModel
 } from '@/ts/types/converters';
 import {
+  MessageModelDto,
   RoomNoUsersDto,
   UserProfileDto,
   UserSettingsDto
@@ -123,10 +124,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.wsConnectionId;
   }
 
-  public async offerFile(roomId: number, browser: string, name: string, size: number): Promise<WebRtcSetConnectionIdMessage> {
+  public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number|null): Promise<WebRtcSetConnectionIdMessage> {
     return this.messageProc.sendToServerAndAwait({
       action: 'offerFile',
-      roomId: roomId,
+      roomId,
+      threadId,
       content: {browser, name, size}
     });
   }
@@ -311,6 +313,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
+  public async sendLoadMessagesByIds(roomId: number, messagesIds: number[]) {
+    return this.messageProc.sendToServerAndAwait({
+      messagesIds,
+      action: 'loadMessagesByIds',
+      roomId
+    });
+  }
+
   public isWsOpen() {
     return this.ws?.readyState === WebSocket.OPEN;
   }
@@ -454,7 +464,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       this.messageProc.handleMessage(data);
     }
   }
-
 
   // private hideGrowlProgress(key: number) {
   //   let progInter = this.progressInterval[key];

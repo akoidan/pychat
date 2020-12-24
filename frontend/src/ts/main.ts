@@ -68,6 +68,10 @@ function declareDirectives() {
 
   const HOLD_TIMEOUT = 300;
 
+  // this directive detects whether user clicked on event, or holds the event
+  // if user mouse down and keeps it down for HOLD_TIMEOUT, start event would be fired
+  // otherwise switch event woould be fired
+  //  v-switcher="{start: mousedownevent, stop: releaseRecord, switch: clickevent}"
   Vue.directive('switcher', {
 
     bind: function (el, binding, vnode: MyVNode) {

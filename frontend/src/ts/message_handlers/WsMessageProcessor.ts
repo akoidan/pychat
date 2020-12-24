@@ -28,7 +28,7 @@ export class WsMessageProcessor extends AbstractMessageProcessor {
   }
   public parseMessage(jsonData: string): DefaultWsInMessage<string, HandlerName>|null {
     let data: DefaultWsInMessage<string, HandlerName>|null =  super.parseMessage(jsonData)
-    if (!data?.handler || !data.action) {
+    if (data?.handler !== 'void' && (!data?.handler || !data.action)) {
       this.logger.error('Invalid message structure')();
 
       return null;

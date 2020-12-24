@@ -25,32 +25,22 @@ export default class PainterPage extends Vue {
   @Ref()
   public div!: HTMLElement;
 
-  public prevPage: string|null = null;
-
   public painter!: Painter;
-
-  public beforeRouteEnter(to: Route, frm: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) {
-    next(vm => {
-      if (/^\/chat\/\d+$/.exec(frm.path)) {
-        // @ts-ignore: next-line
-        vm.prevPage = frm.path;
-      } else {
-        // @ts-ignore: next-line
-        vm.prevPage = `/chat/${ALL_ROOM_ID}`;
-      }
-      // @ts-ignore: next-line
-      vm.$logger.debug('Painter prev is set to {}, we came from {}', vm.prevPage, frm.path)();
-      next();
-    });
-  }
 
   public mounted() {
     this.painter = new Painter(this.div, {
       onBlobPaste: (e: Blob) => {
         let id: string = `paintBlob-${getUniqueId()}`;
         savedFiles[id] = e;
-        this.$store.setPastingQueue([id]);
-        this.$router.replace(this.prevPage!);
+        const {roomId, editedMessageId, openedThreadId} = this.$route.query;
+        this.$store.setPastingQueue([{
+          content: id,
+          editedMessageId: parseInt(editedMessageId as string )|| null,
+          elType: 'blob',
+          openedThreadId: parseInt(openedThreadId as string) || null,
+          roomId: parseInt(roomId as string)
+        }]);
+        this.$router.replace(`/chat/${roomId}`);
       },
       textClass: 'input',
       buttonClass: 'lor-btn',

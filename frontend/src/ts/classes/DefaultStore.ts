@@ -10,11 +10,11 @@ import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
-  EditingThread,
   GrowlModel,
   GrowlType,
   IncomingCallModel,
   MessageModel,
+  PastingTextAreaElement,
   ReceivingFile,
   RoomDictModel,
   RoomModel,
@@ -114,14 +114,11 @@ export class DefaultStore extends VuexModule {
   public storage!: IStorage; // We proxy this as soon as we created Storage
   public isOnline: boolean = false;
   public growls: GrowlModel[] = [];
-  public dim: boolean = false;
-  public pastingImagesQueue: string[] = [];
+  public pastingTextAreaQueue: PastingTextAreaElement[] = [];
   public incomingCall: IncomingCallModel | null = null;
   public microphones: { [id: string]: string } = {};
   public speakers: { [id: string]: string } = {};
   public webcams: { [id: string]: string } = {};
-  public editedMessage: EditingMessage | null = null;
-  public editingThread: EditingThread | null = null;
   public activeRoomId: number | null = null;
   public activeUserId: number | null = null;
   public userInfo: CurrentUserInfoModel | null = null;
@@ -131,8 +128,6 @@ export class DefaultStore extends VuexModule {
   public regHeader: string | null = null;
   public onlineDict: Record<string, string[]> = {};
   public roomsDict: RoomDictModel = {};
-  public showSmileys: boolean = false;
-  public showAttachments: boolean = false;
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
 
@@ -287,16 +282,7 @@ export class DefaultStore extends VuexModule {
   }
 
   get showNav() {
-    return !this.editedMessage && !this.activeUserId;
-  }
-
-  get editingMessageModel(): MessageModel | null {
-    logger.debug('Eval editingMessageModel')();
-    if (this.editedMessage) {
-      return this.roomsDict[this.editedMessage.roomId].messages[this.editedMessage.messageId];
-    } else {
-      return null;
-    }
+    return !this.activeUserId;
   }
 
   @Mutation
@@ -365,11 +351,6 @@ export class DefaultStore extends VuexModule {
       this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
       Vue.set(this.mediaObjects, key, payload.anchor);
     }
-  }
-
-  @Mutation
-  public setDim(payload: boolean) {
-    this.dim = payload;
   }
 
   @Mutation
@@ -600,18 +581,14 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setEditedMessage(editedMessage: EditingMessage|null) {
-    this.editedMessage = editedMessage;
-    this.activeUserId = null;
+  public setEditedMessage(editedMessage: EditingMessage) {
+    this.roomsDict[editedMessage.roomId].messages[editedMessage.messageId].isEditingActive = editedMessage.isEditingNow;
   }
 
   @Mutation
-  public setCurrentThread(editingThread: EditingThread|null) {
-    if (editingThread && this.editingThread && editingThread.messageId === this.editingThread.messageId) {
-      this.editingThread = null; //invert if clicked twice
-    } else {
-      this.editingThread = editingThread;
-    }
+  public setCurrentThread(editingThread: EditingMessage) {
+    let m: MessageModel = this.roomsDict[editingThread.roomId].messages[editingThread.messageId];
+    m.isThreadOpened = editingThread.isEditingNow;
   }
 
   @Mutation
@@ -627,7 +604,6 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setActiveUserId(activeUserId: number) {
     this.activeUserId = activeUserId;
-    this.editedMessage = null;
   }
 
   @Mutation
@@ -697,7 +673,6 @@ export class DefaultStore extends VuexModule {
     if (this.roomsDict[id]) {
       this.roomsDict[id].newMessagesCount = 0;
     }
-    this.editedMessage = null;
   }
 
   @Mutation
@@ -756,8 +731,8 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setPastingQueue(ids: string[]) {
-    this.pastingImagesQueue = ids;
+  public setPastingQueue(ids: PastingTextAreaElement[]) {
+    this.pastingTextAreaQueue = ids;
   }
 
   @Mutation
@@ -802,16 +777,6 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setShowSmileys(value: boolean) {
-    this.showSmileys = value;
-  }
-
-  @Mutation
-  public setShowAttachments(value: boolean) {
-    this.showAttachments = value;
-  }
-
-  @Mutation
   public deleteChannel(channelId: number) {
     Vue.delete(this.channelsDict, String(channelId));
     this.storage.deleteChannel(channelId);
@@ -827,7 +792,6 @@ export class DefaultStore extends VuexModule {
     this.activeUserId = null;
     this.onlineDict = {};
     this.activeRoomId = null;
-    this.editedMessage = null;
     this.storage.clearStorage();
   }
 

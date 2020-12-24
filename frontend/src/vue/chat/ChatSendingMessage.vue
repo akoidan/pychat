@@ -1,8 +1,14 @@
 <template>
   <div :class="cls" @mouseover.passive="removeUnread" @contextmenu="contextmenu">
-    <div v-if="isEditing" class="editing-background"></div>
-    <div v-if="isCurrentThreadEditing" class="thread-background"></div>
-    <chat-message :message="message" class="message-content" />
+    <div v-if="message.isEditingActive" class="editing-background"></div>
+    <div v-if="message.isThreadOpened" class="thread-background" @click="closeThread"></div>
+    <chat-message :message="message" class="message-content" @quote="quote"/>
+    <chat-text-area
+      v-if="message.isEditingActive"
+      :ref="textarea"
+      :room-id="message.roomId"
+      :edit-message-id="message.id"
+    />
     <template v-if="message.transfer">
       <app-progress-bar
         v-if="message.transfer.upload && !message.transfer.error"
@@ -16,7 +22,11 @@
     </template>
     <div class="absolute-right">
       <!--      IF message doesnt have content it's deleted-->
-      <chat-message-tool-tip class="message-tooltip" :message="message" v-if="message.content"/>
+      <chat-message-tool-tip
+        class="message-tooltip"
+        @edit-message="editMessage"
+        :message="message"
+      />
       <div class="spinner" v-if="message.sending" />
     </div>
   </div>
@@ -25,7 +35,9 @@
 import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
+  Ref,
   Prop,
+  Emit,
   Vue
 } from 'vue-property-decorator';
 import ChatMessage from '@/vue/chat/ChatMessage.vue';
@@ -33,16 +45,17 @@ import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
 import {
-  CurrentUserInfoModel, EditingMessage, EditingThread,
+  CurrentUserInfoModel, EditingMessage,
   MessageModel,
   RoomDictModel
 } from '@/ts/types/model';
 import ChatMessageToolTip from '@/vue/chat/ChatMessageToolTip.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
 import {sem} from '@/ts/utils/pureFunctions';
+import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
 
 @Component({
-  components: {ChatMessageToolTip, AppProgressBar, ChatMessage}
+  components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatMessage}
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;
@@ -50,16 +63,11 @@ export default class ChatSendingMessage extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  @State
-  public readonly editedMessage!: EditingMessage;
-
-  @State
-  public readonly editingThread!: EditingThread;
-
+  @Ref()
+  private readonly textarea!: ChatTextArea;
 
   @State
   public readonly roomsDict!: RoomDictModel;
-
 
 
   get filesExist() {
@@ -68,13 +76,6 @@ export default class ChatSendingMessage extends Vue {
 
   get id() {
     return this.message.id;
-  }
-  get isCurrentThreadEditing() {
-    return this.editingThread && this.editingThread.messageId === this.message.id;
-  }
-
-  get isEditing() {
-    return this.editedMessage && this.editedMessage.messageId === this.message.id;
   }
 
   get cls() {
@@ -94,12 +95,35 @@ export default class ChatSendingMessage extends Vue {
     return this.message.userId === this.userInfo.userId;
   }
 
+  @Emit()
+  quote() {
+    return this.message;
+  }
+
    contextmenu(event: Event) {
     if (isMobile) {
       event.preventDefault();
       event.stopPropagation();
       sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
     }
+  }
+
+  closeThread() {
+    let a: EditingMessage = {
+      messageId: this.message.id,
+      isEditingNow: false,
+      roomId: this.message.roomId
+    }
+    this.$store.setCurrentThread(a);
+  }
+
+  editMessage() {
+    let a: EditingMessage = {
+      messageId: this.message.id,
+      isEditingNow: true,
+      roomId: this.message.roomId
+    }
+    this.$store.setEditedMessage(a);
   }
 
   removeUnread() {
@@ -130,7 +154,7 @@ export default class ChatSendingMessage extends Vue {
     border: 1px solid $editing-border-color
     background-color: rgba(255, 255, 255, 0.11)
   .thread-background
-    border: 1px solid $thread-border-color
+    cursor: pointer
   .editing-background, .thread-background
     position: absolute
     top: 0 //-$space-between-messages/2

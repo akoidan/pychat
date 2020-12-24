@@ -34,7 +34,7 @@ export default class ChatRightSection extends Vue {
     overflow-y: auto
     overflow-x: hidden
     position: relative
-    width: 300px
+    min-width: 300px
     @media screen and (max-width: $collapse-width)
       width: 100%
       border-bottom: 8px solid

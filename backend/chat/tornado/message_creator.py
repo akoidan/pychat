@@ -173,7 +173,6 @@ class MessagesCreator(object):
 		"""
 		return {
 			VarNames.CONTENT: cls.append_images(messages, files, prepare_img),
-			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.ROOM_ID: channel,
 			VarNames.JS_MESSAGE_ID: message_id,
 			VarNames.HANDLER_NAME: HandlerNames.NULL
@@ -240,7 +239,7 @@ class MessagesCreator(object):
 
 class WebRtcMessageCreator(MessagesCreator):
 
-	def offer_webrtc(self, content, connection_id, room_id, action):
+	def offer_webrtc(self, content, connection_id, room_id, action, thread_id=None):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
@@ -252,6 +251,7 @@ class WebRtcMessageCreator(MessagesCreator):
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.ROOM_ID: room_id,
+			VarNames.THREAD_ID: thread_id,
 			VarNames.TIME: get_milliseconds()
 		}
 

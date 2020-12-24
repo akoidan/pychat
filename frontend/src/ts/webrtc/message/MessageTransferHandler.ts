@@ -172,16 +172,19 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return connections;
   }
 
+  loadUpSearchMessages(roomId: number, count: number): Promise<void> {
+    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
+    throw new Error('Method not implemented.');
+  }
 
-  addMessages(roomId: number, messages: MessageModelDto[]): void {
+  loadMessages(roomId: number, messageId: number[]): Promise<void> {
     this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
     throw Error('unsupported');
   }
 
-  addSearchMessages(roomId: number, messages: MessageModelDto[]): void {
+  loadUpMessages(roomId: number, count: number): Promise<void> {
     this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
     throw Error('unsupported');
   }
-
 
 }

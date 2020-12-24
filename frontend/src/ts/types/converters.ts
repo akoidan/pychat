@@ -2,7 +2,6 @@ import {
   ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
-  FileModel,
   Location,
   MessageModel,
   RoomModel,
@@ -12,7 +11,6 @@ import {
 } from '@/ts/types/model';
 import {
   ChannelDto,
-  FileModelDto,
   LocationDto,
   RoomDto,
   RoomNoUsersDto,
@@ -21,11 +19,8 @@ import {
   UserProfileDto,
   UserSettingsDto
 } from '@/ts/types/dto';
-import {
-  BooleanDB,
-  SexDB
-} from '@/ts/types/db';
-import { MessageP2pDto } from '@/ts/types/messages/p2pDto';
+import {BooleanDB, SexDB} from '@/ts/types/db';
+import {MessageP2pDto} from '@/ts/types/messages/p2pDto';
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
   return {...userInfo};
@@ -195,6 +190,8 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     parentMessage: m.parentMessage,
     files: {},
     giphy: m.giphy,
+    isThreadOpened: false,
+    isEditingActive: false,
     id: m.id,
     symbol: m.symbol,
     time: Date.now() - m.timeAgo,

@@ -66,8 +66,9 @@ export interface SetDevices {
 
 export interface MessageSender {
   syncMessage(roomId: number, messageId: number):  Promise<void>;
-  addMessages(roomId: number, messages: MessageModelDto[]): void;
-  addSearchMessages(roomId: number, messages: MessageModelDto[]): void;
+  loadMessages(roomId: number, messageId: number[]):  Promise<void>;
+  loadUpMessages(roomId: number, count: number): Promise<void>;
+  loadUpSearchMessages(roomId: number, count: number): Promise<void>;
 }
 
 export interface JsAudioAnalyzer {

@@ -63,6 +63,7 @@ class MessagesHandler():
 		# The handler is determined by @VarNames.EVENT
 		self.process_ws_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
+			Actions.GET_MESSAGES_BY_IDS: self.process_get_messages_by_ids,
 			Actions.PRINT_MESSAGE: self.process_send_message,
 			Actions.DELETE_ROOM: self.delete_room,
 			Actions.EDIT_MESSAGE: self.edit_message,
@@ -764,6 +765,19 @@ class MessagesHandler():
 			})
 		return True
 
+
+	def process_get_messages_by_ids(self, data):
+		"""
+		:type data: dict
+		"""
+		ids = data[VarNames.GET_MESSAGES_MESSAGES_IDS]
+		room_id = data[VarNames.ROOM_ID]
+		self.logger.info('!! Fetching %d messages starting from %s', ids)
+		messages = Message.objects.filter(room_id=room_id, id__in=ids)
+		imv = get_message_images_videos(messages)
+		response = self.message_creator.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
+		self.ws_write(response)
+
 	def process_get_messages(self, data):
 		"""
 		:type data: dict
@@ -831,7 +845,7 @@ class WebRtcMessageHandler(MessagesHandler):
 		# use list because sets dont have 1st element which is offerer
 		self.async_redis_publisher.hset(RedisPrefix.WEBRTC_CONNECTION, connection_id, self.id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-		opponents_message = self.message_creator.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
+		opponents_message = self.message_creator.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT], in_message.get(VarNames.THREAD_ID))
 		self_message = self.message_creator.set_connection_id(js_id, connection_id)
 		self.ws_write(self_message)
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)

@@ -1,26 +1,27 @@
 <template>
   <div class="message-tooltip">
     <i
+      v-if="isMine && message.content"
       class="icon-pencil"
-      v-if="isMine"
-      @click.stop="m2EditMessage"
+      @click.stop="editMessage"
     />
     <i
-      v-if="isMine"
+      v-if="isMine && message.content"
       class="icon-trash-circled"
-      @click.stop="m2DeleteMessage"
+      @click.stop="deleteMessage"
     />
     <i
       v-if="!message.parentMessage"
       class="icon-comment"
-      @click.stop="m2Comment"
+      @click.stop="toggleThread"
     />
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
+import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
 import {State} from '@/ts/instances/storeInstance';
 import {EditingMessage, MessageModel} from '@/ts/types/model';
+import {editMessageWs} from '@/ts/utils/pureFunctions';
 
 @Component
 export default class ChatMessageToolTip extends Vue {
@@ -35,27 +36,28 @@ export default class ChatMessageToolTip extends Vue {
     return this.message.userId === this.myId;
   }
 
-  public m2DeleteMessage() {
-    let payload: EditingMessage = {
-      messageId: this.message.id,
-      roomId: this.message.roomId,
-      isEditingNow: false,
-    }
-    this.$messageBus.$emit('delete-message', payload);
+  @Emit()
+  editMessage() {}
+
+  public deleteMessage() {
+    editMessageWs(
+        null,
+        this.message.id,
+        this.message.roomId,
+        null,
+        null,
+        this.message.time,
+        this.message.edited ? this.message.edited + 1 : 1,
+        this.message.parentMessage,
+        this.$store,
+        this.$messageSenderProxy.getMessageSender(this.message.roomId)
+    );
   }
 
-  public m2Comment() {
-    this.$store.setCurrentThread({messageId: this.message.id, roomId: this.message.roomId});
+  public toggleThread() {
+    this.$store.setCurrentThread({messageId: this.message.id, roomId: this.message.roomId, isEditingNow: !this.message.isThreadOpened});
   }
 
-  public m2EditMessage() {
-    let payload: EditingMessage = {
-      messageId: this.message.id,
-      roomId: this.message.roomId,
-      isEditingNow: true,
-    };
-    this.$store.setEditedMessage(payload);
-  }
 }
 </script>
 <!-- eslint-disable -->

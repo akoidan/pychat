@@ -180,6 +180,8 @@ export default class DatabaseWrapper implements IStorage {
           roomId: m.roomId,
           isHighlighted: false,
           time: m.time,
+          isEditingActive: false,
+          isThreadOpened: false,
           deleted: convertToBoolean(m.deleted),
           transfer: m.sending ? {
             error: null,
