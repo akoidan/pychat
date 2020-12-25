@@ -21,6 +21,7 @@ export class MessageSenderProxy {
     this.store = store;
     this.webrtcApi = webrtcApi;
     this.wsMessageHandler = wsMessageHandler;
+    webrtcApi.setMessageSenderProxy(this);
   }
 
   private getRandomInt(max: number) {
