@@ -172,15 +172,16 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		self.channels.append(self.channel)
 		self.channels.append(self.id)
 		self.listen(self.channels)
-		off_messages, history = self.get_offline_messages(room_users, was_online, self.get_argument('history', False))
-		for room in room_users:
-			room_id = room[VarNames.ROOM_ID]
-			h = history.get(room_id)
-			o = off_messages.get(room_id)
-			if h:
-				room[VarNames.LOAD_MESSAGES_HISTORY] = h
-			if o:
-				room[VarNames.LOAD_MESSAGES_OFFLINE] = o
+		# this was replaced to syncHistory method that's called from browser and passes existing ids
+		# off_messages, history = self.get_offline_messages(room_users, was_online, self.get_argument('history', False))
+		# for room in room_users:
+		# 	room_id = room[VarNames.ROOM_ID]
+		# 	h = history.get(room_id)
+		# 	o = off_messages.get(room_id)
+		# 	if h:
+		# 		room[VarNames.LOAD_MESSAGES_HISTORY] = h
+		# 	if o:
+		# 		room[VarNames.LOAD_MESSAGES_OFFLINE] = o
 
 		if settings.SHOW_COUNTRY_CODE:
 			fetched_users  = User.objects.annotate(user_c=Count('id')).values('id', 'username', 'sex', 'userjoinedinfo__ip__country_code', 'userjoinedinfo__ip__country', 'userjoinedinfo__ip__region', 'userjoinedinfo__ip__city')
@@ -208,31 +209,31 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)
 		self.connected = True
 
-	def get_offline_messages(self, user_rooms, was_online, with_history):
-		q_objects = get_history_message_query(self.get_argument('messages', None), user_rooms, with_history)
-		if was_online:
-			off_messages = []
-		else:
-			off_messages = Message.objects.filter(
-				id__gt=F('room__roomusers__last_read_message_id'),
-				room__roomusers__user_id=self.user_id
-			)
-		off = {}
-		history = {}
-		if len(q_objects.children) > 0:
-			history_messages = Message.objects.filter(q_objects)
-			all = list(chain(off_messages, history_messages))
-			self.logger.info("Offline messages IDs: %s, history messages: %s", [m.id for m in off_messages], [m.id for m in history_messages])
-		else:
-			history_messages = []
-			all = off_messages
-		if self.restored_connection:
-			off_messages = all
-			history_messages = []
-		imv = get_message_images_videos(all)
-		self.set_video_images_messages(imv, off_messages, off)
-		self.set_video_images_messages(imv, history_messages, history)
-		return off, history
+	# def get_offline_messages(self, user_rooms, was_online, with_history):
+	# 	q_objects = get_history_message_query(self.get_argument('messages', None), user_rooms, with_history)
+	# 	if was_online:
+	# 		off_messages = []
+	# 	else:
+	# 		off_messages = Message.objects.filter(
+	# 			id__gt=F('room__roomusers__last_read_message_id'),
+	# 			room__roomusers__user_id=self.user_id
+	# 		)
+	# 	off = {}
+	# 	history = {}
+	# 	if len(q_objects.children) > 0:
+	# 		history_messages = Message.objects.filter(q_objects)
+	# 		all = list(chain(off_messages, history_messages))
+	# 		self.logger.info("Offline messages IDs: %s, history messages: %s", [m.id for m in off_messages], [m.id for m in history_messages])
+	# 	else:
+	# 		history_messages = []
+	# 		all = off_messages
+	# 	if self.restored_connection:
+	# 		off_messages = all
+	# 		history_messages = []
+	# 	imv = get_message_images_videos(all)
+	# 	self.set_video_images_messages(imv, off_messages, off)
+	# 	self.set_video_images_messages(imv, history_messages, history)
+	# 	return off, history
 
 	def set_video_images_messages(self, imv, inm, outm):
 		for message in inm:

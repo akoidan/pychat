@@ -1,5 +1,5 @@
 <template>
-  <div class="videoHolder">
+  <div class="videoHolder" v-show="recordState !=='pause'">
     <div v-show="recordState ==='running'" @click="releaseRecord">
       <span class="click-info">Click on this image to finish record</span>
       <video

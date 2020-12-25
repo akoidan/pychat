@@ -59,7 +59,10 @@ import {
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
-import { DefaultWsOutMessage } from '@/ts/types/messages/wsOutMessages';
+import {
+  DefaultWsOutMessage, SyncHistoryOutContent,
+  SyncHistoryOutMessage
+} from '@/ts/types/messages/wsOutMessages';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -225,12 +228,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async syncHistory(content: { roomId: number; messagesIds: string[] }[], lastSynced: number): Promise<SyncMessagesMessage> {
-    return this.messageProc.sendToServerAndAwait({
+  public async syncHistory(content: SyncHistoryOutContent[], lastSynced: number): Promise<SyncMessagesMessage> {
+    let payload: SyncHistoryOutMessage = {
       content,
       lastSynced: lastSynced,
       action: 'syncHistory'
-    });
+    };
+    return this.messageProc.sendToServerAndAwait(payload);
   }
 
   public async sendAddChannel(channelName: string): Promise<AddChannelMessage> {
@@ -312,10 +316,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendLoadMessages(roomId: number, headerId: number|undefined, count: number) {
+  public async sendLoadMessages(roomId: number, count: number, threadId: number|null, excludeIds: number[]) {
     return this.messageProc.sendToServerAndAwait({
-      headerId,
       count,
+      excludeIds,
+      threadId,
       action: 'loadMessages',
       roomId
     });
@@ -345,7 +350,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   public retry(connId: string, opponentWsId: string) {
     this.sendToServer({action: 'retryFile',  connId, opponentWsId});
   }
-
 
   public replyCall(connId: string, browser: string) {
     this.sendToServer({
@@ -549,19 +553,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   private listenWS() {
+    const wsUrls = `${this.API_URL}?id=${this.wsConnectionId}&sessionId=${this.sessionHolder.session}`;
 
-    const ids: { [id: string]: number } = {};
-    for (const k in this.store.roomsDict) {
-      const maxId: number|null = this.store.maxId(parseInt(k));
-      if (maxId) {
-        ids[k] = maxId;
-      }
-    }
-    let s = this.API_URL + `?id=${this.wsConnectionId}`;
-
-    s += `&sessionId=${this.sessionHolder.session}`;
-
-    this.ws = new WebSocket(s);
+    this.ws = new WebSocket(wsUrls);
     this.ws.onmessage = this.onWsMessage.bind(this);
     this.ws.onclose = this.onWsClose.bind(this);
     this.ws.onopen = () => {

@@ -22,7 +22,7 @@ from django.db.models import \
 	TextField, \
 	IntegerField, \
 	FloatField, \
-	SmallIntegerField, CheckConstraint, Q
+	SmallIntegerField, CheckConstraint, Q, F
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
@@ -249,6 +249,7 @@ class Message(Model):
 	# - images that refers same message always have unique symbols
 	symbol = CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
+	thread_messages_count = IntegerField(default=0, null=False)
 	parent_message = ForeignKey('self', CASCADE, null=True, blank=True)
 	giphy = URLField(null=True, blank=True)
 	edited_times = IntegerField(default=0, null=False)
@@ -267,6 +268,14 @@ class Message(Model):
 		v = json.dumps(v)
 		return "{}/{}".format(self.id, v)
 
+
+from django.db.models.signals import post_save
+
+def save_profile(sender, instance, created, **kwargs):
+	if created and instance.parent_message:
+		Message.objects.filter(id=instance.parent_message_id).update(thread_messages_count=F('thread_messages_count') + 1)
+
+post_save.connect(save_profile, sender=Message)
 
 class UploadedFile(Model):
 	class UploadedFileChoices(Enum):

@@ -50,7 +50,7 @@ export default class DatabaseWrapper implements IStorage {
   private readonly cache: { [id: number]: number } = {};
 
   constructor() {
-    this.dbName = 'v141';
+    this.dbName = 'v142';
     this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
@@ -64,7 +64,7 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), creator INTEGER REFERENCES user(id))');
-      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (sending IN (0,1)), parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE)');
+      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (sending IN (0,1)), parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, thread_messages_count INTEGER)');
       t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
       t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text)');
       t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
@@ -173,7 +173,7 @@ export default class DatabaseWrapper implements IStorage {
         allUsersDict[u.id] = user;
       });
 
-      const am: { [id: string]: MessageModel } = {};
+      const am: Record<string, MessageModel> = {};
       dbMessages.forEach(m => {
         const message: MessageModel = {
           id: m.id,
@@ -182,6 +182,7 @@ export default class DatabaseWrapper implements IStorage {
           time: m.time,
           isEditingActive: false,
           isThreadOpened: false,
+          threadMessagesCount: m.thread_messages_count,
           deleted: convertToBoolean(m.deleted),
           transfer: m.sending ? {
             error: null,
@@ -307,8 +308,8 @@ export default class DatabaseWrapper implements IStorage {
     this.setRoomHeaderId(message.roomId, message.id);
     this.executeSql(
         t,
-        'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending, parent_message_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.sending ? 1 : 0, message.parentMessage || null],
+        'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending, parent_message_id, thread_messages_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.sending ? 1 : 0, message.parentMessage || null, message.threadMessagesCount],
         (t, d) => {
           for (const k in message.files) {
             const f = message.files[k];
@@ -384,11 +385,19 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-  public deleteMessage(id: number) {
+  public deleteMessage(id: number, replaceThreadId: number) {
     this.write(t => {
       this.executeSql(t, 'delete from file where message_id = ?', [id], (t) => {
-        this.executeSql(t, 'delete from message where id = ? ', [id])();
+        this.executeSql(t, 'delete from message where id = ? ', [id], (t) => {
+          this.executeSql(t, 'update message set parent_message_id = ? where parent_message_id = ?', [id, replaceThreadId])()
+        })();
       })();
+    });
+  }
+
+  public setThreadMessageCount(messageId: number, count: number): void {
+    this.write(t => {
+      this.executeSql(t, 'update message set thread_messages_count = ? where id = ?', [count, messageId])();
     });
   }
 

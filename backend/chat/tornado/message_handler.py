@@ -287,7 +287,8 @@ class MessagesHandler():
 			js_id = message[VarNames.JS_MESSAGE_ID]
 			parent_message_id = message[VarNames.PARENT_MESSAGE]
 			if parent_message_id:
-				if not RoomUsers.objects.filter(user_id=self.user_id, room_id=Message.objects.get(id=parent_message_id).room_id).exists():
+				parent_room_id = Message.objects.get(id=parent_message_id).room_id
+				if parent_room_id not in self.channels:
 					raise ValidationError("You don't have access to this room message")
 			message_db = Message(
 				sender_id=self.user_id,
@@ -765,14 +766,12 @@ class MessagesHandler():
 			})
 		return True
 
-
 	def process_get_messages_by_ids(self, data):
 		"""
 		:type data: dict
 		"""
 		ids = data[VarNames.GET_MESSAGES_MESSAGES_IDS]
 		room_id = data[VarNames.ROOM_ID]
-		self.logger.info('!! Fetching %d messages starting from %s', ids)
 		messages = Message.objects.filter(room_id=room_id, id__in=ids)
 		imv = get_message_images_videos(messages)
 		response = self.message_creator.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
@@ -782,14 +781,22 @@ class MessagesHandler():
 		"""
 		:type data: dict
 		"""
-		header_id = data.get(VarNames.GET_MESSAGES_HEADER_ID, None)
-		count = int(data.get(VarNames.GET_MESSAGES_COUNT, 10))
+		exclude_ids = data[VarNames.EXCLUDE_IDS]
+		# this method needs to accept ids of message, because messages on the client can be not-ordered
+		# lets say we loaded a message for a thread , so it's single
+		# or someone joined from offline and he synced message in the top.
+		thread_id = data[VarNames.THREAD_ID]
 		room_id = data[VarNames.ROOM_ID]
-		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
-		if header_id is None:
-			messages = Message.objects.filter(room_id=room_id).order_by('-pk')[:count]
+		if thread_id:
+			messages = Message.objects.filter(room_id=room_id, parent_message__id=thread_id)
 		else:
-			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
+			count = int(data.get(VarNames.GET_MESSAGES_COUNT, 10))
+			if count > 100:
+				raise ValidationError("Can't load that many messages")
+			messages = Message.objects.filter(
+				Q(room_id=room_id) & Q(parent_message__id=thread_id) & ~Q(id__in=exclude_ids)
+			).order_by('-pk')[:count]
+
 		imv = get_message_images_videos(messages)
 		response = self.message_creator.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
 		self.ws_write(response)
@@ -888,12 +895,18 @@ class WebRtcMessageHandler(MessagesHandler):
 
 	def sync_history(self, in_message):
 		room_ids = list(map(lambda d: d['roomId'], in_message[VarNames.CONTENT]))
-		if RoomUsers.objects.filter(room_id__in=room_ids, user_id=self.user_id).count() < len(room_ids):
-			raise ValidationError("GTFO")
+		if not set(room_ids).issubset(self.channels):
+			raise ValidationError("This is not a messages in the room you are in")
 
-		messages_ids = []
+		messages_ids_dict = {}  # dict where key is messageId, and value is edited times
 		for l in in_message[VarNames.CONTENT]:
-			messages_ids += l[VarNames.MESSAGE_IDS]
+			messages_ids_dict.update(l[VarNames.MESSAGE_IDS])
+		messages_ids = [*messages_ids_dict] # get messages id arrays string[]
+		exclude_messages_ids = []
+		existing_messages = Message.objects.filter(id__in=messages_ids).values('id', 'edited_times')
+		for existing_mes in existing_messages:
+			if existing_mes['edited_times'] <= messages_ids_dict[str(existing_mes['id'])]: # python dict keys are str
+				exclude_messages_ids.append(existing_mes['id'])
 		messages = Message.objects.filter(
 			Q(room_id__in=room_ids)
 			& ~Q(id__in=messages_ids)
@@ -905,7 +918,6 @@ class WebRtcMessageHandler(MessagesHandler):
 			VarNames.JS_MESSAGE_ID: in_message[VarNames.JS_MESSAGE_ID],
 			VarNames.HANDLER_NAME: HandlerNames.NULL
 		})
-
 
 	def notify_call_active(self, in_message):
 		# check connectionid , roomId is checked on_message

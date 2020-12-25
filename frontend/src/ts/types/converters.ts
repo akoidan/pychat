@@ -1,7 +1,7 @@
 import {
   ChannelModel,
   CurrentUserInfoModel,
-  CurrentUserSettingsModel,
+  CurrentUserSettingsModel, FileModel,
   Location,
   MessageModel,
   RoomModel,
@@ -11,7 +11,9 @@ import {
 } from '@/ts/types/model';
 import {
   ChannelDto,
+  FileModelDto,
   LocationDto,
+  MessageModelDto,
   RoomDto,
   RoomNoUsersDto,
   SexModelDto,
@@ -182,7 +184,50 @@ export function messageModelToP2p(m: MessageModel): MessageP2pDto {
   }
 }
 
+
+export function convertFiles(dtos: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
+  const res: {[id: number]: FileModel} = {};
+  for (const k in dtos) {
+    let dto = dtos[k];
+    res[k] = {
+      fileId: null,
+      sending: false,
+      previewFileId: null,
+      preview: dto.preview,
+      type: dto.type,
+      url: dto.url
+    }
+  }
+  return res;
+}
+
+export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessage: MessageModel|null, timeConverter: (time: number) => number): MessageModel {
+  if (message.threadMessagesCount === undefined) {
+    throw Error("WTF");
+  }
+  return {
+    id: message.id,
+    time: timeConverter(message.time),
+    isHighlighted: oldMessage? oldMessage.isHighlighted : false,
+    files: message.files ? convertFiles(message.files) : null,
+    content: message.content || null,
+    symbol: message.symbol || null,
+    threadMessagesCount: message.threadMessagesCount,
+    edited: message.edited || null,
+    isEditingActive: oldMessage ? oldMessage.isEditingActive : false,
+    isThreadOpened: oldMessage? oldMessage.isThreadOpened : false,
+    roomId: message.roomId,
+    userId: message.userId,
+    transfer: oldMessage ? oldMessage.transfer: null,
+    parentMessage: message.parentMessage,
+    sending: false, // this code is only called from WsInMessagew which means it's synced
+    giphy: message.giphy || null,
+    deleted: message.deleted || false
+  };
+}
+
 export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageModel {
+  console.error("TODO")
   return {
     content: m.content,
     deleted: m.deleted,
@@ -190,6 +235,7 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     parentMessage: m.parentMessage,
     files: {},
     giphy: m.giphy,
+    threadMessagesCount: 0, // TODO
     isThreadOpened: false,
     isEditingActive: false,
     id: m.id,

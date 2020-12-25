@@ -37,6 +37,7 @@ export interface MessageDB {
   content: string;
   symbol: string;
   parent_message_id: number|null;
+  thread_messages_count: number;
   deleted: BooleanDB;
   giphy: string;
   edited: number;

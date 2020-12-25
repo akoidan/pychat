@@ -44,6 +44,9 @@ import {
 import { savedFiles } from '@/ts/utils/htmlApi';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import {MESSAGES_PER_SEARCH} from '@/ts/utils/consts';
+import {convertMessageModelDtoToModel} from '@/ts/types/converters';
+import {checkIfIdIsMissing, getMissingIds} from '@/ts/utils/pureFunctions';
+import {SyncHistoryOutContent} from '@/ts/types/messages/wsOutMessages';
 
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
@@ -83,6 +86,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   }
 
   public async syncMessages(): Promise<void> {
+    this.logger.log("Syncing messages")();
     if (this.syncMessageLock) {
       this.logger.warn('Exiting from sync message because, the lock is already acquired')();
       return;
@@ -93,10 +97,19 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         if (room.p2p) {
           continue;
         }
-        for (const message of  Object.values(room.messages)) {
-          if (message.sending) {
-              await this.syncMessage(room.id, message.id);
+        let messages = Object.values(room.messages).filter(m => m.sending);
+        // sync messages w/o parent thread first
+        messages.sort((a,b)=> {
+          if (a.parentMessage && !b.parentMessage) {
+            return 1;
+          } else if (b.parentMessage && !a.parentMessage) {
+            return -1;
+          } else {
+            return 0;
           }
+        })
+        for (const message of  messages) {
+            await this.syncMessage(room.id, message.id);
         }
       }
     } catch (e) {
@@ -105,7 +118,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       this.syncMessageLock = false;
     }
   }
-
 
   public async loadMessages(roomId: number, messageIds: number[]): Promise<void> {
     this.logger.log("Asking for messages {}", messageIds)();
@@ -128,10 +140,26 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     return result;
   }
 
+  public async loadThreadMessages(roomId: number, threadId: number): Promise<void> {
+    let room = this.store.roomsDict[roomId];
+    let myids: number[] = Object.values(room.messages)
+        .filter(a => a.parentMessage === threadId && a.id > 0)
+        .map(m => m.id);
+    let lm = await this.ws.sendLoadMessages(roomId, 0, threadId, myids);
+    if (lm.content.length > 0) {
+      this.addMessages(lm.roomId, lm.content);
+    } else {
+      this.logger.error("Got empty messages response from loadThreadMessages")();
+    }
+  }
+
   public async loadUpMessages(roomId: number, count: number): Promise<void> {
-    if (!this.store.roomsDict[roomId].allLoaded) {
-      let lm = await this.ws.sendLoadMessages(roomId, this.store.minId(roomId), count);
+    let room = this.store.roomsDict[roomId];
+    if (!room.allLoaded) {
+      let myids: number[] = Object.values(room.messages).map(m => m.id).filter(a => a > 0);
+      let lm = await this.ws.sendLoadMessages(roomId, count, null, myids);
       if (lm.content.length > 0) {
+        // backend return messages that don't have thread, so we don't neeed to sync parent message here
         this.addMessages(lm.roomId, lm.content);
       } else {
         this.store.setAllLoaded(lm.roomId);
@@ -149,10 +177,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     storeMessage = this.store.roomsDict[roomId].messages[messageId];
     let fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
-      await this.ws.sendPrintMessage(storeMessage.content, roomId, fileIds, storeMessage.id, Date.now() - storeMessage.time, storeMessage.parentMessage);
+      let a: PrintMessage = await this.ws.sendPrintMessage(storeMessage.content, roomId, fileIds, storeMessage.id, Date.now() - storeMessage.time, storeMessage.parentMessage);
       const rmMes: RoomMessageIds = {
         messageId: storeMessage.id,
-        roomId: storeMessage.roomId
+        roomId: storeMessage.roomId,
+        newMessageId: a.id
       };
       this.store.deleteMessage(rmMes);
     } else if (storeMessage.id > 0) {
@@ -212,21 +241,23 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
     const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].messages;
     const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
-    const messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
+    const messages: MessageModel[] = newMesages.map(nm => convertMessageModelDtoToModel(nm, null, time => this.ws.convertServerTimeToPC(time)));
     this.store.addMessages({messages, roomId: roomId});
   }
 
   public addSearchMessages(roomId: number, inMessages: MessageModelDto[]) {
     const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].search.messages;
     const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
-    const messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
+    const messages: MessageModel[] = newMesages.map(nm => convertMessageModelDtoToModel(nm, null, time => this.ws.convertServerTimeToPC(time)));
     this.store.addSearchMessages({messages, roomId: roomId});
   }
 
   public deleteMessage(inMessage: DeleteMessage) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
-      this.logger.debug('Unable to find message {} to delete it', inMessage)();
+      this.logger.warn('Unable to find message {} to delete it', inMessage)();
+    } else if (checkIfIdIsMissing(message, this.store)) {
+      this.logger.warn('This message won\'t be displayed since we havent loaded its thread yet', inMessage)();
     } else {
       message = {
         id: message.id,
@@ -237,6 +268,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         isEditingActive: false,
         parentMessage: message.parentMessage,
         symbol: message.symbol || null,
+        threadMessagesCount: message.threadMessagesCount,
         isHighlighted: false,
         sending: false,
         edited: inMessage.edited,
@@ -251,22 +283,30 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
-  public editMessage(inMessage: EditMessage) {
+  public async editMessage(inMessage: EditMessage) {
     const message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
       this.logger.debug('Unable to find message {} to edit it', inMessage)();
     } else {
-      const message: MessageModel = this.getMessage(inMessage);
-      this.logger.debug('Adding message to storage {}', message)();
-      this.store.addMessage(message);
+      const convertedMessage: MessageModel = convertMessageModelDtoToModel(inMessage, message, time => this.ws.convertServerTimeToPC(time));
+      this.logger.debug('Adding message to storage {}', convertedMessage)();
+      this.store.addMessage(convertedMessage);
+      if (checkIfIdIsMissing(convertedMessage, this.store)) {
+        await this.loadMessages(convertedMessage.roomId, [convertedMessage.parentMessage!]);
+      }
     }
   }
 
 
-  public printMessage(inMessage: PrintMessage) {
-    const message: MessageModel = this.getMessage(inMessage);
+  public async printMessage(inMessage: PrintMessage) {
+    const message: MessageModel = convertMessageModelDtoToModel(inMessage, null, time => this.ws.convertServerTimeToPC(time));
     this.messageHelper.processUnkownP2pMessage(message);
 
+    if (checkIfIdIsMissing(message, this.store)) {
+      await this.loadMessages(message.roomId, [message.parentMessage!]);
+    } else if (inMessage.parentMessage) {
+      this.store.increaseThreadMessageCount({roomId: inMessage.roomId, messageId: message.parentMessage!})
+    }
   }
 
   public async internetAppear(m : InternetAppearMessage) {
@@ -320,48 +360,22 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
-  private getMessage(message: MessageModelDto): MessageModel {
-    function convertFiles(dtos: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
-      const res: {[id: number]: FileModel} = {};
-      for (const k in dtos) {
-        let dto = dtos[k];
-        res[k] = {
-          fileId: null,
-          sending: false,
-          previewFileId: null,
-          preview: dto.preview,
-          type: dto.type,
-          url: dto.url
-        }
-      }
-      return res;
-    }
-
-    return {
-      id: message.id,
-      time: this.ws.convertServerTimeToPC(message.time),
-      isHighlighted: false,
-      files: message.files ? convertFiles(message.files) : null,
-      content: message.content || null,
-      symbol: message.symbol || null,
-      edited: message.edited || null,
-      isEditingActive: false,
-      isThreadOpened: false,
-      roomId: message.roomId,
-      userId: message.userId,
-      transfer: null,
-      parentMessage: message.parentMessage,
-      sending: false, // this code is only called from WsInMessagew which means it's synced
-      giphy: message.giphy || null,
-      deleted: message.deleted || false
-    };
+  private getMessagesIdsEdited(r: RoomModel) {
+    return Object.keys(r.messages)
+        .map(a => parseInt(a))
+        .filter(a => a > 0)  // if message is negative, it's not on the server, so no need to ignore it
+        .reduce((a, v) => {
+          a[v] = r.messages[v].edited || 0; // 0 is smaller than null to send to server, we care about size here
+          return a;
+        }, {} as Record<string, number|null>);
   }
 
   private async syncHistory() {
-    let content = this.store.roomsArray.map(r => ({
+    let content: SyncHistoryOutContent[] = this.store.roomsArray.map(r => ({
       roomId: r.id,
-      messagesIds: Object.keys(r.messages)
+      messagesIds: this.getMessagesIdsEdited(r)
     }));
+
     let joined: any = localStorage.getItem(this.LAST_SYNCED);
     if (!joined) {
       localStorage.setItem(this.LAST_SYNCED, Date.now().toString())
@@ -377,9 +391,16 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       rv[x.roomId].push(x);
       return rv;
     }, {} as Record<number, MessageModelDto[]>);
+
+    // when we load new messages, they can be from thread we don't have
     Object.keys(groupBY).forEach(k => {
-      this.addMessages(parseInt(k), groupBY[k]);
-    })
+      let roomId = parseInt(k);
+      this.addMessages(roomId, groupBY[k]);
+      let missingIds = getMissingIds(roomId, this.store);
+      if (missingIds.length) {
+        this.loadMessages(roomId, missingIds)
+      }
+    });
 
     localStorage.setItem(this.LAST_SYNCED, Date.now().toString())
   }

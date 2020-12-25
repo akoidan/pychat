@@ -1,7 +1,11 @@
 <template>
   <div>
     <chat-sending-message :message="message"/>
-    <div v-if="!message.isThreadOpened" @click="activate" class="thread-replies-count">{{messages.length}} replies</div>
+    <div v-if="!message.isThreadOpened" @click="activate" class="thread-replies-count">{{message.threadMessagesCount}} replies</div>
+    <div v-if="locked" class="loading-history">
+      <div class="spinner"/>
+      <div>Loading history...</div>
+    </div>
     <div v-show="message.isThreadOpened" class="thread-opened">
       <template v-for="message in messages">
         <chat-sending-file
@@ -33,7 +37,7 @@
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {MessageModel, ReceivingFile, SendingFile} from '@/ts/types/model';
 import ChatSendingMessage from '@/vue/chat/ChatSendingMessage.vue';
-import {State} from '@/ts/instances/storeInstance';
+import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
 import ChatSendingFile from '@/vue/chat/ChatSendingFile.vue';
 import ChatReceivingFile from '@/vue/chat/ChatReceivingFile.vue';
@@ -54,13 +58,35 @@ export default class ChatThread extends Vue {
   @Ref()
   private readonly textarea!: ChatTextArea;
 
+  private locked: boolean = false;
+
   onqoute() {
     this.textarea.onEmitQuote(this.message);
   }
 
-  @Watch('isThreadOpened')
-  onThreadOpen(value: boolean) {
+  @Watch('message.threadMessagesCount')
+  checkThreadMessagesCountMatch() {
+    // during printing message there's time when old message exists with a new one
+    if (this.message.threadMessagesCount !== this.messages.length ?? this.message.threadMessagesCount +1 !== this.messages.length) {
+      this.$logger.warn(`Message #${this.message.id} has mismatched thread messages count ${this.message.threadMessagesCount}!=${this.messages.length}`)()
+    }
+  }
+
+  @Watch('message.isThreadOpened')
+  async onThreadOpen(value: boolean) {
     if (value) {
+      if (this.message.threadMessagesCount > this.messages.length) {
+        if (this.locked) {
+          this.$logger.warn("Messages are locked, so syncing won't be triggered")();
+          return ;
+        }
+        try {
+          this.locked = true;
+          await this.$messageSenderProxy.getMessageSender(this.message.roomId).loadThreadMessages(this.message.roomId, this.message.id);
+        } finally {
+          this.locked = false;
+        }
+      }
       this.$nextTick(() => {
         this.textarea.userMessage.focus();
       })
@@ -82,6 +108,14 @@ export default class ChatThread extends Vue {
 
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/mixins"
+
+  .loading-history
+    display: flex
+    padding: 2px 14px
+    justify-content: center
+  .spinner
+    margin-right: 10px
+    @include spinner(3px, white)
 
   .thread-replies-count
     margin-left: 15px

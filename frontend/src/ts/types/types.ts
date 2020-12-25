@@ -68,6 +68,7 @@ export interface MessageSender {
   syncMessage(roomId: number, messageId: number):  Promise<void>;
   loadMessages(roomId: number, messageId: number[]):  Promise<void>;
   loadUpMessages(roomId: number, count: number): Promise<void>;
+  loadThreadMessages(roomId: number, threadId: number): Promise<void>;
   loadUpSearchMessages(roomId: number, count: number, requestInterceptor?: (a: XMLHttpRequest) => void): Promise<boolean>;
 }
 
@@ -158,6 +159,7 @@ export interface SetFileIdsForMessage {
 export interface RoomMessageIds {
   messageId: number;
   roomId: number;
+  newMessageId: number;
 }
 export interface RoomMessagesIds {
   messagesId: number[];
@@ -172,7 +174,8 @@ export interface MessageSupplier {
 export interface IStorage {
   // getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]): void;
-  deleteMessage(id: number): void;
+  deleteMessage(id: number, replaceThreadId: number): void;
+  setThreadMessageCount(mesageid: number, count: number): void;
   deleteRoom(id: number): void;
   deleteChannel(id: number): void;
   saveMessage(m: MessageModel): void;

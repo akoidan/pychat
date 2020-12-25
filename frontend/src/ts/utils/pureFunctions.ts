@@ -3,8 +3,8 @@ import {
   EditingMessage, FileModel,
   MessageModel
 } from '@/ts/types/model';
-import {DefaultStore} from '@/ts/classes/DefaultStore';
-import {MessageSender} from '@/ts/types/types';
+import type {DefaultStore} from '@/ts/classes/DefaultStore';
+import type {MessageSender} from '@/ts/types/types';
 
 export function bytesToSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -86,6 +86,16 @@ export function sem(
   }
 }
 
+export function getMissingIds(roomId: number, store: DefaultStore): number[] {
+  let messages: Record<number, MessageModel> = store.roomsDict[roomId].messages;
+  let missingIds = Object.values(messages).filter(m => m.parentMessage && !messages[m.parentMessage]).map(m => m.parentMessage!);
+  return missingIds;
+}
+
+export function checkIfIdIsMissing(message: MessageModel, store: DefaultStore): boolean {
+  return !!message.parentMessage && !store.roomsDict[message.roomId].messages[message.parentMessage];
+}
+
 export function editMessageWs(
     messageContent: string|null,
     messageId: number,
@@ -99,18 +109,20 @@ export function editMessageWs(
     ms: MessageSender
 ): void {
   let shouldBeSynced: boolean = messageId >0 || !!messageContent;
+  let oldMessage = store.roomsDict[roomId].messages[messageId];
   const mm: MessageModel = {
     roomId,
     deleted: !messageContent,
     id: messageId,
-    isHighlighted: false,
+    isHighlighted: oldMessage ? oldMessage.isHighlighted : false,
     transfer: !!messageContent || messageId > 0 ? { // TODO can this be simplified?
       error: null,
       upload: null
     } : null,
     time,
-    isEditingActive: false,
-    isThreadOpened: false, // TODO do not close thread
+    threadMessagesCount: oldMessage ? oldMessage.threadMessagesCount : 0,
+    isEditingActive: oldMessage ? oldMessage.isEditingActive : false,
+    isThreadOpened: oldMessage ? oldMessage.isThreadOpened : false,
     parentMessage,
     sending: shouldBeSynced,
     content: messageContent,

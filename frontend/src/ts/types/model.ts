@@ -103,6 +103,7 @@ export interface MessageModel {
   isEditingActive: boolean; // if textarea is opened for this message to edit it
   isThreadOpened: boolean; // if thread is opened for this message
   symbol: string|null;
+  threadMessagesCount: number;
   deleted: boolean;
   sending: boolean;
   giphy: string|null;
@@ -236,7 +237,7 @@ export interface RoomModel extends RoomSettingsModel {
   p2pInfo: P2pMessageModel;
   sendingFiles:  { [id: string]: SendingFile };
   receivingFiles:  { [id: string]: ReceivingFile };
-  messages: { [id: number]: MessageModel };
+  messages: Record<number, MessageModel>;
   allLoaded: boolean;
   search: SearchModel;
   newMessagesCount: number;

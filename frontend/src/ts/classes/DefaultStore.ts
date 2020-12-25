@@ -146,6 +146,77 @@ export class DefaultStore extends VuexModule {
     return Object.keys(this.onlineDict).map(a => parseInt(a, 10));
   }
 
+  get calculatedMessagesForRoom() : (roomId: number) => any[] {
+    return (roomId: number): any[] => {
+      let room = this.roomsDict[roomId];
+      let newArray: any[] = room.roomLog.map(value => ({
+        isUserAction: true,
+        ...value
+      }));
+      newArray.push(...room.changeName.map(value => ({isChangeName: true, ...value})));
+      let dates: {[id: string]: boolean} = {};
+      let messageDict: Record<number, {parent?: MessageModel, messages: (MessageModel|ReceivingFile|SendingFile)[]}> = {};
+      for (let m in room.messages) {
+        let message = room.messages[m];
+        if (message.parentMessage) {
+          if (!messageDict[message.parentMessage]) {
+            messageDict[message.parentMessage] = {messages: []}
+          }
+          messageDict[message.parentMessage].messages.push(message)
+        } else {
+          if (!messageDict[message.id]) {
+            messageDict[message.id] = {messages: []}
+          }
+          messageDict[message.id].parent = message;
+          let d = new Date(message.time).toDateString();
+          if (!dates[d]) {
+            dates[d] = true;
+            newArray.push({fieldDay: d, time: Date.parse(d)});
+          }
+        }
+      }
+      for (let m in room.sendingFiles) {
+        let sendingFile: SendingFile = room.sendingFiles[m];
+        if (sendingFile.threadId) {
+          if (messageDict[sendingFile.threadId]) {
+            messageDict[sendingFile.threadId].messages.push(sendingFile);
+          } else {
+            logger.warn(`Receiving file {} won't be dispayed as thread ${sendingFile.threadId} is not loaded yet`)();
+          }
+        } else {
+          newArray.push(sendingFile);
+        }
+      }
+      for (let m in room.receivingFiles) {
+        let receivingFile: ReceivingFile = room.receivingFiles[m];
+        if (receivingFile.threadId) {
+          if (messageDict[receivingFile.threadId]) {
+            messageDict[receivingFile.threadId].messages.push(receivingFile);
+          } else {
+            logger.warn(`Receiving file {} won't be dispayed as thread ${receivingFile.threadId} is not loaded yet`)();
+          }
+        } else {
+          newArray.push(receivingFile);
+        }
+      }
+      Object.values(messageDict).forEach(v => {
+        if (v.messages.length || v.parent?.isThreadOpened || (v.parent && v.parent.threadMessagesCount > 0)) {
+          if (v.parent) {
+            v.messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+            newArray.push({parent: v.parent, thread: true, messages: v.messages, time: v.parent.time});
+          } else {
+            logger.warn(`Skipping rendering messages ${v.messages.map(m => (m as MessageModel).id)} as parent is not loaded yet`)()
+          }
+        } else {
+          newArray.push(v.parent)
+        }
+      });
+      newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+      logger.debug("Reevaluating messages in room #{}: {}", room.id, newArray)();
+      return newArray;
+    }
+  }
+
   get channelsDictUI(): ChannelsDictUIModel {
     let result : ChannelsDictUIModel = this.roomsArray.reduce((dict, current: RoomModel) => {
       let channelId = current.channelId;
@@ -238,22 +309,6 @@ export class DefaultStore extends VuexModule {
       logger.debug('maxId #{}={}', id, maxId)();
 
       return maxId;
-    };
-  }
-
-  get minId(): (id: number) => number|undefined{
-    return (id: number) => {
-      const messages = this.roomsDict[id].messages;
-      let minId: number|undefined = undefined; // should be undefined otherwise we will trigger less than 0
-      for (const m in messages) {
-        const id = messages[m].id;
-        if (id > 0 && (!minId || id < minId)) {
-          minId = id;
-        }
-      }
-      logger.debug('minId #{}={}', id, minId)();
-
-      return minId;
     };
   }
 
@@ -552,8 +607,19 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public deleteMessage(rm: RoomMessageIds) {
-    Vue.delete(this.roomsDict[rm.roomId].messages, String(rm.messageId));
-    this.storage.deleteMessage(rm.messageId);
+    let messages = this.roomsDict[rm.roomId].messages;
+    Vue.delete(messages, String(rm.messageId));
+    Object.values(messages)
+        .filter(m => m.parentMessage === rm.messageId)
+        .forEach(a => a.parentMessage = rm.newMessageId)
+    this.storage.deleteMessage(rm.messageId, rm.newMessageId);
+  }
+
+  @Mutation
+  public increaseThreadMessageCount({roomId, messageId}: {roomId: number; messageId: number}) {
+    let message = this.roomsDict[roomId].messages[messageId];
+    message.threadMessagesCount++;
+    this.storage.setThreadMessageCount(messageId, message.threadMessagesCount);
   }
 
   @Mutation

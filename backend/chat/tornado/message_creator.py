@@ -137,6 +137,7 @@ class MessagesCreator(object):
 			VarNames.MESSAGE_ID: message.id,
 			VarNames.EDITED_TIMES: message.edited_times,
 			VarNames.ROOM_ID: message.room_id,
+			VarNames.THREAD_MESSAGES_COUNT: message.thread_messages_count,
 			VarNames.PARENT_MESSAGE: message.parent_message_id,
 		}
 		if message.deleted:

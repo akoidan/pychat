@@ -30,7 +30,7 @@ export interface OauthSessionResponse extends SessionResponse {
   username: string;
 }
 
-export interface RoomDto  extends  RoomNoUsersDto {
+export interface RoomDto extends RoomNoUsersDto {
   users: number[];
 }
 
@@ -72,13 +72,11 @@ export interface UserSettingsDto {
   theme: string;
 }
 
-
 export interface SetStateFromWS {
   roomsDict: RoomDictModel;
   channelsDict: ChannelsDictModel;
   allUsersDict: {[id: number]: UserModel};
 }
-
 
 export interface SetStateFromStorage {
   roomsDict: RoomDictModel;
@@ -119,6 +117,7 @@ export interface MessageModelDto {
   symbol?: string;
   deleted?: boolean;
   giphy?: string;
+  threadMessagesCount: number;
   edited: number;
   roomId: number;
   userId: number;

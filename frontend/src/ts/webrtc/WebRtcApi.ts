@@ -39,6 +39,7 @@ import {
   LogoutMessage
 } from '@/ts/types/messages/innerMessages';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import {MessageSenderProxy} from '@/ts/message_handlers/MessageSenderProxy';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -61,6 +62,7 @@ export default class WebRtcApi extends MessageHandler {
   private readonly callHandlers: {[id: number]: CallHandler} = {};
   private readonly messageHandlers: Record<number, MessageTransferHandler> = {};
   private readonly messageHelper: MessageHelper;
+  private messageSenderProxy!: MessageSenderProxy; // via setter
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper) {
     super();
@@ -70,6 +72,11 @@ export default class WebRtcApi extends MessageHandler {
     this.logger = loggerFactory.getLogger('WEBRTC');
     this.store = store;
     this.messageHelper = messageHelper;
+  }
+
+
+  public setMessageSenderProxy(messageSenderProxy: MessageSenderProxy) {
+    this.messageSenderProxy = messageSenderProxy;
   }
 
   public offerCall(message: OfferCall) {
@@ -268,6 +275,9 @@ export default class WebRtcApi extends MessageHandler {
       replaced: 1
     });
     this.store.addReceivingFile(payload);
+    if (payload.threadId) {
+      this.messageSenderProxy.getMessageSender(message.roomId).loadMessages(payload.roomId, [payload.threadId]);
+    }
     this.wsHandler.replyFile(message.connId, browserVersion);
     if (!limitExceeded) {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
