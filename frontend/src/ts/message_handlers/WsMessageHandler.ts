@@ -208,16 +208,20 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     };
     this.store.setUploadProgress(sup);
     try {
-      const res: SaveFileResponse = await this.api.uploadFiles(files, evt => {
-        if (evt.lengthComputable) {
-          const payload: SetMessageProgress = {
-            messageId,
-            roomId,
-            uploaded: evt.loaded
-          };
-          this.store.setMessageProgress(payload);
-        }
-      });
+      const res: SaveFileResponse = await this.api.uploadFiles(
+          files,
+          evt => {
+            if (evt.lengthComputable) {
+              const payload: SetMessageProgress = {
+                messageId,
+                roomId,
+                uploaded: evt.loaded
+              };
+              this.store.setMessageProgress(payload);
+            }
+          },
+          xhr => this.store.setUploadXHR({xhr, messageId, roomId})
+      );
       const newVar: RemoveMessageProgress = {
         messageId, roomId
       };

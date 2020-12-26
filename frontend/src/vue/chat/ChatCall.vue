@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="callInfo.callContainer || callInfo.callActiveButNotJoinedYet"
+    v-show="callInfo.callActive"
     class="callContainer"
   >
     <div

@@ -20,6 +20,12 @@
     />
     <div>
       <i
+        v-if="isMobile"
+        class="icon-paper-plane"
+        title="Send this message"
+        @click="sendMessage"
+      />
+      <i
         class="icon-attach-outline"
         title="Add attachment"
         @click="showAttachments = !showAttachments"
@@ -33,7 +39,8 @@
         ref="userMessage"
         contenteditable="true"
         class="usermsg input"
-        @keydown="checkAndSendMessage"
+        :class="{'mobile-user-message': isMobile}"
+        @keydown="onTextAreaKeyDown"
         @paste="onImagePaste"
       />
     </div>
@@ -89,6 +96,7 @@ import {
 } from "vue-router";
 import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
 import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
+import {isMobile} from '@/ts/utils/runtimeConsts';
 
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
@@ -132,6 +140,10 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     get room() {
       return this.roomsDict[this.roomId];
+    }
+
+    get isMobile() {
+      return isMobile;
     }
 
     get editMessage(): MessageModel|null {
@@ -206,13 +218,61 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       return this.$messageSenderProxy.getMessageSender(this.roomId);
     }
 
-    public checkAndSendMessage(event: KeyboardEvent) {
+    public onTextAreaKeyDown(event: KeyboardEvent) {
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
+        if (isMobile) {
+          // do not block multiple lines on mobile, let user use button to send
+          return;
+        }
         event.preventDefault();
-        this.$logger.debug('Checking sending message')();
-        if (this.editMessage) {
-          const md: MessageDataEncode = getMessageData(this.userMessage, this.editMessage!);
-          editMessageWs(
+        this.sendMessage();
+      } else if (event.keyCode === 27) { // 27 = escape
+        this.cancelCurrentAction();
+      } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
+        this.setEditedMessage(event);
+      }
+    }
+
+
+    private setEditedMessage(event: KeyboardEvent) {
+      const messages = this.activeRoom.messages;
+      if (Object.keys(messages).length > 0) {
+        let maxTime: MessageModel | null = null;
+        for (const m in messages) {
+          if (!maxTime || (messages[m].time >= maxTime.time)) {
+            maxTime = messages[m];
+          }
+        }
+        event.preventDefault();
+        event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
+        sem(event, maxTime!, true, this.userInfo, this.$store.setEditedMessage);
+      }
+    }
+
+    private cancelCurrentAction() {
+      if (this.editMessageId) {
+        this.userMessage.innerHTML = '';
+        this.$store.setEditedMessage({
+          messageId: this.editMessageId,
+          isEditingNow: false,
+          roomId: this.roomId
+        });
+      } else if (this.threadMessageId) {
+        this.$store.setCurrentThread({
+          roomId: this.roomId,
+          isEditingNow: false,
+          messageId: this.threadMessageId
+        });
+      } else if (this.showSmileys) { // do not cancel all at once, cancel one by one
+        this.showSmileys = false;
+      }
+    }
+
+    private sendMessage() {
+      this.$logger.debug('Checking sending message')();
+      if (this.editMessage) {
+        const md: MessageDataEncode = getMessageData(this.userMessage, this.editMessage!);
+        editMessageWs(
             md.messageContent,
             this.editMessage.id,
             this.roomId,
@@ -223,18 +283,18 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.editMessage.parentMessage,
             this.$store,
             this.messageSender
-          );
-          this.$store.setEditedMessage({
-            roomId: this.roomId,
-            isEditingNow: false,
-            messageId: this.editMessage.id
-          });
-        } else {
-          const md: MessageDataEncode = getMessageData(this.userMessage, undefined);
-          if (!md.messageContent) { // && !md.files.length // but file content is emppty is symbols are not present
-            return;
-          }
-          editMessageWs(
+        );
+        this.$store.setEditedMessage({
+          roomId: this.roomId,
+          isEditingNow: false,
+          messageId: this.editMessage.id
+        });
+      } else {
+        const md: MessageDataEncode = getMessageData(this.userMessage, undefined);
+        if (!md.messageContent) { // && !md.files.length // but file content is emppty is symbols are not present
+          return;
+        }
+        editMessageWs(
             md.messageContent,
             this.$messageSenderProxy.getUniqueNegativeMessageId(),
             this.roomId,
@@ -242,44 +302,12 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             md.files,
             Date.now(),
             0,
-            this.threadMessageId  ?? null,
+            this.threadMessageId ?? null,
             this.$store,
             this.messageSender
-          );
-        }
-      } else if (event.keyCode === 27) { // 27 = escape
-        if (this.editMessageId) {
-          this.userMessage.innerHTML = '';
-          this.$store.setEditedMessage({
-            messageId: this.editMessageId,
-            isEditingNow: false,
-            roomId: this.roomId
-          });
-        } else if (this.threadMessageId) {
-          this.$store.setCurrentThread({
-            roomId: this.roomId,
-            isEditingNow: false,
-            messageId: this.threadMessageId
-          });
-        } else if (this.showSmileys) { // do not cancel all at once, cancel one by one
-          this.showSmileys = false;
-        }
-      } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
-        const messages = this.activeRoom.messages;
-        if (Object.keys(messages).length > 0) {
-          let maxTime: MessageModel |null = null;
-          for (const m in messages) {
-            if (!maxTime || (messages[m].time >= maxTime.time)) {
-              maxTime = messages[m];
-            }
-          }
-          event.preventDefault();
-          event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
-          sem(event, maxTime!, true, this.userInfo, this.$store.setEditedMessage);
-        }
+        );
       }
     }
-
 
     private pasteImagesToTextArea(files: FileList| File[]) {
       console.error(files);
@@ -362,6 +390,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     .icon-attach-outline
       @extend %chat-icon
       left: 15px
+    .icon-paper-plane
+      @extend %chat-icon
+      right: 40px
     .icon-smile
       @extend %chat-icon
       right: 10px
@@ -379,7 +410,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
   .usermsg /deep/ img[alt] //smile
     @extend %img-code
 
-
+  .usermsg.mobile-user-message
+    padding-right: 50px // before smiley and send
   .usermsg
     z-index: 2
     margin-left: 4px

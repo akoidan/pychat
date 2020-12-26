@@ -84,6 +84,12 @@ export interface SetUploadProgress {
   messageId: number;
 }
 
+export interface SetUploadXHR {
+  xhr: XMLHttpRequest;
+  roomId: number;
+  messageId: number;
+}
+
 export interface SetCallOpponent {
   roomId: number;
   opponentWsId: string;
@@ -279,10 +285,6 @@ export interface SetMessageProgress extends RemoveMessageProgress {
 export interface SetSearchStateTo {
   roomId: number;
   lock: boolean;
-}
-
-export interface ToogleSearch {
-  roomId: number;
 }
 
 export interface SetSearchTextTo {

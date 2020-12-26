@@ -478,6 +478,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* IF chat is opened on multiple tabs, we should display what'sup like message "CHat is opened there, do you want to stop using it here?". subecribe to ls change
 * remove history query param from ws
 * history loading messages should be fully refactored, loaduphistory should pass existing messages ids the same way syncHistory does
 * appear online messages also appear is channel non-relatedto user .e.g. pychat pdr

@@ -1,9 +1,8 @@
 <template>
   <li
-    v-show="userIsInActiveRoom"
     :class="onlineClass"
   >
-    <user-name-sex :user="user" :online="isOnline"/>
+    <user-name-sex :user="user"/>
     <img
       v-if="consts.FLAGS && user.location.countryCode"
       class="country"
@@ -59,12 +58,6 @@ export default class RoomUsersUser extends Vue {
 
   get id() {
     return this.user.id;
-  }
-
-  get userIsInActiveRoom() {
-    const ar = this.activeRoom;
-
-    return ar && ar.users.indexOf(this.user.id) >= 0;
   }
 
   get onlineClass () {

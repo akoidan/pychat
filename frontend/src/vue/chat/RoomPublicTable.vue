@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="room-public-table">
     <span class="header">
       <span
         :class="roomsClass"
@@ -60,6 +60,9 @@ import {
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
+
+  .room-public-table
+    font-size: 24px
   @import "~@/assets/sass/partials/room_users_table.sass"
 
   .icon-angle-circled-down, .icon-angle-circled-up

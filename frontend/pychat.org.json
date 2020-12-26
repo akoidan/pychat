@@ -8,9 +8,9 @@
   "RECAPTCHA_PUBLIC_KEY": "6LchGhwTAAAAAJwCRgfNKraWrFtCdKPFo0Ri8DLt",
   "MANIFEST": "/manifest.json",
   "AUTO_REGISTRATION": false,
-  "ISSUES": true,
-  "STATISTICS": true,
-  "GITHUB_LINK": true,
+  "ISSUES": false,
+  "STATISTICS": false,
+  "GITHUB_LINK": "https://github.com/akoidan/pychat",
   "FLAGS": true,
   "PUBLIC_PATH": "https://static.pychat.org/",
   "WEBRTC_CONFIG": {"iceServers":[{"urls":["turn:pychat.org"],"username":"pychat","credential":"pypass"}]}

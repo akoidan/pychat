@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="settings-page">
     <table>
       <tbody>
         <tr>
@@ -151,6 +151,23 @@ export default class UserProfileSettings extends Vue {
 </script>
 
 <style lang="sass" scoped>
+
+  @import "~@/assets/sass/partials/abstract_classes"
+
   .lor-btn
     width: 100%
+
+  .settings-page /deep/
+    button
+      width: 100%
+    padding-top: 10px
+    padding-bottom: 10px
+    table
+      margin: auto
+    th
+      text-align: right
+    td, th
+      padding: 4px
+    .input
+      @extend %big-input
 </style>

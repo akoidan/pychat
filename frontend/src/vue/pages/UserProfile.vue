@@ -7,9 +7,6 @@
       <router-link to="/profile/image">
         Profile image
       </router-link>
-      <router-link to="/profile/settings">
-        Chat settings
-      </router-link>
       <router-link to="/profile/change-password">
         Change password
       </router-link>
@@ -66,6 +63,14 @@ export default class UserProfile extends Vue {
       &.router-link-active
         color: #ffc000
         text-decoration: underline
+
+  @media screen and (max-width: $collapse-width)
+    .links
+      flex-direction: column
+      padding: 0
+      a
+        text-align: center
+        padding: 4px
 
   .profileInner /deep/
     button

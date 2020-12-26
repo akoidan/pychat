@@ -3,7 +3,7 @@
     <span class="message-header">
       <span class="timeMess">({{ getTime }})</span>
       <span>System</span>: </span>
-    <span class="message-text-style">{{ isUser }} <b @contextmenu.prevent.stop="setActiveUser">{{ user }}</b> {{ where }}</span>
+    <span class="message-text-style">{{ isUser }} <b>{{ user }}</b> {{ where }}</span>
   </p>
 </template>
 <script lang="ts">
@@ -30,10 +30,6 @@ export default class ChatUserActionMessage extends Vue {
 
   get where () {
     return `${this.isMe ? 'have' : 'has'} ${this.action}`;
-  }
-
-  public setActiveUser() {
-    this.$store.setActiveUserId(this.userId);
   }
 
   get isUser() {

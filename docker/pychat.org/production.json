@@ -9,7 +9,7 @@
     "PUBLIC_PATH": null,
     "ISSUES": false,
     "STATISTICS": false,
-    "GITHUB_LINK": "https://github.com/Deathangel908/pychat",
+    "GITHUB_LINK": "https://github.com/akoidan/pychat",
     "PAINTER": true,
     "FLAGS": false,
     "WEBRTC_CONFIG": {"iceServers":[{"urls":["stun:turn2.l.google.com"]}]}

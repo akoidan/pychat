@@ -4,11 +4,6 @@
     <div class="callContainerIconsInner">
       <button v-if="callInfo.callActiveButNotJoinedYet" @click="joinCall" class="green-btn">Join call</button>
       <i
-        v-show="!callInfo.callActive"
-        class="icon-phone-circled"
-        @click="startCall"
-      />
-      <i
         :class="iconMicClass"
         :title="micTitle"
         @click="micClick"
@@ -111,9 +106,6 @@ export default class CallContainerIcons extends Vue {
     };
   }
 
-  public startCall() {
-    this.$webrtcApi.startCall(this.roomId);
-  }
 }
 </script>
 <!-- eslint-disable -->

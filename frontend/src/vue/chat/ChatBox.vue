@@ -34,21 +34,21 @@
       <template v-for="message in messages">
         <chat-user-action-message
           v-if="message.isUserAction"
-          :key="message.time"
+          :key="`a-${message.time}-${message.userId}`"
           :time="message.time"
           :user-id="message.userId"
           :action="message.action"
         />
         <chat-change-name-message
           v-else-if="message.isChangeName"
-          :key="message.time"
+          :key="`n-${message.time}-${message.userId}`"
           :time="message.time"
           :old-name="message.oldName"
           :new-name="message.newName"
         />
         <app-separator
           v-else-if="message.fieldDay"
-          :key="message.fieldDay"
+          :key="`s-${message.fieldDay}`"
           :day="message.fieldDay"
         />
         <chat-sending-file
@@ -69,9 +69,9 @@
         />
         <chat-sending-message
           v-else
-          @quote="onquote"
           :key="message.id"
           :message="message"
+          @quote="onquote"
         />
       </template>
     </div>
@@ -239,9 +239,7 @@ import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
       } else if (e.ctrlKey && e.which === 36) {
         callback(35);
       } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
-        this.$store.toogleSearch({
-          roomId: this.room.id
-        });
+        this.$store.toogleSearch(this.room.id)
       }
     }
 

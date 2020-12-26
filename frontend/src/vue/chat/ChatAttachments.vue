@@ -210,8 +210,9 @@ export default class ChatAttachments extends Vue {
   .attachments-div
     padding: 10px 10px 3px 5px
     bottom: 2px // otherwise there would be scroll
-    font-size: 40px
+    font-size: 30px
     display: flex
+    flex-wrap: wrap // dont push width on mobile
     border-radius: 10px
     [class^="icon-"]
       padding: 5px

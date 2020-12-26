@@ -7,6 +7,7 @@
     <div class="input-holder">
       <input
         ref="inputSearch"
+        @keydown="checkToggleSearch"
         v-model.trim="search"
         type="search"
         class="input"
@@ -54,9 +55,7 @@ export default class SearchMessages extends Vue {
   }
 
   close() {
-    this.$store.toogleSearch({
-      roomId: this.room.id
-    });
+    this.$store.toogleSearch(this.room.id);
   }
 
   get searchActive() {
@@ -79,6 +78,12 @@ export default class SearchMessages extends Vue {
       this.$nextTick(function () {
         this.inputSearch.focus();
       });
+    }
+  }
+
+  private checkToggleSearch(event: KeyboardEvent) {
+    if (event.keyCode === 27) {
+      this.$store.toogleSearch(this.room.id)
     }
   }
 

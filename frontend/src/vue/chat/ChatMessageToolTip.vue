@@ -1,20 +1,27 @@
 <template>
-  <div class="message-tooltip">
+  <div class="message-tooltip" :class="{'message-tooltip-opened': message.isEditingActive}">
     <i
-      v-if="isMine && message.content"
-      class="icon-pencil"
-      @click.stop="editMessage"
+      v-if="message.isEditingActive"
+      class="icon-cancel-circled-outline"
+      @click.stop="setEditingMode(false)"
     />
-    <i
-      v-if="isMine && message.content"
-      class="icon-trash-circled"
-      @click.stop="deleteMessage"
-    />
-    <i
-      v-if="!message.parentMessage"
-      class="icon-comment"
-      @click.stop="toggleThread"
-    />
+    <template v-else>
+      <i
+        v-if="isMine && message.content"
+        class="icon-pencil"
+        @click.stop="setEditingMode(true)"
+      />
+      <i
+        v-if="isMine && message.content"
+        class="icon-trash-circled"
+        @click.stop="deleteMessage"
+      />
+      <i
+        v-if="!message.parentMessage"
+        class="icon-comment"
+        @click.stop="toggleThread"
+      />
+    </template>
   </div>
 </template>
 <script lang="ts">
@@ -36,10 +43,20 @@ export default class ChatMessageToolTip extends Vue {
     return this.message.userId === this.myId;
   }
 
-  @Emit()
-  editMessage() {}
+  setEditingMode(isEditingNow: boolean) {
+    let a: EditingMessage = {
+      messageId: this.message.id,
+      isEditingNow,
+      roomId: this.message.roomId
+    }
+    this.$store.setEditedMessage(a);
+  }
 
   public deleteMessage() {
+    // TODO, check if opened is the only status with abor request
+    if (this.message?.transfer?.xhr?.readyState === XMLHttpRequest.OPENED) {
+      this.message.transfer.xhr.abort();
+    }
     editMessageWs(
         null,
         this.message.id,
@@ -64,8 +81,18 @@ export default class ChatMessageToolTip extends Vue {
 <style lang="sass" scoped>
   @import "~@/assets/sass/partials/mixins"
 
-  .message-tooltip > *
-    cursor: pointer
+  .icon-cancel-circled-outline
+    @include hover-click(#ee0000)
+  .message-tooltip-opened
+    display: block !important
+
+  .color-reg .message-tooltip
+    background: #3e3e3f
+  .message-tooltip
+    padding: 6px
+    margin: 0
+    > *
+      cursor: pointer
   .icon-trash-circled
     @include hover-click(red)
 

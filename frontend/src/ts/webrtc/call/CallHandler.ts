@@ -394,10 +394,6 @@ export default class CallHandler extends FileAndCallTransfer {
       id: this.roomId,
       state: true
     });
-    this.store.setContainerToState({
-      id: this.roomId,
-      state: true
-    });
     this.store.setVideoToState({
       type: 'webcam',
       id: this.roomId,
@@ -426,10 +422,6 @@ export default class CallHandler extends FileAndCallTransfer {
       state: false
     });
     this.store.setCallActiveToState({
-      id: this.roomId,
-      state: true
-    });
-    this.store.setContainerToState({
       id: this.roomId,
       state: true
     });

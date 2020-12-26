@@ -55,7 +55,7 @@ import {
   ShareIdentifier,
   SetSearchStateTo,
   SetSearchTextTo,
-  ToogleSearch
+  SetUploadXHR
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
@@ -120,7 +120,6 @@ export class DefaultStore extends VuexModule {
   public speakers: { [id: string]: string } = {};
   public webcams: { [id: string]: string } = {};
   public activeRoomId: number | null = null;
-  public activeUserId: number | null = null;
   public userInfo: CurrentUserInfoModel | null = null;
   public userSettings: CurrentUserSettingsModel | null = null;
   public userImage: string | null = null;
@@ -332,14 +331,6 @@ export class DefaultStore extends VuexModule {
     return online;
   }
 
-  get activeUser(): UserModel | null {
-    return this.activeUserId ? this.allUsersDict[this.activeUserId] : null;
-  }
-
-  get showNav() {
-    return !this.activeUserId;
-  }
-
   @Mutation
   public setMessageProgress(payload: SetMessageProgress) {
     const transfer = this.roomsDict[payload.roomId].messages[payload.messageId].transfer;
@@ -359,6 +350,16 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setStorage(payload: IStorage) {
     this.storage = payload;
+  }
+
+  @Mutation
+  public setUploadXHR(payload: SetUploadXHR) {
+    const message = this.roomsDict[payload.roomId].messages[payload.messageId];
+    if (message.transfer) {
+      message.transfer.xhr = payload.xhr;
+    } else {
+      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
+    }
   }
 
   @Mutation
@@ -416,16 +417,6 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public expandChannel(channelid: number) {
     this.channelsDict[channelid].expanded = !this.channelsDict[channelid].expanded;
-  }
-
-  @Mutation
-  public toggleContainer(roomId: number) {
-    this.roomsDict[roomId].callInfo.callContainer = !this.roomsDict[roomId].callInfo.callContainer;
-  }
-
-  @Mutation
-  public setContainerToState(payload: BooleanIdentifier) {
-    this.roomsDict[payload.id].callInfo.callContainer = payload.state;
   }
 
   @Mutation
@@ -611,7 +602,7 @@ export class DefaultStore extends VuexModule {
     Vue.delete(messages, String(rm.messageId));
     Object.values(messages)
         .filter(m => m.parentMessage === rm.messageId)
-        .forEach(a => a.parentMessage = rm.newMessageId)
+        .forEach(a => a.parentMessage = rm.newMessageId);
     this.storage.deleteMessage(rm.messageId, rm.newMessageId);
   }
 
@@ -663,13 +654,8 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public toogleSearch(payload: ToogleSearch) {
-    this.roomsDict[payload.roomId].search.searchActive = !this.roomsDict[payload.roomId].search.searchActive;
-  }
-
-  @Mutation
-  public setActiveUserId(activeUserId: number) {
-    this.activeUserId = activeUserId;
+  public toogleSearch(roomId: number) {
+    this.roomsDict[roomId].search.searchActive = !this.roomsDict[roomId].search.searchActive;
   }
 
   @Mutation
@@ -855,7 +841,6 @@ export class DefaultStore extends VuexModule {
     this.userImage = null;
     this.roomsDict = {};
     this.allUsersDict = {};
-    this.activeUserId = null;
     this.onlineDict = {};
     this.activeRoomId = null;
     this.storage.clearStorage();

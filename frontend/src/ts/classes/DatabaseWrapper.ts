@@ -186,6 +186,7 @@ export default class DatabaseWrapper implements IStorage {
           deleted: convertToBoolean(m.deleted),
           transfer: m.sending ? {
             error: null,
+            xhr: null,
             upload: null
           } : null,
           files: {},

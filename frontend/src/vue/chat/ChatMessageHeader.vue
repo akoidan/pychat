@@ -4,7 +4,7 @@
       class="timeMess"
       @click="quote"
     >({{ getTime }})</span>
-    <span @contextmenu.prevent.stop="setActiveUser">{{ username }}</span>:
+    <span>{{ username }}</span>:
   </span>
 </template>
 <script lang="ts">
@@ -26,10 +26,6 @@ export default class ChatMessageHeader extends Vue {
 
   @State
   public readonly allUsersDict!: UserDictModel;
-
-  public setActiveUser() {
-    this.$store.setActiveUserId(this.userId);
-  }
 
   get username() {
     return this.allUsersDict[this.userId].user;

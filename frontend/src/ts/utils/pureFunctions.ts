@@ -117,7 +117,8 @@ export function editMessageWs(
     isHighlighted: oldMessage ? oldMessage.isHighlighted : false,
     transfer: !!messageContent || messageId > 0 ? { // TODO can this be simplified?
       error: null,
-      upload: null
+      upload: null,
+      xhr: null,
     } : null,
     time,
     threadMessagesCount: oldMessage ? oldMessage.threadMessagesCount : 0,

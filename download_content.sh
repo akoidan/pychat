@@ -193,7 +193,8 @@ download_fontello() {
     safeRunCommand curl -X GET "https://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
     safeRunCommand unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
-    cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >  "$SASS_DIR/partials/fontello.scss"
+    echo '@charset "UTF-8";' > "$SASS_DIR/partials/fontello.scss"
+    cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >> "$SASS_DIR/partials/fontello.scss"
     safeRunCommand cp -v "$TMP_DIR/fontello/$dir/css/animation.css" "$SASS_DIR/partials/animation.scss"
     safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
     safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"

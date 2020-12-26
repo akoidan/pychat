@@ -9,7 +9,6 @@ import ResetPassword from '@/vue/singup/ResetPassword.vue';
 import Login from '@/vue/singup/Login.vue';
 import SignUp from '@/vue/singup/SignUp.vue';
 import UserProfile from '@/vue/pages/UserProfile.vue';
-import InviteUser from '@/vue/pages/InviteUser.vue';
 import ReportIssue from '@/vue/pages/ReportIssue.vue';
 import UserProfileChangePassword from '@/vue/pages/UserProfileChangePassword.vue';
 import UserProfileImage from '@/vue/pages/UserProfileImage.vue';
@@ -45,6 +44,9 @@ import {
 } from '@/ts/types/messages/innerMessages';
 import UserProfileOauthSettings from '@/vue/pages/UserProfileOauthSettings.vue';
 import PainterPage from '@/vue/pages/PainterPage.vue';
+import ChatRightSection from '@/vue/chat/ChatRightSection.vue';
+import ChatRightSectionPage from '@/vue/pages/ChatRightSectionPage.vue';
+import RoomUsersListPage from '@/vue/chat/RoomUsersListPage.vue';
 
 Vue.use(VueRouter);
 
@@ -66,6 +68,7 @@ export const router = new VueRouter({
         {
           component: ChannelsPage,
           meta: {
+            hasOwnNavBar: true,
             beforeEnter: (to: Route, from: Route, next: Function) => {
               logger.debug('setActiveRoomId {}', to.params.id)();
               store.setActiveRoomId(parseInt(to.params.id));
@@ -106,12 +109,16 @@ export const router = new VueRouter({
           ]
         },
         {
+          path: 'settings',
+          component: UserProfileSettings
+        },
+        {
           component: UserProfile,
           path: '/profile',
           children: [
             {
               path: '',
-              redirect: '/profile/settings'
+              redirect: '/profile/user-info'
             },
             {
               path: 'user-info',
@@ -133,10 +140,6 @@ export const router = new VueRouter({
               path: 'image',
               component: UserProfileImage
             },
-            {
-              path: 'settings',
-              component: UserProfileSettings
-            }
           ]
         },
         {
@@ -148,12 +151,12 @@ export const router = new VueRouter({
           path: '/channel-settings/:id'
         },
         {
-          component: CreatePrivateRoom,
-          path: '/create-private-room'
+          component: RoomUsersListPage,
+          path: '/room-users/:id'
         },
         {
-          component: InviteUser,
-          path: '/invite-user/:id'
+          component: CreatePrivateRoom,
+          path: '/create-private-room'
         },
         {
           component: ReportIssue,

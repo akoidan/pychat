@@ -529,6 +529,9 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
   let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
   messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
+  if (messageContent) {
+    messageContent = messageContent.trim();
+  }
   userMessage.innerHTML = '';
 
   return {files, messageContent, currSymbol};

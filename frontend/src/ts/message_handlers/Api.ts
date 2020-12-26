@@ -232,7 +232,7 @@ export default class Api extends MessageHandler {
     return this.xhr.doGet<string>(`/confirm_email?token=${token}`, false, true);
   }
 
-  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<SaveFileResponse> {
+  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void, setXhr: (e: XMLHttpRequest) => void): Promise<SaveFileResponse> {
     const fd = new FormData();
     files.forEach(sd => fd.append(sd.key, sd.file, sd.file.name));
 
@@ -241,6 +241,7 @@ export default class Api extends MessageHandler {
       isJsonDecoded: true,
       formData: fd,
       process: r => {
+        setXhr(r);
         r.upload.addEventListener('progress', progress);
       }
     });

@@ -10,10 +10,10 @@
       :edit-message-id="message.id"
     />
     <template v-if="message.transfer">
-      <app-progress-bar
-        v-if="message.transfer.upload && !message.transfer.error"
-        :upload="message.transfer.upload"
-      />
+      <div class="transfer-file" v-if="message.transfer.upload && !message.transfer.error">
+        <app-progress-bar :upload="message.transfer.upload"/>
+        <i class="icon-cancel-circled-outline" @click="cancelTransfer"/>
+      </div>
       <i
         v-else-if="filesExist"
         class="icon-repeat"
@@ -24,7 +24,6 @@
       <!--      IF message doesnt have content it's deleted-->
       <chat-message-tool-tip
         class="message-tooltip"
-        @edit-message="editMessage"
         :message="message"
       />
       <div class="spinner" v-if="message.sending" />
@@ -45,7 +44,8 @@ import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
 import {
-  CurrentUserInfoModel, EditingMessage,
+  CurrentUserInfoModel,
+  EditingMessage,
   MessageModel,
   RoomDictModel
 } from '@/ts/types/model';
@@ -76,6 +76,10 @@ export default class ChatSendingMessage extends Vue {
 
   get id() {
     return this.message.id;
+  }
+
+  cancelTransfer() {
+    this.message.transfer?.xhr?.abort();
   }
 
   get cls() {
@@ -117,15 +121,6 @@ export default class ChatSendingMessage extends Vue {
     this.$store.setCurrentThread(a);
   }
 
-  editMessage() {
-    let a: EditingMessage = {
-      messageId: this.message.id,
-      isEditingNow: true,
-      roomId: this.message.roomId
-    }
-    this.$store.setEditedMessage(a);
-  }
-
   removeUnread() {
     if (this.message.isHighlighted) {
       this.$store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
@@ -150,6 +145,13 @@ export default class ChatSendingMessage extends Vue {
   @import "~@/assets/sass/partials/mixins"
   @import "~@/assets/sass/partials/variables"
 
+
+  .icon-cancel-circled-outline
+    cursor: pointer
+    margin-left: 20px
+    @include hover-click(red)
+
+
   .editing-background
     border: 1px solid $editing-border-color
     background-color: rgba(255, 255, 255, 0.11)
@@ -167,8 +169,6 @@ export default class ChatSendingMessage extends Vue {
       box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
   .message-tooltip
     display: none
-    margin-right: 5px
-    margin-top: $space-between-messages/2
   .absolute-right
     position: absolute
     right: 0
@@ -211,5 +211,7 @@ export default class ChatSendingMessage extends Vue {
     display: block
     text-align: center
     cursor: pointer
-
+  .transfer-file
+    display: flex
+    justify-content: center
 </style>

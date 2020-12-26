@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="direct-user-table">
     <span class="header">
       <span
         :class="directClass"
@@ -48,6 +48,9 @@ import { RoomModel } from '@/ts/types/model';
 <!-- eslint-disable -->
 <style lang="sass" scoped>
   @import "~@/assets/sass/partials/room_users_table.sass"
+
+  .direct-user-table
+    font-size: 24px
   .icon-angle-circled-down, .icon-angle-circled-up
     @extend %header-left-icon
   .icon-plus-squared
