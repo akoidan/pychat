@@ -36,10 +36,8 @@ import {
   setVideoEvent,
   setYoutubeEvent
 } from '@/ts/utils/htmlApi';
-import { sem } from '@/ts/utils/pureFunctions';
 
 import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
-import {isMobile} from '@/ts/utils/runtimeConsts';
 
 @Component({
   components: {ChatMessageHeader}

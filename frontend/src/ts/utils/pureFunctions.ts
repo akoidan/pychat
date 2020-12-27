@@ -62,30 +62,6 @@ export function  extractError (args: unknown |unknown[]| {name: string}) {
   }
 }
 
-const ONE_DAY = 24 * 60 * 60 * 1000;
-
-export function sem(
-    event: Event,
-    message: MessageModel,
-    isEditingNow: boolean,
-    userInfo: CurrentUserInfoModel,
-    setEditedMessage: (a: EditingMessage) => void
-) {
-  if (event.target
-      && (<HTMLElement>event.target).tagName !== 'IMG'
-      && message.userId === userInfo.userId
-      && !message.deleted
-      && message.time + ONE_DAY > Date.now()
-  ) {
-    const newlet: EditingMessage = {
-      messageId: message.id,
-      isEditingNow,
-      roomId: message.roomId
-    };
-    setEditedMessage(newlet);
-  }
-}
-
 export function getMissingIds(roomId: number, store: DefaultStore): number[] {
   let messages: Record<number, MessageModel> = store.roomsDict[roomId].messages;
   let missingIds = Object.values(messages).filter(m => m.parentMessage && !messages[m.parentMessage]).map(m => m.parentMessage!);

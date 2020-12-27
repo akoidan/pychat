@@ -1,5 +1,5 @@
 <template>
-  <div :class="cls" @mouseover.passive="removeUnread" @contextmenu="contextmenu">
+  <div :class="cls" @mouseover.passive="removeUnread">
     <div v-if="message.isEditingActive" class="editing-background"></div>
     <div v-if="message.isThreadOpened" class="thread-background" @click="closeThread"></div>
     <chat-message :message="message" class="message-content" @quote="quote"/>
@@ -50,8 +50,6 @@ import {
   RoomDictModel
 } from '@/ts/types/model';
 import ChatMessageToolTip from '@/vue/chat/ChatMessageToolTip.vue';
-import {isMobile} from '@/ts/utils/runtimeConsts';
-import {sem} from '@/ts/utils/pureFunctions';
 import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
 
 @Component({
@@ -102,14 +100,6 @@ export default class ChatSendingMessage extends Vue {
   @Emit()
   quote() {
     return this.message;
-  }
-
-   contextmenu(event: Event) {
-    if (isMobile) {
-      event.preventDefault();
-      event.stopPropagation();
-      sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
-    }
   }
 
   closeThread() {

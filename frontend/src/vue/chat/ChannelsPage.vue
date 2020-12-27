@@ -1,14 +1,13 @@
 <template>
   <div class="holder">
     <app-menu-bar v-show="showAppMenuBar"/>
-    <app-nav-wrapper >
-      <i class="icon-left" @click="goBack" v-if="lowWidth && currentPage === 'chat'"/>
-      <i class="icon-menu" v-else @click="showMenu"/>
-      <div class="chat-right-icons">
-        <chat-is-online-icon/>
-        <i class="icon-chat" @click="showPopupToggle"/>
-      </div>
-    </app-nav-wrapper>
+    <chat-nav-bar
+      :low-width="lowWidth"
+      :current-page="currentPage"
+      @go-back="goBack"
+      @show-menu="showMenu"
+      @show-popup-toggle="showPopupToggle"
+    />
     <chat-popup-menu v-show="showPopup" class="popup-menu"/>
     <div class="wrapper">
       <chat-right-section v-show="!lowWidth || currentPage === 'rooms'" />
@@ -29,9 +28,13 @@ import ChatIsOnlineIcon from '@/vue/chat/ChatIsOnlineIcon.vue';
 import {State} from '@/ts/instances/storeInstance';
 import ChatPopupMenu from '@/vue/chat/ChatPopupMenu.vue';
 import AppMenuBar from '@/vue/ui/AppMenuBar.vue';
+import {RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
+import {PrivateRoomsIds} from '@/ts/types/types';
+import ChatNavBar from '@/vue/chat/ChatNavBar.vue';
 
 
 @Component({components: {
+    ChatNavBar,
   AppMenuBar,
   ChatPopupMenu,
   ChatIsOnlineIcon,
@@ -50,6 +53,8 @@ export default class ChannelsPage extends Vue {
   private showAppMenuBar = false;
   private currentPage: 'rooms' | 'chat' = 'chat';
   private showPopup = false;
+
+
 
   @Watch('activeRoomId')
   public activeRoomIdChange() {
@@ -111,12 +116,6 @@ export default class ChannelsPage extends Vue {
     position: absolute
     top: 40px
     right: 5px
-  .chat-right-icons
-    margin-left: auto
-  .icon-chat
-    margin-right: 20px
-  .icon-menu, .icon-chat
-    cursor: pointer
   .holder
     display: flex
     flex-direction: column

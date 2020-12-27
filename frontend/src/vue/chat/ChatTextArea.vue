@@ -86,8 +86,7 @@ import {
   UploadFile
 } from '@/ts/types/types';
 import {
-  editMessageWs,
-  sem
+  editMessageWs
 } from '@/ts/utils/pureFunctions';
 import MediaRecorder from '@/vue/chat/MediaRecorder.vue';
 import {
@@ -97,7 +96,6 @@ import {
 import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
 import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
-
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -236,6 +234,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     private setEditedMessage(event: KeyboardEvent) {
       const messages = this.activeRoom.messages;
+
       if (Object.keys(messages).length > 0) {
         let maxTime: MessageModel | null = null;
         for (const m in messages) {
@@ -245,7 +244,19 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         }
         event.preventDefault();
         event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
-        sem(event, maxTime!, true, this.userInfo, this.$store.setEditedMessage);
+
+        if (event.target
+            && (<HTMLElement>event.target).tagName !== 'IMG'
+            && maxTime!.userId === this.userInfo.userId
+            && !maxTime!.deleted
+        ) {
+          const newlet: EditingMessage = {
+            messageId: maxTime!.id,
+            isEditingNow: true,
+            roomId: maxTime!.roomId
+          };
+          this.$store.setEditedMessage(newlet);
+        }
       }
     }
 

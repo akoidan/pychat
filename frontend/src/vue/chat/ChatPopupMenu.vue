@@ -16,7 +16,7 @@
     <router-link :to="`/room-settings/${activeRoomId}`">
       <i class="icon-cog"/> Settings
     </router-link>
-    <router-link :to="`/room-users/${activeRoomId}`">
+    <router-link :to="`/room-users/${activeRoomId}`" v-if="activeRoom.name">
       <i class="icon-user-pair"/> Users
     </router-link>
   </div>
@@ -24,11 +24,15 @@
 <script lang="ts">
   import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
   import {State} from '@/ts/instances/storeInstance';
+  import {RoomModel} from '@/ts/types/model';
 
   @Component
   export default class ChatPopupMenu extends Vue {
     @State
     public readonly activeRoomId!: number;
+
+    @State
+    public readonly activeRoom!: RoomModel;
 
     public invertSearch() {
       this.$store.toogleSearch(this.activeRoomId);

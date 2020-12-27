@@ -569,7 +569,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
     const isSent = this.messageProc.sendToServer(messageRequest);
     if (!isSent && !skipGrowl) {
-      this.store.growlError('Can\'t send message, because connection is lost :(');
+      this.logger.warn('Can\'t send message, because connection is lost :(')();
     }
     return isSent;
   }
