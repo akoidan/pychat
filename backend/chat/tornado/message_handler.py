@@ -14,7 +14,7 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds, UserProfile, Channel, User
+	UploadedFile, Image, get_milliseconds, UserProfile, Channel, User, MessageMention
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
 	REDIS_DB
@@ -301,6 +301,14 @@ class MessagesHandler():
 			message_db.time -= message[VarNames.TIME_DIFF]
 			res_files = []
 			message_db.save()
+			tags_users = message[VarNames.MESSAGE_TAGS]
+			if tags_users:
+				mes_ment = [MessageMention(
+					user_id=userId,
+					message_id=message_db.id,
+					symbol=symb,
+				) for symb, userId in tags_users.items()]
+				MessageMention.objects.bulk_create(mes_ment)
 			if files:
 				images = up_files_to_img(files, message_db.id)
 				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
@@ -308,6 +316,8 @@ class MessagesHandler():
 				message_db,
 				Actions.PRINT_MESSAGE,
 				res_files,
+				tags_users,
+				True
 			)
 			prepared_message[VarNames.JS_MESSAGE_ID] = js_id
 			self.publish(prepared_message, channel)
@@ -728,9 +738,29 @@ class MessagesHandler():
 	def edit_message_edit(self, data, message):
 		action = Actions.EDIT_MESSAGE
 		message.giphy = None
+		tags = data[VarNames.MESSAGE_TAGS]
 		files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
+		if files or tags:
+			update_symbols(files, tags, message)
+		if tags:
+			db_tags = MessageMention.objects.filter(message_id=message.id)
+			update_or_create = []
+			update_or_create_dict = {}
+			for db_tag in db_tags:
+				if tags[db_tag.symbol] and tags[db_tag.symbol] != db_tag.user_id:
+					update_or_create.append(MessageMention(message_id=message.id, symbol=db_tag.symbol, user_id=tags[db_tag.symbol]))
+					update_or_create_dict[db_tag.symbol] = True
+			if update_or_create:
+				MessageMention.objects.bulk_update(update_or_create)
+			create_tags = []
+			for (k, v) in tags.items():
+				if not update_or_create_dict.get(k):
+					create_tags.append(MessageMention(message_id=message.id, symbol=k, user_id=v))
+			if create_tags:
+				MessageMention.objects.bulk_create(update_or_create)
+
+			up_files_to_img(files, message.id)
 		if files:
-			update_symbols(files, message)
 			up_files_to_img(files, message.id)
 		if message.symbol:  # fetch all, including that we just store
 			db_images = Image.objects.filter(message_id=message.id)
@@ -738,7 +768,7 @@ class MessagesHandler():
 		else:
 			prep_files = None
 		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
-		self.publish(self.message_creator.create_send_message(message, action, prep_files), message.room_id)
+		self.publish(self.message_creator.create_send_message(message, action, prep_files, tags, True), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

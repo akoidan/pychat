@@ -4,7 +4,7 @@
       class="timeMess"
       @click="quote"
     >({{ getTime }})</span>
-    <span>{{ username }}</span>:
+    <span>{{ user.user }}</span>:
   </span>
 </template>
 <script lang="ts">
@@ -27,8 +27,8 @@ export default class ChatMessageHeader extends Vue {
   @State
   public readonly allUsersDict!: UserDictModel;
 
-  get username() {
-    return this.allUsersDict[this.userId].user;
+  get user() {
+    return this.allUsersDict[this.userId];
   }
 
   get getTime() {

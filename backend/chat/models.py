@@ -269,6 +269,12 @@ class Message(Model):
 		return "{}/{}".format(self.id, v)
 
 
+class MessageMention(Model):
+	user = ForeignKey(User, CASCADE, null=False)
+	message = ForeignKey(Message, CASCADE, null=False)
+	symbol = CharField(null=False, max_length=1)
+
+
 from django.db.models.signals import post_save
 
 def save_profile(sender, instance, created, **kwargs):

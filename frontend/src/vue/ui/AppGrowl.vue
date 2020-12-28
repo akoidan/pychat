@@ -56,6 +56,9 @@ export default class AppGrowl extends Vue {
       right: -2px
       font-size: 20px
 
+  .growl
+    @extend %modal-window
+
   .color-white .growl
     color: white
     width: calc(100% - 50px)
@@ -68,7 +71,6 @@ export default class AppGrowl extends Vue {
       background-color: rgba(4, 168, 79, 0.9) !important
 
   .color-reg .growl
-    @extend %window-reg
     &.col-error
      color: #FF3131
     &.col-success
@@ -79,7 +81,6 @@ export default class AppGrowl extends Vue {
       @include hover-click(#eb0000)
 
   .color-lor .growl
-    @extend %window-lor
     &.col-error
       color: red
     &.col-success

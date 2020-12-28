@@ -478,6 +478,8 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* /giphy should work exactly like mention with drop above
+* quote should work similar to tag user
 * User icon should be clickable with ability to show user profile/send message and etc. Users should be filterable in userlist
 * IF chat is opened on multiple tabs, we should display what'sup like message "CHat is opened there, do you want to stop using it here?". subecribe to ls change
 * remove history query param from ws

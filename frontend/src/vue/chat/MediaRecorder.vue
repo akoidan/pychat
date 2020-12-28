@@ -1,5 +1,6 @@
 <template>
-  <div class="videoHolder" v-show="recordState !=='pause'">
+  <!--  prevent loosing focus from contenteditable-->
+  <div class="videoHolder" v-show="recordState !=='pause'" @mousedown.prevent>
     <div v-show="recordState ==='running'" @click="releaseRecord">
       <span class="click-info">Click on this image to finish record</span>
       <video

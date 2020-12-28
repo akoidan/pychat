@@ -1,7 +1,7 @@
 from chat.models import get_milliseconds
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, UserSettingsVarNames, \
 	UserProfileVarNames
-from chat.utils import get_message_images_videos
+from chat.utils import get_message_images_videos, get_message_tags
 
 
 class MessagesCreator(object):
@@ -49,10 +49,12 @@ class MessagesCreator(object):
 	@classmethod
 	def message_model_to_dto(cls, messages):
 		imv = get_message_images_videos(messages)
+		tags = get_message_tags(messages)
 		result = []
 		for message in messages:
 			files = cls.prepare_img_video(imv, message.id)
-			prep_m = cls.create_message(message, files)
+			prep_tags = cls.prepare_tags(tags, message.id)
+			prep_m = cls.create_message(message, files, prep_tags)
 			result.append(prep_m)
 		return result
 
@@ -129,7 +131,7 @@ class MessagesCreator(object):
 		return room_less
 
 	@classmethod
-	def create_message(cls, message, files):
+	def create_message(cls, message, files, tags, tags_stringified=False):
 		res = {
 			VarNames.USER_ID: message.sender_id,
 			VarNames.CONTENT: message.content,
@@ -139,6 +141,7 @@ class MessagesCreator(object):
 			VarNames.ROOM_ID: message.room_id,
 			VarNames.THREAD_MESSAGES_COUNT: message.thread_messages_count,
 			VarNames.PARENT_MESSAGE: message.parent_message_id,
+			VarNames.MESSAGE_TAGS: cls.prepare_tags(message, tags) if not tags_stringified else tags,
 		}
 		if message.deleted:
 			res[VarNames.DELETED] = True
@@ -150,7 +153,7 @@ class MessagesCreator(object):
 			res[VarNames.GIPHY] = message.giphy
 		return res
 
-	def create_send_message(self, message, event, files):
+	def create_send_message(self, message, event, files, tags_users, tags_stringified=False):
 		"""
 		:type message: chat.models.Message
 		:type imgs: dict
@@ -158,14 +161,14 @@ class MessagesCreator(object):
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		res = self.create_message(message, files)
+		res = self.create_message(message, files, tags_users, tags_stringified)
 		res[VarNames.EVENT] = event
 		res[VarNames.CB_BY_SENDER] = self.id
 		res[VarNames.HANDLER_NAME] = HandlerNames.WS_MESSAGE
 		return res
 
 	@classmethod
-	def append_images(cls, messages, files, prepare_img):
+	def append_images(cls, messages, files, tags, prepare_img):
 		"""
 		:type messages: list[chat.models.Message] 
 		:type files: list[chat.models.Image]
@@ -197,6 +200,14 @@ class MessagesCreator(object):
 			VarNames.TIME: time,
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 		}
+
+	@staticmethod
+	def prepare_tags(tags, message_id):
+		"""
+		:type message_id: int
+		:type files: list[chat.models.Image]
+		"""
+		return {tag.symbol: tag.user_id for tag in tags if tag.message_id == message_id}
 
 	@staticmethod
 	def prepare_img_video(files, message_id):

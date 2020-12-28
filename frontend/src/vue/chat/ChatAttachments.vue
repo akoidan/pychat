@@ -1,5 +1,6 @@
 <template>
-  <div class="attachments-div">
+  <div class="attachments-div" @mousedown.prevent>
+  <!--   @mousedown.prevent prevent looseing focus from contenteditable-->
     <input
       v-show="false"
       ref="imgInput"
@@ -214,6 +215,7 @@ export default class ChatAttachments extends Vue {
     display: flex
     flex-wrap: wrap // dont push width on mobile
     border-radius: 10px
+    @extend %modal-window
     [class^="icon-"]
       padding: 5px
       display: inline-block
@@ -222,8 +224,6 @@ export default class ChatAttachments extends Vue {
   .color-lor
     .icon-doc-inv
       color: #b8b800
-    .attachments-div
-      @extend %window-lor
     .icon-brush
       color: #960000
     .icon-upload-cloud
@@ -241,8 +241,6 @@ export default class ChatAttachments extends Vue {
       @include hover-click(#b8b800)
     .icon-upload-cloud
       @include hover-click(#15dfff)
-    .attachments-div
-      @extend %window-reg
     .icon-brush
       @include hover-click(#6b75ff)
     .icon-cancel-circled-outline
@@ -256,8 +254,6 @@ export default class ChatAttachments extends Vue {
       color: #0095ad
     .icon-brush
       color: #c51900
-    .attachments-div
-      @extend %window-white
 
 
 </style>

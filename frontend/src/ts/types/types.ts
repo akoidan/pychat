@@ -46,12 +46,11 @@ export interface UserIdConn {
   userId: number;
 }
 
-
-
 export interface MessageDataEncode {
   messageContent: string|null;
   files:  Record<string, FileModel>| null;
   currSymbol: string;
+  tags: Record<string, number>;
 }
 
 export enum VideoType {

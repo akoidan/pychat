@@ -217,7 +217,8 @@ export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessa
     isThreadOpened: oldMessage? oldMessage.isThreadOpened : false,
     roomId: message.roomId,
     userId: message.userId,
-    transfer: oldMessage ? oldMessage.transfer: null,
+    transfer: null,
+    tags: message.tags,
     parentMessage: message.parentMessage,
     sending: false, // this code is only called from WsInMessagew which means it's synced
     giphy: message.giphy || null,
@@ -233,6 +234,7 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     edited: m.edited,
     parentMessage: m.parentMessage,
     files: {},
+    tags: {}, // TODO
     giphy: m.giphy,
     threadMessagesCount: 0, // TODO
     isThreadOpened: false,

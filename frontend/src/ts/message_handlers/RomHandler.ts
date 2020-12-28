@@ -275,12 +275,12 @@ export class RoomHandler extends MessageHandler  {
 
 
   private addChangeOnlineEntry(userId: number, serverTime: number, action: 'appeared online' | 'gone offline') {
-    const roomIds: number[] = [];
-    this.store.roomsArray.forEach(r => {
-      if (r.users.indexOf(userId)) {
-        roomIds.push(r.id);
-      }
-    });
+    if (this.store.myId == userId) {
+      return // do nto display I appear Online
+    }
+    const roomIds: number[] = this.store.roomsArray
+        .filter(r => r.users.includes(userId))
+        .map (r => r.id)
     const entry: RoomLogEntry = {
       roomIds,
       roomLog: {
@@ -291,7 +291,7 @@ export class RoomHandler extends MessageHandler  {
     };
 
     // TODO Uncaught TypeError: Cannot read property 'onlineChangeSound' of null
-    if (this.store.userSettings!.onlineChangeSound && this.store.myId !== userId) {
+    if (this.store.userSettings!.onlineChangeSound) {
       this.audioPlayer.checkAndPlay(action === 'appeared online' ? login : logout, 50);
     }
     this.store.addRoomLog(entry);

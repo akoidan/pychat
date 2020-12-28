@@ -235,12 +235,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	# 	self.set_video_images_messages(imv, history_messages, history)
 	# 	return off, history
 
-	def set_video_images_messages(self, imv, inm, outm):
-		for message in inm:
-			files = MessagesCreator.prepare_img_video(imv, message.id)
-			prep_m = self.message_creator.create_message(message, files)
-			outm.setdefault(message.room_id, []).append(prep_m)
-
 	def check_origin(self, origin):
 		"""
 		check whether browser set domain matches origin

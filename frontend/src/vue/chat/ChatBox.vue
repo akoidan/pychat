@@ -238,7 +238,7 @@ import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
         callback(10);
       } else if (e.ctrlKey && e.which === 36) {
         callback(35);
-      } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
+      } else if (e.shiftKey && e.ctrlKey && e.key.toUpperCase() === 'F') {
         this.$store.toogleSearch(this.room.id)
       }
     }

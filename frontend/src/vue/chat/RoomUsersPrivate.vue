@@ -1,7 +1,7 @@
 <template>
   <li :class="onlineActiveClass">
     <router-link :to="`/chat/${room.id}`" class="link">
-      <user-name-sex :user="user" :online="isOnline"/>
+      <user-name-sex :user="user"/>
     </router-link>
     <room-right-icon :room="room" />
   </li>

@@ -58,7 +58,7 @@ export default class ChatMessage extends Vue {
   }
 
   get encoded() {
-    return this.message.content ? encodeMessage(this.message) : encodeHTML('This message has been removed');
+    return this.message.content ? encodeMessage(this.message, this.$store) : encodeHTML('This message has been removed');
   }
 
   get mainCls() {
@@ -158,6 +158,9 @@ export default class ChatMessage extends Vue {
     /deep/ .video-player
       @extend %img-play-chat
       @extend %img-play
+
+    /deep/ .tag-user
+      color: #729fcf
 
     /deep/ :visited
       color: #7572CF

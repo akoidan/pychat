@@ -113,6 +113,7 @@ export interface MessageModelDto {
   time: number;
   parentMessage: number;
   files?: {[id: number]: FileModelDto};
+  tags: {[id: number]: number};
   content: string;
   symbol?: string;
   deleted?: boolean;

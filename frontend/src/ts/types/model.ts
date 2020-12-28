@@ -100,6 +100,7 @@ export interface MessageModel {
   parentMessage: number|null;
   files: Record<string, FileModel>| null; // THIS IS STRING, not number!!
   content: string|null;
+  tags: Record<string, number>; // user id
   isHighlighted: boolean; // if not read
   isEditingActive: boolean; // if textarea is opened for this message to edit it
   isThreadOpened: boolean; // if thread is opened for this message

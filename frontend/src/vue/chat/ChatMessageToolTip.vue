@@ -63,6 +63,7 @@ export default class ChatMessageToolTip extends Vue {
         this.message.roomId,
         null,
         null,
+        {},
         this.message.time,
         this.message.edited ? this.message.edited + 1 : 1,
         this.message.parentMessage,

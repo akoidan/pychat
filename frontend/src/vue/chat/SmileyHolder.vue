@@ -1,11 +1,11 @@
 <template>
-  <div class="smileParentHolder">
+  <div class="smile-parent-holder" @mousedown.prevent>
     <ul class="tabNames">
       <li
         v-for="(_, tabName) in smileys"
         :key="tabName"
         :class="{'activeTab': activeTab === tabName}"
-        @click="activeTab = tabName"
+        @mousedown.prevent="activeTab = tabName"
       >
         {{ tabName }}
       </li>
@@ -68,7 +68,7 @@ export default class SmileyHolder extends Vue {
     right: -10px // ignore padding right
     @include hover-click(red)
 
-  .smileParentHolder
+  .smile-parent-holder
     padding: 10px
 
   .tabNames
@@ -91,21 +91,18 @@ export default class SmileyHolder extends Vue {
     img
       cursor: pointer
 
+  .smile-parent-holder
+    @extend %modal-window
+
   .color-lor
-    .smileParentHolder
-      @extend %window-lor
     .activeTab
       color: #fcaf3e
 
   .color-reg
-    .smileParentHolder
-      @extend %window-reg
     .activeTab
       color: #C6B955
 
   .color-white
-    .smileParentHolder
-      @extend %window-white
     .activeTab
       color: #11970d
 </style>

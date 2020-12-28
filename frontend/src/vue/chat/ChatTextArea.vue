@@ -12,6 +12,7 @@
       @add-video="addVideo"
     />
     <smiley-holder v-if="showSmileys" @close="showSmileys = false" @add-smiley="onEmitAddSmile"/>
+    <chat-tagging :name="taggingName" :user-ids="room.users" @emit-name="addTagInfo"/>
     <media-recorder
       ref="mediaRecorder"
       :is-video="isRecordingVideo"
@@ -23,17 +24,17 @@
         v-if="isMobile"
         class="icon-paper-plane"
         title="Send this message"
-        @click="sendMessage"
+        @mousedown.prevent="sendMessage"
       />
       <i
         class="icon-attach-outline"
         title="Add attachment"
-        @click="showAttachments = !showAttachments"
+        @mousedown.prevent="showAttachments = !showAttachments"
       />
       <i
         class="icon-smile"
         title="Add a smile :)"
-        @click="showSmileys = !showSmileys"
+        @mousedown.prevent="showSmileys = !showSmileys"
       />
       <div
         ref="userMessage"
@@ -41,6 +42,7 @@
         class="usermsg input"
         :class="{'mobile-user-message': isMobile}"
         @keydown="onTextAreaKeyDown"
+        @keyup="onTextAreaKeyUp"
         @paste="onImagePaste"
       />
     </div>
@@ -56,7 +58,7 @@ import {
 } from 'vue-property-decorator';
 import {
   encodeHTML,
-  encodeP,
+  encodeP, getCurrentWordInHtml,
   getMessageData,
   getSmileyHtml,
   pasteBlobAudioToTextArea,
@@ -64,8 +66,9 @@ import {
   pasteBlobVideoToTextArea,
   pasteFileToTextArea,
   pasteHtmlAtCaret,
-  pasteImgToTextArea,
+  pasteImgToTextArea, pasteNodeAtCaret,
   placeCaretAtEnd,
+  replaceCurrentWord,
   savedFiles,
   timeToString
 } from '@/ts/utils/htmlApi';
@@ -76,7 +79,7 @@ import {
   MessageModel, PastingTextAreaElement,
   RoomDictModel,
   RoomModel,
-  UserDictModel
+  UserDictModel, UserModel
 } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
 
@@ -96,10 +99,17 @@ import {
 import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
 import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
+import {USERNAME_REGEX} from '@/ts/utils/consts';
+import ChatTagging from '@/vue/chat/ChatTagging.vue';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-  @Component({components: {SmileyHolder, ChatAttachments, MediaRecorder}})
+  @Component({components: {
+      ChatTagging,
+      SmileyHolder,
+      ChatAttachments,
+      MediaRecorder
+  }})
   export default class ChatTextArea extends Vue {
 
     @State
@@ -134,9 +144,10 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     private showAttachments: boolean = false;
     private showSmileys: boolean = false;
+    private taggingName: string = '';
     private isRecordingVideo: boolean = true;
 
-    get room() {
+    get room(): RoomModel {
       return this.roomsDict[this.roomId];
     }
 
@@ -162,7 +173,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     public mounted() {
       if (this.editMessage) {
-        this.userMessage.innerHTML = encodeP(this.editMessage)
+        this.userMessage.innerHTML = encodeP(this.editMessage, this.$store)
         placeCaretAtEnd(this.userMessage);;
       }
     }
@@ -181,6 +192,15 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
+    addTagInfo(user: UserModel) {
+      let a = document.createElement('span');
+      a.textContent = `@${user.user}`;
+      a.setAttribute('user-id', String(user.id));
+      a.className = 'tag-user';
+      replaceCurrentWord(this.userMessage, a);
+      this.taggingName = '';
+    }
+
     onEmitAddSmile(code:string) {
       this.$logger.log('Adding smiley {}', code)();
       pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
@@ -192,7 +212,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       const match = oldValue.match(timePattern);
       const user = this.allUsersDict[message.userId];
       oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
-      this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) + ' ' + oldValue;
+      // TODO refactor quote
+      this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message, this.$store) + encodeHTML(' >>>') + String.fromCharCode(13) + ' ' + oldValue;
       placeCaretAtEnd(this.userMessage);
     }
 
@@ -216,17 +237,29 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       return this.$messageSenderProxy.getMessageSender(this.roomId);
     }
 
+
+    onTextAreaKeyUp() {
+      let content: string = this.userMessage.textContent!;
+      this.taggingName = '';
+      if (content.includes("@")) {
+        let currentWord = getCurrentWordInHtml(this.userMessage);
+        if (currentWord === '@' || new RegExp(`@${USERNAME_REGEX}`).test(currentWord)) {
+          this.taggingName = currentWord;
+        }
+      }
+    }
+
     public onTextAreaKeyDown(event: KeyboardEvent) {
-      if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
+      if (event.key === 'Enter' && !event.shiftKey) {
         if (isMobile) {
           // do not block multiple lines on mobile, let user use button to send
           return;
         }
         event.preventDefault();
         this.sendMessage();
-      } else if (event.keyCode === 27) { // 27 = escape
+      } else if (event.key === 'Escape') { // 27 = escape
         this.cancelCurrentAction();
-      } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
+      } else if (event.key === 'ArrowUp' && this.userMessage.innerHTML == '') {
         this.setEditedMessage(event);
       }
     }
@@ -289,6 +322,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.roomId,
             md.currSymbol,
             md.files,
+            md.tags,
             this.editMessage.time,
             this.editMessage.edited ? this.editMessage.edited + 1 : 1,
             this.editMessage.parentMessage,
@@ -311,6 +345,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.roomId,
             md.currSymbol,
             md.files,
+            md.tags,
             Date.now(),
             0,
             this.threadMessageId ?? null,
@@ -423,6 +458,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
   .usermsg.mobile-user-message
     padding-right: 50px // before smiley and send
+
+  .usermsg /deep/ .tag-user
+    color: #729fcf !important
   .usermsg
     z-index: 2
     margin-left: 4px

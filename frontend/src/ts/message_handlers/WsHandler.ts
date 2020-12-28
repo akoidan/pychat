@@ -179,23 +179,33 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public sendEditMessage(content: string|null, id: number, files: number[] | null) {
+  public sendEditMessage(content: string|null, id: number, files: number[] | null, tags: Record<string, number>) {
     const newVar = {
       id,
       action: 'editMessage',
       files,
+      tags,
       content
     };
     this.sendToServer(newVar, true);
   }
 
-  public async sendPrintMessage(content: string, roomId: number, files: number[], id: number, timeDiff: number, parentMessage: number|null): Promise<PrintMessage> {
+  public async sendPrintMessage(
+      content: string,
+      roomId: number,
+      files: number[],
+      id: number,
+      timeDiff: number,
+      parentMessage: number|null,
+      tags: Record<string, number>
+  ): Promise<PrintMessage> {
     const newVar = {
       files,
       id,
       timeDiff,
       action: 'printMessage',
       content,
+      tags,
       parentMessage,
       roomId
     };
@@ -537,7 +547,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
       // this.store.growlError( 'Can\'t establish connection with server');
-      this.logger.error('Chat server is down because {}', reason)();
+      this.logger.warn('Chat server is down because {}', reason)();
       this.wsState = WsState.TRIED_TO_CONNECT;
     } else if (this.wsState === WsState.CONNECTED) {
       // this.store.growlError( `Connection to chat server has been lost, because ${reason}`);

@@ -82,7 +82,7 @@ export default class SearchMessages extends Vue {
   }
 
   private checkToggleSearch(event: KeyboardEvent) {
-    if (event.keyCode === 27) {
+    if (event.key === 'Escape') {
       this.$store.toogleSearch(this.room.id)
     }
   }

@@ -114,6 +114,7 @@ import {UserSettingsDto} from '@/ts/types/dto';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 import { SetSettingsMessage } from '@/ts/types/messages/wsInMessages';
 import { LogLevel, logLevels } from 'lines-logger';
+import {LAST_SYNCED} from '@/ts/utils/consts';
 
 @Component({
   components: {AppSubmit, AppCheckbox}
@@ -137,6 +138,7 @@ export default class UserProfileSettings extends Vue {
   }
 
   public clearHistory() {
+    localStorage.removeItem(LAST_SYNCED); // TODO this should not be here, but in wsmessgehenader
     this.$store.clearMessages();
   }
 

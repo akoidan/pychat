@@ -61,6 +61,7 @@ class VarNames(object):
 	FILE_TYPE = 'type'
 	EVENT = 'action'
 	JS_MESSAGE_ID = 'cbId'
+	MESSAGE_TAGS = 'tags'
 	MESSAGE_ID = 'id'
 	IMAGE_ID = 'id'
 	GENDER = 'sex'

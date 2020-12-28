@@ -31,6 +31,13 @@ export  interface ChannelDB {
   creator: number;
 }
 
+export  interface TagDB {
+  id: number;
+  user_id: number;
+  message_id: number;
+  symbol: string;
+}
+
 export interface MessageDB {
   id: number;
   time: number;

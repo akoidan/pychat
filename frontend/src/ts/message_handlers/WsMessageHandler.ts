@@ -43,7 +43,7 @@ import {
 } from '@/ts/types/messages/wsInMessages';
 import { savedFiles } from '@/ts/utils/htmlApi';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
-import {MESSAGES_PER_SEARCH} from '@/ts/utils/consts';
+import {LAST_SYNCED, MESSAGES_PER_SEARCH} from '@/ts/utils/consts';
 import {convertMessageModelDtoToModel} from '@/ts/types/converters';
 import {checkIfIdIsMissing, getMissingIds} from '@/ts/utils/pureFunctions';
 import {SyncHistoryOutContent} from '@/ts/types/messages/wsOutMessages';
@@ -67,7 +67,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private readonly api: Api;
   private readonly ws: WsHandler;
   private syncMessageLock: boolean = false;
-  private LAST_SYNCED = 'lastSynced';
   private readonly messageHelper: MessageHelper;
 
   constructor(
@@ -177,7 +176,15 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     storeMessage = this.store.roomsDict[roomId].messages[messageId];
     let fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
-      let a: PrintMessage = await this.ws.sendPrintMessage(storeMessage.content, roomId, fileIds, storeMessage.id, Date.now() - storeMessage.time, storeMessage.parentMessage);
+      let a: PrintMessage = await this.ws.sendPrintMessage(
+          storeMessage.content,
+          roomId,
+          fileIds,
+          storeMessage.id,
+          Date.now() - storeMessage.time,
+          storeMessage.parentMessage,
+          {...storeMessage.tags}
+      );
       const rmMes: RoomMessageIds = {
         messageId: storeMessage.id,
         roomId: storeMessage.roomId,
@@ -185,7 +192,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       };
       this.store.deleteMessage(rmMes);
     } else if (storeMessage.id > 0) {
-      this.ws.sendEditMessage(storeMessage.content, storeMessage.id, fileIds);
+      this.ws.sendEditMessage(storeMessage.content, storeMessage.id, fileIds, storeMessage.tags);
     } else if (!storeMessage.content && storeMessage.id < 0) {
       throw Error("Should not be here"); // this messages should be removed
     }
@@ -268,6 +275,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         time: message.time,
         files: message.files,
         content: null,
+        tags: {},
         isThreadOpened: false,
         isEditingActive: false,
         parentMessage: message.parentMessage,
@@ -319,7 +327,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   }
 
   public logout(m: LogoutMessage) {
-    localStorage.removeItem(this.LAST_SYNCED);
+    localStorage.removeItem(LAST_SYNCED);
   }
 
   private getFileIdsFromMessage(storeMessage: MessageModel): number[] {
@@ -380,9 +388,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       messagesIds: this.getMessagesIdsEdited(r)
     }));
 
-    let joined: any = localStorage.getItem(this.LAST_SYNCED);
+    let joined: any = localStorage.getItem(LAST_SYNCED);
     if (!joined) {
-      localStorage.setItem(this.LAST_SYNCED, Date.now().toString())
+      localStorage.setItem(LAST_SYNCED, Date.now().toString())
       return ;
     }
 
@@ -406,7 +414,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       }
     });
 
-    localStorage.setItem(this.LAST_SYNCED, Date.now().toString())
+    localStorage.setItem(LAST_SYNCED, Date.now().toString())
   }
 
 }
