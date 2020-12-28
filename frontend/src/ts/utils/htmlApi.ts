@@ -165,10 +165,12 @@ export function encodeP(data: MessageModel, store: DefaultStore) {
     throw Error(`Message ${data.id} doesn't have content`);
   }
   let html = encodeHTML(data.content);
-  html = encodeFiles(html, data.files, data.tags, store);
+  html = encodeFiles(html, data.files);
 
+  html = encodePTags(html, data.tags, store);
   return encodeSmileys(html);
 }
+
 
 export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO wtf it's nullable?
 
@@ -206,13 +208,28 @@ export function encodeMessage(data: MessageModel, store: DefaultStore) {
     if (replaceElements.length) {
       logger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
     }
-    html = encodeFiles(html, data.files, data.tags, store);
-
+    html = encodeFiles(html, data.files);
+    html = encodeTags(html,  data.tags, store);
     return encodeSmileys(html);
   }
 }
 
-function encodeFiles(html: string, files: { [id: string]: FileModel } | null,  tags: { [id: string]: number } | null, store: DefaultStore) {
+function encodePTags(html: string,   tags: { [id: string]: number } | null, store: DefaultStore) {
+  if (tags && Object.keys(tags).length) {
+    html = html.replace(imageUnicodeRegex, (s) => {
+      const v = tags[s];
+      if (v) {
+        let tag = createTag(store.allUsersDict[v]);
+        return tag.outerHTML;
+      }
+
+      return s;  // if it's absent in files, it could be also in tags so return it. (don't replace )
+    });
+  }
+  return html;
+}
+
+function encodeTags(html: string,   tags: { [id: string]: number } | null, store: DefaultStore) {
   if (tags && Object.keys(tags).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = tags[s];
@@ -220,9 +237,15 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null,  t
         return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].user}</span>`
       }
 
-      return s;
+      return s;  // if it's absent in files, it could be also in tags so return it. (don't replace )
     });
   }
+  return html;
+}
+
+
+function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
+
   if (files && Object.keys(files).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];
@@ -242,7 +265,7 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null,  t
         }
       }
 
-      return s;
+      return s; // if it's absent in files, it could be also in tags so return it. (don't replace )
     });
   }
 
