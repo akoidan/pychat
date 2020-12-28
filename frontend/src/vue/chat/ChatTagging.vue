@@ -45,6 +45,8 @@ export default class ChatTagging extends Vue {
 
   .chat-tagging
     @extend %modal-window
+    overflow-y: auto
+    max-height: 50vh
     padding: 5px
     > div
       padding: 5px
