@@ -177,10 +177,12 @@ def update_symbols(files, tags, message):
 					up.symbol = new_symb
 		if tags:
 			for up in tags:
-				if ord(up.symbol) <= order:
+				if ord(up) <= order:
 					order += 1
 					new_symb = chr(order)
 					message.content = message.content.replace(up.symbol, new_symb)
+					tags[new_symb] = tags[up]
+					del tags[up]
 					up.symbol = new_symb
 	if files:
 		new_file_symbol = get_max_symbol(files)

@@ -1,5 +1,5 @@
 <template>
-  <div v-show="name" class="chat-tagging">
+  <div v-if="name && userList.length" class="chat-tagging">
     <!--    mousedown should be used so we don't lose focus from contenteditable-->
     <!--    https://stackoverflow.com/a/8736218/3872976-->
     <div @mousedown.prevent="emitName(user)" :key="user.id" v-for="user in userList"> {{user.user}}</div>

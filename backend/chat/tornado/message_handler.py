@@ -750,7 +750,7 @@ class MessagesHandler():
 			update_or_create = []
 			update_or_create_dict = {}
 			for db_tag in db_tags:
-				if tags[db_tag.symbol] and tags[db_tag.symbol] != db_tag.user_id:
+				if tags.get(db_tag.symbol) and tags.get(db_tag.symbol) != db_tag.user_id:
 					update_or_create.append(MessageMention(message_id=message.id, symbol=db_tag.symbol, user_id=tags[db_tag.symbol]))
 					update_or_create_dict[db_tag.symbol] = True
 			if update_or_create:
@@ -760,9 +760,8 @@ class MessagesHandler():
 				if not update_or_create_dict.get(k):
 					create_tags.append(MessageMention(message_id=message.id, symbol=k, user_id=v))
 			if create_tags:
-				MessageMention.objects.bulk_create(update_or_create)
+				MessageMention.objects.bulk_create(create_tags)
 
-			up_files_to_img(files, message.id)
 		if files:
 			up_files_to_img(files, message.id)
 		if message.symbol:  # fetch all, including that we just store

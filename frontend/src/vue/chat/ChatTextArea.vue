@@ -58,8 +58,10 @@ import {
   Prop,
 } from 'vue-property-decorator';
 import {
+  createTag,
   encodeHTML,
-  encodeP, getCurrentWordInHtml,
+  encodeP,
+  getCurrentWordInHtml,
   getMessageData,
   getSmileyHtml,
   pasteBlobAudioToTextArea,
@@ -67,7 +69,8 @@ import {
   pasteBlobVideoToTextArea,
   pasteFileToTextArea,
   pasteHtmlAtCaret,
-  pasteImgToTextArea, pasteNodeAtCaret,
+  pasteImgToTextArea,
+  pasteNodeAtCaret,
   placeCaretAtEnd,
   replaceCurrentWord,
   savedFiles,
@@ -194,11 +197,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     addTagInfo(user: UserModel) {
-      let a = document.createElement('span');
-      a.textContent = `@${user.user}`;
-      a.setAttribute('user-id', String(user.id));
-      a.className = 'tag-user';
-      replaceCurrentWord(this.userMessage, a);
+      const tag = createTag(user);
+      replaceCurrentWord(this.userMessage, tag);
       this.taggingName = '';
     }
 
@@ -242,9 +242,10 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     onTextAreaKeyUp() {
       let content: string = this.userMessage.textContent!;
       this.taggingName = '';
+
       if (content.includes("@")) {
         let currentWord = getCurrentWordInHtml(this.userMessage);
-        if (currentWord === '@' || new RegExp(`@${USERNAME_REGEX}`).test(currentWord)) {
+        if (currentWord === '@' || new RegExp(`^@${USERNAME_REGEX}$`).test(currentWord)) {
           this.taggingName = currentWord;
         }
       }

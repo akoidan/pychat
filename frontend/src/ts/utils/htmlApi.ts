@@ -10,7 +10,8 @@ import {
 import {
   BlobType,
   FileModel,
-  MessageModel
+  MessageModel,
+  UserModel
 } from '@/ts/types/model';
 import recordIcon from '@/assets/img/audio.svg';
 import fileIcon from '@/assets/img/file.svg';
@@ -248,12 +249,34 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null,  t
   return html;
 }
 
+let uniqueTagId = 1;
+
+function getUniqueTagId() {
+  return uniqueTagId++;
+}
+
+export function createTag(user: UserModel) {
+  let a = document.createElement('span');
+
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  let id = `usertag${getUniqueTagId()}`;
+  style.innerHTML = ` #${id}:after { content: '@${user.user}'}`;
+  document.getElementsByTagName('head')[0].appendChild(style);
+  a.id = id;
+
+  a.setAttribute('user-id', String(user.id));
+  a.className = 'tag-user';
+  return a;
+}
+
 export function replaceCurrentWord(containerEl: HTMLElement, replacedTo: HTMLElement) {
   containerEl.focus();
   let range;
   let sel = window.getSelection()!;
   if (sel.rangeCount === 0) {
     logger.error('Can\'t place tag, rangeCount is 0')();
+    return
   }
   range = sel.getRangeAt(0).cloneRange()!;
   range.collapse(true);
@@ -268,7 +291,12 @@ export function replaceCurrentWord(containerEl: HTMLElement, replacedTo: HTMLEle
   logger.log('replace word ' + lastWord)();
 
   /* Find word start and end */
-  let wordStart = (range.endContainer as any).data.lastIndexOf(lastWord);
+  let data = (range.endContainer as any).data;
+  if (!data) {
+    logger.error('Can\'t place tag, Selected word data is null')();
+    return
+  }
+  let wordStart = data.lastIndexOf(lastWord);
   let wordEnd = wordStart + lastWord.length;
   logger.log('pos: (' + wordStart + ', ' + wordEnd + ')')();
 
