@@ -15,7 +15,7 @@ from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
 from chat.tornado.message_creator import MessagesCreator, WebRtcMessageCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, get_message_images_videos, get_history_message_query, create_id, \
+from chat.utils import execute_query, get_history_message_query, create_id, \
 	get_or_create_ip_model
 
 parent_logger = logging.getLogger(__name__)

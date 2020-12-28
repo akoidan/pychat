@@ -46,7 +46,7 @@ import {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
-  SyncMessagesMessage,
+  MessagesResponseMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage
 } from '@/ts/types/messages/wsInMessages';
@@ -179,6 +179,19 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
+  public async search(
+      searchString: string,
+      roomId: number,
+      offset: number,
+  ): Promise<MessagesResponseMessage> {
+    return this.messageProc.sendToServerAndAwait({
+      searchString,
+      roomId,
+      offset,
+      action: 'searchMessages'
+    });
+  }
+
   public sendEditMessage(content: string|null, id: number, files: number[] | null, tags: Record<string, number>) {
     const newVar = {
       id,
@@ -238,7 +251,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async syncHistory(content: SyncHistoryOutContent[], lastSynced: number): Promise<SyncMessagesMessage> {
+  public async syncHistory(content: SyncHistoryOutContent[], lastSynced: number): Promise<MessagesResponseMessage> {
     let payload: SyncHistoryOutMessage = {
       content,
       lastSynced: lastSynced,
@@ -326,7 +339,12 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendLoadMessages(roomId: number, count: number, threadId: number|null, excludeIds: number[]) {
+  public async sendLoadMessages(
+      roomId: number,
+      count: number,
+      threadId: number|null,
+      excludeIds: number[]
+  ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       count,
       excludeIds,
@@ -336,7 +354,10 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendLoadMessagesByIds(roomId: number, messagesIds: number[]) {
+  public async sendLoadMessagesByIds(
+      roomId: number,
+      messagesIds: number[]
+  ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       messagesIds,
       action: 'loadMessagesByIds',

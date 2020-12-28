@@ -136,7 +136,15 @@ def create_id(user_id=0, random=None):
 	return "{:04d}:{}".format(user_id if user_id else 0, random), random
 
 
-def get_max_key(symbol_holder):
+def max_from_2(a, b):
+	if a is None:
+		return b
+	if b is None:
+		return a
+	return a if a > b else b
+
+
+def get_max_symbol(symbol_holder):
 	max = None
 	evaluate(symbol_holder)
 	if symbol_holder:
@@ -146,7 +154,7 @@ def get_max_key(symbol_holder):
 	return max
 
 
-def get_max_key_dict(symbol_holder):
+def get_max_symbol_dict(symbol_holder):
 	max = None
 	evaluate(symbol_holder)
 	if symbol_holder:
@@ -175,11 +183,11 @@ def update_symbols(files, tags, message):
 					message.content = message.content.replace(up.symbol, new_symb)
 					up.symbol = new_symb
 	if files:
-		new_file_symbol = get_max_key(files)
+		new_file_symbol = get_max_symbol(files)
 		if message.symbol is None or new_file_symbol > message.symbol:
 			message.symbol = new_file_symbol
 	if tags:
-		new_tag_symbol = get_max_key_dict(tags)
+		new_tag_symbol = get_max_symbol_dict(tags)
 		if message.symbol is None or new_tag_symbol > message.symbol:
 			message.symbol = new_tag_symbol
 

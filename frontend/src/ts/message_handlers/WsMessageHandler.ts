@@ -38,8 +38,8 @@ import {
 import {
   DeleteMessage,
   EditMessage,
+  MessagesResponseMessage,
   PrintMessage,
-  SyncMessagesMessage
 } from '@/ts/types/messages/wsInMessages';
 import { savedFiles } from '@/ts/utils/htmlApi';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
@@ -124,19 +124,21 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.addMessages(roomId, respones.content);
   }
 
-  public async loadUpSearchMessages(roomId: number, count: number, requestInterceptor?: (a: XMLHttpRequest) => void) {
+  public async loadUpSearchMessages(roomId: number, count: number, checkIfSet: (found: boolean) => boolean) {
     let room: RoomModel = this.store.roomsDict[roomId];
-    let result = false;
     if (!room.search.locked) {
-      let messagesDto: MessageModelDto[] = await this.api.search(room.search.searchText, roomId, Object.keys(room.search.messages).length, requestInterceptor);
+      let response: MessagesResponseMessage = await this.ws.search(room.search.searchText, roomId, Object.keys(room.search.messages).length);
+      let messagesDto = response.content;
       this.logger.log("Got {} messages from the server", messagesDto.length)();
-      if (messagesDto.length) {
-        result = true;
-        this.addSearchMessages(roomId, messagesDto);
+      if (checkIfSet(messagesDto.length > 0)) {
+        if (messagesDto.length > 0) {
+          this.addSearchMessages(roomId, messagesDto);
+        }
+        this.store.setSearchStateTo({roomId, lock: messagesDto.length < MESSAGES_PER_SEARCH});
       }
-      this.store.setSearchStateTo({roomId, lock: messagesDto.length < MESSAGES_PER_SEARCH});
+    } else {
+      checkIfSet(false)
     }
-    return result;
   }
 
   public async loadThreadMessages(roomId: number, threadId: number): Promise<void> {
@@ -146,7 +148,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         .map(m => m.id);
     let lm = await this.ws.sendLoadMessages(roomId, 0, threadId, myids);
     if (lm.content.length > 0) {
-      this.addMessages(lm.roomId, lm.content);
+      this.addMessages(roomId, lm.content);
     } else {
       this.logger.error("Got empty messages response from loadThreadMessages")();
     }
@@ -159,9 +161,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       let lm = await this.ws.sendLoadMessages(roomId, count, null, myids);
       if (lm.content.length > 0) {
         // backend return messages that don't have thread, so we don't neeed to sync parent message here
-        this.addMessages(lm.roomId, lm.content);
+        this.addMessages(roomId, lm.content);
       } else {
-        this.store.setAllLoaded(lm.roomId);
+        this.store.setAllLoaded(roomId);
       }
     }
   }
@@ -394,7 +396,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       return ;
     }
 
-    let result: SyncMessagesMessage = await this.ws.syncHistory(content, Date.now() - joined);
+    let result: MessagesResponseMessage = await this.ws.syncHistory(content, Date.now() - joined);
 
     let groupBY : Record<string, MessageModelDto[]> = result.content.reduce((rv, x) => {
       if (!rv[x.roomId]) {

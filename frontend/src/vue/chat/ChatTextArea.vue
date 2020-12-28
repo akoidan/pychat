@@ -10,6 +10,7 @@
       @upload-image="pasteImagesToTextArea"
       @add-audio="addAudio"
       @add-video="addVideo"
+      @add-giphy="addGiphy"
     />
     <smiley-holder v-if="showSmileys" @close="showSmileys = false" @add-smiley="onEmitAddSmile"/>
     <chat-tagging :name="taggingName" :user-ids="room.users" @emit-name="addTagInfo"/>
@@ -363,6 +364,13 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
           this.$store.growlError(err);
         });
       }
+    }
+
+    private addGiphy() {
+      this.userMessage.innerHTML = `/giphy ${this.userMessage.innerHTML}`;
+      this.userMessage.focus();
+      this.$store.growlInfo("Type animation name. e.g. /giphy lol")
+      placeCaretAtEnd(this.userMessage);
     }
 
     private addVideo() {

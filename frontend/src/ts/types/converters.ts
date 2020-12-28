@@ -218,7 +218,7 @@ export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessa
     roomId: message.roomId,
     userId: message.userId,
     transfer: null,
-    tags: message.tags,
+    tags: {...message.tags}, // prevent modifying original object by vuex
     parentMessage: message.parentMessage,
     sending: false, // this code is only called from WsInMessagew which means it's synced
     giphy: message.giphy || null,

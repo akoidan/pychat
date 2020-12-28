@@ -248,7 +248,7 @@ import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
       if (this.chatboxSearch.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-      this.$messageSenderProxy.getMessageSender(this.room.id).loadUpSearchMessages(this.room.id, n);
+      this.$messageSenderProxy.getMessageSender(this.room.id).loadUpSearchMessages(this.room.id, n, () => true);
     }
 
     @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})

@@ -21,8 +21,8 @@ from chat.settings import ALL_ROOM_ID, REDIS_PORT, GIPHY_URL, GIPHY_REGEX, FIREB
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
-from chat.utils import get_max_key, validate_edit_message, \
-	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user, http_client
+from chat.utils import get_max_symbol, validate_edit_message, update_symbols, up_files_to_img, evaluate, check_user, \
+	http_client, get_max_symbol_dict, max_from_2
 
 # from pywebpush import webpush
 
@@ -76,7 +76,9 @@ class MessagesHandler():
 			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
 			Actions.PING: self.respond_ping,
-			Actions.PONG: self.process_pong_message
+			Actions.PONG: self.process_pong_message,
+			Actions.SEARCH_MESSAGES: self.search_messages,
+			Actions.SYNC_HISTORY: self.sync_history,
 		}
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
@@ -281,8 +283,9 @@ class MessagesHandler():
 		def send_message(message, giphy=None):
 			if message[VarNames.TIME_DIFF] < 0:
 				raise ValidationError("Back to the future?")
+			tags_users = message[VarNames.MESSAGE_TAGS]
 			files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
-			symbol = get_max_key(files)
+			symbol = max_from_2(get_max_symbol(files), get_max_symbol_dict(tags_users))
 			channel = message[VarNames.ROOM_ID]
 			js_id = message[VarNames.JS_MESSAGE_ID]
 			parent_message_id = message[VarNames.PARENT_MESSAGE]
@@ -301,7 +304,7 @@ class MessagesHandler():
 			message_db.time -= message[VarNames.TIME_DIFF]
 			res_files = []
 			message_db.save()
-			tags_users = message[VarNames.MESSAGE_TAGS]
+
 			if tags_users:
 				mes_ment = [MessageMention(
 					user_id=userId,
@@ -803,8 +806,7 @@ class MessagesHandler():
 		ids = data[VarNames.GET_MESSAGES_MESSAGES_IDS]
 		room_id = data[VarNames.ROOM_ID]
 		messages = Message.objects.filter(room_id=room_id, id__in=ids)
-		imv = get_message_images_videos(messages)
-		response = self.message_creator.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
+		response = self.message_creator.get_messages(messages, data[VarNames.JS_MESSAGE_ID])
 		self.ws_write(response)
 
 	def process_get_messages(self, data):
@@ -827,10 +829,48 @@ class MessagesHandler():
 				Q(room_id=room_id) & Q(parent_message__id=thread_id) & ~Q(id__in=exclude_ids)
 			).order_by('-pk')[:count]
 
-		imv = get_message_images_videos(messages)
-		response = self.message_creator.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
+		response = self.message_creator.get_messages(messages, data[VarNames.JS_MESSAGE_ID])
 		self.ws_write(response)
 
+	def search_messages(self, data):
+		offset = data[VarNames.SEARCH_OFFSET] #// room, offset
+		messages = Message.objects.filter(
+			content__icontains=data[VarNames.SEARCH_STRING],
+			room_id=data[VarNames.ROOM_ID] # access permissions is already checked on top level by ROOM_ID
+		).order_by('-id')[offset:offset + settings.MESSAGES_PER_SEARCH]
+
+		content =  MessagesCreator.message_models_to_dtos(messages)
+		self.ws_write({
+			VarNames.CONTENT: content,
+			VarNames.JS_MESSAGE_ID: data[VarNames.JS_MESSAGE_ID],
+			VarNames.HANDLER_NAME: HandlerNames.NULL
+		})
+
+	def sync_history(self, in_message):
+		room_ids = list(map(lambda d: d[VarNames.ROOM_ID], in_message[VarNames.CONTENT]))
+		if not set(room_ids).issubset(self.channels):
+			raise ValidationError("This is not a messages in the room you are in")
+
+		messages_ids_dict = {}  # dict where key is messageId, and value is edited times
+		for l in in_message[VarNames.CONTENT]:
+			messages_ids_dict.update(l[VarNames.MESSAGE_IDS])
+		messages_ids = [*messages_ids_dict] # get messages id arrays string[]
+		exclude_messages_ids = []
+		existing_messages = Message.objects.filter(id__in=messages_ids).values('id', 'edited_times')
+		for existing_mes in existing_messages:
+			if existing_mes['edited_times'] <= messages_ids_dict[str(existing_mes['id'])]: # python dict keys are str
+				exclude_messages_ids.append(existing_mes['id'])
+		messages = Message.objects.filter(
+			Q(room_id__in=room_ids)
+			& ~Q(id__in=messages_ids)
+			& Q(time__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+		)
+		content = MessagesCreator.message_models_to_dtos(messages)
+		self.ws_write({
+			VarNames.CONTENT: content,
+			VarNames.JS_MESSAGE_ID: in_message[VarNames.JS_MESSAGE_ID],
+			VarNames.HANDLER_NAME: HandlerNames.NULL
+		})
 
 class WebRtcMessageHandler(MessagesHandler):
 
@@ -851,7 +891,6 @@ class WebRtcMessageHandler(MessagesHandler):
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 			Actions.NOTIFY_CALL_ACTIVE: self.notify_call_active,
-			Actions.SYNC_HISTORY: self.sync_history,
 		})
 		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
@@ -922,32 +961,6 @@ class WebRtcMessageHandler(MessagesHandler):
 			), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
-
-	def sync_history(self, in_message):
-		room_ids = list(map(lambda d: d['roomId'], in_message[VarNames.CONTENT]))
-		if not set(room_ids).issubset(self.channels):
-			raise ValidationError("This is not a messages in the room you are in")
-
-		messages_ids_dict = {}  # dict where key is messageId, and value is edited times
-		for l in in_message[VarNames.CONTENT]:
-			messages_ids_dict.update(l[VarNames.MESSAGE_IDS])
-		messages_ids = [*messages_ids_dict] # get messages id arrays string[]
-		exclude_messages_ids = []
-		existing_messages = Message.objects.filter(id__in=messages_ids).values('id', 'edited_times')
-		for existing_mes in existing_messages:
-			if existing_mes['edited_times'] <= messages_ids_dict[str(existing_mes['id'])]: # python dict keys are str
-				exclude_messages_ids.append(existing_mes['id'])
-		messages = Message.objects.filter(
-			Q(room_id__in=room_ids)
-			& ~Q(id__in=messages_ids)
-			& Q(time__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
-		)
-		content = MessagesCreator.message_model_to_dto(messages)
-		self.ws_write({
-			VarNames.CONTENT: content,
-			VarNames.JS_MESSAGE_ID: in_message[VarNames.JS_MESSAGE_ID],
-			VarNames.HANDLER_NAME: HandlerNames.NULL
-		})
 
 	def notify_call_active(self, in_message):
 		# check connectionid , roomId is checked on_message

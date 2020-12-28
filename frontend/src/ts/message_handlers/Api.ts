@@ -59,20 +59,6 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async search(
-      data: string,
-      room: number,
-      offset: number,
-      process?: (a: XMLHttpRequest) => void
-  ): Promise<MessageModelDto[]> {
-   return this.xhr.doPost<MessageModelDto[]>({
-      url: '/search_messages',
-      params: {data, room, offset},
-      isJsonDecoded: true,
-      process
-    });
-  }
-
   public async changePassword(old_password: string, password: string): Promise<void> {
     return this.xhr.doPost<void>({
       url: '/change_password',

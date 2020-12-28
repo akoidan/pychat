@@ -68,7 +68,7 @@ export interface MessageSender {
   loadMessages(roomId: number, messageId: number[]):  Promise<void>;
   loadUpMessages(roomId: number, count: number): Promise<void>;
   loadThreadMessages(roomId: number, threadId: number): Promise<void>;
-  loadUpSearchMessages(roomId: number, count: number, requestInterceptor?: (a: XMLHttpRequest) => void): Promise<boolean>;
+  loadUpSearchMessages(roomId: number, count: number, checkIfSet: (found: boolean) => boolean): Promise<void>;
 }
 
 export interface JsAudioAnalyzer {

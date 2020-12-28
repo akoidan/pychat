@@ -36,6 +36,12 @@
     >
     </i>
     <i
+      title="Send a random gif animation from text"
+      class="icon-smile"
+      @click="addGiphy"
+    >
+    </i>
+    <i
       class="icon-upload-cloud"
       title="Upload file to server"
       @click="uploadFileClick"
@@ -103,6 +109,11 @@ export default class ChatAttachments extends Vue {
 
   @Emit()
   close() {}
+
+  @Emit()
+  public addGiphy() {
+    this.close();
+  }
 
   @Emit()
   public addVideo() {
@@ -247,6 +258,8 @@ export default class ChatAttachments extends Vue {
       @include hover-click(#ee0000)
     .icon-picture
       @include hover-click(#37ce00)
+    .icon-smile
+      @include hover-click(#ce793e)
 
 
   .color-white

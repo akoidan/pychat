@@ -273,6 +273,9 @@ class MessageMention(Model):
 	user = ForeignKey(User, CASCADE, null=False)
 	message = ForeignKey(Message, CASCADE, null=False)
 	symbol = CharField(null=False, max_length=1)
+	
+	class Meta:
+		unique_together = ('user', 'symbol', 'message')
 
 
 from django.db.models.signals import post_save
@@ -282,6 +285,7 @@ def save_profile(sender, instance, created, **kwargs):
 		Message.objects.filter(id=instance.parent_message_id).update(thread_messages_count=F('thread_messages_count') + 1)
 
 post_save.connect(save_profile, sender=Message)
+
 
 class UploadedFile(Model):
 	class UploadedFileChoices(Enum):

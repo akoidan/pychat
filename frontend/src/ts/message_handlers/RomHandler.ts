@@ -170,7 +170,7 @@ export class RoomHandler extends MessageHandler  {
       // exactly 1 device is now offline, so that new that appeared is the first one
       this.addChangeOnlineEntry(message.userId, message.time, 'appeared online');
     }
-    this.store.setOnline(message.content);
+    this.store.setOnline({...message.content}); // prevent modifying original object
     let payload: ChangeUserOnlineInfoMessage = {
       handler: 'webrtc',
       allowZeroSubscribers: true,

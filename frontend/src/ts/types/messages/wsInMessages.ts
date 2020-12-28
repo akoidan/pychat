@@ -35,12 +35,7 @@ export interface DefaultWsInMessage<A extends string, H extends HandlerName> ext
   cbId?: number;
 }
 
-export interface LoadMessages extends DefaultWsInMessage<'loadMessages', 'ws-message'> {
-  content: MessageModelDto[];
-  roomId: number;
-}
-
-export interface SyncMessagesMessage {
+export interface MessagesResponseMessage {
   content: MessageModelDto[];
 }
 

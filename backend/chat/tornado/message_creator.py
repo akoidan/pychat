@@ -47,16 +47,16 @@ class MessagesCreator(object):
 		}
 
 	@classmethod
-	def message_model_to_dto(cls, messages):
+	def message_models_to_dtos(cls, messages):
 		imv = get_message_images_videos(messages)
 		tags = get_message_tags(messages)
-		result = []
-		for message in messages:
+
+		def message_to_dto(message):
 			files = cls.prepare_img_video(imv, message.id)
 			prep_tags = cls.prepare_tags(tags, message.id)
-			prep_m = cls.create_message(message, files, prep_tags)
-			result.append(prep_m)
-		return result
+			return cls.create_message(message, files, prep_tags)
+
+		return list(map(message_to_dto, messages))
 
 	@staticmethod
 	def set_profile_image(url):
@@ -131,7 +131,10 @@ class MessagesCreator(object):
 		return room_less
 
 	@classmethod
-	def create_message(cls, message, files, tags, tags_stringified=False):
+	def create_message(cls, message, files, tags):
+		"""
+		https://pychat.org/photo/DpHBIO1p_image.png
+		"""
 		res = {
 			VarNames.USER_ID: message.sender_id,
 			VarNames.CONTENT: message.content,
@@ -141,7 +144,7 @@ class MessagesCreator(object):
 			VarNames.ROOM_ID: message.room_id,
 			VarNames.THREAD_MESSAGES_COUNT: message.thread_messages_count,
 			VarNames.PARENT_MESSAGE: message.parent_message_id,
-			VarNames.MESSAGE_TAGS: cls.prepare_tags(message, tags) if not tags_stringified else tags,
+			VarNames.MESSAGE_TAGS: tags,
 		}
 		if message.deleted:
 			res[VarNames.DELETED] = True
@@ -161,34 +164,23 @@ class MessagesCreator(object):
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		res = self.create_message(message, files, tags_users, tags_stringified)
+		res = self.create_message(message, files, tags_users)
 		res[VarNames.EVENT] = event
 		res[VarNames.CB_BY_SENDER] = self.id
 		res[VarNames.HANDLER_NAME] = HandlerNames.WS_MESSAGE
 		return res
 
-	@classmethod
-	def append_images(cls, messages, files, tags, prepare_img):
-		"""
-		:type messages: list[chat.models.Message] 
-		:type files: list[chat.models.Image]
-		"""
-		res_mess = []
-		for message in messages:
-			res_mess.append(cls.create_message(message, prepare_img(files, message.id)))
-		return res_mess
-
 
 	@classmethod
-	def get_messages(cls, messages, channel, files, prepare_img, message_id):
+	def get_messages(cls, messages, message_id):
 		"""
 		:type images: list[chat.models.Image]
 		:type messages: list[chat.models.Message]
 		:type channel: str
 		"""
+
 		return {
-			VarNames.CONTENT: cls.append_images(messages, files, prepare_img),
-			VarNames.ROOM_ID: channel,
+			VarNames.CONTENT: cls.message_models_to_dtos(messages),
 			VarNames.JS_MESSAGE_ID: message_id,
 			VarNames.HANDLER_NAME: HandlerNames.NULL
 		}

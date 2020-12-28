@@ -41,6 +41,13 @@ import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
 
 const START_TYPING = 'Start typing and messages will appear';
 
+
+let uniqueId = 1;
+
+function getUniqueId() {
+  return uniqueId++;
+}
+
 @Component
 export default class SearchMessages extends Vue {
 
@@ -69,7 +76,7 @@ export default class SearchMessages extends Vue {
 
   public debouncedSearch!: Function;
   public search: string = '';
-  public currentRequest: XMLHttpRequest|null = null;
+  public currentRequest: number = 0;
   public searchResult: string = '';
 
   @Watch('searchActive')
@@ -87,7 +94,7 @@ export default class SearchMessages extends Vue {
     }
   }
 
-  public created() {
+  private created() {
     this.search = this.room.search.searchText;
     if (!this.search) {
       this.searchResult = START_TYPING;
@@ -95,34 +102,47 @@ export default class SearchMessages extends Vue {
     this.debouncedSearch = debounce(this.doSearch, 500);
   }
 
-  public async doSearch(search: string) {
-    if (search) {
-      try {
-        let found = await this.$messageSenderProxy
-            .getMessageSender(this.room.id)
-            .loadUpSearchMessages(this.room.id, 10, r => {
-              this.currentRequest = r
-            });
-        this.currentRequest = null;
-        if (found) {
-          this.searchResult = '';
-        } else {
-          this.searchResult = 'No results found';
-        }
-      } catch (e) {
-        this.searchResult = e;
-      }
-    } else {
+  private async doSearch(search: string) {
+    if (!search) {
       this.searchResult = START_TYPING;
+      return
     }
+
+    let uniqueId = getUniqueId();
+    try {
+      this.currentRequest = uniqueId;
+      await this.$messageSenderProxy
+          .getMessageSender(this.room.id)
+          .loadUpSearchMessages(
+              this.room.id,
+              10,
+              found => {
+                if (found) {
+                  this.searchResult = '';
+                } else {
+                  this.searchResult = 'No results found';
+                }
+                if (this.currentRequest === uniqueId) {
+                  this.currentRequest = 0
+                  return true;
+                }
+                return false;
+              }
+          );
+    } catch (e) {
+      if (uniqueId === this.currentRequest) {
+        this.currentRequest = 0
+      }
+      this.searchResult = e;
+    }
+
   }
 
   @Watch('search')
-  public onSearchChange(search: string) {
+  private onSearchChange(search: string) {
     this.$store.setSearchTextTo({searchText: search, roomId: this.room.id})
     if (this.currentRequest) {
-      this.currentRequest.abort();
-      this.currentRequest = null;
+      this.currentRequest = getUniqueId();
     }
     this.debouncedSearch(search);
   }
