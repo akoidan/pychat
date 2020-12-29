@@ -2,7 +2,7 @@
   <div v-if="name && userList.length" class="chat-tagging">
     <!--    mousedown should be used so we don't lose focus from contenteditable-->
     <!--    https://stackoverflow.com/a/8736218/3872976-->
-    <div @mousedown.prevent="emitName(user)" :key="user.id" v-for="user in userList"> {{user.user}}</div>
+    <div @mousedown.prevent="emitName(user)" :key="user.id" :class="{'tag-selected': user.id === currentSelected}" v-for="user in userList"> {{user.user}}</div>
   </div>
 </template>
 <script lang="ts">
@@ -19,6 +19,8 @@ export default class ChatTagging extends Vue {
   @State
   public readonly allUsersDict!: UserDictModel;
 
+  public currentSelected: number|null = null;
+
   get onlyUserName(): string {
     if (this.name.length > 0) {
       return this.name.substring(1);
@@ -27,12 +29,58 @@ export default class ChatTagging extends Vue {
     }
   }
 
+  @Watch('name')
+  onNameChange() {
+    this.currentSelected = null;
+  }
+
+  @Watch('userIds')
+  onUsersInRoomChange() {
+    this.currentSelected = null;
+  }
+
+  @Watch('allUsersDict')
+  onUsersChange() {
+    this.currentSelected = null;
+  }
+
+  public upArrow() {
+    this.navigateKeyBoard(index => index === 0 ? this.userList.length -1 : index - 1);
+  }
+
+  public downArrow() {
+    this.navigateKeyBoard(index =>index === this.userList.length -1 ? 0 : index + 1);
+  }
+
+  public navigateKeyBoard(getNextIndex: (i: number) => number) {
+    if (!this.userList.length) {
+      return;
+    }
+    if (!this.currentSelected) {
+      this.currentSelected = this.userList[0].id;
+      return;
+    }
+    let index = this.userList.findIndex(a => a.id === this.currentSelected);
+    if (index >= 0) {
+      index = getNextIndex(index);
+      this.currentSelected = this.userList[index].id;
+    } else {
+      this.currentSelected = this.userList[0].id;
+    }
+  }
+
+  public confirm() {
+    let user: UserModel = this.userList.find(u => u.id === this.currentSelected)!;
+    this.emitName(user);
+  }
+
   get userList(): UserModel[] {
-    return this.userIds.map(id => this.allUsersDict[id]).filter(u => u.user.includes(this.onlyUserName))
+    return this.userIds.map(id => this.allUsersDict[id]).filter(u => u.user.toLowerCase().includes(this.onlyUserName.toLowerCase()))
   }
 
   @Emit()
   emitName(user: UserModel) {
+    this.currentSelected = null;
     return user;
 
   }
@@ -52,6 +100,9 @@ export default class ChatTagging extends Vue {
       padding: 5px
       &:hover
         text-decoration: underline
-        color: yellow
+        color: #ff9e00
         cursor: pointer
+      &.tag-selected
+        color: yellow
+        text-decoration: underline
 </style>

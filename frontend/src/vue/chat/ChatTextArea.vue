@@ -13,7 +13,7 @@
       @add-giphy="addGiphy"
     />
     <smiley-holder v-if="showSmileys" @close="showSmileys = false" @add-smiley="onEmitAddSmile"/>
-    <chat-tagging :name="taggingName" :user-ids="room.users" @emit-name="addTagInfo"/>
+    <chat-tagging :name="taggingName" :user-ids="room.users" @emit-name="addTagInfo" ref="chatTagging"/>
     <media-recorder
       ref="mediaRecorder"
       :is-video="isRecordingVideo"
@@ -148,6 +148,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     @Ref()
     public mediaRecorder!: MediaRecorder;
 
+    @Ref()
+    public chatTagging!: ChatTagging;
+
     @State
     public readonly allUsersDict!: UserDictModel;
 
@@ -256,10 +259,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
 
-    onTextAreaKeyUp() {
+    onTextAreaKeyUp(event: KeyboardEvent) {
       let content: string = this.userMessage.textContent!;
       this.taggingName = '';
-
       if (content.includes("@")) {
         let currentWord = getCurrentWordInHtml(this.userMessage);
         if (currentWord === '@' || new RegExp(`^@${USERNAME_REGEX}$`).test(currentWord)) {
@@ -275,13 +277,24 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
           return;
         }
         event.preventDefault();
-        this.sendMessage();
+        if (this.chatTagging.currentSelected) {
+          this.chatTagging.confirm();
+        } else {
+          this.sendMessage();
+        }
       } else if (event.key === 'Escape') { // 27 = escape
         this.cancelCurrentAction();
       } else if (event.key === 'ArrowUp' && this.userMessage.innerHTML == '') {
         event.preventDefault();
         event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
         this.setEditedMessage();
+      } else if (this.taggingName && ['ArrowUp', 'ArrowDown'].includes(event.key)) {
+        event.preventDefault();
+        if (event.key === 'ArrowUp') {
+          this.chatTagging.upArrow();
+        } else if (event.key === 'ArrowDown') {
+          this.chatTagging.downArrow();
+        }
       } else {
         if (this.userSettings.showWhenITyping)
         this.showIType.fire();
