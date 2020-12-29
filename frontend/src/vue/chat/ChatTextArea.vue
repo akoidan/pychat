@@ -242,9 +242,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     @Watch('pastingTextAreaQueue')
     onBlob()  {
       if (this.pastingTextAreaQueue.length > 0) {
-        this.$logger.log('Pasting blob {}', this.pastingTextAreaQueue)();
         this.pastingTextAreaQueue.forEach(id => {
           if (id.elType === 'blob' && id.openedThreadId == this.threadMessageId && id.roomId == this.roomId && id.editedMessageId === this.editMessageId) {
+            this.$logger.log('Pasting blob {}', savedFiles[id.content])();
             pasteBlobToContentEditable(savedFiles[id.content], this.userMessage);
             delete savedFiles[id.content]
             this.$store.setPastingQueue(this.pastingTextAreaQueue.filter(el => el != id));

@@ -61,7 +61,7 @@ export default class ChatMessageToolTip extends Vue {
   }
 
   public deleteMessage() {
-    if (this.showAllowEditing()) {
+    if (!this.showAllowEditing()) {
       this.$store.growlError("You can't delete messages sent more than 1 day ago");
       return
     }

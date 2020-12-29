@@ -483,9 +483,6 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 * quote should work similar to tag user
 * User icon should be clickable with ability to show user profile/send message and etc. Users should be filterable in userlist
 * IF chat is opened on multiple tabs, we should display what'sup like message "CHat is opened there, do you want to stop using it here?". subecribe to ls change
-* remove history query param from ws
-* history loading messages should be fully refactored, loaduphistory should pass existing messages ids the same way syncHistory does
-* appear online messages also appear is channel non-relatedto user .e.g. pychat pdr
 * edit message doesn't appear after pasting image from painter. (in editing mode)
 * replace array.indexOf >= 0 to array.includes
 * Refactor UX on navbar, move report issue and amchart to somewhere, they just eat place for nothing. Move Signout to dropdown like in fb or vk. Do something with call, it's not intuitive. Right bar is nto required check how telegram does UX 
