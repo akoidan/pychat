@@ -79,6 +79,7 @@ class MessagesHandler():
 			Actions.PONG: self.process_pong_message,
 			Actions.SEARCH_MESSAGES: self.search_messages,
 			Actions.SYNC_HISTORY: self.sync_history,
+			Actions.SHOW_I_TYPE: self.show_i_type,
 		}
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
@@ -557,6 +558,7 @@ class MessagesHandler():
 			message_sound=message[UserSettingsVarNames.MESSAGE_SOUND],
 			incoming_file_call_sound=message[UserSettingsVarNames.INCOMING_FILE_CALL_SOUND],
 			online_change_sound=message[UserSettingsVarNames.ONLINE_CHANGE_SOUND],
+			show_when_i_typing=message[UserSettingsVarNames.SHOW_WHEN_I_TYPING],
 			logs=message[UserSettingsVarNames.LOGS],
 			send_logs=message[UserSettingsVarNames.SEND_LOGS],
 			theme=message[UserSettingsVarNames.THEME],
@@ -844,6 +846,14 @@ class MessagesHandler():
 			VarNames.JS_MESSAGE_ID: data[VarNames.JS_MESSAGE_ID],
 			VarNames.HANDLER_NAME: HandlerNames.NULL
 		})
+
+	def show_i_type(self, message):
+		self.publish({
+			VarNames.ROOM_ID: message[VarNames.ROOM_ID],
+			VarNames.USER_ID: self.user_id,
+			VarNames.EVENT: Actions.SHOW_I_TYPE,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM # because ws-message doesnt exist in p2p
+		}, message[VarNames.ROOM_ID])
 
 	def sync_history(self, in_message):
 		room_ids = list(map(lambda d: d[VarNames.ROOM_ID], in_message[VarNames.CONTENT]))

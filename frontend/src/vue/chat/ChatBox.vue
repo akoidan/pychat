@@ -75,6 +75,7 @@
         />
       </template>
     </div>
+    <chat-show-user-typing :users-typing="room.usersTyping"/>
     <chat-text-area :room-id="room.id" ref="textarea"/>
   </div>
 </template>
@@ -110,9 +111,11 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 import AppSeparator from '@/vue/ui/AppSeparator.vue';
 import ChatThread from '@/vue/chat/ChatThread.vue';
 import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
+import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
 
   @Component({
     components: {
+      ChatShowUserTyping,
       ChatTextArea,
       ChatThread,
       AppSeparator,

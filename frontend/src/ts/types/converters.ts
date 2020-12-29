@@ -99,6 +99,7 @@ export function getRoomsBaseDict(
     channelId,
     volume,
     p2p,
+    usersTyping: {},
     p2pInfo: {
       liveConnections: []
     },

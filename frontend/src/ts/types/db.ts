@@ -72,6 +72,7 @@ export interface SettingsDB {
   incomingFileCallSound: BooleanDB;
   messageSound: BooleanDB;
   onlineChangeSound: BooleanDB;
+  showWhenITyping: BooleanDB;
   sendLogs: BooleanDB;
   suggestions: BooleanDB;
   theme: string;

@@ -47,7 +47,8 @@ import {
   LeaveUserMessage,
   RemoveOnlineUserMessage,
   SaveChannelSettingsMessage,
-  SaveRoomSettingsMessage
+  SaveRoomSettingsMessage,
+  ShowITypeMessage
 } from '@/ts/types/messages/wsInMessages';
 import { ALL_ROOM_ID } from '@/ts/utils/consts';
 import { sub } from '@/ts/instances/subInstance';
@@ -79,6 +80,7 @@ export class RoomHandler extends MessageHandler  {
     saveChannelSettings:  <HandlerType<'saveChannelSettings', 'room'>>this.saveChannelSettings,
     deleteChannel:  <HandlerType<'deleteChannel', 'room'>>this.deleteChannel,
     saveRoomSettings:  <HandlerType<'saveRoomSettings', 'room'>>this.saveRoomSettings,
+    showIType:  <HandlerType<'showIType', 'room'>>this.showIType,
     logout:  <HandlerType<'logout', 'room'>>this.logout,
   };
 
@@ -193,6 +195,12 @@ export class RoomHandler extends MessageHandler  {
 
   public deleteChannel(message: DeleteChannelMessage) {
     this.store.deleteChannel(message.channelId);
+  }
+
+  public async showIType(message: ShowITypeMessage) {
+    if (this.store.myId !== message.userId) {
+      await this.store.showUserIsTyping({userId: message.userId, roomId: message.roomId});
+    }
   }
 
   public saveRoomSettings(message: SaveRoomSettingsMessage) {

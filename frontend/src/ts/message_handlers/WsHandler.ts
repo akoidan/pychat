@@ -232,6 +232,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
+  public showIType(roomId: number): void {
+    this.sendToServer({
+      roomId,
+      action: 'showIType'
+    });
+  }
+
   public async saveUser(content: UserProfileDto): Promise<SetUserProfileMessage|unknown> {
     return this.messageProc.sendToServerAndAwait({
       action: 'setUserProfile',

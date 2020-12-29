@@ -154,6 +154,7 @@ class UserProfile(User):
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_random_path, null=True, blank=True)
 	suggestions = BooleanField(null=False, default=True)
+	show_when_i_typing = BooleanField(null=False, default=True)
 	embedded_youtube = BooleanField(null=False, default=True)
 	highlight_code = BooleanField(null=False, default=False)
 	logs = CharField(max_length=16, null=False, blank=False, default=JS_CONSOLE_LOGS)

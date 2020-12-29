@@ -89,6 +89,11 @@ export interface DeleteChannelMessage extends DefaultWsInMessage<'deleteChannel'
 export interface SaveRoomSettingsMessage extends DefaultWsInMessage<'saveRoomSettings', 'room'>, RoomNoUsersDto {
 }
 
+export interface ShowITypeMessage extends DefaultWsInMessage<'showIType', 'room'> {
+  roomId: number;
+  userId: number;
+}
+
 export interface SetWsIdMessage extends DefaultWsInMessage<'setWsId', 'ws'>, OpponentWsId {
   rooms:  RoomDto[];
   channels: ChannelDto[];

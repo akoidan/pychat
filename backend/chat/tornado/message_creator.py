@@ -95,6 +95,7 @@ class MessagesCreator(object):
 			UserSettingsVarNames.INCOMING_FILE_CALL_SOUND: up.incoming_file_call_sound,
 			UserSettingsVarNames.MESSAGE_SOUND: up.message_sound,
 			UserSettingsVarNames.THEME: up.theme,
+			UserSettingsVarNames.SHOW_WHEN_I_TYPING: up.show_when_i_typing,
 			UserSettingsVarNames.HIGHLIGHT_CODE: up.highlight_code,
 			UserSettingsVarNames.ONLINE_CHANGE_SOUND: up.online_change_sound
 		}

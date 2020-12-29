@@ -9,6 +9,12 @@
           </td>
         </tr>
         <tr>
+          <th>Show when I'm writing message</th>
+          <td>
+            <app-checkbox v-model="model.showWhenITyping" />
+          </td>
+        </tr>
+        <tr>
           <th>Embedded youtube:</th>
           <td>
             <app-checkbox v-model="model.embeddedYoutube" />

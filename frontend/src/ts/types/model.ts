@@ -27,6 +27,7 @@ export interface CurrentUserSettingsModel {
   messageSound: boolean;
   onlineChangeSound: boolean;
   sendLogs: boolean;
+  showWhenITyping: boolean;
   suggestions: boolean;
   theme: string;
   logs: LogLevel;
@@ -242,6 +243,7 @@ export interface RoomModel extends RoomSettingsModel {
   allLoaded: boolean;
   search: SearchModel;
   newMessagesCount: number;
+  usersTyping: Record<number, number>;
   roomLog: RoomLog[];
   changeName: ChangeRoomName[];
 }

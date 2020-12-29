@@ -78,12 +78,15 @@ import {
 } from '@/ts/utils/htmlApi';
 import {
   CurrentUserInfoModel,
+  CurrentUserSettingsModel,
   EditingMessage,
   FileModel,
-  MessageModel, PastingTextAreaElement,
+  MessageModel,
+  PastingTextAreaElement,
   RoomDictModel,
   RoomModel,
-  UserDictModel, UserModel
+  UserDictModel,
+  UserModel
 } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
 
@@ -103,8 +106,12 @@ import {
 import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
 import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
-import {USERNAME_REGEX} from '@/ts/utils/consts';
+import {
+  SHOW_I_TYPING_INTERVAL,
+  USERNAME_REGEX
+} from '@/ts/utils/consts';
 import ChatTagging from '@/vue/chat/ChatTagging.vue';
+import {Throttle} from '@/ts/classes/Throttle';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -118,6 +125,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     @State
     public readonly userInfo!: CurrentUserInfoModel;
+
+    @State
+    public readonly userSettings!: CurrentUserSettingsModel;
 
     @Prop({default: null})
     public readonly editMessageId!: number;
@@ -150,6 +160,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     private showSmileys: boolean = false;
     private taggingName: string = '';
     private isRecordingVideo: boolean = true;
+    private showIType!: Throttle;
 
     get room(): RoomModel {
       return this.roomsDict[this.roomId];
@@ -176,6 +187,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     public mounted() {
+      // do not spam ws every type user types something, wait 10s at least
+      this.showIType = new Throttle(() => this.$ws.showIType(this.roomId), SHOW_I_TYPING_INTERVAL); // every 10s
       if (this.editMessage) {
         this.userMessage.innerHTML = encodeP(this.editMessage, this.$store)
         placeCaretAtEnd(this.userMessage);;
@@ -263,6 +276,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         this.cancelCurrentAction();
       } else if (event.key === 'ArrowUp' && this.userMessage.innerHTML == '') {
         this.setEditedMessage(event);
+      } else {
+        if (this.userSettings.showWhenITyping)
+        this.showIType.fire();
       }
     }
 

@@ -62,7 +62,10 @@ import {
   SetStateFromWS
 } from '@/ts/types/dto';
 import { encodeHTML } from '@/ts/utils/htmlApi';
-import { ALL_ROOM_ID } from '@/ts/utils/consts';
+import {
+  ALL_ROOM_ID,
+  SHOW_I_TYPING_INTERVAL
+} from '@/ts/utils/consts';
 import {
   Action,
   Module,
@@ -102,6 +105,8 @@ function Validate(target: unknown, propertyKey: string, descriptor: PropertyDesc
     }
   };
 }
+
+const SHOW_I_TYPING_INTERVAL_SHOW = SHOW_I_TYPING_INTERVAL * 1.5;
 
 @Module({
   dynamic: true,
@@ -835,6 +840,15 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public setShowITypingUser({userId, roomId, date}: {userId: number; roomId: number; date: number}) {
+    if (date === 0) {
+      Vue.delete(this.roomsDict[roomId].usersTyping, userId);
+    } else {
+      Vue.set(this.roomsDict[roomId].usersTyping, userId, date);
+    }
+  }
+
+  @Mutation
   public logout() {
     this.userInfo = null;
     this.userSettings = null;
@@ -852,6 +866,16 @@ export class DefaultStore extends VuexModule {
     this.addGrowl(growl);
     await sleep(time);
     this.removeGrowl(growl);
+  }
+
+  @Action
+  public async showUserIsTyping({userId, roomId}: {userId: number; roomId: number}) {
+    let date = Date.now();
+    this.setShowITypingUser({userId, roomId, date});
+    await sleep(SHOW_I_TYPING_INTERVAL_SHOW); // lets say 1 second ping
+    if (this.roomsDict[roomId].usersTyping[userId] === date) {
+      this.setShowITypingUser({userId, roomId, date: 0});
+    }
   }
 
   @Action

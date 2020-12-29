@@ -67,6 +67,7 @@ export interface UserSettingsDto {
   messageSound: boolean;
   onlineChangeSound: boolean;
   sendLogs: boolean;
+  showWhenITyping: boolean;
   suggestions: boolean;
   logs: LogLevel;
   theme: string;
