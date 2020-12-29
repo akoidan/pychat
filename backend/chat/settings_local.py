@@ -48,5 +48,3 @@ LOGGING['loggers'] = {
 PING_CLOSE_JS_DELAY = 100000
 
 logging.config.dictConfig(LOGGING)
-
-
