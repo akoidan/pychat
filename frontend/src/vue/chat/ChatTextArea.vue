@@ -96,7 +96,8 @@ import {
   UploadFile
 } from '@/ts/types/types';
 import {
-  editMessageWs
+  editMessageWs,
+  showAllowEditing
 } from '@/ts/utils/pureFunctions';
 import MediaRecorder from '@/vue/chat/MediaRecorder.vue';
 import {
@@ -128,6 +129,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     @State
     public readonly userSettings!: CurrentUserSettingsModel;
+
+    @State
+    public readonly myId!: number;
 
     @Prop({default: null})
     public readonly editMessageId!: number;
@@ -275,7 +279,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       } else if (event.key === 'Escape') { // 27 = escape
         this.cancelCurrentAction();
       } else if (event.key === 'ArrowUp' && this.userMessage.innerHTML == '') {
-        this.setEditedMessage(event);
+        event.preventDefault();
+        event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
+        this.setEditedMessage();
       } else {
         if (this.userSettings.showWhenITyping)
         this.showIType.fire();
@@ -283,31 +289,24 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
 
-    private setEditedMessage(event: KeyboardEvent) {
+    private setEditedMessage() {
       const messages = this.activeRoom.messages;
-
       if (Object.keys(messages).length > 0) {
-        let maxTime: MessageModel | null = null;
+        let latestMessage: MessageModel | null = null;
         for (const m in messages) {
-          if (!maxTime || (messages[m].time >= maxTime.time)) {
-            maxTime = messages[m];
+          if (messages[m].userId == this.myId && !messages[m].deleted && (!latestMessage || (messages[m].time >= latestMessage.time))) {
+            latestMessage = messages[m];
           }
         }
-        event.preventDefault();
-        event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
-
-        if (event.target
-            && (<HTMLElement>event.target).tagName !== 'IMG'
-            && maxTime!.userId === this.userInfo.userId
-            && !maxTime!.deleted
-        ) {
-          const newlet: EditingMessage = {
-            messageId: maxTime!.id,
-            isEditingNow: true,
-            roomId: maxTime!.roomId
-          };
-          this.$store.setEditedMessage(newlet);
+        if (!showAllowEditing(latestMessage!)) {
+          return
         }
+        const newlet: EditingMessage = {
+          messageId: latestMessage!.id,
+          isEditingNow: true,
+          roomId: latestMessage!.roomId
+        };
+        this.$store.setEditedMessage(newlet);
       }
     }
 

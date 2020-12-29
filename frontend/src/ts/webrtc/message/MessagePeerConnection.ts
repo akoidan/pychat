@@ -151,7 +151,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
       this.messages.forEach(message => {
         let opponentEditedCount: number = payload.messagesInfo[message.id] ?? 0;
         if (payload.messagesInfo[message.id] !== undefined) {
-          let myEditedCount: number = message.edited ?? 0;
+          let myEditedCount: number = message.edited;
           if (myEditedCount > opponentEditedCount) {
             responseMessages.push(messageModelToP2p(message))
           } else if (myEditedCount < opponentEditedCount) {

@@ -157,7 +157,7 @@ class MessagesCreator(object):
 			res[VarNames.GIPHY] = message.giphy
 		return res
 
-	def create_send_message(self, message, event, files, tags_users, tags_stringified=False):
+	def create_send_message(self, message, event, files, tags_users):
 		"""
 		:type message: chat.models.Message
 		:type imgs: dict

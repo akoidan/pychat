@@ -5,6 +5,7 @@ import {
 } from '@/ts/types/model';
 import type {DefaultStore} from '@/ts/classes/DefaultStore';
 import type {MessageSender} from '@/ts/types/types';
+import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from '@/ts/utils/consts';
 
 export function bytesToSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
@@ -70,6 +71,12 @@ export function getMissingIds(roomId: number, store: DefaultStore): number[] {
 
 export function checkIfIdIsMissing(message: MessageModel, store: DefaultStore): boolean {
   return !!message.parentMessage && !store.roomsDict[message.roomId].messages[message.parentMessage];
+}
+
+export function showAllowEditing(message: MessageModel) {
+  // do nto allow edit message longer than 1 day, because it will appear on other history, which would be weird
+  // in the history of last week a message edited 1 year ago would be always on top
+  return (Date.now() - message.time < ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO) || message.id < 0;
 }
 
 export function editMessageWs(

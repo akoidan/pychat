@@ -60,7 +60,7 @@ import {
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
-  DefaultWsOutMessage, SyncHistoryOutContent,
+  DefaultWsOutMessage,
   SyncHistoryOutMessage
 } from '@/ts/types/messages/wsOutMessages';
 
@@ -258,10 +258,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async syncHistory(content: SyncHistoryOutContent[], lastSynced: number): Promise<MessagesResponseMessage> {
+  public async syncHistory(roomIds: number[], messagesIds: number[], lastSynced: number): Promise<MessagesResponseMessage> {
     let payload: SyncHistoryOutMessage = {
-      content,
-      lastSynced: lastSynced,
+      messagesIds,
+      roomIds,
+      lastSynced,
       action: 'syncHistory'
     };
     return this.messageProc.sendToServerAndAwait(payload);

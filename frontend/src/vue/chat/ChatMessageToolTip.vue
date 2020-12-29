@@ -7,12 +7,12 @@
     />
     <template v-else>
       <i
-        v-if="isMine && message.content"
+        v-if="isMine && message.content && showAllowEditing()"
         class="icon-pencil"
         @click.stop="setEditingMode(true)"
       />
       <i
-        v-if="isMine && message.content"
+        v-if="isMine && message.content && showAllowEditing()"
         class="icon-trash-circled"
         @click.stop="deleteMessage"
       />
@@ -28,7 +28,8 @@
 import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
 import {State} from '@/ts/instances/storeInstance';
 import {EditingMessage, MessageModel} from '@/ts/types/model';
-import {editMessageWs} from '@/ts/utils/pureFunctions';
+import {editMessageWs, showAllowEditing} from '@/ts/utils/pureFunctions';
+import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from '@/ts/utils/consts';
 
 @Component
 export default class ChatMessageToolTip extends Vue {
@@ -43,7 +44,14 @@ export default class ChatMessageToolTip extends Vue {
     return this.message.userId === this.myId;
   }
 
+  showAllowEditing() {
+    return showAllowEditing(this.message);
+  }
+
   setEditingMode(isEditingNow: boolean) {
+    if (!this.showAllowEditing()) {
+      this.$store.growlError("You can't edit messages sent more than 1 day ago");
+    }
     let a: EditingMessage = {
       messageId: this.message.id,
       isEditingNow,
@@ -53,6 +61,10 @@ export default class ChatMessageToolTip extends Vue {
   }
 
   public deleteMessage() {
+    if (this.showAllowEditing()) {
+      this.$store.growlError("You can't delete messages sent more than 1 day ago");
+      return
+    }
     // TODO, check if opened is the only status with abor request
     if (this.message?.transfer?.xhr?.readyState === XMLHttpRequest.OPENED) {
       this.message.transfer.xhr.abort();
@@ -65,7 +77,7 @@ export default class ChatMessageToolTip extends Vue {
         null,
         {},
         this.message.time,
-        this.message.edited ? this.message.edited + 1 : 1,
+        Date.now(),
         this.message.parentMessage,
         this.$store,
         this.$messageSenderProxy.getMessageSender(this.message.roomId)

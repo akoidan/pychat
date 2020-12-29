@@ -253,7 +253,7 @@ class Message(Model):
 	thread_messages_count = IntegerField(default=0, null=False)
 	parent_message = ForeignKey('self', CASCADE, null=True, blank=True)
 	giphy = URLField(null=True, blank=True)
-	edited_times = IntegerField(default=0, null=False)
+	edited_times = BigIntegerField(default=get_milliseconds, null=False)
 
 	def __unicode__(self):
 		return self.__str__()

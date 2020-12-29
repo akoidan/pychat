@@ -320,8 +320,7 @@ class MessagesHandler():
 				message_db,
 				Actions.PRINT_MESSAGE,
 				res_files,
-				tags_users,
-				True
+				tags_users
 			)
 			prepared_message[VarNames.JS_MESSAGE_ID] = js_id
 			self.publish(prepared_message, channel)
@@ -718,10 +717,10 @@ class MessagesHandler():
 		if message.content is None:
 			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(
 				deleted=True,
-				edited_times=message.edited_times,
+				edited_times=get_milliseconds(),
 				content=None
 			)
-			self.publish(self.message_creator.create_send_message(message, Actions.DELETE_MESSAGE, None), message.room_id)
+			self.publish(self.message_creator.create_send_message(message, Actions.DELETE_MESSAGE, None, {}), message.room_id)
 		elif giphy_match is not None:
 			self.edit_message_giphy(giphy_match, message)
 		else:
@@ -733,10 +732,10 @@ class MessagesHandler():
 				content=message.content,
 				symbol=message.symbol,
 				giphy=giphy,
-				edited_times=message.edited_times
+				edited_times=get_milliseconds()
 			)
 			message.giphy = giphy
-			self.publish(self.message_creator.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
+			self.publish(self.message_creator.create_send_message(message, Actions.EDIT_MESSAGE, None, {}), message.room_id)
 
 		self.search_giphy(message, giphy_match, edit_glyphy)
 
@@ -771,8 +770,8 @@ class MessagesHandler():
 			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
 		else:
 			prep_files = None
-		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
-		self.publish(self.message_creator.create_send_message(message, action, prep_files, tags, True), message.room_id)
+		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=get_milliseconds())
+		self.publish(self.message_creator.create_send_message(message, action, prep_files, tags), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -804,7 +803,7 @@ class MessagesHandler():
 		"""
 		:type data: dict
 		"""
-		ids = data[VarNames.GET_MESSAGES_MESSAGES_IDS]
+		ids = data[VarNames.MESSAGE_IDS]
 		room_id = data[VarNames.ROOM_ID]
 		messages = Message.objects.filter(room_id=room_id, id__in=ids)
 		response = self.message_creator.get_messages(messages, data[VarNames.JS_MESSAGE_ID])
@@ -856,23 +855,15 @@ class MessagesHandler():
 		}, message[VarNames.ROOM_ID])
 
 	def sync_history(self, in_message):
-		room_ids = list(map(lambda d: d[VarNames.ROOM_ID], in_message[VarNames.CONTENT]))
+		room_ids = in_message[VarNames.ROOM_IDS]
+		message_ids = in_message[VarNames.MESSAGE_IDS]
 		if not set(room_ids).issubset(self.channels):
 			raise ValidationError("This is not a messages in the room you are in")
 
-		messages_ids_dict = {}  # dict where key is messageId, and value is edited times
-		for l in in_message[VarNames.CONTENT]:
-			messages_ids_dict.update(l[VarNames.MESSAGE_IDS])
-		messages_ids = [*messages_ids_dict] # get messages id arrays string[]
-		exclude_messages_ids = []
-		existing_messages = Message.objects.filter(id__in=messages_ids).values('id', 'edited_times')
-		for existing_mes in existing_messages:
-			if existing_mes['edited_times'] <= messages_ids_dict[str(existing_mes['id'])]: # python dict keys are str
-				exclude_messages_ids.append(existing_mes['id'])
 		messages = Message.objects.filter(
 			Q(room_id__in=room_ids)
-			& ~Q(id__in=messages_ids)
-			& Q(time__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+			& ~Q(id__in=message_ids)
+			& Q(edited_times__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
 		)
 		content = MessagesCreator.message_models_to_dtos(messages)
 		self.ws_write({

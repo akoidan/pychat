@@ -58,10 +58,12 @@ def evaluate(query_set):
 def validate_edit_message(self_id, message):
 	if message.sender_id != self_id:
 		raise ValidationError("You can only edit your messages")
-	if message.time + ONE_DAY < get_milliseconds():
-		raise ValidationError("You can only edit messages that were send not more than 1 day")
-	if message.deleted:
-		raise ValidationError("Already deleted")
+	# we don't need this validation anymore, let users edit messages w/e they want
+	# if message.time + ONE_DAY < get_milliseconds():
+	# 	raise ValidationError("You can only edit messages that were send not more than 1 day")
+	# if same user deletes message from different devices, it should not error
+	# if message.deleted:
+	# 	raise ValidationError("Already deleted")
 
 
 def execute_query(query, *args, **kwargs):

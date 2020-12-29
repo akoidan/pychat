@@ -110,7 +110,7 @@ export interface MessageModel {
   deleted: boolean;
   sending: boolean;
   giphy: string|null;
-  edited: number|null;
+  edited: number;
   roomId: number;
   userId: number;
   transfer: MessageTransferInfo|null;

@@ -10,12 +10,8 @@ export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A>
   cbId?: number;
 }
 
-export interface SyncHistoryOutContent {
-  roomId: number;
-  messagesIds: Record<string, number|null>;
-}
-
 export interface SyncHistoryOutMessage extends DefaultWsOutMessage<'syncHistory'>{
-  content: SyncHistoryOutContent[];
+  roomIds: number[];
+  messagesIds: number[];
   lastSynced: number;
 }

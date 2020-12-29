@@ -146,6 +146,7 @@ export default class UserProfileSettings extends Vue {
   public clearHistory() {
     localStorage.removeItem(LAST_SYNCED); // TODO this should not be here, but in wsmessgehenader
     this.$store.clearMessages();
+    this.$store.growlSuccess("History has been cleared");
   }
 
   @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})

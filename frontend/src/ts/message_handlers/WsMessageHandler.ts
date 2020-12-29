@@ -46,7 +46,6 @@ import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import {LAST_SYNCED, MESSAGES_PER_SEARCH} from '@/ts/utils/consts';
 import {convertMessageModelDtoToModel} from '@/ts/types/converters';
 import {checkIfIdIsMissing, getMissingIds} from '@/ts/utils/pureFunctions';
-import {SyncHistoryOutContent} from '@/ts/types/messages/wsOutMessages';
 
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
@@ -374,29 +373,24 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
-  private getMessagesIdsEdited(r: RoomModel) {
-    return Object.keys(r.messages)
-        .map(a => parseInt(a))
-        .filter(a => a > 0)  // if message is negative, it's not on the server, so no need to ignore it
-        .reduce((a, v) => {
-          a[v] = r.messages[v].edited || 0; // 0 is smaller than null to send to server, we care about size here
-          return a;
-        }, {} as Record<string, number|null>);
-  }
-
   private async syncHistory() {
-    let content: SyncHistoryOutContent[] = this.store.roomsArray.map(r => ({
-      roomId: r.id,
-      messagesIds: this.getMessagesIdsEdited(r)
-    }));
+    let messagesIds: number[] = [];
+    let roomIds: number[] = this.store.roomsArray.map(r => {
+      let roomMessageIds = Object.values(r.messages)
+          .map(r => r.id)
+          .filter(id => id > 0);
+      messagesIds.push(...roomMessageIds)
+      return r.id;
+    });
 
     let joined: any = localStorage.getItem(LAST_SYNCED);
     if (!joined) {
       localStorage.setItem(LAST_SYNCED, Date.now().toString())
       return ;
     }
+    joined = parseInt(joined);
 
-    let result: MessagesResponseMessage = await this.ws.syncHistory(content, Date.now() - joined);
+    let result: MessagesResponseMessage = await this.ws.syncHistory(roomIds, messagesIds, Date.now() - joined);
 
     let groupBY : Record<string, MessageModelDto[]> = result.content.reduce((rv, x) => {
       if (!rv[x.roomId]) {
@@ -409,7 +403,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     // when we load new messages, they can be from thread we don't have
     Object.keys(groupBY).forEach(k => {
       let roomId = parseInt(k);
-      this.addMessages(roomId, groupBY[k]);
+      let messagesInGroup = groupBY[k];
+      this.addMessages(roomId, messagesInGroup);
       let missingIds = getMissingIds(roomId, this.store);
       if (missingIds.length) {
         this.loadMessages(roomId, missingIds)

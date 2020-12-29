@@ -173,7 +173,7 @@ export function messageModelToP2p(m: MessageModel): MessageP2pDto {
   return  {
     content: m.content,
     deleted: m.deleted,
-    edited: m.edited ?? 0,
+    edited: m.edited,
     files: {},
     giphy: m.giphy,
     id: m.id,
@@ -213,7 +213,7 @@ export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessa
     content: message.content || null,
     symbol: message.symbol || null,
     threadMessagesCount: message.threadMessagesCount,
-    edited: message.edited || null,
+    edited: message.edited,
     isEditingActive: oldMessage ? oldMessage.isEditingActive : false,
     isThreadOpened: oldMessage? oldMessage.isThreadOpened : false,
     roomId: message.roomId,
