@@ -64,6 +64,7 @@ export interface UserModel {
   user: string;
   id: number;
   sex: SexModelString;
+  lastTimeOnline: number;
   location: Location;
 }
 
@@ -95,6 +96,8 @@ export interface MessageTransferInfo {
   xhr: XMLHttpRequest|null;
 }
 
+export type MessageStatus = 'sending' | 'received' | 'read' | 'on_server';
+
 export interface MessageModel {
   id: number;
   time: number;
@@ -108,7 +111,7 @@ export interface MessageModel {
   symbol: string|null;
   threadMessagesCount: number;
   deleted: boolean;
-  sending: boolean;
+  status: MessageStatus;
   giphy: string|null;
   edited: number;
   roomId: number;

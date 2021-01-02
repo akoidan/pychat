@@ -592,8 +592,8 @@ export class DefaultStore extends VuexModule {
     let markSendingIds: number[] = []
     m.messagesId.forEach(messageId => {
       let message = this.roomsDict[m.roomId].messages[messageId];
-      if (message.sending) {
-        message.sending = false;
+      if (message.status === 'sending') {
+        message.status = 'on_server';
         markSendingIds.push(messageId);
       }
     });

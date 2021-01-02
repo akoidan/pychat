@@ -110,7 +110,7 @@ export function editMessageWs(
     isEditingActive: oldMessage ? oldMessage.isEditingActive : false,
     isThreadOpened: oldMessage ? oldMessage.isThreadOpened : false,
     parentMessage,
-    sending: shouldBeSynced,
+    status: shouldBeSynced ? 'sending' : 'on_server',
     content: messageContent,
     symbol: symbol,
     giphy: null,

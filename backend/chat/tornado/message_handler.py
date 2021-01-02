@@ -434,7 +434,6 @@ class MessagesHandler():
 			ru = [RoomUsers(
 				user_id=user_id,
 				room_id=room_id,
-				last_read_message_id=max_id,
 				volume=message[VarNames.VOLUME],
 				notifications=message[VarNames.NOTIFICATIONS]
 			) for user_id in users]
@@ -620,7 +619,6 @@ class MessagesHandler():
 		ru = [RoomUsers(
 			user_id=user_id,
 			room_id=room_id,
-			last_read_message_id=max_id,
 			volume=1,
 			notifications=False
 		) for user_id in users]
@@ -712,12 +710,12 @@ class MessagesHandler():
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		MessageHistory(message=message, content=message.content, giphy=message.giphy).save()
-		message.edited_times += 1
+
 		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
 			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(
 				deleted=True,
-				edited_times=get_milliseconds(),
+				updated_at=get_milliseconds(),
 				content=None
 			)
 			self.publish(self.message_creator.create_send_message(message, Actions.DELETE_MESSAGE, None, {}), message.room_id)
@@ -732,7 +730,7 @@ class MessagesHandler():
 				content=message.content,
 				symbol=message.symbol,
 				giphy=giphy,
-				edited_times=get_milliseconds()
+				updated_at=get_milliseconds()
 			)
 			message.giphy = giphy
 			self.publish(self.message_creator.create_send_message(message, Actions.EDIT_MESSAGE, None, {}), message.room_id)
@@ -770,7 +768,7 @@ class MessagesHandler():
 			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
 		else:
 			prep_files = None
-		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=get_milliseconds())
+		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, updated_at=get_milliseconds())
 		self.publish(self.message_creator.create_send_message(message, action, prep_files, tags), message.room_id)
 
 	def send_client_new_channel(self, message):
@@ -863,7 +861,7 @@ class MessagesHandler():
 		messages = Message.objects.filter(
 			Q(room_id__in=room_ids)
 			& ~Q(id__in=message_ids)
-			& Q(edited_times__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+			& Q(updated_at=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
 		)
 		content = MessagesCreator.message_models_to_dtos(messages)
 		self.ws_write({

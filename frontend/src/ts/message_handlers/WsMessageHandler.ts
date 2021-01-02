@@ -95,7 +95,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         if (room.p2p) {
           continue;
         }
-        let messages = Object.values(room.messages).filter(m => m.sending);
+        let messages = Object.values(room.messages).filter(m => m.status === 'sending');
         // sync messages w/o parent thread first
         messages.sort((a,b)=> {
           if (a.parentMessage && !b.parentMessage) {
@@ -283,7 +283,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         symbol: message.symbol || null,
         threadMessagesCount: message.threadMessagesCount,
         isHighlighted: false,
-        sending: false,
+        status: message.status === 'sending' ? 'on_server' : message.status,
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,

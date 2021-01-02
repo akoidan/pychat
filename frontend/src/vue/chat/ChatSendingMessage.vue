@@ -21,7 +21,10 @@
       >{{ message.transfer.error }}</i>
     </template>
     <div class="absolute-right">
-      <!--      IF message doesnt have content it's deleted-->
+      <div v-if="isRead"/>
+      <div v-if="acceptedBy">
+
+      </div>
       <chat-message-tool-tip
         class="message-tooltip"
         :message="message"
@@ -87,7 +90,7 @@ export default class ChatSendingMessage extends Vue {
       'message-self': this.isSelf,
       'message-others': !this.isSelf,
       'message-wrapper': true,
-      'message-is-being-sent': this.message.sending,
+      'message-is-being-sent': this.message.status === 'sending',
       'removed-message': this.message.deleted,
       'unread-message': this.message.isHighlighted,
     };

@@ -289,7 +289,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   private markAsReadSentMessages(responseMessages: MessageP2pDto[]) {
     if (!this.isConnectedToMyAnotherDevices) {
-      let isNotRead: number[] = responseMessages.map(m => m.id).filter(id => this.room.messages[id].sending);
+      let isNotRead: number[] = responseMessages.map(m => m.id).filter(id => this.room.messages[id].status === 'sending');
       if (isNotRead.length > 0) {
         this.store.markMessageAsSent({messagesId: isNotRead, roomId: this.roomId});
       }
