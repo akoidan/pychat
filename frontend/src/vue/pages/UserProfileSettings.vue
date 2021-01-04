@@ -86,7 +86,7 @@
         </tr>
         <tr>
           <th><label>Clear history</label></th>
-          <td style="padding: 10px 0">
+          <td>
             <input
               type="button"
               class="lor-btn"

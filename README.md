@@ -478,6 +478,8 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* read mesage
+* lastTimeOnline
 * When user goes back to room list and he wants to join the same room, he can't because watch doesn't trigger when you click on the same room
 * /giphy should work exactly like mention with drop above
 * quote should work similar to tag user

@@ -100,7 +100,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   public async sendNewP2PMessage(payload: SendNewP2PMessage) {
     let message: MessageModel = p2pMessageToModel(payload.message, this.roomId);
-    this.messageHelper.processUnkownP2pMessage(message);
+    this.messageHelper.processUnknownP2pMessage(message);
 
     let response: ConfirmReceivedP2pMessage = {
       action: 'confirmReceivedP2pMessage',

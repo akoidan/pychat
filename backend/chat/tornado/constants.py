@@ -40,6 +40,7 @@ class Actions(object):
 	NOTIFY_CALL_ACTIVE = 'notifyCallActive'
 	SYNC_HISTORY = 'syncHistory'
 	SHOW_I_TYPE = 'showIType'
+	SET_MESSAGE_STATUS = 'setMessageStatus'
 	SEARCH_MESSAGES = 'searchMessages'
 	PING = 'ping'
 	PONG = 'pong'
@@ -104,6 +105,7 @@ class VarNames(object):
 	P2P = 'p2p'
 	LAST_SYNCED = 'lastSynced'
 	MESSAGE_IDS = 'messagesIds'
+	MESSAGE_STATUS = 'status'
 
 
 class IpVarNames(object):

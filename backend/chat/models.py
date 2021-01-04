@@ -244,9 +244,24 @@ class Message(Model):
 	"""
 
 	class MessageStatus(Enum):
-		on_server = 'on_server'
-		read = 'read'
-		received= 'received'
+		on_server = 'u'  # uploaded to server
+		read = 'r'  # read
+		received = 's'  # sent
+
+		@classmethod
+		def from_dto(cls, dto):
+			if dto == 'on_server':
+				return cls.on_server
+			elif dto == 'read':
+				return cls.read
+			elif dto == 'received':
+				return cls.received
+			else:
+				raise Exception("Invalid message type")
+
+		@property
+		def dto(self):
+			return self.name
 
 	sender = ForeignKey(User, CASCADE)
 	room = ForeignKey(Room, CASCADE, null=True)
@@ -259,7 +274,7 @@ class Message(Model):
 	# - images that refers same message always have unique symbols
 	symbol = CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
-	message_status = CharField(max_length=10, null=False, default=MessageStatus.on_server.value)
+	message_status = CharField(max_length=1, null=False, default=MessageStatus.on_server.value)
 	thread_messages_count = IntegerField(default=0, null=False)
 	parent_message = ForeignKey('self', CASCADE, null=True, blank=True)
 	giphy = URLField(null=True, blank=True)

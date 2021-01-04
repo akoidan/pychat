@@ -73,7 +73,7 @@ export class MessageHelper {
 
   }
 
-  public processUnkownP2pMessage(message: MessageModel) {
+  public processUnknownP2pMessage(message: MessageModel) {
     if (message.userId !== this.store.myId) {
       this.processOpponentMessage(message);
     }

@@ -29,6 +29,7 @@ import {
   WebRtcDefaultMessage
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { DefaultInnerSystemMessage } from '@/ts/types/messages/innerMessages';
+import {MessageStatus} from '@/ts/types/model';
 
 export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H>, CallBackMessage {
   cbBySender?: string;
@@ -43,6 +44,12 @@ export interface DeleteMessage extends DefaultWsInMessage<'deleteMessage', 'ws-m
   roomId: number;
   id: number;
   edited: number;
+}
+
+export interface SetMessageStatusMessage extends DefaultWsInMessage<'setMessageStatus', 'ws-message'> {
+  roomId: number;
+  status: MessageStatus;
+  messagesIds: number[];
 }
 
 export interface EditMessage extends DefaultWsInMessage<'editMessage', 'ws-message'> , MessageModelDto  {

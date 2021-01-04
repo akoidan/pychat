@@ -14,6 +14,7 @@ import {
   GrowlType,
   IncomingCallModel,
   MessageModel,
+  MessageStatus,
   PastingTextAreaElement,
   ReceivingFile,
   RoomDictModel,
@@ -532,6 +533,29 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public incNewMessagesCount(roomId: number) {
     this.roomsDict[roomId].newMessagesCount++;
+  }
+
+  @Mutation
+  public setMessagesStatus(
+      {
+        roomId,
+        messagesIds,
+        status,
+      }: {
+        roomId: number;
+        messagesIds: number[];
+        status: MessageStatus;
+      }
+  ) {
+    let ids = Object.values(this.roomsDict[roomId].messages)
+        .filter(m => messagesIds.includes(m.id))
+        .map(m => {
+          m.status = status;
+          return m.id;
+    });
+    if (ids.length) {
+      this.storage.setMessagesStatus(ids, status);
+    }
   }
 
   // resetNewMessagesCount(roomId: number) {

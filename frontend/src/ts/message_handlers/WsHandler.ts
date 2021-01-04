@@ -11,6 +11,7 @@ import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
+  MessageStatus,
   UserModel
 } from '@/ts/types/model';
 import {
@@ -344,6 +345,19 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.messageProc.sendToServerAndAwait({
       roomId,
       action: 'deleteRoom'
+    });
+  }
+
+  public async setMessageStatus(
+      messagesIds: number[],
+      roomId: number,
+      status: MessageStatus
+  ) {
+    return this.messageProc.sendToServerAndAwait({
+      messagesIds,
+      action: 'setMessageStatus',
+      status,
+      roomId // this is for server performance reason. To exclude access token validation
     });
   }
 

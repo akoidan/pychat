@@ -21,15 +21,13 @@
       >{{ message.transfer.error }}</i>
     </template>
     <div class="absolute-right">
-      <div v-if="isRead"/>
-      <div v-if="acceptedBy">
-
-      </div>
+      <div v-if="message.status === 'received'">received</div>
+      <div v-if="message.status === 'read'">Read</div>
       <chat-message-tool-tip
         class="message-tooltip"
         :message="message"
       />
-      <div class="spinner" v-if="message.sending" />
+      <div class="spinner" v-if="message.status === 'sending'" />
     </div>
   </div>
 </template>

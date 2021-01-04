@@ -36,6 +36,7 @@ import {
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
+  SetMessageStatusMessage,
   DeleteMessage,
   EditMessage,
   MessagesResponseMessage,
@@ -46,6 +47,7 @@ import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import {LAST_SYNCED, MESSAGES_PER_SEARCH} from '@/ts/utils/consts';
 import {convertMessageModelDtoToModel} from '@/ts/types/converters';
 import {checkIfIdIsMissing, getMissingIds} from '@/ts/utils/pureFunctions';
+import NotifierHandler from '@/ts/classes/NotificationHandler';
 
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
@@ -57,6 +59,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     editMessage:  <HandlerType<'editMessage', 'ws-message'>>this.editMessage,
     printMessage:  <HandlerType<'printMessage', 'ws-message'>>this.printMessage,
     internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
+    setMessageStatus:  <HandlerType<'setMessageStatus', 'ws-message'>>this.setMessageStatus,
     logout:  <HandlerType<'logout', HandlerName>>this.logout,
   };
 
@@ -67,13 +70,14 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private readonly ws: WsHandler;
   private syncMessageLock: boolean = false;
   private readonly messageHelper: MessageHelper;
+  private readonly notifier: NotifierHandler;
 
   constructor(
       store: DefaultStore,
       api: Api,
       ws: WsHandler,
       messageHelper: MessageHelper,
-  ) {
+      notifier: NotifierHandler) {
     super();
     this.store = store;
     this.api = api;
@@ -81,6 +85,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.logger = loggerFactory.getLogger('ws-message');
     this.ws = ws;
     this.messageHelper = messageHelper;
+    this.notifier = notifier;
   }
 
   public async syncMessages(): Promise<void> {
@@ -117,9 +122,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
-  public async loadMessages(roomId: number, messageIds: number[]): Promise<void> {
-    this.logger.log("Asking for messages {}", messageIds)();
-    let respones = await this.ws.sendLoadMessagesByIds(roomId, messageIds);
+  public async loadMessages(roomId: number, messagesIds: number[]): Promise<void> {
+    this.logger.log("Asking for messages {}", messagesIds)();
+    let respones = await this.ws.sendLoadMessagesByIds(roomId, messagesIds);
     this.addMessages(roomId, respones.content);
   }
 
@@ -313,8 +318,15 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   public async printMessage(inMessage: PrintMessage) {
     const message: MessageModel = convertMessageModelDtoToModel(inMessage, null, time => this.ws.convertServerTimeToPC(time));
-    this.messageHelper.processUnkownP2pMessage(message);
-
+    this.messageHelper.processUnknownP2pMessage(message);
+    if (inMessage.userId !== this.store.myId) {
+      let isRead = this.notifier.getIsCurrentWindowActive() && this.store.activeRoomId === inMessage.roomId;
+      this.ws.setMessageStatus(
+          [inMessage.id],
+          inMessage.roomId,
+          isRead ? 'read' : 'received'
+      );
+    }
     if (checkIfIdIsMissing(message, this.store)) {
       await this.loadMessages(message.roomId, [message.parentMessage!]);
     } else if (inMessage.parentMessage) {
@@ -325,6 +337,14 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   public async internetAppear(m : InternetAppearMessage) {
     this.syncMessages(); // if message was edited, or changed by server
     this.syncHistory(); // if some messages were sent during offline
+  }
+
+  public async setMessageStatus(m: SetMessageStatusMessage) {
+    this.store.setMessagesStatus({
+      roomId: m.roomId,
+      status: m.status,
+      messagesIds: m.messagesIds
+    });
   }
 
   public logout(m: LogoutMessage) {

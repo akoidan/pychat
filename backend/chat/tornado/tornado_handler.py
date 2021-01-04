@@ -121,8 +121,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.close(403, "Session key %s has been rejected" % session_key)
 			return
 		self.user_id = int(user_id)
+		try:
+			user_db = UserProfile.objects.get(id=self.user_id)
+		except UserProfile.DoesNotExist:
+			self.logger.warning('Database has been cleared, but redis %s not. Logging out current user' % session_key)
+			self.close(403, "This user no more longer exists")
+			return
 		self.ip = self.get_client_ip()
-		user_db = UserProfile.objects.get(id=self.user_id)
 		self.generate_self_id()
 		self.message_creator = WebRtcMessageCreator(self.user_id, self.id)
 		self._logger = logging.LoggerAdapter(parent_logger, {

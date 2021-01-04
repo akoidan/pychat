@@ -160,7 +160,7 @@ async function init() {
   const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
   const messageBus = new Vue();
   const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
-  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
+  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper, notifier);
   const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();

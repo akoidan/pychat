@@ -80,6 +80,7 @@ class MessagesHandler():
 			Actions.SEARCH_MESSAGES: self.search_messages,
 			Actions.SYNC_HISTORY: self.sync_history,
 			Actions.SHOW_I_TYPE: self.show_i_type,
+			Actions.SET_MESSAGE_STATUS: self.set_message_status,
 		}
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
@@ -89,6 +90,7 @@ class MessagesHandler():
 			Actions.INVITE_USER: self.send_client_new_channel,
 			Actions.ADD_INVITE: self.send_client_new_channel,
 			Actions.PING: self.process_ping_message,
+			Actions.SET_MESSAGE_STATUS: self.set_message_status_cb,
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -851,6 +853,43 @@ class MessagesHandler():
 			VarNames.EVENT: Actions.SHOW_I_TYPE,
 			VarNames.HANDLER_NAME: HandlerNames.ROOM # because ws-message doesnt exist in p2p
 		}, message[VarNames.ROOM_ID])
+
+	def set_message_status_cb(self, payload):
+		if payload[VarNames.USER_ID] == self.user_id:
+			return True # Do not send to this user again
+
+	def set_message_status(self, payload):
+		to_status = Message.MessageStatus.from_dto(payload[VarNames.MESSAGE_STATUS])
+		if to_status == Message.MessageStatus.received:
+			ids_list = list(Message.objects.filter(
+				id__in=payload[VarNames.MESSAGE_IDS],
+				room_id=payload[VarNames.ROOM_ID],
+				message_status=Message.MessageStatus.on_server.value
+			).values_list('id', flat=True))
+		elif to_status == Message.MessageStatus.read:
+			ids_list = list(Message.objects.filter(
+				id__in=payload[VarNames.MESSAGE_IDS],
+				room_id=payload[VarNames.ROOM_ID],
+				message_status__in=(Message.MessageStatus.on_server.value, Message.MessageStatus.received.value)
+			).values_list('id', flat=True))
+		else:
+			raise Exception("Unsupported status")
+		if ids_list:
+			Message.objects.filter(id__in=ids_list).update(
+				message_status=to_status.value
+			)
+			self.publish(
+				{
+					VarNames.ROOM_ID: payload[VarNames.ROOM_ID],
+					VarNames.HANDLER_NAME: HandlerNames.WS_MESSAGE,
+					VarNames.EVENT: Actions.SET_MESSAGE_STATUS,
+					VarNames.MESSAGE_STATUS: to_status.dto,
+					VarNames.MESSAGE_IDS: ids_list,
+					VarNames.USER_ID: self.user_id,
+				},
+				payload[VarNames.ROOM_ID],
+				True
+			)
 
 	def sync_history(self, in_message):
 		room_ids = in_message[VarNames.ROOM_IDS]

@@ -96,7 +96,7 @@ export interface MessageTransferInfo {
   xhr: XMLHttpRequest|null;
 }
 
-export type MessageStatus = 'sending' | 'received' | 'read' | 'on_server';
+export type MessageStatus = 'sending' | 'on_server'| 'received' | 'read' ;
 
 export interface MessageModel {
   id: number;

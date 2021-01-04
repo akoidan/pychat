@@ -13,6 +13,7 @@ import {
   CurrentUserSettingsModel,
   FileModel,
   MessageModel,
+  MessageStatus,
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
@@ -294,10 +295,14 @@ export default class DatabaseWrapper implements IStorage {
     this.logger.log('Db has been purged')();
   }
 
-  public markMessageAsSent(messageIds: number[]) {
+  public markMessageAsSent(messagesIds: number[]) {
     this.write(t => {
-      this.executeSql(t, `update message set status = 'on_server' where id in (${messageIds.join(', ')})`, [])();
+      this.executeSql(t, `update message set status = 'on_server' where id in ${this.idsToString(messagesIds)}`, [])();
     });
+  }
+
+  private idsToString(ids: number[]): string {
+    return `(${ids.join(', ')})`;
   }
 
   // private getMessages (t, cb) {
@@ -398,6 +403,12 @@ export default class DatabaseWrapper implements IStorage {
     this.write(t => {
       this.executeSql(t, 'update user set deleted = 1', [])();
       users.forEach(u => this.insertUser(t, u));
+    });
+  }
+
+  public setMessagesStatus(messagesIds: number[], status: MessageStatus): void {
+    this.write(t => {
+      this.executeSql(t, `update message set status = ? where id in ${this.idsToString(messagesIds)}`, [status])();
     });
   }
 
@@ -550,7 +561,7 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   private insertRoomUsers(t: SQLTransaction, roomId: number, userId: number) {
-    this.executeSql(t, 'insert into room_users (room_id, user_id) values (?, ?, ?)', [roomId, userId])();
+    this.executeSql(t, 'insert into room_users (room_id, user_id) values (?, ?)', [roomId, userId])();
   }
 
   private setRoomUsers(t: SQLTransaction, roomId: number, users: number[]) {
