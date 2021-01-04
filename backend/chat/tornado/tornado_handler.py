@@ -9,14 +9,13 @@ from itertools import chain
 from tornado import ioloop, gen
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile, Channel
+from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile, Channel, get_milliseconds
 from chat.py2_3 import str_type
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
 from chat.tornado.message_creator import MessagesCreator, WebRtcMessageCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, get_history_message_query, create_id, \
-	get_or_create_ip_model
+from chat.utils import create_id, get_or_create_ip_model
 
 parent_logger = logging.getLogger(__name__)
 
@@ -80,8 +79,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		if self.connected:
 			message = self.message_creator.room_online_logout(online)
 			self.publish(message, settings.ALL_ROOM_ID)
-			res = execute_query(settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
-			self.logger.info("Updated %s last read message", res)
+			UserProfile.objects.filter(id=self.user_id).update(last_time_online=get_milliseconds())
 		self.disconnect()
 
 	def disconnect(self, tries=0):
@@ -123,8 +121,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.close(403, "Session key %s has been rejected" % session_key)
 			return
 		self.user_id = int(user_id)
+		try:
+			user_db = UserProfile.objects.get(id=self.user_id)
+		except UserProfile.DoesNotExist:
+			self.logger.warning('Database has been cleared, but redis %s not. Logging out current user' % session_key)
+			self.close(403, "This user no more longer exists")
+			return
 		self.ip = self.get_client_ip()
-		user_db = UserProfile.objects.get(id=self.user_id)
 		self.generate_self_id()
 		self.message_creator = WebRtcMessageCreator(self.user_id, self.id)
 		self._logger = logging.LoggerAdapter(parent_logger, {

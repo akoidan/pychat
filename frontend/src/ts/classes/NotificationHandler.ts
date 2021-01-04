@@ -20,7 +20,6 @@ export default class NotifierHandler {
   private serviceWorkedTried = false;
   private serviceWorkerRegistration: any = null;
   private subscriptionId: string|null = null;
-  private isCurrentTabActive: boolean = false;
   private newMessagesCount: number = 0;
   private unloaded: boolean = false;
   private readonly store: DefaultStore;
@@ -105,7 +104,7 @@ export default class NotifierHandler {
   }
 
   public async showNotification(title: string, options: NotificationOptions) {
-    if (this.isCurrentTabActive) {
+    if (this.store.isCurrentWindowActive) {
       return;
     }
     this.newMessagesCount++;
@@ -154,7 +153,7 @@ export default class NotifierHandler {
     } else {
       this.logger.debug('Marking current tab as active')();
     }
-    this.isCurrentTabActive = true;
+    this.store.setIsCurrentWindowActive(true);
     this.newMessagesCount = 0;
     document.title = this.documentTitle;
     this.popedNotifQueue.forEach((n) => {
@@ -162,12 +161,8 @@ export default class NotifierHandler {
     });
   }
 
-  public getIsCurrentWindowActive(): boolean {
-    return this.isCurrentTabActive;
-  }
-
   public onFocusOut() {
-    this.isCurrentTabActive = false;
+    this.store.setIsCurrentWindowActive(false);
     this.logger.debug('Deactivating current tab')();
   }
 

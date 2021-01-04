@@ -21,12 +21,13 @@
       >{{ message.transfer.error }}</i>
     </template>
     <div class="absolute-right">
-      <!--      IF message doesnt have content it's deleted-->
       <chat-message-tool-tip
         class="message-tooltip"
         :message="message"
       />
-      <div class="spinner" v-if="message.sending" />
+      <i class="icon-ok message-status-read" v-if="isSelf && message.status === 'read'" title="This message has been read by at least one user"/>
+      <i class="icon-ok message-status-received" v-if="isSelf && message.status === 'received'" title="At least one user in this room has received this message"/>
+      <div class="spinner" v-if="message.status === 'sending'" />
     </div>
   </div>
 </template>
@@ -87,7 +88,7 @@ export default class ChatSendingMessage extends Vue {
       'message-self': this.isSelf,
       'message-others': !this.isSelf,
       'message-wrapper': true,
-      'message-is-being-sent': this.message.sending,
+      'message-is-being-sent': this.message.status === 'sending',
       'removed-message': this.message.deleted,
       'unread-message': this.message.isHighlighted,
     };
@@ -141,7 +142,15 @@ export default class ChatSendingMessage extends Vue {
     margin-left: 20px
     @include hover-click(red)
 
-
+  %message-status
+    margin: 0 8px
+    font-size: 10px
+  .message-status-read
+    @extend %message-status
+    color: #00b500
+  .message-status-received
+    @extend %message-status
+    color: #dfdd00
   .editing-background
     border: 1px solid $editing-border-color
     background-color: rgba(255, 255, 255, 0.11)
@@ -176,6 +185,8 @@ export default class ChatSendingMessage extends Vue {
         top: 0 // $space-between-messages/2
       .message-tooltip
         display: inline-block
+      %message-status, .spinner
+        display: none
       //.message-content
       //  margin-top: 0 //-$space-between-messages/2
       //  padding-top: 0 // $space-between-messages/2

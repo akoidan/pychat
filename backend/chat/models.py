@@ -28,12 +28,22 @@ from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
 
 
+def get_milliseconds(dt=None):
+	if dt is None:
+		return int(time.time()*1000)
+	if dt.time.timestamp:
+		return int(dt.time.timestamp()*1000)
+	else:
+		return mktime(dt.time.timetuple()) * 1000 + int(dt.time.microsecond / 1000)
+
+
 def get_random_path(instance, filename):
 	"""
 	:param filename base string for generated name
 	:return: a unique string filename
 	"""
 	return u"{}_{}".format(id_generator(8), filename) # support nonenglish characters with u'
+
 
 def myoverridenmeta(name, bases, adict):
 	newClass = type(name, bases, adict)
@@ -72,6 +82,8 @@ class User(AbstractBaseUser):
 
 	# ISO/IEC 5218 1 male, 2 - female
 	sex = SmallIntegerField(null=False, default=0)
+
+	last_time_online = BigIntegerField(default=get_milliseconds)
 
 	@property
 	def sex_str(self):
@@ -219,15 +231,6 @@ class Room(Model):
 		]
 
 
-def get_milliseconds(dt=None):
-	if dt is None:
-		return int(time.time()*1000)
-	if dt.time.timestamp:
-		return int(dt.time.timestamp()*1000)
-	else:
-		return mktime(dt.time.timetuple()) * 1000 + int(dt.time.microsecond / 1000)
-
-
 class MessageHistory(Model):
 	time = BigIntegerField(default=get_milliseconds)
 	message = ForeignKey('Message', CASCADE, null=False)
@@ -239,6 +242,27 @@ class Message(Model):
 	"""
 	Contains all public messages
 	"""
+
+	class MessageStatus(Enum):
+		on_server = 'u'  # uploaded to server
+		read = 'r'  # read
+		received = 's'  # sent
+
+		@classmethod
+		def from_dto(cls, dto):
+			if dto == 'on_server':
+				return cls.on_server
+			elif dto == 'read':
+				return cls.read
+			elif dto == 'received':
+				return cls.received
+			else:
+				raise Exception("Invalid message type")
+
+		@property
+		def dto(self):
+			return self.name
+
 	sender = ForeignKey(User, CASCADE)
 	room = ForeignKey(Room, CASCADE, null=True)
 	# DateField.auto_now
@@ -250,10 +274,20 @@ class Message(Model):
 	# - images that refers same message always have unique symbols
 	symbol = CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
+	message_status = CharField(max_length=1, null=False, default=MessageStatus.on_server.value)
 	thread_messages_count = IntegerField(default=0, null=False)
 	parent_message = ForeignKey('self', CASCADE, null=True, blank=True)
 	giphy = URLField(null=True, blank=True)
-	edited_times = BigIntegerField(default=get_milliseconds, null=False)
+	updated_at = BigIntegerField(default=get_milliseconds, null=False)
+
+	@property
+	def status(self):
+		return self.MessageStatus(self.message_status)
+
+	@status.setter
+	def status(self, p_type):
+		self.message_status = p_type.value
+
 
 	def __unicode__(self):
 		return self.__str__()
@@ -339,7 +373,6 @@ class Image(Model):
 class RoomUsers(Model):
 	room = ForeignKey(Room, CASCADE, null=False)
 	user = ForeignKey(User, CASCADE, null=False)
-	last_read_message = ForeignKey(Message, CASCADE, null=True)
 	volume = IntegerField(default=2, null=False)
 	notifications = BooleanField(null=False, default=True)
 

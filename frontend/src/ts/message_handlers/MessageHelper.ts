@@ -58,7 +58,7 @@ export class MessageHelper {
         icon
       });
     }
-    if (!this.notifier.getIsCurrentWindowActive() || activeRoomId !== message.roomId) {
+    if (!this.store.isCurrentWindowActive || activeRoomId !== message.roomId) {
       if (!message.deleted) {
         message.isHighlighted = true;
       }
@@ -73,7 +73,7 @@ export class MessageHelper {
 
   }
 
-  public processUnkownP2pMessage(message: MessageModel) {
+  public processUnknownP2pMessage(message: MessageModel) {
     if (message.userId !== this.store.myId) {
       this.processOpponentMessage(message);
     }

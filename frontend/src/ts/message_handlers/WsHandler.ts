@@ -11,6 +11,7 @@ import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
+  MessageStatus,
   UserModel
 } from '@/ts/types/model';
 import {
@@ -48,7 +49,8 @@ import {
   SetWsIdMessage,
   MessagesResponseMessage,
   UserProfileChangedMessage,
-  WebRtcSetConnectionIdMessage
+  WebRtcSetConnectionIdMessage,
+  SyncHistoryResponseMessage
 } from '@/ts/types/messages/wsInMessages';
 import {
   InternetAppearMessage,
@@ -258,9 +260,17 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async syncHistory(roomIds: number[], messagesIds: number[], lastSynced: number): Promise<MessagesResponseMessage> {
+  public async syncHistory(
+      roomIds: number[],
+      messagesIds: number[],
+      receivedMessageIds: number[],
+      onServerMessageIds: number[],
+      lastSynced: number
+  ): Promise<SyncHistoryResponseMessage> {
     let payload: SyncHistoryOutMessage = {
       messagesIds,
+      receivedMessageIds,
+      onServerMessageIds,
       roomIds,
       lastSynced,
       action: 'syncHistory'
@@ -344,6 +354,19 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.messageProc.sendToServerAndAwait({
       roomId,
       action: 'deleteRoom'
+    });
+  }
+
+  public async setMessageStatus(
+      messagesIds: number[],
+      roomId: number,
+      status: MessageStatus
+  ) {
+    return this.messageProc.sendToServerAndAwait({
+      messagesIds,
+      action: 'setMessageStatus',
+      status,
+      roomId // this is for server performance reason. To exclude access token validation
     });
   }
 

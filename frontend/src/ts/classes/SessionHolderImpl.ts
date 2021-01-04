@@ -10,8 +10,8 @@ export class SessionHolderImpl implements SessionHolder {
     } else {
       localStorage.removeItem(SessionHolderImpl.SESSION_KEY);
     }
-
   }
+
   get session(): string|null {
    return localStorage.getItem(SessionHolderImpl.SESSION_KEY);
   }

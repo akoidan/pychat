@@ -6,6 +6,7 @@ import {
   FileModel,
   FileTransferStatus,
   MessageModel,
+  MessageStatus,
   RoomLog,
   RoomModel,
   RoomSettingsModel,
@@ -194,6 +195,7 @@ export interface IStorage {
   setUserSettings(settings: CurrentUserSettingsModel): void;
   saveRoomUsers(ru: SetRoomsUsers): void;
   setUsers(users: UserModel[]): void;
+  setMessagesStatus(messagesIds: number[], status: MessageStatus): void;
   getAllTree(): Promise<SetStateFromStorage|null>;
   saveUser(users: UserModel): void;
   clearStorage(): void;

@@ -3,6 +3,7 @@ import {
   ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
+  MessageStatus,
   RoomDictModel,
   SexModelString,
   UserModel
@@ -49,6 +50,7 @@ export interface ChannelDto {
 export interface UserDto {
   user: string;
   userId: number;
+  lastTimeOnline: number;
   sex: SexModelString;
   location: LocationDto;
 }
@@ -116,6 +118,7 @@ export interface MessageModelDto {
   files?: {[id: number]: FileModelDto};
   tags: {[id: number]: number};
   content: string;
+  status: MessageStatus;
   symbol?: string;
   deleted?: boolean;
   giphy?: string;

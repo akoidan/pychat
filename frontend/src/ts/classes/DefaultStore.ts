@@ -14,6 +14,7 @@ import {
   GrowlType,
   IncomingCallModel,
   MessageModel,
+  MessageStatus,
   PastingTextAreaElement,
   ReceivingFile,
   RoomDictModel,
@@ -89,7 +90,7 @@ const mediaLinkIdGetter: Function = (function () {
   };
 })();
 
-const vueStore = new Vuex.Store({
+export const vueStore = new Vuex.Store({
   state: {},
   mutations: {},
   actions: {}
@@ -134,6 +135,7 @@ export class DefaultStore extends VuexModule {
   public roomsDict: RoomDictModel = {};
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
+  public isCurrentWindowActive: boolean = true;
 
   get userName(): (id: number) => string {
     return (id: number): string => this.allUsersDict[id].user;
@@ -435,6 +437,11 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public setIsCurrentWindowActive(payload: boolean) {
+    this.isCurrentWindowActive = payload;
+  }
+
+  @Mutation
   public setCurrentSpeaker(payload: StringIdentifier) {
     this.roomsDict[payload.id].callInfo.currentSpeaker = payload.state;
   }
@@ -534,6 +541,29 @@ export class DefaultStore extends VuexModule {
     this.roomsDict[roomId].newMessagesCount++;
   }
 
+  @Mutation
+  public setMessagesStatus(
+      {
+        roomId,
+        messagesIds,
+        status,
+      }: {
+        roomId: number;
+        messagesIds: number[];
+        status: MessageStatus;
+      }
+  ) {
+    let ids = Object.values(this.roomsDict[roomId].messages)
+        .filter(m => messagesIds.includes(m.id))
+        .map(m => {
+          m.status = status;
+          return m.id;
+    });
+    if (ids.length) {
+      this.storage.setMessagesStatus(ids, status);
+    }
+  }
+
   // resetNewMessagesCount(roomId: number) {
   //   this.roomsDict[roomId].newMessagesCount = 0;
   // }
@@ -592,8 +622,8 @@ export class DefaultStore extends VuexModule {
     let markSendingIds: number[] = []
     m.messagesId.forEach(messageId => {
       let message = this.roomsDict[m.roomId].messages[messageId];
-      if (message.sending) {
-        message.sending = false;
+      if (message.status === 'sending') {
+        message.status = 'on_server';
         markSendingIds.push(messageId);
       }
     });

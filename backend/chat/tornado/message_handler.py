@@ -80,6 +80,7 @@ class MessagesHandler():
 			Actions.SEARCH_MESSAGES: self.search_messages,
 			Actions.SYNC_HISTORY: self.sync_history,
 			Actions.SHOW_I_TYPE: self.show_i_type,
+			Actions.SET_MESSAGE_STATUS: self.set_message_status,
 		}
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
@@ -89,6 +90,7 @@ class MessagesHandler():
 			Actions.INVITE_USER: self.send_client_new_channel,
 			Actions.ADD_INVITE: self.send_client_new_channel,
 			Actions.PING: self.process_ping_message,
+			Actions.SET_MESSAGE_STATUS: self.set_message_status_cb,
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -434,7 +436,6 @@ class MessagesHandler():
 			ru = [RoomUsers(
 				user_id=user_id,
 				room_id=room_id,
-				last_read_message_id=max_id,
 				volume=message[VarNames.VOLUME],
 				notifications=message[VarNames.NOTIFICATIONS]
 			) for user_id in users]
@@ -620,7 +621,6 @@ class MessagesHandler():
 		ru = [RoomUsers(
 			user_id=user_id,
 			room_id=room_id,
-			last_read_message_id=max_id,
 			volume=1,
 			notifications=False
 		) for user_id in users]
@@ -712,12 +712,12 @@ class MessagesHandler():
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		MessageHistory(message=message, content=message.content, giphy=message.giphy).save()
-		message.edited_times += 1
+
 		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
 			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(
 				deleted=True,
-				edited_times=get_milliseconds(),
+				updated_at=get_milliseconds(),
 				content=None
 			)
 			self.publish(self.message_creator.create_send_message(message, Actions.DELETE_MESSAGE, None, {}), message.room_id)
@@ -732,7 +732,7 @@ class MessagesHandler():
 				content=message.content,
 				symbol=message.symbol,
 				giphy=giphy,
-				edited_times=get_milliseconds()
+				updated_at=get_milliseconds()
 			)
 			message.giphy = giphy
 			self.publish(self.message_creator.create_send_message(message, Actions.EDIT_MESSAGE, None, {}), message.room_id)
@@ -770,7 +770,7 @@ class MessagesHandler():
 			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
 		else:
 			prep_files = None
-		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=get_milliseconds())
+		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, updated_at=get_milliseconds())
 		self.publish(self.message_creator.create_send_message(message, action, prep_files, tags), message.room_id)
 
 	def send_client_new_channel(self, message):
@@ -854,6 +854,43 @@ class MessagesHandler():
 			VarNames.HANDLER_NAME: HandlerNames.ROOM # because ws-message doesnt exist in p2p
 		}, message[VarNames.ROOM_ID])
 
+	def set_message_status_cb(self, payload):
+		if payload[VarNames.USER_ID] == self.user_id:
+			return True # Do not send to this user again
+
+	def set_message_status(self, payload):
+		to_status = Message.MessageStatus.from_dto(payload[VarNames.MESSAGE_STATUS])
+		if to_status == Message.MessageStatus.received:
+			ids_list = list(Message.objects.filter(
+				id__in=payload[VarNames.MESSAGE_IDS],
+				room_id=payload[VarNames.ROOM_ID],
+				message_status=Message.MessageStatus.on_server.value
+			).values_list('id', flat=True))
+		elif to_status == Message.MessageStatus.read:
+			ids_list = list(Message.objects.filter(
+				id__in=payload[VarNames.MESSAGE_IDS],
+				room_id=payload[VarNames.ROOM_ID],
+				message_status__in=(Message.MessageStatus.on_server.value, Message.MessageStatus.received.value)
+			).values_list('id', flat=True))
+		else:
+			raise Exception("Unsupported status")
+		if ids_list:
+			Message.objects.filter(id__in=ids_list).update(
+				message_status=to_status.value
+			)
+			self.publish(
+				{
+					VarNames.ROOM_ID: payload[VarNames.ROOM_ID],
+					VarNames.HANDLER_NAME: HandlerNames.WS_MESSAGE,
+					VarNames.EVENT: Actions.SET_MESSAGE_STATUS,
+					VarNames.MESSAGE_STATUS: to_status.dto,
+					VarNames.MESSAGE_IDS: ids_list,
+					VarNames.USER_ID: self.user_id,
+				},
+				payload[VarNames.ROOM_ID],
+				True
+			)
+
 	def sync_history(self, in_message):
 		room_ids = in_message[VarNames.ROOM_IDS]
 		message_ids = in_message[VarNames.MESSAGE_IDS]
@@ -863,11 +900,33 @@ class MessagesHandler():
 		messages = Message.objects.filter(
 			Q(room_id__in=room_ids)
 			& ~Q(id__in=message_ids)
-			& Q(edited_times__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+			& Q(updated_at__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
 		)
+
+		if in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
+			on_server_to_received_ids = list(Message.objects.filter(
+				Q(room_id__in=room_ids)
+				& Q(id__in=in_message[VarNames.ON_SERVER_MESSAGE_IDS])
+				& Q(message_status=Message.MessageStatus.received.value)
+			).values_list('id', flat=True))
+		else:
+			on_server_to_received_ids = []
+
+		if in_message[VarNames.RECEIVED_MESSAGE_IDS] or in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
+			ids_to_search = in_message[VarNames.RECEIVED_MESSAGE_IDS] + in_message[VarNames.ON_SERVER_MESSAGE_IDS] 
+			read_ids = list(Message.objects.filter(
+				Q(room_id__in=room_ids)
+				& Q(id__in=ids_to_search)
+				& Q(message_status=Message.MessageStatus.read.value)
+			).values_list('id', flat=True))
+		else:
+			read_ids = []
+
 		content = MessagesCreator.message_models_to_dtos(messages)
 		self.ws_write({
 			VarNames.CONTENT: content,
+			VarNames.RECEIVED_MESSAGE_IDS: on_server_to_received_ids,
+			VarNames.READ_MESSAGE_IDS: read_ids,
 			VarNames.JS_MESSAGE_ID: in_message[VarNames.JS_MESSAGE_ID],
 			VarNames.HANDLER_NAME: HandlerNames.NULL
 		})

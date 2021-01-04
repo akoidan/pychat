@@ -1,9 +1,11 @@
 import { LogLevel } from 'lines-logger';
+import {MessageStatus} from '@/ts/types/model';
 
 export interface UserDB {
   id: number;
   user: string;
   sex: SexDB;
+  last_time_online: number;
   deleted: BooleanDB;
   country_code: string;
   country: string;
@@ -25,7 +27,7 @@ export interface RoomDB {
   creator: number;
 }
 
-export  interface ChannelDB {
+export interface ChannelDB {
   id: number;
   name: string;
   creator: number;
@@ -48,12 +50,12 @@ export interface MessageDB {
   deleted: BooleanDB;
   giphy: string;
   edited: number;
-  roomId: number;
-  userId: number;
-  sending: BooleanDB;
+  room_id: number;
+  user_id: number;
+  status: MessageStatus;
 }
 
-export  interface FileDB {
+export interface FileDB {
   id: number;
   preview_file_id: number; //  so this is UploadFile.id for "preview" File
   file_id: number;  // so this is UploadFile.id for "url" File
@@ -66,21 +68,21 @@ export  interface FileDB {
 }
 
 export interface SettingsDB {
-  userId: number;
-  embeddedYoutube: BooleanDB;
-  highlightCode: BooleanDB;
-  incomingFileCallSound: BooleanDB;
-  messageSound: BooleanDB;
-  onlineChangeSound: BooleanDB;
-  showWhenITyping: BooleanDB;
-  sendLogs: BooleanDB;
+  user_id: number;
+  embedded_youtube: BooleanDB;
+  highlight_code: BooleanDB;
+  incoming_file_call_sound: BooleanDB;
+  message_sound: BooleanDB;
+  online_change_sound: BooleanDB;
+  show_when_i_typing: BooleanDB;
+  send_logs: BooleanDB;
   suggestions: BooleanDB;
   theme: string;
   logs: LogLevel;
 }
 
 export interface ProfileDB {
-  userId: number;
+  user_id: number;
   user: string;
   name: string;
   city: string;

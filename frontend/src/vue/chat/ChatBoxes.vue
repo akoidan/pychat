@@ -20,7 +20,8 @@
 <script lang="ts">
 import {
   Component,
-  Vue
+  Vue,
+  Watch
 } from 'vue-property-decorator';
 import ChatBox from '@/vue/chat/ChatBox.vue';
 import { State } from '@/ts/instances/storeInstance';
@@ -47,7 +48,12 @@ export default class ChatBoxes extends Vue {
 
   @State
   public readonly activeRoomId!: number;
+
+  @Watch('activeRoomId')
+  onActiveRoomIdChange() {
+
   }
+}
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>

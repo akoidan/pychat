@@ -1007,6 +1007,12 @@
       "src": "typicons"
     },
     {
+      "uid": "7b16b22168e762c88333f465da862098",
+      "css": "ok",
+      "code": 59474,
+      "src": "websymbols"
+    },
+    {
       "uid": "918bda80304f8b29c37dbd7322fef131",
       "css": "webrtc-nomic",
       "code": 59465,

@@ -9,6 +9,7 @@ import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   MessageModel,
+  MessageStatus,
   RoomSettingsModel,
   UserModel
 } from '@/ts/types/model';
@@ -75,6 +76,7 @@ export default class LocalStorage implements IStorage {
   public setUserSettings(settings: CurrentUserSettingsModel)  {}
   public saveRoomUsers(ru: SetRoomsUsers)  {}
   public setUsers(users: UserModel[])  {}
+  public setMessagesStatus(messagesIds: number[], status: MessageStatus) {}
   public saveUser(users: UserModel)  {}
   public markMessageAsSent(m: number[]) {}
 

@@ -181,17 +181,19 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
     }
 
     onEmitScroll() {
-      this.$nextTick(function () {
-        if (this.scrollBottom) {
-          if (this.room.search.searchActive && this.chatboxSearch) {
-            this.$logger.debug("Scrolling chatboxSearch to bottom")();
-            this.chatboxSearch.scrollTop = this.chatboxSearch.scrollHeight;
-          } else if (this.chatbox) {
-            this.$logger.debug("Scrolling chatbox to bottom")();
-            this.chatbox.scrollTop = this.chatbox.scrollHeight;
+      if (this.activeRoomId === this.room.id) {
+        this.$nextTick(function () {
+          if (this.scrollBottom) {
+            if (this.room.search.searchActive && this.chatboxSearch) {
+              this.$logger.debug("Scrolling chatboxSearch to bottom")();
+              this.chatboxSearch.scrollTop = this.chatboxSearch.scrollHeight;
+            } else if (this.chatbox) {
+              this.$logger.debug("Scrolling chatbox to bottom")();
+              this.chatbox.scrollTop = this.chatbox.scrollHeight;
+            }
           }
-        }
-      });
+        });
+      }
     }
 
     created() {

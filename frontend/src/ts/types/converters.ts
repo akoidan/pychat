@@ -221,7 +221,7 @@ export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessa
     transfer: null,
     tags: {...message.tags}, // prevent modifying original object by vuex
     parentMessage: message.parentMessage,
-    sending: false, // this code is only called from WsInMessagew which means it's synced
+    status: message.status,
     giphy: message.giphy || null,
     deleted: message.deleted || false
   };
@@ -244,11 +244,11 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     symbol: m.symbol,
     time: Date.now() - m.timeAgo,
     userId: m.userId,
-    sending: false,
+    status: 'received',
     roomId,
     isHighlighted: false,
     transfer: null
-  }
+  };
 }
 
 export function convertUser(u: UserDto): UserModel {
@@ -262,6 +262,7 @@ export function convertUser(u: UserDto): UserModel {
   return {
     user: u.user,
     id: u.userId,
+    lastTimeOnline: u.lastTimeOnline,
     sex: convertSex(u.sex),
     location
   };

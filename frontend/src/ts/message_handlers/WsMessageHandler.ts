@@ -13,6 +13,7 @@ import {
 import {
   FileModel,
   MessageModel,
+  MessageStatus,
   RoomModel
 } from '@/ts/types/model';
 import { Logger } from 'lines-logger';
@@ -36,17 +37,18 @@ import {
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
+  SetMessageStatusMessage,
   DeleteMessage,
   EditMessage,
   MessagesResponseMessage,
   PrintMessage,
+  SyncHistoryResponseMessage,
 } from '@/ts/types/messages/wsInMessages';
 import { savedFiles } from '@/ts/utils/htmlApi';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import {LAST_SYNCED, MESSAGES_PER_SEARCH} from '@/ts/utils/consts';
 import {convertMessageModelDtoToModel} from '@/ts/types/converters';
 import {checkIfIdIsMissing, getMissingIds} from '@/ts/utils/pureFunctions';
-
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
 
@@ -57,6 +59,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     editMessage:  <HandlerType<'editMessage', 'ws-message'>>this.editMessage,
     printMessage:  <HandlerType<'printMessage', 'ws-message'>>this.printMessage,
     internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
+    setMessageStatus:  <HandlerType<'setMessageStatus', 'ws-message'>>this.setMessageStatus,
     logout:  <HandlerType<'logout', HandlerName>>this.logout,
   };
 
@@ -67,12 +70,14 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private readonly ws: WsHandler;
   private syncMessageLock: boolean = false;
   private readonly messageHelper: MessageHelper;
+  private vueStore: any;
 
   constructor(
       store: DefaultStore,
+      vueStore: any,
       api: Api,
       ws: WsHandler,
-      messageHelper: MessageHelper,
+      messageHelper: MessageHelper
   ) {
     super();
     this.store = store;
@@ -81,6 +86,31 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.logger = loggerFactory.getLogger('ws-message');
     this.ws = ws;
     this.messageHelper = messageHelper;
+    this.vueStore = vueStore;
+    this.vueStore.watch(() => this.store.activeRoomId, (value: number, oldValue: number) => {
+      if (this.store.activeRoom) {
+        this.markMessagesInCurrentRoomAsRead();
+      }
+    });
+    this.vueStore.watch(() => this.store.isCurrentWindowActive, (value: number, oldValue: number) => {
+      if (value && this.store.activeRoom) {
+        this.markMessagesInCurrentRoomAsRead();
+      }
+    });
+  }
+
+  private markMessagesInCurrentRoomAsRead() {
+    this.logger.debug("Checking if we can set some messages to status read")();
+    let messagesIds = Object.values(this.store.activeRoom!.messages)
+        .filter(m => m.userId !== this.store.myId && m.status === 'received' ||  m.status === 'on_server')
+        .map(m => m.id);
+    if (messagesIds.length > 0) {
+      this.ws.setMessageStatus(
+          messagesIds,
+          this.store.activeRoomId!,
+          'read'
+      );
+    }
   }
 
   public async syncMessages(): Promise<void> {
@@ -95,7 +125,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         if (room.p2p) {
           continue;
         }
-        let messages = Object.values(room.messages).filter(m => m.sending);
+        let messages = Object.values(room.messages).filter(m => m.status === 'sending');
         // sync messages w/o parent thread first
         messages.sort((a,b)=> {
           if (a.parentMessage && !b.parentMessage) {
@@ -117,9 +147,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
-  public async loadMessages(roomId: number, messageIds: number[]): Promise<void> {
-    this.logger.log("Asking for messages {}", messageIds)();
-    let respones = await this.ws.sendLoadMessagesByIds(roomId, messageIds);
+  public async loadMessages(roomId: number, messagesIds: number[]): Promise<void> {
+    this.logger.log("Asking for messages {}", messagesIds)();
+    let respones = await this.ws.sendLoadMessagesByIds(roomId, messagesIds);
     this.addMessages(roomId, respones.content);
   }
 
@@ -283,7 +313,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         symbol: message.symbol || null,
         threadMessagesCount: message.threadMessagesCount,
         isHighlighted: false,
-        sending: false,
+        status: message.status === 'sending' ? 'on_server' : message.status,
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,
@@ -313,8 +343,15 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   public async printMessage(inMessage: PrintMessage) {
     const message: MessageModel = convertMessageModelDtoToModel(inMessage, null, time => this.ws.convertServerTimeToPC(time));
-    this.messageHelper.processUnkownP2pMessage(message);
-
+    this.messageHelper.processUnknownP2pMessage(message);
+    if (inMessage.userId !== this.store.myId) {
+      let isRead = this.store.isCurrentWindowActive && this.store.activeRoomId === inMessage.roomId;
+      this.ws.setMessageStatus(
+          [inMessage.id],
+          inMessage.roomId,
+          isRead ? 'read' : 'received'
+      );
+    }
     if (checkIfIdIsMissing(message, this.store)) {
       await this.loadMessages(message.roomId, [message.parentMessage!]);
     } else if (inMessage.parentMessage) {
@@ -325,6 +362,14 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   public async internetAppear(m : InternetAppearMessage) {
     this.syncMessages(); // if message was edited, or changed by server
     this.syncHistory(); // if some messages were sent during offline
+  }
+
+  public async setMessageStatus(m: SetMessageStatusMessage) {
+    this.store.setMessagesStatus({
+      roomId: m.roomId,
+      status: m.status,
+      messagesIds: m.messagesIds
+    });
   }
 
   public logout(m: LogoutMessage) {
@@ -373,13 +418,35 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
+  private setAllMessagesStatus(inMessagesIds: number[], status: MessageStatus) {
+    if (inMessagesIds.length === 0) {
+      return
+    }
+    this.store.roomsArray.forEach(r => {
+      let messagesIds = Object.values(r.messages)
+          .map (m => m.id)
+          .filter(id => inMessagesIds.includes(id));
+      if (messagesIds.length > 0) {
+        this.store.setMessagesStatus({
+          messagesIds,
+          roomId: r.id,
+          status: status
+        });
+      }
+    });
+  }
+
   private async syncHistory() {
+    this.logger.log("Syncing history")();
     let messagesIds: number[] = [];
+    let receivedMessageIds: number[] = [];
+    let onServerMessageIds: number[] = [];
     let roomIds: number[] = this.store.roomsArray.map(r => {
-      let roomMessageIds = Object.values(r.messages)
-          .map(r => r.id)
-          .filter(id => id > 0);
-      messagesIds.push(...roomMessageIds)
+      let roomMessage = Object.values(r.messages).filter(m => m.id > 0)
+      messagesIds.push(...roomMessage.map(m => m.id));
+      roomMessage = roomMessage.filter(u => u.userId === this.store.myId);
+      receivedMessageIds.push(...roomMessage.filter(m => m.status === 'received').map(m => m.id));
+      onServerMessageIds.push(...roomMessage.filter(m => m.status === 'on_server').map(m => m.id));
       return r.id;
     });
 
@@ -390,7 +457,10 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
     joined = parseInt(joined);
 
-    let result: MessagesResponseMessage = await this.ws.syncHistory(roomIds, messagesIds, Date.now() - joined);
+    let result: SyncHistoryResponseMessage = await this.ws.syncHistory(roomIds, messagesIds, receivedMessageIds, onServerMessageIds, Date.now() - joined);
+
+    this.setAllMessagesStatus(result.readMessageIds, 'read');
+    this.setAllMessagesStatus(result.receivedMessageIds, 'received');
 
     let groupBY : Record<string, MessageModelDto[]> = result.content.reduce((rv, x) => {
       if (!rv[x.roomId]) {
