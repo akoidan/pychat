@@ -386,7 +386,6 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     private pasteImagesToTextArea(files: FileList| File[]) {
-      console.error(files);
       this.showAttachments = false;
       for (let i = 0; i < files.length; i++) {
         pasteImgToTextArea(files[i], this.userMessage, (err: string) => {

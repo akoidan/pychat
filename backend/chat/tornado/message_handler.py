@@ -90,7 +90,6 @@ class MessagesHandler():
 			Actions.INVITE_USER: self.send_client_new_channel,
 			Actions.ADD_INVITE: self.send_client_new_channel,
 			Actions.PING: self.process_ping_message,
-			Actions.SET_MESSAGE_STATUS: self.set_message_status_cb,
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -854,9 +853,9 @@ class MessagesHandler():
 			VarNames.HANDLER_NAME: HandlerNames.ROOM # because ws-message doesnt exist in p2p
 		}, message[VarNames.ROOM_ID])
 
-	def set_message_status_cb(self, payload):
-		if payload[VarNames.USER_ID] == self.user_id:
-			return True # Do not send to this user again
+	@property
+	def channels_only_rooms(self):
+		return list(filter(lambda a: isinstance(a, int), self.channels))
 
 	def set_message_status(self, payload):
 		to_status = Message.MessageStatus.from_dto(payload[VarNames.MESSAGE_STATUS])
@@ -888,7 +887,6 @@ class MessagesHandler():
 					VarNames.USER_ID: self.user_id,
 				},
 				payload[VarNames.ROOM_ID],
-				True
 			)
 
 	def sync_history(self, in_message):
@@ -900,7 +898,11 @@ class MessagesHandler():
 		messages = Message.objects.filter(
 			Q(room_id__in=room_ids)
 			& ~Q(id__in=message_ids)
-			& Q(updated_at__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+			& (
+				Q(updated_at__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED]) |
+				# If none user have received this message, return them as well
+				Q(message_status=Message.MessageStatus.on_server.value)
+			)
 		)
 
 		if in_message[VarNames.ON_SERVER_MESSAGE_IDS]:

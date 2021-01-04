@@ -457,31 +457,80 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
     joined = parseInt(joined);
 
-    let result: SyncHistoryResponseMessage = await this.ws.syncHistory(roomIds, messagesIds, receivedMessageIds, onServerMessageIds, Date.now() - joined);
+    let result: SyncHistoryResponseMessage = await this.ws.syncHistory(
+        roomIds,
+        messagesIds,
+        receivedMessageIds,
+        onServerMessageIds,
+        Date.now() - joined
+    );
 
+    // Updating information if message that I sent were received/read
     this.setAllMessagesStatus(result.readMessageIds, 'read');
     this.setAllMessagesStatus(result.receivedMessageIds, 'received');
 
-    let groupBY : Record<string, MessageModelDto[]> = result.content.reduce((rv, x) => {
-      if (!rv[x.roomId]) {
-        rv[x.roomId] = [];
-      }
-      rv[x.roomId].push(x);
-      return rv;
-    }, {} as Record<number, MessageModelDto[]>);
+    // Persist loaded messages into storage
+    this.addRandomMessagesToStorage(result.content);
 
-    // when we load new messages, they can be from thread we don't have
-    Object.keys(groupBY).forEach(k => {
-      let roomId = parseInt(k);
-      let messagesInGroup = groupBY[k];
-      this.addMessages(roomId, messagesInGroup);
-      let missingIds = getMissingIds(roomId, this.store);
-      if (missingIds.length) {
-        this.loadMessages(roomId, missingIds)
-      }
-    });
+    // Sending information that I receive or read messages that other users have sent
+    this.markMessagesAsReceived(result);
+    this.markMessagesAsRead(result);
 
     localStorage.setItem(LAST_SYNCED, Date.now().toString())
+  }
+
+  private markMessagesAsRead(result: SyncHistoryResponseMessage) {
+    let messagesIdsUpdateToRead = result.content
+        .filter(m => ((m.status === 'received' || m.status === 'on_server') && m.roomId === this.store.activeRoomId))
+        .map(m => m.id);
+    if (messagesIdsUpdateToRead.length > 0) {
+      this.ws.setMessageStatus(
+          messagesIdsUpdateToRead,
+          this.store.activeRoomId!,
+          'read'
+      );
+    }
+  }
+
+  private markMessagesAsReceived(result: SyncHistoryResponseMessage) {
+    let messagesUpdateToReceived = this.groupMessagesIdsByStatus(
+        result.content,
+        m => m.status === 'on_server' && m.roomId !== this.store.activeRoomId
+    );
+    Object.entries(messagesUpdateToReceived)
+        .forEach(([k, messages]) => {
+          let roomId = parseInt(k);
+          this.ws.setMessageStatus(
+              messages.map(m => m.id),
+              roomId,
+              'received'
+          );
+        });
+  }
+
+  private groupMessagesIdsByStatus(messages: MessageModelDto[], predicate: (m: MessageModelDto) => boolean): Record<number, MessageModelDto[]> {
+    return  messages.reduce((rv, x) => {
+      if (predicate(x)) {
+        if (!rv[x.roomId]) {
+          rv[x.roomId] = [];
+        }
+        rv[x.roomId].push(x);
+      }
+      return rv;
+    }, {} as Record<number, MessageModelDto[]>);
+  }
+
+  private addRandomMessagesToStorage(messages: MessageModelDto[]) {
+    Object.entries(this.groupMessagesIdsByStatus(messages, () => true))
+        .forEach(([k,messagesInGroup]) => {
+          let roomId = parseInt(k);
+          this.addMessages(roomId, messagesInGroup);
+          let missingIds = getMissingIds(roomId, this.store);
+          if (missingIds.length) {
+            // when we load new messages, they can be from thread we don't have
+            this.loadMessages(roomId, missingIds)
+          }
+        });
   }
 
 }
