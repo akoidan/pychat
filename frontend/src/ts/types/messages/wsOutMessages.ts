@@ -13,5 +13,7 @@ export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A>
 export interface SyncHistoryOutMessage extends DefaultWsOutMessage<'syncHistory'>{
   roomIds: number[];
   messagesIds: number[];
+  onServerMessageIds: number[];
+  receivedMessageIds: number[];
   lastSynced: number;
 }

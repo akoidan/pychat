@@ -900,11 +900,33 @@ class MessagesHandler():
 		messages = Message.objects.filter(
 			Q(room_id__in=room_ids)
 			& ~Q(id__in=message_ids)
-			& Q(updated_at=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+			& Q(updated_at__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
 		)
+
+		if in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
+			on_server_to_received_ids = list(Message.objects.filter(
+				Q(room_id__in=room_ids)
+				& Q(id__in=in_message[VarNames.ON_SERVER_MESSAGE_IDS])
+				& Q(message_status=Message.MessageStatus.received.value)
+			).values_list('id', flat=True))
+		else:
+			on_server_to_received_ids = []
+
+		if in_message[VarNames.RECEIVED_MESSAGE_IDS] or in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
+			ids_to_search = in_message[VarNames.RECEIVED_MESSAGE_IDS] + in_message[VarNames.ON_SERVER_MESSAGE_IDS] 
+			read_ids = list(Message.objects.filter(
+				Q(room_id__in=room_ids)
+				& Q(id__in=ids_to_search)
+				& Q(message_status=Message.MessageStatus.read.value)
+			).values_list('id', flat=True))
+		else:
+			read_ids = []
+
 		content = MessagesCreator.message_models_to_dtos(messages)
 		self.ws_write({
 			VarNames.CONTENT: content,
+			VarNames.RECEIVED_MESSAGE_IDS: on_server_to_received_ids,
+			VarNames.READ_MESSAGE_IDS: read_ids,
 			VarNames.JS_MESSAGE_ID: in_message[VarNames.JS_MESSAGE_ID],
 			VarNames.HANDLER_NAME: HandlerNames.NULL
 		})

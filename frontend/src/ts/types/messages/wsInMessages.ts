@@ -40,6 +40,11 @@ export interface MessagesResponseMessage {
   content: MessageModelDto[];
 }
 
+export interface SyncHistoryResponseMessage extends MessagesResponseMessage{
+  readMessageIds: number[];
+  receivedMessageIds: number[];
+}
+
 export interface DeleteMessage extends DefaultWsInMessage<'deleteMessage', 'ws-message'> {
   roomId: number;
   id: number;

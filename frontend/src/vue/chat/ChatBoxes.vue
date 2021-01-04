@@ -53,7 +53,7 @@ export default class ChatBoxes extends Vue {
   onActiveRoomIdChange() {
 
   }
-  }
+}
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>

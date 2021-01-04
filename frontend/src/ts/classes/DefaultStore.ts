@@ -90,7 +90,7 @@ const mediaLinkIdGetter: Function = (function () {
   };
 })();
 
-const vueStore = new Vuex.Store({
+export const vueStore = new Vuex.Store({
   state: {},
   mutations: {},
   actions: {}
@@ -135,6 +135,7 @@ export class DefaultStore extends VuexModule {
   public roomsDict: RoomDictModel = {};
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
+  public isCurrentWindowActive: boolean = true;
 
   get userName(): (id: number) => string {
     return (id: number): string => this.allUsersDict[id].user;
@@ -433,6 +434,11 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setCurrentMic(payload: StringIdentifier) {
     this.roomsDict[payload.id].callInfo.currentMic = payload.state;
+  }
+
+  @Mutation
+  public setIsCurrentWindowActive(payload: boolean) {
+    this.isCurrentWindowActive = payload;
   }
 
   @Mutation

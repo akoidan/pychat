@@ -105,6 +105,9 @@ class VarNames(object):
 	P2P = 'p2p'
 	LAST_SYNCED = 'lastSynced'
 	MESSAGE_IDS = 'messagesIds'
+	ON_SERVER_MESSAGE_IDS = 'onServerMessageIds'
+	RECEIVED_MESSAGE_IDS = 'receivedMessageIds'
+	READ_MESSAGE_IDS = 'readMessageIds'
 	MESSAGE_STATUS = 'status'
 
 

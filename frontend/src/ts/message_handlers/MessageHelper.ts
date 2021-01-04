@@ -58,7 +58,7 @@ export class MessageHelper {
         icon
       });
     }
-    if (!this.notifier.getIsCurrentWindowActive() || activeRoomId !== message.roomId) {
+    if (!this.store.isCurrentWindowActive || activeRoomId !== message.roomId) {
       if (!message.deleted) {
         message.isHighlighted = true;
       }

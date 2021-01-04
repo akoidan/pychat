@@ -49,7 +49,8 @@ import {
   SetWsIdMessage,
   MessagesResponseMessage,
   UserProfileChangedMessage,
-  WebRtcSetConnectionIdMessage
+  WebRtcSetConnectionIdMessage,
+  SyncHistoryResponseMessage
 } from '@/ts/types/messages/wsInMessages';
 import {
   InternetAppearMessage,
@@ -259,9 +260,17 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async syncHistory(roomIds: number[], messagesIds: number[], lastSynced: number): Promise<MessagesResponseMessage> {
+  public async syncHistory(
+      roomIds: number[],
+      messagesIds: number[],
+      receivedMessageIds: number[],
+      onServerMessageIds: number[],
+      lastSynced: number
+  ): Promise<SyncHistoryResponseMessage> {
     let payload: SyncHistoryOutMessage = {
       messagesIds,
+      receivedMessageIds,
+      onServerMessageIds,
       roomIds,
       lastSynced,
       action: 'syncHistory'
