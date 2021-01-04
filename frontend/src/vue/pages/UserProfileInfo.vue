@@ -97,6 +97,16 @@
             />
           </td>
         </tr>
+        <tr>
+          <td colspan="2">
+            <app-submit
+              type="button"
+              class="red-btn"
+              value="Sign out"
+              @click.native="signOut"
+            />
+          </td>
+        </tr>
       </tbody>
     </table>
   </form>
@@ -110,6 +120,8 @@ import {UserProfileDto} from '@/ts/types/dto';
 import {currentUserInfoModelToDto} from '@/ts/types/converters';
 import AppInputDate from '@/vue/ui/AppInputDate.vue';
 import { SetUserProfileMessage } from '@/ts/types/messages/wsInMessages';
+import {LogoutMessage} from '@/ts/types/messages/innerMessages';
+import {sub} from '@/ts/instances/subInstance';
 
 @Component({
   components: {AppInputDate, AppSubmit}
@@ -123,7 +135,6 @@ export default class UserProfileInfo extends Vue {
   private model!: UserProfileDto;
 
   public created() {
-    this.$store.setActiveUserId(0);
     this.model = currentUserInfoModelToDto(this.userInfo);
   }
 
@@ -133,6 +144,16 @@ export default class UserProfileInfo extends Vue {
     const cui: UserProfileDto = {...this.model};
     const e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
     this.$store.growlSuccess('User profile has been saved');
+  }
+
+
+  public async signOut() {
+    this.$api.logout(); // do not make user wait, logout instantly
+    let message: LogoutMessage = {
+      action: 'logout',
+      handler: 'any'
+    };
+    sub.notify(message);
   }
 }
 </script>

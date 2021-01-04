@@ -10,7 +10,7 @@ from django.db.models import Q
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
 from chat.log_filters import id_generator
-from chat.models import Image, UploadedFile, get_milliseconds
+from chat.models import Image, UploadedFile, get_milliseconds, MessageMention
 from chat.models import User
 from chat.models import UserProfile, IpAddress
 from chat.py2_3 import dict_values_to_list
@@ -58,10 +58,12 @@ def evaluate(query_set):
 def validate_edit_message(self_id, message):
 	if message.sender_id != self_id:
 		raise ValidationError("You can only edit your messages")
-	if message.time + ONE_DAY < get_milliseconds():
-		raise ValidationError("You can only edit messages that were send not more than 1 day")
-	if message.deleted:
-		raise ValidationError("Already deleted")
+	# we don't need this validation anymore, let users edit messages w/e they want
+	# if message.time + ONE_DAY < get_milliseconds():
+	# 	raise ValidationError("You can only edit messages that were send not more than 1 day")
+	# if same user deletes message from different devices, it should not error
+	# if message.deleted:
+	# 	raise ValidationError("Already deleted")
 
 
 def execute_query(query, *args, **kwargs):
@@ -136,28 +138,62 @@ def create_id(user_id=0, random=None):
 	return "{:04d}:{}".format(user_id if user_id else 0, random), random
 
 
-def get_max_key(files):
+def max_from_2(a, b):
+	if a is None:
+		return b
+	if b is None:
+		return a
+	return a if a > b else b
+
+
+def get_max_symbol(symbol_holder):
 	max = None
-	evaluate(files)
-	if files:
-		for f in files:
+	evaluate(symbol_holder)
+	if symbol_holder:
+		for f in symbol_holder:
 			if max is None or f.symbol > max:
 				max = f.symbol
 	return max
 
 
-def update_symbols(files, message):
+def get_max_symbol_dict(symbol_holder):
+	max = None
+	evaluate(symbol_holder)
+	if symbol_holder:
+		for f in symbol_holder:
+			if max is None or f > max:
+				max = f
+	return max
+
+
+def update_symbols(files, tags, message):
+	# TODO refactor this crap
 	if message.symbol:
 		order = ord(message.symbol)
-		for up in files:
-			if ord(up.symbol) <= order:
-				order += 1
-				new_symb = chr(order)
-				message.content = message.content.replace(up.symbol, new_symb)
-				up.symbol = new_symb
-	new_symbol = get_max_key(files)
-	if message.symbol is None or new_symbol > message.symbol:
-		message.symbol = new_symbol
+		if files:
+			for up in files:
+				if ord(up.symbol) <= order:
+					order += 1
+					new_symb = chr(order)
+					message.content = message.content.replace(up.symbol, new_symb)
+					up.symbol = new_symb
+		if tags:
+			for up in tags:
+				if ord(up) <= order:
+					order += 1
+					new_symb = chr(order)
+					message.content = message.content.replace(up.symbol, new_symb)
+					tags[new_symb] = tags[up]
+					del tags[up]
+					up.symbol = new_symb
+	if files:
+		new_file_symbol = get_max_symbol(files)
+		if message.symbol is None or new_file_symbol > message.symbol:
+			message.symbol = new_file_symbol
+	if tags:
+		new_tag_symbol = get_max_symbol_dict(tags)
+		if message.symbol is None or new_tag_symbol > message.symbol:
+			message.symbol = new_tag_symbol
 
 
 def get_message_images_videos(messages):
@@ -167,6 +203,15 @@ def get_message_images_videos(messages):
 	else:
 		images = []
 	return images
+
+
+def get_message_tags(messages):
+	ids = [message.id for message in messages if message.symbol]
+	if ids:
+		mentions = MessageMention.objects.filter(message_id__in=ids)
+	else:
+		mentions = []
+	return mentions
 
 
 def up_files_to_img(files, message_id):

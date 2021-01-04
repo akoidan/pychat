@@ -1,8 +1,5 @@
 <template>
-  <p
-    :class="mainCls"
-    @contextmenu="contextmenu"
-  >
+  <p :class="mainCls">
     <chat-message-header
       :time="message.time"
       :user-id="message.userId"
@@ -20,6 +17,7 @@ import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
+  Emit,
   Ref,
   Vue
 } from 'vue-property-decorator';
@@ -38,7 +36,6 @@ import {
   setVideoEvent,
   setYoutubeEvent
 } from '@/ts/utils/htmlApi';
-import { sem } from '@/ts/utils/pureFunctions';
 
 import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
 
@@ -47,42 +44,31 @@ import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
 })
 export default class ChatMessage extends Vue {
 
+  @Prop()
+  public message!: MessageModel;
+
+  @State
+  public readonly userSettings!: CurrentUserSettingsModel;
+
+  @Ref()
+  public content!: HTMLElement;
+
   get id() {
     return this.message.id;
   }
 
   get encoded() {
-    return this.message.content ? encodeMessage(this.message) : encodeHTML('This message has been removed');
+    return this.message.content ? encodeMessage(this.message, this.$store) : encodeHTML('This message has been removed');
   }
 
   get mainCls() {
     return {
       'removed-message': this.message.deleted,
-      highLightMessage: this.isEditing
     };
   }
 
-  get isEditing() {
-    return this.editedMessage && this.editedMessage.messageId === this.message.id;
-  }
-
-  @State
-  public readonly userSettings!: CurrentUserSettingsModel;
-  @State
-  public readonly userInfo!: CurrentUserInfoModel;
-  @Prop() public message!: MessageModel;
-  @State
-  public readonly editedMessage!: EditingMessage;
-
-  @Ref()
-  public content!: HTMLElement;
-
+  @Emit()
   public quote() {
-    this.$messageBus.$emit('quote', this.message);
-  }
-
-  public contextmenu(event: Event) {
-    sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
   }
 
   public updated() {
@@ -126,13 +112,6 @@ export default class ChatMessage extends Vue {
     max-width: calc(100% - 25px)
     max-height: 400px
     display: block
-
-  .highLightMessage
-    border: 1px solid grey
-    border-radius: 3px
-    margin-right: 6px
-    padding: 5px
-
 
   .removed-message .message-text-style
     color: #5d5d5d
@@ -180,6 +159,9 @@ export default class ChatMessage extends Vue {
       @extend %img-play-chat
       @extend %img-play
 
+    /deep/ .tag-user
+      color: #729fcf
+
     /deep/ :visited
       color: #7572CF
     /deep/ :link
@@ -188,7 +170,7 @@ export default class ChatMessage extends Vue {
       &:hover
         text-decoration: underline
 
-    /deep/ img[code]
+    /deep/ img[alt] // smile
       @extend %img-code
 
     /deep/ .quote
@@ -241,6 +223,10 @@ export default class ChatMessage extends Vue {
       vertical-align: middle
       height: 50px
       cursor: pointer
+    /deep/ .uploading-file
+      vertical-align: middle
+      height: 50px
+      cursor: pointer
     /deep/ .audio-player-ready
       vertical-align: middle
 
@@ -248,11 +234,6 @@ export default class ChatMessage extends Vue {
     @import "~highlightjs/styles/railscasts"
   .color-white p /deep/
     @import "~highlightjs/styles/default"
-
-  .color-white
-    .highLightMessage
-      border: 1px solid #3f3f3f
-      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
     .message-others
       background-color: white
 </style>

@@ -2,7 +2,6 @@
   <div class="chat-room-users-wrapper">
     <room-direct-users-table />
     <room-public-table />
-    <current-room-users-table />
   </div>
 </template>
 <script lang="ts">
@@ -12,10 +11,9 @@ import {
 } from 'vue-property-decorator';
 import RoomDirectUsersTable from '@/vue/chat/RoomDirectUsersTable.vue';
 import RoomPublicTable from '@/vue/chat/RoomPublicTable.vue';
-import CurrentRoomUsersTable from '@/vue/chat/CurrentRoomUsersTable.vue';
 
 @Component({
-  components: {CurrentRoomUsersTable, RoomPublicTable, RoomDirectUsersTable}
+  components: {RoomPublicTable, RoomDirectUsersTable}
 })
 export default class ChatRightSection extends Vue {
 
@@ -30,28 +28,16 @@ export default class ChatRightSection extends Vue {
 
   .chat-room-users-wrapper
     float: right
-    font-size: 24px
-    overflow-y: auto
+    overflow-y: scroll
     overflow-x: hidden
     position: relative
-    width: 300px
+    min-width: 300px
     @media screen and (max-width: $collapse-width)
       width: 100%
-      border-bottom: 8px solid
-      max-height: 50%
-
-  .color-lor .chat-room-users-wrapper /deep/
-    @media screen and (max-width: $collapse-width)
-      border-bottom-color: $color-lor-scroll
-
-  .color-reg .chat-room-users-wrapper /deep/
-    @media screen and (max-width: $collapse-width)
-      border-bottom-color: $mostly-black
+      min-width: 200px
 
   .color-white .chat-room-users-wrapper /deep/
     color: $color-white-main
-    @media screen and (max-width: $collapse-width)
-      border-bottom: 2px solid grey
 
 
 </style>

@@ -10,6 +10,7 @@ import {
 } from '@/ts/types/dto';
 import {
   ChangeDeviceType,
+  ChangeOnlineType,
   DefaultInMessage,
   HandlerName
 } from '@/ts/types/messages/baseMessagesInterfaces';
@@ -19,7 +20,7 @@ export interface DefaultInnerSystemMessage<A extends string, H extends HandlerNa
   allowZeroSubscribers?: boolean; // if true, no errors should be present on handeling this message by sucrcription if nothing was notified
 }
 
-export interface PubSetRooms extends DefaultInnerSystemMessage<'init', 'channels'> {
+export interface PubSetRooms extends DefaultInnerSystemMessage<'init', 'room'> {
   rooms:  RoomDto[];
   channels: ChannelDto[];
   users: UserDto[];
@@ -41,6 +42,12 @@ export interface RouterNavigateMessage extends DefaultInnerSystemMessage<'naviga
   to: string;
 }
 
+export interface ChangeUserOnlineInfoMessage extends DefaultInnerSystemMessage<'changeOnline', 'webrtc'>  {
+  opponentWsId: string;
+  userId: number;
+  changeType: ChangeOnlineType;
+}
+
 export interface ChangeP2pRoomInfoMessage extends DefaultInnerSystemMessage<'changeDevices', 'webrtc'>  {
   allowZeroSubscribers: true;
   changeType: ChangeDeviceType;
@@ -48,11 +55,12 @@ export interface ChangeP2pRoomInfoMessage extends DefaultInnerSystemMessage<'cha
   userId: number|null;
 }
 
-export interface ConnectToRemoteMessage extends DefaultInnerSystemMessage<'connectToRemote', HandlerName>  {
+export interface ConnectToRemoteMessage extends DefaultInnerSystemMessage<'connectToRemote', HandlerName> {
   stream: MediaStream|null;
 }
 
 export interface CheckTransferDestroy extends DefaultInnerSystemMessage<'checkTransferDestroy', 'webrtcTransfer:*'> {
+  wsOpponentId: string;
 }
 
 export interface ChangeStreamMessage extends DefaultInnerSystemMessage<'streamChanged', 'peerConnection:*'> {

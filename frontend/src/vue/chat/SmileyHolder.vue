@@ -1,13 +1,16 @@
 <template>
-  <div class="smileParentHolder" v-show="showSmileys">
+  <div class="smile-parent-holder" @mousedown.prevent>
     <ul class="tabNames">
       <li
         v-for="(_, tabName) in smileys"
         :key="tabName"
         :class="{'activeTab': activeTab === tabName}"
-        @click="activeTab = tabName"
+        @mousedown.prevent="activeTab = tabName"
       >
         {{ tabName }}
+      </li>
+      <li class="holder-icon-cancel">
+        <i class="icon-cancel-circled-outline" @click="close"/>
       </li>
     </ul>
     <template v-for="(allSmileys, tabName) in smileys">
@@ -30,7 +33,8 @@
 <script lang="ts">
 import {
   Component,
-  Vue
+  Vue,
+  Emit
 } from 'vue-property-decorator';
 import { smileys } from '@/ts/utils/smileys';
 
@@ -39,15 +43,16 @@ import { State } from '@/ts/instances/storeInstance';
 @Component
 export default class SmileyHolder extends Vue {
 
-  @State
-  public readonly showSmileys!: boolean;
-
   public smileys = smileys;
   public activeTab: string = Object.keys(smileys)[0];
 
+  @Emit()
   addSmiley(code: string) {
-    this.$messageBus.$emit('add-smile', code);
+    return code;
   }
+
+  @Emit()
+  close() {}
 
 }
 </script>
@@ -55,13 +60,24 @@ export default class SmileyHolder extends Vue {
 <style lang="sass" scoped>
 
   @import "~@/assets/sass/partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
+
+  .icon-cancel-circled-outline
+    position: relative // icon is broken a bit, it occupies 1 px above the screen
+    top: 1px
+    right: -10px // ignore padding right
+    @include hover-click(red)
+
+  .smile-parent-holder
+    padding: 10px
 
   .tabNames
     margin: 0
     padding-left: 0
+    display: flex
 
     > li
-      display: inline
+      display: inline-block
       padding-left: 10px
       padding-right: 10px
 
@@ -69,35 +85,24 @@ export default class SmileyHolder extends Vue {
         cursor: pointer
         text-decoration: underline
 
-  .smileParentHolder
-    position: absolute
-    right: 5px
-    padding: 10px
-    bottom: 0
-    border-radius: 10px
-    width: 50%
-
-    @media screen and (max-height: 300px), screen and (max-width: 600px)
-      width: calc(100% - 30px)
+    .holder-icon-cancel
+      margin-left: auto
 
     img
       cursor: pointer
 
+  .smile-parent-holder
+    @extend %modal-window
+
   .color-lor
-    .smileParentHolder
-      @extend %window-lor
     .activeTab
       color: #fcaf3e
 
   .color-reg
-    .smileParentHolder
-      @extend %window-reg
     .activeTab
       color: #C6B955
 
   .color-white
-    .smileParentHolder
-      @extend %window-white
     .activeTab
       color: #11970d
 </style>

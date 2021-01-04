@@ -62,7 +62,8 @@ export default class LocalStorage implements IStorage {
     localStorage.setItem(this.STORAGE_NAME, JSON.stringify(lm));
   }
   public updateFileIds(m: SetFileIdsForMessage) {}
-  public deleteMessage(id: number) {}
+  public deleteMessage(id: number,  replaceThreadId: number) {}
+  public setThreadMessageCount(mesageid: number, count: number): void {}
   public deleteRoom(id: number) {}
   public deleteChannel(id: number) {}
   public updateRoom(m: RoomSettingsModel)  {}

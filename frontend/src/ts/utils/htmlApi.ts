@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {
   IS_DEBUG,
-  PASTED_IMG_CLASS
+  PASTED_IMG_CLASS, USERNAME_REGEX
 } from '@/ts/utils/consts';
 import {
   MessageDataEncode,
@@ -10,9 +10,11 @@ import {
 import {
   BlobType,
   FileModel,
-  MessageModel
+  MessageModel,
+  UserModel
 } from '@/ts/types/model';
 import recordIcon from '@/assets/img/audio.svg';
+import fileIcon from '@/assets/img/file.svg';
 import { getFlag } from '@/ts/utils/flags';
 import {
   Smile,
@@ -22,6 +24,7 @@ import {
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import { MEDIA_API_URL } from '@/ts/utils/runtimeConsts';
+import {DefaultStore} from '@/ts/classes/DefaultStore';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -70,11 +73,40 @@ const patterns = [
     name: 'code'
   },
   {
-    search: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
+    search: new RegExp(`(^\(\d\d:\d\d:\d\d\)\s${USERNAME_REGEX}:)(.*)&gt;&gt;&gt;<br>`),
     replace: '<div class="quote"><span>$1</span>$2</div>',
     name: 'quote'
   }
 ];
+
+export function getCurrentWordInHtml(el: HTMLElement) {
+  let position = 0;
+  const sel: Selection = window.getSelection()!;
+  if (!sel.rangeCount) {
+    return
+  }
+  const range = sel.getRangeAt(0);
+  if (range.commonAncestorContainer.parentNode === el) {
+    position = range.endOffset;
+  }
+  // Get content of div
+  const content = (range.commonAncestorContainer as any).data; // this this is undefined todo, really undefied somethng
+
+  if (!content) { // content is undefined when e.g. user selects all
+    return "";
+  }
+
+  // Check if clicked at the end of word
+  position = content![position] === ' ' ? position - 1 : position;  /* TODO vue.js:1897 TypeError: Cannot read property '0' of undefined*/
+
+  // Get the start and end index
+  let startPosition = content!.lastIndexOf(' ', position);
+  startPosition = startPosition === content!.length ? 0 : startPosition;
+  let endPosition = content!.indexOf(' ', position);
+  endPosition = endPosition === -1 ? content!.length : endPosition;
+
+  return content!.substring(startPosition + 1, endPosition);
+}
 
 export function sliceZero(n: number, count: number = -2) {
   return String('00' + n).slice(count);
@@ -128,15 +160,17 @@ export function encodeSmileys(html: string): string {
   return html.replace(smileUnicodeRegex, getSmileyHtml);
 }
 
-export function encodeP(data: MessageModel) {
+export function encodeP(data: MessageModel, store: DefaultStore) {
   if (!data.content) {
     throw Error(`Message ${data.id} doesn't have content`);
   }
   let html = encodeHTML(data.content);
   html = encodeFiles(html, data.files);
 
+  html = encodePTags(html, data.tags, store);
   return encodeSmileys(html);
 }
+
 
 export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO wtf it's nullable?
 
@@ -154,7 +188,7 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
 
 }
 
-export function encodeMessage(data: MessageModel) {
+export function encodeMessage(data: MessageModel, store: DefaultStore) {
   logger.debug('Encoding message {}: {}', data.id, data)();
   if (data.giphy) {
     return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
@@ -175,12 +209,43 @@ export function encodeMessage(data: MessageModel) {
       logger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
     }
     html = encodeFiles(html, data.files);
-
+    html = encodeTags(html,  data.tags, store);
     return encodeSmileys(html);
   }
 }
 
+function encodePTags(html: string,   tags: { [id: string]: number } | null, store: DefaultStore) {
+  if (tags && Object.keys(tags).length) {
+    html = html.replace(imageUnicodeRegex, (s) => {
+      const v = tags[s];
+      if (v) {
+        let tag = createTag(store.allUsersDict[v]);
+        return tag.outerHTML;
+      }
+
+      return s;  // if it's absent in files, it could be also in tags so return it. (don't replace )
+    });
+  }
+  return html;
+}
+
+function encodeTags(html: string,   tags: { [id: string]: number } | null, store: DefaultStore) {
+  if (tags && Object.keys(tags).length) {
+    html = html.replace(imageUnicodeRegex, (s) => {
+      const v = tags[s];
+      if (v) {
+        return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].user}</span>`
+      }
+
+      return s;  // if it's absent in files, it could be also in tags so return it. (don't replace )
+    });
+  }
+  return html;
+}
+
+
 function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
+
   if (files && Object.keys(files).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];
@@ -192,17 +257,84 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
 
           return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-          return `<img src='${recordIcon}'  symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+          return `<img src='${recordIcon}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+        } else if (v.type === 'f') {
+          return `<a href="${resolveMediaUrl(v.url!)}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
         } else {
           logger.error('Invalid type {}', v.type)();
         }
       }
 
-      return s;
+      return s; // if it's absent in files, it could be also in tags so return it. (don't replace )
     });
   }
 
   return html;
+}
+
+let uniqueTagId = 1;
+
+function getUniqueTagId() {
+  return uniqueTagId++;
+}
+
+export function createTag(user: UserModel) {
+  let a = document.createElement('span');
+
+  const style = document.createElement('style');
+  style.type = 'text/css';
+  let id = `usertag${getUniqueTagId()}`;
+  style.innerHTML = ` #${id}:after { content: '@${user.user}'}`;
+  document.getElementsByTagName('head')[0].appendChild(style);
+  a.id = id;
+
+  a.setAttribute('user-id', String(user.id));
+  a.className = 'tag-user';
+  return a;
+}
+
+export function replaceCurrentWord(containerEl: HTMLElement, replacedTo: HTMLElement) {
+  containerEl.focus();
+  let range;
+  let sel = window.getSelection()!;
+  if (sel.rangeCount === 0) {
+    logger.error('Can\'t place tag, rangeCount is 0')();
+    return
+  }
+  range = sel.getRangeAt(0).cloneRange()!;
+  range.collapse(true);
+  range.setStart(containerEl, 0);
+
+  let words = range.toString().trim().split(' ');
+  let lastWord = words[words.length - 1];
+
+  if (!lastWord) {
+    logger.error('Can\'t place tag, last word not found')();
+  }
+  logger.log('replace word ' + lastWord)();
+
+  /* Find word start and end */
+  let data = (range.endContainer as any).data;
+  if (!data) {
+    logger.error('Can\'t place tag, Selected word data is null')();
+    return
+  }
+  let wordStart = data.lastIndexOf(lastWord);
+  let wordEnd = wordStart + lastWord.length;
+  logger.log('pos: (' + wordStart + ', ' + wordEnd + ')')();
+
+  range.setStart(range.endContainer, wordStart);
+  range.setEnd(range.endContainer, wordEnd);
+  range.deleteContents();
+  range.insertNode(replacedTo);
+  // delete That specific word and replace if with resultValue
+
+  range.setStartAfter(replacedTo);
+  let textAfter = document.createTextNode(' ');
+  range.insertNode(textAfter);
+  range.setStartAfter(textAfter);
+  sel.removeAllRanges();
+  sel.addRange(range);
 }
 
 export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
@@ -399,7 +531,7 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
         'image/jpeg',
         0.95
       );
-    },                     false);
+    }, false);
     video.src = src;
   } else {
     errCb(`Browser doesn't support playing ${file.type}`);
@@ -415,6 +547,26 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
   savedFiles[associatedAudio] = file;
   img.src = recordIcon as string;
   pasteNodeAtCaret(img, textArea);
+}
+
+export function pasteBlobFileToTextArea(file: Blob, textArea: HTMLElement) {
+  const img = document.createElement('img');
+  const associatedFile = URL.createObjectURL(file);
+  img.setAttribute('associatedFile', associatedFile);
+  img.className = `uploading-file ${PASTED_IMG_CLASS}`;
+  setBlobName(file);
+  savedFiles[associatedFile] = file;
+  img.src = fileIcon as string;
+  pasteNodeAtCaret(img, textArea);
+}
+
+
+export function pasteFileToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
+  if (file.size > 10_000_000) {
+    errCb(`Can't upload file greater than 10MB`);
+  } else {
+    pasteBlobFileToTextArea(file, textArea);
+  }
 }
 
 export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
@@ -452,6 +604,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     let src = img.getAttribute('src');
     const assVideo = img.getAttribute('associatedVideo') ?? null;
     const assAudio = img.getAttribute('associatedAudio')  ?? null;
+    const assFile = img.getAttribute('associatedFile')  ?? null;
     const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
 
     let elSymbol = oldSymbol;
@@ -470,21 +623,53 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
         return;
       }
     }
+    let type: BlobType;
+    if (videoType) {
+      type = videoType;
+    } else if (assAudio) {
+      type = 'a'
+    } else if (assFile) {
+      type = 'f'
+    } else {
+      type = 'i'
+    }
+
+    let url: string;
+    if (assAudio) {
+      url = assAudio;
+    } else if (assFile) {
+      url = assFile;
+    } else if (assVideo) {
+      url = assVideo;
+    } else {
+      url = src!;
+    }
 
     files[elSymbol] = {
-      type: videoType ?? (assAudio ? 'a' : 'i'),
+      type,
       preview: assVideo ? src : assVideo,
-      url: assAudio ?? (assVideo ?? src),
+      url,
       sending: true,
       fileId: null,
       previewFileId: null,
     }
 
   });
+  let tags: Record<string, number> = {};
+  forEach(userMessage.querySelectorAll(`.tag-user`), img => {
+    currSymbol = nextChar(currSymbol);
+    tags[currSymbol] =  parseInt(img.getAttribute('user-id')!);
+
+    /// https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/replaceWith
+    img.replaceWith(document.createTextNode(currSymbol));
+  });
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
   let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
   messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
+  if (messageContent) {
+    messageContent = messageContent.trim();
+  }
   userMessage.innerHTML = '';
 
-  return {files, messageContent, currSymbol};
+  return {files, messageContent, currSymbol, tags};
 }

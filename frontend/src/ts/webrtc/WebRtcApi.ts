@@ -20,6 +20,7 @@ import { browserVersion } from '@/ts/utils/runtimeConsts';
 import MessageTransferHandler from '@/ts/webrtc/message/MessageTransferHandler';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
 import {
+  NotifyCallActiveMessage,
   OfferCall,
   OfferFile,
   OfferMessage,
@@ -33,10 +34,12 @@ import {
 import { VideoType } from '@/ts/types/types';
 import {
   ChangeP2pRoomInfoMessage,
+  ChangeUserOnlineInfoMessage,
   InternetAppearMessage,
   LogoutMessage
 } from '@/ts/types/messages/innerMessages';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import {MessageSenderProxy} from '@/ts/message_handlers/MessageSenderProxy';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -47,8 +50,10 @@ export default class WebRtcApi extends MessageHandler {
     changeDevices: <HandlerType<'changeDevices', 'webrtc'>>this.changeDevices,
     offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
     offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
+    changeOnline: <HandlerType<'changeOnline', 'webrtc'>>this.changeOnline,
     logout: <HandlerType<'logout', HandlerName>>this.logout,
-    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear
+    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
+    notifyCallActive:  <HandlerType<'notifyCallActive', HandlerName>>this.notifyCallActive
   };
 
   private readonly wsHandler: WsHandler;
@@ -57,6 +62,7 @@ export default class WebRtcApi extends MessageHandler {
   private readonly callHandlers: {[id: number]: CallHandler} = {};
   private readonly messageHandlers: Record<number, MessageTransferHandler> = {};
   private readonly messageHelper: MessageHelper;
+  private messageSenderProxy!: MessageSenderProxy; // via setter
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper) {
     super();
@@ -68,19 +74,56 @@ export default class WebRtcApi extends MessageHandler {
     this.messageHelper = messageHelper;
   }
 
+
+  public setMessageSenderProxy(messageSenderProxy: MessageSenderProxy) {
+    this.messageSenderProxy = messageSenderProxy;
+  }
+
   public offerCall(message: OfferCall) {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
+  public joinCall(roomId: number) {
+    this.getCallHandler(roomId).joinCall();
+  }
+
   public async changeDevices(m: ChangeP2pRoomInfoMessage): Promise<void> {
     this.logger.log('change devices {}', m)();
+    this.updateCallTransfer(m);
+    await this.updateMessagesTransfer(m);
+  }
+
+  private updateCallTransfer(m: ChangeP2pRoomInfoMessage) {
+    if (m.changeType === 'someone_joined' || m.changeType === 'someone_left') {
+      this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(m.userId!)).forEach(r => {
+        if (m.changeType === 'someone_joined') {
+          if (this.store.onlineDict[m.userId!]) {
+            this.store.onlineDict[m.userId!].forEach((opponentWsId: string) => {
+              this.getCallHandler(r.id).createCallPeerConnection({opponentWsId, userId: m.userId!});
+              this.wsHandler.notifyCallActive({
+                opponentWsId,
+                connectionId: this.getCallHandler(r.id).getConnectionId(),
+                roomId: r.id
+              });
+            })
+          }
+        } else {
+          // we dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
+          if (this.callHandlers[r.id]) {
+            this.callHandlers[r.id].removeUserOpponent(m.userId!);
+          }
+        }
+      })
+    }
+  }
+
+  private async updateMessagesTransfer(m: ChangeP2pRoomInfoMessage) {
     if (m.changeType === 'i_deleted') { // destroy my room
       let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
       if (mh) {
         mh.destroyThisTransferHandler();
       }
       delete this.messageHandlers[m.roomId!];
-      return;
     } else if (this.store.roomsDict[m.roomId!]?.p2p) {
       //  'someone_left' - destroy peer connection in this room
       //  'room_created' - send to everyone when new room is created
@@ -101,6 +144,24 @@ export default class WebRtcApi extends MessageHandler {
     this.initAndSyncMessages();
   }
 
+  public notifyCallActive(m: NotifyCallActiveMessage) {
+    this.getCallHandler(m.roomId).addOpponent(m.connId, m.userId, m.opponentWsId);
+  }
+
+  public changeOnline(message: ChangeUserOnlineInfoMessage) {
+    this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(message.userId)).forEach(r => {
+      if (message.changeType === 'appear_online') {
+        this.getCallHandler(r.id).createCallPeerConnection({opponentWsId: message.opponentWsId, userId: message.userId});
+        this.wsHandler.notifyCallActive({opponentWsId: message.opponentWsId, connectionId: this.getCallHandler(r.id).getConnectionId(), roomId: r.id});
+      } else {
+        // we dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
+        if (this.callHandlers[r.id]) {
+          this.callHandlers[r.id].removeOpponent(message.opponentWsId);
+        }
+      }
+    })
+  }
+
   public offerMessage(message: OfferMessage) {
     this.getMessageHandler(message.roomId).acceptConnection(message);
   }
@@ -117,10 +178,10 @@ export default class WebRtcApi extends MessageHandler {
     sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
-  public async sendFileOffer(file: File, channel: number) {
+  public async sendFileOffer(file: File, channel: number, threadId: number|null) {
     if (file.size > 0) {
-      const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
-      new FileHandler(channel, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
+      const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, threadId);
+      new FileHandler(channel, threadId, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }
@@ -195,6 +256,7 @@ export default class WebRtcApi extends MessageHandler {
       roomId: message.roomId,
       opponentWsId: message.opponentWsId,
       anchor: null,
+      threadId: message.threadId,
       status: limitExceeded ? FileTransferStatus.ERROR : FileTransferStatus.NOT_DECIDED_YET,
       userId: message.userId,
       error: limitExceeded ? `Your browser doesn't support receiving files over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}` : null,
@@ -213,6 +275,9 @@ export default class WebRtcApi extends MessageHandler {
       replaced: 1
     });
     this.store.addReceivingFile(payload);
+    if (payload.threadId) {
+      this.messageSenderProxy.getMessageSender(message.roomId).loadMessages(payload.roomId, [payload.threadId]);
+    }
     this.wsHandler.replyFile(message.connId, browserVersion);
     if (!limitExceeded) {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);

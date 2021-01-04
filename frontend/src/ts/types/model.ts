@@ -19,6 +19,7 @@ export interface EditingMessage {
   isEditingNow: boolean;
 }
 
+
 export interface CurrentUserSettingsModel {
   embeddedYoutube: boolean;
   highlightCode: boolean;
@@ -26,6 +27,7 @@ export interface CurrentUserSettingsModel {
   messageSound: boolean;
   onlineChangeSound: boolean;
   sendLogs: boolean;
+  showWhenITyping: boolean;
   suggestions: boolean;
   theme: string;
   logs: LogLevel;
@@ -34,6 +36,14 @@ export interface CurrentUserSettingsModel {
 export interface GoogleCaptcha {
   render(div: HTMLElement): void;
   reset(): void;
+}
+
+export interface PastingTextAreaElement {
+  elType: 'blob';
+  content: string;
+  roomId: number;
+  editedMessageId: number|null;
+  openedThreadId: number|null;
 }
 
 export interface CurrentUserInfoModel {
@@ -63,7 +73,7 @@ export interface Location {
   countryCode: string|null;
   region: string|null;
 }
-export type BlobType = 'v' | 'm' | 'a' | 'i';
+export type BlobType = 'v' | 'm' | 'a' | 'i' | 'f';
 
 export interface FileModel {
   url: string|null;
@@ -82,19 +92,25 @@ export interface UploadProgressModel {
 export interface MessageTransferInfo {
   upload: UploadProgressModel| null;
   error: string|null;
+  xhr: XMLHttpRequest|null;
 }
 
-export  interface MessageModel {
+export interface MessageModel {
   id: number;
   time: number;
+  parentMessage: number|null;
   files: Record<string, FileModel>| null; // THIS IS STRING, not number!!
   content: string|null;
-  isHighlighted: boolean;
+  tags: Record<string, number>; // user id
+  isHighlighted: boolean; // if not read
+  isEditingActive: boolean; // if textarea is opened for this message to edit it
+  isThreadOpened: boolean; // if thread is opened for this message
   symbol: string|null;
+  threadMessagesCount: number;
   deleted: boolean;
   sending: boolean;
   giphy: string|null;
-  edited: number|null;
+  edited: number;
   roomId: number;
   userId: number;
   transfer: MessageTransferInfo|null;
@@ -127,10 +143,10 @@ export interface ChannelsDictUIModel {
 }
 
 export interface SearchModel {
-  searchActive: boolean;
-  searchedIds: number[];
+  searchActive: boolean; // if true search panel is shown
+  messages: Record<number, MessageModel>;
   searchText: string;
-  locked: boolean;
+  locked: boolean; // if true, no more messages with this search is available from the server
 }
 
 export interface RoomLog {
@@ -161,6 +177,7 @@ export interface ReceivingFile {
   upload: UploadProgressModel;
   status: FileTransferStatus;
   fileName: string;
+  threadId: number|null;
   opponentWsId: string;
   roomId: number;
   connId: string;
@@ -172,6 +189,7 @@ export interface ReceivingFile {
 export interface SendingFile {
   time: number;
   fileName: string;
+  threadId: number|null;
   roomId: number;
   connId: string;
   fileSize: number;
@@ -191,7 +209,7 @@ export interface P2pMessageModel {
 
 export interface CallsInfoModel {
   calls: Record<string, CallInfoModel>;
-  callContainer: boolean;
+  callActiveButNotJoinedYet: boolean;
   showMic: boolean;
   currentMicLevel: number; // voice
   mediaStreamLink: string|null;
@@ -221,10 +239,11 @@ export interface RoomModel extends RoomSettingsModel {
   p2pInfo: P2pMessageModel;
   sendingFiles:  { [id: string]: SendingFile };
   receivingFiles:  { [id: string]: ReceivingFile };
-  messages: { [id: number]: MessageModel };
+  messages: Record<number, MessageModel>;
   allLoaded: boolean;
   search: SearchModel;
   newMessagesCount: number;
+  usersTyping: Record<number, number>;
   roomLog: RoomLog[];
   changeName: ChangeRoomName[];
 }

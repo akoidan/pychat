@@ -21,7 +21,16 @@ export interface RoomNoUsersDto {
   roomCreatorId: number;
 }
 
-export interface RoomDto  extends  RoomNoUsersDto {
+export interface SessionResponse {
+  session: string;
+}
+
+export interface OauthSessionResponse extends SessionResponse {
+  isNewAccount: boolean;
+  username: string;
+}
+
+export interface RoomDto extends RoomNoUsersDto {
   users: number[];
 }
 
@@ -58,18 +67,17 @@ export interface UserSettingsDto {
   messageSound: boolean;
   onlineChangeSound: boolean;
   sendLogs: boolean;
+  showWhenITyping: boolean;
   suggestions: boolean;
   logs: LogLevel;
   theme: string;
 }
-
 
 export interface SetStateFromWS {
   roomsDict: RoomDictModel;
   channelsDict: ChannelsDictModel;
   allUsersDict: {[id: number]: UserModel};
 }
-
 
 export interface SetStateFromStorage {
   roomsDict: RoomDictModel;
@@ -104,11 +112,14 @@ export interface FileModelDto {
 export interface MessageModelDto {
   id: number;
   time: number;
+  parentMessage: number;
   files?: {[id: number]: FileModelDto};
+  tags: {[id: number]: number};
   content: string;
   symbol?: string;
   deleted?: boolean;
   giphy?: string;
+  threadMessagesCount: number;
   edited: number;
   roomId: number;
   userId: number;

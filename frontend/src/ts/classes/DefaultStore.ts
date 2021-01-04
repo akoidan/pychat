@@ -14,6 +14,7 @@ import {
   GrowlType,
   IncomingCallModel,
   MessageModel,
+  PastingTextAreaElement,
   ReceivingFile,
   RoomDictModel,
   RoomModel,
@@ -45,21 +46,26 @@ import {
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
   SetRoomsUsers,
-  SetSearchTo,
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
   StringIdentifier,
   LiveConnectionLocation,
   RoomMessagesIds,
-  ShareIdentifier
+  ShareIdentifier,
+  SetSearchStateTo,
+  SetSearchTextTo,
+  SetUploadXHR
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
   SetStateFromWS
 } from '@/ts/types/dto';
 import { encodeHTML } from '@/ts/utils/htmlApi';
-import { ALL_ROOM_ID } from '@/ts/utils/consts';
+import {
+  ALL_ROOM_ID,
+  SHOW_I_TYPING_INTERVAL
+} from '@/ts/utils/consts';
 import {
   Action,
   Module,
@@ -100,6 +106,8 @@ function Validate(target: unknown, propertyKey: string, descriptor: PropertyDesc
   };
 }
 
+const SHOW_I_TYPING_INTERVAL_SHOW = SHOW_I_TYPING_INTERVAL * 1.5;
+
 @Module({
   dynamic: true,
   namespaced: true,
@@ -111,15 +119,12 @@ export class DefaultStore extends VuexModule {
   public storage!: IStorage; // We proxy this as soon as we created Storage
   public isOnline: boolean = false;
   public growls: GrowlModel[] = [];
-  public dim: boolean = false;
-  public pastingImagesQueue: string[] = [];
+  public pastingTextAreaQueue: PastingTextAreaElement[] = [];
   public incomingCall: IncomingCallModel | null = null;
   public microphones: { [id: string]: string } = {};
   public speakers: { [id: string]: string } = {};
   public webcams: { [id: string]: string } = {};
-  public editedMessage: EditingMessage | null = null;
   public activeRoomId: number | null = null;
-  public activeUserId: number | null = null;
   public userInfo: CurrentUserInfoModel | null = null;
   public userSettings: CurrentUserSettingsModel | null = null;
   public userImage: string | null = null;
@@ -127,7 +132,6 @@ export class DefaultStore extends VuexModule {
   public regHeader: string | null = null;
   public onlineDict: Record<string, string[]> = {};
   public roomsDict: RoomDictModel = {};
-  public showSmileys: boolean = false;
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
 
@@ -144,6 +148,77 @@ export class DefaultStore extends VuexModule {
 
   get online(): number[] {
     return Object.keys(this.onlineDict).map(a => parseInt(a, 10));
+  }
+
+  get calculatedMessagesForRoom() : (roomId: number) => any[] {
+    return (roomId: number): any[] => {
+      let room = this.roomsDict[roomId];
+      let newArray: any[] = room.roomLog.map(value => ({
+        isUserAction: true,
+        ...value
+      }));
+      newArray.push(...room.changeName.map(value => ({isChangeName: true, ...value})));
+      let dates: {[id: string]: boolean} = {};
+      let messageDict: Record<number, {parent?: MessageModel, messages: (MessageModel|ReceivingFile|SendingFile)[]}> = {};
+      for (let m in room.messages) {
+        let message = room.messages[m];
+        if (message.parentMessage) {
+          if (!messageDict[message.parentMessage]) {
+            messageDict[message.parentMessage] = {messages: []}
+          }
+          messageDict[message.parentMessage].messages.push(message)
+        } else {
+          if (!messageDict[message.id]) {
+            messageDict[message.id] = {messages: []}
+          }
+          messageDict[message.id].parent = message;
+          let d = new Date(message.time).toDateString();
+          if (!dates[d]) {
+            dates[d] = true;
+            newArray.push({fieldDay: d, time: Date.parse(d)});
+          }
+        }
+      }
+      for (let m in room.sendingFiles) {
+        let sendingFile: SendingFile = room.sendingFiles[m];
+        if (sendingFile.threadId) {
+          if (messageDict[sendingFile.threadId]) {
+            messageDict[sendingFile.threadId].messages.push(sendingFile);
+          } else {
+            logger.warn(`Receiving file {} won't be dispayed as thread ${sendingFile.threadId} is not loaded yet`)();
+          }
+        } else {
+          newArray.push(sendingFile);
+        }
+      }
+      for (let m in room.receivingFiles) {
+        let receivingFile: ReceivingFile = room.receivingFiles[m];
+        if (receivingFile.threadId) {
+          if (messageDict[receivingFile.threadId]) {
+            messageDict[receivingFile.threadId].messages.push(receivingFile);
+          } else {
+            logger.warn(`Receiving file {} won't be dispayed as thread ${receivingFile.threadId} is not loaded yet`)();
+          }
+        } else {
+          newArray.push(receivingFile);
+        }
+      }
+      Object.values(messageDict).forEach(v => {
+        if (v.messages.length || v.parent?.isThreadOpened || (v.parent && v.parent.threadMessagesCount > 0)) {
+          if (v.parent) {
+            v.messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+            newArray.push({parent: v.parent, thread: true, messages: v.messages, time: v.parent.time});
+          } else {
+            logger.warn(`Skipping rendering messages ${v.messages.map(m => (m as MessageModel).id)} as parent is not loaded yet`)()
+          }
+        } else {
+          newArray.push(v.parent)
+        }
+      });
+      newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+      logger.debug("Reevaluating messages in room #{}: {}", room.id, newArray)();
+      return newArray;
+    }
   }
 
   get channelsDictUI(): ChannelsDictUIModel {
@@ -241,22 +316,6 @@ export class DefaultStore extends VuexModule {
     };
   }
 
-  get minId(): (id: number) => number|undefined{
-    return (id: number) => {
-      const messages = this.roomsDict[id].messages;
-      let minId: number|undefined = undefined; // should be undefined otherwise we will trigger less than 0
-      for (const m in messages) {
-        const id = messages[m].id;
-        if (id > 0 && (!minId || id < minId)) {
-          minId = id;
-        }
-      }
-      logger.debug('minId #{}={}', id, minId)();
-
-      return minId;
-    };
-  }
-
   get activeRoom(): RoomModel | null {
     if (this.activeRoomId) {
       return this.roomsDict[this.activeRoomId];
@@ -275,23 +334,6 @@ export class DefaultStore extends VuexModule {
       });
     }
     return online;
-  }
-
-  get activeUser(): UserModel | null {
-    return this.activeUserId ? this.allUsersDict[this.activeUserId] : null;
-  }
-
-  get showNav() {
-    return !this.editedMessage && !this.activeUserId;
-  }
-
-  get editingMessageModel(): MessageModel | null {
-    logger.debug('Eval editingMessageModel')();
-    if (this.editedMessage) {
-      return this.roomsDict[this.editedMessage.roomId].messages[this.editedMessage.messageId];
-    } else {
-      return null;
-    }
   }
 
   @Mutation
@@ -313,6 +355,16 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setStorage(payload: IStorage) {
     this.storage = payload;
+  }
+
+  @Mutation
+  public setUploadXHR(payload: SetUploadXHR) {
+    const message = this.roomsDict[payload.roomId].messages[payload.messageId];
+    if (message.transfer) {
+      message.transfer.xhr = payload.xhr;
+    } else {
+      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
+    }
   }
 
   @Mutation
@@ -363,11 +415,6 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setDim(payload: boolean) {
-    this.dim = payload;
-  }
-
-  @Mutation
   public addSendingFile(payload: SendingFile) {
     Vue.set(this.roomsDict[payload.roomId].sendingFiles, payload.connId, payload);
   }
@@ -375,16 +422,6 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public expandChannel(channelid: number) {
     this.channelsDict[channelid].expanded = !this.channelsDict[channelid].expanded;
-  }
-
-  @Mutation
-  public toggleContainer(roomId: number) {
-    this.roomsDict[roomId].callInfo.callContainer = !this.roomsDict[roomId].callInfo.callContainer;
-  }
-
-  @Mutation
-  public setContainerToState(payload: BooleanIdentifier) {
-    this.roomsDict[payload.id].callInfo.callContainer = payload.state;
   }
 
   @Mutation
@@ -566,8 +603,19 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public deleteMessage(rm: RoomMessageIds) {
-    Vue.delete(this.roomsDict[rm.roomId].messages, String(rm.messageId));
-    this.storage.deleteMessage(rm.messageId);
+    let messages = this.roomsDict[rm.roomId].messages;
+    Vue.delete(messages, String(rm.messageId));
+    Object.values(messages)
+        .filter(m => m.parentMessage === rm.messageId)
+        .forEach(a => a.parentMessage = rm.newMessageId);
+    this.storage.deleteMessage(rm.messageId, rm.newMessageId);
+  }
+
+  @Mutation
+  public increaseThreadMessageCount({roomId, messageId}: {roomId: number; messageId: number}) {
+    let message = this.roomsDict[roomId].messages[messageId];
+    message.threadMessagesCount++;
+    this.storage.setThreadMessageCount(messageId, message.threadMessagesCount);
   }
 
   @Mutation
@@ -580,20 +628,39 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setEditedMessage(editedMessage: EditingMessage|null) {
-    this.editedMessage = editedMessage;
-    this.activeUserId = null;
+  public addSearchMessages(ml: MessagesLocation) {
+    const om: Record<number, MessageModel> = this.roomsDict[ml.roomId].search.messages;
+    ml.messages.forEach(m => {
+      Vue.set(om, String(m.id), m);
+    });
   }
 
   @Mutation
-  public setSearchTo(payload: SetSearchTo) {
-    this.roomsDict[payload.roomId].search = payload.search;
+  public setSearchTextTo(ml: SetSearchTextTo) {
+    this.roomsDict[ml.roomId].search.messages = [];
+    this.roomsDict[ml.roomId].search.searchText = ml.searchText;
+    this.roomsDict[ml.roomId].search.locked = false;
   }
 
   @Mutation
-  public setActiveUserId(activeUserId: number) {
-    this.activeUserId = activeUserId;
-    this.editedMessage = null;
+  public setEditedMessage(editedMessage: EditingMessage) {
+    this.roomsDict[editedMessage.roomId].messages[editedMessage.messageId].isEditingActive = editedMessage.isEditingNow;
+  }
+
+  @Mutation
+  public setCurrentThread(editingThread: EditingMessage) {
+    let m: MessageModel = this.roomsDict[editingThread.roomId].messages[editingThread.messageId];
+    m.isThreadOpened = editingThread.isEditingNow;
+  }
+
+  @Mutation
+  public setSearchStateTo(payload: SetSearchStateTo) {
+    this.roomsDict[payload.roomId].search.locked = payload.lock;
+  }
+
+  @Mutation
+  public toogleSearch(roomId: number) {
+    this.roomsDict[roomId].search.searchActive = !this.roomsDict[roomId].search.searchActive;
   }
 
   @Mutation
@@ -663,7 +730,6 @@ export class DefaultStore extends VuexModule {
     if (this.roomsDict[id]) {
       this.roomsDict[id].newMessagesCount = 0;
     }
-    this.editedMessage = null;
   }
 
   @Mutation
@@ -685,6 +751,11 @@ export class DefaultStore extends VuexModule {
     payload.roomIds.forEach(r => {
       this.roomsDict[r].roomLog.push(payload.roomLog);
     });
+  }
+
+  @Mutation
+  public setCallActiveButNotJoinedYet(payload: BooleanIdentifier) {
+    this.roomsDict[payload.id].callInfo.callActiveButNotJoinedYet = payload.state;
   }
 
   @Mutation
@@ -717,8 +788,8 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setPastingQueue(ids: string[]) {
-    this.pastingImagesQueue = ids;
+  public setPastingQueue(ids: PastingTextAreaElement[]) {
+    this.pastingTextAreaQueue = ids;
   }
 
   @Mutation
@@ -763,14 +834,18 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setShowSmileys(value: boolean) {
-    this.showSmileys = value;
-  }
-
-  @Mutation
   public deleteChannel(channelId: number) {
     Vue.delete(this.channelsDict, String(channelId));
     this.storage.deleteChannel(channelId);
+  }
+
+  @Mutation
+  public setShowITypingUser({userId, roomId, date}: {userId: number; roomId: number; date: number}) {
+    if (date === 0) {
+      Vue.delete(this.roomsDict[roomId].usersTyping, userId);
+    } else {
+      Vue.set(this.roomsDict[roomId].usersTyping, userId, date);
+    }
   }
 
   @Mutation
@@ -780,39 +855,47 @@ export class DefaultStore extends VuexModule {
     this.userImage = null;
     this.roomsDict = {};
     this.allUsersDict = {};
-    this.activeUserId = null;
     this.onlineDict = {};
     this.activeRoomId = null;
-    this.editedMessage = null;
     this.storage.clearStorage();
   }
 
   @Action
-  public async showGrowl({html, type}: { html: string; type: GrowlType }) {
+  public async showGrowl({html, type, time}: { html: string; type: GrowlType; time: number }) {
     const growl: GrowlModel = {id: Date.now(), html, type};
     this.addGrowl(growl);
-    await sleep(4000);
+    await sleep(time);
     this.removeGrowl(growl);
   }
 
   @Action
+  public async showUserIsTyping({userId, roomId}: {userId: number; roomId: number}) {
+    let date = Date.now();
+    this.setShowITypingUser({userId, roomId, date});
+    await sleep(SHOW_I_TYPING_INTERVAL_SHOW); // lets say 1 second ping
+    if (this.roomsDict[roomId].usersTyping[userId] === date) {
+      this.setShowITypingUser({userId, roomId, date: 0});
+    }
+  }
+
+  @Action
   public async growlErrorRaw(html: string) {
-    await this.showGrowl({html, type: GrowlType.ERROR});
+    await this.showGrowl({html, type: GrowlType.ERROR, time: 6000});
   }
 
   @Action
   public async growlError(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.ERROR});
+    await this.showGrowl({html: encodeHTML(title), type: GrowlType.ERROR, time: 6000});
   }
 
   @Action
   public async growlInfo(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO});
+    await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO, time: 5000});
   }
 
   @Action
   public async growlSuccess(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.SUCCESS});
+    await this.showGrowl({html: encodeHTML(title), type: GrowlType.SUCCESS, time: 4000});
   }
 
 }

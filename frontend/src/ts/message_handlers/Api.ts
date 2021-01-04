@@ -7,8 +7,10 @@ import {
 } from '@/ts/types/types';
 import {
   MessageModelDto,
+  OauthSessionResponse,
   OauthStatus,
   SaveFileResponse,
+  SessionResponse,
   ViewUserProfileDto
 } from '@/ts/types/dto';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
@@ -41,9 +43,10 @@ export default class Api extends MessageHandler {
     this.xhr = xhr;
   }
 
-  public async login(form: HTMLFormElement): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async login(form: HTMLFormElement): Promise<SessionResponse> {
+    return this.xhr.doPost<SessionResponse>({
       url: '/auth',
+      isJsonDecoded: true,
       formData: new FormData(form)
     });
   }
@@ -53,20 +56,6 @@ export default class Api extends MessageHandler {
       url: '/report_issue',
       params: {issue, browser, version},
       checkOkString: true
-    });
-  }
-
-  public async search(
-      data: string,
-      room: number,
-      offset: number,
-      requestInterceptor?: (a: XMLHttpRequest) => void
-  ): Promise<MessageModelDto[]> {
-   return this.xhr.doPost<MessageModelDto[]>({
-      url: '/search_messages',
-      params: {data, room, offset},
-      isJsonDecoded: true,
-      requestInterceptor
     });
   }
 
@@ -94,16 +83,18 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async register(form: HTMLFormElement): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async register(form: HTMLFormElement): Promise<SessionResponse> {
+    return this.xhr.doPost<SessionResponse>({
       url: '/register',
+      isJsonDecoded: true,
       formData: new FormData(form)
     });
   }
 
-  public async registerDict(password: string, username: string): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async registerDict(password: string, username: string): Promise<SessionResponse> {
+    return this.xhr.doPost<SessionResponse>({
       url: '/register',
+      isJsonDecoded: true,
       params: {username, password}
     });
   }
@@ -128,18 +119,20 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async googleAuth(token: string): Promise<string> {
-    return this.xhr.doPost<string>({
+  public async googleAuth(token: string): Promise<OauthSessionResponse> {
+    return this.xhr.doPost<OauthSessionResponse>({
       url: '/google_auth',
+      isJsonDecoded: true,
       params: {
         token
       }
     });
   }
 
-  public async facebookAuth(token: string): Promise<string> {
-    return  this.xhr.doPost<string>({
+  public async facebookAuth(token: string): Promise<OauthSessionResponse> {
+    return  this.xhr.doPost<OauthSessionResponse>({
       url: '/facebook_auth',
+      isJsonDecoded: true,
       params: {
         token
       }
@@ -185,12 +178,12 @@ export default class Api extends MessageHandler {
     }
   }
 
-  public async validateUsername(username: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
+  public async validateUsername(username: string, process: (r: XMLHttpRequest) => void): Promise<void> {
     return this.xhr.doPost({
       url: '/validate_user',
       params: {username},
       checkOkString: true,
-      requestInterceptor
+      process
     });
   }
 
@@ -225,7 +218,7 @@ export default class Api extends MessageHandler {
     return this.xhr.doGet<string>(`/confirm_email?token=${token}`, false, true);
   }
 
-  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<SaveFileResponse> {
+  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void, setXhr: (e: XMLHttpRequest) => void): Promise<SaveFileResponse> {
     const fd = new FormData();
     files.forEach(sd => fd.append(sd.key, sd.file, sd.file.name));
 
@@ -234,17 +227,18 @@ export default class Api extends MessageHandler {
       isJsonDecoded: true,
       formData: fd,
       process: r => {
+        setXhr(r);
         r.upload.addEventListener('progress', progress);
       }
     });
   }
 
-  public async validateEmail(email: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
+  public async validateEmail(email: string, process: (r: XMLHttpRequest) => void): Promise<void> {
     return this.xhr.doPost({
       url: '/validate_email',
       params: {email},
       checkOkString: true,
-      requestInterceptor
+      process,
     });
   }
 

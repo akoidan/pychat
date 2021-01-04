@@ -66,7 +66,9 @@ class SocialAuth():
 		try:
 			user_profile = UserProfile.objects.get(**user_profile_query)
 			self.logger.info("Sign in as %s with id %s", user_profile.username, user_profile.id)
+			is_new = False
 		except UserProfile.DoesNotExist:
+			is_new = True
 			if email and UserProfile.objects.filter(email=email).exists():
 				raise ValidationError(f"User with email {email} already exists. If this is you, please sign in from your account and connect with social auth in settings.")
 
@@ -86,7 +88,7 @@ class SocialAuth():
 			self.download_http_photo(picture, user_profile)
 			user_profile.save()
 			RoomUsers(user_id=user_profile.id, room_id=settings.ALL_ROOM_ID, notifications=False).save()
-		return user_profile
+		return (user_profile, is_new)
 
 
 class GoogleAuth(SocialAuth):

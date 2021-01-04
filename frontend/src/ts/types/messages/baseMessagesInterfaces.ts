@@ -17,7 +17,7 @@ export interface ChangeUserOnlineBase extends UserDto {
 // any means that every every registered subscriber will be called with this handler if it exists
 // this means, that handler that registered this event will be called
 // void means that no handlers should process this signal
-export type HandlerName = 'router' | 'channels' | 'message' | 'webrtc' | 'ws'| 'void' | 'any' | 'call' | 'webrtcTransfer:*' | 'peerConnection:*';
+export type HandlerName = 'router' | 'ws-message' | 'webrtc-message' |'room' | 'webrtc' | 'ws'| 'void' | 'any' | 'call' | 'webrtcTransfer:*' | 'peerConnection:*';
 export type CallHandlerName = HandlerName | 'dummyCall';
 
 export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | 'any'>) => void|Promise<void>;
@@ -60,6 +60,7 @@ export interface OfferFileContent extends BrowserBase {
   name: string;
 }
 export type ChangeDeviceType = 'someone_left'| 'room_created' | 'i_deleted' | 'someone_joined' | 'invited';
+export type ChangeOnlineType = 'appear_online' | 'gone_offline';
 
 export interface BrowserBase {
   browser: string;

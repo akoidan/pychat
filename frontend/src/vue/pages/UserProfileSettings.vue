@@ -1,11 +1,17 @@
 <template>
-  <div>
+  <div class="settings-page">
     <table>
       <tbody>
         <tr>
           <th>Suggestions:</th>
           <td>
             <app-checkbox v-model="model.suggestions" />
+          </td>
+        </tr>
+        <tr>
+          <th>Show when I'm writing message</th>
+          <td>
+            <app-checkbox v-model="model.showWhenITyping" />
           </td>
         </tr>
         <tr>
@@ -114,6 +120,7 @@ import {UserSettingsDto} from '@/ts/types/dto';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 import { SetSettingsMessage } from '@/ts/types/messages/wsInMessages';
 import { LogLevel, logLevels } from 'lines-logger';
+import {LAST_SYNCED} from '@/ts/utils/consts';
 
 @Component({
   components: {AppSubmit, AppCheckbox}
@@ -137,7 +144,9 @@ export default class UserProfileSettings extends Vue {
   }
 
   public clearHistory() {
+    localStorage.removeItem(LAST_SYNCED); // TODO this should not be here, but in wsmessgehenader
     this.$store.clearMessages();
+    this.$store.growlSuccess("History has been cleared");
   }
 
   @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})
@@ -151,6 +160,23 @@ export default class UserProfileSettings extends Vue {
 </script>
 
 <style lang="sass" scoped>
+
+  @import "~@/assets/sass/partials/abstract_classes"
+
   .lor-btn
     width: 100%
+
+  .settings-page /deep/
+    button
+      width: 100%
+    padding-top: 10px
+    padding-bottom: 10px
+    table
+      margin: auto
+    th
+      text-align: right
+    td, th
+      padding: 4px
+    .input
+      @extend %big-input
 </style>

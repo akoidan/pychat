@@ -52,7 +52,11 @@ export default class GoogleAuth extends Vue {
       }
       await new Promise(r => gapi.load('client:auth2', r));
       this.$logger.log('gapi 2 is ready')();
-      await gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID});
+      try {
+        await gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID});
+      } catch (e) {
+        throw Error(e?.details)
+      }
       this.$logger.log('gauth 2 is ready')();
       googleInited = true;
     }

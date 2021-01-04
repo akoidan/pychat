@@ -1,10 +1,8 @@
 <template>
   <div class="flex">
-    <div
-      v-if="dim"
-      class="wait"
-    />
-    <app-nav v-show="showNav" />
+    <app-nav-wrapper v-show="!$route.meta.hasOwnNavBar">
+      <chat-back-icon/>
+    </app-nav-wrapper>
     <incoming-call
       v-if="incomingCall"
       :call="incomingCall"
@@ -22,7 +20,6 @@
   </div>
 </template>
 <script lang="ts">
-import AppNav from '@/vue/AppNav.vue';
 import {
   Component,
   Vue
@@ -33,20 +30,18 @@ import {
 } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
 import IncomingCall from '@/vue/chat/IncomingCall.vue';
+import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
+import ChatBackIcon from '@/vue/chat/ChatBackIcon.vue';
 
 @Component({
-  components: {IncomingCall, AppNav}
+  components: {ChatBackIcon, AppNavWrapper, IncomingCall}
 })
 export default class MainPage extends Vue {
 
   @State
-  public readonly showNav!: boolean;
-  @State
   public readonly userInfo!: CurrentUserInfoModel;
   @State
   public readonly incomingCall!: IncomingCallModel;
-  @State
-  public readonly dim!: boolean;
 
   get inited() {
     return this.userInfo;

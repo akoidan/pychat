@@ -31,7 +31,7 @@ from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
 	add_missing_fields, extract_nginx_files, check_captcha, get_user_id
-from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model
+from chat.utils import check_user, is_blank, get_or_create_ip_model
 
 SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
 
@@ -295,7 +295,7 @@ class HttpHandler(MethodDispatcher):
 		except User.DoesNotExist:
 			raise ValidationError("User {} doesn't exist".format(username))
 
-		return self.__generate_session__(user.id)
+		return MessagesCreator.get_session(self.__generate_session__(user.id))
 
 	@add_missing_fields('email', 'sex')
 	# @transaction.atomic TODO, is this works in single thread?
@@ -309,7 +309,7 @@ class HttpHandler(MethodDispatcher):
 		RoomUsers(user_id=user_profile.id, room_id=settings.ALL_ROOM_ID, notifications=False).save()
 		if email:
 			yield from self.__send_sign_up_email(user_profile)
-		return self.__generate_session__(user_profile.id)
+		return MessagesCreator.get_session(self.__generate_session__(user_profile.id))
 
 	@require_http_method('GET')
 	def confirm_email(self, token):
@@ -339,8 +339,8 @@ class HttpHandler(MethodDispatcher):
 
 	@run_on_executor
 	def __oauth(self, token, handler):
-		user_profile = handler.generate_user_profile(token)
-		return self.__generate_session__(user_profile.id)
+		user_profile, is_new = handler.generate_user_profile(token)
+		return MessagesCreator.get_oauth_session(self.__generate_session__(user_profile.id), user_profile.username, is_new)
 
 	@run_on_executor
 	def __get_oauth_identifier(self, token, handler):
@@ -600,22 +600,6 @@ class HttpHandler(MethodDispatcher):
 	def statistics(self):
 		pie_data = IpAddress.objects.values('country').filter(country__isnull=False).annotate(count=Count("country"))
 		return list(pie_data)
-
-	@require_http_method('POST')
-	@login_required_no_redirect
-	def search_messages(self, data, room, offset):
-		offset = int(offset)
-		if not RoomUsers.objects.filter(room_id=room, user_id=self.user_id).exists():
-			raise ValidationError("You can't access this room")
-		messages = Message.objects.filter(content__icontains=data, room_id=room).order_by('-id')[
-					  offset:offset + settings.MESSAGES_PER_SEARCH]
-		imv = get_message_images_videos(messages)
-		result = []
-		for message in messages:
-			files = MessagesCreator.prepare_img_video(imv, message.id)
-			prep_m = MessagesCreator.create_message(message, files)
-			result.append(prep_m)
-		return result
 
 	@require_http_method('POST')
 	@login_required_no_redirect

@@ -31,11 +31,20 @@ export  interface ChannelDB {
   creator: number;
 }
 
-export  interface MessageDB {
+export  interface TagDB {
+  id: number;
+  user_id: number;
+  message_id: number;
+  symbol: string;
+}
+
+export interface MessageDB {
   id: number;
   time: number;
   content: string;
   symbol: string;
+  parent_message_id: number|null;
+  thread_messages_count: number;
   deleted: BooleanDB;
   giphy: string;
   edited: number;
@@ -63,6 +72,7 @@ export interface SettingsDB {
   incomingFileCallSound: BooleanDB;
   messageSound: BooleanDB;
   onlineChangeSound: BooleanDB;
+  showWhenITyping: BooleanDB;
   sendLogs: BooleanDB;
   suggestions: BooleanDB;
   theme: string;

@@ -1,9 +1,14 @@
 from chat.models import get_milliseconds
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, UserSettingsVarNames, \
 	UserProfileVarNames
+from chat.utils import get_message_images_videos, get_message_tags
 
 
 class MessagesCreator(object):
+
+	def __init__(self, user_id, id):
+		self.user_id = user_id
+		self.id = id
 
 	def default(self, content, event, handler):
 		"""
@@ -14,14 +19,6 @@ class MessagesCreator(object):
 			VarNames.CONTENT: content,
 			VarNames.USER_ID: self.user_id,
 			VarNames.TIME: get_milliseconds(),
-			VarNames.HANDLER_NAME: handler
-		}
-
-	@staticmethod
-	def base_default(event, content, handler):
-		return {
-			VarNames.EVENT: event,
-			VarNames.CONTENT: content,
 			VarNames.HANDLER_NAME: handler
 		}
 
@@ -48,6 +45,18 @@ class MessagesCreator(object):
 			VarNames.JS_MESSAGE_ID: js_message_id,
 			VarNames.CONTENT: message,
 		}
+
+	@classmethod
+	def message_models_to_dtos(cls, messages):
+		imv = get_message_images_videos(messages)
+		tags = get_message_tags(messages)
+
+		def message_to_dto(message):
+			files = cls.prepare_img_video(imv, message.id)
+			prep_tags = cls.prepare_tags(tags, message.id)
+			return cls.create_message(message, files, prep_tags)
+
+		return list(map(message_to_dto, messages))
 
 	@staticmethod
 	def set_profile_image(url):
@@ -86,6 +95,7 @@ class MessagesCreator(object):
 			UserSettingsVarNames.INCOMING_FILE_CALL_SOUND: up.incoming_file_call_sound,
 			UserSettingsVarNames.MESSAGE_SOUND: up.message_sound,
 			UserSettingsVarNames.THEME: up.theme,
+			UserSettingsVarNames.SHOW_WHEN_I_TYPING: up.show_when_i_typing,
 			UserSettingsVarNames.HIGHLIGHT_CODE: up.highlight_code,
 			UserSettingsVarNames.ONLINE_CHANGE_SOUND: up.online_change_sound
 		}
@@ -99,7 +109,7 @@ class MessagesCreator(object):
 			UserProfileVarNames.CITY: up.city,
 			UserProfileVarNames.SEX: up.sex_str,
 			UserProfileVarNames.CONTACTS: up.contacts,
-			UserProfileVarNames.BIRTHDAY: str(up.birthday),
+			UserProfileVarNames.BIRTHDAY: str(up.birthday) if up.birthday else None,
 			UserProfileVarNames.EMAIL: up.email,
 			UserProfileVarNames.SURNAME: up.surname,
 		}
@@ -108,20 +118,24 @@ class MessagesCreator(object):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
-		room_less = self.default(online, Actions.LOGOUT, HandlerNames.CHANNELS)
+		room_less = self.default(online, Actions.LOGOUT, HandlerNames.ROOM)
 		return room_less
 
 	def room_online_login(self, online, sender_name, sex):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
-		room_less = self.default(online, Actions.LOGIN, HandlerNames.CHANNELS)
+		room_less = self.default(online, Actions.LOGIN, HandlerNames.ROOM)
 		room_less[VarNames.USER] = sender_name
 		room_less[VarNames.GENDER] = sex
+		room_less[VarNames.WEBRTC_OPPONENT_ID] = self.id
 		return room_less
 
 	@classmethod
-	def create_message(cls, message, files):
+	def create_message(cls, message, files, tags):
+		"""
+		https://pychat.org/photo/DpHBIO1p_image.png
+		"""
 		res = {
 			VarNames.USER_ID: message.sender_id,
 			VarNames.CONTENT: message.content,
@@ -129,6 +143,9 @@ class MessagesCreator(object):
 			VarNames.MESSAGE_ID: message.id,
 			VarNames.EDITED_TIMES: message.edited_times,
 			VarNames.ROOM_ID: message.room_id,
+			VarNames.THREAD_MESSAGES_COUNT: message.thread_messages_count,
+			VarNames.PARENT_MESSAGE: message.parent_message_id,
+			VarNames.MESSAGE_TAGS: tags,
 		}
 		if message.deleted:
 			res[VarNames.DELETED] = True
@@ -140,7 +157,7 @@ class MessagesCreator(object):
 			res[VarNames.GIPHY] = message.giphy
 		return res
 
-	def create_send_message(self, message, event, files):
+	def create_send_message(self, message, event, files, tags_users):
 		"""
 		:type message: chat.models.Message
 		:type imgs: dict
@@ -148,37 +165,25 @@ class MessagesCreator(object):
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		res = self.create_message(message, files)
+		res = self.create_message(message, files, tags_users)
 		res[VarNames.EVENT] = event
 		res[VarNames.CB_BY_SENDER] = self.id
-		res[VarNames.HANDLER_NAME] = HandlerNames.CHANNELS
+		res[VarNames.HANDLER_NAME] = HandlerNames.WS_MESSAGE
 		return res
 
-	@classmethod
-	def append_images(cls, messages, files, prepare_img):
-		"""
-		:type messages: list[chat.models.Message] 
-		:type files: list[chat.models.Image]
-		"""
-		res_mess = []
-		for message in messages:
-			res_mess.append(cls.create_message(message, prepare_img(files, message.id)))
-		return res_mess
-
 
 	@classmethod
-	def get_messages(cls, messages, channel, files, prepare_img, message_id):
+	def get_messages(cls, messages, message_id):
 		"""
 		:type images: list[chat.models.Image]
 		:type messages: list[chat.models.Message]
 		:type channel: str
 		"""
+
 		return {
-			VarNames.CONTENT: cls.append_images(messages, files, prepare_img),
-			VarNames.EVENT: Actions.GET_MESSAGES,
-			VarNames.ROOM_ID: channel,
+			VarNames.CONTENT: cls.message_models_to_dtos(messages),
 			VarNames.JS_MESSAGE_ID: message_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
+			VarNames.HANDLER_NAME: HandlerNames.NULL
 		}
 
 	@staticmethod
@@ -188,6 +193,14 @@ class MessagesCreator(object):
 			VarNames.TIME: time,
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 		}
+
+	@staticmethod
+	def prepare_tags(tags, message_id):
+		"""
+		:type message_id: int
+		:type files: list[chat.models.Image]
+		"""
+		return {tag.symbol: tag.user_id for tag in tags if tag.message_id == message_id}
 
 	@staticmethod
 	def prepare_img_video(files, message_id):
@@ -203,15 +216,25 @@ class MessagesCreator(object):
 				VarNames.IMAGE_ID: x.id
 			} for x in files if x.message_id == message_id}
 
-	@property
-	def channel(self):
-		return RedisPrefix.generate_user(self.user_id)
-
 	def responde_pong(self, js_id):
 		return {
 			VarNames.EVENT: Actions.PONG,
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.JS_MESSAGE_ID: js_id
+		}
+
+	@staticmethod
+	def get_session(session_id):
+		return {
+			'session': session_id,
+		}
+
+	@staticmethod
+	def get_oauth_session(session_id, username, is_new):
+		return {
+			'session': session_id,
+			'username': username,
+			'isNewAccount': is_new,
 		}
 
 	def unsubscribe_direct_message(self, room_id, js_id, myws_id, users, name):
@@ -224,15 +247,15 @@ class MessagesCreator(object):
 			VarNames.ROOM_NAME: name,
 			VarNames.JS_MESSAGE_ID: js_id,
 			VarNames.USER_ID: self.user_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.CB_BY_SENDER: myws_id,
 			VarNames.ROOM_USERS: users
 		}
 
 
-class WebRtcMessageCreator(object):
+class WebRtcMessageCreator(MessagesCreator):
 
-	def offer_webrtc(self, content, connection_id, room_id, action):
+	def offer_webrtc(self, content, connection_id, room_id, action, thread_id=None):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
@@ -244,6 +267,7 @@ class WebRtcMessageCreator(object):
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.ROOM_ID: room_id,
+			VarNames.THREAD_ID: thread_id,
 			VarNames.TIME: get_milliseconds()
 		}
 

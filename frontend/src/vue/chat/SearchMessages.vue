@@ -4,13 +4,17 @@
     class="search"
     :class="{'loading': !!currentRequest}"
   >
-    <input
-      ref="inputSearch"
-      v-model.trim="search"
-      type="search"
-      class="input"
-    >
-    <div class="search-loading" />
+    <div class="input-holder">
+      <input
+        ref="inputSearch"
+        @keydown="checkToggleSearch"
+        v-model.trim="search"
+        type="search"
+        class="input"
+      >
+      <i class="icon-cancel-circled-outline" @click="close"/>
+      <div class="search-loading" />
+    </div>
     <div
       v-if="searchResultText"
       class="search_result"
@@ -33,11 +37,16 @@ import {
   SearchModel
 } from '@/ts/types/model';
 import { MessageModelDto } from '@/ts/types/dto';
-
-import { SetSearchTo } from '@/ts/types/types';
 import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
 
 const START_TYPING = 'Start typing and messages will appear';
+
+
+let uniqueId = 1;
+
+function getUniqueId() {
+  return uniqueId++;
+}
 
 @Component
 export default class SearchMessages extends Vue {
@@ -48,8 +57,12 @@ export default class SearchMessages extends Vue {
     } else if (!this.room.search.locked) {
       return 'More messages are available, scroll top to load them';
     } else {
-      return '';
+      return 'No more messages are available on this search';
     }
+  }
+
+  close() {
+    this.$store.toogleSearch(this.room.id);
   }
 
   get searchActive() {
@@ -63,10 +76,8 @@ export default class SearchMessages extends Vue {
 
   public debouncedSearch!: Function;
   public search: string = '';
-  public offset: number = 0;
-  public currentRequest: XMLHttpRequest|null = null;
+  public currentRequest: number = 0;
   public searchResult: string = '';
-  public searchedIds = [];
 
   @Watch('searchActive')
   public onSearchActiveChange(value: boolean) {
@@ -77,7 +88,13 @@ export default class SearchMessages extends Vue {
     }
   }
 
-  public created() {
+  private checkToggleSearch(event: KeyboardEvent) {
+    if (event.key === 'Escape') {
+      this.$store.toogleSearch(this.room.id)
+    }
+  }
+
+  private created() {
     this.search = this.room.search.searchText;
     if (!this.search) {
       this.searchResult = START_TYPING;
@@ -85,71 +102,72 @@ export default class SearchMessages extends Vue {
     this.debouncedSearch = debounce(this.doSearch, 500);
   }
 
-  public async doSearch(search: string) {
-    if (search) {
-      try {
-       const a: MessageModelDto[] = await  this.$api.search(search, this.room.id, this.offset, r => this.currentRequest = r);
-       this.$logger.debug('http response {} {}', a)();
-       this.currentRequest = null;
-       if (a.length) {
-          this.$messageSenderProxy.getMessageSender(this.room.id).addMessages(this.room.id, a); // TODO this should be separate messages, otherwise we would have history with holes
-          const ids = this.room.search.searchedIds.concat([]);
-          this.mutateSearchedIds(a.map(a => a.id), search);
-          this.searchResult = '';
-        } else {
-          this.mutateSearchedIds([], search);
-          this.searchResult = 'No results found';
-        }
-      } catch (e) {
-        this.searchResult = e;
-        this.mutateSearchedIds([], search);
-      }
-    } else {
-      this.mutateSearchedIds([], search);
+  private async doSearch(search: string) {
+    if (!search) {
       this.searchResult = START_TYPING;
+      return
     }
+
+    let uniqueId = getUniqueId();
+    try {
+      this.currentRequest = uniqueId;
+      await this.$messageSenderProxy
+          .getMessageSender(this.room.id)
+          .loadUpSearchMessages(
+              this.room.id,
+              10,
+              found => {
+                if (found) {
+                  this.searchResult = '';
+                } else {
+                  this.searchResult = 'No results found';
+                }
+                if (this.currentRequest === uniqueId) {
+                  this.currentRequest = 0
+                  return true;
+                }
+                return false;
+              }
+          );
+    } catch (e) {
+      if (uniqueId === this.currentRequest) {
+        this.currentRequest = 0
+      }
+      this.searchResult = e;
+    }
+
   }
 
   @Watch('search')
-  public onSearchChange(search: string) {
+  private onSearchChange(search: string) {
+    this.$store.setSearchTextTo({searchText: search, roomId: this.room.id})
     if (this.currentRequest) {
-      this.currentRequest.abort();
-      this.currentRequest = null;
+      this.currentRequest = getUniqueId();
     }
     this.debouncedSearch(search);
-  }
-
-  private mutateSearchedIds(searchedIds: number[], searchText: string) {
-    const search: SearchModel = {
-      searchActive: this.searchActive,
-      searchedIds,
-      searchText,
-      locked: searchedIds.length < MESSAGES_PER_SEARCH
-    };
-    this.$store.setSearchTo({
-      roomId: this.room.id,
-      search
-    } as SetSearchTo);
   }
 }
 </script>
 
 <style lang="sass" scoped>
   @import "~@/assets/sass/partials/mixins"
+
+  .icon-cancel-circled-outline
+    @include hover-click(red)
+    cursor: pointer
+  .input-holder
+    display: flex
+    width: 100%
+    .input
+      flex-grow: 1
   .search
     padding: 5px
-    > *
-      display: inline-block
-    input
-      width: calc(100% - 10px)
     &.loading
       .search-loading
         margin-left: 5px
         margin-bottom: -5px
         margin-top: -3px
         @include spinner(3px, white)
-      input
-        width: calc(100% - 40px)
 
   .search_result
     display: flex

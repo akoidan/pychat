@@ -34,7 +34,7 @@ import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
  */
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
-  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'message'> = {
+  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'webrtc-message'> = {
   };
 
   private state: 'not_inited' |'initing' | 'ready' = 'not_inited';
@@ -172,11 +172,25 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return connections;
   }
 
-
-  addMessages(roomId: number, messages: MessageModelDto[]): void {
-    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
-    throw Error('unsupported');
+  loadThreadMessages(roomId: number, threadId: number): Promise<void> {
+    this.logger.error('Method not implemented.')();
+    return Promise.resolve();
+    // this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
+    // throw new Error('Method not implemented.');
   }
 
+  loadUpSearchMessages(roomId: number, count: number): Promise<void> {
+    throw new Error('Searching message is not supported on p2p direct channel yet');
+  }
+
+  loadMessages(roomId: number, messageId: number[]): Promise<void> {
+    this.logger.error('Method not implemented.')();
+    return Promise.resolve();
+  }
+
+  loadUpMessages(roomId: number, count: number): Promise<void> {
+    this.logger.error('Method not implemented.')();
+    return Promise.resolve();
+  }
 
 }

@@ -136,6 +136,7 @@ import { SexModelString } from '@/ts/types/model';
 import { sub } from '@/ts/instances/subInstance'
 import { LoginMessage } from '@/ts/types/messages/innerMessages';
 import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
+import {USERNAME_REGEX} from '@/ts/utils/consts';
 
 @Component({components: {SocialAuthSignUp, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
@@ -194,7 +195,7 @@ import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
         this.userCheckValue = IconColor.ERROR;
         this.userDescription = "Username can't be empty";
         this.usernameValidity = this.userDescription;
-      } else if (!/^[a-zA-Z-_0-9]{1,16}$/.test(username)) {
+      } else if (!new RegExp(USERNAME_REGEX).test(username)) {
         this.userDescription = "Username can only contain latin letters, numbers, dashes or underscore";
         this.usernameValidity = this.userDescription;
         this.userCheckValue = IconColor.ERROR;
@@ -266,7 +267,7 @@ import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
         this.currentValidateEmailRequest = null;
       }
       try {
-         await this.$api.validateEmail(username, r => this.currentValidateEmailRequest = r);
+        await this.$api.validateEmail(username, r => this.currentValidateEmailRequest = r);
         this.emailCheckValue = IconColor.SUCCESS;
         this.emailDescription = `Email is ok!`;
         this.emailValidity = '';
@@ -324,7 +325,7 @@ import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
 
     @ApplyGrowlErr({runningProp: 'running', message: `Can't sign up`})
     async register() {
-      let session: string = await this.$api.register(this.form);
+      let {session} = await this.$api.register(this.form);
       let message: LoginMessage = {action: 'login', handler: 'router', session};
       sub.notify(message)
     }

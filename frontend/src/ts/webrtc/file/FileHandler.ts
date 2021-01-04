@@ -22,7 +22,7 @@ export default class FileHandler extends FileAndCallTransfer {
   };
   private readonly file: File;
 
-  constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number) {
+  constructor(roomId: number, threadId: number|null, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number) {
     super(roomId, wsHandler, notifier, store);
     this.file = file;
     this.setConnectionId(connId);
@@ -30,6 +30,7 @@ export default class FileHandler extends FileAndCallTransfer {
     const payload: SendingFile = {
       roomId,
       connId,
+      threadId,
       fileName: file.name,
       fileSize: file.size,
       time,

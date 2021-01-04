@@ -15,9 +15,6 @@ import { UserModel } from '@/ts/types/model';
     @Prop()
     public readonly user!: UserModel;
 
-    @Prop()
-    public readonly online!: boolean;
-
     get userSexClass() {
       if (this.user.sex === 'Male') {
         return 'icon-man';

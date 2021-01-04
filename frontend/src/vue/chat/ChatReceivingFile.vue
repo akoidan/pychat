@@ -66,9 +66,9 @@ export default class ChatReceivingFile extends Vue {
 
   get mainClass(): string {
     if (this.receivingFile.userId === this.myId) {
-      return 'message-self';
+      return 'message-self message-receiving-file';
     } else {
-      return 'message-others';
+      return 'message-others message-receiving-file';
     }
   }
 
@@ -84,6 +84,11 @@ export default class ChatReceivingFile extends Vue {
 </script>
 
 <style lang="sass" scoped>
+
+  @import "~@/assets/sass/partials/variables"
+
+  .message-receiving-file
+    padding: $space-between-messages $space-between-messages/4
 
   .progress-wrap-file /deep/ .progress-wrap
     width: calc(100% - 40px)

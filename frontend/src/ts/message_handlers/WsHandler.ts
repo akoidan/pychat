@@ -23,6 +23,7 @@ import {
   userSettingsDtoToModel
 } from '@/ts/types/converters';
 import {
+  MessageModelDto,
   RoomNoUsersDto,
   UserProfileDto,
   UserSettingsDto
@@ -45,6 +46,7 @@ import {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
+  MessagesResponseMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage
 } from '@/ts/types/messages/wsInMessages';
@@ -57,7 +59,10 @@ import {
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
-import { DefaultWsOutMessage } from '@/ts/types/messages/wsOutMessages';
+import {
+  DefaultWsOutMessage,
+  SyncHistoryOutMessage
+} from '@/ts/types/messages/wsOutMessages';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -84,7 +89,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private pingTimeoutFunction: number|null = null;
   private ws: WebSocket | null = null;
   private noServerPingTimeout: any;
-  private readonly loadHistoryFromWs: boolean = false;
   private readonly store: DefaultStore;
   private readonly sessionHolder: SessionHolder;
   private listenWsTimeout: number|null = null;
@@ -123,10 +127,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.wsConnectionId;
   }
 
-  public async offerFile(roomId: number, browser: string, name: string, size: number): Promise<WebRtcSetConnectionIdMessage> {
+  public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number|null): Promise<WebRtcSetConnectionIdMessage> {
     return this.messageProc.sendToServerAndAwait({
       action: 'offerFile',
-      roomId: roomId,
+      roomId,
+      threadId,
       content: {browser, name, size}
     });
   }
@@ -174,23 +179,47 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public sendEditMessage(content: string|null, id: number, files: number[] | null) {
+  public async search(
+      searchString: string,
+      roomId: number,
+      offset: number,
+  ): Promise<MessagesResponseMessage> {
+    return this.messageProc.sendToServerAndAwait({
+      searchString,
+      roomId,
+      offset,
+      action: 'searchMessages'
+    });
+  }
+
+  public sendEditMessage(content: string|null, id: number, files: number[] | null, tags: Record<string, number>) {
     const newVar = {
       id,
       action: 'editMessage',
       files,
+      tags,
       content
     };
     this.sendToServer(newVar, true);
   }
 
-  public async sendPrintMessage(content: string, roomId: number, files: number[], id: number, timeDiff: number): Promise<PrintMessage> {
+  public async sendPrintMessage(
+      content: string,
+      roomId: number,
+      files: number[],
+      id: number,
+      timeDiff: number,
+      parentMessage: number|null,
+      tags: Record<string, number>
+  ): Promise<PrintMessage> {
     const newVar = {
       files,
       id,
       timeDiff,
       action: 'printMessage',
       content,
+      tags,
+      parentMessage,
       roomId
     };
     return this.messageProc.sendToServerAndAwait(newVar);
@@ -200,6 +229,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.messageProc.sendToServerAndAwait({
       action: 'setSettings',
       content
+    });
+  }
+
+  public showIType(roomId: number): void {
+    this.sendToServer({
+      roomId,
+      action: 'showIType'
     });
   }
 
@@ -220,6 +256,16 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       volume,
       notifications
     });
+  }
+
+  public async syncHistory(roomIds: number[], messagesIds: number[], lastSynced: number): Promise<MessagesResponseMessage> {
+    let payload: SyncHistoryOutMessage = {
+      messagesIds,
+      roomIds,
+      lastSynced,
+      action: 'syncHistory'
+    };
+    return this.messageProc.sendToServerAndAwait(payload);
   }
 
   public async sendAddChannel(channelName: string): Promise<AddChannelMessage> {
@@ -301,11 +347,28 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendLoadMessages(roomId: number, headerId: number|undefined, count: number) {
+  public async sendLoadMessages(
+      roomId: number,
+      count: number,
+      threadId: number|null,
+      excludeIds: number[]
+  ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
-      headerId,
       count,
+      excludeIds,
+      threadId,
       action: 'loadMessages',
+      roomId
+    });
+  }
+
+  public async sendLoadMessagesByIds(
+      roomId: number,
+      messagesIds: number[]
+  ): Promise<MessagesResponseMessage> {
+    return this.messageProc.sendToServerAndAwait({
+      messagesIds,
+      action: 'loadMessagesByIds',
       roomId
     });
   }
@@ -326,7 +389,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   public retry(connId: string, opponentWsId: string) {
     this.sendToServer({action: 'retryFile',  connId, opponentWsId});
   }
-
 
   public replyCall(connId: string, browser: string) {
     this.sendToServer({
@@ -360,6 +422,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
+  public joinCall(connId: string) {
+    this.sendToServer({
+      action: 'joinCall',
+      connId
+    });
+  }
+
 
   public setSettings(m: SetSettingsMessage) {
     const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
@@ -389,7 +458,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     const pubSetRooms: PubSetRooms = {
       action: 'init',
       channels: message.channels,
-      handler: 'channels',
+      handler: 'room',
       rooms: message.rooms,
       online: message.online,
       users: message.users
@@ -446,7 +515,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       this.messageProc.handleMessage(data);
     }
   }
-
 
   // private hideGrowlProgress(key: number) {
   //   let progInter = this.progressInterval[key];
@@ -508,7 +576,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
       // this.store.growlError( 'Can\'t establish connection with server');
-      this.logger.error('Chat server is down because {}', reason)();
+      this.logger.warn('Chat server is down because {}', reason)();
       this.wsState = WsState.TRIED_TO_CONNECT;
     } else if (this.wsState === WsState.CONNECTED) {
       // this.store.growlError( `Connection to chat server has been lost, because ${reason}`);
@@ -524,30 +592,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   private listenWS() {
-    if (typeof WebSocket === 'undefined') {
-      // TODO
-      // alert('Your browser ({}) doesn\'t support webSockets. Supported browsers: ' +
-      //     'Android, Chrome, Opera, Safari, IE11, Edge, Firefox'.format(window.browserVersion));
-      return;
-    }
+    const wsUrls = `${this.API_URL}?id=${this.wsConnectionId}&sessionId=${this.sessionHolder.session}`;
 
-    const ids: { [id: string]: number } = {};
-    for (const k in this.store.roomsDict) {
-      const maxId: number|null = this.store.maxId(parseInt(k));
-      if (maxId) {
-        ids[k] = maxId;
-      }
-    }
-    let s = this.API_URL + `?id=${this.wsConnectionId}`;
-    if (Object.keys(ids).length > 0) {
-      s += `&messages=${encodeURI(JSON.stringify(ids))}`;
-    }
-    if (this.loadHistoryFromWs && this.wsState !== WsState.CONNECTION_IS_LOST) {
-      s += '&history=true';
-    }
-    s += `&sessionId=${this.sessionHolder.session}`;
-
-    this.ws = new WebSocket(s);
+    this.ws = new WebSocket(wsUrls);
     this.ws.onmessage = this.onWsMessage.bind(this);
     this.ws.onclose = this.onWsClose.bind(this);
     this.ws.onopen = () => {
@@ -561,7 +608,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
     const isSent = this.messageProc.sendToServer(messageRequest);
     if (!isSent && !skipGrowl) {
-      this.store.growlError('Can\'t send message, because connection is lost :(');
+      this.logger.warn('Can\'t send message, because connection is lost :(')();
     }
     return isSent;
   }
@@ -579,5 +626,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
         this.ws.close(1000, 'Sever didn\'t ping us');
       }
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
+  }
+
+  notifyCallActive(param: { connectionId: string | null; opponentWsId: string; roomId: number }) {
+    this.sendToServer({
+      action: 'notifyCallActive',
+      connId: param.connectionId,
+      opponentWsId: param.opponentWsId,
+      roomId: param.roomId
+    })
   }
 }

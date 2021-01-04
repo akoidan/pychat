@@ -6,6 +6,14 @@
   >
     <table>
       <tbody>
+        <tr>
+          <td colspan="2" v-if="room.name" class="room-heder">
+            Room <b>{{room.name}}</b> settings
+          </td>
+          <td colspan="2" v-else class="room-heder">
+            User <b>{{user}}</b> settings
+          </td>
+        </tr>
         <tr v-if="isPublic">
           <th>
             Name
@@ -111,6 +119,7 @@ import {CurrentUserInfoModel, RoomDictModel, RoomModel, UserDictModel, UserModel
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
 import PickUser from '@/vue/pages/parts/PickUser.vue';
+import {PrivateRoomsIds} from '@/ts/types/types';
 
 @Component({components: {
     PickUser,
@@ -149,12 +158,17 @@ export default class RoomSettings extends Vue {
   public readonly roomsDict!: RoomDictModel;
 
   @State
+  public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+
+  @State
   public readonly allUsersDict!: UserDictModel;
 
-  @ApplyGrowlErr({runningProp: 'running'})
-  public async leave() {
-    this.$logger.log('Leaving room {}', this.roomId)();
-    await this.$ws.sendLeaveRoom(this.roomId);
+  get user(): string|null  {
+    if (this.room.name) {
+      return null
+    }
+    let uId =  this.privateRoomsUsersIds.roomUsers[this.room.id];
+    return this.allUsersDict[uId].user;
   }
 
   get showInviteUsers() {
@@ -191,6 +205,12 @@ export default class RoomSettings extends Vue {
     } else {
       return this.room.creator;
     }
+  }
+
+  @ApplyGrowlErr({runningProp: 'running'})
+  public async leave() {
+    this.$logger.log('Leaving room {}', this.roomId)();
+    await this.$ws.sendLeaveRoom(this.roomId);
   }
 
   @ApplyGrowlErr({runningProp: 'running', message: `Can't set room settings`})

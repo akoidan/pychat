@@ -193,7 +193,8 @@ download_fontello() {
     safeRunCommand curl -X GET "https://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
     safeRunCommand unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
-    cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >  "$SASS_DIR/partials/fontello.scss"
+    echo '@charset "UTF-8";' > "$SASS_DIR/partials/fontello.scss"
+    cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >> "$SASS_DIR/partials/fontello.scss"
     safeRunCommand cp -v "$TMP_DIR/fontello/$dir/css/animation.css" "$SASS_DIR/partials/animation.scss"
     safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
     safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
@@ -396,6 +397,29 @@ create_django_tables() {
     safeRunCommand python3 ./manage.py fill_data
 }
 
+copy_docker_prod_files() {
+    safeRunCommand docker volume create pychat_data
+    safeRunCommand docker container create --name dummy -v pychat_data:/data hello-world
+    sed 's/"WEBRTC_CONFIG".*/"WEBRTC_CONFIG": {"iceServers":[{"urls":["turn:{}"],"username":"pychat", "credential":"pypass"}]}/g' ./docker/pychat.org/production.json >> ./docker/pychat.org/production-prod.json
+    printOut "Generated production.json"
+    cat ./docker/pychat.org/production-prod.json
+    sed '/server-name=/d; /realm=/d' ./docker/pychat.org/turnserver.conf >> ./docker/pychat.org/turnserver-prod.conf
+    printOut "Generated turnserver.conf"
+    cat ./docker/pychat.org/turnserver-prod.conf
+    safeRunCommand docker cp ./docker/pychat.org/certificate.crt dummy:/data/certificate.crt
+    safeRunCommand docker cp ./docker/pychat.org/server.key dummy:/data/server.key
+    safeRunCommand docker cp ./docker/pychat.org/settings.py dummy:/data/settings.py
+    safeRunCommand docker cp ./docker/pychat.org/production-prod.json dummy:/data/production.json
+    safeRunCommand docker cp ./docker/pychat.org/turnserver-prod.conf dummy:/data/turnserver.conf
+    safeRunCommand rm ./docker/pychat.org/production-prod.json
+    safeRunCommand rm ./docker/pychat.org/turnserver-prod.conf
+    safeRunCommand docker rm dummy
+    printSuccess "ALl files have been succesfully copied. To start docker container use:"
+    printOut "docker run -t -v pychat_data:/data -p 443:443 -p 3478:3478 deathangel908/pychat"
+    printSuccess "To edit files use:"
+    printOut "docker run -i -t -v pychat_data:/tmp -it alpine /bin/sh"
+}
+
 android() {
   cd $FE_DIRECTORY
   ./node_modules/.bin/cordova build
@@ -462,6 +486,8 @@ elif [ "$1" = "print_icon_session" ]; then
     show_fontello_session
 elif [ "$1" = "android" ]; then
     android
+elif [ "$1" = "copy_docker_prod_files" ]; then
+    copy_docker_prod_files
 elif [ "$1" = "copy_root_fs" ]; then
     copy_root_fs
 elif [ "$1" = "redirect" ]; then
@@ -502,6 +528,7 @@ else
     chp generate_secret_key "Creates django secret key into \e[96m$BE_DIRECTORY/chat/settings.py\e[0;33;40m"
     chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
     chp update_docker "Builds docker images for deathangel908/pychat"
+    chp copy_docker_prod_files "Copies dummy files to be able to test prod docker image deathange908/pychat"
     chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"
     chp delete_redirect "Removes redirection above"
     chp compile_js "Compiles frontend SPA javascript if $DIST_DIRECTORY is empty"

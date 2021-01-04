@@ -1,35 +1,52 @@
 <template>
   <div class="userMessageWrapper">
-    <input
-      v-show="false"
-      ref="imgInput"
-      type="file"
-      accept="image/*,video/*"
-      multiple="multiple"
-      @change="handleFileSelect"
-    >
-    <i
-      class="icon-picture"
-      title="Share Video/Image"
-      @click="addImage"
+    <chat-attachments
+      v-if="showAttachments"
+      :room-id="roomId"
+      :edit-message-id="editMessageId"
+      :thread-message-id="threadMessageId"
+      @close="showAttachments = false"
+      @upload-file="pasteFilesToTextArea"
+      @upload-image="pasteImagesToTextArea"
+      @add-audio="addAudio"
+      @add-video="addVideo"
+      @add-giphy="addGiphy"
     />
-    <i
-      class="icon-smile"
-      title="Add a smile :)"
-      @click="showSmileysChange"
-    />
+    <smiley-holder v-if="showSmileys" @close="showSmileys = false" @add-smiley="onEmitAddSmile"/>
+    <chat-tagging :name="taggingName" :user-ids="room.users" @emit-name="addTagInfo" ref="chatTagging"/>
     <media-recorder
-      @record="handleRecord"
+      ref="mediaRecorder"
+      :is-video="isRecordingVideo"
       @video="handleAddVideo"
       @audio="handleAddAudio"
     />
-    <div
-      ref="userMessage"
-      contenteditable="true"
-      class="usermsg input"
-      @keydown="checkAndSendMessage"
-      @paste="onImagePaste"
-    />
+    <div>
+      <i
+        v-if="isMobile"
+        class="icon-paper-plane"
+        title="Send this message"
+        @mousedown.prevent="sendMessage"
+      />
+      <i
+        class="icon-attach-outline"
+        title="Add attachment"
+        @mousedown.prevent="showAttachments = !showAttachments"
+      />
+      <i
+        class="icon-smile"
+        title="Add a smile :)"
+        @mousedown.prevent="showSmileys = !showSmileys"
+      />
+      <div
+        ref="userMessage"
+        contenteditable="true"
+        class="usermsg input"
+        :class="{'mobile-user-message': isMobile}"
+        @keydown="onTextAreaKeyDown"
+        @keyup="onTextAreaKeyUp"
+        @paste="onImagePaste"
+      />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -37,29 +54,39 @@ import {
   Component,
   Ref,
   Vue,
-  Watch
+  Watch,
+  Prop,
 } from 'vue-property-decorator';
 import {
+  createTag,
   encodeHTML,
   encodeP,
+  getCurrentWordInHtml,
   getMessageData,
   getSmileyHtml,
   pasteBlobAudioToTextArea,
   pasteBlobToContentEditable,
   pasteBlobVideoToTextArea,
+  pasteFileToTextArea,
   pasteHtmlAtCaret,
   pasteImgToTextArea,
+  pasteNodeAtCaret,
   placeCaretAtEnd,
+  replaceCurrentWord,
   savedFiles,
   timeToString
 } from '@/ts/utils/htmlApi';
 import {
   CurrentUserInfoModel,
+  CurrentUserSettingsModel,
   EditingMessage,
   FileModel,
   MessageModel,
+  PastingTextAreaElement,
+  RoomDictModel,
   RoomModel,
-  UserDictModel
+  UserDictModel,
+  UserModel
 } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
 
@@ -69,67 +96,113 @@ import {
   UploadFile
 } from '@/ts/types/types';
 import {
-  sem
+  editMessageWs,
+  showAllowEditing
 } from '@/ts/utils/pureFunctions';
 import MediaRecorder from '@/vue/chat/MediaRecorder.vue';
 import {
   RawLocation,
   Route
 } from "vue-router";
-
+import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
+import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
+import {isMobile} from '@/ts/utils/runtimeConsts';
+import {
+  SHOW_I_TYPING_INTERVAL,
+  USERNAME_REGEX
+} from '@/ts/utils/consts';
+import ChatTagging from '@/vue/chat/ChatTagging.vue';
+import {Throttle} from '@/ts/classes/Throttle';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-  @Component({components: {MediaRecorder}})
+  @Component({components: {
+      ChatTagging,
+      SmileyHolder,
+      ChatAttachments,
+      MediaRecorder
+  }})
   export default class ChatTextArea extends Vue {
 
     @State
     public readonly userInfo!: CurrentUserInfoModel;
 
     @State
-    public readonly showSmileys!: boolean;
+    public readonly userSettings!: CurrentUserSettingsModel;
 
     @State
-    public readonly editingMessageModel!: MessageModel;
+    public readonly myId!: number;
 
-    @State
-    public readonly editedMessage!: EditingMessage;
+    @Prop({default: null})
+    public readonly editMessageId!: number;
+
+    @Prop({default: null})
+    public readonly threadMessageId!: number;
+
+    @Prop()
+    public readonly roomId!: number;
 
     @Ref()
     public userMessage!: HTMLElement;
 
     @Ref()
-    public imgInput!: HTMLInputElement;
+    public mediaRecorder!: MediaRecorder;
+
+    @Ref()
+    public chatTagging!: ChatTagging;
 
     @State
     public readonly allUsersDict!: UserDictModel;
 
     @State
-    public readonly activeRoomId!: number;
+    public readonly roomsDict!: RoomDictModel;
 
     @State
-    public readonly pastingImagesQueue!: string[];
+    public readonly pastingTextAreaQueue!: PastingTextAreaElement[];
 
     @State
     public readonly activeRoom!: RoomModel;
 
+    private showAttachments: boolean = false;
+    private showSmileys: boolean = false;
+    private taggingName: string = '';
+    private isRecordingVideo: boolean = true;
+    private showIType!: Throttle;
 
-    public created() {
-      this.$messageBus.$on('drop-photo', this.onEmitDropPhoto);
-      this.$messageBus.$on('add-smile', this.onEmitAddSmile);
-      this.$messageBus.$on('delete-message', this.onEmitDeleteMessage);
-      this.$messageBus.$on('quote', this.onEmitQuote);
+    get room(): RoomModel {
+      return this.roomsDict[this.roomId];
     }
 
-    public destroyed() {
-      this.$messageBus.$off('drop-photo', this.onEmitDropPhoto);
-      this.$messageBus.$off('add-smile', this.onEmitAddSmile);
-      this.$messageBus.$off('delete-message', this.onEmitDeleteMessage);
-      this.$messageBus.$off('quote', this.onEmitQuote);
+    get isMobile() {
+      return isMobile;
     }
 
+    get editMessage(): MessageModel|null {
+      if (this.editMessageId) {
+        return this.room.messages[this.editMessageId]
+      } else {
+        return null
+      }
+    }
 
-    onEmitDropPhoto(files: FileList) {
+    get threadMesage(): MessageModel|null {
+      if (this.threadMessageId) {
+        return this.room.messages[this.threadMessageId]
+      } else {
+        return null
+      }
+    }
+
+    public mounted() {
+      // do not spam ws every type user types something, wait 10s at least
+      this.showIType = new Throttle(() => this.$ws.showIType(this.roomId), SHOW_I_TYPING_INTERVAL); // every 10s
+      if (this.editMessage) {
+        this.userMessage.innerHTML = encodeP(this.editMessage, this.$store)
+        placeCaretAtEnd(this.userMessage);;
+      }
+    }
+
+    public onEmitDropPhoto(files: FileList) {
       for (let i = 0; i < files.length; i++) {
         this.$logger.debug('loop')();
         const file = files[i];
@@ -138,19 +211,20 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.$store.growlError(err);
           });
         } else {
-          this.$webrtcApi.sendFileOffer(file, this.activeRoomId);
+          this.$webrtcApi.sendFileOffer(file, this.roomId, this.threadMessageId);
         }
       }
+    }
+
+    addTagInfo(user: UserModel) {
+      const tag = createTag(user);
+      replaceCurrentWord(this.userMessage, tag);
+      this.taggingName = '';
     }
 
     onEmitAddSmile(code:string) {
       this.$logger.log('Adding smiley {}', code)();
       pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
-    }
-
-    onEmitDeleteMessage() {
-      this.editMessageWs(null, this.editedMessage.messageId, this.editedMessage.roomId, null, null, this.editingMessageModel.time, this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1);
-      this.$store.setEditedMessage(null);
     }
 
     onEmitQuote(message: MessageModel) {
@@ -159,161 +233,189 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       const match = oldValue.match(timePattern);
       const user = this.allUsersDict[message.userId];
       oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
-      this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) + ' ' + oldValue;
+      // TODO refactor quote
+      this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message, this.$store) + encodeHTML(' >>>') + String.fromCharCode(13) + ' ' + oldValue;
       placeCaretAtEnd(this.userMessage);
     }
 
 
-    @Watch('pastingImagesQueue')
+    @Watch('pastingTextAreaQueue')
     onBlob()  {
-      if (this.pastingImagesQueue.length > 0) {
-        this.$logger.log('Pasting blob {}', this.pastingImagesQueue)();
-        this.pastingImagesQueue.forEach(id => {
-          pasteBlobToContentEditable(savedFiles[id], this.userMessage);
-          delete savedFiles[id]
+      if (this.pastingTextAreaQueue.length > 0) {
+        this.pastingTextAreaQueue.forEach(id => {
+          if (id.elType === 'blob' && id.openedThreadId == this.threadMessageId && id.roomId == this.roomId && id.editedMessageId === this.editMessageId) {
+            this.$logger.log('Pasting blob {}', savedFiles[id.content])();
+            pasteBlobToContentEditable(savedFiles[id.content], this.userMessage);
+            delete savedFiles[id.content]
+            this.$store.setPastingQueue(this.pastingTextAreaQueue.filter(el => el != id));
+          }
         })
         placeCaretAtEnd(this.userMessage);
-        this.$store.setPastingQueue([]);
       }
     }
 
     get messageSender(): MessageSender { // todo does vuew cache this?
-      return this.$messageSenderProxy.getMessageSender(this.activeRoomId);
+      return this.$messageSenderProxy.getMessageSender(this.roomId);
     }
 
-    public checkAndSendMessage(event: KeyboardEvent) {
-      if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
+
+    onTextAreaKeyUp(event: KeyboardEvent) {
+      let content: string = this.userMessage.textContent!;
+      this.taggingName = '';
+      if (content.includes("@")) {
+        let currentWord = getCurrentWordInHtml(this.userMessage);
+        if (currentWord === '@' || new RegExp(`^@${USERNAME_REGEX}$`).test(currentWord)) {
+          this.taggingName = currentWord;
+        }
+      }
+    }
+
+    public onTextAreaKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        if (isMobile) {
+          // do not block multiple lines on mobile, let user use button to send
+          return;
+        }
         event.preventDefault();
-        this.$logger.debug('Checking sending message')();
-        if (this.editedMessage && this.editedMessage.isEditingNow) {
-          const md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel);
-          this.editMessageWs(
+        if (this.chatTagging.currentSelected) {
+          this.chatTagging.confirm();
+        } else {
+          this.sendMessage();
+        }
+      } else if (event.key === 'Escape') { // 27 = escape
+        this.cancelCurrentAction();
+      } else if (event.key === 'ArrowUp' && this.userMessage.innerHTML == '') {
+        event.preventDefault();
+        event.stopPropagation(); // otherwise up event would be propaganded to chatbox which would lead to load history
+        this.setEditedMessage();
+      } else if (this.taggingName && ['ArrowUp', 'ArrowDown'].includes(event.key)) {
+        event.preventDefault();
+        if (event.key === 'ArrowUp') {
+          this.chatTagging.upArrow();
+        } else if (event.key === 'ArrowDown') {
+          this.chatTagging.downArrow();
+        }
+      } else {
+        if (this.userSettings.showWhenITyping)
+        this.showIType.fire();
+      }
+    }
+
+
+    private setEditedMessage() {
+      const messages = this.activeRoom.messages;
+      if (Object.keys(messages).length > 0) {
+        let latestMessage: MessageModel | null = null;
+        for (const m in messages) {
+          if (messages[m].userId == this.myId && !messages[m].deleted && (!latestMessage || (messages[m].time >= latestMessage.time))) {
+            latestMessage = messages[m];
+          }
+        }
+        if (!showAllowEditing(latestMessage!)) {
+          return
+        }
+        const newlet: EditingMessage = {
+          messageId: latestMessage!.id,
+          isEditingNow: true,
+          roomId: latestMessage!.roomId
+        };
+        this.$store.setEditedMessage(newlet);
+      }
+    }
+
+    private cancelCurrentAction() {
+      if (this.editMessageId) {
+        this.userMessage.innerHTML = '';
+        this.$store.setEditedMessage({
+          messageId: this.editMessageId,
+          isEditingNow: false,
+          roomId: this.roomId
+        });
+      } else if (this.threadMessageId) {
+        this.$store.setCurrentThread({
+          roomId: this.roomId,
+          isEditingNow: false,
+          messageId: this.threadMessageId
+        });
+      } else if (this.showSmileys) { // do not cancel all at once, cancel one by one
+        this.showSmileys = false;
+      }
+    }
+
+    private sendMessage() {
+      this.$logger.debug('Checking sending message')();
+      if (this.editMessage) {
+        const md: MessageDataEncode = getMessageData(this.userMessage, this.editMessage!);
+        editMessageWs(
             md.messageContent,
-            this.editedMessage.messageId,
-            this.activeRoomId,
+            this.editMessage.id,
+            this.roomId,
             md.currSymbol,
             md.files,
-            this.editingMessageModel.time,
-            this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1
-          );
-          this.$store.setEditedMessage(null);
-        } else {
-          const md: MessageDataEncode = getMessageData(this.userMessage, undefined);
-          if (!md.messageContent) { // && !md.files.length // but file content is emppty is symbols are not present
-            return;
-          }
-          this.editMessageWs(
+            md.tags,
+            this.editMessage.time,
+            this.editMessage.edited ? this.editMessage.edited + 1 : 1,
+            this.editMessage.parentMessage,
+            this.$store,
+            this.messageSender
+        );
+        this.$store.setEditedMessage({
+          roomId: this.roomId,
+          isEditingNow: false,
+          messageId: this.editMessage.id
+        });
+      } else {
+        const md: MessageDataEncode = getMessageData(this.userMessage, undefined);
+        if (!md.messageContent) { // && !md.files.length // but file content is emppty is symbols are not present
+          return;
+        }
+        editMessageWs(
             md.messageContent,
             this.$messageSenderProxy.getUniqueNegativeMessageId(),
-            this.activeRoomId,
+            this.roomId,
             md.currSymbol,
             md.files,
+            md.tags,
             Date.now(),
-            0
-          );
-        }
-      } else if (event.keyCode === 27) { // 27 = escape
-        this.$store.setShowSmileys(false);
-        if (this.editedMessage) {
-          this.userMessage.innerHTML = '';
-          this.$store.setEditedMessage(null);
-
-        }
-      } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
-        const messages = this.activeRoom.messages;
-        if (Object.keys(messages).length > 0) {
-          let maxTime: MessageModel |null = null;
-          for (const m in messages) {
-            if (!maxTime || (messages[m].time >= maxTime.time)) {
-              maxTime = messages[m];
-            }
-          }
-          sem(event, maxTime!, true, this.userInfo, this.$store.setEditedMessage);
-        }
+            0,
+            this.threadMessageId ?? null,
+            this.$store,
+            this.messageSender
+        );
       }
     }
 
-    private editMessageWs(
-        messageContent: string|null,
-        messageId: number,
-        roomId: number,
-        symbol: string|null,
-        files: {[id: number]: FileModel}|null,
-        time: number,
-        edited: number
-    ): void {
-      const mm: MessageModel = {
-        roomId,
-        deleted: !messageContent,
-        id: messageId,
-        isHighlighted: false,
-        transfer: !!messageContent || messageId > 0 ? { // TODO can this be simplified?
-          error: null,
-          upload: null
-        } : null,
-        time,
-        sending: true,
-        content: messageContent,
-        symbol: symbol,
-        giphy: null,
-        edited,
-        files,
-        userId: this.userInfo.userId
-      };
-      this.$store.addMessage(mm);
-      this.messageSender.syncMessage(roomId, messageId);
-    }
-
-    @Watch('editedMessage')
-    public onActiveRoomIdChange(val: EditingMessage) {
-      this.$logger.log('editedMessage changed')();
-      if (val && val.isEditingNow) {
-        this.userMessage.innerHTML = encodeP(this.editingMessageModel);
-        placeCaretAtEnd(this.userMessage);
-      }
-    }
-
-
-    public handleRecord({src, isVideo}: {src: string; isVideo: boolean}) {
-      this.$emit("update:recordingNow", true);
-      if (isVideo) {
-        this.$emit("update:srcVideo", src);
-      }
-    }
-
-    public async addImage() {
-      // TODO seems like filePicker has limited about of time which file lives.
-      //  Sometimes it errors `net::ERR_FILE_NOT_FOUND` on upload
-      // if (window.showOpenFilePicker) {
-      //   let filesHandles: FileSystemFileHandle[] = await window.showOpenFilePicker({
-      //     multiple: true,
-      //     types: [
-      //       {
-      //         description: 'Images',
-      //         accept: {
-      //           'image/*': ['.png', '.gif', '.jpeg', '.jpg']
-      //         }
-      //       }
-      //     ]
-      //   })
-      //   let files = await Promise.all(filesHandles.map(a => a.getFile()))
-      //
-      //   this.pasteFilesToTextArea(files);
-      // } else {
-        this.imgInput.click();
-      // }
-    }
-
-    public  handleFileSelect (evt: Event) {
-      const files: FileList = (evt.target as HTMLInputElement).files!;
-      this.pasteFilesToTextArea(files);
-      this.imgInput.value = '';
-    }
-
-
-    private pasteFilesToTextArea(files: FileList| File[]) {
+    private pasteImagesToTextArea(files: FileList| File[]) {
+      console.error(files);
+      this.showAttachments = false;
       for (let i = 0; i < files.length; i++) {
         pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
+          this.$store.growlError(err);
+        });
+      }
+    }
+
+    private addGiphy() {
+      this.userMessage.innerHTML = `/giphy ${this.userMessage.innerHTML}`;
+      this.userMessage.focus();
+      this.$store.growlInfo("Type animation name. e.g. /giphy lol")
+      placeCaretAtEnd(this.userMessage);
+    }
+
+    private addVideo() {
+      this.isRecordingVideo = true;
+      this.mediaRecorder.startRecord();
+    }
+
+    private addAudio() {
+      this.isRecordingVideo = false;
+      this.mediaRecorder.startRecord();
+    }
+
+    private pasteFilesToTextArea(files: FileList| File[]) {
+      this.showAttachments = false;
+      for (let i = 0; i < files.length; i++) {
+        pasteFileToTextArea(files[i], this.userMessage, (err: string) => {
           this.$store.growlError(err);
         });
       }
@@ -340,20 +442,12 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
     public handleAddAudio(file: Blob) {
-      this.$emit("update:recordingNow", false);
       if (file) {
         pasteBlobAudioToTextArea(file, this.userMessage);
       }
     }
 
-    showSmileysChange() {
-      this.$store.setShowSmileys(!this.showSmileys)
-    }
-
     public handleAddVideo(file: Blob) {
-      this.$emit("update:srcVideo", null);
-      this.$emit("update:recordingNow", false);
-      this.$emit('pause-video');
       if (file) {
         pasteBlobVideoToTextArea(file, this.userMessage, 'm', (e: string) => {
           this.$store.growlError(e);
@@ -371,13 +465,17 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/abstract_classes"
 
-
-
   .userMessageWrapper
     padding: 8px
     position: relative
     width: calc(100% - 16px)
 
+    .icon-attach-outline
+      @extend %chat-icon
+      left: 15px
+    .icon-paper-plane
+      @extend %chat-icon
+      right: 40px
     .icon-smile
       @extend %chat-icon
       right: 10px
@@ -392,11 +490,16 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       color: #7b7979
 
 
-  .usermsg /deep/ img[code]
+  .usermsg /deep/ img[alt] //smile
     @extend %img-code
 
+  .usermsg.mobile-user-message
+    padding-right: 50px // before smiley and send
 
+  .usermsg /deep/ .tag-user
+    color: #729fcf !important
   .usermsg
+    z-index: 2
     margin-left: 4px
     padding-left: 25px
     color: #c1c1c1
@@ -418,6 +521,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         min-width: 200px
         min-height: 100px
     /deep/ .audio-record
+      height: 50px
+    /deep/ .uploading-file
       height: 50px
 
     /deep/ *

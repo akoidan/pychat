@@ -140,6 +140,8 @@ export default class Xhr extends Http {
           } else {
             data = r.response;
           }
+        } else if (r.status >= 400 && r.status < 500 && r.response) {
+          error = r.responseText;
         } else if (r.status === 404) {
           error = 'Resource not found';
         } else if (r.status === 500) {

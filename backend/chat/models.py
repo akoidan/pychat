@@ -22,7 +22,7 @@ from django.db.models import \
 	TextField, \
 	IntegerField, \
 	FloatField, \
-	SmallIntegerField, CheckConstraint, Q
+	SmallIntegerField, CheckConstraint, Q, F
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
@@ -154,6 +154,7 @@ class UserProfile(User):
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_random_path, null=True, blank=True)
 	suggestions = BooleanField(null=False, default=True)
+	show_when_i_typing = BooleanField(null=False, default=True)
 	embedded_youtube = BooleanField(null=False, default=True)
 	highlight_code = BooleanField(null=False, default=False)
 	logs = CharField(max_length=16, null=False, blank=False, default=JS_CONSOLE_LOGS)
@@ -238,7 +239,7 @@ class Message(Model):
 	"""
 	Contains all public messages
 	"""
-	sender = ForeignKey(User, CASCADE, related_name='sender')
+	sender = ForeignKey(User, CASCADE)
 	room = ForeignKey(Room, CASCADE, null=True)
 	# DateField.auto_now
 	time = BigIntegerField(default=get_milliseconds)
@@ -249,8 +250,10 @@ class Message(Model):
 	# - images that refers same message always have unique symbols
 	symbol = CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
+	thread_messages_count = IntegerField(default=0, null=False)
+	parent_message = ForeignKey('self', CASCADE, null=True, blank=True)
 	giphy = URLField(null=True, blank=True)
-	edited_times = IntegerField(default=0, null=False)
+	edited_times = BigIntegerField(default=get_milliseconds, null=False)
 
 	def __unicode__(self):
 		return self.__str__()
@@ -267,9 +270,28 @@ class Message(Model):
 		return "{}/{}".format(self.id, v)
 
 
+class MessageMention(Model):
+	user = ForeignKey(User, CASCADE, null=False)
+	message = ForeignKey(Message, CASCADE, null=False)
+	symbol = CharField(null=False, max_length=1)
+	
+	class Meta:
+		unique_together = ('user', 'symbol', 'message')
+
+
+from django.db.models.signals import post_save
+
+def save_profile(sender, instance, created, **kwargs):
+	if created and instance.parent_message:
+		Message.objects.filter(id=instance.parent_message_id).update(thread_messages_count=F('thread_messages_count') + 1)
+
+post_save.connect(save_profile, sender=Message)
+
+
 class UploadedFile(Model):
 	class UploadedFileChoices(Enum):
 		video = 'v'
+		file = 'f'
 		media_record= 'm'
 		audio_record = 'a'
 		image = 'i'
@@ -297,7 +319,7 @@ class Image(Model):
 
 	# character in Message.content that will be replaced with this image
 	symbol = CharField(null=False, max_length=1)
-	message = ForeignKey(Message, CASCADE, related_name='message', null=False)
+	message = ForeignKey(Message, CASCADE, null=False)
 	img = FileField(upload_to=get_random_path, null=True)
 	preview = FileField(upload_to=get_random_path, null=True)
 	type = CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
@@ -348,7 +370,7 @@ class IssueDetails(Model):
 	browser = CharField(null=True, max_length=32, blank=True)
 	version = CharField(null=True, max_length=32, blank=True)
 	time = DateField(default=datetime.datetime.now, blank=True)
-	issue = ForeignKey(Issue, CASCADE, related_name='issue')
+	issue = ForeignKey(Issue, CASCADE)
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_issue_detail'))

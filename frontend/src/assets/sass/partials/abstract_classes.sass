@@ -27,9 +27,10 @@
   display: inline
   float: right
   cursor: pointer
+  cursor: pointer
   position: absolute
-  height: 16px
-  top: 11px
+  font-size: 20px
+  @include hover-click(#C1C1C1)
 
 %img-code
   margin-top: -17px
@@ -45,18 +46,6 @@
     background: url('~@/assets/img/icon-play-red.svg') no-repeat center
   background: black
 
-%window-white
-  color: black
-  background-color: rgba(227, 227, 218, 0.9)
-  border: 1px #c3bec2 solid
-
-%window-reg
-  background-color: rgba(33, 33, 31, 0.9)
-  border: 1px #696951 solid
-
-%window-lor
-  background-color: rgba(34, 31, 31, 0.86)
-  border: 1px #775E39 solid
 
 .color-lor %nav
   background-color: $color-lor-nav-color
@@ -70,6 +59,22 @@
 .color-reg %nav
   background-image: linear-gradient(#232323 0%, #151515 100%)
 
+.color-lor
+  %modal-window
+    background-color: rgba(34, 31, 31, 0.86)
+    border: 1px #775E39 solid
+
+.color-reg
+  %modal-window
+    background-color: rgba(33, 33, 31, 0.9)
+    border: 1px #696951 solid
+
+.color-white
+  %modal-window
+    color: black
+    background-color: rgba(227, 227, 218, 0.9)
+    border: 1px #c3bec2 solid
+
 %nav
   padding: 10px 4px 9px 10px
   font-size: 26px
@@ -82,13 +87,6 @@
   display: flex
   position: relative
   flex-direction: row
-  @media screen and (min-width: $collapse-width) and (max-width: $collapse-no-mtext)
-    .mText
-      display: none !important
-  @media screen and (max-width: $collapse-width)
-    flex-direction: column
-    > *
-      margin-right: auto !important
 
 %img
   margin-top: -17px

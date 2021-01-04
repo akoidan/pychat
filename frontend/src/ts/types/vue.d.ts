@@ -7,7 +7,7 @@ import {
   GoogleCaptcha,
   PlatformUtil
 } from '@/ts/types/model';
-import ChannelsHandler from '@/ts/message_handlers/ChannelsHandler';
+import WsMessageHandler from '@/ts/message_handlers/WsMessageHandler';
 import {
   IStorage,
   JsAudioAnalyzer
@@ -19,6 +19,7 @@ import Vue, { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
+import { RoomHandler } from '@/ts/message_handlers/RomHandler';
 
 declare global {
   interface Window {
@@ -26,7 +27,8 @@ declare global {
     vue: Vue;
     router: VueRouter;
     api: Api;
-    channelsHandler: ChannelsHandler;
+    wsMessageHandler: WsMessageHandler;
+    roomHandler: RoomHandler;
     xhr: Http;
     ws: WsHandler;
     storage: IStorage;
@@ -37,6 +39,7 @@ declare global {
     savedFiles: { [id: string]: Blob };
     sub: Subscription;
     consts: {};
+    runtimeConsts: {};
   }
 }
 

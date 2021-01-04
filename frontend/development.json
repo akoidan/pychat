@@ -9,10 +9,9 @@
   "FACEBOOK_APP_ID": false,
   "RECAPTCHA_PUBLIC_KEY": false,
   "AUTO_REGISTRATION": false,
-  "ISSUES": true,
-  "STATISTICS": true,
-  "GITHUB_LINK": "https://github.com/Deathangel908/pychat",
-  "PAINTER": true,
+  "ISSUES": false,
+  "STATISTICS": false,
+  "GITHUB_LINK": "https://github.com/akoidan/pychat",
   "FLAGS": true,
   "WEBRTC_CONFIG": {"iceServers":[{"urls":["stun:turn2.l.google.com"]}]}
 }

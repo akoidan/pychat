@@ -4,6 +4,7 @@ export interface MessageP2pDto {
   files: Record<string, FileP2pDto>;
   timeAgo: number;
   symbol: string|null;
+  parentMessage: number|null;
   deleted: boolean;
   giphy: string|null;
   edited: number;

@@ -34,7 +34,7 @@ import {
   ProfileDB,
   RoomDB,
   RoomUsersDB,
-  SettingsDB,
+  SettingsDB, TagDB,
   TransactionType,
   UserDB
 } from '@/ts/types/db';
@@ -50,7 +50,7 @@ export default class DatabaseWrapper implements IStorage {
   private readonly cache: { [id: number]: number } = {};
 
   constructor() {
-    this.dbName = 'v138';
+    this.dbName = 'v145';
     this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
@@ -64,9 +64,10 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), creator INTEGER REFERENCES user(id))');
-      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (sending IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (sending IN (0,1)), parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, thread_messages_count INTEGER)');
       t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
-      t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text)');
+      t = await this.runSql(t, 'CREATE TABLE tag (id integer primary key, user_id INTEGER REFERENCES user(id), message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, symbol text)');
+      t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text, showWhenITyping boolean NOT NULL CHECK (showWhenITyping IN (0,1)))');
       t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
       t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
       this.logger.log('DatabaseWrapper has been initialized')();
@@ -90,7 +91,8 @@ export default class DatabaseWrapper implements IStorage {
       'select * from settings',
       'select * from user where deleted = 0',
       'select * from message',
-      'select * from channel'
+      'select * from channel',
+      'select * from tag'
     ].map(sql => new Promise((resolve, reject) => {
       this.executeSql(t, sql, [], (t: SQLTransaction, d: SQLResultSet) => {
         this.logger.debug('sql {} fetched {} ', sql, d)();
@@ -114,7 +116,8 @@ export default class DatabaseWrapper implements IStorage {
         dbSettings: SettingsDB[] = f[4] as SettingsDB[],
         dbUsers: UserDB[] = f[5] as UserDB[],
         dbMessages: MessageDB[] = f[6] as MessageDB[],
-        dbChannels: ChannelDB[] = f[7] as ChannelDB[];
+        dbChannels: ChannelDB[] = f[7] as ChannelDB[],
+        dbTags: TagDB[] = f[8] as TagDB[];
     this.logger.debug('resolved all sqls')();
 
     if (dbProfile.length) {
@@ -134,6 +137,7 @@ export default class DatabaseWrapper implements IStorage {
         highlightCode: convertToBoolean(dbSettings[0].highlightCode),
         incomingFileCallSound: convertToBoolean(dbSettings[0].incomingFileCallSound),
         messageSound: convertToBoolean(dbSettings[0].messageSound),
+        showWhenITyping: convertToBoolean(dbSettings[0].showWhenITyping),
         onlineChangeSound: convertToBoolean(dbSettings[0].onlineChangeSound),
         sendLogs: convertToBoolean(dbSettings[0].sendLogs),
         suggestions: convertToBoolean(dbSettings[0].suggestions),
@@ -173,21 +177,36 @@ export default class DatabaseWrapper implements IStorage {
         allUsersDict[u.id] = user;
       });
 
-      const am: { [id: string]: MessageModel } = {};
+      let messageTags: Record<string, Record<string, number>> = {}
+      dbTags.forEach(a => {
+        if (!messageTags[a.message_id]) {
+          messageTags[a.message_id] = {}
+        }
+        messageTags[a.message_id][a.symbol] = a.user_id
+      })
+
+      const am: Record<string, MessageModel> = {};
       dbMessages.forEach(m => {
+        let tags = messageTags[m.id] ? messageTags[m.id] : {};
         const message: MessageModel = {
           id: m.id,
           roomId: m.roomId,
           isHighlighted: false,
           time: m.time,
+          isEditingActive: false,
+          isThreadOpened: false,
+          threadMessagesCount: m.thread_messages_count,
           deleted: convertToBoolean(m.deleted),
+          tags,
           transfer: m.sending ? {
             error: null,
+            xhr: null,
             upload: null
           } : null,
           files: {},
           sending: convertToBoolean(m.sending),
           edited: m.edited,
+          parentMessage: m.parent_message_id,
           symbol: m.symbol,
           content: m.content,
           userId: m.userId,
@@ -255,22 +274,23 @@ export default class DatabaseWrapper implements IStorage {
   public async clearMessages() {
     let t: SQLTransaction = await this.asyncWrite();
     t = await this.runSql(t, 'delete from file');
+    t = await this.runSql(t, 'delete from tag');
     t = await this.runSql(t, 'delete from message');
     this.logger.log('Db has messages removed')();
   }
 
-  public clearStorage() {
-    this.write(t => {
-      this.executeSql(t, 'delete from room_users')();
-      this.executeSql(t, 'delete from room')();
-      this.executeSql(t, 'delete from channel')();
-      this.executeSql(t, 'delete from user')();
-      this.executeSql(t, 'delete from file')();
-      this.executeSql(t, 'delete from message')();
-      this.executeSql(t, 'delete from settings')();
-      this.executeSql(t, 'delete from profile')();
-      this.logger.log('Db has been cleared')();
-    });
+  public async clearStorage() {
+    let t: SQLTransaction = await this.asyncWrite();
+    t = await this.runSql(t, 'delete from room_users');
+    t = await this.runSql(t, 'delete from tag');
+    t = await this.runSql(t, 'delete from room');
+    t = await this.runSql(t, 'delete from channel');
+    t = await this.runSql(t, 'delete from message');
+    t = await this.runSql(t, 'delete from user');
+    t = await this.runSql(t, 'delete from file');
+    t = await this.runSql(t, 'delete from settings');
+    t = await this.runSql(t, 'delete from profile');
+    this.logger.log('Db has been purged')();
   }
 
   public markMessageAsSent(messageIds: number[]) {
@@ -304,12 +324,19 @@ export default class DatabaseWrapper implements IStorage {
     this.setRoomHeaderId(message.roomId, message.id);
     this.executeSql(
         t,
-        'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.sending ? 1 : 0],
+        'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending, parent_message_id, thread_messages_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.sending ? 1 : 0, message.parentMessage || null, message.threadMessagesCount],
         (t, d) => {
           for (const k in message.files) {
             const f = message.files[k];
             this.executeSql(t, 'insert into file (file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values ( ?, ?, ?, ?, ?, ?, ?, ?)', [ f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
+            // this.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+
+            // })();
+          }
+          for (const k in message.tags) {
+            const userId = message.tags[k];
+            this.executeSql(t, 'insert into tag (user_id, message_id, symbol) values (?, ?, ?)', [userId, message.id, k])();
             // this.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
 
             // })();
@@ -377,15 +404,25 @@ export default class DatabaseWrapper implements IStorage {
 
   public setUserSettings(settings: CurrentUserSettingsModel) {
     this.write(t => {
-      this.executeSql(t, 'insert or replace into settings (userId, embeddedYoutube, highlightCode, incomingFileCallSound, messageSound, onlineChangeSound, sendLogs, suggestions, theme, logs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs])();
+      this.executeSql(t, 'insert or replace into settings (userId, embeddedYoutube, highlightCode, incomingFileCallSound, messageSound, onlineChangeSound, sendLogs, suggestions, theme, logs, showWhenITyping) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs, settings.showWhenITyping ? 1 : 0])();
     });
   }
 
-  public deleteMessage(id: number) {
+  public deleteMessage(id: number, replaceThreadId: number) {
     this.write(t => {
       this.executeSql(t, 'delete from file where message_id = ?', [id], (t) => {
-        this.executeSql(t, 'delete from message where id = ? ', [id])();
+        this.executeSql(t, 'delete from tag where message_id = ?', [id], (t) => {
+          this.executeSql(t, 'delete from message where id = ? ', [id], (t) => {
+            this.executeSql(t, 'update message set parent_message_id = ? where parent_message_id = ?', [id, replaceThreadId])()
+          })()
+        })();
       })();
+    });
+  }
+
+  public setThreadMessageCount(messageId: number, count: number): void {
+    this.write(t => {
+      this.executeSql(t, 'update message set thread_messages_count = ? where id = ?', [count, messageId])();
     });
   }
 

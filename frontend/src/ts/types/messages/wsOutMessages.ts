@@ -9,3 +9,9 @@ import {
 export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A> {
   cbId?: number;
 }
+
+export interface SyncHistoryOutMessage extends DefaultWsOutMessage<'syncHistory'>{
+  roomIds: number[];
+  messagesIds: number[];
+  lastSynced: number;
+}

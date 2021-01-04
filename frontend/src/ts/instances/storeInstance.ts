@@ -2,6 +2,9 @@ import { getModule } from 'vuex-module-decorators';
 import { stateDecoratorFactory } from 'vuex-module-decorators-state';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { IS_DEBUG } from '@/ts/utils/consts';
+import { encodeHTML } from '@/ts/utils/htmlApi';
+import { GrowlType } from '@/ts/types/model';
+import { Vue } from 'vue/types/vue';
 
 export const store: DefaultStore = getModule(DefaultStore);
 export const State = stateDecoratorFactory(store);
@@ -15,24 +18,26 @@ type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
 
 // TODO add success growl, and specify error property so it reflects forever in comp
 export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
-    {message, runningProp, vueProperty}: {
+    {message, runningProp, vueProperty, preventStacking}: {
       message?: string;
+      preventStacking?: boolean;
       runningProp?: ValueFilterForKey<T, boolean>;
       vueProperty?: ValueFilterForKey<T, string>;
     }
 ) {
   const processError = function (e: Error|string) {
+
     const strError: string = String((<Error>e)?.message || e || 'Unknown error');
     if (vueProperty && message) {
       // @ts-ignore: next-line
       this[vueProperty] = `${message}: ${strError}`;
     } else if (message) {
-      store.growlError(`${message}:  ${strError}`);
+      store.showGrowl({html: encodeHTML(`${message}:  ${strError}`), type: GrowlType.ERROR, time: 20000 });
     } else if (vueProperty) {
       // @ts-ignore: next-line
       this[vueProperty] = `Error: ${strError}`;
     } else {
-      store.growlError(strError);
+      store.showGrowl({html: encodeHTML(strError), type: GrowlType.ERROR, time: 20000 });
     }
   };
 
@@ -42,11 +47,11 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       // @ts-ignore: next-line
 
       // TODO this thing breaks fb login
-      // if (this[runningProp]) {
-      //   // @ts-ignore: next-line
-      //   this.logger.warn('Skipping {} as it\'s loading', descriptor.value)();
-      //   return;
-      // }
+      if (preventStacking && this[runningProp]) {
+
+        (this as Vue).$logger.warn('Skipping {} as it\'s loading', descriptor.value)();
+        return;
+      }
       try {
         if (runningProp) {
           // @ts-ignore: next-line

@@ -1,25 +1,42 @@
 <template>
   <div :class="cls" @mouseover.passive="removeUnread">
-    <chat-message :message="message" />
+    <div v-if="message.isEditingActive" class="editing-background"></div>
+    <div v-if="message.isThreadOpened" class="thread-background" @click="closeThread"></div>
+    <chat-message :message="message" class="message-content" @quote="quote"/>
+    <chat-text-area
+      v-if="message.isEditingActive"
+      :ref="textarea"
+      :room-id="message.roomId"
+      :edit-message-id="message.id"
+    />
     <template v-if="message.transfer">
-      <app-progress-bar
-        v-if="message.transfer.upload && !message.transfer.error"
-        :upload="message.transfer.upload"
-      />
+      <div class="transfer-file" v-if="message.transfer.upload && !message.transfer.error">
+        <app-progress-bar :upload="message.transfer.upload"/>
+        <i class="icon-cancel-circled-outline" @click="cancelTransfer"/>
+      </div>
       <i
         v-else-if="filesExist"
         class="icon-repeat"
         @click="retry"
       >{{ message.transfer.error }}</i>
     </template>
-    <div class="spinner" v-if="message.sending" />
+    <div class="absolute-right">
+      <!--      IF message doesnt have content it's deleted-->
+      <chat-message-tool-tip
+        class="message-tooltip"
+        :message="message"
+      />
+      <div class="spinner" v-if="message.sending" />
+    </div>
   </div>
 </template>
 <script lang="ts">
 import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
+  Ref,
   Prop,
+  Emit,
   Vue
 } from 'vue-property-decorator';
 import ChatMessage from '@/vue/chat/ChatMessage.vue';
@@ -28,24 +45,28 @@ import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 import { SetMessageProgressError } from '@/ts/types/types';
 import {
   CurrentUserInfoModel,
+  EditingMessage,
   MessageModel,
   RoomDictModel
 } from '@/ts/types/model';
+import ChatMessageToolTip from '@/vue/chat/ChatMessageToolTip.vue';
+import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
 
 @Component({
-  components: {AppProgressBar, ChatMessage}
+  components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatMessage}
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;
 
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
+  @Ref()
+  private readonly textarea!: ChatTextArea;
+
   @State
   public readonly roomsDict!: RoomDictModel;
 
-  get searchedIds() {
-    return this.roomsDict[this.message.roomId].search.searchedIds;
-  }
 
   get filesExist() {
     return this.message.files && Object.keys(this.message.files).length > 0;
@@ -55,19 +76,18 @@ export default class ChatSendingMessage extends Vue {
     return this.message.id;
   }
 
-  removeUnread() {
-    if (this.message.isHighlighted) {
-      this.$store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
-    }
+  cancelTransfer() {
+    this.message.transfer?.xhr?.abort();
   }
 
   get cls() {
     return {
       sendingMessage: this.message.transfer && !this.message.transfer.upload,
       uploadMessage: this.message.transfer && !!this.message.transfer.upload,
-      'filter-search': this.searchedIds.indexOf(this.message.id) >= 0,
       'message-self': this.isSelf,
       'message-others': !this.isSelf,
+      'message-wrapper': true,
+      'message-is-being-sent': this.message.sending,
       'removed-message': this.message.deleted,
       'unread-message': this.message.isHighlighted,
     };
@@ -75,6 +95,26 @@ export default class ChatSendingMessage extends Vue {
 
   get isSelf() {
     return this.message.userId === this.userInfo.userId;
+  }
+
+  @Emit()
+  quote() {
+    return this.message;
+  }
+
+  closeThread() {
+    let a: EditingMessage = {
+      messageId: this.message.id,
+      isEditingNow: false,
+      roomId: this.message.roomId
+    }
+    this.$store.setCurrentThread(a);
+  }
+
+  removeUnread() {
+    if (this.message.isHighlighted) {
+      this.$store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
+    }
   }
 
   public retry() {
@@ -93,6 +133,54 @@ export default class ChatSendingMessage extends Vue {
 <style lang="sass" scoped>
 
   @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/variables"
+
+
+  .icon-cancel-circled-outline
+    cursor: pointer
+    margin-left: 20px
+    @include hover-click(red)
+
+
+  .editing-background
+    border: 1px solid $editing-border-color
+    background-color: rgba(255, 255, 255, 0.11)
+  .thread-background
+    cursor: pointer
+  .editing-background, .thread-background
+    position: absolute
+    top: 0 //-$space-between-messages/2
+    right: 0
+    left: 0
+    bottom: 0 //-$space-between-messages/2
+  .color-white
+    .editing-background
+      border: 1px solid #3f3f3f
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
+  .message-tooltip
+    display: none
+  .absolute-right
+    position: absolute
+    right: 0
+    top: 0
+  .spinner
+    display: inline-block
+    margin: -4px 8px
+    @include spinner(3px, white)
+
+  .message-wrapper
+    position: relative
+    &:hover
+      background-color: rgba(255, 255, 255, 0.11)
+      .absolute-right
+        top: 0 // $space-between-messages/2
+      .message-tooltip
+        display: inline-block
+      //.message-content
+      //  margin-top: 0 //-$space-between-messages/2
+      //  padding-top: 0 // $space-between-messages/2
+      //  padding-bottom: 0 //$space-between-messages/2
+      //  margin-bottom: 0 //-$space-between-messages/2
 
   .sendingMessage
     position: relative
@@ -109,16 +197,11 @@ export default class ChatSendingMessage extends Vue {
     z-index: -1
     padding: 4px 0
 
-  .spinner
-    position: absolute
-    right: 0
-    top: 3px
-    display: inline-block
-    margin: -4px 10px -4px 10px
-    @include spinner(3px, white)
   .icon-repeat
     display: block
     text-align: center
     cursor: pointer
-
+  .transfer-file
+    display: flex
+    justify-content: center
 </style>

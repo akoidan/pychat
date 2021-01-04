@@ -1,6 +1,6 @@
 <template>
   <div
-    v-show="callInfo.callContainer"
+    v-show="callInfo.callActive"
     class="callContainer"
   >
     <div
@@ -37,7 +37,8 @@
         @invert-show-video-container="invertShowVideoContainer"
       />
       <div class="spainter">
-        <painter @canvas="onCanvas" v-show="callInfo.sharePaint"/>
+<!--        TODO v-if doesn't detach events on destroy on painter-->
+        <painter @canvas="onCanvas" v-if="callInfo.sharePaint"/>
       </div>
     </div>
   </div>
@@ -65,13 +66,11 @@ import VideoObject from '@/vue/chat/VideoObject.vue';
 import InputDevicesSettings from '@/vue/chat/InputDevicesSettings.vue';
 import VideoContainer from '@/vue/chat/VideoContainer.vue';
 import CallContainerIcons from '@/vue/chat/CallContainerIcons.vue';
-import PainterPage from '@/vue/pages/PainterPage.vue';
 import Painter from '@/vue/chat/Painter.vue';
 
 @Component({
   components: {
     Painter,
-    PainterPage,
     CallContainerIcons,
     VideoContainer,
     InputDevicesSettings,

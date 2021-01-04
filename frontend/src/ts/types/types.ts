@@ -46,12 +46,11 @@ export interface UserIdConn {
   userId: number;
 }
 
-
-
 export interface MessageDataEncode {
   messageContent: string|null;
   files:  Record<string, FileModel>| null;
   currSymbol: string;
+  tags: Record<string, number>;
 }
 
 export enum VideoType {
@@ -66,7 +65,10 @@ export interface SetDevices {
 
 export interface MessageSender {
   syncMessage(roomId: number, messageId: number):  Promise<void>;
-  addMessages(roomId: number, messages: MessageModelDto[]): void;
+  loadMessages(roomId: number, messageId: number[]):  Promise<void>;
+  loadUpMessages(roomId: number, count: number): Promise<void>;
+  loadThreadMessages(roomId: number, threadId: number): Promise<void>;
+  loadUpSearchMessages(roomId: number, count: number, checkIfSet: (found: boolean) => boolean): Promise<void>;
 }
 
 export interface JsAudioAnalyzer {
@@ -77,6 +79,12 @@ export interface JsAudioAnalyzer {
 }
 export interface SetUploadProgress {
   upload: UploadProgressModel;
+  roomId: number;
+  messageId: number;
+}
+
+export interface SetUploadXHR {
+  xhr: XMLHttpRequest;
   roomId: number;
   messageId: number;
 }
@@ -156,6 +164,7 @@ export interface SetFileIdsForMessage {
 export interface RoomMessageIds {
   messageId: number;
   roomId: number;
+  newMessageId: number;
 }
 export interface RoomMessagesIds {
   messagesId: number[];
@@ -170,7 +179,8 @@ export interface MessageSupplier {
 export interface IStorage {
   // getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]): void;
-  deleteMessage(id: number): void;
+  deleteMessage(id: number, replaceThreadId: number): void;
+  setThreadMessageCount(mesageid: number, count: number): void;
   deleteRoom(id: number): void;
   deleteChannel(id: number): void;
   saveMessage(m: MessageModel): void;
@@ -202,7 +212,6 @@ export interface  PostData<T> {
   isJsonDecoded?: boolean;
   checkOkString?: boolean;
   errorDescription?: string;
-  requestInterceptor?(a: XMLHttpRequest): void;
   process?(R: XMLHttpRequest): void;
 }
 
@@ -268,15 +277,18 @@ export interface RemoveMessageProgress {
   roomId: number;
 }
 
-
-
 export interface SetMessageProgress extends RemoveMessageProgress {
   uploaded: number;
 }
 
-export interface SetSearchTo {
+export interface SetSearchStateTo {
   roomId: number;
-  search: SearchModel;
+  lock: boolean;
+}
+
+export interface SetSearchTextTo {
+  roomId: number;
+  searchText: string;
 }
 
 export enum IconColor {
