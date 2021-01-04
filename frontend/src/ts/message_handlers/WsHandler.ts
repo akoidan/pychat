@@ -366,7 +366,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       messagesIds,
       action: 'setMessageStatus',
       status,
-      roomId // this is for server performance reason. To exclude access token validation
+      roomId // this room event will be published to
     });
   }
 
