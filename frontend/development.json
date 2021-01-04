@@ -1,5 +1,5 @@
 {
-  "BACKEND_ADDRESS": "localhost:8888",
+  "BACKEND_ADDRESS": "{}:8888",
   "IS_DEBUG": true,
   "UGLIFY": false,
   "ELECTRON_IGNORE_SSL": true,
@@ -13,5 +13,6 @@
   "STATISTICS": true,
   "GITHUB_LINK": "https://github.com/Deathangel908/pychat",
   "PAINTER": true,
-  "FLAGS": true
+  "FLAGS": true,
+  "WEBRTC_CONFIG": {"iceServers":[{"urls":["stun:turn2.l.google.com"]}]}
 }

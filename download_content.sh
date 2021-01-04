@@ -171,15 +171,15 @@ chp(){
 
 post_fontello_conf() {
     printOut "Creating fontello config"
-    safeRunCommand curl --silent --show-error --fail --form "config=@./frontend/font-config.json" --output $FE_DIRECTORY/.fontello http://fontello.com
+    safeRunCommand curl --silent --show-error --fail --form "config=@./frontend/font-config.json" --output $FE_DIRECTORY/.fontello https://fontello.com
     fontello_session=$(cat $FE_DIRECTORY/.fontello)
-    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
+    url="https://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     echo "Genereted fontello url: $url"
 }
 
 show_fontello_session() {
     fontello_session=$(cat $FE_DIRECTORY/.fontello)
-    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
+    url="https://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     printOut "Fonts url is: $url"
     echo "It has been opened in new browser tab"
     python -mwebbrowser $url
@@ -190,13 +190,14 @@ download_fontello() {
     fontello_session=$(cat $FE_DIRECTORY/.fontello)
     printOut "Downloading fontello using fontello session '$fontello_session'"
     mkdir -p "$TMP_DIR/fontello"
-    safeRunCommand curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
+    safeRunCommand curl -X GET "https://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
     safeRunCommand unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
     cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >  "$SASS_DIR/partials/fontello.scss"
-    cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
-    cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
-    cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
+    safeRunCommand cp -v "$TMP_DIR/fontello/$dir/css/animation.css" "$SASS_DIR/partials/animation.scss"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
 
     if type "sed" &> /dev/null; then
         sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/fontello.scss"
@@ -419,7 +420,7 @@ generate_secret_key() {
 
 if [ "$1" = "post_fontello_conf" ]; then
     post_fontello_conf
-    python -mwebbrowser "http://fontello.com/`cat .fontello`"
+    python -mwebbrowser "https://fontello.com/`cat $FE_DIRECTORY/.fontello`"
 elif [ "$1" = "check_files" ]; then
     check_files
 elif [ "$1" = "create_django_tables" ]; then
@@ -466,6 +467,18 @@ elif [ "$1" = "copy_root_fs" ]; then
 elif [ "$1" = "redirect" ]; then
     safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
     safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
+elif [ "$1" = "delete_redirect" ]; then
+    sudo iptables -t nat -v -L PREROUTING -n --line-number |grep 8080
+    lines_prerouting=`sudo iptables -t nat -v -L PREROUTING -n --line-number |grep 8080 | awk '{print $1;}'`
+    sudo iptables -t nat -v -L OUTPUT -n --line-number |grep 8080
+    lines_postrouting=`sudo iptables -t nat -v -L OUTPUT -n --line-number |grep 8080 | awk '{print $1;}'`
+    for value in $lines_prerouting; do
+       safeRunCommand sudo iptables -t nat -D PREROUTING $value
+    done
+
+     for value2 in $lines_postrouting; do
+       safeRunCommand  sudo iptables -t nat -D OUTPUT $value2
+    done
 elif [ "$1" = "download_fontello" ]; then
     download_fontello
     delete_tmp_dir
@@ -490,6 +503,7 @@ else
     chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
     chp update_docker "Builds docker images for deathangel908/pychat"
     chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"
+    chp delete_redirect "Removes redirection above"
     chp compile_js "Compiles frontend SPA javascript if $DIST_DIRECTORY is empty"
     chp create_venv "removes .venv and creates a new one with dependencies"
     chp copy_root_fs "Creates soft links from \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m to \e[96m/\e[0;33;40m"

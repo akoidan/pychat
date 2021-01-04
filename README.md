@@ -1,67 +1,76 @@
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat.svg?label=docker%3Aprod)](https://hub.docker.com/r/deathangel908/pychat)
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master) [![Upload Frontend pychat.org](https://github.com/akoidan/pychat/workflows/FE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3AFE%3Apychat.org) [![Refresh backend pychat.org](https://github.com/akoidan/pychat/workflows/BE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3ABE%3Apychat.org)
 
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 
-# Table of contents
-  * [About](#about)
-  * [When should I use pychat](#when-should-i-use-pychat)
-  * [Production](#production-setup)
-      * [Run test docker image](#run-test-docker-image)
-      * [Run prod docker image](#run-prod-docker-image)
-      * [Native setup](#production-setup-without-docker)
-      * [Frontend](#frontend)
-      * [Desktop app](#desktop-app)
-      * [Android app](#android-app)
-  * [Development setup](#development-setup)
-     * [Install OS packages](#install-os-packages)
-     * [Bootstrap files](#bootstrap-files)
-     * [Configure IDEs if you use it](#configure-ides-if-you-use-it)
-     * [Start services and run](#start-services-and-run)
-  * [Contribution guide](#contribution-guide)
-     * [Description](#description)
-     * [Shell helper](#shell-helper)
-     * [Frontend logging](#frontend-logging)
-     * [Smileys](#smileys)
-     * [Icons](#icons)
-     * [Sustaining online protocol](#sustaining-online-protocol)
-     * [Database migrations](#database-migrations)
-     * [Screen Share for Chrome v71 or less](#screen-sharing-for-chrome-v71-or-less)
-     * [WebRTC connection establishment](#webrtc-connection-establishment)
-     * [Frontend stack](#frontend-stack)
-     * [Frontend config](#frontend-config)
-  * [TODO](#todo)
-  
-  
+## Table of contents
+- [About](#about)
+- [When should I use pychat](#when-should-i-use-pychat)
+- [How to host pychat](#how-to-host-pychat)
+  * [Run test docker image](#run-test-docker-image)
+  * [Run prod docker image](#run-prod-docker-image)
+  * [Native setup](#native-setup)
+  * [Frontend](#frontend)
+  * [Desktop app](#desktop-app)
+  * [Android app](#android-app)
+- [Development setup](#development-setup)
+  * [Install OS packages](#install-os-packages)
+  * [Bootstrap files:](#bootstrap-files-)
+  * [Build frontend](#build-frontend)
+  * [Configure IDEs if you use it:](#configure-ides-if-you-use-it-)
+  * [Linting](#linting)
+  * [Start services and run:](#start-services-and-run-)
+- [Contribution guide](#contribution-guide)
+  * [Description](#description)
+  * [Shell helper](#shell-helper)
+  * [Frontend logging](#frontend-logging)
+  * [Icons](#icons)
+  * [Sustaining online protocol](#sustaining-online-protocol)
+  * [Database migrations](#database-migrations)
+  * [Screen sharing for Chrome v71 or less](#screen-sharing-for-chrome-v71-or-less)
+  * [WebRTC connection establishment](#webrtc-connection-establishment)
+  * [Frontend Stack](#frontend-stack)
+  * [Frontend config](#frontend-config)
+- [Github actions](#github-actions)
+- [TODO](#todo)
+
 # About
 This is free web (browser) chat, that features:
- - Sending instant text messages via websockets.
- - Sending images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/)
- - Making calls and video conference using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
- - Sharing screen during call or conference
- - Sending files directly to another PC (p2p) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
- - Editing images with [integrated painter](https://github.com/akoidan/spainter)
- - Login in with facebook/google oauth.
+ - Sending instant text messages, images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/) using selfhosted server and websockets
+ - Making calls and video conferences using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
+ - Sharing screen during call or conference.
+ - Drawing images and stream them during video calls with [spainter](https://github.com/akoidan/spainter)
+ - Sending files or text messages directly to another PC (bypassing server) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
+ - Login with social media
  - Sending offline messages with Firebase push notifications
- - Responsive interface (bs like)+ themes
 
-# When should I use pychat:
+# When should I use pychat
 |                        | Pychat | Slack | Skype | Telegram | Viber |
 |------------------------|--------|-------|-------|----------|-------|
 | Open Source            | +      | -     | -     | -        | -     |
 | Free                   | +      | +/-   | +/-   | +        | +/-   |
 | Screen sharing         | +      | +     | -     | -        | -     |
+| Stream drawing         | +      | -     | -     | -        | -     |
 | Syntax highlight       | +      | -     | -     | -        | -     |
 | Unlimited history      | +      | +/-   | +     | +        | +     |
 | Audio/Video conference | +      | +     | +     | +        | -     |
 | Can run on your server | +      | -     | -     | -        | -     |
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
+| P2P messaging*         | +      | -     | -     | -        | -     |
 | Desktop client         | +      | +     | +     | +        | +/-   |
 | Mobile client          | +      | +     | +     | +        | +     |
 | GCM phone call         | -      | -     | +/-   | -        | +/-   |
 | 3rd-party integration  | -      | +     | -     | -        | -     | 
 
+None of other client use p2p for message exchange or file sharing which makes them less secure (you can verify that by opening devtools and checking chrome://webrtc-internals/). Also they lack features like drawing during the conference and screen sharing (but slack). If you don't care that your message store on another server and you could miss some features above from pychat I would personally chose clients bellow instead of pychat:
+ - Slack. But be aware it will make you pay by pushing features like unlimited history and other things in the end of the day.
+ - If slack is not an option, go with telegram/discord. But be aware that it has a lot of other users and bots that may interfere with your busines.
+ - I would never use viber/skype/whatsapp or any other messages in 2021. They have a lot of disadvantages comparing to discord/telegram/slack.
+
+If you still feel enthusiastic for bleeding-edge opensource project, try pychat with instructions bellow!
+
+# How to host pychat
 
 ## Run test docker image
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
@@ -79,13 +88,15 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
  - Download [settings.py](https://github.com/akoidan/pychat/blob/master/backend/chat/settings_example.py) and edit it according comments in it.
- - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json)  and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config)
+ - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json) and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config) Replace WEBRTC_CONFIG turnserver realm and server-name to your domain one
+ - Download [turnserver.conf](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/turnserver.conf) Replace server-name and realm to your domain. Otherwise you will have low connection quality
  - Create volume and copy files there
  ```bash
  docker volume create pychat_data
  containerid=`docker container create --name dummy -v pychat_data:/data hello-world`
  docker cp settings.py dummy:/data/settings.py
  docker cp production.json dummy:/data/production.json
+ docker cp turnserver.conf dummy:/data/turnserver.conf
  docker cp certificate.crt dummy:/data/certificate.crt
  docker cp server.key dummy:/data/server.key
  docker rm dummy
@@ -137,8 +148,8 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
    - Check that user `http` has access to you project directory, and all directories inside, especially to `/photos` 
 
 ## Frontend
- - `cd frontend; nvm use`. Apply `nvm install` before it if node of specified version is not installed
- - `yarn install`
+ - `cd frontend; nvm install; nvm use`.
+ - `yarn install --frozen-lockfile`
  - Create production.json based on [Frontend config](#frontend-config). Also you can use and modify `cp docker/pychat.org/production.json ./frontend/`
  - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
 
@@ -179,24 +190,26 @@ Example for mac:
 The flow is the following
  - Install OS packages depending on your OS type
  - Bootstrap files
- - Follow the [Frontend](#frontend) steps
+ - Build frontend
  - Start services and check if it works
 
 ## Install OS packages
 This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/MacOS/Archlinux/Archlinux(rpi3 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux Raspberry Pi 3.
 
 ### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
- 1. Install [python](https://www.python.org/downloads/) with pip. only **Python 3.6-3.8** is supported.
+ 1. Install [python](https://www.python.org/downloads/) with pip. only **Python 3.6**+ is **required**
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector.
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
+ 1. Install [nvm](https://github.com/coreybutler/nvm-windows). 
 
 ### [Ubuntu](http://www.ubuntu.com/):
- 1. Install required packages: `apt-get install python pip mysql-server libmysqlclient-dev` (python should be 3.5-3.8) If pip is missing check `python-pip`.
- 2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
+ 1. Install required packages: `apt-get install python pip mysql-server libmysqlclient-dev` (python should be 3.6-3.8) If pip is missing check `python-pip`. For old versions of Ubuntu you can use this ppa: `sudo add-apt-repository ppa:deadsnakes/ppa; sudo apt-get update; sudo apt-get install python3.8 python3.8-dev python3.8-venv python3.8-apt; curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; python3.8 get-pip.py` 
+ 1. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
  1. Install mysqlclient `pip install mysqlclient==1.3.13`
+ 1. Install [nvm](https://qiita.com/shaching/items/6e398140432d4133c866)
 
 ### [Archlinux](https://www.archlinux.org/):
  1. Install system packages:  `pacman -S unzip python python-pip redis yarn mariadb python-mysqlclient`. nvm is located in [aur](https://aur.archlinux.org/packages/nvm/) so `yay -S nvm` (or use another aur package)
@@ -211,18 +224,24 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
  3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv`. For ubuntu you can omit `--system-site-packages `. Activate it: `source .venv/bin/activate`
- 4. Install python packages with `pip install -r requirements.txt`.
- 5. From **root** user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
- 6. Fill database with tables: `bash ../download_content.sh create_django_tables`
+ 4. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
+ 5. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 6. Fill database with tables: `bash ../download_content.sh create_django_tables`. (Remember you're still in `backend` dir)
 
-## Follow the [Frontend](#frontend) steps
+## Build frontend
+Change to frontend directory `cd frontend` I would recommend to use node version specified in nvm, so  `nvm install; nvm use`.
+ - To get started install dependencies first: `yarn install --frozen-lock` # or use npm if you're old and cranky
+ - Take a look at copy [development.json](frontend/development.json). The description is at [Frontend config](#frontend-config)
+ - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080. If requests don't work, apply self-signed certificate by navigating to http://localhost:8888
+ - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
+ - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
 
 ## Configure IDEs if you use it:
 
 ### Pycharm
- 1. I recommend open backend as root directory for pycharm.
- 1. Enable django support. Go to Settings -> Django -> Enable django support. 
-   - Django project root: root directory of your project. Where .git asides.
+ 1. I recommend open `backend` as root directory for pycharm.
+ 1. Django support should be enabled by default when you open this project. If it doesn't happen go to Settings -> Languages and Framework -> Django -> Enable django support. 
+   - Django project root: `backend`
    - Put `Settings:` to `chat/settings.py`
  1. If pycharm didn't configure virtualenv itself. Go to `Settings` -> `Project backend` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
  1. `Settings` -> `Project backend` -> `Project structure`
@@ -276,16 +295,7 @@ Disable tslint, since it's not used, and enable eslint:
 
  
 #### Enable aliases for webpack
- - to resolve absolute path for webpack webstorm requires webpack.config.js. Go to settings -> javascript -> webpack -> Webpack config file  
-
-## Build frontend
-I would recommend to use version node 12.10, `nvm use 12.10`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows). 
- - To get started install dependencies first: `yarn install` # or use npm if you're old and cranky
- - Take a look at copy [development.json](frontend/development.json]. The description is at [Frontend config](#frontend-config)
- - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080
- - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
- - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
-  
+ - to resolve absolute path for webpack webstorm requires webpack.config.js. Go to settings -> javascript -> webpack -> Webpack config file   
 
 ## Start services and run:
  - Start `mysql` server if it's not started.
@@ -383,6 +393,10 @@ The string `rsok33GN:0005:EJAd` describes:
  - `0005` is Id of user
  - `EJAd` id of connection (`TornadoHandler.id`)
  
+TO see current connections and their info check chrome://webrtc-internals/
+Read [this](https://www.html5rocks.com/en/tutorials/webrtc/infrastructure) article to understand how JSEP architecture works.
+SEE  WEBRTC_CONFIG at development.json. I personally use turn server coturn, It needs ports 3478 to be exposed.
+ 
 ## Frontend Stack
 The technologies stack used in project:
 - Typescript
@@ -442,15 +456,35 @@ development.json and production.json have the following format:
   "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
   "PAINTER": "if true chat will contain a link to painter page in the navbar. This you can draw any images and send to chat",
-  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen"
+  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",
+  "WEBRTC_CONFIG": "Sometimes webrtc stun server doesn't work in establishing a connection. This variable defines a variable that RtcPeerConnection accepts as a first argument, you can use {'iceServers':[{'urls':['stun:turn2.l.google.com']}]}' Or specify your turn/stun server see https://github.com/coturn/coturn project for more info"
 }
 ```
 
+# Github actions
+In order to setup continuous delivery via github:
+- Generate a new pair of ssh keys `mkdir /tmp/sshkey; ssh-keygen -t rsa -b 4096 -C "github actions" -f  /tmp/sshkey/id_rsa`
+- put `/tmp/sshkey/id_rsa.pub` to server `~/.ssh/authorized_keys` where `~` is the home for ssh user to use ( I used `http`) 
+- Create ssh variables at https://github.com/akoidan/pychat/settings/secrets/actions (where akoidan/pychat is your repo) :
+   - `HOST` -ssh host (your domain)
+   - `PORT` - ssh port (22)
+   - `SSH_USER` - ssh user, if you used my setup it's `http`
+   - `ID_RSA` - what ssh-keygen has generated in step above to`/tmp/sshkey/id_rsa`
+- I used alias to give http user to access tornado systemd service like in [this](https://serverfault.com/a/841104/304770) example. So append `/etc/sudoers` with
+ ```
+Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
+http ALL=(ALL) NOPASSWD: RESTART_TORNADO
+``` 
+
 # TODO
+* Add ability to make a call like in google meet with a link
+* https://webrtc.github.io/samples/src/content/getusermedia/resolution/
+* when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
+* if users joins a room that already has call in progress, he should be able to join this call
+* create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module
 * opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
-* ctrl+c on builder leaves the process in foreground
 * .stylelintignore @for loops doesn't work in linter https://github.com/AleshaOleg/postcss-sass/issues/53
 * https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * get\s+(\w+)\(\):\s+((\w|\[|\])+)\s+\{\s+return\s+store\.\w+\;?\s+\}\;?        @State\n    public readonly $1!: $2;

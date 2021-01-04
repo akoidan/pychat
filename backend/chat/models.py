@@ -143,6 +143,8 @@ class Verification(Model):
 class UserProfile(User):
 	name = CharField(max_length=30, null=True, blank=True)
 	surname = CharField(max_length=30, null=True, blank=True)
+	facebook_id = CharField(max_length=30, null=True, blank=True, unique=True)
+	google_id = CharField(max_length=190, null=True, blank=True, unique=True)
 	# tho email max length is 254 characted mysql supports unique keys only 767 bytes long (utf8 4 bytes = 767/4 = 191)
 	email = EmailField(null=True, unique=True, blank=True, max_length=190)
 	city = CharField(max_length=50, null=True, blank=True)
@@ -154,12 +156,12 @@ class UserProfile(User):
 	suggestions = BooleanField(null=False, default=True)
 	embedded_youtube = BooleanField(null=False, default=True)
 	highlight_code = BooleanField(null=False, default=False)
-	logs = BooleanField(null=False, default=JS_CONSOLE_LOGS)
+	logs = CharField(max_length=16, null=False, blank=False, default=JS_CONSOLE_LOGS)
 	theme = CharField(max_length=16, null=False, default='color-reg')
 	online_change_sound = BooleanField(null=False, default=True)
 	incoming_file_call_sound = BooleanField(null=False, default=True)
 	message_sound = BooleanField(null=False, default=True)
-	send_logs = BooleanField(null=False, default=True)
+	send_logs = BooleanField(null=False, default=False)
 
 	email_verification = ForeignKey(Verification, CASCADE, null=True, blank=True)
 

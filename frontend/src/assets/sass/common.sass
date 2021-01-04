@@ -1,14 +1,14 @@
 $FontPathOpenSans: "~npm-font-open-sans/fonts" !default
 @import '~npm-font-open-sans/open-sans.scss'
 @import "~typeface-oswald/index.css"
+@import "~spainter/no-fonts.sass"
+@import "~@/assets/sass/partials/animation.scss"
 
-
-@import "~@/assets/sass/partials/fontello"
+@import "~@/assets/sass/partials/fontello.scss"
 
 @import "~@/assets/sass/themes/common_lor"
 @import "~@/assets/sass/themes/common_reg"
 @import "~@/assets/sass/themes/common_white"
-
 
 $FontelloPath: "~@/assets/font"
 
@@ -33,7 +33,6 @@ $FontelloPath: "~@/assets/font"
   display: inline-block
   text-decoration: inherit
   width: 1em
-  margin-right: .2em
   text-align: center
   /* opacity: .8; */
 
@@ -44,9 +43,6 @@ $FontelloPath: "~@/assets/font"
   /* fix buttons height, for twitter bootstrap */
   line-height: 1em
 
-  /* Animation center compensation - margins should be symmetric */
-  /* remove if not needed */
-  margin-left: .2em
 
   /* you can be more comfortable with increased icons size */
   /* font-size: 120%; */

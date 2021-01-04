@@ -11,5 +11,6 @@
   "STATISTICS": false,
   "GITHUB_LINK": false,
   "PAINTER": false,
-  "FLAGS": false
+  "FLAGS": false,
+  "WEBRTC_CONFIG": {"iceServers":[{"urls":["turn:chatconference.its-glue.com"],"username":"chatconf","credential":"chatconf"}]}
 }

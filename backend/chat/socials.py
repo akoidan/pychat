@@ -48,28 +48,40 @@ class SocialAuth():
 				self.logger.error("Unable to download photo from url %s for user %s because %s",
 						url, user_profile.username, e)
 
-	def create_user_profile(self, email, name, surname, picture):
+	def get_user_name(self, email, name, surname):
 		try:
-			user_profile = UserProfile.objects.get(email=email)
+			# replace all characters but a valid one with '-' and cut to 15 chars
+			if email:
+				username = re.sub('[^0-9a-zA-Z-_]+', '-', email.rsplit('@')[0])[:15]
+			else:
+				username = f'{name}_{surname}'
+			check_user(username)
+		except ValidationError as e:
+			self.logger.info("Can't use username %s because %s", username, e)
+			username = id_generator(8)
+		self.logger.debug("Generated username: %s", username)
+		return username
+
+	def create_user_profile(self, user_profile_query, name, surname, picture=None, email=None, fb_id=None, google_id=None):
+		try:
+			user_profile = UserProfile.objects.get(**user_profile_query)
 			self.logger.info("Sign in as %s with id %s", user_profile.username, user_profile.id)
 		except UserProfile.DoesNotExist:
-			try:
-				self.logger.info(
-					"Creating new user with email %s, name %s, surname %s, picture %s",
-					email, name, surname, picture
-				)
-				# replace all characters but a valid one with '-' and cut to 15 chars
-				username = re.sub('[^0-9a-zA-Z-_]+', '-', email.rsplit('@')[0])[:15]
-				check_user(username)
-			except ValidationError as e:
-				self.logger.info("Can't use username %s because %s", username, e)
-				username = id_generator(8)
-			self.logger.debug("Generated username: %s", username)
+			if email and UserProfile.objects.filter(email=email).exists():
+				raise ValidationError(f"User with email {email} already exists. If this is you, please sign in from your account and connect with social auth in settings.")
+
+			self.logger.info(
+				"Creating new user with email %s, name %s, surname %s, picture %s",
+				email, name, surname, picture
+			)
+			username = self.get_user_name(email, name, surname)
 			user_profile = UserProfile(
 				name=name,
 				surname=surname,
 				email=email,
-				username=username
+				username=username,
+				facebook_id=fb_id,
+				google_id=google_id
 			)
 			self.download_http_photo(picture, user_profile)
 			user_profile.save()
@@ -89,7 +101,7 @@ class GoogleAuth(SocialAuth):
 	def instance(self):
 		return 'google'
 
-	def verify_google_token(self, token):
+	def get_user_info(self, token):
 		try:
 			response = client.verify_id_token(token, None)
 			if response['aud'] != self.app_token:
@@ -102,13 +114,19 @@ class GoogleAuth(SocialAuth):
 		except AppIdentityError as e:
 			raise ValidationError(e)
 
+	def get_oauth_identifier(self, token):
+		response = self.get_user_info(token)
+		return response.get('email')
+
 	def generate_user_profile(self, token):
-		response = self.verify_google_token(token)
+		response = self.get_user_info(token)
 		return self.create_user_profile(
-			response['email'],
+			{'google_id': response.get('email')},
 			response.get('given_name'),
 			response.get('family_name'),
-			response.get('picture')
+			email=response.get('email'),
+			picture=response.get('picture'),
+			google_id=response.get('id')
 		)
 
 
@@ -123,12 +141,14 @@ class FacebookAuth(SocialAuth):
 		'fields': ",".join(('email', 'first_name', 'last_name'))
 	}
 
-	def get_facebook_user_id(self, token):
+	def get_oauth_identifier(self, token):
 
-		r = http_client.fetch(HTTPRequest(url_concat(
+		url_result = url_concat(
 			'https://graph.facebook.com/debug_token',
 			{'input_token': token, 'access_token': FACEBOOK_ACCESS_TOKEN}
-		)))
+		)
+		r = http_client.fetch(HTTPRequest(url_result))
+		self.logger.info("get_facebook_user_id(%s) = %s ", url_result, r.body)
 		response = json.loads(r.body)
 		data = response.get('data')
 		if data is None:
@@ -145,23 +165,21 @@ class FacebookAuth(SocialAuth):
 		return user_id
 
 	def get_facebook_user(self, user_id):
-		r = http_client.fetch(HTTPRequest(url_concat(
-			"https://graph.facebook.com/{}".format(user_id),
-			self.PARAMS
-		)))
+		url_result = url_concat("https://graph.facebook.com/{}".format(user_id), self.PARAMS)
+		r = http_client.fetch(HTTPRequest(url_result))
+		self.logger.info("get_facebook_user(%s) = %s ", url_result, r.body)
 		user_info = json.loads(r.body)
-		if user_info.get('email') is None:
-			raise ValidationError("Email for this user not found")
 		return user_info
+
 
 	def generate_user_profile(self, token):
 		if FACEBOOK_ACCESS_TOKEN is None:
 			raise ValidationError("FACEBOOK_ACCESS_TOKEN is not specified")
-		user_id = self.get_facebook_user_id(token)
+		user_id = self.get_oauth_identifier(token)
 		user_info = self.get_facebook_user(user_id)
 		return self.create_user_profile(
-			user_info['email'],
+			{'facebook_id': user_id},
 			user_info.get('first_name'),
 			user_info.get('last_name'),
-			None
+			fb_id=user_id
 		)

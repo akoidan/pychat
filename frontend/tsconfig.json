@@ -16,7 +16,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "types": [
-      "websql", "webrtc", "chrome"
+      "websql", "webrtc", "chrome", "wicg-native-file-system"
     ],
     "resolveJsonModule": true,
     "declaration": false,

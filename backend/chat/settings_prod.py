@@ -1,7 +1,6 @@
 import sys
 
 from chat.settings_base import *
-import logging.config
 
 TEMPLATE_DEBUG = False
 DEBUG = False
@@ -15,21 +14,14 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [(
 	]
 )]
 
-try:
-	logfile_name = 'tornado-{}.log'.format(sys.argv[sys.argv.index('--port') + 1])
-except (ValueError, IndexError):
-	logfile_name = 'tornado.log'
-
 
 LOGGING['handlers'] = {
 	'default': {
 		'level': 'DEBUG',
-		'class': 'logging.handlers.TimedRotatingFileHandler',
-		'formatter': 'django',
-		'when': 'midnight',
+		'class': 'logging.StreamHandler',
+		'stream': sys.stdout,
 		'filters': ['id', ],
-		'interval': 1,
-		'filename': os.path.join(BASE_DIR, 'log', logfile_name)
+		'formatter': 'django',
 	},
 	'mail_admins': {
 		'level': 'ERROR',
@@ -37,13 +29,10 @@ LOGGING['handlers'] = {
 	}
 }
 
-
 LOGGING['loggers'] = {
 	'': {
-		'handlers': ['default', 'mail_admins'],
+		'handlers': ['default', ],
 		'level': 'DEBUG',
 		'propagate': False,
 	},
 }
-LOGGING['loggers']['']['handlers'] = ['default']
-logging.config.dictConfig(LOGGING)

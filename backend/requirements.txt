@@ -16,4 +16,4 @@ enum34==1.1.6
 # PyMySQL
 # mysql-connector-python
 # for windows you can install client with mysql installer or via whl file specified in readme
-# mysqlclient
+mysqlclient

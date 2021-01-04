@@ -1,5 +1,9 @@
 @import "~@/assets/sass/partials/variables"
 
+@mixin fix-user-icon-top-position()
+	i:before
+		transform: translate(0, 3px)
+
 @mixin border-radius($radius...)
 	-webkit-border-radius: $radius
 	-moz-border-radius: $radius
@@ -140,6 +144,11 @@
 	background-image: -o-linear-gradient($s1, $s2), -o-linear-gradient($f1, $f2)
 	background-image: linear-gradient($s1, $s2), linear-gradient($f1, $f2)
 	background-image: -ms-linear-gradient($s1, $s2), -ms-linear-gradient($f1, $f2)
+
+=wrapper-inner
+	@include display-flex
+	flex: 1
+	width: 100%
 
 @mixin placeholder
 	\::-webkit-input-placeholder
