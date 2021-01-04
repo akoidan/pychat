@@ -898,7 +898,11 @@ class MessagesHandler():
 		messages = Message.objects.filter(
 			Q(room_id__in=room_ids)
 			& ~Q(id__in=message_ids)
-			& Q(updated_at__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED])
+			& (
+				Q(updated_at__gt=get_milliseconds() - in_message[VarNames.LAST_SYNCED]) |
+				# If none user have received this message, return them as well
+				Q(message_status=Message.MessageStatus.on_server.value)
+			)
 		)
 
 		if in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
