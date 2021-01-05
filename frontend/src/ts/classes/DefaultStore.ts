@@ -303,23 +303,8 @@ export class DefaultStore extends VuexModule {
     return res;
   }
 
-  get maxId(): (a: number) => number | null {
-    return (id: number) => {
-      const messages = this.roomsDict[id].messages;
-      let maxId: number | null = null;
-      for (const m in messages) {
-        if (!maxId || !(messages[m].id <= maxId)) {
-          maxId = messages[m].id;
-        }
-      }
-      logger.debug('maxId #{}={}', id, maxId)();
-
-      return maxId;
-    };
-  }
-
   get activeRoom(): RoomModel | null {
-    if (this.activeRoomId) {
+    if (this.activeRoomId && this.roomsDict) {
       return this.roomsDict[this.activeRoomId];
     } else {
       return null;

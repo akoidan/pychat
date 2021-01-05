@@ -281,8 +281,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   }
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
+    this.updateMessagesStatusIfRequired(roomId, inMessages);
     const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].messages;
-    const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
+    const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]); // TODO this is no longer required, probably
     const messages: MessageModel[] = newMesages.map(nm => convertMessageModelDtoToModel(nm, null, time => this.ws.convertServerTimeToPC(time)));
     this.store.addMessages({messages, roomId: roomId});
   }
@@ -472,41 +473,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     // Persist loaded messages into storage
     this.addRandomMessagesToStorage(result.content);
 
-    // Sending information that I receive or read messages that other users have sent
-    this.markMessagesAsReceived(result);
-    this.markMessagesAsRead(result);
-
     localStorage.setItem(LAST_SYNCED, Date.now().toString())
   }
 
-  private markMessagesAsRead(result: SyncHistoryResponseMessage) {
-    let messagesIdsUpdateToRead = result.content
-        .filter(m => ((m.status === 'received' || m.status === 'on_server') && m.roomId === this.store.activeRoomId))
-        .map(m => m.id);
-    if (messagesIdsUpdateToRead.length > 0) {
-      this.ws.setMessageStatus(
-          messagesIdsUpdateToRead,
-          this.store.activeRoomId!,
-          'read'
-      );
-    }
-  }
-
-  private markMessagesAsReceived(result: SyncHistoryResponseMessage) {
-    let messagesUpdateToReceived = this.groupMessagesIdsByStatus(
-        result.content,
-        m => m.status === 'on_server' && m.roomId !== this.store.activeRoomId
-    );
-    Object.entries(messagesUpdateToReceived)
-        .forEach(([k, messages]) => {
-          let roomId = parseInt(k);
-          this.ws.setMessageStatus(
-              messages.map(m => m.id),
-              roomId,
-              'received'
-          );
-        });
-  }
 
   private groupMessagesIdsByStatus(messages: MessageModelDto[], predicate: (m: MessageModelDto) => boolean): Record<number, MessageModelDto[]> {
     return  messages.reduce((rv, x) => {
@@ -531,6 +500,32 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
             this.loadMessages(roomId, missingIds)
           }
         });
+  }
+
+  private updateMessagesStatusIfRequired(roomId: number, inMessages: MessageModelDto[]) {
+    if (roomId === this.store.activeRoomId) {
+      let ids: number[] = inMessages
+          .filter(m => m.status === 'received' || m.status === 'on_server')
+          .map(m => m.id);
+      if (ids.length > 0) {
+        this.ws.setMessageStatus(
+            ids,
+            this.store.activeRoomId!,
+            'read'
+        );
+      }
+    } else {
+      let ids: number[] = inMessages
+          .filter(m => m.status === 'on_server')
+          .map(m => m.id);
+      if (ids.length > 0) {
+        this.ws.setMessageStatus(
+            ids,
+            this.store.activeRoomId!,
+            'received'
+        );
+      }
+    }
   }
 
 }
