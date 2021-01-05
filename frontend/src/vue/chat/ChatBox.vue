@@ -253,7 +253,7 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
       if (this.chatboxSearch.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-      this.$messageSenderProxy.getMessageSender(this.room.id).loadUpSearchMessages(this.room.id, n, () => true);
+      await this.$messageSenderProxy.getMessageSender(this.room.id).loadUpSearchMessages(this.room.id, n, () => true);
     }
 
     @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})
@@ -261,7 +261,7 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
       if (this.chatbox.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-      this.$messageSenderProxy.getMessageSender(this.room.id).loadUpMessages(this.room.id, n);
+      await this.$messageSenderProxy.getMessageSender(this.room.id).loadUpMessages(this.room.id, n);
     }
 
     onSearchScroll(e: WheelEvent) {
