@@ -4,6 +4,7 @@
 
 /* eslint-disable no-shadow, no-console */
 
+console.log("This files are licensed under MIT https://github.com/akoidan/pychat/blob/master/LICENSE")
 
 const WebpackDevServer = require('webpack-dev-server');
 const fs = require('fs');
