@@ -1,0 +1,19 @@
+name: test:pychat.org
+
+on:
+  push:
+    branches: [ anas ]
+    paths: 
+      - 'frontend/**'
+
+jobs:
+  upload_frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup ssh
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ANAS_ID_RSA }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.ANAS_PORT }} ${{ secrets.ANAS_HOST }} >> ~/.ssh/known_hosts
+          cat ~/.ssh/id_rsa |base64
