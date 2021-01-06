@@ -3,8 +3,6 @@ name: test:pychat.org
 on:
   push:
     branches: [ anas ]
-    paths: 
-      - 'frontend/**'
 
 jobs:
   upload_frontend:
