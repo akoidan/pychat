@@ -2,7 +2,7 @@ name: BE:pychat.org
 
 on:
   push:
-    branches: [ master ]
+    branches: [ anas ]
     paths: 
       - 'backend/**'
 
@@ -14,12 +14,12 @@ jobs:
       - name: Setup ssh
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.ID_RSA }}" > ~/.ssh/id_rsa
+          echo "${{ secrets.ANAS_ID_RSA }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p ${{ secrets.PORT }} ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${{ secrets.ANAS_PORT }} ${{ secrets.ANAS_HOST }} >> ~/.ssh/known_hosts
       - name: Update master branch
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "cd /srv/http/pychat/backend && git pull"
+        run: ssh ${{ secrets.ANAS_SSH_USER }}@${{ secrets.ANAS_HOST }} -p ${{ secrets.ANAS_PORT }} "cd /srv/http/pychat/backend && git pull"
       - name: Update database
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "cd /srv/http/pychat/backend && ./.venv/bin/python ./manage.py makemigrations && ./.venv/bin/python ./manage.py migrate"
+        run: ssh ${{ secrets.ANAS_SSH_USER }}@${{ secrets.ANAS_HOST }} -p ${{ secrets.ANAS_PORT }} "cd /srv/http/pychat/backend && ./.venv/bin/python ./manage.py makemigrations && ./.venv/bin/python ./manage.py migrate"
       - name: Restart tornado service
-        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "sudo /usr/bin/systemctl restart tornado"
+        run: ssh ${{ secrets.ANAS_SSH_USER }}@${{ secrets.ANAS_HOST }} -p ${{ secrets.ANAS_PORT }} "sudo /usr/bin/systemctl restart tornado"
