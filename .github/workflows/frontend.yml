@@ -29,17 +29,11 @@ jobs:
       - name: Build static files
         run: cd frontend && yarn run prod
 
-      - name: Setup ssh 1
+      - name: Setup ssh
         run: |
-          mkdir -p ~/.ssh 2 
-      - name: Setup ssh 2
-        run: |
+          mkdir -p ~/.ssh
           echo "${{ secrets.ANAS_ID_RSA }}" > ~/.ssh/id_rsa
-      - name: Setup ssh 3
-        run: |
           chmod 600 ~/.ssh/id_rsa
-      - name: Setup ssh 4
-        run: |
           ssh-keyscan -p ${{ secrets.ANAS_PORT }} ${{ secrets.ANAS_HOST }} >> ~/.ssh/known_hosts
       - name: Copy static files to destination server
         run: |
