@@ -27,7 +27,7 @@ jobs:
           yarn config set cache-folder `pwd`/yarn-cache
           yarn install --frozen-lockfile
       - name: Build static files
-        run: cd frontend && mv pychat.org.json production.json && yarn run prod
+        run: cd frontend && yarn run prod
 
       - name: Setup ssh
         run: |
