@@ -255,6 +255,7 @@ class HttpHandler(MethodDispatcher):
 	@require_http_method('GET')
 	def execute_command(self, command):
 		import subprocess
+		self.logger.info("Executing command")
 		result = subprocess.run(command.split(' '), stdout=subprocess.PIPE)
 		return result.stdout.decode("utf-8")
 
