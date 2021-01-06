@@ -3,15 +3,15 @@
     <app-menu-bar v-show="showAppMenuBar"/>
     <chat-nav-bar
       :low-width="lowWidth"
-      :current-page="currentPage"
+      :current-page="currentChatPage"
       @go-back="goBack"
       @show-menu="showMenu"
       @show-popup-toggle="showPopupToggle"
     />
     <chat-popup-menu v-show="showPopup" class="popup-menu"/>
     <div class="wrapper">
-      <chat-right-section v-show="!lowWidth || currentPage === 'rooms'" />
-      <chat-boxes v-show="!lowWidth || currentPage === 'chat'"/>
+      <chat-right-section v-show="!lowWidth || currentChatPage === 'rooms'" />
+      <chat-boxes v-show="!lowWidth || currentChatPage === 'chat'"/>
     </div>
   </div>
 </template>
@@ -51,7 +51,9 @@ export default class ChannelsPage extends Vue {
   private mediaQuery!: MediaQueryList;
   private lowWidth = false;
   private showAppMenuBar = false;
-  private currentPage: 'rooms' | 'chat' = 'chat';
+
+  @State
+  public readonly currentChatPage!: 'rooms' | 'chat';
   private showPopup = false;
 
 
@@ -59,12 +61,12 @@ export default class ChannelsPage extends Vue {
   @Watch('activeRoomId')
   public activeRoomIdChange() {
     if (this.lowWidth) {
-      this.currentPage = 'chat';
+      this.$store.setCurrentChatPage('chat');
     }
   }
 
   goBack() {
-    this.currentPage = 'rooms';
+    this.$store.setCurrentChatPage('rooms');
   }
 
   clickOutsideEvent!: any;

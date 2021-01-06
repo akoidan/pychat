@@ -48,11 +48,6 @@ export default class ChatBoxes extends Vue {
 
   @State
   public readonly activeRoomId!: number;
-
-  @Watch('activeRoomId')
-  onActiveRoomIdChange() {
-
-  }
 }
 </script>
 <!-- eslint-disable -->

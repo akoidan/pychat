@@ -136,6 +136,7 @@ export class DefaultStore extends VuexModule {
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
   public isCurrentWindowActive: boolean = true;
+  public currentChatPage: 'rooms' | 'chat' = 'chat';
 
   get userName(): (id: number) => string {
     return (id: number): string => this.allUsersDict[id].user;
@@ -332,6 +333,11 @@ export class DefaultStore extends VuexModule {
       throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
     }
 
+  }
+
+  @Mutation
+  public setCurrentChatPage(currentChatPage: 'rooms' | 'chat') {
+    this.currentChatPage = currentChatPage;
   }
 
   @Mutation

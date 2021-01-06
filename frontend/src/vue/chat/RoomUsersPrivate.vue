@@ -1,10 +1,7 @@
 <template>
-  <li :class="onlineActiveClass">
-    <router-link :to="`/chat/${room.id}`" class="link">
-      <user-name-sex :user="user"/>
-    </router-link>
-    <room-right-icon :room="room" />
-  </li>
+  <room-users-wrapper :room="room" :class="onlineActiveClass">
+    <user-name-sex :user="user"/>
+  </room-users-wrapper>
 </template>
 <script lang="ts">
 import { State } from '@/ts/instances/storeInstance';
@@ -21,9 +18,10 @@ import {
 import { PrivateRoomsIds } from '@/ts/types/types';
 import RoomRightIcon from '@/vue/chat/RoomRightIcon.vue';
 import UserNameSex from '@/vue/chat/UserNameSex.vue';
+import RoomUsersWrapper from '@/vue/chat/RoomUsersWrapper.vue';
 
 @Component({
-  components: {UserNameSex, RoomRightIcon}
+  components: {RoomUsersWrapper, UserNameSex, RoomRightIcon}
 })
 export default class RoomUsersPrivate extends Vue {
 
@@ -31,11 +29,7 @@ export default class RoomUsersPrivate extends Vue {
   @State
   public readonly online!: number[];
   @State
-  public readonly activeRoomId!: number;
-  @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
-  @State
-  public readonly userInfo!: CurrentUserInfoModel;
   @State
   public readonly allUsersDict!: { [id: number]: UserModel } ;
 
@@ -47,26 +41,9 @@ export default class RoomUsersPrivate extends Vue {
     return this.online.indexOf(this.user.id) < 0;
   }
 
-  get onlineActiveClass (): string[] {
-    const a = [this.isOnline ? 'offline' : 'online'];
-    if (this.room.id === this.activeRoomId) {
-      a.push('active-room');
-    }
-
-    return a;
+  get onlineActiveClass (): string {
+    return this.isOnline ? 'offline' : 'online';
   }
 
 }
 </script>
-
-<style lang="sass" scoped>
-
-  @import "~@/assets/sass/partials/room_users_table.sass"
-
-  li
-    @extend %li
-  .active-room
-    @extend %active-room
-  .link
-    @extend %link
-</style>
