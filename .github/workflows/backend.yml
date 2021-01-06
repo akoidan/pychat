@@ -22,4 +22,4 @@ jobs:
       - name: Update database
         run: ssh ${{ secrets.ANAS_SSH_USER }}@${{ secrets.ANAS_HOST }} -p ${{ secrets.ANAS_PORT }} "cd /home/ubuntu/pychat/backend && ./.venv/bin/python ./manage.py makemigrations && ./.venv/bin/python ./manage.py migrate"
       - name: Restart tornado service
-        run: ssh ${{ secrets.ANAS_SSH_USER }}@${{ secrets.ANAS_HOST }} -p ${{ secrets.ANAS_PORT }} "sudo /usr/bin/systemctl restart tornado"
+        run: ssh ${{ secrets.ANAS_SSH_USER }}@${{ secrets.ANAS_HOST }} -p ${{ secrets.ANAS_PORT }} "sudo /bin/systemctl restart tornado"
