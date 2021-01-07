@@ -41,7 +41,7 @@ Pychat is an opensource absolutely free communcation tool targeted for a copmany
 |                        | Pychat | Slack | Skype | Telegram | Viber | Discord |
 |------------------------|--------|-------|-------|----------|-------|---------|
 | Open Source            | +      | -     | -     | -        | -     | -       |
-| Free                   | +      | +/-   | +/-   | +        | +/-   | +       |
+| Free                   | +      | +/-   | +/-   | +        | +/-   | +/-     |
 | Screen sharing         | +      | +     | -     | -        | -     | +       |
 | Stream drawing         | +      | -     | -     | -        | -     | -       |
 | Syntax highlight       | +      | -     | -     | -        | -     | +       |
