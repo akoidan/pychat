@@ -45,7 +45,6 @@ Pychat is an opensource absolutely free communcation tool targeted for a copmany
 | Screen sharing         | +      | +     | -     | -        | -     | +       |
 | Stream drawing         | +      | -     | -     | -        | -     | -       |
 | Syntax highlight       | +      | -     | -     | -        | -     | +       |
-| Unlimited history      | +      | +/-   | +     | +        | +     | +       |
 | Only company users     | +      | +     | -     | -        | -     | +       |
 | Audio/Video conference | +      | +     | +     | +        | -     | +       |
 | Can run on your server | +      | -     | -     | -        | -     | -       |
