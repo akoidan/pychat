@@ -35,14 +35,7 @@
 - [TODO](#todo)
 
 # About
-This is free web (browser) chat, that features:
- - Sending instant text messages, images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/) using selfhosted server and websockets
- - Making calls and video conferences using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
- - Sharing screen during call or conference.
- - Drawing images and stream them during video calls with [spainter](https://github.com/akoidan/spainter)
- - Sending files or text messages directly to another PC (bypassing server) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
- - Login with social media
- - Sending offline messages with Firebase push notifications
+Pychat is an opensource absolutely free communcation tool targeted for a copmany use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
 
 # When should I use pychat
 |                        | Pychat | Slack | Skype | Telegram | Viber | Discord |
