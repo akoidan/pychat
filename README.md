@@ -51,10 +51,9 @@ Pychat is an opensource absolutely free communcation tool targeted for a copmany
 | Audio/Video messages   | +      | -     | -     | +        | +     | -       |
 | P2P file sharing       | +      | -     | -     | -        | -     | -       |
 | P2P messaging          | +      | -     | -     | -        | -     | -       |
-| Message threads        | +      | +     | -     | -        | -     | +       |
 | Message read status    | +      | -     | +     | +        | +     | -       |
 | Tagging user           | +      | +     | -     | +        | +     | +       |
-| Message threads        | +      | +     | -     | -        | -     | +       |
+| Message threads        | +      | +     | -     | -        | -     | -       |
 | Desktop client         | +/-    | +     | +     | +        | +/-   | +       |
 | Mobile client          | +/-    | +     | +     | +        | +     | +       |
 | 3rd-party plugins      | -      | +     | -     | -        | -     | +       |
