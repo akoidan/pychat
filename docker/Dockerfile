@@ -5,7 +5,8 @@ ENV DB_DATA_PATH=/var/lib/mysql \
     DB_USER=pychat \
     DB_PASS=pypass \
     NGINX_VERSION=1.15.3 \
-    NGINX_UPLOAD_MODULE_VERSION=2.3.0
+    NGINX_UPLOAD_MODULE_VERSION=2.3.0 \
+    NGINX_LUA_MODULE=0.10.19
 
 WORKDIR /srv/http
 
@@ -48,7 +49,8 @@ COPY ./download_content.sh .
 
 # compile nginx with upload module
 RUN  set -x && \
-    bash download_content.sh build_nginx $NGINX_VERSION $NGINX_UPLOAD_MODULE_VERSION /tmp/runDepsFile &&\
+    bash download_content.sh build_nginx $NGINX_VERSION $NGINX_UPLOAD_MODULE_VERSION $NGINX_LUA_MODULE &&\
+    bash download_content nginx_copy_deps /tmp/runDepsFile &&\
     runDeps=$(cat /tmp/runDepsFile) &&\
     rm /tmp/runDepsFile &&\
     apk add --no-cache --virtual .nginx-rundeps $runDeps &&\

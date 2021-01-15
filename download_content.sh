@@ -222,7 +222,7 @@ delete_tmp_dir() {
 build_nginx() {
     NGINX_VERSION="$1"
     NGINX_UPLOAD_MODULE_VERSION="$2"
-    RUN_DEPS="$3"
+    NGINX_LUA_MODULE="$3"
     GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8
     safeRunCommand mkdir -p /tmp/nginx
     safeRunCommand cd /tmp/nginx
@@ -250,6 +250,7 @@ build_nginx() {
     CONFIG="\
         --prefix=/etc/nginx \
         --add-module=/tmp/nginx/nginx-upload-module-$NGINX_UPLOAD_MODULE_VERSION/ \
+        ${LUA_MODULE_CONFIG} \
         --sbin-path=/usr/sbin/nginx \
         --modules-path=/usr/lib/nginx/modules \
         --conf-path=/etc/nginx/nginx.conf \
@@ -316,18 +317,19 @@ build_nginx() {
     safeRunCommand strip /usr/sbin/nginx*
     safeRunCommand strip /usr/lib/nginx/modules/*.so
     safeRunCommand rm -rf /tmp/nginx
-    if [ ! -z "$RUN_DEPS" ]; then
-        safeRunCommand cp /usr/bin/envsubst /tmp/
-        runDeps="$( \
-          scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
-            | tr ',' '\n' \
-            | sort -u \
-            | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-        )"
-        echo $runDeps > "$RUN_DEPS"
-    fi
 }
 
+nginx_copy_deps () {
+    RUN_DEPS="$1"
+    safeRunCommand cp /usr/bin/envsubst /tmp/
+    runDeps="$( \
+      scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
+        | tr ',' '\n' \
+        | sort -u \
+        | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+    )"
+    echo $runDeps > "$RUN_DEPS"
+}
 
 create_db() {
     files=$(shopt -s nullglob dotglob; echo ${DB_DATA_PATH}/*)
@@ -453,10 +455,12 @@ elif [ "$1" = "compile_js" ]; then
     compile_js
 elif [ "$1" = "create_venv" ]; then
     create_venv
+elif [ "$1" = "nginx_copy_deps" ]; then
+    nginx_copy_deps $2
 elif [ "$1" = "build_nginx" ]; then
     if [ -z "$3" ]
     then
-        printError "pass minimum 3 variables"
+        printError "pass minimum 2 arguments"
         exit 1;
     fi
     build_nginx "$2" "$3" "$4"
@@ -534,7 +538,8 @@ else
     chp compile_js "Compiles frontend SPA javascript if $DIST_DIRECTORY is empty"
     chp create_venv "removes .venv and creates a new one with dependencies"
     chp copy_root_fs "Creates soft links from \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m to \e[96m/\e[0;33;40m"
-    chp build_nginx "Build nginx with http-upload-module and installs it; . Usage: \e[92msh download_content.sh build_nginx 1.15.3 2.3.0  /tmp/depsFileList.txt\e[0;33;40m where 1.15 is nginx version, 2.3.0 is upload-http-module version"
+    chp build_nginx "Build nginx with http-upload-module and lua_module. Also installs it; . Usage: \e[92msh download_content.sh build_nginx 1.15.3 2.3.0 0.10.19 \e[0;33;40m where 1.15 is nginx version, 2.3.0 is upload-http-module version, 0.10.19 lua version"
+    chp nginx_copy_deps "Copies deps file for nginx"
     chp create_django_tables "Creates database tables and data"
     exit 1
 fi
