@@ -188,6 +188,7 @@ export default class CallHandler extends FileAndCallTransfer {
   }
 
   setCanvasElement(canvas: HTMLCanvasElement) {
+    this.logger.debug('Setting canvas to {}', canvas)();
     this.canvas = canvas;
   }
 

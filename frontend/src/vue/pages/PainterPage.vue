@@ -4,14 +4,16 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Ref, Vue} from 'vue-property-decorator';
-import Painter from 'spainter';
-import {ALL_ROOM_ID} from '@/ts/utils/consts';
+import {
+  Component,
+  Ref,
+  Vue
+} from 'vue-property-decorator';
+
 
 import loggerFactory from '@/ts/instances/loggerFactory';
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
-import {RawLocation, Route} from 'vue-router';
-import { savedFiles } from '@/ts/utils/htmlApi';
+import {savedFiles} from '@/ts/utils/htmlApi';
 
 let uniqueId = 1;
 
@@ -25,10 +27,10 @@ export default class PainterPage extends Vue {
   @Ref()
   public div!: HTMLElement;
 
-  public painter!: Painter;
 
-  public mounted() {
-    this.painter = new Painter(this.div, {
+  public async mounted() {
+    let painterImport = await import(/* webpackChunkName: "spainter" */'spainter');
+    let painter = new painterImport.default(this.div, {
       onBlobPaste: (e: Blob) => {
         let id: string = `paintBlob-${getUniqueId()}`;
         savedFiles[id] = e;
@@ -53,6 +55,7 @@ export default class PainterPage extends Vue {
         return instance.$el as HTMLInputElement;
       }
     });
+    this.$emit('canvas', this.div.querySelector('canvas'));
   }
 }
 </script>

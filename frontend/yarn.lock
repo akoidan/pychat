@@ -9223,10 +9223,10 @@ source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.0, source-map@~0.6.1:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
-spainter@^1.2.7:
-  version "1.2.7"
-  resolved "https://registry.yarnpkg.com/spainter/-/spainter-1.2.7.tgz#cdb6a879f96a7e79dfcff6db9012a1e9061720a8"
-  integrity sha512-h4XI7FOwZFSAgjvknyaHt0a8wydvYOaDWALA7EfnDQjpnTihRbZarh8mcOx7HCHt0eJ1rl4gxyiWzHkH3GLcnw==
+spainter@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/spainter/-/spainter-1.2.8.tgz#bf55554e00dcaa9b675315b59bc7354ebc87b271"
+  integrity sha512-EMYdGZvNqoWz0nRK9317JoRw/XoMUjGpa/SR4NDH6l6zUvKpwc7sKs+5w6C6sendLXwk2WavaNpNXxz4nI6mwg==
 
 spdx-correct@^3.0.0:
   version "3.1.0"
