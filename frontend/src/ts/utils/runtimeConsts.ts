@@ -2,7 +2,8 @@ import mobile from 'is-mobile';
 import {
   BACKEND_ADDRESS,
   IS_SSL,
-  WEBRTC_CONFIG
+  WEBRTC_CONFIG,
+  PUBLIC_PATH
 } from '@/ts/utils/consts';
 
 export const isMobile: boolean = mobile.isMobile();
@@ -41,4 +42,4 @@ export const WEBRTC_RUNTIME_CONFIG = (function() {
 })()
 export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/ws`;
 export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/api`;
-export const MEDIA_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}`;
+export const MEDIA_API_URL = PUBLIC_PATH;
