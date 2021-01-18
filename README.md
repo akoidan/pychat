@@ -473,6 +473,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* pasting from painterpage doesn't work
 * lastTimeOnline
 * /giphy should work exactly like mention with drop above
 * quote should work similar to tag user
