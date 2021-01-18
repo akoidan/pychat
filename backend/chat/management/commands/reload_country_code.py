@@ -28,5 +28,6 @@ class Command(BaseCommand):
 				ip.city = response['city'],
 				ip.country_code = response['countryCode']
 				ip.save()
+				print("Saved %s", raw_response)
 			except Exception as e:
 				print("Skip %s because %s" % (ip, e))
