@@ -22,10 +22,10 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { isDateMissing } from '@/ts/utils/htmlApi';
-import { ELECTRON_MAIN_FILE } from '@/ts/utils/consts';
+import { IS_ELECTRON } from '@/ts/utils/consts';
 
 let Datepicker: unknown;
-if (!ELECTRON_MAIN_FILE) {
+if (!IS_ELECTRON) {
   // @ts-ignore: next-line
   Datepicker = (() => import(/* webpackChunkName: "vuejs-datepicker" */ 'vuejs-datepicker'));
 } else {

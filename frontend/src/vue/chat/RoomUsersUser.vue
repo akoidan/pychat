@@ -75,6 +75,8 @@ export default class RoomUsersUser extends Vue {
 
   li
     @extend %li
+    justify-content: space-between
+    display: flex
   div
     text-overflow: ellipsis
     word-break: break-all

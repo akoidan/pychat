@@ -46,10 +46,14 @@
     goBack() {}
 
     @Emit()
-    showPopupToggle() {}
+    showPopupToggle(e: Event) {
+      e.stopPropagation();
+    }
 
     @Emit()
-    showMenu() {}
+    showMenu(e: Event) {
+      e.stopPropagation();
+    }
 
   }
 </script>

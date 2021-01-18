@@ -72,17 +72,13 @@ export default class ChannelsPage extends Vue {
   clickOutsideEvent!: any;
 
   showMenu() {
-    this.showAppMenuBar = true;
-    setTimeout(() => { // otherwise listener will be triggered right away
-        document.body.addEventListener('click', this.clickOutsideEvent)
-    });
+    this.showAppMenuBar = !this.showAppMenuBar;
+    document.body.addEventListener('click', this.clickOutsideEvent)
   }
 
   showPopupToggle() {
-    this.showPopup = true;
-    setTimeout(() => { // otherwise listener will be triggered right away
-      document.body.addEventListener('click', this.clickOutsideEvent)
-    });
+    this.showPopup = !this.showPopup;
+    document.body.addEventListener('click', this.clickOutsideEvent)
   }
 
   created() {

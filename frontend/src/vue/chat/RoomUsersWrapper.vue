@@ -46,6 +46,8 @@
 
   li
     @extend %li
+    &:hover
+      padding-right: 25px
 
   .link
     @extend %link
