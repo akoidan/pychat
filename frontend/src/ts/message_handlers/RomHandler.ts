@@ -138,8 +138,13 @@ export class RoomHandler extends MessageHandler  {
   }
 
   public addChannel(message: AddChannelMessage) {
-    let channelDict: ChannelModel = getChannelDict(message);
+
+
+    this.mutateRoomAddition(message, 'room_created');
+
+    let channelDict: ChannelModel = getChannelDict(message as  Omit<AddRoomMessage, 'channelId'> & { channelId: number; });
     this.store.addChannel(channelDict);
+
   }
 
   public inviteUser(message: InviteUserMessage) {

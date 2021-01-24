@@ -369,20 +369,46 @@ class MessagesHandler():
 		if not channel_name or len(channel_name) > 16:
 			raise ValidationError('Incorrect channel name name "{}"'.format(channel_name))
 
+		users = message.get(VarNames.ROOM_USERS)
 		channel = Channel(name=channel_name, creator_id=self.user_id)
 		channel.save()
 		channel_id = channel.id
+
+		users.append(self.user_id)
+		users = list(set(users))
+
+		room = Room(channel_id=channel_id, is_main_in_channel=True, creator_id= self.user_id)
+		room.save()
+		room_id = room.id
+
+		ru = [RoomUsers(
+			user_id=user_id,
+			room_id=room_id
+		) for user_id in users]
+		RoomUsers.objects.bulk_create(ru)
+
 		m = {
-			VarNames.EVENT: Actions.CREATE_CHANNEL,
-			VarNames.CHANNEL_ID: channel_id,
-			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
-			VarNames.CB_BY_SENDER: self.id,
+			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_USERS: users,
+			VarNames.INVITER_USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
-			VarNames.CHANNEL_NAME: channel_name,
+			VarNames.VOLUME: 0,
+			VarNames.P2P: False,
+			VarNames.NOTIFICATIONS: False,
+			VarNames.ROOM_NAME: None,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+			VarNames.CHANNEL_NAME: channel_name,
+			VarNames.CHANNEL_ID:  channel_id,
+			VarNames.EVENT: Actions.CREATE_CHANNEL,
+			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
+			VarNames.CB_BY_SENDER: self.id,
 		}
-		self.publish(m, self.channel)
+
+		jsoned_mess = encode_message(m, True)
+		for user in users:
+			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
+
 		
 	def create_new_room(self, message):
 		room_name = message.get(VarNames.ROOM_NAME)
@@ -614,9 +640,6 @@ class MessagesHandler():
 			raise ValidationError("Users %s are already in the room", intersect)
 		users_in_room.extend(users)
 
-		max_id = Message.objects.filter(room_id=room_id).aggregate(Max('id'))['id__max']
-		if not max_id:
-			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
 		ru = [RoomUsers(
 			user_id=user_id,
 			room_id=room_id,

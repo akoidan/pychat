@@ -278,9 +278,10 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.messageProc.sendToServerAndAwait(payload);
   }
 
-  public async sendAddChannel(channelName: string): Promise<AddChannelMessage> {
+  public async sendAddChannel(channelName: string, users: number[]): Promise<AddChannelMessage> {
     return this.messageProc.sendToServerAndAwait({
       channelName,
+      users,
       action: 'addChannel'
     });
   }

@@ -5,7 +5,7 @@
         Create public room
       </router-link>
       <router-link to="/create-room/channel">
-        Create channel
+        Create group
       </router-link>
     </div>
     <keep-alive>
