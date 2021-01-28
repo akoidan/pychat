@@ -93,6 +93,10 @@ export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore, Defaul
 }
 
 export interface SaveChannelSettingsMessage extends DefaultWsInMessage<'saveChannelSettings', 'room'>, ChannelDto {
+  notifications: boolean;
+  volume: number;
+  p2p: boolean;
+  userId: number;
 }
 
 export interface DeleteChannelMessage extends DefaultWsInMessage<'deleteChannel', 'room'> {

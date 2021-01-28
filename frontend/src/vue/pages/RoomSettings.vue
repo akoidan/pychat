@@ -7,17 +7,14 @@
     <table>
       <tbody>
         <tr>
-          <td colspan="2" v-if="room.isMainInChannel" class="room-heder">
-            Group <b>{{room.name}}</b> settings
-          </td>
-          <td colspan="2" v-else-if="room.name" class="room-heder">
+          <td colspan="2" v-if="room.name" class="room-heder">
             Room <b>{{room.name}}</b> settings
           </td>
           <td colspan="2" v-else class="room-heder">
             User <b>{{user}}</b> settings
           </td>
         </tr>
-        <tr v-if="isPublic && !room.isMainInChannel">
+        <tr v-if="isPublic">
           <th>
             Name
           </th>
@@ -35,7 +32,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="isPublic && !room.isMainInChannel">
+        <tr v-if="isPublic">
           <th>Admin</th>
           <td v-if="canChangeAdmin">
             <pick-user
@@ -79,7 +76,7 @@
             <app-checkbox v-model="p2p" />
           </td>
         </tr>
-        <tr v-if="!isMainRoom && !room.isMainInChannel">
+        <tr v-if="!isMainRoom">
           <td colspan="2">
             <app-submit
               type="button"

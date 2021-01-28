@@ -14,11 +14,6 @@
           {{ channel.name }}
         </router-link>
       </template>
-      <template v-slot:right>
-        <router-link :to="`/channel/${channel.id}/settings`">
-          <span class="icon-cog" />
-        </router-link>
-      </template>
       <room-users-public
         v-for="room in channel.rooms"
         :key="room.id"

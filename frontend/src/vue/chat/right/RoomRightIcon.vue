@@ -1,11 +1,5 @@
 <template>
   <div>
-    <router-link :to="`/room-settings/${room.id}`">
-      <span
-        v-if="!room.newMessagesCount"
-        class="icon-cog"
-      />
-    </router-link>
     <span
       v-if="room.newMessagesCount"
       class="newMessagesCount"

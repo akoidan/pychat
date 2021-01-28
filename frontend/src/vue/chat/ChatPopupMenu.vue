@@ -13,11 +13,17 @@
       title="Make a video/mic call"
       @click="startCall"
     ><span class="mText">Call</span></i>
-    <router-link :to="`/room-settings/${activeRoomId}`">
-      <i class="icon-cog"/> Settings
-    </router-link>
     <router-link :to="`/room-users/${activeRoomId}`" v-if="activeRoom.name">
       <i class="icon-user-pair"/> Users
+    </router-link>
+    <router-link v-if="activeRoom.isMainInChannel" :to="`/channel/${activeRoom.channelId}/room`">
+      <i class="icon-plus-squared"/> Add room
+    </router-link>
+    <router-link v-if="activeRoom.isMainInChannel" :to="`/channel/${activeRoom.channelId}/settings`">
+      <i class="icon-cog"/> Settings
+    </router-link>
+    <router-link v-else :to="`/room-settings/${activeRoomId}`">
+      <i class="icon-cog"/> Settings
     </router-link>
   </div>
 </template>

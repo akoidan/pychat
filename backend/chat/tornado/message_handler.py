@@ -342,7 +342,8 @@ class MessagesHandler():
 		if not channel_name or len(channel_name) > 16:
 			raise ValidationError('Incorrect channel name name "{}"'.format(channel_name))
 		channel = Channel.objects.get(id=channel_id)
-		users_id = list(RoomUsers.objects.filter(room__channel_id=channel_id).values_list('user_id', flat=True))
+		main_room = Room.objects.get(channel_id=channel_id, is_main_in_channel=True)
+		users_id = list(RoomUsers.objects.filter(room_id=main_room.id).values_list('user_id', flat=True))
 		if channel.creator_id != self.user_id and self.user_id not in users_id:
 			raise ValidationError("You are not allowed to edit this channel")
 		if new_creator != channel.creator_id:
@@ -355,6 +356,11 @@ class MessagesHandler():
 			users_id.append(self.user_id)
 		channel.name = channel_name
 		channel.save()
+
+		RoomUsers.objects.filter(room_id=main_room.id, user_id=self.user_id).update(
+			volume=message[VarNames.VOLUME],
+			notifications=message[VarNames.NOTIFICATIONS],
+		)
 		m = {
 			VarNames.EVENT: Actions.SAVE_CHANNEL_SETTINGS,
 			VarNames.CHANNEL_ID: channel_id,
@@ -362,11 +368,13 @@ class MessagesHandler():
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.CHANNEL_NAME: channel_name,
 			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
+			VarNames.USER_ID: self.user_id,
+			VarNames.VOLUME: message[VarNames.VOLUME],
+			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
 			VarNames.TIME: get_milliseconds(),
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
 		}
-		for user_id in users_id:
-			self.publish(m, RedisPrefix.generate_user(user_id))
+		self.publish(m, main_room.id)
 
 	def create_new_channel(self, message):
 		channel_name = message.get(VarNames.CHANNEL_NAME)
@@ -509,6 +517,8 @@ class MessagesHandler():
 		if updated != 1:
 			raise ValidationError("You don't have access to this room")
 		room = Room.objects.get(id=room_id)
+		if room.is_main_in_channel:
+			raise ValidationError("You can't edit main room")
 		update_all = False
 		if not room.name:
 			if room.p2p != message[VarNames.P2P]:
