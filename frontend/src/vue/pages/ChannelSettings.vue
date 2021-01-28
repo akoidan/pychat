@@ -8,6 +8,11 @@
       <table>
         <tbody>
         <tr>
+          <td colspan="2">
+            Group <b>{{channel.name}}</b> settings
+          </td>
+        </tr>
+        <tr>
           <th>
             Name
           </th>
@@ -19,6 +24,26 @@
                 class="input"
                 maxlength="16"
             >
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Notifications
+          </th>
+          <td>
+            <app-checkbox v-model="notifications" />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Sound
+          </th>
+          <td>
+            <app-input-range
+              v-model="sound"
+              min="0"
+              max="100"
+            />
           </td>
         </tr>
         <tr>
@@ -84,9 +109,11 @@ import PickUser from '@/vue/pages/parts/PickUser.vue';
 import {RouterNavigateMessage} from '@/ts/types/messages/innerMessages';
 import {sub} from '@/ts/instances/subInstance';
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
+import AppInputRange from '@/vue/ui/AppInputRange.vue';
+import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 
 @Component({
-    components: {PickUser, AppSubmit}
+    components: {AppCheckbox, AppInputRange, PickUser, AppSubmit}
   })
   export default class ChannelSettings extends Vue {
 
@@ -95,6 +122,9 @@ import {ALL_ROOM_ID} from '@/ts/utils/consts';
     public channelName!: string;
 
     public admin: number[] = [];
+
+   public sound: number = 0;
+   public notifications: boolean = false;
 
     @State
     public readonly userInfo!: CurrentUserInfoModel;
@@ -144,7 +174,13 @@ import {ALL_ROOM_ID} from '@/ts/utils/consts';
       if (this.isAdmin && this.admin.length === 0) {
         throw Error("Pick an admin");
       }
-      await this.$ws.saveChannelSettings(this.channelName, this.channelId, this.singleAdmin);
+      await this.$ws.saveChannelSettings(
+          this.channelName,
+          this.channelId,
+          this.singleAdmin,
+          this.sound,
+          this.notifications,
+      );
       this.$store.growlSuccess('Settings has been saved');
       this.$router.go(-1);
     }
@@ -183,7 +219,10 @@ import {ALL_ROOM_ID} from '@/ts/utils/consts';
       this.$logger.log('Updated for channel settings {} ', this.channel)();
       this.channelName = this.channel.name;
       this.admin = [this.channel.creator];
+      this.sound = this.channel.mainRoom.volume;
+      this.notifications = this.channel.mainRoom.notifications;
     }
+
   }
 </script>
 <!-- eslint-disable -->

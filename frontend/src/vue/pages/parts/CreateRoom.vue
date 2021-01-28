@@ -73,7 +73,10 @@ import {
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import PickUser from '@/vue/pages/parts/PickUser.vue';
-import {CurrentUserInfoModel} from '@/ts/types/model';
+import {
+  ChannelsDictUIModel,
+  CurrentUserInfoModel
+} from '@/ts/types/model';
 import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 import {PrivateRoomsIds} from '@/ts/types/types';
 import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
@@ -94,6 +97,9 @@ export default class CreateRoom extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
+  @State
+  public readonly channelsDictUI!: ChannelsDictUIModel;
+
   public currentUsers: number[] = [];
   public notifications: boolean = false;
   public sound: number = 0;
@@ -109,6 +115,9 @@ export default class CreateRoom extends Vue {
   public readonly userIds!: number[];
 
   get inviteUsers(): string {
+    if (this.parentChannelId) {
+      return `Users in a new room in group ${this.channelsDictUI[this.parentChannelId].name}`
+    }
     return this.isPublic ? 'Invite users to new room' : 'Select user for private room';
   }
 

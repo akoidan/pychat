@@ -44,20 +44,19 @@ import {
   DeleteChannelMessage,
   DeleteRoomMessage,
   InviteUserMessage,
-  LeaveChannelMessage,
   LeaveUserMessage,
   RemoveOnlineUserMessage,
   SaveChannelSettingsMessage,
   SaveRoomSettingsMessage,
   ShowITypeMessage
 } from '@/ts/types/messages/wsInMessages';
-import { ALL_ROOM_ID } from '@/ts/utils/consts';
-import { sub } from '@/ts/instances/subInstance';
-import { Logger } from 'lines-logger';
-import { DefaultStore } from '@/ts/classes/DefaultStore';
+import {ALL_ROOM_ID} from '@/ts/utils/consts';
+import {sub} from '@/ts/instances/subInstance';
+import {Logger} from 'lines-logger';
+import {DefaultStore} from '@/ts/classes/DefaultStore';
 import Api from '@/ts/message_handlers/Api';
 import WsHandler from '@/ts/message_handlers/WsHandler';
-import { AudioPlayer } from '@/ts/classes/AudioPlayer';
+import {AudioPlayer} from '@/ts/classes/AudioPlayer';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   login,
@@ -186,6 +185,12 @@ export class RoomHandler extends MessageHandler  {
     } else {
       const c: ChannelModel = getChannelDict(message);
       this.store.addChannel(c);
+      if (this.store.myId === message.userId) {
+        let oldRoom : RoomModel = {...this.store.channelsDictUI[c.id].mainRoom}
+        oldRoom.volume = message.volume,
+        oldRoom.notifications =  message.notifications;
+        this.store.setRoomSettings(oldRoom);
+      }
     }
   }
 
