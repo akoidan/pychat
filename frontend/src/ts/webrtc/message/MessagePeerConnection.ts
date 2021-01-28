@@ -1,28 +1,26 @@
 import AbstractPeerConnection from '@/ts/webrtc/AbstractPeerConnection';
 import WsHandler from '@/ts/message_handlers/WsHandler';
-import { DefaultStore } from '@/ts/classes/DefaultStore';
-import { sub } from '@/ts/instances/subInstance';
-import { MessageSupplier } from '@/ts/types/types';
-import { P2PMessageProcessor } from '@/ts/message_handlers/P2PMessageProcessor';
-import Subscription from '@/ts/classes/Subscription';
+import {DefaultStore} from '@/ts/classes/DefaultStore';
+import {MessageSupplier} from '@/ts/types/types';
+import {P2PMessageProcessor} from '@/ts/message_handlers/P2PMessageProcessor';
 
 import {
-  HandlerName,
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
+  ConfirmReceivedP2pMessage,
+  ConfirmSetMessageStatusRequest,
   DefaultP2pMessage,
   ExchangeMessageInfoRequest,
   ExchangeMessageInfoResponse,
-  P2PHandlerType,
-  P2PHandlerTypes,
-  ConfirmReceivedP2pMessage,
-  SendNewP2PMessage,
   ExchangeMessageInfoResponse2,
   ExchangeMessageInfoResponse3,
+  P2PHandlerType,
+  P2PHandlerTypes,
+  SendNewP2PMessage,
+  SetMessageStatusRequest,
 } from '@/ts/types/messages/p2pMessages';
-import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
 import {
   MessageModel,
   RoomModel
@@ -36,10 +34,10 @@ import {
   p2pMessageToModel
 } from '@/ts/types/converters';
 import {
-  CheckTransferDestroy,
+  SendSetMessagesStatusMessage,
   SyncP2PMessage
 } from '@/ts/types/messages/innerMessages';
-import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import {MessageHelper} from '@/ts/message_handlers/MessageHelper';
 import loggerFactory from '@/ts/instances/loggerFactory';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
@@ -47,7 +45,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, 'peerConnection:*'> = {
     sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
     checkDestroy: <HandlerType<'checkDestroy', 'peerConnection:*'>>this.checkDestroy,
-    syncP2pMessage: <HandlerType<'syncP2pMessage', 'peerConnection:*'>>this.syncP2pMessage
+    syncP2pMessage: <HandlerType<'syncP2pMessage', 'peerConnection:*'>>this.syncP2pMessage,
+    sendSetMessagesStatus: <HandlerType<'sendSetMessagesStatus', 'peerConnection:*'>>this.sendSetMessagesStatus
   };
 
   connectedToRemote: boolean = true;
@@ -56,7 +55,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   private readonly p2pHandlers: P2PHandlerTypes<keyof MessagePeerConnection> = {
     exchangeMessageInfoRequest: <P2PHandlerType<'exchangeMessageInfoRequest'>>this.exchangeMessageInfoRequest,
-    sendNewP2PMessage: <P2PHandlerType<'sendNewP2PMessage'>>this.sendNewP2PMessage
+    sendNewP2PMessage: <P2PHandlerType<'sendNewP2PMessage'>>this.sendNewP2PMessage,
+    setMessageStatus:  <P2PHandlerType<'setMessageStatus'>>this.setMessageStatus,
   };
 
   private readonly messageProc: P2PMessageProcessor;
@@ -78,6 +78,33 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, '#4c002b');
     this.messageProc = new P2PMessageProcessor(this, store, `peer:${connId}:${opponentWsId}`);
     this.messageHelper = messageHelper;
+  }
+
+  public async sendSetMessagesStatus(payload: SendSetMessagesStatusMessage) {
+    let responseToRequest: SetMessageStatusRequest = {
+      action: 'setMessageStatus',
+      messagesIds: payload.messageIds,
+      status: 'read'
+    }
+    await this.messageProc.sendToServerAndAwait(responseToRequest);
+    this.store.setMessagesStatus({
+      roomId: this.roomId,
+      status: 'read',
+      messagesIds: payload.messageIds
+    });
+  }
+
+  public async setMessageStatus(m: SetMessageStatusRequest) {
+    this.store.setMessagesStatus({
+      roomId: this.roomId,
+      status: m.status,
+      messagesIds: m.messagesIds
+    });
+    let response: ConfirmSetMessageStatusRequest = {
+      action: 'confirmSetMessageStatusRequest',
+      resolveCbId: m.cbId
+    };
+    this.messageProc.sendToServer(response);
   }
 
   public getOpponentUserId() {

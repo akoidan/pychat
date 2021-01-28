@@ -1,32 +1,24 @@
 import BaseTransferHandler from '@/ts/webrtc/BaseTransferHandler';
 import {
   MessageSender,
-  UploadFile,
   UserIdConn
 } from '@/ts/types/types';
-import {
-  MessageModel,
-  RoomModel
-} from '@/ts/types/model';
-import MessageSenderPeerConnection from '@/ts/webrtc/message/MessageSenderPeerConnection';
-import MessageReceiverPeerConnection from '@/ts/webrtc/message/MessageReceiverPeerConnection';
+import {RoomModel} from '@/ts/types/model';
+import MessageSenderPeerConnection
+  from '@/ts/webrtc/message/MessageSenderPeerConnection';
+import MessageReceiverPeerConnection
+  from '@/ts/webrtc/message/MessageReceiverPeerConnection';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
-import { DefaultStore } from '@/ts/classes/DefaultStore';
-import { sub } from '@/ts/instances/subInstance';
+import {DefaultStore} from '@/ts/classes/DefaultStore';
+import {sub} from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
-import { MessageModelDto } from '@/ts/types/dto';
 import {
-  ChangeP2pRoomInfoMessage,
-  InternetAppearMessage,
+  SendSetMessagesStatusMessage,
   SyncP2PMessage
 } from '@/ts/types/messages/innerMessages';
-import {
-  HandlerName,
-  HandlerType,
-  HandlerTypes
-} from '@/ts/types/messages/baseMessagesInterfaces';
-import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import {HandlerTypes} from '@/ts/types/messages/baseMessagesInterfaces';
+import {MessageHelper} from '@/ts/message_handlers/MessageHelper';
 
 /**
  *
@@ -183,9 +175,18 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     throw new Error('Searching message is not supported on p2p direct channel yet');
   }
 
-  markMessagesInCurrentRoomAsRead(roomId: number, messageIds: number[]): Promise<void> {
-
-    return Promise.resolve();
+  public async markMessagesInCurrentRoomAsRead(roomId: number, messageIds: number[]) {
+    this.messageHelper.processAnyMessage()
+    if (this.state === 'ready') {
+      let payload : SendSetMessagesStatusMessage  = {
+        action: 'sendSetMessagesStatus',
+        handler:  Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+        messageIds,
+        status: 'read',
+        allowZeroSubscribers: true
+      }
+      sub.notify(payload);
+    }
   }
 
   loadMessages(roomId: number, messageId: number[]): Promise<void> {
