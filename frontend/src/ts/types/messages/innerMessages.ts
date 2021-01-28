@@ -14,6 +14,7 @@ import {
   DefaultInMessage,
   HandlerName
 } from '@/ts/types/messages/baseMessagesInterfaces';
+import {MessageStatus} from '@/ts/types/model';
 
 
 export interface DefaultInnerSystemMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H> {
@@ -72,4 +73,9 @@ export interface DestroyPeerConnectionMessage extends DefaultInnerSystemMessage<
 
 export interface SyncP2PMessage extends DefaultInnerSystemMessage<'syncP2pMessage', 'peerConnection:*'> {
   id: number;
+}
+
+export interface SendSetMessagesStatusMessage extends DefaultInnerSystemMessage<'sendSetMessagesStatus', 'peerConnection:*'> {
+  messageIds: number[];
+  status: MessageStatus;
 }

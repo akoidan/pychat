@@ -13,6 +13,8 @@ import {
   MessageP2pDto,
   MessagesInfo
 } from '@/ts/types/messages/p2pDto';
+import {MessageStatus} from '@/ts/types/model';
+import {DefaultWsInMessage} from '@/ts/types/messages/wsInMessages';
 
 
 export type P2PHandlerType<A extends string> = (a: DefaultP2pMessage<A>) => void|Promise<void>;
@@ -27,6 +29,14 @@ export interface DefaultP2pMessage<A extends string> extends DefaultMessage<A>, 
 
 
 export interface ExchangeMessageInfoResponse3 extends DefaultP2pMessage<'exchangeMessageInfoResponse3'>, CallBackMessage {
+}
+
+export interface SetMessageStatusRequest extends DefaultP2pMessage<'setMessageStatus'>, CallBackMessage  {
+  status: MessageStatus;
+  messagesIds: number[];
+}
+
+export interface ConfirmSetMessageStatusRequest extends DefaultP2pMessage<'confirmSetMessageStatusRequest'> {
 }
 
 export interface ExchangeMessageInfoResponse extends DefaultP2pMessage<'exchangeMessageInfoResponse'>, CallBackMessage {
