@@ -1,9 +1,12 @@
+import {MessageStatus} from '@/ts/types/model';
+
 export interface MessageP2pDto {
   id: number;
   content: string|null;
   files: Record<string, FileP2pDto>;
   timeAgo: number;
   symbol: string|null;
+  status: MessageStatus;
   parentMessage: number|null;
   deleted: boolean;
   giphy: string|null;

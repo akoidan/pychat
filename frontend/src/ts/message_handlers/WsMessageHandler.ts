@@ -322,7 +322,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
-
   public async printMessage(inMessage: PrintMessage) {
     const message: MessageModel = convertMessageModelDtoToModel(inMessage, null, time => this.ws.convertServerTimeToPC(time));
     this.messageHelper.processUnknownP2pMessage(message);

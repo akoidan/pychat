@@ -57,4 +57,5 @@ export interface SendNewP2PMessage extends DefaultP2pMessage<'sendNewP2PMessage'
 }
 
 export interface ConfirmReceivedP2pMessage extends DefaultP2pMessage<'confirmReceivedP2pMessage'> {
+  status?: MessageStatus;
 }
