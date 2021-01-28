@@ -133,6 +133,12 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
       action: 'confirmReceivedP2pMessage',
       resolveCbId: payload.cbId
     };
+    if (payload.message.userId !== this.store.myId) {
+      let isRead = this.store.isCurrentWindowActive && this.store.activeRoomId === this.roomId;
+      if (isRead) {
+        response.status = 'read';
+      }
+    }
     this.messageProc.sendToServer(response);
   }
 
@@ -143,9 +149,17 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
         message: messageModelToP2p(this.room.messages[payload.id]),
         action: 'sendNewP2PMessage',
       }
-      await this.messageProc.sendToServerAndAwait(message);
+      let response: ConfirmReceivedP2pMessage = await this.messageProc.sendToServerAndAwait(message);
       if (!this.isConnectedToMyAnotherDevices) {
-        this.store.markMessageAsSent({messagesId: [payload.id], roomId: this.roomId});
+        if (response.status) {
+          this.store.setMessagesStatus({
+            roomId: this.roomId,
+            status: response.status,
+            messagesIds: [payload.id]
+          })
+        } else {
+          this.store.markMessageAsSent({messagesId: [payload.id], roomId: this.roomId});
+        }
       }
     }
   }

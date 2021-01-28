@@ -1,9 +1,11 @@
 import {
   ChannelModel,
   CurrentUserInfoModel,
-  CurrentUserSettingsModel, FileModel,
+  CurrentUserSettingsModel,
+  FileModel,
   Location,
   MessageModel,
+  MessageStatus,
   RoomModel,
   RoomSettingsModel,
   SexModelString,
@@ -180,6 +182,7 @@ export function messageModelToP2p(m: MessageModel): MessageP2pDto {
     files: {},
     giphy: m.giphy,
     id: m.id,
+    status: m.status,
     parentMessage: m.parentMessage,
     symbol: m.symbol,
     timeAgo: Date.now() - m.time,
@@ -231,7 +234,10 @@ export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessa
 }
 
 export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageModel {
-  console.error("TODO")
+  let status: MessageStatus = 'received';
+  if (m.status === 'read') {
+    status = 'read';
+  }
   return {
     content: m.content,
     deleted: m.deleted,
@@ -247,7 +253,7 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     symbol: m.symbol,
     time: Date.now() - m.timeAgo,
     userId: m.userId,
-    status: 'received',
+    status,
     roomId,
     isHighlighted: false,
     transfer: null
