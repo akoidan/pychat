@@ -17,6 +17,7 @@ export interface RoomNoUsersDto {
   notifications: boolean;
   p2p: boolean;
   volume: number;
+  isMainInChannel: boolean;
   roomId: number;
   name: string;
   roomCreatorId: number;

@@ -23,6 +23,7 @@ export interface RoomDB {
   p2p: BooleanDB;
   volume: number;
   channel_id: number;
+  is_main_in_channel: BooleanDB;
   deleted: BooleanDB ;
   creator: number;
 }

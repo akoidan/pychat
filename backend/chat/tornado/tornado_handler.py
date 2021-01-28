@@ -147,12 +147,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 
 		was_online = len(online.get(self.user_id)) > 1 # if other tabs are opened
 		user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
-			.values('id', 'name', 'creator_id', 'channel_id', 'p2p', 'roomusers__notifications', 'roomusers__volume')
+			.values('id', 'name', 'creator_id', 'is_main_in_channel', 'channel_id', 'p2p', 'roomusers__notifications', 'roomusers__volume')
 		room_users = [{
 			VarNames.ROOM_ID: room['id'],
 			VarNames.ROOM_NAME: room['name'],
 			VarNames.CHANNEL_ID: room['channel_id'],
 			VarNames.ROOM_CREATOR_ID: room['creator_id'],
+			VarNames.IS_MAIN_IN_CHANNEL: room['is_main_in_channel'],
 			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
 			VarNames.P2P: room['p2p'],
 			VarNames.VOLUME: room['roomusers__volume'],

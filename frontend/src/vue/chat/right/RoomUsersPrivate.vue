@@ -16,9 +16,9 @@ import {
   UserModel
 } from '@/ts/types/model';
 import { PrivateRoomsIds } from '@/ts/types/types';
-import RoomRightIcon from '@/vue/chat/RoomRightIcon.vue';
+import RoomRightIcon from '@/vue/chat/right/RoomRightIcon.vue';
 import UserNameSex from '@/vue/chat/UserNameSex.vue';
-import RoomUsersWrapper from '@/vue/chat/RoomUsersWrapper.vue';
+import RoomUsersWrapper from '@/vue/chat/right/RoomUsersWrapper.vue';
 
 @Component({
   components: {RoomUsersWrapper, UserNameSex, RoomRightIcon}

@@ -300,6 +300,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
+  public async sendLeaveChannel(channelId: number): Promise<unknown> {
+    return this.messageProc.sendToServerAndAwait({
+      channelId,
+      action: 'leaveChannel'
+    });
+  }
+
   public async saveChannelSettings(channelName: string, channelId: number, channelCreatorId: number): Promise<SaveChannelSettingsMessage> {
     return this.messageProc.sendToServerAndAwait({
       action: 'saveChannelSettings',

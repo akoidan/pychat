@@ -44,9 +44,11 @@ import {
 } from '@/ts/types/messages/innerMessages';
 import UserProfileOauthSettings from '@/vue/pages/UserProfileOauthSettings.vue';
 import PainterPage from '@/vue/pages/PainterPage.vue';
-import ChatRightSection from '@/vue/chat/ChatRightSection.vue';
+import ChatRightSection from '@/vue/chat/right/ChatRightSection.vue';
 import ChatRightSectionPage from '@/vue/pages/ChatRightSectionPage.vue';
 import RoomUsersListPage from '@/vue/chat/RoomUsersListPage.vue';
+import ChannelConfigurationPage from '@/vue/pages/ChannelConfigurationPage.vue';
+import ChannelAddRoom from '@/vue/pages/ChannelAddRoom.vue';
 
 Vue.use(VueRouter);
 
@@ -143,12 +145,23 @@ export const router = new VueRouter({
           ]
         },
         {
+          component: ChannelConfigurationPage,
+          path: '/channel/:id',
+          children: [
+            {
+              path: 'settings',
+              component: ChannelSettings
+            },
+            {
+              path: 'room',
+              component: ChannelAddRoom
+            },
+          ]
+        },
+
+        {
           component: RoomSettings,
           path: '/room-settings/:id'
-        },
-        {
-          component: ChannelSettings,
-          path: '/channel-settings/:id'
         },
         {
           component: RoomUsersListPage,

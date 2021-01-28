@@ -19,7 +19,7 @@
     </table>
     <pick-user
       v-model="currentUsers"
-      text="Users in current channel"
+      text="Invite users"
       :users-ids="userIds"
     />
     <app-submit

@@ -229,7 +229,8 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 Change to frontend directory `cd frontend` I would recommend to use node version specified in nvm, so  `nvm install; nvm use`.
  - To get started install dependencies first: `yarn install --frozen-lock` # or use npm if you're old and cranky
  - Take a look at copy [development.json](frontend/development.json). The description is at [Frontend config](#frontend-config)
- - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080. If requests don't work, apply self-signed certificate by navigating to http://localhost:8888 . For chrome on mac you can also launch chrome with `--ignore-certificate-errors` or set flag `chrome://flags/#allow-insecure-localhost` 
+ - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080.
+ - If you websocket doesn't work. Go to http://localhost:8888 . For chrome you can run it with `--ignore-certificate-errors` or set flag `chrome://flags/#allow-insecure-localhost`. For MacOS chrome you can also type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
 

@@ -70,11 +70,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private readonly ws: WsHandler;
   private syncMessageLock: boolean = false;
   private readonly messageHelper: MessageHelper;
-  private vueStore: any;
 
   constructor(
       store: DefaultStore,
-      vueStore: any,
       api: Api,
       ws: WsHandler,
       messageHelper: MessageHelper
@@ -86,31 +84,14 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.logger = loggerFactory.getLogger('ws-message');
     this.ws = ws;
     this.messageHelper = messageHelper;
-    this.vueStore = vueStore;
-    this.vueStore.watch(() => this.store.activeRoomId, (value: number, oldValue: number) => {
-      if (this.store.activeRoom) {
-        this.markMessagesInCurrentRoomAsRead();
-      }
-    });
-    this.vueStore.watch(() => this.store.isCurrentWindowActive, (value: number, oldValue: number) => {
-      if (value && this.store.activeRoom) {
-        this.markMessagesInCurrentRoomAsRead();
-      }
-    });
   }
 
-  private markMessagesInCurrentRoomAsRead() {
-    this.logger.debug("Checking if we can set some messages to status read")();
-    let messagesIds = Object.values(this.store.activeRoom!.messages)
-        .filter(m => m.userId !== this.store.myId && m.status === 'received' ||  m.status === 'on_server')
-        .map(m => m.id);
-    if (messagesIds.length > 0) {
-      this.ws.setMessageStatus(
-          messagesIds,
-          this.store.activeRoomId!,
-          'read'
-      );
-    }
+  public async markMessagesInCurrentRoomAsRead(roomId: number, messagesIds: number[]) {
+    await this.ws.setMessageStatus(
+        messagesIds,
+        roomId,
+        'read'
+    );
   }
 
   public async syncMessages(): Promise<void> {

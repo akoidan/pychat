@@ -1,5 +1,6 @@
 <template>
   <div class="controls">
+    <div>{{ text }}</div>
     <div class="spanHo">
       <span
         v-for="currentUser in valueUsers"
@@ -13,7 +14,6 @@
       </span>
     </div>
     <template v-if="showAddUsersComp">
-      <div>{{ text }}</div>
       <input
         v-model="search"
         type="search"
@@ -97,6 +97,7 @@ export default class PickUser extends Vue {
 
   .controls
     display: flex
+    margin-top: 15px
     flex-direction: column
     > *
       margin-bottom: 5px

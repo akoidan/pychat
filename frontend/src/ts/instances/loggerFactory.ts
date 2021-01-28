@@ -2,4 +2,4 @@ import {
   LoggerFactory
 } from 'lines-logger';
 
-export default new LoggerFactory('debug');
+export default new LoggerFactory('trace');
