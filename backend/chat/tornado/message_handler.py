@@ -72,6 +72,7 @@ class MessagesHandler():
 			Actions.SAVE_CHANNEL_SETTINGS: self.save_channels_settings,
 			Actions.SAVE_ROOM_SETTINGS: self.save_room_settings,
 			Actions.DELETE_CHANNEL: self.delete_channel,
+			Actions.LEAVE_CHANNEL: self.leave_channel,
 			Actions.SET_USER_PROFILE: self.profile_save_user,
 			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
@@ -86,7 +87,10 @@ class MessagesHandler():
 		# The handler is determined by @VarNames.EVENT
 		self.process_pubsub_message = {
 			Actions.CREATE_ROOM: self.send_client_new_channel,
+			Actions.CREATE_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
+			Actions.LEAVE_CHANNEL: self.send_client_leave_group,
+			Actions.DELETE_CHANNEL: self.send_client_delete_group,
 			Actions.INVITE_USER: self.send_client_new_channel,
 			Actions.ADD_INVITE: self.send_client_new_channel,
 			Actions.PING: self.process_ping_message,
@@ -369,21 +373,48 @@ class MessagesHandler():
 		if not channel_name or len(channel_name) > 16:
 			raise ValidationError('Incorrect channel name name "{}"'.format(channel_name))
 
+		users = message.get(VarNames.ROOM_USERS)
 		channel = Channel(name=channel_name, creator_id=self.user_id)
 		channel.save()
 		channel_id = channel.id
+
+		users.append(self.user_id)
+		users = list(set(users))
+
+		room = Room(channel_id=channel_id, name=channel_name, is_main_in_channel=True, creator_id= self.user_id)
+		room.save()
+		room_id = room.id
+
+		ru = [RoomUsers(
+			user_id=user_id,
+			room_id=room_id
+		) for user_id in users]
+		RoomUsers.objects.bulk_create(ru)
+
 		m = {
-			VarNames.EVENT: Actions.CREATE_CHANNEL,
-			VarNames.CHANNEL_ID: channel_id,
-			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
-			VarNames.CB_BY_SENDER: self.id,
+			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_USERS: users,
+			VarNames.INVITER_USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
-			VarNames.CHANNEL_NAME: channel_name,
+			VarNames.P2P: False,
+			VarNames.IS_MAIN_IN_CHANNEL: True,
+			VarNames.ROOM_CREATOR_ID: self.user_id,
+			VarNames.NOTIFICATIONS: True,
+			VarNames.VOLUME: 2, ## default roomUsers model
+			VarNames.ROOM_NAME: room.name,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+			VarNames.CHANNEL_NAME: channel_name,
+			VarNames.CHANNEL_ID:  channel_id,
+			VarNames.EVENT: Actions.CREATE_CHANNEL,
+			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
+			VarNames.CB_BY_SENDER: self.id,
 		}
-		self.publish(m, self.channel)
-		
+
+		jsoned_mess = encode_message(m, True)
+		for user in users:
+			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
+
 	def create_new_room(self, message):
 		room_name = message.get(VarNames.ROOM_NAME)
 		users = message.get(VarNames.ROOM_USERS)
@@ -448,6 +479,8 @@ class MessagesHandler():
 			VarNames.INVITER_USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.VOLUME: message[VarNames.VOLUME],
+			VarNames.IS_MAIN_IN_CHANNEL: False,
+			VarNames.CHANNEL_ID: None,
 			VarNames.P2P: message[VarNames.P2P],
 			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
 			VarNames.ROOM_NAME: room_name,
@@ -519,6 +552,7 @@ class MessagesHandler():
 					VarNames.CHANNEL_CREATOR_ID: channel_creator_id,
 					VarNames.ROOM_CREATOR_ID: room.creator_id,
 					VarNames.ROOM_ID: room.id,
+					VarNames.IS_MAIN_IN_CHANNEL: room.is_main_in_channel,
 					VarNames.VOLUME: room_user.volume,
 					VarNames.NOTIFICATIONS: room_user.notifications,
 					VarNames.P2P: message[VarNames.P2P],
@@ -531,6 +565,7 @@ class MessagesHandler():
 				VarNames.EVENT: Actions.SAVE_ROOM_SETTINGS,
 				VarNames.CHANNEL_ID: room.channel_id,
 				VarNames.CB_BY_SENDER: self.id,
+				VarNames.IS_MAIN_IN_CHANNEL: room.is_main_in_channel,
 				VarNames.CHANNEL_CREATOR_ID: channel_creator_id,
 				VarNames.ROOM_CREATOR_ID: room.creator_id,
 				VarNames.HANDLER_NAME: HandlerNames.ROOM,
@@ -604,7 +639,7 @@ class MessagesHandler():
 		room_id = message[VarNames.ROOM_ID]
 		if room_id not in self.channels:
 			raise ValidationError("Access denied, only allowed for channels {}".format(self.channels))
-		room = Room.objects.get(id=room_id)
+		room = Room.objects.prefetch_related('channel').get(id=room_id)
 		if room.is_private:
 			raise ValidationError("You can't add users to direct room, create a new room instead")
 		users = message.get(VarNames.ROOM_USERS)
@@ -614,9 +649,6 @@ class MessagesHandler():
 			raise ValidationError("Users %s are already in the room", intersect)
 		users_in_room.extend(users)
 
-		max_id = Message.objects.filter(room_id=room_id).aggregate(Max('id'))['id__max']
-		if not max_id:
-			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
 		ru = [RoomUsers(
 			user_id=user_id,
 			room_id=room_id,
@@ -624,12 +656,12 @@ class MessagesHandler():
 			notifications=False
 		) for user_id in users]
 		RoomUsers.objects.bulk_create(ru)
-
 		add_invitee = {
 			VarNames.EVENT: Actions.ADD_INVITE,
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: users_in_room,
 			VarNames.ROOM_NAME: room.name,
+			VarNames.IS_MAIN_IN_CHANNEL: room.is_main_in_channel,
 			VarNames.INVITEE_USER_ID: users,
 			VarNames.INVITER_USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
@@ -637,6 +669,9 @@ class MessagesHandler():
 			VarNames.VOLUME: 1,
 			VarNames.NOTIFICATIONS: False,
 		}
+		if room.channel:
+			add_invitee[VarNames.CHANNEL_ID] = room.channel.id
+			add_invitee[VarNames.CHANNEL_NAME] = room.channel.name
 		add_invitee_dumped = encode_message(add_invitee, True)
 		for user in users:
 			self.raw_publish(add_invitee_dumped, RedisPrefix.generate_user(user))
@@ -666,28 +701,44 @@ class MessagesHandler():
 				self.close(408, "Ping timeout")
 		IOLoop.instance().call_later(settings.PING_CLOSE_SERVER_DELAY, call_check)
 
+	def leave_channel(self, message):
+		channel_id = message[VarNames.CHANNEL_ID]
+		js_id = message[VarNames.JS_MESSAGE_ID]
+		channel = Channel.objects.get(id=channel_id)
+		rooms = list(RoomUsers.objects.filter(room__channel_id=channel_id, user_id=self.user_id).prefetch_related('room'))
+		if len(rooms) > 1:
+			raise ValidationError(f"Please leave all the rooms first")
+		if len(rooms) == 0:
+			raise ValidationError(f"Not your room")
+		if channel.creator_id == self.user_id:
+			raise ValidationError(f"Admin can't leave ;(")
+		room_id = rooms[0].room_id
+		RoomUsers.objects.filter(room_id=room_id, user_id=self.user_id).delete()
+
+		ru = list(RoomUsers.objects.filter(room_id=room_id).values_list('user_id', flat=True))
+		message = self.message_creator.unsubscribe_direct_message(room_id, js_id, self.id, ru, channel.name, Actions.LEAVE_CHANNEL)
+		message[VarNames.CHANNEL_ID] = channel_id
+		self.publish(message, room_id, True)
+
 	def delete_channel(self, message):
 		channel_id = message[VarNames.CHANNEL_ID]
+		js_id = message[VarNames.JS_MESSAGE_ID]
 		channel = Channel.objects.get(id=channel_id)
 		if channel.creator_id != self.user_id:
 			raise ValidationError(f"Only admin can delete this channel. Please ask ${User.objects.get(id=channel.creator_id).username}")
-		# if Room.objects.filter(channel_id=channel_id).count() > 0:
-		users_id = list(RoomUsers.objects.filter(room__channel_id=channel_id).values_list('user_id', flat=True))
-		if len(users_id) > 0:
-			raise ValidationError(f"Some users are still in the rooms on this channel Please ask them to leave")
+		if Room.objects.filter(channel_id=channel_id, is_main_in_channel=False, disabled=False).count() > 0:
+			raise ValidationError("Remove all rooms first")
+		main_room = Room.objects.get(channel_id=channel_id, is_main_in_channel=True)
+
+		ru = list(RoomUsers.objects.filter(room_id=main_room.id).values_list('user_id', flat=True))
+		message = self.message_creator.unsubscribe_direct_message(main_room.id, js_id, self.id, ru, channel.name, Actions.DELETE_CHANNEL)
+		message[VarNames.CHANNEL_ID] = channel_id
+
 		Room.objects.filter(channel_id=channel_id).update(disabled=True)
+
 		channel.disabled = True
 		channel.save()
-
-		message = {
-			VarNames.EVENT: Actions.DELETE_CHANNEL,
-			VarNames.CHANNEL_ID: channel_id,
-			VarNames.HANDLER_NAME: HandlerNames.ROOM,
-			VarNames.TIME: get_milliseconds(),
-			VarNames.CB_BY_SENDER: self.id,
-			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID]
-		}
-		self.publish(message, self.channel)
+		self.publish(message, main_room.id, True)
 
 	def delete_room(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -703,7 +754,7 @@ class MessagesHandler():
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
-		message = self.message_creator.unsubscribe_direct_message(room_id, js_id, self.id, ru, room.name)
+		message = self.message_creator.unsubscribe_direct_message(room_id, js_id, self.id, ru, room.name, Actions.DELETE_ROOM)
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
@@ -775,6 +826,45 @@ class MessagesHandler():
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
+		
+	def send_client_delete_group(self, message):
+		room_id = message[VarNames.ROOM_ID]
+		channel_id = message[VarNames.CHANNEL_ID]
+		self.async_redis.unsubscribe((room_id,))
+		self.channels.remove(room_id)
+		channels = {
+			VarNames.EVENT: Actions.DELETE_CHANNEL,
+			VarNames.ROOM_ID: room_id,
+			VarNames.CHANNEL_ID: channel_id,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+		}
+		self.ws_write(channels)
+		return True
+
+	def send_client_leave_group(self, message):
+		room_id = message[VarNames.ROOM_ID]
+		channel_id = message[VarNames.CHANNEL_ID]
+		if message[VarNames.USER_ID] == self.user_id:
+			self.async_redis.unsubscribe((room_id,))
+			self.channels.remove(room_id)
+			channels = {
+				VarNames.EVENT: Actions.DELETE_CHANNEL,
+				VarNames.ROOM_ID: room_id,
+				VarNames.CHANNEL_ID: channel_id,
+				VarNames.HANDLER_NAME: HandlerNames.ROOM,
+				VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+			}
+			self.ws_write(channels)
+		else:
+			self.ws_write({
+				VarNames.EVENT: Actions.USER_LEAVES_ROOM,
+				VarNames.ROOM_ID: room_id,
+				VarNames.USER_ID: message[VarNames.USER_ID],
+				VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
+				VarNames.HANDLER_NAME: HandlerNames.ROOM
+			})
+		return True
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

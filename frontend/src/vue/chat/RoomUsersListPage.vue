@@ -1,6 +1,8 @@
 <template>
   <div class="current-room-users-table">
-    <div class="current-room-users-table-header">Users in room <b>{{room.name}}</b></div>
+    <div class="current-room-users-table-header">
+      {{ title }} <b>{{ room.name }}</b>
+    </div>
     <ul>
       <room-users-user
         v-for="user in usersArray"
@@ -9,7 +11,9 @@
       />
     </ul>
     <template v-if="userIds.length > 0">
-      <div class="current-room-users-table-header">Invite more users</div>
+      <div class="current-room-users-table-header">
+        Invite more users
+      </div>
       <div class="holder">
         <pick-user
           v-model="userdToAdd"
@@ -27,21 +31,23 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue
-} from 'vue-property-decorator';
-import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import {
-  RoomDictModel,
-  RoomModel, UserDictModel,
-  UserModel
-} from '@/ts/types/model';
-import RoomUsersUser from '@/vue/chat/RoomUsersUser.vue';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import PickUser from '@/vue/pages/parts/PickUser.vue';
+  import {
+    Component,
+    Vue
+  } from 'vue-property-decorator';
+  import {
+    ApplyGrowlErr,
+    State
+  } from '@/ts/instances/storeInstance';
+  import {
+    RoomDictModel,
+    UserDictModel
+  } from '@/ts/types/model';
+  import RoomUsersUser from '@/vue/chat/right/RoomUsersUser.vue';
+  import AppSubmit from '@/vue/ui/AppSubmit.vue';
+  import PickUser from '@/vue/pages/parts/PickUser.vue';
 
-@Component({
+  @Component({
   components: {RoomUsersUser,  AppSubmit, PickUser}
 })
 export default class RoomUsersListPage extends Vue {
@@ -62,6 +68,10 @@ export default class RoomUsersListPage extends Vue {
 
   get room() {
     return this.roomsDict[this.roomId];
+  }
+
+  get title() {
+    return this.room.isMainInChannel ? 'Users in group' : 'Users in room';
   }
 
   get usersArray() {
@@ -104,9 +114,6 @@ export default class RoomUsersListPage extends Vue {
     font-size: 24px
     width: 350px
     margin: auto
-
-  .header
-    @extend %header
 
   ul
     @extend %ul

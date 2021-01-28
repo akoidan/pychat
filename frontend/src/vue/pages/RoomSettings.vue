@@ -7,14 +7,17 @@
     <table>
       <tbody>
         <tr>
-          <td colspan="2" v-if="room.name" class="room-heder">
+          <td colspan="2" v-if="room.isMainInChannel" class="room-heder">
+            Group <b>{{room.name}}</b> settings
+          </td>
+          <td colspan="2" v-else-if="room.name" class="room-heder">
             Room <b>{{room.name}}</b> settings
           </td>
           <td colspan="2" v-else class="room-heder">
             User <b>{{user}}</b> settings
           </td>
         </tr>
-        <tr v-if="isPublic">
+        <tr v-if="isPublic && !room.isMainInChannel">
           <th>
             Name
           </th>
@@ -32,7 +35,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="isPublic">
+        <tr v-if="isPublic && !room.isMainInChannel">
           <th>Admin</th>
           <td v-if="canChangeAdmin">
             <pick-user
@@ -76,13 +79,7 @@
             <app-checkbox v-model="p2p" />
           </td>
         </tr>
-        <tr v-if="isPublic && !isMainRoom">
-          <th>Parent channel</th>
-          <td>
-            <parent-channel v-model="channelId"/>
-          </td>
-        </tr>
-        <tr v-if="!isMainRoom">
+        <tr v-if="!isMainRoom && !room.isMainInChannel">
           <td colspan="2">
             <app-submit
               type="button"
@@ -221,6 +218,7 @@ export default class RoomSettings extends Vue {
       volume: this.sound,
       notifications: this.notifications,
       name: this.roomName,
+      isMainInChannel: this.room.isMainInChannel,
       roomId: this.roomId,
       p2p: this.p2p,
       channelId: this.channelId

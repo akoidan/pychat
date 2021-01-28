@@ -19,7 +19,7 @@
 <script lang='ts'>
 import {Component, Vue, Watch, Ref} from 'vue-property-decorator';
 
-import ChatRightSection from '@/vue/chat/ChatRightSection.vue';
+import ChatRightSection from '@/vue/chat/right/ChatRightSection.vue';
 // import NavEditMessage from '@/vue/chat/NavEditMessage.vue';
 import ChatBoxes from '@/vue/chat/ChatBoxes.vue';
 import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';

@@ -124,6 +124,7 @@ export interface RoomSettingsModel {
   name: string;
   channelId: null | number;
   p2p: boolean;
+  isMainInChannel: boolean;
   notifications: boolean;
   volume: number;
   creator: number;
@@ -234,6 +235,7 @@ export interface ChannelModel {
 
 export interface ChannelUIModel extends ChannelModel {
   rooms: RoomModel[];
+  mainRoom: RoomModel;
 }
 
 export interface RoomModel extends RoomSettingsModel {

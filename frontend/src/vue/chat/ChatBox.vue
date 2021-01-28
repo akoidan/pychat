@@ -136,6 +136,12 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
     @State
     public readonly activeRoomId!: number;
 
+    @State
+    public readonly isCurrentWindowActive!: boolean;
+
+    @State
+    public readonly myId!: number;
+
     messageLoading: boolean = false;
     searchMessageLoading: boolean = false;
 
@@ -159,12 +165,31 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
       }
     }
 
+
+    @Watch('isCurrentWindowActive')
+    public onTabFocus(value: boolean) {
+      if (this.activeRoomId === this.room.id && value) {
+        this.markMessagesInCurrentRoomAsRead();
+      }
+    }
+
+    public markMessagesInCurrentRoomAsRead() {
+      this.$logger.debug("Checking if we can set some messages to status read")();
+      let messagesIds = Object.values(this.room!.messages)
+          .filter(m => m.userId !== this.myId && m.status === 'received' ||  m.status === 'on_server')
+          .map(m => m.id);
+      if (messagesIds.length > 0) {
+        this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
+      }
+    }
+
     @Watch('activeRoomId')
     public onActivate() {
       if (this.activeRoomId === this.room.id) {
-       this.$nextTick(() => {
-         this.textarea.userMessage.focus();
-       })
+        this.markMessagesInCurrentRoomAsRead();
+        this.$nextTick(() => {
+          this.textarea.userMessage.focus();
+        })
       }
     }
 
@@ -253,7 +278,11 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
       if (this.chatboxSearch.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-      await this.$messageSenderProxy.getMessageSender(this.room.id).loadUpSearchMessages(this.room.id, n, () => true);
+      await this.messageSender.loadUpSearchMessages(this.room.id, n, () => true);
+    }
+
+    private get messageSender() {
+      return this.$messageSenderProxy.getMessageSender(this.room.id);
     }
 
     @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})
@@ -261,7 +290,7 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
       if (this.chatbox.scrollTop !== 0) {
         return; // we're just scrolling up
       }
-      await this.$messageSenderProxy.getMessageSender(this.room.id).loadUpMessages(this.room.id, n);
+      await this.messageSender.loadUpMessages(this.room.id, n);
     }
 
     onSearchScroll(e: WheelEvent) {

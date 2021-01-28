@@ -80,7 +80,8 @@ export interface LeaveUserMessage extends DefaultWsInMessage<'leaveUser', 'room'
   users: number[];
 }
 
-export interface AddChannelMessage extends DefaultWsInMessage<'addChannel', 'room'> , ChannelDto {
+export interface AddChannelMessage extends DefaultWsInMessage<'addChannel', 'room'> , ChannelDto, Omit<RoomDto, 'channelId'>, NewRoom {
+  channelUsers: number[];
 }
 
 export interface InviteUserMessage extends NewRoom, RoomExistedBefore, DefaultWsInMessage<'inviteUser', 'room'> {
@@ -95,6 +96,12 @@ export interface SaveChannelSettingsMessage extends DefaultWsInMessage<'saveChan
 }
 
 export interface DeleteChannelMessage extends DefaultWsInMessage<'deleteChannel', 'room'> {
+  channelId: number;
+  roomId: number;
+}
+
+export interface LeaveChannelMessage extends DefaultWsInMessage<'leaveChannel', 'room'> {
+  userId: number;
   channelId: number;
 }
 
@@ -122,6 +129,8 @@ export interface WebRtcSetConnectionIdMessage extends WebRtcDefaultMessage, Defa
 }
 
 export interface AddRoomMessage extends AddRoomBase, DefaultWsInMessage<'addRoom', 'room'> {
+  channelUsers: number[];
+  channelId: number;
 }
 
 export interface OfferFile extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'offerFile', 'webrtc'> {

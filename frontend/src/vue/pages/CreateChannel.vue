@@ -8,21 +8,26 @@
           </th>
           <td>
             <input
-                v-model="channelName"
-                type="text"
-                class="input"
-                maxlength="16"
+              v-model="channelName"
+              type="text"
+              class="input"
+              maxlength="16"
             />
           </td>
         </tr>
       </tbody>
     </table>
+    <pick-user
+      v-model="currentUsers"
+      text="Invite users"
+      :users-ids="userIds"
+    />
     <app-submit
-        type="button"
-        value="Create Channel"
-        class="green-btn"
-        :running="running"
-        @click.native="add"
+      type="button"
+      value="Create Group"
+      class="green-btn"
+      :running="running"
+      @click.native="add"
     />
   </div>
 </template>
@@ -31,19 +36,25 @@ import {Component, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
+import PickUser from '@/vue/pages/parts/PickUser.vue';
 
-@Component({components: {AppSubmit}})
+@Component({components: {PickUser, AppSubmit}})
   export default class CreateChannel extends Vue {
     public channelName: string = '';
     public running: boolean = false;
+    public currentUsers: number[] = [];
 
+
+  get userIds(): number[] {
+    return this.$store.usersArray.map(u => u.id)
+  }
 
     @ApplyGrowlErr({runningProp: 'running', message: 'Unable to add channel'})
     public async add() {
       if (!this.channelName) {
         throw Error('Please specify a channel name');
       }
-      let e = await this.$ws.sendAddChannel(this.channelName);
+      let e = await this.$ws.sendAddChannel(this.channelName, this.currentUsers);
       this.$store.growlSuccess(`Channel '${this.channelName}' has been created`);
       this.$router.replace(`/chat/${ALL_ROOM_ID}`);
     }

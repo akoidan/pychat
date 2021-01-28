@@ -48,6 +48,7 @@ class Actions(object):
 	SAVE_CHANNEL_SETTINGS = 'saveChannelSettings'
 	SAVE_ROOM_SETTINGS = 'saveRoomSettings'
 	DELETE_CHANNEL = 'deleteChannel'
+	LEAVE_CHANNEL = 'leaveChannel'
 
 
 class VarNames(object):
@@ -75,6 +76,7 @@ class VarNames(object):
 	CHANNEL_NAME = 'channelName'
 	CHANNEL_ID = 'channelId'
 	ROOM_CREATOR_ID = 'roomCreatorId'
+	IS_MAIN_IN_CHANNEL = 'isMainInChannel'
 	CHANNEL_CREATOR_ID = 'channelCreatorId'
 	NOTIFICATIONS = 'notifications'
 	VOLUME = 'volume'

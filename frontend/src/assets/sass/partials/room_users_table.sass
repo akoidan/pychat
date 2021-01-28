@@ -2,20 +2,10 @@
 @import "~@/assets/sass/partials/mixins"
 @import "~@/assets/sass/partials/abstract_classes"
 
-%header
-  display: block
-  font-size: 13px
-  font-weight: bold
-  @extend %user-select-none
-  text-transform: uppercase
-  vertical-align: middle
-  padding: 5px
 
 .color-reg
   %link
     color: $color-lor-main
-  %header
-    background-color: #171717
   %active-room
     background-color: rgba(33, 158, 147, 0.45)
   %header-left-icon
@@ -24,9 +14,6 @@
     @include hover-click(#59b2c1)
 
 .color-lor
-  %header
-    background-color: #221f1f
-    color: #8f8f8f
   %active-room
     background-color: #375a70
   %icon-cog
@@ -35,9 +22,6 @@
 .color-white
   %link
     color: $color-white-main
-  %header
-    background-color: #414141
-    color: white
   %active-room
     background-color: #656888
   %header-left-icon

@@ -44,6 +44,7 @@ import {
   DeleteChannelMessage,
   DeleteRoomMessage,
   InviteUserMessage,
+  LeaveChannelMessage,
   LeaveUserMessage,
   RemoveOnlineUserMessage,
   SaveChannelSettingsMessage,
@@ -125,10 +126,6 @@ export class RoomHandler extends MessageHandler  {
 
   public addRoom(message: AddRoomMessage) {
     this.mutateRoomAddition(message, 'room_created');
-    if (message.channelId) {
-      let channelDict: ChannelModel = getChannelDict(message as  Omit<AddRoomMessage, 'channelId'> & { channelId: number; });
-      this.store.addChannel(channelDict);
-    }
   }
   public removeOnlineUser(message: RemoveOnlineUserMessage) {
     if (message.content[message.userId].length === 0) {
@@ -138,8 +135,7 @@ export class RoomHandler extends MessageHandler  {
   }
 
   public addChannel(message: AddChannelMessage) {
-    let channelDict: ChannelModel = getChannelDict(message);
-    this.store.addChannel(channelDict);
+    this.mutateRoomAddition(message, 'room_created');
   }
 
   public inviteUser(message: InviteUserMessage) {
@@ -195,6 +191,7 @@ export class RoomHandler extends MessageHandler  {
 
   public deleteChannel(message: DeleteChannelMessage) {
     this.store.deleteChannel(message.channelId);
+    this.doRoomDelete(message.roomId);
   }
 
   public async showIType(message: ShowITypeMessage) {
@@ -219,21 +216,25 @@ export class RoomHandler extends MessageHandler  {
 
 
   public deleteRoom(message: DeleteRoomMessage) {
-    if (this.store.roomsDict[message.roomId]) {
-      if (this.store.activeRoomId === message.roomId) {
-        let m : RouterNavigateMessage = {
+    this.doRoomDelete(message.roomId);
+  }
+
+  private doRoomDelete( roomId: number) {
+    if (this.store.roomsDict[roomId]) {
+      if (this.store.activeRoomId === roomId) {
+        let m: RouterNavigateMessage = {
           action: 'navigate',
           handler: 'router',
           to: `/chat/${ALL_ROOM_ID}`,
-        }
-        this.store.growlInfo(`Room #${message.roomId} has been deleted. Navigating to main room`)
+        };
+        this.store.growlInfo(`Room #${roomId} has been deleted. Navigating to main room`);
         sub.notify(m);
       }
-      this.store.deleteRoom(message.roomId);
+      this.store.deleteRoom(roomId);
     } else {
-      this.logger.error('Unable to find room {} to delete', message.roomId)();
+      this.logger.error('Unable to find room {} to delete', roomId)();
     }
-    this.notifyDevicesChanged(null, message.roomId, 'i_deleted');
+    this.notifyDevicesChanged(null, roomId, 'i_deleted');
   }
 
   public logout(m: LogoutMessage) {
@@ -317,9 +318,12 @@ export class RoomHandler extends MessageHandler  {
     sub.notify(message);
   }
 
-
-
   private mutateRoomAddition(message: AddRoomBase, type: 'room_created' | 'invited') {
+    if (message.channelId) {
+      //as (Omit<AddRoomMessage, 'action'> & {action: 'addChannel'})
+      let channelDict: ChannelModel = getChannelDict(message as any);
+      this.store.addChannel(channelDict);
+    }
     const r: RoomModel = getRoomsBaseDict(message);
     this.store.addRoom(r);
     this.store.addRoomLog({

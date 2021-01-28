@@ -199,6 +199,7 @@ class Channel(Model):
 
 
 class Room(Model):
+	is_main_in_channel = BooleanField(default=False, null=False)
 	name = CharField(max_length=16, null=True, blank=True)
 	channel = ForeignKey(Channel, PROTECT, null=True)
 	p2p = BooleanField(default=False, null=False)

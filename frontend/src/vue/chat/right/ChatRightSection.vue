@@ -2,6 +2,7 @@
   <div class="chat-room-users-wrapper">
     <room-direct-users-table />
     <room-public-table />
+    <channel-table />
   </div>
 </template>
 <script lang="ts">
@@ -9,13 +10,19 @@ import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import RoomDirectUsersTable from '@/vue/chat/RoomDirectUsersTable.vue';
-import RoomPublicTable from '@/vue/chat/RoomPublicTable.vue';
+import RoomDirectUsersTable from '@/vue/chat/right/RoomDirectUsersTable.vue';
+import RoomPublicTable from '@/vue/chat/right/RoomPublicTable.vue';
+import ChannelTable from '@/vue/chat/right/ChannelTable.vue';
 
 @Component({
-  components: {RoomPublicTable, RoomDirectUsersTable}
+  components: {
+    ChannelTable,
+    RoomPublicTable,
+    RoomDirectUsersTable
+  }
 })
 export default class ChatRightSection extends Vue {
+
 
 }
 </script>

@@ -23,12 +23,6 @@
             <app-checkbox v-model="p2p" />
           </td>
         </tr>
-        <tr v-if="isPublic">
-          <th>Parent channel</th>
-          <td>
-            <parent-channel v-model="selectedChannelId"/>
-          </td>
-        </tr>
         <tr v-if="!p2p">
           <th>
             Notifications
@@ -79,14 +73,20 @@ import {
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import PickUser from '@/vue/pages/parts/PickUser.vue';
-import { CurrentUserInfoModel } from '@/ts/types/model';
+import {CurrentUserInfoModel} from '@/ts/types/model';
 import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
-import { PrivateRoomsIds } from '@/ts/types/types';
+import {PrivateRoomsIds} from '@/ts/types/types';
 import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
 
-@Component({components: {
-    ParentChannel,
-    AppCheckbox, AppInputRange, AppSubmit, PickUser}})
+@Component({
+components: {
+  ParentChannel,
+  AppCheckbox,
+  AppInputRange,
+  AppSubmit,
+  PickUser
+}
+})
 export default class CreateRoom extends Vue {
 
   @State
@@ -98,11 +98,15 @@ export default class CreateRoom extends Vue {
   public notifications: boolean = false;
   public sound: number = 0;
   public p2p: boolean = false;
-  public selectedChannelId: number|null = null;
   public roomName: string = '';
   public running: boolean = false;
 
   @Prop() public isPublic!: boolean;
+
+  @Prop() public readonly parentChannelId!: number;
+
+  @Prop()
+  public readonly userIds!: number[];
 
   get inviteUsers(): string {
     return this.isPublic ? 'Invite users to new room' : 'Select user for private room';
@@ -110,26 +114,6 @@ export default class CreateRoom extends Vue {
 
   get showInviteUsers() {
     return this.isPublic || this.currentUsers.length < 1;
-  }
-
-
-  get userIds(): number[] {
-
-    let uids: number[];
-    if (!this.isPublic) {
-      uids = Object.values(this.privateRoomsUsersIds.roomUsers);
-    } else {
-      uids = [];
-    }
-    uids.push(this.userInfo.userId);
-
-    const users: number[] = [];
-    this.$store.usersArray.forEach(a => {
-      if (uids.indexOf(a.id) < 0) {
-        users.push(a.id);
-      }
-    });
-    return users;
   }
 
 
@@ -147,7 +131,7 @@ export default class CreateRoom extends Vue {
         this.sound,
         !this.p2p && this.notifications,
         this.currentUsers,
-        this.selectedChannelId
+        this.parentChannelId ? this. parentChannelId : null
     );
     this.$router.replace(`/chat/${e.roomId}`);
   }

@@ -73,6 +73,7 @@ export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
     p2p: r.p2p,
     id: r.roomId,
     name: r.name,
+    isMainInChannel: r.isMainInChannel,
     notifications: r.notifications,
     volume: r.volume,
     creator: r.roomCreatorId
@@ -84,6 +85,7 @@ export function getRoomsBaseDict(
       roomId,
       volume,
       channelId,
+      isMainInChannel,
       notifications,
       roomCreatorId ,
       p2p,
@@ -99,6 +101,7 @@ export function getRoomsBaseDict(
     channelId,
     volume,
     p2p,
+    isMainInChannel,
     usersTyping: {},
     p2pInfo: {
       liveConnections: []

@@ -1,6 +1,6 @@
 <template>
   <div class="holder">
-    <div class="links">
+    <app-tab class="tab">
       <router-link to="/profile/user-info">
         User info
       </router-link>
@@ -16,7 +16,7 @@
       <router-link to="/profile/oauth-settings" v-if="GOOGLE_OAUTH_2_CLIENT_ID && FACEBOOK_APP_ID">
         Social accounts
       </router-link>
-    </div>
+    </app-tab>
     <div class="container">
       <keep-alive>
         <router-view class="profileInner" />
@@ -27,9 +27,10 @@
 <script lang="ts">
 import { GOOGLE_OAUTH_2_CLIENT_ID , FACEBOOK_APP_ID} from '@/ts/utils/consts';
 import {Component, Vue} from 'vue-property-decorator';
-
-
-@Component
+import AppTab from '@/vue/ui/AppTab.vue';
+@Component({
+  components: {AppTab}
+})
 export default class UserProfile extends Vue {
   private readonly GOOGLE_OAUTH_2_CLIENT_ID = GOOGLE_OAUTH_2_CLIENT_ID;
   private readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
@@ -42,35 +43,8 @@ export default class UserProfile extends Vue {
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/abstract_classes"
 
-  .color-white .links a
-    color: #c3fffd
-    &.router-link-active
-      color: #e8e156
-
-
-  .links
-    display: flex
+  .tab
     max-width: 680px
-    margin: auto
-    margin-top: 10px
-    padding: 8px
-    justify-content: space-between
-    a
-      color: $link-color
-      &:hover
-        cursor: pointer
-        text-decoration: underline
-      &.router-link-active
-        color: #ffc000
-        text-decoration: underline
-
-  @media screen and (max-width: $collapse-width)
-    .links
-      flex-direction: column
-      padding: 0
-      a
-        text-align: center
-        padding: 4px
 
   .profileInner /deep/
     button

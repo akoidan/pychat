@@ -183,6 +183,11 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     throw new Error('Searching message is not supported on p2p direct channel yet');
   }
 
+  markMessagesInCurrentRoomAsRead(roomId: number, messageIds: number[]): Promise<void> {
+
+    return Promise.resolve();
+  }
+
   loadMessages(roomId: number, messageId: number[]): Promise<void> {
     this.logger.error('Method not implemented.')();
     return Promise.resolve();
