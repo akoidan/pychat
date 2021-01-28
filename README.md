@@ -35,40 +35,35 @@
 - [TODO](#todo)
 
 # About
-This is free web (browser) chat, that features:
- - Sending instant text messages, images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/) using selfhosted server and websockets
- - Making calls and video conferences using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
- - Sharing screen during call or conference.
- - Drawing images and stream them during video calls with [spainter](https://github.com/akoidan/spainter)
- - Sending files or text messages directly to another PC (bypassing server) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
- - Login with social media
- - Sending offline messages with Firebase push notifications
+Pychat is an opensource absolutely free communcation tool targeted for a copmany use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
 
 # When should I use pychat
-|                        | Pychat | Slack | Skype | Telegram | Viber |
-|------------------------|--------|-------|-------|----------|-------|
-| Open Source            | +      | -     | -     | -        | -     |
-| Free                   | +      | +/-   | +/-   | +        | +/-   |
-| Screen sharing         | +      | +     | -     | -        | -     |
-| Stream drawing         | +      | -     | -     | -        | -     |
-| Syntax highlight       | +      | -     | -     | -        | -     |
-| Unlimited history      | +      | +/-   | +     | +        | +     |
-| Audio/Video conference | +      | +     | +     | +        | -     |
-| Can run on your server | +      | -     | -     | -        | -     |
-| Audio/Video messages   | +      | -     | -     | +        | +     |
-| P2P file sharing       | +      | -     | -     | -        | -     |
-| P2P messaging*         | +      | -     | -     | -        | -     |
-| Desktop client         | +      | +     | +     | +        | +/-   |
-| Mobile client          | +      | +     | +     | +        | +     |
-| GCM phone call         | -      | -     | +/-   | -        | +/-   |
-| 3rd-party integration  | -      | +     | -     | -        | -     | 
+|                        | Pychat | Slack | Skype | Telegram | Viber | Discord |
+|------------------------|--------|-------|-------|----------|-------|---------|
+| Open Source            | +      | -     | -     | -        | -     | -       |
+| Free                   | +      | +/-   | +/-   | +        | +/-   | +/-     |
+| Screen sharing         | +      | +     | -     | -        | -     | +       |
+| Stream drawing         | +      | -     | -     | -        | -     | -       |
+| Syntax highlight       | +      | -     | -     | -        | -     | +       |
+| Only company users     | +      | +     | -     | -        | -     | +       |
+| Audio/Video conference | +      | +     | +     | +        | -     | +       |
+| Can run on your server | +      | -     | -     | -        | -     | -       |
+| Audio/Video messages   | +      | -     | -     | +        | +     | -       |
+| P2P file sharing       | +      | -     | -     | -        | -     | -       |
+| P2P messaging          | +      | -     | -     | -        | -     | -       |
+| Message read status    | +      | -     | +     | +        | +     | -       |
+| Tagging user           | +      | +     | -     | +        | +     | +       |
+| Message threads        | +      | +     | -     | -        | -     | -       |
+| Desktop client         | +/-    | +     | +     | +        | +/-   | +       |
+| Mobile client          | +/-    | +     | +     | +        | +     | +       |
+| 3rd-party plugins      | -      | +     | -     | -        | -     | +       |
 
-None of other client use p2p for message exchange or file sharing which makes them less secure (you can verify that by opening devtools and checking chrome://webrtc-internals/). Also they lack features like drawing during the conference and screen sharing (but slack). If you don't care that your message store on another server and you could miss some features above from pychat I would personally chose clients bellow instead of pychat:
- - Slack. But be aware it will make you pay by pushing features like unlimited history and other things in the end of the day.
- - If slack is not an option, go with telegram/discord. But be aware that it has a lot of other users and bots that may interfere with your busines.
- - I would never use viber/skype/whatsapp or any other messages in 2021. They have a lot of disadvantages comparing to discord/telegram/slack.
+I would personally use discord or slack as a company chat. They are built and maintained by thousands of people rather than a single person. BUT wait!!! There're some key factors of picking pychat over others:
 
-If you still feel enthusiastic for bleeding-edge opensource project, try pychat with instructions bellow!
+ 1. Being opensource. If you need to add some custom tool or feature, you will never able to do this with any other messanger. Slack and discord provides plugins but they are still limited.
+ 2. Being absolutely free. You don't need to pay anything to use or setup pychat at all. You can host pychat on low-end hardware like Raspberry Pi which costs under 50$ and will easily handle thousands of active users. Slack and Discord [will charge you](https://www.chanty.com/blog/discord-vs-slack/) for the set of features you need now or WILL need in the future. Telegram/Skype/Viber and etc are not corporate chats and they lack a lot of features and there're people all over the world which could accidentaly be invited to your group. 
+ 3. Security. All of the chats above are SAAS solutions, but not Pychat! Remember wHen you chose any messangers, all of your communication is stored on external hard drive which is always less secure. Some messangers like viber or whatsapp backup do not store messages but rather backup history to your google driver. But that often leads to holes in history and broken search. Also only pychat features p2p file sharing. Do you still use messangers to echange ssh keys or any other secure files? Never store them on the server! Only with pychat you can send file directly to another person ommiting persisting it on the server.
+ 4. You just feel enthusiastic for bleeding-edge opensource projects. 
 
 # How to host pychat
 
@@ -478,6 +473,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* pasting from painterpage doesn't work
 * lastTimeOnline
 * /giphy should work exactly like mention with drop above
 * quote should work similar to tag user

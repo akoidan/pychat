@@ -123,7 +123,7 @@
     "npm-font-open-sans": "1.1.0",
     "postinstall-postinstall": "^2.1.0",
     "reflect-metadata": "0.1.13",
-    "spainter": "^1.2.7",
+    "spainter": "^1.2.10",
     "typeface-oswald": "0.0.75",
     "vue": "2.6.10",
     "vue-router": "3.1.3",

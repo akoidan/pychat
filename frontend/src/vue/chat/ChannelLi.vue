@@ -44,6 +44,8 @@ import RoomUsersPublic from '@/vue/chat/RoomUsersPublic.vue';
 
   li
     @extend %li
+    &:hover
+      padding-right: 25px
     color: #b89e00
   .icon-cog
     @extend %icon-cog

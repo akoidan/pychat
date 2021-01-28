@@ -14,7 +14,7 @@ class Command(BaseCommand):
 	help = 'fills chat_ip_address.country_code'
 
 	def handle(self, *args, **options):
-		for ip in IpAddress.objects.all():
+		for ip in IpAddress.objects.filter(country__isnull=True):
 			try:
 				f = urlopen(api_url % ip.ip)
 				raw_response = f.read().decode("utf-8")
@@ -28,5 +28,6 @@ class Command(BaseCommand):
 				ip.city = response['city'],
 				ip.country_code = response['countryCode']
 				ip.save()
+				print("Saved %s", raw_response)
 			except Exception as e:
 				print("Skip %s because %s" % (ip, e))

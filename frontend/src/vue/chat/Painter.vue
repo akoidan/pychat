@@ -8,7 +8,6 @@ import {
   Ref,
   Vue
 } from 'vue-property-decorator';
-import Spainter from 'spainter';
 
 import loggerFactory from '@/ts/instances/loggerFactory';
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
@@ -27,10 +26,9 @@ export default class Painter extends Vue {
   @Ref()
   public div!: HTMLElement;
 
-  public painter!: Spainter;
-
-  public mounted() {
-    this.painter = new Spainter(this.div, {
+  public async mounted() {
+    let painterImport = await import(/* webpackChunkName: "spainter" */ 'spainter');
+    new painterImport.default(this.div, {
       textClass: 'input',
       buttonClass: 'lor-btn',
       logger: loggerFactory.getLogger('painter'),

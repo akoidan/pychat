@@ -31,7 +31,7 @@
         @hang-up-call="hangUpCall"
         @video-click="videoClick"
         @paint-click="paintClick"
-        @invert-show-settings="invertShowSetings"
+        @invert-show-settings="invertShowSettings"
         @desktop-click="desktopClick"
         @enter-fullscreen="enterFullscreen"
         @invert-show-video-container="invertShowVideoContainer"
@@ -106,9 +106,12 @@ export default class ChatCall extends Vue {
 
   onCanvas(canvas: HTMLCanvasElement) {
     this.$webrtcApi.setCanvas(this.roomId, canvas);
+    if (this.callInfo.callActive) {
+      this.$webrtcApi.toggleDevice(this.roomId, VideoType.PAINT);
+    }
   }
 
-  invertShowSetings() {
+  invertShowSettings() {
     this.showSettings = !this.showSettings;
   }
 
@@ -172,7 +175,7 @@ export default class ChatCall extends Vue {
       type: 'paint'
     };
     this.$store.setVideoToState(payload);
-    if (this.callInfo.callActive) {
+    if (this.callInfo.callActive && !this.callInfo.sharePaint) {
       this.$webrtcApi.toggleDevice(this.roomId, VideoType.PAINT);
     }
   }
@@ -234,7 +237,7 @@ export default class ChatCall extends Vue {
     border-right: 7.5px solid #1a1a1a
     display: inline-block
     max-width: 100%
-    max-height: 100%
+    max-height: calc(100% - 160px)
     text-align: center
 
     label

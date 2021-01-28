@@ -411,11 +411,11 @@ class IssueDetails(Model):
 
 class IpAddress(Model):
 	ip = CharField(null=False, max_length=32, unique=True)
-	isp = CharField(null=True, max_length=32, blank=True)
+	isp = CharField(null=True, max_length=255, blank=True)
 	country_code = CharField(null=True, max_length=16, blank=True)
-	country = CharField(null=True, max_length=32, blank=True)
-	region = CharField(null=True, max_length=32, blank=True)
-	city = CharField(null=True, max_length=32, blank=True)
+	country = CharField(null=True, max_length=64, blank=True)
+	region = CharField(null=True, max_length=64, blank=True)
+	city = CharField(null=True, max_length=64, blank=True)
 	lat = FloatField(null=True, blank=True)
 	lon = FloatField(null=True, blank=True)
 	zip = CharField(null=True, max_length=32, blank=True)
