@@ -29,14 +29,16 @@ import {
   AddSendingFileTransfer,
   BooleanIdentifier,
   IStorage,
+  LiveConnectionLocation,
   MarkMessageAsRead,
   MediaIdentifier,
   MessagesLocation,
   NumberIdentifier,
   PrivateRoomsIds,
   RemoveMessageProgress,
-  RoomMessageIds,
   RoomLogEntry,
+  RoomMessageIds,
+  RoomMessagesIds,
   SetCallOpponent,
   SetDevices,
   SetFileIdsForMessage,
@@ -47,22 +49,20 @@ import {
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
   SetRoomsUsers,
+  SetSearchStateTo,
+  SetSearchTextTo,
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
-  StringIdentifier,
-  LiveConnectionLocation,
-  RoomMessagesIds,
+  SetUploadXHR,
   ShareIdentifier,
-  SetSearchStateTo,
-  SetSearchTextTo,
-  SetUploadXHR
+  StringIdentifier
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
   SetStateFromWS
 } from '@/ts/types/dto';
-import { encodeHTML } from '@/ts/utils/htmlApi';
+import {encodeHTML} from '@/ts/utils/htmlApi';
 import {
   ALL_ROOM_ID,
   SHOW_I_TYPING_INTERVAL
@@ -237,11 +237,16 @@ export class DefaultStore extends VuexModule {
             id: channel.id,
             expanded: channel.expanded,
             rooms: [],
+            mainRoom: null!,
             name: channel.name,
             creator: channel.creator,
           };
         }
-        dict[channelId].rooms.push(current);
+        if (current.isMainInChannel) {
+          dict[channelId].mainRoom = current; // TODO throw error on invalid structure
+        } else {
+          dict[channelId].rooms.push(current);
+        }
       }
       return dict;
     } , {} as ChannelsDictUIModel)
@@ -250,7 +255,8 @@ export class DefaultStore extends VuexModule {
         .filter(k => !result[k]).reduce(((previousValue, currentValue) => {
             previousValue[currentValue] = {
               ...this.channelsDict[currentValue],
-              rooms: []
+              rooms: [],
+              mainRoom: null!,
             };
             return previousValue;
           }), result);
@@ -704,6 +710,7 @@ export class DefaultStore extends VuexModule {
     room.name = srm.name;
     room.p2p = srm.p2p;
     room.channelId = srm.channelId;
+    room.isMainInChannel = srm.isMainInChannel;
     this.storage.updateRoom(srm);
   }
 

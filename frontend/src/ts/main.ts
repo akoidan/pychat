@@ -46,7 +46,6 @@ import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 import { SetStateFromStorage } from '@/ts/types/dto';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import { RoomHandler } from '@/ts/message_handlers/RomHandler';
-import {vueStore} from '@/ts/classes/DefaultStore';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -138,10 +137,10 @@ function declareMixins() {
       }
     },
     updated: function (this: Vue): void {
-      this.$logger && this.$logger.trace('Updated')();
+      // this.$logger && this.$logger.debug('Updated')();
     },
     created: function (this: Vue) {
-      this.$logger && this.$logger.trace('Created')();
+      // this.$logger && this.$logger.debug('Created')();
     }
   };
   Vue.mixin(<ComponentOptions<Vue>><unknown>mixin);
@@ -161,7 +160,7 @@ async function init() {
   const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
   const messageBus = new Vue();
   const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
-  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, vueStore, api, ws, messageHelper);
+  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
   const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();

@@ -70,6 +70,7 @@ export interface MessageSender {
   loadUpMessages(roomId: number, count: number): Promise<void>;
   loadThreadMessages(roomId: number, threadId: number): Promise<void>;
   loadUpSearchMessages(roomId: number, count: number, checkIfSet: (found: boolean) => boolean): Promise<void>;
+  markMessagesInCurrentRoomAsRead(roomId: number, messageIds: number[]): Promise<void>;
 }
 
 export interface JsAudioAnalyzer {

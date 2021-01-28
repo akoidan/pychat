@@ -38,14 +38,23 @@
             This channel doesnt have an admin
           </td>
         </tr>
-        <tr v-if="noRooms && isAdmin">
-          <td colspan="2">
+        <tr v-if="noRooms">
+          <td colspan="2" >
             <app-submit
+                v-if="isAdmin"
                 type="button"
                 class="red-btn"
-                value="DELETE THIS CHANNEL"
+                value="DELETE THIS GROUP"
                 :running="running"
                 @click.native="deleteChannel"
+            />
+            <app-submit
+              v-else
+              type="button"
+              class="red-btn"
+              value="LEAVE THIS GROUP"
+              :running="running"
+              @click.native="leaveChannel"
             />
           </td>
         </tr>
@@ -72,6 +81,9 @@ import {ChannelsDictUIModel, ChannelUIModel, CurrentUserInfoModel, UserModel} fr
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import PickUser from '@/vue/pages/parts/PickUser.vue';
+import {RouterNavigateMessage} from '@/ts/types/messages/innerMessages';
+import {sub} from '@/ts/instances/subInstance';
+import {ALL_ROOM_ID} from '@/ts/utils/consts';
 
 @Component({
     components: {PickUser, AppSubmit}
@@ -144,12 +156,27 @@ import PickUser from '@/vue/pages/parts/PickUser.vue';
       return parseInt(id);
     }
 
+  private goToMain() { // TODO, should go back instead of main
+    let message1: RouterNavigateMessage = {
+      handler: 'router',
+      action: 'navigate',
+      to: `/chat/${ALL_ROOM_ID}`
+    };
+    sub.notify(message1);
+  }
 
-    @ApplyGrowlErr({runningProp: 'running'})
+  @ApplyGrowlErr({runningProp: 'running'})
+  public async leaveChannel(): Promise<void> {
+    await this.$ws.sendLeaveChannel(this.channelId);
+    this.goToMain();
+    this.$store.growlSuccess('Channel has been left');
+  }
+
+  @ApplyGrowlErr({runningProp: 'running'})
     public async deleteChannel(): Promise<void> {
       await this.$ws.sendDeleteChannel(this.channelId);
+      this.goToMain();
       this.$store.growlSuccess('Channel has been deleted');
-      this.$router.go(-1);
     }
 
     created() {

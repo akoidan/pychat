@@ -10,7 +10,7 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { RoomModel } from '@/ts/types/model';
-import RoomUsersWrapper from '@/vue/chat/RoomUsersWrapper.vue';
+import RoomUsersWrapper from '@/vue/chat/right/RoomUsersWrapper.vue';
 
 @Component({
   components: {RoomUsersWrapper}

@@ -4,7 +4,7 @@ import {
   SetRoomsUsers,
 } from '@/ts/types/types';
 import loggerFactory from '@/ts/instances/loggerFactory';
-import { Logger } from 'lines-logger';
+import {Logger} from 'lines-logger';
 import {
   BlobType,
   ChannelModel,
@@ -35,14 +35,16 @@ import {
   ProfileDB,
   RoomDB,
   RoomUsersDB,
-  SettingsDB, TagDB,
+  SettingsDB,
+  TagDB,
   TransactionType,
   UserDB
 } from '@/ts/types/db';
-import { browserVersion } from '@/ts/utils/runtimeConsts';
-import { SetStateFromStorage } from '@/ts/types/dto';
+import {browserVersion} from '@/ts/utils/runtimeConsts';
+import {SetStateFromStorage} from '@/ts/types/dto';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
+type QueryObject = [string, any[]];
 
 export default class DatabaseWrapper implements IStorage {
   private readonly logger: Logger;
@@ -51,7 +53,7 @@ export default class DatabaseWrapper implements IStorage {
   private readonly cache: { [id: number]: number } = {};
 
   constructor() {
-    this.dbName = 'v147';
+    this.dbName = 'v151';
     this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
@@ -64,7 +66,7 @@ export default class DatabaseWrapper implements IStorage {
       });
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, last_time_online integer)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
-      t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), creator INTEGER REFERENCES user(id))');
+      t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), is_main_in_channel boolean NOT NULL CHECK (is_main_in_channel IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, room_id integer REFERENCES room(id), user_id integer REFERENCES user(id), status text, parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, thread_messages_count INTEGER)');
       t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
       t = await this.runSql(t, 'CREATE TABLE tag (id integer primary key, user_id INTEGER REFERENCES user(id), message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, symbol text)');
@@ -92,7 +94,7 @@ export default class DatabaseWrapper implements IStorage {
       'select * from settings',
       'select * from user where deleted = 0',
       'select * from message',
-      'select * from channel',
+      'select * from channel where deleted = 0',
       'select * from tag'
     ].map(sql => new Promise((resolve, reject) => {
       this.executeSql(t, sql, [], (t: SQLTransaction, d: SQLResultSet) => {
@@ -151,6 +153,7 @@ export default class DatabaseWrapper implements IStorage {
           roomId: r.id,
           p2p: convertToBoolean(r.p2p),
           notifications: convertToBoolean(r.notifications),
+          isMainInChannel: convertToBoolean(r.is_main_in_channel),
           name: r.name,
           channelId: r.channel_id,
           roomCreatorId: r.creator,
@@ -353,7 +356,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public saveRoom(room: RoomModel) {
     this.write((t: SQLTransaction) => {
-      this.setRoom(t, room);
+      this.executeSingle(t, this.getSetRoomQuery(t, room))()
       this.setRoomUsers(t, room.id, room.users);
     });
   }
@@ -375,34 +378,63 @@ export default class DatabaseWrapper implements IStorage {
   public setRooms(rooms: RoomModel[]) {
     this.write(t => {
       this.executeSql(t, 'update room set deleted = 1', [], (t) => {
-        rooms.forEach(r => this.setRoom(t, r));
+        this.executeMultiple(t, rooms.map(r => this.getSetRoomQuery(t, r)))();
       })();
       this.executeSql(t, 'delete from room_users', [], (t) => {
+        let sqls: QueryObject[] = [];
         rooms.forEach(r => {
-          r.users.forEach(u => {
-            this.insertRoomUsers(t, r.id, u);
+          r.users.forEach(uId => {
+            sqls.push(this.getInsertRoomUsersQuery(r.id, uId))
           });
         });
+        this.executeMultiple(t, sqls)();
       })();
     });
   }
 
-  public insertUser(t: SQLTransaction, user: UserModel) {
-    this.executeSql(
-        t,
-        'insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online) values (?, ?, ?, 0, ?, ?, ?, ?, ?)',
+
+  public executeSingle(t: SQLTransaction, args: QueryObject) {
+    return this.executeSql(t, args[0], args[1])
+  }
+
+  public executeMultiple(t: SQLTransaction, sqls: QueryObject[]): ()  => void {
+    sqls.forEach(sqlArgs => {
+      this.executeSingle(t, sqlArgs)
+    })
+    if (sqls.length) {
+      return this.logger.debug(`${sqls[0][0]} {}`, sqls.map(sql => sql[1]))
+    } else {
+      return () => {}
+    }
+  }
+
+  private setRoomUsers(t: SQLTransaction, roomId: number, users: number[]) {
+    this.executeSql(t, 'delete from room_users where room_id = ?', [roomId], t => {
+      let sqls = users.map(u => this.getInsertRoomUsersQuery(roomId, u));
+      this.executeMultiple(t, sqls)();
+    })();
+  }
+
+  private getInsertRoomUsersQuery(roomId: number, userId: number): QueryObject {
+    return [`insert into room_users (room_id, user_id) values (?, ?)`, [roomId, userId]];
+  }
+
+  public getInsertUser(user: UserModel): QueryObject {
+    return ['insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online) values (?, ?, ?, 0, ?, ?, ?, ?, ?)',
         [user.id, user.user, convertSexToNumber(user.sex), user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline]
-    )();
+    ]
   }
 
   public saveUser(user: UserModel) {
-    this.write(t => this.insertUser(t, user));
+    this.write(t => {
+      this.executeSingle(t, this.getInsertUser(user))
+    })
   }
 
   public setUsers(users: UserModel[]) {
     this.write(t => {
       this.executeSql(t, 'update user set deleted = 1', [])();
-      users.forEach(u => this.insertUser(t, u));
+      this.executeMultiple(t, users.map(u => this.getInsertUser(u)))()
     });
   }
 
@@ -463,7 +495,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public updateRoom(r: RoomSettingsModel) {
     this.write(t => {
-      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ?, p2p = ?, creator = ? where id = ? ', [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.creator, r.id])();
+      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ?, p2p = ?, creator = ?, is_main_in_channel = ?, channel_id = ? where id = ? ', [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.creator, r.isMainInChannel ? 1: 0, r.channelId, r.id])();
     });
   }
 
@@ -483,9 +515,14 @@ export default class DatabaseWrapper implements IStorage {
 
   public updateFileIds(m: SetFileIdsForMessage): void {
     this.write(t => {
-      Object.keys(m.fileIds).forEach(symb => {
-        this.executeSql(t, 'update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?', [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId])();
-      });
+      this.executeMultiple(
+          t,
+          Object.keys(m.fileIds)
+              .map(symb => [
+                  'update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?',
+                [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId]
+              ])
+      )();
     });
   }
 
@@ -552,24 +589,13 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-  private setRoom(t: SQLTransaction, room: RoomSettingsModel) {
-    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted, channel_id, p2p, creator) values (?, ?, ?, ?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0, room.channelId, room.p2p ? 1 : 0, room.creator])();
+  private getSetRoomQuery(t: SQLTransaction, room: RoomSettingsModel): QueryObject {
+    return ['insert or replace into room (id, name, notifications, volume, deleted, channel_id, p2p, creator, is_main_in_channel) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0, room.channelId, room.p2p ? 1 : 0, room.creator, room.isMainInChannel ? 1: 0]]
   }
 
   private setChannel(t: SQLTransaction, channel: ChannelModel) {
     this.executeSql(t, 'insert or replace into channel (id, name, deleted, creator) values (?, ?, ?, ?)', [channel.id, channel.name, 0, channel.creator])();
   }
 
-  private insertRoomUsers(t: SQLTransaction, roomId: number, userId: number) {
-    this.executeSql(t, 'insert into room_users (room_id, user_id) values (?, ?)', [roomId, userId])();
-  }
-
-  private setRoomUsers(t: SQLTransaction, roomId: number, users: number[]) {
-    this.executeSql(t, 'delete from room_users where room_id = ?', [roomId], t => {
-      users.forEach(u => {
-        this.insertRoomUsers(t, roomId, u);
-      });
-    })();
-  }
 
 }

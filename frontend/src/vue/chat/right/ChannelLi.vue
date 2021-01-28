@@ -23,7 +23,7 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { ChannelUIModel } from '@/ts/types/model';
-import RoomUsersPublic from '@/vue/chat/RoomUsersPublic.vue';
+import RoomUsersPublic from '@/vue/chat/right/RoomUsersPublic.vue';
 
 @Component({
     components: {RoomUsersPublic}
@@ -32,9 +32,7 @@ import RoomUsersPublic from '@/vue/chat/RoomUsersPublic.vue';
 
     @Prop() public channel!: ChannelUIModel;
 
-    public expandChannel(id: number) {
-      this.$store.expandChannel(id);
-    }
+
   }
 </script>
 <!-- eslint-disable -->
