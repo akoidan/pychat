@@ -65,6 +65,9 @@ export default class ChatMessageToolTip extends Vue {
       this.$store.growlError("You can't delete messages sent more than 1 day ago");
       return
     }
+    if (!confirm(`Are you sure you want to delete this message?`)) {
+      return
+    }
     // TODO, check if opened is the only status with abor request
     if (this.message?.transfer?.xhr?.readyState === XMLHttpRequest.OPENED) {
       this.message.transfer.xhr.abort();

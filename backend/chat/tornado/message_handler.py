@@ -736,13 +736,13 @@ class MessagesHandler():
 		channel = Channel.objects.get(id=channel_id)
 		if channel.creator_id != self.user_id:
 			raise ValidationError(f"Only admin can delete this channel. Please ask ${User.objects.get(id=channel.creator_id).username}")
-		if Room.objects.filter(channel_id=channel_id, is_main_in_channel=False, disabled=False).count() > 0:
-			raise ValidationError("Remove all rooms first")
+		room_ids = list(Room.objects.filter(channel_id=channel_id, is_main_in_channel=False, disabled=False).values_list('id', flat=True))
 		main_room = Room.objects.get(channel_id=channel_id, is_main_in_channel=True)
 
 		ru = list(RoomUsers.objects.filter(room_id=main_room.id).values_list('user_id', flat=True))
 		message = self.message_creator.unsubscribe_direct_message(main_room.id, js_id, self.id, ru, channel.name, Actions.DELETE_CHANNEL)
 		message[VarNames.CHANNEL_ID] = channel_id
+		message[VarNames.ROOM_IDS] = room_ids
 
 		Room.objects.filter(channel_id=channel_id).update(disabled=True)
 
@@ -840,11 +840,16 @@ class MessagesHandler():
 	def send_client_delete_group(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		channel_id = message[VarNames.CHANNEL_ID]
+		room_ids = message[VarNames.ROOM_IDS]
+		if room_ids:
+			self.async_redis.unsubscribe(room_ids)
+			self.channels = [x for x in self.channels if x not in room_ids]
 		self.async_redis.unsubscribe((room_id,))
 		self.channels.remove(room_id)
 		channels = {
 			VarNames.EVENT: Actions.DELETE_CHANNEL,
 			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_IDS: room_ids,
 			VarNames.CHANNEL_ID: channel_id,
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],

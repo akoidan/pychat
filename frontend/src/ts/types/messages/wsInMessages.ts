@@ -102,6 +102,7 @@ export interface SaveChannelSettingsMessage extends DefaultWsInMessage<'saveChan
 export interface DeleteChannelMessage extends DefaultWsInMessage<'deleteChannel', 'room'> {
   channelId: number;
   roomId: number;
+  roomIds: number[];
 }
 
 export interface LeaveChannelMessage extends DefaultWsInMessage<'leaveChannel', 'room'> {
