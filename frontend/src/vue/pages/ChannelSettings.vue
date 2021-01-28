@@ -63,7 +63,7 @@
             This channel doesnt have an admin
           </td>
         </tr>
-        <tr v-if="noRooms">
+        <tr>
           <td colspan="2" >
             <app-submit
                 v-if="isAdmin"
@@ -74,7 +74,7 @@
                 @click.native="deleteChannel"
             />
             <app-submit
-              v-else
+              v-else-if="noRooms"
               type="button"
               class="red-btn"
               value="LEAVE THIS GROUP"
@@ -203,27 +203,33 @@ import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 
   @ApplyGrowlErr({runningProp: 'running'})
   public async leaveChannel(): Promise<void> {
+    if (!confirm(`Are you sure you want to leave group ${this.channel.name}`)) {
+      return
+    }
     await this.$ws.sendLeaveChannel(this.channelId);
     this.goToMain();
     this.$store.growlSuccess('Channel has been left');
   }
 
   @ApplyGrowlErr({runningProp: 'running'})
-    public async deleteChannel(): Promise<void> {
-      await this.$ws.sendDeleteChannel(this.channelId);
-      this.goToMain();
-      this.$store.growlSuccess('Channel has been deleted');
+  public async deleteChannel(): Promise<void> {
+    if (!confirm(`Are you sure you want to delete group ${this.channel.name}`)) {
+     return
     }
-
-    created() {
-      this.$logger.log('Updated for channel settings {} ', this.channel)();
-      this.channelName = this.channel.name;
-      this.admin = [this.channel.creator];
-      this.sound = this.channel.mainRoom.volume;
-      this.notifications = this.channel.mainRoom.notifications;
-    }
-
+    await this.$ws.sendDeleteChannel(this.channelId);
+    this.goToMain();
+    this.$store.growlSuccess('Channel has been deleted');
   }
+
+  created() {
+    this.$logger.log('Updated for channel settings {} ', this.channel)();
+    this.channelName = this.channel.name;
+    this.admin = [this.channel.creator];
+    this.sound = this.channel.mainRoom.volume;
+    this.notifications = this.channel.mainRoom.notifications;
+  }
+
+}
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>

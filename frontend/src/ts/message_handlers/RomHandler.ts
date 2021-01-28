@@ -197,6 +197,7 @@ export class RoomHandler extends MessageHandler  {
   public deleteChannel(message: DeleteChannelMessage) {
     this.store.deleteChannel(message.channelId);
     this.doRoomDelete(message.roomId);
+    message.roomIds.forEach(id => this.doRoomDelete(id));
   }
 
   public async showIType(message: ShowITypeMessage) {
@@ -224,7 +225,7 @@ export class RoomHandler extends MessageHandler  {
     this.doRoomDelete(message.roomId);
   }
 
-  private doRoomDelete( roomId: number) {
+  private doRoomDelete(roomId: number) {
     if (this.store.roomsDict[roomId]) {
       if (this.store.activeRoomId === roomId) {
         let m: RouterNavigateMessage = {

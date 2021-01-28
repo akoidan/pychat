@@ -203,6 +203,9 @@ export default class RoomSettings extends Vue {
 
   @ApplyGrowlErr({runningProp: 'running'})
   public async leave() {
+    if (this.room.name && !confirm(`Are you sure you want to leave room ${this.room.name}`)) {
+      return
+    }
     this.$logger.log('Leaving room {}', this.roomId)();
     await this.$ws.sendLeaveRoom(this.roomId);
   }
