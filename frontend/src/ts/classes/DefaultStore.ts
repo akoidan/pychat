@@ -296,13 +296,6 @@ export class DefaultStore extends VuexModule {
     return anies;
   }
 
-  get publicRooms(): RoomModel[] {
-    const roomModels: RoomModel[] = this.roomsArray.filter(r => r.name && !r.channelId);
-    logger.debug('publicRooms {} ', roomModels)();
-
-    return roomModels;
-  }
-
   get usersArray(): UserModel[] {
     const res: UserModel[] = Object.values(this.allUsersDict);
     logger.debug('usersArray {}', res)();
@@ -768,9 +761,6 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public addUser(u: UserModel) {
     Vue.set(this.allUsersDict, String(u.id), u);
-    if (this.roomsDict[ALL_ROOM_ID] && this.roomsDict[ALL_ROOM_ID].users.indexOf(u.id) < 0) {
-      this.roomsDict[ALL_ROOM_ID].users.push(u.id);
-    }
     this.storage.saveUser(u);
   }
 

@@ -66,6 +66,7 @@ class MessagesHandler():
 			Actions.GET_MESSAGES_BY_IDS: self.process_get_messages_by_ids,
 			Actions.PRINT_MESSAGE: self.process_send_message,
 			Actions.DELETE_ROOM: self.delete_room,
+			Actions.USER_LEAVES_ROOM: self.leave_room,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM: self.create_new_room,
 			Actions.CREATE_CHANNEL: self.create_new_channel,
@@ -88,7 +89,8 @@ class MessagesHandler():
 		self.process_pubsub_message = {
 			Actions.CREATE_ROOM: self.send_client_new_channel,
 			Actions.CREATE_CHANNEL: self.send_client_new_channel,
-			Actions.DELETE_ROOM: self.send_client_delete_channel,
+			Actions.DELETE_ROOM: self.send_client_delete_room,
+			Actions.USER_LEAVES_ROOM: self.send_client_leave_room,
 			Actions.LEAVE_CHANNEL: self.send_client_leave_group,
 			Actions.DELETE_CHANNEL: self.send_client_delete_group,
 			Actions.INVITE_USER: self.send_client_new_channel,
@@ -389,7 +391,8 @@ class MessagesHandler():
 		users.append(self.user_id)
 		users = list(set(users))
 
-		room = Room(channel_id=channel_id, name=channel_name, is_main_in_channel=True, creator_id= self.user_id)
+		# main room should have a name, since otherwise Room.is_private will be true
+		room = Room(channel_id=channel_id, name=channel_name, is_main_in_channel=True, creator_id=self.user_id)
 		room.save()
 		room_id = room.id
 
@@ -429,10 +432,14 @@ class MessagesHandler():
 		channel_id = message.get(VarNames.CHANNEL_ID)
 		users.append(self.user_id)
 		users = list(set(users))
+		if not channel_id and room_name:
+			raise ValidationError('Channel id must be provided')
 		if room_name and len(room_name) > 16:
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
 		create_room = True
-		if not room_name and len(users) == 2:
+		room_id = None
+		is_private = not room_name and len(users) == 2
+		if is_private:
 			user_rooms = evaluate(Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id'))
 			user_id = users[0] if users[1] == self.user_id else users[1]
 			try:
@@ -455,22 +462,17 @@ class MessagesHandler():
 		elif not room_name:
 			raise ValidationError('At least one user should be selected, or room should be public')
 
-		if channel_id and channel_id not in self.get_users_channels_ids():
+		if channel_id not in self.get_users_channels_ids():
 			raise ValidationError("You don't have access to this channel")
-		if channel_id:
-			channel = Channel.objects.get(id=channel_id)
-			channel_name = channel.name
-			channel_creator_id = channel.creator_id
-		else:
-			channel_name = None
-			channel_creator_id = None
+		channel = Channel.objects.get(id=channel_id)
+		channel_name = channel.name
+		channel_creator_id = channel.creator_id
 		if create_room:
 			room = Room(name=room_name, channel_id=channel_id, p2p=message[VarNames.P2P])
-			if not room_name:
+			if not is_private:
 				room.creator_id = self.user_id
 			room.save()
 			room_id = room.id
-			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
 			ru = [RoomUsers(
 				user_id=user_id,
 				room_id=room_id,
@@ -488,6 +490,7 @@ class MessagesHandler():
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
 			VarNames.VOLUME: message[VarNames.VOLUME],
 			VarNames.IS_MAIN_IN_CHANNEL: False,
+			VarNames.ROOM_CREATOR_ID: self.user_id,
 			VarNames.CHANNEL_ID: None,
 			VarNames.P2P: message[VarNames.P2P],
 			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
@@ -715,7 +718,7 @@ class MessagesHandler():
 		channel_id = message[VarNames.CHANNEL_ID]
 		js_id = message[VarNames.JS_MESSAGE_ID]
 		channel = Channel.objects.get(id=channel_id)
-		rooms = list(RoomUsers.objects.filter(room__channel_id=channel_id, user_id=self.user_id).prefetch_related('room'))
+		rooms = list(RoomUsers.objects.filter(room__channel_id=channel_id, user_id=self.user_id))
 		if len(rooms) > 1:
 			raise ValidationError(f"Please leave all the rooms first")
 		if len(rooms) == 0:
@@ -728,6 +731,7 @@ class MessagesHandler():
 		ru = list(RoomUsers.objects.filter(room_id=room_id).values_list('user_id', flat=True))
 		message = self.message_creator.unsubscribe_direct_message(room_id, js_id, self.id, ru, channel.name, Actions.LEAVE_CHANNEL)
 		message[VarNames.CHANNEL_ID] = channel_id
+		message[VarNames.ROOM_IDS] = [room_id]
 		self.publish(message, room_id, True)
 
 	def delete_channel(self, message):
@@ -750,22 +754,42 @@ class MessagesHandler():
 		channel.save()
 		self.publish(message, main_room.id, True)
 
-	def delete_room(self, message):
-		room_id = message[VarNames.ROOM_ID]
-		js_id = message[VarNames.JS_MESSAGE_ID]
+	def do_room_action(self, room_id, js_id, action):
 		if room_id not in self.channels or room_id == ALL_ROOM_ID:
 			raise ValidationError('You are not allowed to exit this room')
 		room = Room.objects.get(id=room_id)
+		ru = []
 		if room.disabled:
 			raise ValidationError('Room is already deleted')
 		if room.name is None:  # if private then disable
 			room.disabled = True
 			room.save()
 		else:  # if public -> leave the room, delete the link
-			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
-		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
-		message = self.message_creator.unsubscribe_direct_message(room_id, js_id, self.id, ru, room.name, Actions.DELETE_ROOM)
+			if action == Actions.USER_LEAVES_ROOM:
+				RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
+				ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
+				if room.creator_id == self.user_id:
+					room.creator_id = None
+					room.save()
+			elif action == Actions.DELETE_ROOM:
+				room.disabled = True
+				room.save()
+				RoomUsers.objects.filter(room_id=room.id).delete()
+		message = self.message_creator.unsubscribe_direct_message(
+			room_id,
+			js_id,
+			self.id,
+			ru,
+			room.name,
+			action
+		)
 		self.publish(message, room_id, True)
+
+	def leave_room(self, message):
+		self.do_room_action(message[VarNames.ROOM_ID], message[VarNames.JS_MESSAGE_ID], Actions.USER_LEAVES_ROOM)
+
+	def delete_room(self, message):
+		self.do_room_action(message[VarNames.ROOM_ID], message[VarNames.JS_MESSAGE_ID], Actions.DELETE_ROOM)
 
 	def edit_message(self, data):
 		message = Message.objects.get(id=data[VarNames.MESSAGE_ID])
@@ -836,19 +860,14 @@ class MessagesHandler():
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
-		
+
 	def send_client_delete_group(self, message):
-		room_id = message[VarNames.ROOM_ID]
 		channel_id = message[VarNames.CHANNEL_ID]
 		room_ids = message[VarNames.ROOM_IDS]
-		if room_ids:
-			self.async_redis.unsubscribe(room_ids)
-			self.channels = [x for x in self.channels if x not in room_ids]
-		self.async_redis.unsubscribe((room_id,))
-		self.channels.remove(room_id)
+		self.async_redis.unsubscribe(room_ids)
+		self.channels = [x for x in self.channels if x not in room_ids]
 		channels = {
 			VarNames.EVENT: Actions.DELETE_CHANNEL,
-			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_IDS: room_ids,
 			VarNames.CHANNEL_ID: channel_id,
 			VarNames.HANDLER_NAME: HandlerNames.ROOM,
@@ -859,18 +878,23 @@ class MessagesHandler():
 
 	def send_client_leave_group(self, message):
 		room_id = message[VarNames.ROOM_ID]
-		channel_id = message[VarNames.CHANNEL_ID]
 		if message[VarNames.USER_ID] == self.user_id:
-			self.async_redis.unsubscribe((room_id,))
-			self.channels.remove(room_id)
-			channels = {
-				VarNames.EVENT: Actions.DELETE_CHANNEL,
+			return self.send_client_delete_group(message)
+		else:
+			self.ws_write({
+				VarNames.EVENT: Actions.USER_LEAVES_ROOM,
 				VarNames.ROOM_ID: room_id,
-				VarNames.CHANNEL_ID: channel_id,
+				VarNames.USER_ID: message[VarNames.USER_ID],
+				VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
 				VarNames.HANDLER_NAME: HandlerNames.ROOM,
 				VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
-			}
-			self.ws_write(channels)
+			})
+		return True
+
+	def send_client_leave_room(self, message):
+		room_id = message[VarNames.ROOM_ID]
+		if message[VarNames.USER_ID] == self.user_id or message[VarNames.ROOM_NAME] is None:
+			return self.send_client_delete_room(message)
 		else:
 			self.ws_write({
 				VarNames.EVENT: Actions.USER_LEAVES_ROOM,
@@ -881,26 +905,17 @@ class MessagesHandler():
 			})
 		return True
 
-	def send_client_delete_channel(self, message):
+	def send_client_delete_room(self, message):
 		room_id = message[VarNames.ROOM_ID]
-		if message[VarNames.USER_ID] == self.user_id or message[VarNames.ROOM_NAME] is None:
-			self.async_redis.unsubscribe((room_id,))
-			self.channels.remove(room_id)
-			channels = {
-				VarNames.EVENT: Actions.DELETE_MY_ROOM,
-				VarNames.ROOM_ID: room_id,
-				VarNames.HANDLER_NAME: HandlerNames.ROOM,
-				VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
-			}
-			self.ws_write(channels)
-		else:
-			self.ws_write({
-				VarNames.EVENT: Actions.USER_LEAVES_ROOM,
-				VarNames.ROOM_ID: room_id,
-				VarNames.USER_ID: message[VarNames.USER_ID],
-				VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
-				VarNames.HANDLER_NAME: HandlerNames.ROOM
-			})
+		self.async_redis.unsubscribe((room_id,))
+		self.channels.remove(room_id)
+		channels = {
+			VarNames.EVENT: Actions.DELETE_ROOM,
+			VarNames.ROOM_ID: room_id,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+		}
+		self.ws_write(channels)
 		return True
 
 	def process_get_messages_by_ids(self, data):

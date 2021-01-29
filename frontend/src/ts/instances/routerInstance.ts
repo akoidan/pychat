@@ -92,22 +92,8 @@ export const router = new VueRouter({
           path: '/user/:id'
         },
         {
-          component: CreateRoomChannel,
-          path: '/create-room',
-          children: [
-            {
-              path: '',
-              redirect: '/create-room/public'
-            },
-            {
-              component: CreatePublicRoom,
-              path: 'public'
-            },
-            {
-              path: 'channel',
-              component: CreateChannel
-            }
-          ]
+          component: CreateChannel,
+          path: '/create-group',
         },
         {
           path: 'settings',

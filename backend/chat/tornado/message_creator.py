@@ -121,13 +121,11 @@ class MessagesCreator(object):
 		room_less = self.default(online, Actions.LOGOUT, HandlerNames.ROOM)
 		return room_less
 
-	def room_online_login(self, online, sender_name, sex):
+	def room_online_login(self, online):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
 		room_less = self.default(online, Actions.LOGIN, HandlerNames.ROOM)
-		room_less[VarNames.USER] = sender_name
-		room_less[VarNames.GENDER] = sex
 		room_less[VarNames.WEBRTC_OPPONENT_ID] = self.id
 		return room_less
 

@@ -32,7 +32,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="isPublic">
+        <tr v-if="isPublic && !isMainRoom">
           <th>Admin</th>
           <td v-if="canChangeAdmin">
             <pick-user
@@ -83,7 +83,18 @@
               class="red-btn"
               value="LEAVE THIS ROOM"
               :running="running"
-              @click.native="leave"
+              @click.native="leaveRoom"
+            />
+          </td>
+        </tr>
+        <tr v-if="isAdmin">
+          <td colspan="2">
+            <app-submit
+              type="button"
+              class="red-btn"
+              value="DELETE THIS ROOM"
+              :running="running"
+              @click.native="deleteRoom"
             />
           </td>
         </tr>
@@ -146,7 +157,7 @@ export default class RoomSettings extends Vue {
   public p2p: boolean = false;
 
   @State
-  public readonly userInfo!: CurrentUserInfoModel;
+  public readonly myId!: number;
 
   @State
   public readonly roomsDict!: RoomDictModel;
@@ -165,6 +176,10 @@ export default class RoomSettings extends Vue {
     return this.allUsersDict[uId].user;
   }
 
+  get isAdmin(): boolean {
+    return this.room.creator === this.myId;
+  }
+
   get showInviteUsers() {
     return  this.admin.length < 1;
   }
@@ -174,7 +189,7 @@ export default class RoomSettings extends Vue {
   }
 
   get canChangeAdmin() {
-    return this.isPublic && (!this.room.creator || this.userInfo.userId === this.room.creator);
+    return this.isPublic && (!this.room.creator || this.myId === this.room.creator);
   }
 
   get userIds(): number[] {
@@ -202,7 +217,16 @@ export default class RoomSettings extends Vue {
   }
 
   @ApplyGrowlErr({runningProp: 'running'})
-  public async leave() {
+  public async deleteRoom() {
+    if (this.room.name && !confirm(`Are you sure you want to delete room ${this.room.name}`)) {
+      return
+    }
+    this.$logger.log('deleting room {}', this.roomId)();
+    await this.$ws.sendDeleteRoom(this.roomId);
+  }
+
+  @ApplyGrowlErr({runningProp: 'running'})
+  public async leaveRoom() {
     if (this.room.name && !confirm(`Are you sure you want to leave room ${this.room.name}`)) {
       return
     }

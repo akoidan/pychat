@@ -17,7 +17,6 @@ class Actions(object):
 	GET_MESSAGES = 'loadMessages'
 	GET_MESSAGES_BY_IDS = 'loadMessagesByIds'
 	DELETE_ROOM = 'deleteRoom'
-	DELETE_MY_ROOM = DELETE_ROOM
 	USER_LEAVES_ROOM = 'leaveUser'
 	EDIT_MESSAGE = 'editMessage'
 	DELETE_MESSAGE = 'deleteMessage'
@@ -49,6 +48,7 @@ class Actions(object):
 	SAVE_ROOM_SETTINGS = 'saveRoomSettings'
 	DELETE_CHANNEL = 'deleteChannel'
 	LEAVE_CHANNEL = 'leaveChannel'
+	CREATE_NEW_USER = 'createNewUser'
 
 
 class VarNames(object):

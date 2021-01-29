@@ -8,7 +8,6 @@
         />
       <slot name="name"/>
       </div>
-      <slot name="right"/>
     </span>
     <ul v-show="!value">
       <slot />

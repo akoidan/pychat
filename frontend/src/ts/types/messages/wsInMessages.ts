@@ -67,6 +67,13 @@ export interface AddOnlineUserMessage extends DefaultWsInMessage<'addOnlineUser'
   opponentWsId: string;
 }
 
+export interface CreateNewUsedMessage extends DefaultWsInMessage<'createNewUser', 'room'>, UserDto {
+  rooms: {
+    roomId: number;
+    users: number[];
+  }[];
+}
+
 export interface RemoveOnlineUserMessage extends DefaultWsInMessage<'removeOnlineUser', 'room'>, ChangeUserOnlineBase {
 }
 
@@ -101,13 +108,7 @@ export interface SaveChannelSettingsMessage extends DefaultWsInMessage<'saveChan
 
 export interface DeleteChannelMessage extends DefaultWsInMessage<'deleteChannel', 'room'> {
   channelId: number;
-  roomId: number;
   roomIds: number[];
-}
-
-export interface LeaveChannelMessage extends DefaultWsInMessage<'leaveChannel', 'room'> {
-  userId: number;
-  channelId: number;
 }
 
 export interface SaveRoomSettingsMessage extends DefaultWsInMessage<'saveRoomSettings', 'room'>, RoomNoUsersDto {

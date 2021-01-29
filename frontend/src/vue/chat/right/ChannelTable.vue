@@ -1,31 +1,26 @@
 <template>
-  <div>
-    <chat-right-collapsed-section
-      v-for="channel in channels"
-      :key="channel.id"
-      :value="channel.expanded"
-      @input="expandChannel(channel.id)"
-    >
-      <template v-slot:name>
-        <router-link
-          :to="`/chat/${mainRoomId(channel)}`"
-          class="active-room"
-        >
-          {{ channel.name }}
-        </router-link>
-      </template>
-      <room-users-public
-        v-for="room in channel.rooms"
-        :key="room.id"
-        :room="room"
-      />
-    </chat-right-collapsed-section>
-  </div>
+  <chat-right-collapsed-section :value="channel.expanded" @input="expandChannel">
+    <template v-slot:name>
+      <router-link
+        :to="`/chat/${mainRoomId(channel)}`"
+        @click.native="navigate(channel)"
+        class="active-room"
+      >
+        {{ channel.name }}
+      </router-link>
+    </template>
+    <room-users-public
+      v-for="room in channel.rooms"
+      :key="room.id"
+      :room="room"
+    />
+  </chat-right-collapsed-section>
 </template>
 <script lang="ts">
   import {
     Component,
-    Vue
+    Vue,
+    Prop
   } from 'vue-property-decorator';
   import {State} from '@/ts/instances/storeInstance';
   import {ChannelUIModel} from '@/ts/types/model';
@@ -37,9 +32,17 @@
     components: {RoomUsersPublic, ChatRightCollapsedSection}
   })
   export default class ChannelTable extends Vue {
-    @State
-    public readonly channels!: ChannelUIModel[];
+    @Prop()
+    public readonly channel!: ChannelUIModel;
 
+    @State
+    public readonly activeRoomId!: number;
+
+    navigate() {
+      if (this.activeRoomId === this.channel.mainRoom.id) {
+        this.$store.setCurrentChatPage('chat');
+      }
+    }
 
     mainRoomId(channel: ChannelUIModel) {
       if (!channel.mainRoom) {
@@ -48,8 +51,9 @@
       }
       return channel.mainRoom.id;
     }
-    public expandChannel(id: number) {
-      this.$store.expandChannel(id);
+
+    public expandChannel() {
+      this.$store.expandChannel(this.channel.id);
     }
   }
 </script>

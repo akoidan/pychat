@@ -41,6 +41,7 @@ import {
   AddInviteMessage,
   AddOnlineUserMessage,
   AddRoomMessage,
+  CreateNewUsedMessage,
   DeleteChannelMessage,
   DeleteRoomMessage,
   InviteUserMessage,
@@ -80,6 +81,7 @@ export class RoomHandler extends MessageHandler  {
     saveChannelSettings:  <HandlerType<'saveChannelSettings', 'room'>>this.saveChannelSettings,
     deleteChannel:  <HandlerType<'deleteChannel', 'room'>>this.deleteChannel,
     saveRoomSettings:  <HandlerType<'saveRoomSettings', 'room'>>this.saveRoomSettings,
+    createNewUser:  <HandlerType<'createNewUser', 'room'>>this.createNewUser,
     showIType:  <HandlerType<'showIType', 'room'>>this.showIType,
     logout:  <HandlerType<'logout', 'room'>>this.logout,
   };
@@ -156,13 +158,25 @@ export class RoomHandler extends MessageHandler  {
     this.mutateRoomAddition(message, 'invited');
   }
 
+  public createNewUser(message: CreateNewUsedMessage) {
+    const newVar: UserModel = convertUser(message);
+    this.store.addUser(newVar);
+    message.rooms.forEach(({roomId, users}) => {
+      this.store.setRoomsUsers({
+        roomId: roomId,
+        users: users
+      } as SetRoomsUsers);
+
+      this.store.addRoomLog({roomIds: [roomId], roomLog: {
+          action: 'joined this room',
+          time: Date.now(),
+          userId: message.userId
+        }});
+      this.notifyDevicesChanged(null, roomId, 'someone_joined');
+    })
+  }
+
   public addOnlineUser(message: AddOnlineUserMessage) {
-    if (!this.store.allUsersDict[message.userId]) {
-      const newVar: UserModel = convertUser(message);
-      this.store.addUser(newVar);
-      // this is a new user, so there's no p2p rooms with him
-      // this.notifyDevicesChanged(message.userId, null);
-    }
     if (message.content[message.userId].length === 1) {
       // exactly 1 device is now offline, so that new that appeared is the first one
       this.addChangeOnlineEntry(message.userId, message.time, 'appeared online');
@@ -196,7 +210,6 @@ export class RoomHandler extends MessageHandler  {
 
   public deleteChannel(message: DeleteChannelMessage) {
     this.store.deleteChannel(message.channelId);
-    this.doRoomDelete(message.roomId);
     message.roomIds.forEach(id => this.doRoomDelete(id));
   }
 

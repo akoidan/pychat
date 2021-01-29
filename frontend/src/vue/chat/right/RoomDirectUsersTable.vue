@@ -5,13 +5,6 @@
     <template v-slot:name>
       Users
     </template>
-    <template v-slot:right>
-      <router-link
-        to="/create-private-room"
-        class="icon-plus-squared"
-        title="Create direct room"
-      />
-    </template>
     <room-users-private
       v-for="room in privateRooms"
       :key="room.id"
