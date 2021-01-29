@@ -9,8 +9,10 @@ import {
 import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
 
 
-export interface ChangeUserOnlineBase extends UserDto {
+export interface ChangeUserOnlineBase {
   content: Record<number, string[]>;
+  userId: number;
+  lastTimeOnline: number;
   time: number;
 }
 

@@ -3,8 +3,7 @@
     <i class="icon-left" @click="goBack" v-if="lowWidth && currentPage === 'chat'"/>
     <i class="icon-menu" v-else @click="showMenu"/>
     <template v-if="lowWidth">
-      <span class="room-name" v-if="activeRoom.name">{{activeRoom.name}}</span>
-      <span class="room-name" v-else>{{user.user}}</span>
+      <span class="room-name">{{roomName}}</span>
     </template>
     <div class="chat-right-icons">
       <chat-is-online-icon/>
@@ -16,7 +15,12 @@
   import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
   import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
   import {State} from '@/ts/instances/storeInstance';
-  import {RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
+  import {
+    ChannelsDictUIModel,
+    RoomModel,
+    UserDictModel,
+    UserModel
+  } from '@/ts/types/model';
   import ChatIsOnlineIcon from '@/vue/chat/ChatIsOnlineIcon.vue';
   import {PrivateRoomsIds} from '@/ts/types/types';
   @Component({
@@ -36,10 +40,22 @@
     public readonly privateRoomsUsersIds!: PrivateRoomsIds;
 
     @State
+    public readonly channelsDictUI!: ChannelsDictUIModel;
+
+    @State
     public readonly allUsersDict!: UserDictModel;
 
-    get user(): UserModel  {
-      return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.activeRoom.id]];
+    get roomName(): string  {
+      if (this.activeRoom.name) {
+        return this.activeRoom.name;
+      }
+      if (this.activeRoom.isMainInChannel) {
+        return this.channelsDictUI[this.activeRoom.channelId!].name;
+      }
+      if (!this.activeRoom.name) {
+        return  this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.activeRoom.id]].user;
+      }
+      throw Error('Invalid structure');
     }
 
     @Emit()

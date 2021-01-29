@@ -26,8 +26,9 @@ from chat.global_redis import sync_redis
 from chat.log_filters import id_generator
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
 	SubscriptionMessages, RoomUsers, Room, UploadedFile, User
+from chat.settings_base import ALL_ROOM_ID
 from chat.socials import GoogleAuth, FacebookAuth
-from chat.tornado.constants import RedisPrefix
+from chat.tornado.constants import Actions, RedisPrefix, VarNames, HandlerNames
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
 	add_missing_fields, extract_nginx_files, check_captcha, get_user_id
@@ -307,6 +308,24 @@ class HttpHandler(MethodDispatcher):
 		user_profile.set_password(password)
 		user_profile.save()
 		RoomUsers(user_id=user_profile.id, room_id=settings.ALL_ROOM_ID, notifications=False).save()
+
+		global_redis.async_redis_publisher.publish(
+			settings.ALL_ROOM_ID,
+			json.dumps(
+				{
+					VarNames.ROOMS: [{
+						VarNames.ROOM_ID: settings.ALL_ROOM_ID,
+						VarNames.ROOM_USERS: list(RoomUsers.objects.filter(room_id=ALL_ROOM_ID).values_list('user_id', flat=True))
+					}],
+					VarNames.EVENT: Actions.CREATE_NEW_USER,
+					VarNames.USER_ID: user_profile.id,
+					VarNames.HANDLER_NAME: HandlerNames.ROOM,
+					VarNames.GENDER: user_profile.sex_str,
+					VarNames.USER: user_profile.username,
+				}
+			),
+		)
+
 		if email:
 			yield from self.__send_sign_up_email(user_profile)
 		return MessagesCreator.get_session(self.__generate_session__(user_profile.id))

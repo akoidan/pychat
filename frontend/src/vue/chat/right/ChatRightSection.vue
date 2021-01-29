@@ -1,8 +1,10 @@
 <template>
   <div class="chat-room-users-wrapper">
     <room-direct-users-table />
-    <room-public-table />
-    <channel-table />
+    <channel-table
+      v-for="channel in channels"
+      :key="channel.id"
+      :channel="channel" />
   </div>
 </template>
 <script lang="ts">
@@ -13,16 +15,19 @@ import {
 import RoomDirectUsersTable from '@/vue/chat/right/RoomDirectUsersTable.vue';
 import RoomPublicTable from '@/vue/chat/right/RoomPublicTable.vue';
 import ChannelTable from '@/vue/chat/right/ChannelTable.vue';
+import {ChannelUIModel} from '@/ts/types/model';
+import {State} from '@/ts/instances/storeInstance';
 
 @Component({
   components: {
     ChannelTable,
-    RoomPublicTable,
     RoomDirectUsersTable
   }
 })
 export default class ChatRightSection extends Vue {
 
+  @State
+  public readonly channels!: ChannelUIModel[];
 
 }
 </script>

@@ -1,14 +1,14 @@
 <template>
   <div class="holder">
-    <app-menu-bar v-show="showAppMenuBar"/>
+    <app-menu-bar v-show="showAppMenuBar"  v-model="showAppMenuBar" @click.native="showAppMenuBar = false"/>
     <chat-nav-bar
       :low-width="lowWidth"
       :current-page="currentChatPage"
       @go-back="goBack"
-      @show-menu="showMenu"
-      @show-popup-toggle="showPopupToggle"
+      @show-menu="showAppMenuBar = true"
+      @show-popup-toggle="showPopup = true"
     />
-    <chat-popup-menu v-show="showPopup" class="popup-menu"/>
+    <chat-popup-menu v-show="showPopup" @click.native="showPopup = false" />
     <div class="wrapper">
       <chat-right-section v-show="!lowWidth || currentChatPage === 'rooms'" />
       <chat-boxes v-show="!lowWidth || currentChatPage === 'chat'"/>
@@ -56,8 +56,6 @@ export default class ChannelsPage extends Vue {
   public readonly currentChatPage!: 'rooms' | 'chat';
   private showPopup = false;
 
-
-
   @Watch('activeRoomId')
   public activeRoomIdChange() {
     if (this.lowWidth) {
@@ -69,17 +67,6 @@ export default class ChannelsPage extends Vue {
     this.$store.setCurrentChatPage('rooms');
   }
 
-  clickOutsideEvent!: any;
-
-  showMenu() {
-    this.showAppMenuBar = !this.showAppMenuBar;
-    document.body.addEventListener('click', this.clickOutsideEvent)
-  }
-
-  showPopupToggle() {
-    this.showPopup = !this.showPopup;
-    document.body.addEventListener('click', this.clickOutsideEvent)
-  }
 
   created() {
     this.mediaQuery = window.matchMedia('(max-width: 700px)');
@@ -88,13 +75,6 @@ export default class ChannelsPage extends Vue {
     };
     this.listener(this.mediaQuery)
     this.mediaQuery.addListener(this.listener as any);
-
-    this.clickOutsideEvent = (event: any) => {
-      document.body.removeEventListener('click', this.clickOutsideEvent)
-      this.showPopup = false;
-      this.showAppMenuBar = false;
-    };
-
   }
 
   destroyed() {
@@ -109,11 +89,6 @@ export default class ChannelsPage extends Vue {
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/abstract_classes"
 
-
-  .popup-menu
-    position: absolute
-    top: 40px
-    right: 5px
   .holder
     display: flex
     flex-direction: column

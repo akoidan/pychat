@@ -25,7 +25,7 @@ from django.db.models import \
 	SmallIntegerField, CheckConstraint, Q, F
 
 from chat.log_filters import id_generator
-from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
+from chat.settings import GENDERS, JS_CONSOLE_LOGS, ALL_ROOM_ID
 
 
 def get_milliseconds(dt=None):
@@ -63,7 +63,7 @@ class User(AbstractBaseUser):
 	@property
 	def is_staff(self):
 		# every registered user can edit database
-		return self.pk == DEFAULT_PROFILE_ID
+		return False
 
 	def has_perm(self, perm, obj=None):
 		return self.is_staff
@@ -195,13 +195,13 @@ class Channel(Model):
 	"""
 	name = CharField(max_length=16, null=False, blank=False)
 	disabled = BooleanField(default=False, null=False)
-	creator = ForeignKey(User, CASCADE, null=False)
+	creator = ForeignKey(User, CASCADE, null=True) # main room has no admin
 
 
 class Room(Model):
 	is_main_in_channel = BooleanField(default=False, null=False)
 	name = CharField(max_length=16, null=True, blank=True)
-	channel = ForeignKey(Channel, PROTECT, null=True)
+	channel = ForeignKey(Channel, PROTECT, null=False)
 	p2p = BooleanField(default=False, null=False)
 	users = ManyToManyField(User, related_name='rooms', through='RoomUsers')
 	# We don't delete private rooms, in order when a person

@@ -366,10 +366,17 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.logger.debug('Finished ws: {}', info.join(', '))();
   }
 
-  public async sendLeaveRoom(roomId: number) {
+  public async sendDeleteRoom(roomId: number) {
     return this.messageProc.sendToServerAndAwait({
       roomId,
       action: 'deleteRoom'
+    });
+  }
+
+  public async sendLeaveRoom(roomId: number) {
+    return this.messageProc.sendToServerAndAwait({
+      roomId,
+      action: 'leaveUser'
     });
   }
 

@@ -28,7 +28,6 @@
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {
   RECAPTCHA_PUBLIC_KEY,
-  PUBLIC_PATH,
   CAPTCHA_IFRAME
 } from '@/ts/utils/consts';
 import {GoogleCaptcha} from '@/ts/types/model';

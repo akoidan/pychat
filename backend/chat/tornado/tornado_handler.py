@@ -207,7 +207,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			) for user in fetched_users]
 
 		self.ws_write(self.message_creator.set_room(room_users, user_dict, online, user_db, channels))
-		online_user_names_mes = self.message_creator.room_online_login(online, user_db.username, user_db.sex_str)
+		online_user_names_mes = self.message_creator.room_online_login(online)
 		self.logger.info('!! First tab, sending refresh online for all')
 		self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
 		self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)

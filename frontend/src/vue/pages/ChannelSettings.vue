@@ -160,9 +160,7 @@ import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
     }
 
     get userIds(): number[] {
-      let results: number[] = [this.userInfo.userId]; // channel can have no rooms,
-      this.channel.rooms.forEach(r => results.push(...r.users));
-      return Array.from(new Set(results));
+      return [...this.channel.mainRoom.users]
     }
 
     get currentAdmin(): UserModel {

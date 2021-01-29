@@ -46,7 +46,7 @@ export default class App extends Vue {
     top: 10px
     min-width: 250px
     /*51 is nav + margin
-    left: 10px
+    right: 10px
     position: absolute
     max-width: 50%
     z-index: 1

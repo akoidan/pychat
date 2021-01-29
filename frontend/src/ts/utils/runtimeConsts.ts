@@ -42,4 +42,4 @@ export const WEBRTC_RUNTIME_CONFIG = (function() {
 })()
 export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/ws`;
 export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/api`;
-export const MEDIA_API_URL = PUBLIC_PATH;
+export const MEDIA_API_URL = PUBLIC_PATH ? PUBLIC_PATH : `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}`;
