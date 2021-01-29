@@ -13,7 +13,6 @@ import {
   Vue
 } from 'vue-property-decorator';
 import RoomDirectUsersTable from '@/vue/chat/right/RoomDirectUsersTable.vue';
-import RoomPublicTable from '@/vue/chat/right/RoomPublicTable.vue';
 import ChannelTable from '@/vue/chat/right/ChannelTable.vue';
 import {ChannelUIModel} from '@/ts/types/model';
 import {State} from '@/ts/instances/storeInstance';

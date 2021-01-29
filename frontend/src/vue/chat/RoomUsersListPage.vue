@@ -40,6 +40,7 @@
     State
   } from '@/ts/instances/storeInstance';
   import {
+    ChannelsDictUIModel,
     RoomDictModel,
     UserDictModel
   } from '@/ts/types/model';
@@ -58,7 +59,11 @@ export default class RoomUsersListPage extends Vue {
   @State
   public readonly roomsDict!: RoomDictModel;
 
-  private userdToAdd: number[] = [];
+  @State
+  public readonly channelsDictUI!: ChannelsDictUIModel;
+
+
+    private userdToAdd: number[] = [];
   public running: boolean = false;
 
 
@@ -79,6 +84,10 @@ export default class RoomUsersListPage extends Vue {
   }
 
   get userIds(): number[] {
+    if (this.room.channelId && !this.room.isMainInChannel) {
+      return this.channelsDictUI[this.room.channelId].mainRoom.users
+          .filter(uId => !this.room.users.includes(uId))
+    }
     return this.$store.usersArray
         .filter(u => this.room.users.indexOf(u.id) < 0)
         .map(u => u.id)
