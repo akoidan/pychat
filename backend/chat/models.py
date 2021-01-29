@@ -222,6 +222,10 @@ class Room(Model):
 	class Meta:
 		constraints = [
 			CheckConstraint(
+				check=Q(channel__isnull=False) | Q(name__isnull=False),
+				name='channel_not_null_if_room_public'
+			),
+			CheckConstraint(
 				check=Q(creator__isnull=False) | Q(name__isnull=False),
 				name='creator_not_null_if_room_public'
 			),
