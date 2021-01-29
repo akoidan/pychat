@@ -461,12 +461,16 @@ class MessagesHandler():
 				pass
 		elif not room_name:
 			raise ValidationError('At least one user should be selected, or room should be public')
-
-		if channel_id not in self.get_users_channels_ids():
+		if not is_private and channel_id not in self.get_users_channels_ids():
 			raise ValidationError("You don't have access to this channel")
-		channel = Channel.objects.get(id=channel_id)
-		channel_name = channel.name
-		channel_creator_id = channel.creator_id
+		if not is_private:
+			channel = Channel.objects.get(id=channel_id)
+			channel_name = channel.name
+			channel_creator_id = channel.creator_id
+			main_room = Room.objects.get(is_main_in_channel=True, channel_id=channel.id)
+			allowed_users = list(RoomUsers.objects.filter(room_id=main_room.id).values_list('user_id', flat=True))
+			if not set(users).issubset(allowed_users):
+				raise ValidationError("Some users are in the group")
 		if create_room:
 			room = Room(name=room_name, channel_id=channel_id, p2p=message[VarNames.P2P])
 			if not is_private:
@@ -498,7 +502,7 @@ class MessagesHandler():
 			VarNames.TIME: get_milliseconds(),
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
 		}
-		if channel_id:
+		if not is_private:
 			m[VarNames.CHANNEL_NAME] = channel_name
 			m[VarNames.CHANNEL_ID] = channel_id
 			m[VarNames.CHANNEL_CREATOR_ID] = channel_creator_id
@@ -660,6 +664,11 @@ class MessagesHandler():
 		intersect = set(users_in_room) & set(users)
 		if bool(intersect):
 			raise ValidationError("Users %s are already in the room", intersect)
+		if not room.is_main_in_channel:
+			main_room = Room.objects.get(is_main_in_channel=True, channel_id=room.channel.id)
+			allowed_users = list(RoomUsers.objects.filter(room_id=main_room.id).values_list('user_id', flat=True))
+			if not set(users).issubset(allowed_users):
+				raise ValidationError("Some users are in the group")
 		users_in_room.extend(users)
 
 		ru = [RoomUsers(

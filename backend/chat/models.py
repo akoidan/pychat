@@ -222,8 +222,12 @@ class Room(Model):
 	class Meta:
 		constraints = [
 			CheckConstraint(
-				check=Q(creator__isnull=False) | Q(name__isnull=False),
-				name='creator_not_null_if_room_public'
+				check=Q(Q(channel__isnull=True) & Q(name__isnull=True)) | Q(channel__isnull=False) & Q(name__isnull=False),
+				name='channel_should_exist_for_public_room_and_not_exist_for_private'
+			),
+			CheckConstraint(
+				check=Q(creator__isnull=True) | Q(name__isnull=False),
+				name='admin_should_not_be_define_for_private_rooms'
 			),
 			CheckConstraint(
 				check=Q(p2p=False) | Q(name__isnull=True),
