@@ -64,6 +64,7 @@ export default class ChatMessage extends Vue {
   get mainCls() {
     return {
       'removed-message': this.message.deleted,
+      'message-content': true,
     };
   }
 
@@ -116,6 +117,9 @@ export default class ChatMessage extends Vue {
   .removed-message .message-text-style
     color: #5d5d5d
     text-decoration: line-through
+
+  .message-content
+    display: flex
 
   %img-play-chat
     @extend %user-select-none

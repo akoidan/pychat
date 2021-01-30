@@ -271,6 +271,7 @@ export function convertUser(u: UserDto): UserModel {
   return {
     user: u.user,
     id: u.userId,
+    image: u.userImage,
     lastTimeOnline: u.lastTimeOnline,
     sex: convertSex(u.sex),
     location

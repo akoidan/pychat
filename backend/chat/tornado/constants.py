@@ -25,7 +25,6 @@ class Actions(object):
 	SET_SETTINGS = 'setSettings'
 	USER_PROFILE_CHANGED = 'userProfileChanged'
 	SET_USER_PROFILE = 'setUserProfile'
-	SET_PROFILE_IMAGE = 'setProfileImage'
 	INVITE_USER = 'inviteUser'
 	ADD_INVITE = 'addInvite'
 	SET_WEBRTC_ID = 'setConnectionId'
@@ -169,8 +168,8 @@ class RedisPrefix:
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@classmethod
-	def set_js_user_structure_flag(cls, id, name, sex, flag, country, region, city):
-		res = cls.set_js_user_structure(id, name, sex)
+	def set_js_user_structure_flag(cls, id, name, sex, image, flag, country, region, city):
+		res = cls.set_js_user_structure(id, name, sex, image)
 		res[VarNames.LOCATION] = {
 			IpVarNames.COUNTRY_CODE: flag,
 			IpVarNames.COUNTRY: country,
@@ -180,11 +179,12 @@ class RedisPrefix:
 		return res
 
 	@staticmethod
-	def set_js_user_structure(id, name, sex):
+	def set_js_user_structure(id, name, sex, image):
 		return {
 			VarNames.USER: name,
 			VarNames.USER_ID: id,
-			VarNames.GENDER: settings.GENDERS[sex]
+			VarNames.GENDER: settings.GENDERS[sex],
+			VarNames.USER_IMAGE: image
 		}
 
 	@classmethod

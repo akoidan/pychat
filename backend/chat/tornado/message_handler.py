@@ -635,22 +635,19 @@ class MessagesHandler():
 		)
 		self.publish(self.message_creator.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
 		if userprofile.sex_str != sex or userprofile.username != un:
-			self.publish(self.message_creator.changed_user_profile(sex, self.user_id, un), settings.ALL_ROOM_ID)
-
-	def profile_save_image(self, request):
-		pass
-		# UserProfile.objects.filter(id=request.user.id).update(
-		# 	suggestions=request.POST['suggestions'],
-		# 	embedded_youtube=request.POST['embedded_youtube'],
-		# 	highlight_code=request.POST['highlight_code'],
-		# 	message_sound=request.POST['message_sound'],
-		# 	incoming_file_call_sound=request.POST['incoming_file_call_sound'],
-		# 	online_change_sound=request.POST['online_change_sound'],
-		# 	logs=request.POST['logs'],
-		# 	send_logs=request.POST['send_logs'],
-		# 	theme=request.POST['theme'],
-		# )
-		# return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+			payload = {
+				VarNames.HANDLER_NAME: HandlerNames.WS,
+				VarNames.EVENT: Actions.USER_PROFILE_CHANGED
+			}
+			payload.update(
+				RedisPrefix.set_js_user_structure(
+					self.user_id,
+					un,
+					settings.GENDERS_STR[sex],
+					userprofile.photo.url if userprofile.photo else None,
+				)
+			)
+			self.publish(payload, settings.ALL_ROOM_ID)
 
 	def invite_user(self, message):
 		room_id = message[VarNames.ROOM_ID]

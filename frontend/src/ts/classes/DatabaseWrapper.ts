@@ -53,7 +53,7 @@ export default class DatabaseWrapper implements IStorage {
   private readonly cache: { [id: number]: number } = {};
 
   constructor() {
-    this.dbName = 'v151';
+    this.dbName = 'v152';
     this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
@@ -64,7 +64,7 @@ export default class DatabaseWrapper implements IStorage {
       let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
         this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
       });
-      t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, last_time_online integer)');
+      t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, image text, last_time_online integer)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), is_main_in_channel boolean NOT NULL CHECK (is_main_in_channel IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, room_id integer REFERENCES room(id), user_id integer REFERENCES user(id), status text, parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, thread_messages_count INTEGER)');
@@ -171,6 +171,7 @@ export default class DatabaseWrapper implements IStorage {
           id: u.id,
           lastTimeOnline: u.last_time_online,
           sex: convertNumberToSex(u.sex),
+          image: u.image,
           user: u.user,
           location: {
             region: u.region,
@@ -420,8 +421,8 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   public getInsertUser(user: UserModel): QueryObject {
-    return ['insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online) values (?, ?, ?, 0, ?, ?, ?, ?, ?)',
-        [user.id, user.user, convertSexToNumber(user.sex), user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline]
+    return ['insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online, image) values (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)',
+        [user.id, user.user, convertSexToNumber(user.sex), user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline, user.image]
     ]
   }
 

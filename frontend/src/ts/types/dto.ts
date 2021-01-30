@@ -51,6 +51,7 @@ export interface ChannelDto {
 export interface UserDto {
   user: string;
   userId: number;
+  userImage: string;
   lastTimeOnline: number;
   sex: SexModelString;
   location: LocationDto;

@@ -2,7 +2,12 @@
   <li
     :class="onlineClass"
   >
-    <user-name-sex :user="user"/>
+    <div class="user-name-sex">
+      <div class="user-icon">
+        <user-icon-or-sex :user="user"/>
+      </div>
+      <span>{{ user.user }}</span>
+    </div>
     <img
       v-if="consts.FLAGS && user.location.countryCode"
       class="country"
@@ -25,9 +30,10 @@ import {
 import { getFlagPath, } from '@/ts/utils/htmlApi';
 import { FLAGS } from '@/ts/utils/consts';
 import UserNameSex from '@/vue/chat/UserNameSex.vue';
+import UserIconOrSex from '@/vue/chat/UserIconOrSex.vue';
 
 @Component({
-  components: {UserNameSex}
+  components: {UserIconOrSex, UserNameSex}
 })
 export default class RoomUsersUser extends Vue {
   @Prop() public user!: UserModel;
@@ -72,6 +78,20 @@ export default class RoomUsersUser extends Vue {
 
 <style lang="sass" scoped>
   @import "~@/assets/sass/partials/room_users_table.sass"
+  .user-icon
+    width: 60px
+    display: flex
+    justify-content: space-around
+
+  .user-name-sex
+    display: flex
+    justify-content: center
+    /deep/ i
+      position: relative
+      top: 3px
+      margin-right: 3px
+  span
+    margin-left: 5px
 
   li
     @extend %li

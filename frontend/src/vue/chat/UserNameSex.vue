@@ -1,60 +1,31 @@
 <template>
-  <div><i :class="userSexClass" />{{ user.user }}</div>
+  <div>
+    <user-icon-or-sex :user="user"/>
+    <span>{{ user.user }}</span>
+  </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue
-} from 'vue-property-decorator';
-import { UserModel } from '@/ts/types/model';
-
-@Component
+  import {
+    Component,
+    Prop,
+    Vue
+  } from 'vue-property-decorator';
+  import {UserModel} from '@/ts/types/model';
+  import {resolveMediaUrl} from '@/ts/utils/htmlApi';
+  import UserIconOrSex from '@/vue/chat/UserIconOrSex.vue';
+  @Component({
+    components: {UserIconOrSex}
+  })
   export default class UserNameSex extends Vue {
 
     @Prop()
     public readonly user!: UserModel;
 
-    get userSexClass() {
-      if (this.user.sex === 'Male') {
-        return 'icon-man';
-      } else if (this.user.sex === 'Female') {
-        return 'icon-girl';
-      } else if (this.user.sex === 'Secret') {
-        return 'icon-user-secret';
-      } else {
-        throw Error(`Invalid sex ${this.user.sex}`);
-      }
-    }
   }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  i
-    position: relative
-    top: 3px
-    margin-right: 3px
-  .color-lor
-    .online
-      .icon-man, .icon-girl, .icon-user-secret
-        color: #2e9154
-    .offline
-      .icon-man, .icon-girl, .icon-user-secret
-        color: #c53432
 
-  .color-reg
-    .online
-      .icon-man, .icon-girl, .icon-user-secret
-        color: #1f772c
-    .offline
-      .icon-man, .icon-girl, .icon-user-secret
-        color: #b32c1c
 
-  .color-white
-    .online
-      .icon-man, .icon-girl, .icon-user-secret
-        color: #78f584
-    .offline
-      .icon-man, .icon-girl, .icon-user-secret
-        color: #fa9d9b
+
 </style>

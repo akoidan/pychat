@@ -20,7 +20,7 @@
           :key="message.fieldDay"
           :day="message.fieldDay"
         />
-        <chat-message v-else :key="message.id" :message="message" class="message-content" />
+        <chat-message v-else :key="message.id" :message="message" />
       </template>
     </div>
     <div

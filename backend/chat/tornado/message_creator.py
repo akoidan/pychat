@@ -32,7 +32,6 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.SET_WS_ID,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.TIME: get_milliseconds(),
-			VarNames.USER_IMAGE: up.photo.url if up.photo else None,
 			VarNames.CURRENT_USER_SETTINGS: self.get_user_settings(up),
 			VarNames.CURRENT_USER_INFO: self.get_user_profile(up),
 		}
@@ -57,23 +56,6 @@ class MessagesCreator(object):
 			return cls.create_message(message, files, prep_tags)
 
 		return list(map(message_to_dto, messages))
-
-	@staticmethod
-	def set_profile_image(url):
-		return {
-			VarNames.HANDLER_NAME: HandlerNames.WS,
-			VarNames.EVENT: Actions.SET_PROFILE_IMAGE,
-			VarNames.CONTENT: url,
-		}
-
-	def changed_user_profile(self, sex,  user_id, username):
-		return  {
-			VarNames.HANDLER_NAME: HandlerNames.WS,
-			VarNames.EVENT: Actions.USER_PROFILE_CHANGED,
-			UserProfileVarNames.SEX: sex,
-			UserProfileVarNames.USER_ID: user_id,
-			UserProfileVarNames.USERNAME: username,
-		}
 
 	def set_user_profile(self, js_message_id,  message):
 		return  {

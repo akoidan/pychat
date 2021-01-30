@@ -125,7 +125,6 @@ export interface SetWsIdMessage extends DefaultWsInMessage<'setWsId', 'ws'>, Opp
   users: UserDto[];
   online: Record<number, string[]>;
   time: number;
-  userImage: string;
   userInfo: UserProfileDto;
   userSettings: UserSettingsDto;
 }
@@ -180,10 +179,6 @@ export interface SetSettingsMessage extends DefaultWsInMessage<'setSettings', 'w
 
 export interface SetUserProfileMessage extends DefaultWsInMessage<'setUserProfile', 'ws'> {
   content: UserProfileDto;
-}
-
-export interface SetProfileImageMessage extends DefaultWsInMessage<'setProfileImage', 'ws'> {
-  content: string;
 }
 
 export interface UserProfileChangedMessage extends DefaultWsInMessage<'userProfileChanged', 'ws'>, UserDto {

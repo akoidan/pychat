@@ -9,11 +9,14 @@
         {{ channel.name }}
       </router-link>
     </template>
-    <room-users-public
+
+    <room-users-wrapper
       v-for="room in channel.rooms"
       :key="room.id"
       :room="room"
-    />
+    >
+      {{ room.name }}
+    </room-users-wrapper>
   </chat-right-collapsed-section>
 </template>
 <script lang="ts">
@@ -26,10 +29,10 @@
   import {ChannelUIModel} from '@/ts/types/model';
   import ChatRightCollapsedSection
     from '@/vue/chat/right/ChatRightCollapsedSection.vue';
-  import RoomUsersPublic from '@/vue/chat/right/RoomUsersPublic.vue';
+  import RoomUsersWrapper from '@/vue/chat/right/RoomUsersWrapper.vue';
 
   @Component({
-    components: {RoomUsersPublic, ChatRightCollapsedSection}
+    components: {RoomUsersWrapper, ChatRightCollapsedSection}
   })
   export default class ChannelTable extends Vue {
     @Prop()

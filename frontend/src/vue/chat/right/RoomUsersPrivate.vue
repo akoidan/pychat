@@ -1,6 +1,10 @@
 <template>
   <room-users-wrapper :room="room" :class="onlineActiveClass">
-    <user-name-sex :user="user"/>
+
+    <div class="user-icon">
+      <user-icon-or-sex :user="user"/>
+    </div>
+    <span>{{ user.user }}</span>
   </room-users-wrapper>
 </template>
 <script lang="ts">
@@ -19,9 +23,10 @@ import { PrivateRoomsIds } from '@/ts/types/types';
 import RoomRightIcon from '@/vue/chat/right/RoomRightIcon.vue';
 import UserNameSex from '@/vue/chat/UserNameSex.vue';
 import RoomUsersWrapper from '@/vue/chat/right/RoomUsersWrapper.vue';
+import UserIconOrSex from '@/vue/chat/UserIconOrSex.vue';
 
 @Component({
-  components: {RoomUsersWrapper, UserNameSex, RoomRightIcon}
+  components: {UserIconOrSex, RoomUsersWrapper, UserNameSex, RoomRightIcon}
 })
 export default class RoomUsersPrivate extends Vue {
 
@@ -47,3 +52,13 @@ export default class RoomUsersPrivate extends Vue {
 
 }
 </script>
+
+<style lang="sass" scoped>
+  .user-icon
+    width: 60px
+    display: flex
+    justify-content: space-around
+
+  .online, .offline
+    padding-left: 0
+</style>

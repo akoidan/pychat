@@ -64,6 +64,7 @@ export interface UserModel {
   user: string;
   id: number;
   sex: SexModelString;
+  image: string;
   lastTimeOnline: number;
   location: Location;
 }

@@ -2,7 +2,7 @@
   <div :class="cls" @mouseover.passive="removeUnread">
     <div v-if="message.isEditingActive" class="editing-background"></div>
     <div v-if="message.isThreadOpened" class="thread-background" @click="closeThread"></div>
-    <chat-message :message="message" class="message-content" @quote="quote"/>
+    <chat-message :message="message" @quote="quote"/>
     <chat-text-area
       v-if="message.isEditingActive"
       :ref="textarea"
@@ -187,11 +187,6 @@ export default class ChatSendingMessage extends Vue {
         display: inline-block
       %message-status, .spinner
         display: none
-      //.message-content
-      //  margin-top: 0 //-$space-between-messages/2
-      //  padding-top: 0 // $space-between-messages/2
-      //  padding-bottom: 0 //$space-between-messages/2
-      //  margin-bottom: 0 //-$space-between-messages/2
 
   .sendingMessage
     position: relative

@@ -9,6 +9,7 @@ export interface UserDB {
   deleted: BooleanDB;
   country_code: string;
   country: string;
+  image: string;
   region: string;
   city: string;
 }

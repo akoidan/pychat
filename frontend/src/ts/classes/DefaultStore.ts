@@ -128,7 +128,6 @@ export class DefaultStore extends VuexModule {
   public activeRoomId: number | null = null;
   public userInfo: CurrentUserInfoModel | null = null;
   public userSettings: CurrentUserSettingsModel | null = null;
-  public userImage: string | null = null;
   public allUsersDict: UserDictModel = {};
   public regHeader: string | null = null;
   public onlineDict: Record<string, string[]> = {};
@@ -272,6 +271,13 @@ export class DefaultStore extends VuexModule {
 
   get myId(): number | null {
     return this.userInfo?.userId ?? null;
+  }
+
+  get userImage(): string|null {
+    if (this.userInfo) {
+      return this.allUsersDict[this.userInfo.userId].image;
+    }
+    return null;
   }
 
   get privateRoomsUsersIds(): PrivateRoomsIds {
@@ -790,6 +796,7 @@ export class DefaultStore extends VuexModule {
   public setUser(user: UserModel) {
     this.allUsersDict[user.id].user = user.user;
     this.allUsersDict[user.id].sex = user.sex;
+    this.allUsersDict[user.id].image = user.image;
     this.storage.saveUser(user);
   }
 
@@ -808,11 +815,6 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setPastingQueue(ids: PastingTextAreaElement[]) {
     this.pastingTextAreaQueue = ids;
-  }
-
-  @Mutation
-  public setUserImage(userImage: string) {
-    this.userImage = userImage;
   }
 
   @Mutation
@@ -870,7 +872,6 @@ export class DefaultStore extends VuexModule {
   public logout() {
     this.userInfo = null;
     this.userSettings = null;
-    this.userImage = null;
     this.roomsDict = {};
     this.allUsersDict = {};
     this.onlineDict = {};

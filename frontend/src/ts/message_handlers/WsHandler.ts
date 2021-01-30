@@ -43,7 +43,6 @@ import {
   PongMessage,
   PrintMessage,
   SaveChannelSettingsMessage,
-  SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
@@ -80,7 +79,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   protected readonly handlers: HandlerTypes<keyof WsHandler, 'ws'> = {
     setSettings: <HandlerType<'setSettings', 'ws'>>this.setSettings,
     setUserProfile: <HandlerType<'setUserProfile', 'ws'>>this.setUserProfile,
-    setProfileImage: <HandlerType<'setProfileImage', 'ws'>>this.setProfileImage,
     setWsId: <HandlerType<'setWsId', 'ws'>>this.setWsId,
     logout: <HandlerType<'logout', 'ws'>>this.logout,
     userProfileChanged: <HandlerType<'userProfileChanged', 'ws'>>this.userProfileChanged,
@@ -487,10 +485,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.store.setUserInfo(a);
   }
 
-  public setProfileImage(m: SetProfileImageMessage) {
-    this.setUserImage(m.content);
-  }
-
   public convertServerTimeToPC(serverTime: number) {
     return serverTime + this.timeDiffWithServer; // serverTime + (Date.now - serverTime) === Date.now
   }
@@ -499,7 +493,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.wsConnectionId = message.opponentWsId;
     this.setUserInfo(message.userInfo);
     this.setUserSettings(message.userSettings);
-    this.setUserImage(message.userImage);
     this.timeDiffWithServer = Date.now() - message.time;
     const pubSetRooms: PubSetRooms = {
       action: 'init',
@@ -549,10 +542,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       loggerFactory.setLogWarnings(userInfo.logs ?? 'debug');
     }
     this.store.setUserSettings(um);
-  }
-
-  private setUserImage(image: string) {
-    this.store.setUserImage(image);
   }
 
   private onWsMessage(message: MessageEvent) {

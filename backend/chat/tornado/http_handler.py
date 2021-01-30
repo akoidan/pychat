@@ -303,21 +303,23 @@ class HttpHandler(MethodDispatcher):
 		user_profile.save()
 		RoomUsers(user_id=user_profile.id, room_id=settings.ALL_ROOM_ID, notifications=False).save()
 
+		user_data = {
+			VarNames.ROOMS: [{
+				VarNames.ROOM_ID: settings.ALL_ROOM_ID,
+				VarNames.ROOM_USERS: list(RoomUsers.objects.filter(room_id=ALL_ROOM_ID).values_list('user_id', flat=True))
+			}],
+			VarNames.EVENT: Actions.CREATE_NEW_USER,
+			VarNames.HANDLER_NAME: HandlerNames.ROOM,
+		}
+		user_data.update(RedisPrefix.set_js_user_structure(
+			user_profile.id,
+			user_profile.username,
+			user_profile.sex,
+			None
+		))
 		global_redis.async_redis_publisher.publish(
 			settings.ALL_ROOM_ID,
-			json.dumps(
-				{
-					VarNames.ROOMS: [{
-						VarNames.ROOM_ID: settings.ALL_ROOM_ID,
-						VarNames.ROOM_USERS: list(RoomUsers.objects.filter(room_id=ALL_ROOM_ID).values_list('user_id', flat=True))
-					}],
-					VarNames.EVENT: Actions.CREATE_NEW_USER,
-					VarNames.USER_ID: user_profile.id,
-					VarNames.HANDLER_NAME: HandlerNames.ROOM,
-					VarNames.GENDER: user_profile.sex_str,
-					VarNames.USER: user_profile.username,
-				}
-			),
+			json.dumps(user_data),
 		)
 
 		if email:
@@ -603,10 +605,20 @@ class HttpHandler(MethodDispatcher):
 		"""
 		up = UserProfile(photo=files['file'], id=self.user_id)
 		up.save(update_fields=('photo',))
-		url = up.photo.url
-		message = json.dumps(MessagesCreator.set_profile_image(url))
-		channel = RedisPrefix.generate_user(self.user_id)
-		global_redis.sync_redis.publish(channel, message)
+		up = UserProfile.objects.values('sex', 'photo', 'username').get(id=self.user_id)
+		payload = {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.USER_PROFILE_CHANGED
+		}
+		payload.update(
+			RedisPrefix.set_js_user_structure(
+				self.user_id,
+				up['username'],
+				up['sex'],
+				"{0}{1}".format(settings.MEDIA_URL, up['photo']) if up['photo'] else None,
+			)
+		)
+		global_redis.sync_redis.publish(settings.ALL_ROOM_ID, json.dumps(payload))
 		return settings.VALIDATION_IS_OK
 
 	@require_http_method('GET')

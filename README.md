@@ -474,6 +474,8 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* Room should have image
+* Image should be collapsed to universal size, e.g. 50x120 that's small and easy to use
 * pasting from painterpage doesn't work
 * lastTimeOnline
 * /giphy should work exactly like mention with drop above
