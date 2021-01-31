@@ -104,7 +104,7 @@ import {
   RawLocation,
   Route
 } from "vue-router";
-import ChatAttachments from '@/vue/chat/chatbox/ChatAttachments.vue';
+import ChatAttachments from '@/vue/chat/textarea/ChatAttachments.vue';
 import SmileyHolder from '@/vue/chat/chatbox/SmileyHolder.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
 import {

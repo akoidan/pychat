@@ -4,11 +4,9 @@
       {{ title }} <b>{{ room.name }}</b>
     </div>
     <ul>
-      <room-users-user
-        v-for="user in usersArray"
-        :key="user.id"
-        :user="user"
-      />
+      <li v-for="user in usersArray" :key="user.id">
+        <user-row :user="user"/>
+      </li>
     </ul>
     <template v-if="userIds.length > 0">
       <div class="current-room-users-table-header">
@@ -44,12 +42,12 @@
     RoomDictModel,
     UserDictModel
   } from '@/ts/types/model';
-  import RoomUsersUser from '@/vue/chat/right/RoomUsersUser.vue';
+  import UserRow from '@/vue/chat/right/UserRow.vue';
   import AppSubmit from '@/vue/ui/AppSubmit.vue';
   import PickUser from '@/vue/pages/parts/PickUser.vue';
 
   @Component({
-  components: {RoomUsersUser,  AppSubmit, PickUser}
+  components: {UserRow,  AppSubmit, PickUser}
 })
 export default class RoomUsersListPage extends Vue {
 
@@ -63,7 +61,7 @@ export default class RoomUsersListPage extends Vue {
   public readonly channelsDictUI!: ChannelsDictUIModel;
 
 
-    private userdToAdd: number[] = [];
+  private userdToAdd: number[] = [];
   public running: boolean = false;
 
 
@@ -126,6 +124,11 @@ export default class RoomUsersListPage extends Vue {
 
   ul
     @extend %ul
+
+  li
+    @extend %li
+    justify-content: space-between
+    display: flex
 
   .usersStateText:hover
     cursor: pointer

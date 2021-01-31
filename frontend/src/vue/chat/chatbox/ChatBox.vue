@@ -88,7 +88,7 @@ import {
   Vue
 } from "vue-property-decorator";
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import ChatTextMessage from '@/vue/chat/message/ChatMessage.vue';
+import ChatTextMessage from '@/vue/chat/message/ChatTextMessage.vue';
 import SearchMessages from '@/vue/chat/chatbox/SearchMessages.vue';
 import {
   MessageModel,
@@ -101,7 +101,7 @@ import { MessageModelDto } from '@/ts/types/dto';
 
 import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingMessage from '@/vue/chat/chatbox/ChatSendingMessage.vue';
+import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage.vue';
 import ChatUserActionMessage from '@/vue/chat/message/ChatUserActionMessage.vue';
 import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
 import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
@@ -313,9 +313,6 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
     height: 100%
     display: flex
     flex-direction: column // otherwise chat-call is not full width
-    /deep/ p
-      padding: $space-between-messages $space-between-messages/4
-      margin: 0
     /deep/ .message-header
       font-weight: bold
 

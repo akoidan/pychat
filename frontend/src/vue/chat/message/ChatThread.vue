@@ -35,7 +35,7 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {MessageModel, ReceivingFile, SendingFile} from '@/ts/types/model';
-import ChatSendingMessage from '@/vue/chat/chatbox/ChatSendingMessage.vue';
+import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage.vue';
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';

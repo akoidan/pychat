@@ -40,7 +40,7 @@ import {
   Emit,
   Vue
 } from 'vue-property-decorator';
-import ChatTextMessage from '@/vue/chat/message/ChatMessage.vue';
+import ChatTextMessage from '@/vue/chat/message/ChatTextMessage.vue';
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
@@ -54,7 +54,7 @@ import ChatMessageToolTip from '@/vue/chat/message/ChatMessageToolTip.vue';
 import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 
 @Component({
-  components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatMessage: ChatTextMessage}
+  components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatTextMessage}
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;

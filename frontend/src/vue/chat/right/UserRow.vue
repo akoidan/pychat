@@ -1,11 +1,9 @@
 <template>
-  <li
+  <div
     :class="onlineClass"
   >
     <div class="user-name-sex">
-      <div class="user-icon">
-        <user-icon-or-sex :user="user"/>
-      </div>
+      <user-image-icon :user="user"/>
       <span>{{ user.user }}</span>
     </div>
     <img
@@ -14,7 +12,7 @@
       :src="getFlag(user)"
       :title="title"
     >
-  </li>
+  </div>
 </template>
 <script lang="ts">
 import { State } from '@/ts/instances/storeInstance';
@@ -29,13 +27,13 @@ import {
 } from '@/ts/types/model';
 import { getFlagPath, } from '@/ts/utils/htmlApi';
 import { FLAGS } from '@/ts/utils/consts';
-import UserNameSex from '@/vue/chat/chatbox/UserNameSex.vue';
-import UserIconOrSex from '@/vue/chat/chatbox/UserIconOrSex.vue';
+import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
+
 
 @Component({
-  components: {UserIconOrSex, UserNameSex}
+  components: {UserImageIcon}
 })
-export default class RoomUsersUser extends Vue {
+export default class UserRow extends Vue {
   @Prop() public user!: UserModel;
   @State
   public readonly activeRoom!: RoomModel;
@@ -85,7 +83,6 @@ export default class RoomUsersUser extends Vue {
 
   .user-name-sex
     display: flex
-    justify-content: center
     /deep/ i
       position: relative
       top: 3px
@@ -93,10 +90,6 @@ export default class RoomUsersUser extends Vue {
   span
     margin-left: 5px
 
-  li
-    @extend %li
-    justify-content: space-between
-    display: flex
   div
     text-overflow: ellipsis
     word-break: break-all

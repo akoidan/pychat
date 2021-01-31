@@ -12,11 +12,10 @@ import {
 } from 'vue-property-decorator';
 import { UserDictModel } from '@/ts/types/model';
 import { timeToString } from '@/ts/utils/htmlApi';
-import UserNameSex from '@/vue/chat/chatbox/UserNameSex.vue';
-import UserIconOrSex from '@/vue/chat/chatbox/UserIconOrSex.vue';
+
 import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
 @Component({
-  components: {UserImageIcon, UserIconOrSex, UserNameSex}
+  components: {UserImageIcon}
 })
 export default class ChatMessageHeader extends Vue {
 
@@ -41,8 +40,7 @@ export default class ChatMessageHeader extends Vue {
     margin: -8px 5px -8px 0
   .time-mess
     position: absolute
-    right: 0px
-    background-color: red
+    right: 0
     font-size: 16px
     margin-right: 5px
     @media screen and (max-width: 400px)

@@ -1,9 +1,10 @@
 <template>
-  <div class="message-self">
-    <chat-message-header
-      :time="sendingFile.time"
-      :user-id="myId"
-    />
+  <chat-message-wrapper :time="sendingFile.time" class="message-self">
+    <template #header>
+      <chat-message-header
+        :user-id="myId"
+      />
+    </template>
     <table class="table">
       <tbody>
         <tr>
@@ -23,7 +24,7 @@
         :transfer="transfer"
       />
     </table>
-  </div>
+  </chat-message-wrapper>
 </template>
 <script lang="ts">
 import { State } from '@/ts/instances/storeInstance';
@@ -35,11 +36,14 @@ import {
 import { SendingFile } from '@/ts/types/model';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingFileTransfer from '@/vue/chat/chatbox/ChatSendingFileTransfer.vue';
+import ChatSendingFileTransfer from '@/vue/chat/message/ChatSendingFileTransfer.vue';
 import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 
 @Component({
-  components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
+  components: {
+    ChatMessageWrapper,
+    ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
 })
 export default class ChatSendingFile extends Vue {
   @Prop() public sendingFile!: SendingFile;
@@ -58,7 +62,7 @@ export default class ChatSendingFile extends Vue {
   @import "~@/assets/sass/partials/variables"
 
   .message-self
-    padding: $space-between-messages $space-between-messages/4
+    display: flex
   table /deep/
     width: 100%
     th, td

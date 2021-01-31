@@ -1,11 +1,7 @@
 <template>
-  <room-users-wrapper :room="room" :class="onlineActiveClass">
-
-    <div class="user-icon">
-      <user-icon-or-sex :user="user"/>
-    </div>
-    <span>{{ user.user }}</span>
-  </room-users-wrapper>
+  <room-row-wrapper :room="room" :class="onlineActiveClass">
+    <user-row :user="user"></user-row>
+  </room-row-wrapper>
 </template>
 <script lang="ts">
 import { State } from '@/ts/instances/storeInstance';
@@ -21,14 +17,13 @@ import {
 } from '@/ts/types/model';
 import { PrivateRoomsIds } from '@/ts/types/types';
 import RoomRightIcon from '@/vue/chat/right/RoomRightIcon.vue';
-import UserNameSex from '@/vue/chat/chatbox/UserNameSex.vue';
-import RoomUsersWrapper from '@/vue/chat/right/RoomUsersWrapper.vue';
-import UserIconOrSex from '@/vue/chat/chatbox/UserIconOrSex.vue';
+import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper.vue';
+import UserRow from '@/vue/chat/right/UserRow.vue';
 
 @Component({
-  components: {UserIconOrSex, RoomUsersWrapper, UserNameSex, RoomRightIcon}
+  components: {UserRow, RoomRowWrapper,  RoomRightIcon}
 })
-export default class RoomUsersPrivate extends Vue {
+export default class PrivateRoomRow extends Vue {
 
   @Prop() public room!: RoomModel;
   @State

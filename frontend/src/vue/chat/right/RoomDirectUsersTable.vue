@@ -5,7 +5,7 @@
     <template v-slot:name>
       Users
     </template>
-    <room-users-private
+    <private-room-row
       v-for="room in privateRooms"
       :key="room.id"
       :room="room"
@@ -17,14 +17,14 @@ import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import RoomUsersPrivate from '@/vue/chat/right/RoomUsersPrivate.vue';
+import PrivateRoomRow from '@/vue/chat/right/PrivateRoomRow.vue';
 import {State} from '@/ts/instances/storeInstance';
 import {RoomModel} from '@/ts/types/model';
 import ChatRightCollapsedSection
   from '@/vue/chat/right/ChatRightCollapsedSection.vue';
 
 @Component({
-  components: {ChatRightCollapsedSection, RoomUsersPrivate}
+  components: {ChatRightCollapsedSection, PrivateRoomRow}
 })
 export default class RoomDirectUsersTable extends Vue {
 

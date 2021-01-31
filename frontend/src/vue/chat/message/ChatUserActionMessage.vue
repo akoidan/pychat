@@ -1,10 +1,11 @@
 <template>
-  <p class="message-system">
-    <span class="message-header">
-      <span class="timeMess">({{ getTime }})</span>
+  <chat-message-wrapper class="message-system" :time="time">
+    <template #header>
+      <span class="message-header">
       <span>System</span>: </span>
+    </template>
     <span class="message-text-style">{{ isUser }} <b>{{ user }}</b> {{ where }}</span>
-  </p>
+  </chat-message-wrapper>
 </template>
 <script lang="ts">
 import { State } from '@/ts/instances/storeInstance';
@@ -15,9 +16,10 @@ import {
 } from 'vue-property-decorator';
 import { UserModel } from '@/ts/types/model';
 import {timeToString} from '@/ts/utils/htmlApi';
-
-
-@Component
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+@Component({
+  components: {ChatMessageWrapper}
+})
 export default class ChatUserActionMessage extends Vue {
   @Prop() public time!: number;
   @Prop() public userId!: number;
@@ -42,10 +44,6 @@ export default class ChatUserActionMessage extends Vue {
 
   get isMe() {
     return this.userId === this.myId;
-  }
-
-  get getTime() {
-    return timeToString(this.time);
   }
 }
 </script>

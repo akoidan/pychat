@@ -22,12 +22,8 @@
         title="Filter by username"
       >
       <ul>
-        <li
-          v-for="user in filteredUsers"
-          :key="user.id"
-          @click="addUser(user.id)"
-        >
-          {{ user.user }}
+        <li v-for="user in filteredUsers"   :key="user.id">
+          <user-row :user="user" @click.native="addUser(user.id)"/>
         </li>
       </ul>
     </template>
@@ -41,8 +37,10 @@ import {
 } from 'vue-property-decorator';
 import { UserModel } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
-
-@Component
+import UserRow from '@/vue/chat/right/UserRow.vue';
+@Component({
+  components: {UserRow}
+})
 export default class PickUser extends Vue {
 
   @Prop() public value!: number[];
@@ -97,7 +95,6 @@ export default class PickUser extends Vue {
 
   .controls
     display: flex
-    margin-top: 15px
     flex-direction: column
     > *
       margin-bottom: 5px

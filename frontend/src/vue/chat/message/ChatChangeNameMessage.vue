@@ -1,13 +1,13 @@
 <template>
-  <p class="message-system">
-    <span class="message-header">
-      <span class="timeMess">({{ getTime }})</span>
-      <span>System</span>:
-    </span>
+  <chat-message-wrapper class="message-system" :time="time">
+    <template #header>
+      <span class="message-header">
+      <span>System</span>: </span>
+    </template>
     <span class="message-text-style">
       This room has been renamed from <b>{{ oldName }}</b> to <b>{{ newName }}</b>
     </span>
-  </p>
+  </chat-message-wrapper>
 </template>
 <script lang="ts">
 import {
@@ -16,17 +16,14 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { timeToString } from '@/ts/utils/htmlApi';
-
-
-@Component
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+@Component({
+  components: {ChatMessageWrapper}
+})
 export default class ChatChangeNameMessage extends Vue {
   @Prop() public time!: number;
   @Prop() public oldName!: string;
   @Prop() public newName!: string;
-
-  get getTime() {
-    return timeToString(this.time);
-  }
 }
 </script>
 

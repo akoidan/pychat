@@ -20,7 +20,7 @@
   @Component({
     components: {RoomRightIcon}
   })
-  export default class RoomUsersWrapper extends Vue {
+  export default class RoomRowWrapper extends Vue {
     @Prop() public room!: RoomModel;
 
     @State

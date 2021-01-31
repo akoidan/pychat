@@ -10,13 +10,13 @@
       </router-link>
     </template>
 
-    <room-users-wrapper
+    <room-row-wrapper
       v-for="room in channel.rooms"
       :key="room.id"
       :room="room"
     >
       {{ room.name }}
-    </room-users-wrapper>
+    </room-row-wrapper>
   </chat-right-collapsed-section>
 </template>
 <script lang="ts">
@@ -29,10 +29,10 @@
   import {ChannelUIModel} from '@/ts/types/model';
   import ChatRightCollapsedSection
     from '@/vue/chat/right/ChatRightCollapsedSection.vue';
-  import RoomUsersWrapper from '@/vue/chat/right/RoomUsersWrapper.vue';
+  import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper.vue';
 
   @Component({
-    components: {RoomUsersWrapper, ChatRightCollapsedSection}
+    components: {RoomRowWrapper, ChatRightCollapsedSection}
   })
   export default class ChannelTable extends Vue {
     @Prop()

@@ -1,35 +1,38 @@
 <template>
-  <div :class="mainClass">
-    <chat-message-header
-      :time="receivingFile.time"
-      :user-id="receivingFile.userId"
-    />
-    <receiving-file-info
-      :receiving-file="receivingFile"
-    />
-    <app-progress-bar
-      v-if="showProgress"
-      class="progress-wrap-file"
-      :upload="receivingFile.upload"
-    />
-    <div
-      v-if="showYesNo"
-      class="yesNo"
-    >
-      <input
-        type="button"
-        value="Accept"
-        class="green-btn"
-        @click="accept"
+  <chat-message-wrapper :time="receivingFile.time" :class="mainClass">
+    <template #header>
+      <chat-message-header
+        :user-id="receivingFile.userId"
+      />
+    </template>
+    <div>
+      <receiving-file-info
+        :receiving-file="receivingFile"
+      />
+      <app-progress-bar
+        v-if="showProgress"
+        class="progress-wrap-file"
+        :upload="receivingFile.upload"
+      />
+      <div
+        v-if="showYesNo"
+        class="yesNo"
       >
-      <input
-        type="button"
-        value="Decline"
-        class="red-btn"
-        @click="decline"
-      >
+        <input
+          type="button"
+          value="Accept"
+          class="green-btn"
+          @click="accept"
+        >
+        <input
+          type="button"
+          value="Decline"
+          class="red-btn"
+          @click="decline"
+        >
+      </div>
     </div>
-  </div>
+  </chat-message-wrapper>
 </template>
 <script lang="ts">
 import {
@@ -45,10 +48,16 @@ import {
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
 import ReceivingFileInfo from '@/vue/chat/message/ReceivingFileInfo.vue';
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 
 
 @Component({
-  components: {ReceivingFileInfo, ChatMessageHeader, AppProgressBar}
+  components: {
+    ChatMessageWrapper,
+    ReceivingFileInfo,
+    ChatMessageHeader,
+    AppProgressBar
+  }
 })
 export default class ChatReceivingFile extends Vue {
   @Prop() public receivingFile!: ReceivingFile;
@@ -88,7 +97,7 @@ export default class ChatReceivingFile extends Vue {
   @import "~@/assets/sass/partials/variables"
 
   .message-receiving-file
-    padding: $space-between-messages $space-between-messages/4
+    display: flex
 
   .progress-wrap-file /deep/ .progress-wrap
     width: calc(100% - 40px)
