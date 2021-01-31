@@ -188,12 +188,12 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		# 		room[VarNames.LOAD_MESSAGES_OFFLINE] = o
 
 		if settings.SHOW_COUNTRY_CODE:
-			fetched_users  = UserProfile.objects.annotate(user_c=Count('id')).values('id', 'username', 'sex', 'photo', 'userjoinedinfo__ip__country_code', 'userjoinedinfo__ip__country', 'userjoinedinfo__ip__region', 'userjoinedinfo__ip__city')
+			fetched_users  = UserProfile.objects.annotate(user_c=Count('id')).values('id', 'username', 'sex', 'thumbnail', 'userjoinedinfo__ip__country_code', 'userjoinedinfo__ip__country', 'userjoinedinfo__ip__region', 'userjoinedinfo__ip__city')
 			user_dict = [RedisPrefix.set_js_user_structure_flag(
 				user['id'],
 				user['username'],
 				user['sex'],
-				"{0}{1}".format(settings.MEDIA_URL, user['photo']) if user['photo'] else None,
+				"{0}{1}".format(settings.MEDIA_URL, user['thumbnail']) if user['thumbnail'] else None,
 				user['userjoinedinfo__ip__country_code'],
 				user['userjoinedinfo__ip__country'],
 				user['userjoinedinfo__ip__region'],
@@ -205,7 +205,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				user['id'],
 				user['username'],
 				user['sex'],
-				"{0}{1}".format(settings.MEDIA_URL, user['photo']) if user['photo'] else None,
+				"{0}{1}".format(settings.MEDIA_URL, user['thumbnail']) if user['thumbnail'] else None,
 			) for user in fetched_users]
 
 		self.ws_write(self.message_creator.set_room(room_users, user_dict, online, user_db, channels))

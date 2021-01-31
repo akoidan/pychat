@@ -116,7 +116,10 @@ import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {CurrentUserInfoModel, SexModelString} from '@/ts/types/model';
-import {UserProfileDto} from '@/ts/types/dto';
+import {
+  UserProfileDto,
+  UserProfileDtoWoImage
+} from '@/ts/types/dto';
 import {currentUserInfoModelToDto} from '@/ts/types/converters';
 import AppInputDate from '@/vue/ui/AppInputDate.vue';
 import { SetUserProfileMessage } from '@/ts/types/messages/wsInMessages';
@@ -132,7 +135,7 @@ export default class UserProfileInfo extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
 
   public sex: SexModelString[] = ['Male', 'Female', 'Secret'];
-  private model!: UserProfileDto;
+  private model!: UserProfileDtoWoImage;
 
   public created() {
     this.model = currentUserInfoModelToDto(this.userInfo);
@@ -141,7 +144,7 @@ export default class UserProfileInfo extends Vue {
   @ApplyGrowlErr({ message: 'Error saving profile', runningProp: 'running'})
   public async save() {
     this.$logger.debug('Saving userProfile')();
-    const cui: UserProfileDto = {...this.model};
+    const cui: UserProfileDtoWoImage = {...this.model};
     const e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
     this.$store.growlSuccess('User profile has been saved');
   }

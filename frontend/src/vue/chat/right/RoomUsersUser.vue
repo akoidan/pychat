@@ -29,8 +29,8 @@ import {
 } from '@/ts/types/model';
 import { getFlagPath, } from '@/ts/utils/htmlApi';
 import { FLAGS } from '@/ts/utils/consts';
-import UserNameSex from '@/vue/chat/UserNameSex.vue';
-import UserIconOrSex from '@/vue/chat/UserIconOrSex.vue';
+import UserNameSex from '@/vue/chat/chatbox/UserNameSex.vue';
+import UserIconOrSex from '@/vue/chat/chatbox/UserIconOrSex.vue';
 
 @Component({
   components: {UserIconOrSex, UserNameSex}

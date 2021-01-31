@@ -9,7 +9,7 @@ export interface UserDB {
   deleted: BooleanDB;
   country_code: string;
   country: string;
-  image: string;
+  thumbnail: string;
   region: string;
   city: string;
 }
@@ -88,6 +88,7 @@ export interface ProfileDB {
   user: string;
   name: string;
   city: string;
+  image: string;
   surname: string;
   email: string;
   birthday: string;

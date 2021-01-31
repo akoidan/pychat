@@ -28,7 +28,7 @@ import {
 } from 'vue-property-decorator';
 import { CallInfoModel } from '@/ts/types/model';
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
-import VideoObject from '@/vue/chat/VideoObject.vue';
+import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
 
 @Component({
   components: {VideoObject, AppInputRange}

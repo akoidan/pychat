@@ -29,9 +29,9 @@ import {
   IncomingCallModel
 } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
-import IncomingCall from '@/vue/chat/IncomingCall.vue';
+import IncomingCall from '@/vue/chat/call/IncomingCall.vue';
 import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
-import ChatBackIcon from '@/vue/chat/ChatBackIcon.vue';
+import ChatBackIcon from '@/vue/chat/chatbox/ChatBackIcon.vue';
 
 @Component({
   components: {ChatBackIcon, AppNavWrapper, IncomingCall}

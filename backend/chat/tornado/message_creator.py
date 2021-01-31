@@ -89,6 +89,7 @@ class MessagesCreator(object):
 			UserProfileVarNames.USER_ID: up.id,
 			UserProfileVarNames.NAME: up.name,
 			UserProfileVarNames.CITY: up.city,
+			VarNames.USER_IMAGE: up.photo.url if up.photo else None,
 			UserProfileVarNames.SEX: up.sex_str,
 			UserProfileVarNames.CONTACTS: up.contacts,
 			UserProfileVarNames.BIRTHDAY: str(up.birthday) if up.birthday else None,

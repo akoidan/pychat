@@ -10,6 +10,7 @@ import loggerFactory from '@/ts/instances/loggerFactory';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
   CurrentUserInfoModel,
+  CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
   MessageStatus,
   UserModel
@@ -27,6 +28,7 @@ import {
   MessageModelDto,
   RoomNoUsersDto,
   UserProfileDto,
+  UserProfileDtoWoImage,
   UserSettingsDto
 } from '@/ts/types/dto';
 import { sub } from '@/ts/instances/subInstance';
@@ -43,6 +45,7 @@ import {
   PongMessage,
   PrintMessage,
   SaveChannelSettingsMessage,
+  SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
@@ -79,6 +82,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   protected readonly handlers: HandlerTypes<keyof WsHandler, 'ws'> = {
     setSettings: <HandlerType<'setSettings', 'ws'>>this.setSettings,
     setUserProfile: <HandlerType<'setUserProfile', 'ws'>>this.setUserProfile,
+    setProfileImage: <HandlerType<'setProfileImage', 'ws'>>this.setProfileImage,
     setWsId: <HandlerType<'setWsId', 'ws'>>this.setWsId,
     logout: <HandlerType<'logout', 'ws'>>this.logout,
     userProfileChanged: <HandlerType<'userProfileChanged', 'ws'>>this.userProfileChanged,
@@ -239,7 +243,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async saveUser(content: UserProfileDto): Promise<SetUserProfileMessage|unknown> {
+  public async saveUser(content: UserProfileDtoWoImage): Promise<SetUserProfileMessage|unknown> {
     return this.messageProc.sendToServerAndAwait({
       action: 'setUserProfile',
       content
@@ -480,9 +484,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public setUserProfile(m: SetUserProfileMessage) {
-    const a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
+    const a: CurrentUserInfoWoImage = currentUserInfoDtoToModel(m.content);
     a.userId = this.store.userInfo!.userId; // this could came only when we logged in
     this.store.setUserInfo(a);
+  }
+
+  public setProfileImage(m: SetProfileImageMessage) {
+    this.setUserImage(m.content);
   }
 
   public convertServerTimeToPC(serverTime: number) {
@@ -493,6 +501,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.wsConnectionId = message.opponentWsId;
     this.setUserInfo(message.userInfo);
     this.setUserSettings(message.userSettings);
+    this.setUserImage(message.userInfo.userImage);
     this.timeDiffWithServer = Date.now() - message.time;
     const pubSetRooms: PubSetRooms = {
       action: 'init',
@@ -532,7 +541,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   private setUserInfo(userInfo: UserProfileDto) {
-    const um: CurrentUserInfoModel = currentUserInfoDtoToModel(userInfo);
+    const um: CurrentUserInfoWoImage = currentUserInfoDtoToModel(userInfo);
     this.store.setUserInfo(um);
   }
 
@@ -542,6 +551,10 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       loggerFactory.setLogWarnings(userInfo.logs ?? 'debug');
     }
     this.store.setUserSettings(um);
+  }
+
+  private setUserImage(image: string) {
+    this.store.setUserImage(image);
   }
 
   private onWsMessage(message: MessageEvent) {

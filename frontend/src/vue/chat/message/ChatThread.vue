@@ -22,7 +22,6 @@
           v-else
           :key="message.id"
           :message="message"
-          @quote="onqoute"
         />
       </template>
       <chat-text-area
@@ -36,11 +35,11 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {MessageModel, ReceivingFile, SendingFile} from '@/ts/types/model';
-import ChatSendingMessage from '@/vue/chat/ChatSendingMessage.vue';
+import ChatSendingMessage from '@/vue/chat/chatbox/ChatSendingMessage.vue';
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
-import ChatSendingFile from '@/vue/chat/ChatSendingFile.vue';
-import ChatReceivingFile from '@/vue/chat/ChatReceivingFile.vue';
+import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
+import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
+import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
 import AppSeparator from '@/vue/ui/AppSeparator.vue';
 @Component({
   components: {
@@ -59,10 +58,6 @@ export default class ChatThread extends Vue {
   private readonly textarea!: ChatTextArea;
 
   private locked: boolean = false;
-
-  onqoute() {
-    this.textarea.onEmitQuote(this.message);
-  }
 
   @Watch('message.threadMessagesCount')
   checkThreadMessagesCountMatch() {

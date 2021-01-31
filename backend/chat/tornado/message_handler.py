@@ -644,7 +644,7 @@ class MessagesHandler():
 					self.user_id,
 					un,
 					settings.GENDERS_STR[sex],
-					userprofile.photo.url if userprofile.photo else None,
+					userprofile.thumbnail.url if userprofile.thumbnail else None,
 				)
 			)
 			self.publish(payload, settings.ALL_ROOM_ID)

@@ -2,17 +2,19 @@ import json
 import logging
 import re
 
+from PIL import Image as PilImage
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
-from django.db import connection, OperationalError, InterfaceError
+from django.core.files.base import ContentFile
+from django.db import connection
 from django.db.models import Q
+from django.utils.six import BytesIO
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
 from chat.log_filters import id_generator
-from chat.models import Image, UploadedFile, get_milliseconds, MessageMention
+from chat.models import Image, UploadedFile, MessageMention
+from chat.models import IpAddress
 from chat.models import User
-from chat.models import UserProfile, IpAddress
 from chat.py2_3 import dict_values_to_list
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
@@ -27,18 +29,18 @@ def is_blank(check_str):
 	else:
 		return True
 
-def get_history_message_query(messages, user_rooms, with_history):
-	cb = with_history_q if with_history else no_history_q
-	q_objects = Q()
-	if messages:
-		pmessages = json.loads(messages)
-	else:
-		pmessages = {}
-	for room_id in user_rooms:
-		room_hf = pmessages.get(str(room_id))
-		if room_hf:
-			cb(q_objects, room_id, room_hf['h'], room_hf['f'])
-	return q_objects
+# def get_history_message_query(messages, user_rooms, with_history):
+# 	cb = with_history_q if with_history else no_history_q
+# 	q_objects = Q()
+# 	if messages:
+# 		pmessages = json.loads(messages)
+# 	else:
+# 		pmessages = {}
+# 	for room_id in user_rooms:
+# 		room_hf = pmessages.get(str(room_id))
+# 		if room_hf:
+# 			cb(q_objects, room_id, room_hf['h'], room_hf['f'])
+# 	return q_objects
 
 
 def with_history_q(q_objects, room_id, h, f):
@@ -190,6 +192,15 @@ def update_symbols(files, tags, message):
 		new_tag_symbol = get_max_symbol_dict(tags)
 		if message.symbol is None or new_tag_symbol > message.symbol:
 			message.symbol = new_tag_symbol
+
+
+def create_thumbnail(input_file, up):
+	im = PilImage.open(input_file)
+	im.thumbnail((72, 72), PilImage.ANTIALIAS)
+	jpeg = im.convert('RGB')
+	thumb_io = BytesIO()
+	jpeg.save(thumb_io, 'jpeg', quality=60)
+	up.thumbnail.save(im.filename + '.jpeg', ContentFile(thumb_io.getvalue()), save=False)
 
 
 def get_message_images_videos(messages):

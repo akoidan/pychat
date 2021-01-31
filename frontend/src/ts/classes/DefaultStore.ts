@@ -8,6 +8,7 @@ import {
   ChannelsDictUIModel,
   ChannelUIModel,
   CurrentUserInfoModel,
+  CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
   EditingMessage,
   GrowlModel,
@@ -271,13 +272,6 @@ export class DefaultStore extends VuexModule {
 
   get myId(): number | null {
     return this.userInfo?.userId ?? null;
-  }
-
-  get userImage(): string|null {
-    if (this.userInfo) {
-      return this.allUsersDict[this.userInfo.userId].image;
-    }
-    return null;
   }
 
   get privateRoomsUsersIds(): PrivateRoomsIds {
@@ -801,15 +795,23 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setUserInfo(userInfo: CurrentUserInfoModel) {
-    this.userInfo = userInfo;
-    this.storage.setUserProfile(userInfo);
+  public setUserInfo(userInfo: CurrentUserInfoWoImage) {
+    let image: string|null = this.userInfo?.image || null;
+    let newUserInfo: CurrentUserInfoModel= {...userInfo, image}
+    this.userInfo = newUserInfo;
+    this.storage.setUserProfile(this.userInfo);
   }
 
   @Mutation
   public setUserSettings(userInfo: CurrentUserSettingsModel) {
     this.userSettings = userInfo;
     this.storage.setUserSettings(userInfo);
+  }
+
+  @Mutation
+  public setUserImage(image: string) {
+    this.userInfo!.image = image;
+    this.storage.setUserProfile(this.userInfo!);
   }
 
   @Mutation

@@ -2,7 +2,7 @@
   <div :class="cls" @mouseover.passive="removeUnread">
     <div v-if="message.isEditingActive" class="editing-background"></div>
     <div v-if="message.isThreadOpened" class="thread-background" @click="closeThread"></div>
-    <chat-message :message="message" @quote="quote"/>
+    <chat-text-message :message="message"/>
     <chat-text-area
       v-if="message.isEditingActive"
       :ref="textarea"
@@ -40,7 +40,7 @@ import {
   Emit,
   Vue
 } from 'vue-property-decorator';
-import ChatMessage from '@/vue/chat/ChatMessage.vue';
+import ChatTextMessage from '@/vue/chat/message/ChatMessage.vue';
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
@@ -50,11 +50,11 @@ import {
   MessageModel,
   RoomDictModel
 } from '@/ts/types/model';
-import ChatMessageToolTip from '@/vue/chat/ChatMessageToolTip.vue';
-import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
+import ChatMessageToolTip from '@/vue/chat/message/ChatMessageToolTip.vue';
+import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 
 @Component({
-  components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatMessage}
+  components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatMessage: ChatTextMessage}
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;
@@ -96,11 +96,6 @@ export default class ChatSendingMessage extends Vue {
 
   get isSelf() {
     return this.message.userId === this.userInfo.userId;
-  }
-
-  @Emit()
-  quote() {
-    return this.message;
   }
 
   closeThread() {

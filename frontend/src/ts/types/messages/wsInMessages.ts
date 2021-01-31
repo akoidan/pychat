@@ -10,6 +10,7 @@ import {
   RoomNoUsersDto,
   UserDto,
   UserProfileDto,
+  UserProfileDtoWoImage,
   UserSettingsDto
 } from '@/ts/types/dto';
 
@@ -178,7 +179,7 @@ export interface SetSettingsMessage extends DefaultWsInMessage<'setSettings', 'w
 }
 
 export interface SetUserProfileMessage extends DefaultWsInMessage<'setUserProfile', 'ws'> {
-  content: UserProfileDto;
+  content: UserProfileDtoWoImage;
 }
 
 export interface UserProfileChangedMessage extends DefaultWsInMessage<'userProfileChanged', 'ws'>, UserDto {
@@ -200,6 +201,10 @@ export interface PongMessage extends DefaultWsInMessage<'pong', 'ws'> {
 
 export interface ReplyFileMessage extends ReplyWebRtc, DefaultWsInMessage<'replyFile', 'webrtcTransfer:*'> {
 
+}
+
+export interface SetProfileImageMessage extends DefaultWsInMessage<'setProfileImage', 'ws'> {
+  content: string;
 }
 
 export interface AcceptCallMessage extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'acceptCall', 'webrtcTransfer:*'> {

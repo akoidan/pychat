@@ -43,8 +43,8 @@ import {
   ReceivingFile
 } from '@/ts/types/model';
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
-import ReceivingFileInfo from '@/vue/chat/ReceivingFileInfo.vue';
+import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
+import ReceivingFileInfo from '@/vue/chat/message/ReceivingFileInfo.vue';
 
 
 @Component({

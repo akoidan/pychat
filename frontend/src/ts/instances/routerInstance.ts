@@ -2,8 +2,8 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import sessionHolder from '@/ts/instances/sessionInstance';
 import { store } from '@/ts/instances/storeInstance';
-import MainPage from '@/vue/MainPage.vue';
-import ChannelsPage from '@/vue/chat/ChannelsPage.vue';
+import MainPage from '@/vue/pages/MainPage.vue';
+import ChannelsPage from '@/vue/pages/ChannelsPage.vue';
 import AuthPage from '@/vue/singup/AuthPage.vue';
 import ResetPassword from '@/vue/singup/ResetPassword.vue';
 import Login from '@/vue/singup/Login.vue';
@@ -23,7 +23,7 @@ import {
   ALL_ROOM_ID,
   STATISTICS
 } from '@/ts/utils/consts';
-import ConfirmMail from '@/vue/email/ConfirmMail.vue';
+import ConfirmMail from '@/vue/pages/ConfirmMail.vue';
 import UserProfileChangeEmail from '@/vue/pages/UserProfileChangeEmail.vue';
 import { Route } from 'vue-router/types';
 import CreateRoomChannel from '@/vue/pages/CreateRoomChannel.vue';
@@ -46,7 +46,7 @@ import UserProfileOauthSettings from '@/vue/pages/UserProfileOauthSettings.vue';
 import PainterPage from '@/vue/pages/PainterPage.vue';
 import ChatRightSection from '@/vue/chat/right/ChatRightSection.vue';
 import ChatRightSectionPage from '@/vue/pages/ChatRightSectionPage.vue';
-import RoomUsersListPage from '@/vue/chat/RoomUsersListPage.vue';
+import RoomUsersListPage from '@/vue/pages/RoomUsersListPage.vue';
 import ChannelAddRoom from '@/vue/pages/ChannelAddRoom.vue';
 
 Vue.use(VueRouter);

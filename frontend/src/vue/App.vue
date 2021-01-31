@@ -2,7 +2,7 @@
   <div class="body">
     <div class="growlHolder">
       <growl
-        v-for="growl in growls"
+        v-for="growl in last3Growl"
         :key="growl.id"
         :growl="growl"
       />
@@ -27,6 +27,10 @@ export default class App extends Vue {
 
   @State
   public readonly growls!: GrowlModel[];
+
+  get last3Growl(): GrowlModel[] {
+    return this.growls.slice(-3);
+  }
 
   get mainClass(): string {
     return this.userSettings && this.userSettings.theme || 'color-reg';

@@ -12,7 +12,7 @@
   } from 'vue-property-decorator';
   import {UserModel} from '@/ts/types/model';
   import {resolveMediaUrl} from '@/ts/utils/htmlApi';
-  import UserIconOrSex from '@/vue/chat/UserIconOrSex.vue';
+  import UserIconOrSex from '@/vue/chat/chatbox/UserIconOrSex.vue';
   @Component({
     components: {UserIconOrSex}
   })

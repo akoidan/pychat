@@ -91,7 +91,7 @@ export interface SetStateFromStorage {
   allUsersDict: {[id: number]: UserModel};
 }
 
-export interface UserProfileDto {
+export interface UserProfileDtoWoImage {
   user: string;
   name: string;
   city: string;
@@ -101,6 +101,10 @@ export interface UserProfileDto {
   contacts: string;
   sex: SexModelDto;
   userId: number;
+}
+
+export interface UserProfileDto extends UserProfileDtoWoImage {
+  userImage: string;
 }
 
 export interface OauthStatus {

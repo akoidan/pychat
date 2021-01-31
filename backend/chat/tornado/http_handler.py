@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-
 import datetime
 import json
 import re
@@ -32,7 +31,7 @@ from chat.tornado.constants import Actions, RedisPrefix, VarNames, HandlerNames
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
 	add_missing_fields, extract_nginx_files, check_captcha, get_user_id
-from chat.utils import check_user, is_blank, get_or_create_ip_model
+from chat.utils import check_user, is_blank, get_or_create_ip_model, create_thumbnail
 
 SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
 
@@ -603,9 +602,11 @@ class HttpHandler(MethodDispatcher):
 		"""
 		POST only, validates email during registration
 		"""
-		up = UserProfile(photo=files['file'], id=self.user_id)
-		up.save(update_fields=('photo',))
-		up = UserProfile.objects.values('sex', 'photo', 'username').get(id=self.user_id)
+		input_file = files['file']
+		up = UserProfile(photo=input_file, id=self.user_id)
+		create_thumbnail(input_file, up)
+		up.save(update_fields=('photo', 'thumbnail'))
+		up = UserProfile.objects.values('sex', 'thumbnail', 'photo', 'username').get(id=self.user_id)
 		payload = {
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.USER_PROFILE_CHANGED
@@ -615,11 +616,18 @@ class HttpHandler(MethodDispatcher):
 				self.user_id,
 				up['username'],
 				up['sex'],
-				"{0}{1}".format(settings.MEDIA_URL, up['photo']) if up['photo'] else None,
+				"{0}{1}".format(settings.MEDIA_URL, up['thumbnail']) if up['thumbnail'] else None,
 			)
 		)
 		global_redis.sync_redis.publish(settings.ALL_ROOM_ID, json.dumps(payload))
+		global_redis.sync_redis.publish( RedisPrefix.generate_user(self.user_id), json.dumps({
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_PROFILE_IMAGE,
+			VarNames.CONTENT: "{0}{1}".format(settings.MEDIA_URL, up['photo']) if up['photo'] else None,
+		}))
 		return settings.VALIDATION_IS_OK
+
+
 
 	@require_http_method('GET')
 	def statistics(self):

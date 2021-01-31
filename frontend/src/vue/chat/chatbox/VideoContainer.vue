@@ -71,8 +71,8 @@ import {
 } from "vue-property-decorator";
 import { State } from '@/ts/instances/storeInstance';
 import { CallsInfoModel } from '@/ts/types/model';
-import VideoObject from '@/vue/chat/VideoObject.vue';
-import ChatRemotePeer from '@/vue/chat/ChatRemotePeer.vue';
+import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
+import ChatRemotePeer from '@/vue/chat/call/ChatRemotePeer.vue';
 
 
 @Component({

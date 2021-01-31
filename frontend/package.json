@@ -112,6 +112,7 @@
   },
   "dependencies": {
     "@types/cordova": "^0.0.34",
+    "@types/vue-cropperjs": "^4.1.1",
     "amcharts3": "3.21.15",
     "cordova": "10.0.0",
     "cordova-android": "^9.0.0",
@@ -126,6 +127,7 @@
     "spainter": "^1.2.10",
     "typeface-oswald": "0.0.75",
     "vue": "2.6.10",
+    "vue-cropperjs": "^4.2.0",
     "vue-router": "3.1.3",
     "vuejs-datepicker": "1.6.2",
     "vuex": "3.1.1",

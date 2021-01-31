@@ -53,7 +53,7 @@ export default class DatabaseWrapper implements IStorage {
   private readonly cache: { [id: number]: number } = {};
 
   constructor() {
-    this.dbName = 'v152';
+    this.dbName = 'v153';
     this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
@@ -64,14 +64,14 @@ export default class DatabaseWrapper implements IStorage {
       let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
         this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
       });
-      t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, image text, last_time_online integer)');
+      t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, thumbnail text, last_time_online integer)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), is_main_in_channel boolean NOT NULL CHECK (is_main_in_channel IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, room_id integer REFERENCES room(id), user_id integer REFERENCES user(id), status text, parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, thread_messages_count INTEGER)');
       t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
       t = await this.runSql(t, 'CREATE TABLE tag (id integer primary key, user_id INTEGER REFERENCES user(id), message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, symbol text)');
       t = await this.runSql(t, 'CREATE TABLE settings (user_id integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text, showWhenITyping boolean NOT NULL CHECK (showWhenITyping IN (0,1)))');
-      t = await this.runSql(t, 'CREATE TABLE profile (user_id integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
+      t = await this.runSql(t, 'CREATE TABLE profile (user_id integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, image text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
       t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
       this.logger.log('DatabaseWrapper has been initialized')();
       return true;
@@ -127,6 +127,7 @@ export default class DatabaseWrapper implements IStorage {
       const profile: CurrentUserInfoModel = {
         sex: convertSexToString(dbProfile[0].sex),
         contacts: dbProfile[0].contacts,
+        image: dbProfile[0].image,
         birthday: dbProfile[0].birthday,
         email: dbProfile[0].email,
         surname: dbProfile[0].surname,
@@ -171,7 +172,7 @@ export default class DatabaseWrapper implements IStorage {
           id: u.id,
           lastTimeOnline: u.last_time_online,
           sex: convertNumberToSex(u.sex),
-          image: u.image,
+          image: u.thumbnail,
           user: u.user,
           location: {
             region: u.region,
@@ -421,7 +422,7 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   public getInsertUser(user: UserModel): QueryObject {
-    return ['insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online, image) values (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)',
+    return ['insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online, thumbnail) values (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)',
         [user.id, user.user, convertSexToNumber(user.sex), user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline, user.image]
     ]
   }
@@ -447,7 +448,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public setUserProfile(user: CurrentUserInfoModel) {
     this.write(t => {
-      this.executeSql(t, 'insert or replace into profile (user_id, user, name, city, surname, email, birthday, contacts, sex) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, convertStringSexToNumber(user.sex)])();
+      this.executeSql(t, 'insert or replace into profile (user_id, user, name, city, surname, email, birthday, contacts, sex, image) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, convertStringSexToNumber(user.sex), user.image])();
     });
   }
 

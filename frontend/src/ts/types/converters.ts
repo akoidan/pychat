@@ -1,6 +1,7 @@
 import {
   ChannelModel,
   CurrentUserInfoModel,
+  CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
   FileModel,
   Location,
@@ -21,12 +22,13 @@ import {
   SexModelDto,
   UserDto,
   UserProfileDto,
+  UserProfileDtoWoImage,
   UserSettingsDto
 } from '@/ts/types/dto';
 import {BooleanDB, SexDB} from '@/ts/types/db';
 import {MessageP2pDto} from '@/ts/types/messages/p2pDto';
 
-export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
+export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
   return {...userInfo};
 }
 
@@ -34,7 +36,7 @@ export function userSettingsDtoToModel(userInfo: UserSettingsDto): CurrentUserSe
   return {...userInfo};
 }
 
-export function currentUserInfoModelToDto(userInfo: CurrentUserInfoModel): UserProfileDto {
+export function currentUserInfoModelToDto(userInfo: CurrentUserInfoModel): UserProfileDtoWoImage {
   return {...userInfo};
 }
 

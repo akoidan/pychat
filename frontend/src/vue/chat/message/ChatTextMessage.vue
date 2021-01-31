@@ -1,16 +1,17 @@
 <template>
-  <p :class="mainCls">
-    <chat-message-header
-      :time="message.time"
-      :user-id="message.userId"
-      @quote="quote"
-    />
+  <chat-message-wrapper :time="message.time" :class="mainCls">
+    <template #header>
+      <chat-message-header
+        class="header"
+        :user-id="message.userId"
+      />
+    </template>
     <span
       ref="content"
       class="message-text-style"
       v-html="encoded"
     />
-  </p>
+  </chat-message-wrapper>
 </template>
 <script lang="ts">
 import { State } from '@/ts/instances/storeInstance';
@@ -37,12 +38,13 @@ import {
   setYoutubeEvent
 } from '@/ts/utils/htmlApi';
 
-import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
+import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 
 @Component({
-  components: {ChatMessageHeader}
+  components: {ChatMessageWrapper, ChatMessageHeader}
 })
-export default class ChatMessage extends Vue {
+export default class ChatTextMessage extends Vue {
 
   @Prop()
   public message!: MessageModel;
@@ -66,10 +68,6 @@ export default class ChatMessage extends Vue {
       'removed-message': this.message.deleted,
       'message-content': true,
     };
-  }
-
-  @Emit()
-  public quote() {
   }
 
   public updated() {
@@ -121,6 +119,8 @@ export default class ChatMessage extends Vue {
   .message-content
     display: flex
 
+  .header
+    padding-right: 5px
   %img-play-chat
     @extend %user-select-none
     display: block
@@ -155,6 +155,7 @@ export default class ChatMessage extends Vue {
           width: 70px
 
   .message-text-style
+    min-width: 0
 
     /deep/ .youtube-player
       @extend %img-play-chat
@@ -235,9 +236,9 @@ export default class ChatMessage extends Vue {
       vertical-align: middle
 
   .color-lor p /deep/, .color-reg p /deep/
-    @import "~highlightjs/styles/railscasts"
+    @import "../../../../node_modules/highlightjs/styles/railscasts.css"
   .color-white p /deep/
-    @import "~highlightjs/styles/default"
+    @import "../../../../node_modules/highlightjs/styles/default.css"
     .message-others
       background-color: white
 </style>

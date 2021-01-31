@@ -21,7 +21,7 @@
     UserDictModel,
     UserModel
   } from '@/ts/types/model';
-  import ChatIsOnlineIcon from '@/vue/chat/ChatIsOnlineIcon.vue';
+  import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon.vue';
   import {PrivateRoomsIds} from '@/ts/types/types';
   @Component({
     components: {ChatIsOnlineIcon, AppNavWrapper}

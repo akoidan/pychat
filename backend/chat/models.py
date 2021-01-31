@@ -22,7 +22,7 @@ from django.db.models import \
 	TextField, \
 	IntegerField, \
 	FloatField, \
-	SmallIntegerField, CheckConstraint, Q, F
+	SmallIntegerField, CheckConstraint, Q, F, ImageField
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, JS_CONSOLE_LOGS, ALL_ROOM_ID
@@ -82,6 +82,8 @@ class User(AbstractBaseUser):
 
 	# ISO/IEC 5218 1 male, 2 - female
 	sex = SmallIntegerField(null=False, default=0)
+
+	thumbnail = ImageField(upload_to=get_random_path, null=True, blank=True)
 
 	last_time_online = BigIntegerField(default=get_milliseconds)
 

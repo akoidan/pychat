@@ -1013,6 +1013,18 @@
       "src": "websymbols"
     },
     {
+      "uid": "7dde84b4f180e3c07523faecda81caa6",
+      "css": "resize-vertical",
+      "code": 59475,
+      "src": "iconic"
+    },
+    {
+      "uid": "63493102fc6b827e4a7be30b13cbf3b4",
+      "css": "resize-horizontal",
+      "code": 59476,
+      "src": "iconic"
+    },
+    {
       "uid": "918bda80304f8b29c37dbd7322fef131",
       "css": "webrtc-nomic",
       "code": 59465,

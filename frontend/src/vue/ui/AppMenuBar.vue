@@ -69,11 +69,8 @@
     @State
     public readonly userInfo!: CurrentUserInfoModel;
 
-    @State
-    public readonly userImage!: string;
-
     get imgSrc() {
-      return this.userImage? resolveMediaUrl(this.userImage): null;
+      return this.userInfo.image? resolveMediaUrl(this.userInfo.image): null;
     }
 
     public get consts(): object {

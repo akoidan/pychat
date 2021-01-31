@@ -173,6 +173,7 @@
 	flex: $value
 
 @mixin hover-click($color)
+	cursor: pointer
 	color: desaturate(darken($color, 8%), 15%)
 	-webkit-mask-image: -webkit-linear-gradient(top, rgba(0,0,0,1),rgba(0,0,0,0.5))
 	&:hover

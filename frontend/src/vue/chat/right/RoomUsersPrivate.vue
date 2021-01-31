@@ -21,9 +21,9 @@ import {
 } from '@/ts/types/model';
 import { PrivateRoomsIds } from '@/ts/types/types';
 import RoomRightIcon from '@/vue/chat/right/RoomRightIcon.vue';
-import UserNameSex from '@/vue/chat/UserNameSex.vue';
+import UserNameSex from '@/vue/chat/chatbox/UserNameSex.vue';
 import RoomUsersWrapper from '@/vue/chat/right/RoomUsersWrapper.vue';
-import UserIconOrSex from '@/vue/chat/UserIconOrSex.vue';
+import UserIconOrSex from '@/vue/chat/chatbox/UserIconOrSex.vue';
 
 @Component({
   components: {UserIconOrSex, RoomUsersWrapper, UserNameSex, RoomRightIcon}

@@ -46,7 +46,11 @@ export interface PastingTextAreaElement {
   openedThreadId: number|null;
 }
 
-export interface CurrentUserInfoModel {
+export interface CurrentUserInfoModel extends CurrentUserInfoWoImage{
+  image: string|null;
+}
+
+export interface CurrentUserInfoWoImage {
   userId: number;
   user: string;
   name: string;

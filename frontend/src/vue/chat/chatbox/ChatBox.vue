@@ -20,7 +20,7 @@
           :key="message.fieldDay"
           :day="message.fieldDay"
         />
-        <chat-message v-else :key="message.id" :message="message" />
+        <chat-text-message v-else :key="message.id" :message="message" />
       </template>
     </div>
     <div
@@ -71,7 +71,6 @@
           v-else
           :key="message.id"
           :message="message"
-          @quote="onquote"
         />
       </template>
     </div>
@@ -89,8 +88,8 @@ import {
   Vue
 } from "vue-property-decorator";
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import ChatMessage from '@/vue/chat/ChatMessage.vue';
-import SearchMessages from '@/vue/chat/SearchMessages.vue';
+import ChatTextMessage from '@/vue/chat/message/ChatMessage.vue';
+import SearchMessages from '@/vue/chat/chatbox/SearchMessages.vue';
 import {
   MessageModel,
   ReceivingFile,
@@ -102,16 +101,16 @@ import { MessageModelDto } from '@/ts/types/dto';
 
 import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingMessage from '@/vue/chat/ChatSendingMessage.vue';
-import ChatUserActionMessage from '@/vue/chat/ChatUserActionMessage.vue';
-import ChatSendingFile from '@/vue/chat/ChatSendingFile.vue';
-import ChatReceivingFile from '@/vue/chat/ChatReceivingFile.vue';
-import ChatCall from '@/vue/chat/ChatCall.vue';
-import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
+import ChatSendingMessage from '@/vue/chat/chatbox/ChatSendingMessage.vue';
+import ChatUserActionMessage from '@/vue/chat/message/ChatUserActionMessage.vue';
+import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
+import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
+import ChatCall from '@/vue/chat/call/ChatCall.vue';
+import ChatChangeNameMessage from '@/vue/chat/message/ChatChangeNameMessage.vue';
 import AppSeparator from '@/vue/ui/AppSeparator.vue';
-import ChatThread from '@/vue/chat/ChatThread.vue';
-import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
-import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
+import ChatThread from '@/vue/chat/message/ChatThread.vue';
+import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
+import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
 
   @Component({
     components: {
@@ -126,7 +125,7 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
       ChatUserActionMessage,
       ChatSendingMessage,
       AppProgressBar,
-      ChatMessage,
+      ChatTextMessage,
       SearchMessages
     }
   })
@@ -191,10 +190,6 @@ import ChatShowUserTyping from '@/vue/chat/ChatShowUserTyping.vue';
           this.textarea.userMessage.focus();
         })
       }
-    }
-
-    onquote(m: MessageModel) {
-      this.textarea.onEmitQuote(m);
     }
 
     dropPhoto(evt: DragEvent) {

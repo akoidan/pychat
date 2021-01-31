@@ -25,6 +25,7 @@ class Actions(object):
 	SET_SETTINGS = 'setSettings'
 	USER_PROFILE_CHANGED = 'userProfileChanged'
 	SET_USER_PROFILE = 'setUserProfile'
+	SET_PROFILE_IMAGE = 'setProfileImage'
 	INVITE_USER = 'inviteUser'
 	ADD_INVITE = 'addInvite'
 	SET_WEBRTC_ID = 'setConnectionId'

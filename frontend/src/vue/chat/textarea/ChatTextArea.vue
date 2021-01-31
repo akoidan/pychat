@@ -99,19 +99,19 @@ import {
   editMessageWs,
   showAllowEditing
 } from '@/ts/utils/pureFunctions';
-import MediaRecorder from '@/vue/chat/MediaRecorder.vue';
+import MediaRecorder from '@/vue/chat/textarea/MediaRecorder.vue';
 import {
   RawLocation,
   Route
 } from "vue-router";
-import ChatAttachments from '@/vue/chat/ChatAttachments.vue';
-import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
+import ChatAttachments from '@/vue/chat/chatbox/ChatAttachments.vue';
+import SmileyHolder from '@/vue/chat/chatbox/SmileyHolder.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
 import {
   SHOW_I_TYPING_INTERVAL,
   USERNAME_REGEX
 } from '@/ts/utils/consts';
-import ChatTagging from '@/vue/chat/ChatTagging.vue';
+import ChatTagging from '@/vue/chat/textarea/ChatTagging.vue';
 import {Throttle} from '@/ts/classes/Throttle';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;

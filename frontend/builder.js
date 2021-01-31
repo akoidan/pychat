@@ -385,6 +385,11 @@ const getConfig = async () => {
           test: /assets\/img\/.*\.(png|jpg|svg|gif)$/,
           loader: 'file-loader',
           options: getOptions('img')
+        },
+        {
+          test: /cropperjs\/.*\.(png|jpg|svg|gif)$/,
+          loader: 'file-loader',
+          options: getOptions('img/cropperjs')
         }
         // FUCK url loader, http2 works competely fine,
         // we get rid of bugs like https://data:image

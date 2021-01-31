@@ -1,11 +1,6 @@
 <template>
   <span class="message-header">
-    <span
-      class="timeMess"
-      @click="quote"
-    >({{ getTime }})</span>
-    <user-icon-or-sex :user="user" class="user-name-sex"/>
-    <span>{{ user.user }}</span>:
+    <user-image-icon :user="user"/>
   </span>
 </template>
 <script lang="ts">
@@ -17,10 +12,11 @@ import {
 } from 'vue-property-decorator';
 import { UserDictModel } from '@/ts/types/model';
 import { timeToString } from '@/ts/utils/htmlApi';
-import UserNameSex from '@/vue/chat/UserNameSex.vue';
-import UserIconOrSex from '@/vue/chat/UserIconOrSex.vue';
+import UserNameSex from '@/vue/chat/chatbox/UserNameSex.vue';
+import UserIconOrSex from '@/vue/chat/chatbox/UserIconOrSex.vue';
+import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
 @Component({
-  components: {UserIconOrSex, UserNameSex}
+  components: {UserImageIcon, UserIconOrSex, UserNameSex}
 })
 export default class ChatMessageHeader extends Vue {
 
@@ -33,14 +29,6 @@ export default class ChatMessageHeader extends Vue {
   get user() {
     return this.allUsersDict[this.userId];
   }
-
-  get getTime() {
-    return timeToString(this.time);
-  }
-
-  public quote() {
-    this.$emit('quote');
-  }
 }
 </script>
 
@@ -51,7 +39,11 @@ export default class ChatMessageHeader extends Vue {
 
   img.user-name-sex
     margin: -8px 5px -8px 0
-  .timeMess
+  .time-mess
+    position: absolute
+    right: 0px
+    background-color: red
+    font-size: 16px
     margin-right: 5px
     @media screen and (max-width: 400px)
       display: none !important
@@ -60,7 +52,7 @@ export default class ChatMessageHeader extends Vue {
       color: #979797
 
   .color-white
-    .timeMess
+    .time-mess
       color: #85d379
       font-weight: normal
 </style>

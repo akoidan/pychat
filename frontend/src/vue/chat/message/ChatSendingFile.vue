@@ -35,8 +35,8 @@ import {
 import { SendingFile } from '@/ts/types/model';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
 import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingFileTransfer from '@/vue/chat/ChatSendingFileTransfer.vue';
-import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
+import ChatSendingFileTransfer from '@/vue/chat/chatbox/ChatSendingFileTransfer.vue';
+import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
 
 @Component({
   components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}

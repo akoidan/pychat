@@ -11,6 +11,8 @@ from chat.global_redis import ping_online
 from chat.tornado.http_handler import HttpHandler
 import logging
 
+from chat.tornado.static_file_handler import PychatStaticFileHandler
+
 TORNADO_SSL_OPTIONS = getattr(settings, "TORNADO_SSL_OPTIONS", None)
 from chat.tornado.tornado_handler import TornadoHandler
 
@@ -56,7 +58,7 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
 		application = Application([
 			(r'/api/.*', HttpHandler),
-			(r'/photo/(.*)', StaticFileHandler, {'path': settings.MEDIA_ROOT}),
+			(r'/photo/(.*)', PychatStaticFileHandler, {'path': settings.MEDIA_ROOT}),
 			(r'/ws', TornadoHandler),
 		], debug=settings.DEBUG, default_host=options['host'])
 		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS, max_buffer_size=1000000000) # 1GB, limit in nginx if u need

@@ -1,10 +1,5 @@
 <template>
-  <img
-    v-if="user.image"
-    :src="userImg"
-  >
   <i
-    v-else
     :class="userSexClass"
   />
 </template>
@@ -16,30 +11,24 @@
     Watch,
     Ref
   } from 'vue-property-decorator';
-  import {UserModel} from '@/ts/types/model';
-  import {resolveMediaUrl} from '@/ts/utils/htmlApi';
+  import {SexModelDto} from '@/ts/types/dto';
+  import {SexModelString} from '@/ts/types/model';
 
   @Component
-  export default class UserIconOrSex extends Vue {
-    @Prop()
-    public readonly user!: UserModel;
+  export default class UserSexIcon extends Vue {
 
-    get userImg() {
-      if (this.user.image) {
-        return resolveMediaUrl(this.user.image)
-      }
-      return  null;
-    }
+    @Prop()
+    private sex!: SexModelString;
 
     get userSexClass() {
-      if (this.user.sex === 'Male') {
+      if (this.sex === 'Male') {
         return 'icon-man';
-      } else if (this.user.sex === 'Female') {
+      } else if (this.sex === 'Female') {
         return 'icon-girl';
-      } else if (this.user.sex === 'Secret') {
+      } else if (this.sex === 'Secret') {
         return 'icon-user-secret';
       } else {
-        throw Error(`Invalid sex ${this.user.sex}`);
+        throw Error(`Invalid sex ${this.sex}`);
       }
     }
   }
@@ -49,9 +38,6 @@
   lang="sass"
   scoped
 >
-  img
-    max-height: 36px
-    max-width: 50px
 
   .color-lor
     .online
