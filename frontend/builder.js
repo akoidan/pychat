@@ -171,7 +171,10 @@ const getConfig = async () => {
     }
     return res;
   }
-  const entry = ['reflect-metadata', './src/ts/main.ts'];
+  const entry = {
+    main: ['reflect-metadata', './src/ts/main.ts'],
+    sw: ['./src/ts/sw.ts']
+  }
 
 
   let webpackOptions = {
@@ -597,13 +600,6 @@ async function setup() {
     const cli = require('cordova/src/cli');
     await cli([null, null, 'run']);
 
-  } else if (options.IS_WEB) {
-    let config = getSimpleConfig(
-      'sw.js',
-      options.IS_PROD ? getDist() : '/tmp/',
-      ['./src/ts/sw.ts']
-    );
-    await runWebpack(config);
   }
 }
 
