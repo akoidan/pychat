@@ -6,12 +6,7 @@
       <user-image-icon :user="user"/>
       <span>{{ user.user }}</span>
     </div>
-    <img
-      v-if="consts.FLAGS && user.location.countryCode"
-      class="country"
-      :src="getFlag(user)"
-      :title="title"
-    >
+    <slot></slot>
   </div>
 </template>
 <script lang="ts">
@@ -40,25 +35,6 @@ export default class UserRow extends Vue {
   @State
   public readonly online!: number[];
 
-  public get consts(): object {
-    return {
-      FLAGS,
-    }
-  }
-
-  get title() {
-    return this.user.location.region === this.user.location.city ?
-      `${this.user.location.country} ${this.user.location.city}` :
-      `${this.user.location.country} ${this.user.location.region} ${this.user.location.city}`;
-  }
-
-  public getFlag(user: UserModel) {
-    if (user.location.countryCode) {
-      return getFlagPath(user.location.countryCode.toLowerCase());
-    } else {
-      return null;
-    }
-  }
 
   get id() {
     return this.user.id;

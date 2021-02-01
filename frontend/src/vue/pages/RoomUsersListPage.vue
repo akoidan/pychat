@@ -5,7 +5,7 @@
     </div>
     <ul>
       <li v-for="user in usersArray" :key="user.id">
-        <user-row :user="user"/>
+        <user-flag-row :user="user"/>
       </li>
     </ul>
     <template v-if="userIds.length > 0">
@@ -42,12 +42,12 @@
     RoomDictModel,
     UserDictModel
   } from '@/ts/types/model';
-  import UserRow from '@/vue/chat/right/UserRow.vue';
   import AppSubmit from '@/vue/ui/AppSubmit.vue';
   import PickUser from '@/vue/pages/parts/PickUser.vue';
+  import UserFlagRow from '@/vue/chat/right/UserFlagRow.vue';
 
   @Component({
-  components: {UserRow,  AppSubmit, PickUser}
+  components: {UserFlagRow,  AppSubmit, PickUser}
 })
 export default class RoomUsersListPage extends Vue {
 
