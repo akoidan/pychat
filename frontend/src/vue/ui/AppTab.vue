@@ -26,7 +26,6 @@
   @import "~@/assets/sass/partials/abstract_classes"
   .links /deep/
     display: flex
-    margin: auto
     margin-top: 10px
     padding: 8px
     justify-content: space-between

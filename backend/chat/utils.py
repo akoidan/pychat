@@ -1,11 +1,12 @@
 import json
 import logging
+import os
 import re
 
 from PIL import Image as PilImage
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
+from django.core.files.base import ContentFile, File
 from django.db import connection
 from django.db.models import Q
 from django.utils.six import BytesIO
@@ -195,12 +196,18 @@ def update_symbols(files, tags, message):
 
 
 def create_thumbnail(input_file, up):
+	filename = None
+	if isinstance(input_file, str):
+		filename = input_file
+		input_file = os.sep.join((settings.MEDIA_ROOT, input_file))
 	im = PilImage.open(input_file)
 	im.thumbnail((72, 72), PilImage.ANTIALIAS)
 	jpeg = im.convert('RGB')
 	thumb_io = BytesIO()
+	if not filename:
+		filename = im.filename
 	jpeg.save(thumb_io, 'jpeg', quality=60)
-	up.thumbnail.save(im.filename + '.jpeg', ContentFile(thumb_io.getvalue()), save=False)
+	up.thumbnail.save(filename + '.jpeg', ContentFile(thumb_io.getvalue()), save=False)
 
 
 def get_message_images_videos(messages):

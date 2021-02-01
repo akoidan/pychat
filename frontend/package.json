@@ -10,6 +10,7 @@
     "fix": "./node_modules/.bin/eslint \"**.*.vue\"--fix ; ./node_modules/.bin/tslint --fix -c ./tslint.json 'src/*.ts' ; ./node_modules/.bin/vue-tslint -g -p . -c tslint.json --fix",
     "prod": "PLATFORM=web BUILD_MODE=production node ./builder.js",
     "dev": "PLATFORM=web BUILD_MODE=development node ./builder.js",
+    "devProxy": "PLATFORM=web BUILD_MODE=development PROXY_BACKEND=true node ./builder.js",
     "devLinting": "LINTING=on PLATFORM=web BUILD_MODE=development node ./builder.js",
     "electronDev": "PLATFORM=electron BUILD_MODE=development node ./builder.js",
     "electronProd": "PLATFORM=electron BUILD_MODE=production node ./builder.js",

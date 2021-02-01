@@ -85,16 +85,18 @@ const {options, definePlugin, optimization, configFile, startCordova, linting, b
 
   const linting = process.env.LINTING  === 'on';
   const isProd = getEnv('BUILD_MODE', 'production', ['development']);
+  const proxyBackend = getEnv('PROXY_BACKEND', 'true');
   // cordova is built for production atm
   let options = require(isProd && !startCordova ? `./production.json` : './development.json');
   options.IS_PROD = isProd;
+  options.PROXY_BACKEND = proxyBackend;
   options.IS_ELECTRON = getEnv('PLATFORM', 'electron', ['web', 'android']);
   options.IS_ANDROID = getEnv('PLATFORM', 'android', ['electron', 'web']);
   options.IS_WEB = getEnv('PLATFORM', 'web', ['electron', 'android']);
   options.SERVICE_WORKER_URL = options.IS_WEB ? '/sw.js' : false;
   options.IS_PROFILE = getEnv('PROFILE', 'true');
   const backendPort = options.BACKEND_ADDRESS.split(':')[1];
-  if (!options.IS_PROD) {
+  if (options.PROXY_BACKEND && !options.IS_PROD) {
     options.BACKEND_ADDRESS = `{}:${DEV_PORT}`;
   }
   if (options.IS_ANDROID)  {
@@ -548,7 +550,6 @@ async function setup() {
         resolve => fs.readFile(path.resolve(__dirname, 'certs', e), (err, data) => resolve(data))
       ))
     );
-
     let devServer = {
       disableHostCheck: true,
       headers: {
@@ -557,21 +558,6 @@ async function setup() {
       public: `https://localhost:${DEV_PORT}`,
       historyApiFallback: true,
       inline: true,
-      proxy: {
-        "/api/**": {
-          target: `https://localhost:${backendPort}`,
-          secure: false
-        },
-        "/ws": {
-          target: `https://localhost:${backendPort}`,
-          secure: false,
-          ws: true
-        },
-        "/photo/**": {
-          target: `https://localhost:${backendPort}`,
-          secure: false
-        },
-      },
       host: '0.0.0.0',
       port: DEV_PORT,
       http2: options.IS_SSL,
@@ -581,6 +567,24 @@ async function setup() {
         app.use('/__open-in-editor', require('launch-editor-middleware')())
       }
     };
+
+    if (options.PROXY_BACKEND) {
+      devServer.proxy = {
+        "/api/**": {
+          target: `https://localhost:${backendPort}`,
+            secure: false
+        },
+        "/ws": {
+          target: `https://localhost:${backendPort}`,
+            secure: false,
+            ws: true
+        },
+        "/photo/**": {
+          target: `https://localhost:${backendPort}`,
+            secure: false
+        },
+      }
+    }
 
     let compiler = webpack(config);
     let server = new WebpackDevServer(compiler, devServer);
@@ -626,6 +630,7 @@ setup().catch(e => {
   try {
     console.error(e);
   } finally {
-    process.exit(1);
+    console.log(e)
+    // process.exit(1);
   }
 });

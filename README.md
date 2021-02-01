@@ -238,6 +238,7 @@ Useful links:
     - Drag and drop for image near localhost to finder![browser-1](frontend/certs/browser-cert-2.png)
     - Double click on newly created file and go to All items, select localhost and mark it as 'Always trust' ![macos-cert](frontend/certs/macos-cert-3.png)
   - Click on Proceed unsafe when accessing your site. Proceed unsafe may be unavailable in some cases. E.g. for MacOS chrome you can use hack: just type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
+   -  If you use different ports for back and front (like its described above) you may need to accept certificate from localhost:8888 (use for api) as well. For that open https://localhost:8888 
   - Tell Browser to ignore certificate:
    - E.g. for chrome you can enable invalid certificates for localhost in [chrome://flags/#allow-insecure-localhost](chrome://flags/#allow-insecure-localhost).
    - If flag is not available you can also launch chrome with custom flag: `--ignore-certificate-errors` flag. E.g. on MacOS `open -a Google\ Chrome --args --ignore-certificate-errors` 
@@ -255,7 +256,7 @@ Remember that Service Worker will work only if certificate is trusted. So flags 
 Change to frontend directory `cd frontend` I would recommend to use node version specified in nvm, so  `nvm install; nvm use`.
  - To get started install dependencies first: `yarn install --frozen-lock` # or use npm if you're old and cranky
  - Take a look at copy [development.json](frontend/development.json). The description is at [Frontend config](#frontend-config)
- - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080.
+ - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run devProxy`. Backend should be running during that. Otherwise use `yarn run dev`. You can navigate to http://localhost:8080.
 
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
