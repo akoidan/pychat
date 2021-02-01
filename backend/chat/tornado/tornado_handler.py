@@ -4,12 +4,13 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import F, Q, Count
+from django.db.models import F, Q, Count, Prefetch
 from itertools import chain
 from tornado import ioloop, gen
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile, Channel, get_milliseconds
+from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile, Channel, get_milliseconds, \
+	IpAddress
 from chat.py2_3 import str_type
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
@@ -188,19 +189,28 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		# 		room[VarNames.LOAD_MESSAGES_OFFLINE] = o
 
 		if settings.SHOW_COUNTRY_CODE:
-			fetched_users  = UserProfile.objects.annotate(user_c=Count('id')).values('id', 'username', 'sex', 'thumbnail', 'userjoinedinfo__ip__country_code', 'userjoinedinfo__ip__country', 'userjoinedinfo__ip__region', 'userjoinedinfo__ip__city')
-			user_dict = [RedisPrefix.set_js_user_structure_flag(
-				user['id'],
-				user['username'],
-				user['sex'],
-				"{0}{1}".format(settings.MEDIA_URL, user['thumbnail']) if user['thumbnail'] else None,
-				user['userjoinedinfo__ip__country_code'],
-				user['userjoinedinfo__ip__country'],
-				user['userjoinedinfo__ip__region'],
-				user['userjoinedinfo__ip__city']
-			) for user in fetched_users]
+			user_dict = []
+			fetched_users = UserProfile.objects.all().only('id', 'username', 'sex', 'thumbnail').prefetch_related(
+				Prefetch('userjoinedinfo_set__ip', queryset=IpAddress.objects.all().only('country_code', 'country', 'region', 'city'))
+			)
+			for user in fetched_users:
+
+				ip = user.userjoinedinfo_set.all()[0].ip if len(user.userjoinedinfo_set.all()) > 0 else None
+
+				user_dict.append(RedisPrefix.set_js_user_structure_flag(
+					user.id,
+					user.username,
+					user.sex,
+					user.thumbnail.url if user.thumbnail else None,
+					ip.country_code if ip else None,
+					ip.country if ip else None,
+					ip.region if ip else None,
+					ip.city if ip else None
+				))
+
+			# user_dict =
 		else:
-			fetched_users = UserProfile.objects.values('id', 'username', 'sex', 'photo')
+			fetched_users = UserProfile.objects.values('id', 'username', 'sex', 'thumbnail')
 			user_dict = [RedisPrefix.set_js_user_structure(
 				user['id'],
 				user['username'],

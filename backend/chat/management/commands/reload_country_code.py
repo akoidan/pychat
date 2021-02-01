@@ -1,9 +1,11 @@
 import json
+import time
+
 from chat.py2_3 import urlopen
 
 from chat import settings
 from chat.models import IpAddress
-
+from django.db.models import Q
 api_url = getattr(settings, "IP_API_URL", "http://ip-api.com/json/%s")
 
 __author__ = 'andrew'
@@ -14,7 +16,7 @@ class Command(BaseCommand):
 	help = 'fills chat_ip_address.country_code'
 
 	def handle(self, *args, **options):
-		for ip in IpAddress.objects.filter(country__isnull=True):
+		for ip in IpAddress.objects.filter(Q(country__isnull=True) | Q(lat__isnull=True)):
 			try:
 				f = urlopen(api_url % ip.ip)
 				raw_response = f.read().decode("utf-8")
@@ -27,7 +29,13 @@ class Command(BaseCommand):
 				ip.region = response['regionName'],
 				ip.city = response['city'],
 				ip.country_code = response['countryCode']
+				ip.lat = response['lat']
+				ip.lon = response['lon']
+				ip.timezone = response['timezone']
+				ip.zip = response['zip']
+
 				ip.save()
-				print("Saved %s", raw_response)
+				print("Saved %s" % raw_response)
+				time.sleep(1) # do not get banned
 			except Exception as e:
 				print("Skip %s because %s" % (ip, e))
