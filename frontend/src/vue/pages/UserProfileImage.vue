@@ -14,12 +14,15 @@ import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import {canvasContext, resolveMediaUrl, stopVideo} from '@/ts/utils/htmlApi';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import AppImageCropper from '@/vue/ui/AppImageCropper.vue';
+import type AppImageCropper from '@/vue/ui/AppImageCropper.vue';
 import {CurrentUserInfoModel} from '@/ts/types/model';
 
 
 @Component({
-  components: {AppImageCropper, AppSubmit}
+  components: {
+    AppImageCropper: () => import(/* webpackChunkName: 'cropper' */ '@/vue/ui/AppImageCropper.vue'),
+    AppSubmit
+  }
 })
 export default class UserProfileImage extends Vue {
 
