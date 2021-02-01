@@ -1,7 +1,10 @@
 <template>
-  <img v-if="userImg" :src="userImg" :title="user.user">
-  <div class="image-missing" v-else :style="{'background-color': color}" :title="user.user">
-    {{twoLetter}}
+  <div class="user-image-holder">
+    <div class="online-marker"></div>
+    <img v-if="userImg" :src="userImg" :title="user.user">
+    <div class="image-missing" v-else :style="{'background-color': color}" :title="user.user">
+      {{twoLetter}}
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -51,5 +54,19 @@
     height: 36px
     color: white
     border-radius: 50%
+  .user-image-holder
+    position: relative
 
+  .online .online-marker
+    background-color: green
+  .offline .online-marker
+    background-color: #a50000
+  .online-marker
+    /*display: none*/
+    width: 10px
+    height: 10px
+    position: absolute
+    bottom: 1px
+    right: 1px
+    border-radius: 50%
 </style>

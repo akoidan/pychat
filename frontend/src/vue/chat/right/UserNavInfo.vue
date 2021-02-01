@@ -43,7 +43,6 @@
   lang="sass"
   scoped
 >
-
   .user-row
     width: auto
     display: flex

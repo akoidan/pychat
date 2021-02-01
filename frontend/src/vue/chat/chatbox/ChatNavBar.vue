@@ -114,6 +114,7 @@
   lang="sass"
   scoped
 >
+
   .room-name
     margin-left: 10px
   .chat-right-icons
