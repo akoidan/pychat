@@ -502,6 +502,8 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* webpack [ext] doesn't work for chunks. 
+* Serviceworkerplugin doesn't support hashmaps
 * Room should have image
 * pasting from painterpage doesn't work
 * lastTimeOnline
