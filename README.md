@@ -217,6 +217,32 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. Start services `brew services run mysql redis`
  1. Install mysqlclient `pip install mysqlclient`
 
+## Ssl
+Since we're using self singed certificate your OS doesn't know about for development. We need to do some tricks for browser to make it work. If you have valid certificates for your domain you can skip this step.
+
+1. I used the following commands to generate a new self signed certificate. You can use mine located in `frontend/certs` directory. So you can skip this text
+```
+cd frontend/certs
+openssl genrsa -out private.key.pem 4096
+openssl req -new -sha256 -out root.ca.pem -key private.key.pem -subj '/CN=localhost' -extensions EXT -config <( printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+openssl x509 -req -days 3650 -in root.ca.pem -signkey private.key.pem -out server.crt.pem -extfile ./v3.ext
+```
+Useful links:   
+  - https://stackoverflow.com/a/59523186/3872976
+  - https://stackoverflow.com/a/43665244/3872976
+  - https://stackoverflow.com/a/56844743/3872976
+
+2. You have multiple options:
+  - Install development certificate on operating system. Each os will require own configuration. E.g. macos do 
+    - ![browser-1](frontend/certs/browser-cert-1.png)
+    - Drag and drop for image near localhost to finder![browser-1](frontend/certs/browser-cert-2.png)
+    - Double click on newly created file and go to All items, select localhost and mark it as 'Always trust' ![macos-cert](frontend/certs/macos-cert-3.png)
+  - Click on Proceed unsafe when accessing your site. If you use different ports for back and front (like its described above) you may need to accept certificate from localhost:8888 (use for api) as well. For that open https://localhost:8888 . Proceed unsafe may be unavailable in some cases. E.g. for MacOS chrome you can use hack: just type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
+  - Tell Browser to ignore certificate:
+   - E.g. for chrome you can enable invalid certificates for localhost in [chrome://flags/#allow-insecure-localhost](chrome://flags/#allow-insecure-localhost).
+   - If flag is not available you can also launch chrome with custom flag: `--ignore-certificate-errors` flag. E.g. on MacOS `open -a Google\ Chrome --args --ignore-certificate-errors` 
+Remember that Service Worker will work only if certificate is trusted. So flags like ignore-ceritifcate-errors won't work. But installing certifcate to root system will.
+
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
@@ -230,7 +256,7 @@ Change to frontend directory `cd frontend` I would recommend to use node version
  - To get started install dependencies first: `yarn install --frozen-lock` # or use npm if you're old and cranky
  - Take a look at copy [development.json](frontend/development.json). The description is at [Frontend config](#frontend-config)
  - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080.
- - If you websocket doesn't work. Go to http://localhost:8888 . For chrome you can run it with `--ignore-certificate-errors` or set flag `chrome://flags/#allow-insecure-localhost`. For MacOS chrome you can also type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
+
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
 
@@ -300,7 +326,7 @@ Disable tslint, since it's not used, and enable eslint:
  - Start session holder: `redis-server`
  - Start webSocket listener: `python manage.py start_tornado`
  - Open in browser [http**s**://127.0.0.1:8080](https://127.0.0.1:8080).
- - Add self signed ssl certificate provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt) to browser exception. For chrome you can enable invalid certificates for localohost in [chrome://flags/#allow-insecure-localhost](chrome://flags/#allow-insecure-localhost). If this flag didn't work use `--ignore-certificate-errors` flag. E.g. on MacOS `open -a Google\ Chrome --args --ignore-certificate-errors` Or for others open [https://localhost:8888](https://localhost:8888) and [https://localhost:8000](https://localhost:8000). Where `8888` comes from `start_tornado.py`
+ - Check ssl section TODO
 
 # Contribution guide
 
