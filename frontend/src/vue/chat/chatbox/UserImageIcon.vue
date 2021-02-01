@@ -30,7 +30,7 @@
     }
 
     get color() {
-      return loggerFactory.getRandomColor(this.twoLetter);
+      return loggerFactory.getRandomColor(this.user.user);
     }
 
     get userImg() {
