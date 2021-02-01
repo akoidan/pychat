@@ -40,19 +40,46 @@ self.addEventListener('install', (event: any) => {
 self.addEventListener('fetch', async (event: any) => {
   event.respondWith((async function() {
     let response: any = await caches.match(event.request);
-    // Cache hit - return response
-    if (response) {
-      return  response;
+
+    // cache only static files + photos, exclude api backend calls
+    let matchesExistingCache = ['/smileys/', '/photo/thumbnail/', '/flags/'].find(e => event.request.url.indexOf(e) >=0);
+    if (response && matchesExistingCache ) {
+      return response;
     }
-    response = await fetch(event.request);
-    if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
-      let cache = await caches.open('thumbnails')
-      await cache.put(event.request, response.clone());
-    } else if (event.request.url.indexOf('/flags/') >= 0) {
-      let cache = await caches.open('flags')
-      await cache.put(event.request, response.clone());
+
+    let fetchedResponse: Response|null = null;
+    let error = null;
+    try {
+      fetchedResponse = await fetch(event.request);
+    } catch (e) {
+      error = e;
     }
-    return response
+
+    if (fetchedResponse?.ok ) {
+      if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
+        let cache = await caches.open('thumbnails')
+        await cache.put(event.request, fetchedResponse.clone());
+      } else if (event.request.url.indexOf('/flags/') >= 0) {
+        let cache = await caches.open('flags')
+        await cache.put(event.request, fetchedResponse.clone());
+      } else if ( // cache index.html, main.js , main.css and other trash only if response is not ok
+          (serviceWorkerOption.assets.find(e => event.request.url.indexOf(e) >=0)
+          && !matchesExistingCache) || event.request.mode == 'navigate') {
+        if (fetchedResponse.status !== 206) { // do not put partial response. E.g. preload audio
+          let cache = await caches.open('static')
+          await cache.put(event.request, fetchedResponse.clone())
+        }
+      }
+      return fetchedResponse;
+    }
+    if (response && error) {
+      logger.warn("Site is offline returning {} from cache", event.request)();
+      return response;
+    }
+    if (error) {
+      throw error
+    }
+    return fetchedResponse
   })())
 });
 
