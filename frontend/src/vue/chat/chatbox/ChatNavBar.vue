@@ -1,18 +1,39 @@
 <template>
   <app-nav-wrapper>
-    <i class="icon-left" @click="goBack" v-if="lowWidth && currentPage === 'chat'"/>
-    <i class="icon-menu" v-else @click="showMenu"/>
+    <i
+      v-if="lowWidth && currentPage === 'chat'"
+      class="icon-left"
+      @click="goBack"
+    />
+    <i
+      v-else
+      class="icon-menu"
+      @click="showMenu"
+    />
     <template v-if="lowWidth">
-      <span class="room-name">{{roomName}}</span>
+      <user-nav-info :user="user" v-if="user"/>
+      <span
+        v-else
+        class="room-name"
+      >{{ roomName }}</span>
     </template>
     <div class="chat-right-icons">
-      <chat-is-online-icon/>
-      <i class="icon-chat" @click="showPopupToggle" v-if="!lowWidth || currentPage === 'chat'"/>
+      <chat-is-online-icon />
+      <i
+        v-if="!lowWidth || currentPage === 'chat'"
+        class="icon-chat"
+        @click="showPopupToggle"
+      />
     </div>
   </app-nav-wrapper>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
+  import {
+    Component,
+    Emit,
+    Prop,
+    Vue
+  } from 'vue-property-decorator';
   import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
   import {State} from '@/ts/instances/storeInstance';
   import {
@@ -23,8 +44,15 @@
   } from '@/ts/types/model';
   import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon.vue';
   import {PrivateRoomsIds} from '@/ts/types/types';
+  import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
+  import UserNavInfo from '@/vue/chat/right/UserNavInfo.vue';
+
   @Component({
-    components: {ChatIsOnlineIcon, AppNavWrapper}
+    components: {
+      UserNavInfo,
+      ChatIsOnlineIcon,
+      AppNavWrapper
+    }
   })
   export default class ChatNavBar extends Vue {
     @State
@@ -52,10 +80,18 @@
       if (this.activeRoom.isMainInChannel) {
         return this.channelsDictUI[this.activeRoom.channelId!].name;
       }
-      if (!this.activeRoom.name) {
-        return  this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.activeRoom.id]].user;
+      if (this.user) {
+        return this.user.user;
       }
       throw Error('Invalid structure');
+    }
+
+    get user(): UserModel|null {
+      if (!this.activeRoom.name) {
+        return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.activeRoom.id]];
+      } else {
+        return null;
+      }
     }
 
     @Emit()
