@@ -1,6 +1,9 @@
-import { Logger } from 'lines-logger';
+import {Logger} from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
-import { BACKEND_ADDRESS } from '@/ts/utils/consts';
+import {
+  BACKEND_ADDRESS,
+  PUBLIC_PATH
+} from '@/ts/utils/consts';
 
 declare var clients: any;
 declare var serviceWorkerOption: {assets: string[]};
@@ -16,9 +19,17 @@ let subScr: null | string = null;
 self.addEventListener('install', (event: any) => {
   logger.log(' installed!')();
   event.waitUntil(
-      caches.open('static').then(function(cache) {
+      caches.open('smileys').then(function(cache) {
         return cache.addAll([
-            ...serviceWorkerOption.assets.filter(a => a.startsWith('/smileys/') || a.startsWith('/flags/')),
+            ...serviceWorkerOption.assets
+                .filter(a => a.startsWith('/smileys/'))
+                .map(url => {
+                  if (PUBLIC_PATH) {
+                    return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
+                  } else {
+                    return url;
+                  }
+                }),
             ]
         );
       })
@@ -36,6 +47,9 @@ self.addEventListener('fetch', async (event: any) => {
     response = await fetch(event.request);
     if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
       let cache = await caches.open('thumbnails')
+      await cache.put(event.request, response.clone());
+    } else if (event.request.url.indexOf('/flags/') >= 0) {
+      let cache = await caches.open('flags')
       await cache.put(event.request, response.clone());
     }
     return response

@@ -81,6 +81,11 @@ export default class UserRow extends Vue {
     display: flex
     justify-content: space-around
 
+  .online, .offline
+    display: flex
+    justify-content: space-between
+    width: 100%
+
   .user-name-sex
     display: flex
     /deep/ i

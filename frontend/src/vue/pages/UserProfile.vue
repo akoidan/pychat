@@ -43,6 +43,8 @@ export default class UserProfile extends Vue {
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/abstract_classes"
 
+  .holder
+    @extend %room-settings-holder
   .tab
     max-width: 680px
 
