@@ -45,6 +45,13 @@ def get_random_path(instance, filename):
 	return u"{}_{}".format(id_generator(8), filename) # support nonenglish characters with u'
 
 
+def get_random_path_thumbnail(instance, filename):
+	"""
+	:param filename base string for generated name
+	:return: a unique string filename
+	"""
+	return u"thumbnail/{}_{}".format(id_generator(8), filename) # support nonenglish characters with u'
+
 def myoverridenmeta(name, bases, adict):
 	newClass = type(name, bases, adict)
 	for field in newClass._meta.fields:
@@ -83,7 +90,7 @@ class User(AbstractBaseUser):
 	# ISO/IEC 5218 1 male, 2 - female
 	sex = SmallIntegerField(null=False, default=0)
 
-	thumbnail = ImageField(upload_to=get_random_path, null=True, blank=True)
+	thumbnail = ImageField(upload_to=get_random_path_thumbnail, null=True, blank=True)
 
 	last_time_online = BigIntegerField(default=get_milliseconds)
 

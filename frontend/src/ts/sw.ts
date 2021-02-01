@@ -3,7 +3,7 @@ import loggerFactory from '@/ts/instances/loggerFactory';
 import { BACKEND_ADDRESS } from '@/ts/utils/consts';
 
 declare var clients: any;
-
+declare var serviceWorkerOption: {assets: string[]};
 const logger: Logger = loggerFactory.getLogger('SW_S');
 
 //
@@ -13,8 +13,33 @@ logger.debug('startup, version {}', SW_VERSION)();
 let subScr: null | string = null;
 
 // Install Service Worker
-self.addEventListener('install', () => {
+self.addEventListener('install', (event: any) => {
   logger.log(' installed!')();
+  event.waitUntil(
+      caches.open('static').then(function(cache) {
+        return cache.addAll([
+            ...serviceWorkerOption.assets.filter(a => a.startsWith('/smileys/') || a.startsWith('/flags/')),
+            ]
+        );
+      })
+  );
+});
+
+// Cache and return requests
+self.addEventListener('fetch', async (event: any) => {
+  event.respondWith((async function() {
+    let response: any = await caches.match(event.request);
+    // Cache hit - return response
+    if (response) {
+      return  response;
+    }
+    response = await fetch(event.request);
+    if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
+      let cache = await caches.open('thumbnails')
+      await cache.put(event.request, response.clone());
+    }
+    return response
+  })())
 });
 
 // Service Worker Active

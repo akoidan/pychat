@@ -24,6 +24,7 @@ const MAIN_DIST = path.resolve(__dirname, MAIN_DIST_DIRNAME);
 const ANDROID_DIST = path.resolve(__dirname, ANDROID_DIST_DIRNAME);
 const DEV_PORT = 8080;
 const StyleLintPlugin = require('stylelint-webpack-plugin');
+const ServiceWorkerWepbackPlugin = require('serviceworker-webpack-plugin');
 const sassOptionsGlobal = {
   loader: "sass-loader",
   options: {
@@ -70,7 +71,7 @@ class SaveHtmlToFile {
 }
 
 
-const {options, definePlugin, optimization, configFile, startCordova, linting} = function () {
+const {options, definePlugin, optimization, configFile, startCordova, linting, backendPort} = function () {
   function getEnv(mode, trueValue, falseValues) {
     if (process.env[mode] === trueValue) {
       return true;
@@ -92,6 +93,10 @@ const {options, definePlugin, optimization, configFile, startCordova, linting} =
   options.IS_WEB = getEnv('PLATFORM', 'web', ['electron', 'android']);
   options.SERVICE_WORKER_URL = options.IS_WEB ? '/sw.js' : false;
   options.IS_PROFILE = getEnv('PROFILE', 'true');
+  const backendPort = options.BACKEND_ADDRESS.split(':')[1];
+  if (!options.IS_PROD) {
+    options.BACKEND_ADDRESS = `{}:${DEV_PORT}`;
+  }
   if (options.IS_ANDROID)  {
     if (startCordova) {
       options.BACKEND_ADDRESS = `${startCordova}:${options.BACKEND_ADDRESS.split(':')[1]}`;
@@ -153,7 +158,7 @@ const {options, definePlugin, optimization, configFile, startCordova, linting} =
 
   const configFile = options.IS_WEB && !options.IS_DEBUG ? 'tsconfig.json' : 'tsconfig.esnext.json' ;
   let definePlugin = new webpack.DefinePlugin({PYCHAT_CONSTS: JSON.stringify(options)});
-  return {options, definePlugin, optimization, configFile, startCordova, linting};
+  return {options, definePlugin, optimization, configFile, startCordova, linting, backendPort};
 }();
 
 
@@ -171,10 +176,7 @@ const getConfig = async () => {
     }
     return res;
   }
-  const entry = {
-    main: ['reflect-metadata', './src/ts/main.ts'],
-    sw: ['./src/ts/sw.ts']
-  }
+  const entry = ['reflect-metadata', './src/ts/main.ts']
 
 
   let webpackOptions = {
@@ -207,6 +209,9 @@ const getConfig = async () => {
     definePlugin,
     new VueLoaderPlugin(),
     new CleanTerminalPlugin(),
+    new ServiceWorkerWepbackPlugin({
+      entry: './src/ts/sw.ts',
+    }),
     new CopyWebpackPlugin([
       {from: './src/assets/manifest.json', to: ''},
       {from: './src/assets/recaptcha.html', to: ''},
@@ -552,6 +557,21 @@ async function setup() {
       public: `https://localhost:${DEV_PORT}`,
       historyApiFallback: true,
       inline: true,
+      proxy: {
+        "/api/**": {
+          target: `https://localhost:${backendPort}`,
+          secure: false
+        },
+        "/ws": {
+          target: `https://localhost:${backendPort}`,
+          secure: false,
+          ws: true
+        },
+        "/photo/**": {
+          target: `https://localhost:${backendPort}`,
+          secure: false
+        },
+      },
       host: '0.0.0.0',
       port: DEV_PORT,
       http2: options.IS_SSL,
@@ -599,7 +619,6 @@ async function setup() {
     require('loud-rejection/register');
     const cli = require('cordova/src/cli');
     await cli([null, null, 'run']);
-
   }
 }
 

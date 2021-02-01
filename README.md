@@ -237,7 +237,7 @@ Useful links:
     - ![browser-1](frontend/certs/browser-cert-1.png)
     - Drag and drop for image near localhost to finder![browser-1](frontend/certs/browser-cert-2.png)
     - Double click on newly created file and go to All items, select localhost and mark it as 'Always trust' ![macos-cert](frontend/certs/macos-cert-3.png)
-  - Click on Proceed unsafe when accessing your site. If you use different ports for back and front (like its described above) you may need to accept certificate from localhost:8888 (use for api) as well. For that open https://localhost:8888 . Proceed unsafe may be unavailable in some cases. E.g. for MacOS chrome you can use hack: just type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
+  - Click on Proceed unsafe when accessing your site. Proceed unsafe may be unavailable in some cases. E.g. for MacOS chrome you can use hack: just type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
   - Tell Browser to ignore certificate:
    - E.g. for chrome you can enable invalid certificates for localhost in [chrome://flags/#allow-insecure-localhost](chrome://flags/#allow-insecure-localhost).
    - If flag is not available you can also launch chrome with custom flag: `--ignore-certificate-errors` flag. E.g. on MacOS `open -a Google\ Chrome --args --ignore-certificate-errors` 

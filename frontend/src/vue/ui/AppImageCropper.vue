@@ -6,12 +6,16 @@
         <div class="img-cropper" @drop.prevent="dropPhoto">
           <vue-cropper
             ref="cropper"
+            v-show="srcImg"
             :auto-crop-area="1"
             :aspect-ratio="aspectRatio"
             :src="srcImg"
           />
+          <div v-if="!srcImg" class="drop-zone">
+
+          </div>
         </div>
-        <div class="actions">
+        <div class="actions" v-if="srcImg">
           <i title="Zoom In (Mouse Wheel)" class="icon-zoom-in" @click="cropper.relativeZoom(0.2)"></i>
           <i title="Zoom Out (Mouse Wheel)" class="icon-zoom-out" @click="cropper.relativeZoom(-0.2)"></i>
           <i title="Rotate" class="icon-rotate" @click="cropper.rotate(90)"></i>
@@ -263,4 +267,8 @@
     min-width: 100%
     max-width: 100%
     border: 1px solid white
+  .drop-zone
+    background-color: rgba(255, 255, 255, 0.5)
+    width: 100%
+    height: 200px
 </style>

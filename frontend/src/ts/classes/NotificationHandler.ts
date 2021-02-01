@@ -4,6 +4,7 @@ import { extractError } from '@/ts/utils/pureFunctions';
 import Api from '@/ts/message_handlers/Api';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
+import webpackServiceWorker from 'serviceworker-webpack-plugin/lib/runtime';
 import {
   IS_DEBUG,
   MANIFEST,
@@ -97,7 +98,7 @@ export default class NotifierHandler {
         await this.registerWorker();
       }
     } catch (e) {
-      this.logger.warn('Error registering service worker {}', extractError(e))();
+      this.logger.error('Error registering service worker {}', extractError(e))();
     } finally {
       this.serviceWorkedTried = true;
     }
@@ -202,7 +203,7 @@ export default class NotifierHandler {
     } else if (!MANIFEST || ! SERVICE_WORKER_URL) {
      throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
     }
-    const r = await navigator.serviceWorker.register(SERVICE_WORKER_URL, {scope: '/'});
+    const r = await webpackServiceWorker.register( {scope: '/'});
     this.logger.debug('Registered service worker {}', r)();
     this.serviceWorkerRegistration = await navigator.serviceWorker.ready;
     this.logger.debug('Service worker is ready {}', this.serviceWorkerRegistration)();
