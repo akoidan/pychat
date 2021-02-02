@@ -152,8 +152,11 @@ export const isDateMissing = (function () {
   return input.value === notADateValue;
 })();
 
-export function resolveMediaUrl(src: string): string {
-  return src.indexOf('blob:http') === 0 ? src : `${MEDIA_API_URL}${src}`;
+export function resolveMediaUrl<T extends string|null>(src: T): T {
+  if (!src) {
+    return null as T;
+  }
+  return src.indexOf('blob:http') === 0 ? src : `${MEDIA_API_URL}${src}` as T;
 }
 
 export function encodeSmileys(html: string): string {

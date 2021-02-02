@@ -50,8 +50,8 @@ export default class MainPage extends Vue {
 
   public created() {
     this.$logger.log('Main page has been created, fire listening ws, and register notification')();
-    this.$notifier.tryAgainRegisterServiceWorker(); // should be async, do no wait here
     this.$ws.startListening();
+    this.$notifier.tryAgainRegisterServiceWorker();
   }
 
 }

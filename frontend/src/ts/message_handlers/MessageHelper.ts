@@ -15,6 +15,7 @@ import Vue from 'vue';
 import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
+import {resolveMediaUrl} from '@/ts/utils/htmlApi';
 
 export class MessageHelper {
 
@@ -39,7 +40,7 @@ export class MessageHelper {
     if (room.notifications) {
       const title = this.store.allUsersDict[message.userId].user;
 
-      let icon: string = <string>faviconUrl;
+      let icon: string = resolveMediaUrl(this.store.allUsersDict[message.userId].image) || <string>faviconUrl;
       if (message.files) {
         const fff: FileModel = Object.values(message.files)[0];
         if (fff?.url) {

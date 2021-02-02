@@ -221,8 +221,12 @@ export default class NotifierHandler {
       throw Error('Current browser doesnt support offline notifications');
     }
 
-    await this.api.registerFCB(subscription.endpoint.split('/')[5], this.browserVersion, this.isMobile);
-    this.logger.log('Saved subscription to server')();
-
+    if (subscription.endpoint && subscription.endpoint.startsWith('https://fcm.googleapis.com/fcm/send')) {
+      let registrationId = subscription.endpoint.split('/').pop()
+      await this.api.registerFCB(registrationId, this.browserVersion, this.isMobile);
+      this.logger.log('Saved subscription to server')();
+    } else {
+      this.logger.warn('Unsupported subscription type {}', subscription.endpoint)();
+    }
   }
 }

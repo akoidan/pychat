@@ -71,7 +71,7 @@
     public readonly userInfo!: CurrentUserInfoModel;
 
     get imgSrc() {
-      return this.userInfo.image? resolveMediaUrl(this.userInfo.image): null;
+      return resolveMediaUrl(this.userInfo.image);
     }
 
     public get consts(): object {

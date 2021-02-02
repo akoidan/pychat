@@ -38,11 +38,11 @@ export default class UserProfileImage extends Vue {
 
   @Watch('userInfo.image')
   public onUserImageChange(value: string) {
-    this.srcImg = resolveMediaUrl(value);
+    this.srcImg = resolveMediaUrl(value) || '';
   }
 
   public created() {
-    this.srcImg = this.userInfo.image ? resolveMediaUrl(this.userInfo.image) : '';
+    this.srcImg = resolveMediaUrl(this.userInfo.image) || '';
   }
 
   @ApplyGrowlErr({ message: 'Unable to upload event', runningProp: 'running'})

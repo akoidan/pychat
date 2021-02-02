@@ -19,22 +19,18 @@ let subScr: null | string = null;
 // Install Service Worker
 self.addEventListener('install', (event: any) => {
   logger.log(' installed!')();
-  event.waitUntil(
-      caches.open('smileys').then(function(cache) {
-        return cache.addAll([
-            ...serviceWorkerOption.assets
-                .filter(a => a.startsWith('/smileys/'))
-                .map(url => {
-                  if (PUBLIC_PATH) {
-                    return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
-                  } else {
-                    return url;
-                  }
-                }),
-            ]
-        );
-      })
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open('smileys');
+    await cache.addAll(serviceWorkerOption.assets
+        .filter(a => a.startsWith('/smileys/'))
+        .map(url => {
+          if (PUBLIC_PATH) {
+            return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
+          } else {
+            return url;
+          }
+        }));
+  })());
 });
 
 // Cache and return requests

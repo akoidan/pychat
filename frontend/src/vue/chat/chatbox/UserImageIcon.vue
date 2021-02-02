@@ -34,10 +34,7 @@
     }
 
     get userImg() {
-      if (this.user.image) {
-        return resolveMediaUrl(this.user.image)
-      }
-      return  null;
+      return resolveMediaUrl(this.user.image)
     }
   }
 </script>

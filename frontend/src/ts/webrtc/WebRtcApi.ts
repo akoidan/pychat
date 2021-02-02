@@ -10,7 +10,10 @@ import NotifierHandler from '@/ts/classes/NotificationHandler';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import { sub } from '@/ts/instances/subInstance';
 import { MAX_ACCEPT_FILE_SIZE_WO_FS_API } from '@/ts/utils/consts';
-import { requestFileSystem } from '@/ts/utils/htmlApi';
+import {
+  requestFileSystem,
+  resolveMediaUrl
+} from '@/ts/utils/htmlApi';
 import FileReceiverPeerConnection from '@/ts/webrtc/file/FileReceiveerPeerConnection';
 import Subscription from '@/ts/classes/Subscription';
 import CallHandler from '@/ts/webrtc/call/CallHandler';
@@ -271,7 +274,7 @@ export default class WebRtcApi extends MessageHandler {
     this.notifier.showNotification(this.store.allUsersDict[message.userId].user, {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
-      icon: <string>faviconUrl,
+      icon: resolveMediaUrl(this.store.allUsersDict[message.userId].image) || faviconUrl as string,
       replaced: 1
     });
     this.store.addReceivingFile(payload);
