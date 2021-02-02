@@ -33,15 +33,18 @@ import {PrivateRoomsIds} from '@/ts/types/types';
 import ChatNavBar from '@/vue/chat/chatbox/ChatNavBar.vue';
 
 
-@Component({components: {
-    ChatNavBar,
+@Component({
+  name: 'ChannelsPage',
+  components: {
+  ChatNavBar,
   AppMenuBar,
   ChatPopupMenu,
   ChatIsOnlineIcon,
   AppNavWrapper,
   ChatBoxes,
   ChatRightSection
-}})
+  }
+})
 export default class ChannelsPage extends Vue {
 
   @State

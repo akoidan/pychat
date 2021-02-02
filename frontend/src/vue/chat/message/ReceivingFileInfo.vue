@@ -47,8 +47,8 @@ import {
   ReceivingFile
 } from '@/ts/types/model';
 
-@Component
-export default class ReceivingFileInfo extends Vue {
+@Component({name: 'ReceivingFileInfo'})
+ export default class ReceivingFileInfo extends Vue {
   @Prop() public receivingFile!: ReceivingFile;
 
   get size(): string {

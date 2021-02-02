@@ -12,8 +12,8 @@
     Ref
   } from 'vue-property-decorator';
 
-  @Component
-  export default class AppTab extends Vue {
+  @Component({name: 'AppTab'})
+ export default class AppTab extends Vue {
 
   }
 </script>

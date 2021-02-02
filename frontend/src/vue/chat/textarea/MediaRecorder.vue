@@ -36,8 +36,8 @@ import {
 } from '@/ts/utils/runtimeConsts';
 
 
-@Component
-export default class MediaRecorder extends Vue {
+@Component({name: 'MediaRecorder'})
+ export default class MediaRecorder extends Vue {
 
   @Ref()
   public video!: HTMLVideoElement;

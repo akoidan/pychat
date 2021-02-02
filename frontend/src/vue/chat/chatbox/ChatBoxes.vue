@@ -32,6 +32,7 @@ import { RoomModel } from '@/ts/types/model';
 
 
 @Component({
+  name: 'ChatBoxes' ,
   components: {ChatBox}
 })
 export default class ChatBoxes extends Vue {

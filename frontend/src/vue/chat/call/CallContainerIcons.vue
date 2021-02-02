@@ -66,8 +66,8 @@ import {
 } from "vue-property-decorator";
 import { CallsInfoModel } from '@/ts/types/model';
 
-@Component
-export default class CallContainerIcons extends Vue {
+@Component({name: 'CallContainerIcons'})
+ export default class CallContainerIcons extends Vue {
   @Prop() public callInfo!: CallsInfoModel;
   @Prop() public roomId!: number;
 

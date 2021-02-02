@@ -138,7 +138,10 @@ import { LoginMessage } from '@/ts/types/messages/innerMessages';
 import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
 import {USERNAME_REGEX} from '@/ts/utils/consts';
 
-@Component({components: {SocialAuthSignUp, AppSubmit, RegisterFieldSet}})
+@Component({
+  name: 'SignUp' ,
+  components: {SocialAuthSignUp, AppSubmit, RegisterFieldSet}
+})
   export default class SignUp extends Vue {
 
     @Prop() public oauth_token!: string;

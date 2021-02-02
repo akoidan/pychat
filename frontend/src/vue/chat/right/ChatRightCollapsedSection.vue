@@ -22,8 +22,8 @@
     Emit
   } from 'vue-property-decorator';
 
-  @Component
-  export default class ChatRightCollapsedSection extends Vue {
+  @Component({name: 'ChatRightCollapsedSection'})
+ export default class ChatRightCollapsedSection extends Vue {
     @Prop()
     public readonly value!: boolean ;
 

@@ -40,8 +40,8 @@ import { smileys } from '@/ts/utils/smileys';
 
 import { State } from '@/ts/instances/storeInstance';
 
-@Component
-export default class SmileyHolder extends Vue {
+@Component({name: 'SmileyHolder'})
+ export default class SmileyHolder extends Vue {
 
   public smileys = smileys;
   public activeTab: string = Object.keys(smileys)[0];

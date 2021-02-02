@@ -53,8 +53,8 @@ import {
 } from '@/ts/types/model';
 
 
-@Component
-export default class IncomingCall extends Vue {
+@Component({name: 'IncomingCall'})
+ export default class IncomingCall extends Vue {
 
   @Prop() public call!: IncomingCallModel;
   @State

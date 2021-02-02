@@ -54,6 +54,7 @@ import ChatMessageToolTip from '@/vue/chat/message/ChatMessageToolTip.vue';
 import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 
 @Component({
+  name: 'ChatSendingMessage' ,
   components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatTextMessage}
 })
 export default class ChatSendingMessage extends Vue {

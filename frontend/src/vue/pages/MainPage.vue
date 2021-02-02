@@ -34,6 +34,7 @@ import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
 import ChatBackIcon from '@/vue/chat/chatbox/ChatBackIcon.vue';
 
 @Component({
+  name: 'MainPage' ,
   components: {ChatBackIcon, AppNavWrapper, IncomingCall}
 })
 export default class MainPage extends Vue {

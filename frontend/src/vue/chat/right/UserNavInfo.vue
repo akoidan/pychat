@@ -20,6 +20,7 @@
   import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
   import {UserModel} from '@/ts/types/model';
   @Component({
+    name: 'UserNavInfo' ,
     components: {UserImageIcon}
   })
   export default class UserNavInfo extends Vue {

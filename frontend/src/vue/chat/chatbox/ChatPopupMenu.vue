@@ -35,6 +35,7 @@
   import AppModal from '@/vue/ui/AppModal.vue';
 
   @Component({
+    name: 'ChatPopupMenu' ,
     components: {
       AppModal
     }

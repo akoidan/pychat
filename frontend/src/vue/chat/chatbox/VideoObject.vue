@@ -16,8 +16,8 @@ import {
 } from 'vue-property-decorator';
 import { getStreamLog } from '@/ts/utils/pureFunctions';
 
-@Component
-export default class VideoObject extends Vue {
+@Component({name: 'VideoObject'})
+ export default class VideoObject extends Vue {
   @Prop() public mediaStreamLink!: string;
   @Prop() public muted!: string;
   @Prop() public userId!: number;

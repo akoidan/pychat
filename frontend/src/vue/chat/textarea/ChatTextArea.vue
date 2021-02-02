@@ -116,7 +116,9 @@ import {Throttle} from '@/ts/classes/Throttle';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-  @Component({components: {
+  @Component({
+    name: 'ChatTextArea' ,
+    components: {
       ChatTagging,
       SmileyHolder,
       ChatAttachments,

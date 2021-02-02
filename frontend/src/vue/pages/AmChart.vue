@@ -17,8 +17,8 @@ import 'amcharts3/amcharts/pie';
 interface AmChartI {
   dataItem: { wedge: { node: HTMLElement } };
 }
-@Component
-export default class AmChart extends Vue {
+@Component({name: 'AmChart'})
+ export default class AmChart extends Vue {
 
   public async mounted() {
     let data: any = {

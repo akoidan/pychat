@@ -76,6 +76,7 @@ import ChatRemotePeer from '@/vue/chat/call/ChatRemotePeer.vue';
 
 
 @Component({
+  name: 'VideoContainer' ,
   components: {ChatRemotePeer, VideoObject}
 })
 export default class VideoContainer extends Vue {

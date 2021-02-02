@@ -60,6 +60,7 @@
   import {resolveMediaUrl} from '@/ts/utils/htmlApi';
 
   @Component({
+    name: 'AppMenuBar',
     components: {
       AppModal
     }

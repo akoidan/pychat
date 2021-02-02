@@ -86,6 +86,7 @@
 
 
   @Component({
+    name: 'AppImageCropper',
     components: { VueCropper}
   })
   export default class AppImageCropper extends Vue {

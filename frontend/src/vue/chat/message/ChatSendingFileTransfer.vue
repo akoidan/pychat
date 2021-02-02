@@ -44,6 +44,7 @@ const fileStatusDict: Record<FileTransferStatus, string> = {
 };
 
 @Component({
+  name: 'ChatSendingFileTransfer' ,
   components: {AppProgressBar}
 })
 export default class ChatSendingFileTransfer extends Vue {

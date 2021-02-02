@@ -15,8 +15,8 @@ import Vue from 'vue';
 import {Prop, Component} from 'vue-property-decorator';
 import {IconColor} from '@/ts/types/types';
 
-@Component
-export default class FieldSet extends Vue {
+@Component({name: 'FieldSet'})
+ export default class FieldSet extends Vue {
   @Prop() public icon!: string;
   @Prop() public  validation!: IconColor;
   @Prop() public description!: string;

@@ -56,7 +56,10 @@ import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {GIT_HASH} from '@/ts/utils/consts';
 import {browserVersion} from '@/ts/utils/runtimeConsts';
 
-@Component({components: {AppSubmit}})
+@Component({
+  name: 'ReportIssue' ,
+  components: {AppSubmit}
+})
 export default class ReportIssue extends Vue {
 
   get git() {

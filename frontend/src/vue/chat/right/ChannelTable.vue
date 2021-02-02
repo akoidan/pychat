@@ -32,6 +32,7 @@
   import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper.vue';
 
   @Component({
+    name: 'ChannelTable',
     components: {RoomRowWrapper, ChatRightCollapsedSection}
   })
   export default class ChannelTable extends Vue {

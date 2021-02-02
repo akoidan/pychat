@@ -26,8 +26,8 @@ function getUniqueId() {
   return uniqueId++;
 }
 
-@Component
-export default class AppCheckbox extends Vue {
+@Component({name: 'AppCheckbox'})
+ export default class AppCheckbox extends Vue {
 
   @Prop()
   public readonly value!: boolean;

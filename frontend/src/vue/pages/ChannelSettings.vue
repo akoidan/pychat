@@ -113,6 +113,7 @@ import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 
 @Component({
+  name: 'ChannelSettings',
     components: {AppCheckbox, AppInputRange, PickUser, AppSubmit}
   })
   export default class ChannelSettings extends Vue {

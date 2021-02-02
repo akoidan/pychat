@@ -24,6 +24,7 @@ declare const gapi: any;
 let googleInited = false; // this is a global variable
 
 @Component({
+  name: 'GoogleAuth' ,
   components: {AppSubmit}
 })
 export default class GoogleAuth extends Vue {

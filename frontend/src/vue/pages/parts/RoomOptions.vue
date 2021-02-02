@@ -73,8 +73,8 @@ import {
   Vue
 } from 'vue-property-decorator';
 
-@Component
-  export default class RoomOptions extends Vue {
+@Component({name: 'RoomOptions'})
+ export default class RoomOptions extends Vue {
 
 
     public roomName: string = '';

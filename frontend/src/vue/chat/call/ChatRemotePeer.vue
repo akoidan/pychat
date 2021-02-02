@@ -31,6 +31,7 @@ import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
 
 @Component({
+  name: 'ChatRemotePeer' ,
   components: {VideoObject, AppInputRange}
 })
 export default class ChatRemotePeer extends Vue {

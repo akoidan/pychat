@@ -34,7 +34,10 @@ import {State} from '@/ts/instances/storeInstance';
 import CaptchaComponent from '@/vue/singup/CaptchaComponent.vue';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 
-@Component({components: {CaptchaComponent, AppSubmit}})
+@Component({
+  name: 'ResetPassword' ,
+  components: {CaptchaComponent, AppSubmit}
+})
 export default class ResetPassword extends Vue {
 
   @Ref()

@@ -132,6 +132,7 @@
   import {LAST_SYNCED} from '@/ts/utils/consts';
 
   @Component({
+    name: 'UserProfileSettings' ,
   components: {AppSubmit, AppCheckbox}
 })
 export default class UserProfileSettings extends Vue {

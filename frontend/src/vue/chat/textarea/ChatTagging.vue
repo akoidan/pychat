@@ -10,8 +10,8 @@ import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
 import {ChannelUIModel, UserDictModel, UserModel} from '@/ts/types/model';
 import {State} from '@/ts/instances/storeInstance';
 
-@Component
-export default class ChatTagging extends Vue {
+@Component({name: 'ChatTagging'})
+ export default class ChatTagging extends Vue {
   @Prop() public name!: string;
 
   @Prop() public userIds!: number[];

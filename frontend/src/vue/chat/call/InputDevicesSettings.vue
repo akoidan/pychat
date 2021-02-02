@@ -80,8 +80,8 @@ import { StringIdentifier } from '@/ts/types/types';
 import { State } from '@/ts/instances/storeInstance';
 import { file } from '@/ts/utils/audio';
 
-@Component
-export default class InputDevicesSettings extends Vue {
+@Component({name: 'InputDevicesSettings'})
+ export default class InputDevicesSettings extends Vue {
 
   @Prop() public callInfo!: CallsInfoModel;
   @Prop() public roomId!: number;

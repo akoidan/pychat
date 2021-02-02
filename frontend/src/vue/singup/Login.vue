@@ -54,7 +54,10 @@ import {sub} from '@/ts/instances/subInstance'
 import { LoginMessage } from '@/ts/types/messages/innerMessages';
 import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
 
-@Component({components: {SocialAuthSignUp, CaptchaComponent, AppSubmit}})
+@Component({
+  name: 'Login' ,
+  components: {SocialAuthSignUp, CaptchaComponent, AppSubmit}
+})
 export default class Login extends Vue {
 
   @Ref()

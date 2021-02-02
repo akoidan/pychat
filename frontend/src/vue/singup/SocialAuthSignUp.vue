@@ -18,6 +18,7 @@ import { GOOGLE_OAUTH_2_CLIENT_ID, FACEBOOK_APP_ID } from "@/ts/utils/consts";
 import { OauthSessionResponse } from '@/ts/types/dto';
 
 @Component({
+  name: 'SocialAuthSignUp' ,
   components: {GoogleAuth, FacebookAuth}
 })
 export default class SocialAuthSignUp extends Vue {

@@ -19,8 +19,8 @@
   import {resolveMediaUrl} from '@/ts/utils/htmlApi';
   import loggerFactory from '@/ts/instances/loggerFactory';
 
-  @Component
-  export default class UserImageIcon extends Vue {
+  @Component({name: 'UserImageIcon'})
+ export default class UserImageIcon extends Vue {
 
     @Prop()
     public readonly user!: UserModel;

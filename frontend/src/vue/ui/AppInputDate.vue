@@ -33,7 +33,10 @@ if (!IS_ELECTRON) {
 }
 
 // @ts-ignore: next-line
-@Component({components: {Datepicker}})
+@Component({
+  name: 'AppInputDate',
+  components: {Datepicker}
+})
 export default class AppInputDate extends Vue {
 
   get datePickerValue() {

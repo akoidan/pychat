@@ -20,8 +20,8 @@ import {
 import { State } from '@/ts/instances/storeInstance';
 import { ChannelUIModel } from '@/ts/types/model';
 
-@Component
-  export default class ParentChannel extends Vue {
+@Component({name: 'ParentChannel'})
+ export default class ParentChannel extends Vue {
     @State
     public readonly channels!: ChannelUIModel[];
 

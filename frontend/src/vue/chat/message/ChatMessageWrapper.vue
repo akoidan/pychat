@@ -13,8 +13,8 @@
   } from 'vue-property-decorator';
   import {timeToString} from '@/ts/utils/htmlApi';
 
-  @Component
-  export default class ChatMessageWrapper extends Vue {
+  @Component({name: 'ChatMessageWrapper'})
+ export default class ChatMessageWrapper extends Vue {
     @Prop()
     private readonly time!: number;
 

@@ -17,8 +17,8 @@
   } from '@/ts/types/model';
   import {State} from '@/ts/instances/storeInstance';
 
-  @Component
-  export default class ChatShowUserTyping extends Vue {
+  @Component({name: 'ChatShowUserTyping'})
+ export default class ChatShowUserTyping extends Vue {
     @Prop() public usersTyping!: Record<number, number>;
 
     @State

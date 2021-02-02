@@ -29,6 +29,7 @@ import { GOOGLE_OAUTH_2_CLIENT_ID , FACEBOOK_APP_ID} from '@/ts/utils/consts';
 import {Component, Vue} from 'vue-property-decorator';
 import AppTab from '@/vue/ui/AppTab.vue';
 @Component({
+  name: 'UserProfile' ,
   components: {AppTab}
 })
 export default class UserProfile extends Vue {

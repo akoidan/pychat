@@ -31,8 +31,8 @@ import {EditingMessage, MessageModel} from '@/ts/types/model';
 import {editMessageWs, showAllowEditing} from '@/ts/utils/pureFunctions';
 import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from '@/ts/utils/consts';
 
-@Component
-export default class ChatMessageToolTip extends Vue {
+@Component({name: 'ChatMessageToolTip'})
+ export default class ChatMessageToolTip extends Vue {
   @Prop()
   public readonly message!: MessageModel;
 

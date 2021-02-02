@@ -9,8 +9,8 @@
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {State} from '@/ts/instances/storeInstance';
 
-@Component
-export default class ChatIsOnlineIcon extends Vue {
+@Component({name: 'ChatIsOnlineIcon'})
+ export default class ChatIsOnlineIcon extends Vue {
   @State
   public readonly isOnline!: boolean;
 

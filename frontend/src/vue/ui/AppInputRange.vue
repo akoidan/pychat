@@ -21,8 +21,8 @@ function getUniqueId() {
   return uniqueId++;
 }
 
-@Component
-export default class AppInputRange extends Vue {
+@Component({name: 'AppInputRange'})
+ export default class AppInputRange extends Vue {
   @Prop() public readonly value!: number;
 
   @Ref()

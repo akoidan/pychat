@@ -29,8 +29,8 @@ import {
 } from 'vue-property-decorator';
 import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
 
-@Component
-export default class ConfirmMail extends Vue {
+@Component({name: 'ConfirmMail'})
+ export default class ConfirmMail extends Vue {
 
   public message: string|null = null;
   public errorMessage: string|null = null;

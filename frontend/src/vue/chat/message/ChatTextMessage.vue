@@ -42,6 +42,7 @@ import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
 import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 
 @Component({
+  name: 'ChatTextMessage' ,
   components: {ChatMessageWrapper, ChatMessageHeader}
 })
 export default class ChatTextMessage extends Vue {

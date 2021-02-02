@@ -126,7 +126,9 @@ import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
 import PickUser from '@/vue/pages/parts/PickUser.vue';
 import {PrivateRoomsIds} from '@/ts/types/types';
 
-@Component({components: {
+@Component({
+  name: 'RoomSettings' ,
+  components: {
     PickUser,
     ParentChannel,
     AppInputRange,

@@ -6,8 +6,8 @@
 <script lang="ts">
   import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 
-  @Component
-  export default class AppNavWrapper extends Vue {
+  @Component({name: 'AppNavWrapper'})
+ export default class AppNavWrapper extends Vue {
 
   }
 </script>

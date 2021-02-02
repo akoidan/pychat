@@ -38,7 +38,10 @@ import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 import PickUser from '@/vue/pages/parts/PickUser.vue';
 
-@Component({components: {PickUser, AppSubmit}})
+@Component({
+  name: 'CreateChannel' ,
+  components: {PickUser, AppSubmit}
+})
   export default class CreateChannel extends Vue {
     public channelName: string = '';
     public running: boolean = false;

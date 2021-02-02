@@ -73,6 +73,7 @@ import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {CurrentUserInfoModel} from '@/ts/types/model';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 @Component({
+  name: 'UserProfileChangePassword' ,
   components: {AppSubmit}
 })
 export default class UserProfileChangePassword extends Vue {

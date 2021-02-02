@@ -18,6 +18,7 @@ import {
 } from '@/ts/types/model';
 
 @Component({
+  name: 'ChannelAddRoom',
     components: {
         CreateRoom
     }

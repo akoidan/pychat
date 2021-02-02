@@ -127,6 +127,7 @@ import {LogoutMessage} from '@/ts/types/messages/innerMessages';
 import {sub} from '@/ts/instances/subInstance';
 
 @Component({
+  name: 'UserProfileInfo' ,
   components: {AppInputDate, AppSubmit}
 })
 export default class UserProfileInfo extends Vue {

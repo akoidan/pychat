@@ -48,8 +48,8 @@ function getUniqueId() {
   return uniqueId++;
 }
 
-@Component
-export default class SearchMessages extends Vue {
+@Component({name: 'SearchMessages'})
+ export default class SearchMessages extends Vue {
 
   get searchResultText() {
     if (this.searchResult) {

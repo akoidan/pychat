@@ -18,6 +18,7 @@ import {ChannelUIModel} from '@/ts/types/model';
 import {State} from '@/ts/instances/storeInstance';
 
 @Component({
+  name: 'ChatRightSection' ,
   components: {
     ChannelTable,
     RoomDirectUsersTable

@@ -42,6 +42,7 @@ import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
 import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
 import AppSeparator from '@/vue/ui/AppSeparator.vue';
 @Component({
+  name: 'ChatThread' ,
   components: {
     AppSeparator,
     ChatReceivingFile,

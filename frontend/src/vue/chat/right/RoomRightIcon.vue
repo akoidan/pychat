@@ -33,8 +33,8 @@ import {
 } from 'vue-property-decorator';
 import { RoomModel } from '@/ts/types/model';
 
-@Component
-  export default class RoomRightIcon extends Vue {
+@Component({name: 'RoomRightIcon'})
+ export default class RoomRightIcon extends Vue {
 
     @Prop() public room!: RoomModel;
 

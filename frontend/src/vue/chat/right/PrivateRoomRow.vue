@@ -21,6 +21,7 @@ import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper.vue';
 import UserRow from '@/vue/chat/right/UserRow.vue';
 
 @Component({
+  name: 'PrivateRoomRow' ,
   components: {UserRow, RoomRowWrapper,  RoomRightIcon}
 })
 export default class PrivateRoomRow extends Vue {

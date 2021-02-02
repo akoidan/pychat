@@ -20,8 +20,8 @@ import {AUTO_REGISTRATION} from '@/ts/utils/consts';
 import {sub} from '@/ts/instances/subInstance'
 import { LoginMessage } from '@/ts/types/messages/innerMessages';
 
-@Component
-export default class AuthPage extends Vue {
+@Component({name: 'AuthPage'})
+ export default class AuthPage extends Vue {
   @State
   public readonly regHeader!: string;
 

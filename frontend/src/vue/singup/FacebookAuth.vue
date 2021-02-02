@@ -25,6 +25,7 @@ declare const FB: any;
 let fbInited = false; // this is a global variable
 
 @Component({
+  name: 'FacebookAuth' ,
   components: {AppSubmit}
 })
 export default class FacebookAuth extends Vue {

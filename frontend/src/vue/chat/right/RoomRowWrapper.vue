@@ -18,6 +18,7 @@
   import {RoomModel} from '@/ts/types/model';
   import {State} from '@/ts/instances/storeInstance';
   @Component({
+    name: 'RoomRowWrapper' ,
     components: {RoomRightIcon}
   })
   export default class RoomRowWrapper extends Vue {

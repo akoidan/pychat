@@ -52,6 +52,7 @@ import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 
 
 @Component({
+  name: 'ChatReceivingFile' ,
   components: {
     ChatMessageWrapper,
     ReceivingFileInfo,

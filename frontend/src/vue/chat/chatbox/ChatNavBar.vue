@@ -48,6 +48,7 @@
   import UserNavInfo from '@/vue/chat/right/UserNavInfo.vue';
 
   @Component({
+    name: 'ChatNavBar' ,
     components: {
       UserNavInfo,
       ChatIsOnlineIcon,

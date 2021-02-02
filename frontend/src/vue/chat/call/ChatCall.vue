@@ -69,6 +69,7 @@ import CallContainerIcons from '@/vue/chat/call/CallContainerIcons.vue';
 import Painter from '@/vue/chat/textarea/Painter.vue';
 
 @Component({
+  name: 'ChatCall' ,
   components: {
     Painter,
     CallContainerIcons,

@@ -47,7 +47,10 @@
   import AppSubmit from '@/vue/ui/AppSubmit.vue';
   import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 
-  @Component({components: {AppSubmit}})
+  @Component({
+    name: 'ApplyResetPassword',
+    components: {AppSubmit}
+  })
   export default class ApplyResetPassword extends Vue {
 
     restoreUser: string = '';

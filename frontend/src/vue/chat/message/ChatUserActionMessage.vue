@@ -18,6 +18,7 @@ import { UserModel } from '@/ts/types/model';
 import {timeToString} from '@/ts/utils/htmlApi';
 import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 @Component({
+  name: 'ChatUserActionMessage' ,
   components: {ChatMessageWrapper}
 })
 export default class ChatUserActionMessage extends Vue {

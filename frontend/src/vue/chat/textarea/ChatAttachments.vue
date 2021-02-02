@@ -85,8 +85,8 @@ import { State } from '@/ts/instances/storeInstance';
 import { RoomModel } from '@/ts/types/model';
 import {buildQueryParams} from '@/ts/utils/pureFunctions';
 
-@Component
-export default class ChatAttachments extends Vue {
+@Component({name: 'ChatAttachments'})
+ export default class ChatAttachments extends Vue {
 
   @Ref()
   public imgInput!: HTMLInputElement;

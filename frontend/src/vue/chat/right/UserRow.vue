@@ -26,6 +26,7 @@ import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
 
 
 @Component({
+  name: 'UserRow' ,
   components: {UserImageIcon}
 })
 export default class UserRow extends Vue {

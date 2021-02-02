@@ -20,8 +20,8 @@ function getUniqueId() {
 }
 
 
-@Component
-export default class Painter extends Vue {
+@Component({name: 'Painter'})
+ export default class Painter extends Vue {
 
   @Ref()
   public div!: HTMLElement;

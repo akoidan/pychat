@@ -82,6 +82,7 @@ import {PrivateRoomsIds} from '@/ts/types/types';
 import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
 
 @Component({
+  name: 'CreateRoom' ,
 components: {
   ParentChannel,
   AppCheckbox,

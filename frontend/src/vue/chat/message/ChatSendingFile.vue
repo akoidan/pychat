@@ -41,6 +41,7 @@ import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
 import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 
 @Component({
+  name: 'ChatSendingFile' ,
   components: {
     ChatMessageWrapper,
     ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}

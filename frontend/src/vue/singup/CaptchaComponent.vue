@@ -35,8 +35,8 @@ import {GoogleCaptcha} from '@/ts/types/model';
 const captchaInited: boolean = false; // don't init captcha again, if it was inited in another component
 let captchaId = 1; // just random id to diff one comp fro another
 
-@Component
-export default class CaptchaComponent extends Vue {
+@Component({name: 'CaptchaComponent'})
+ export default class CaptchaComponent extends Vue {
 
   public captcha_key: string = RECAPTCHA_PUBLIC_KEY || '';
   public captchaInited: boolean = false;  // if current component was initialized

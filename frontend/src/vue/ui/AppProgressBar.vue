@@ -20,8 +20,8 @@ import {
 import { bytesToSize } from '@/ts/utils/pureFunctions';
 import { UploadProgressModel } from '@/ts/types/model';
 
-@Component
-export default class AppProgressBar extends Vue {
+@Component({name: 'AppProgressBar'})
+ export default class AppProgressBar extends Vue {
   @Prop()
   public readonly upload!: UploadProgressModel;
 

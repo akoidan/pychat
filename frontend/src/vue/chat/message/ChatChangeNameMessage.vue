@@ -18,6 +18,7 @@ import {
 import { timeToString } from '@/ts/utils/htmlApi';
 import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 @Component({
+  name: 'ChatChangeNameMessage' ,
   components: {ChatMessageWrapper}
 })
 export default class ChatChangeNameMessage extends Vue {

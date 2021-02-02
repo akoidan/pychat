@@ -113,6 +113,7 @@ import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
 
   @Component({
+    name: 'ChatBox' ,
     components: {
       ChatShowUserTyping,
       ChatTextArea,

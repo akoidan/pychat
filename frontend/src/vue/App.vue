@@ -18,6 +18,7 @@ import {CurrentUserSettingsModel, GrowlModel} from '@/ts/types/model';
 import {State} from '@/ts/instances/storeInstance';
 
 @Component({
+  name: 'App',
   components: {Growl}
 })
 export default class App extends Vue {

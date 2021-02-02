@@ -103,7 +103,7 @@ function Validate(target: unknown, propertyKey: string, descriptor: PropertyDesc
     try {
       original.apply(this, args);
     } catch (e) {
-      throw Error(`store.${propertyKey}(${JSON.stringify(args)})\n\n ${JSON.stringify(this)}\n`);
+      logger.warn(`Invalid temporal store structure.${propertyKey} {} {}`, args, JSON.parse(JSON.stringify(this)) )();
     }
   };
 }

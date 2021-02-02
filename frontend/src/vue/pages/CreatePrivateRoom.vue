@@ -13,7 +13,10 @@
   import {State} from '@/ts/instances/storeInstance';
   import {PrivateRoomsIds} from '@/ts/types/types';
 
-  @Component({components: {CreateRoom}})
+  @Component({
+    name: 'CreatePrivateRoom' ,
+    components: {CreateRoom}
+  })
 export default class CreatePrivateRoom extends Vue {
 
   @State

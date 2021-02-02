@@ -18,6 +18,7 @@ import FacebookAuth from '@/vue/singup/FacebookAuth.vue';
 import GoogleAuth from '@/vue/singup/GoogleAuth.vue';
 
 @Component({
+  name: 'UserProfileOauthSettings' ,
   components: {GoogleAuth, FacebookAuth, AppSubmit}
 })
 export default class UserProfileOauthSettings extends Vue {

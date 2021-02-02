@@ -21,8 +21,8 @@ function getUniqueId() {
   return uniqueId++;
 }
 
-@Component
-export default class PainterPage extends Vue {
+@Component({name: 'PainterPage'})
+ export default class PainterPage extends Vue {
 
   @Ref()
   public div!: HTMLElement;

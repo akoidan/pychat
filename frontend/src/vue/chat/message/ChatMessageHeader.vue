@@ -15,6 +15,7 @@ import { timeToString } from '@/ts/utils/htmlApi';
 
 import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
 @Component({
+  name: 'ChatMessageHeader' ,
   components: {UserImageIcon}
 })
 export default class ChatMessageHeader extends Vue {

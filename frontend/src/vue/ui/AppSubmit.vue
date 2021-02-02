@@ -18,8 +18,8 @@ import {
   Vue
 } from 'vue-property-decorator';
 
-@Component
-export default class AppSubmit extends Vue {
+@Component({name: 'AppSubmit'})
+ export default class AppSubmit extends Vue {
   @Prop()
   public readonly value!: string;
   @Prop()

@@ -39,6 +39,7 @@ import { UserModel } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
 import UserRow from '@/vue/chat/right/UserRow.vue';
 @Component({
+  name: 'PickUser' ,
   components: {UserRow}
 })
 export default class PickUser extends Vue {

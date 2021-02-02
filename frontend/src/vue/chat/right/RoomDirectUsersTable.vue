@@ -24,6 +24,7 @@ import ChatRightCollapsedSection
   from '@/vue/chat/right/ChatRightCollapsedSection.vue';
 
 @Component({
+  name: 'RoomDirectUsersTable' ,
   components: {ChatRightCollapsedSection, PrivateRoomRow}
 })
 export default class RoomDirectUsersTable extends Vue {

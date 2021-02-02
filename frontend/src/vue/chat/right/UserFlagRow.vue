@@ -24,6 +24,7 @@
   import {FLAGS} from '@/ts/utils/consts';
   import {getFlagPath} from '@/ts/utils/htmlApi';
   @Component({
+    name: 'UserFlagRow' ,
     components: {UserRow}
   })
   export default class UserFlagRow extends Vue {

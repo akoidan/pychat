@@ -19,6 +19,7 @@ import {CurrentUserInfoModel} from '@/ts/types/model';
 
 
 @Component({
+  name: 'UserProfileImage' ,
   components: {
     AppImageCropper: () => import(/* webpackChunkName: 'cropper' */ '@/vue/ui/AppImageCropper.vue'),
     AppSubmit

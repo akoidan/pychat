@@ -8,8 +8,8 @@
 <script lang="ts">
   import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 
-  @Component
-  export default class AppSeparator extends Vue {
+  @Component({name: 'AppSeparator'})
+ export default class AppSeparator extends Vue {
     @Prop()
     public readonly day!: string;
   }
