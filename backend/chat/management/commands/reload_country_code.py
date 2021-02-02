@@ -16,7 +16,8 @@ class Command(BaseCommand):
 	help = 'fills chat_ip_address.country_code'
 
 	def handle(self, *args, **options):
-		for ip in IpAddress.objects.filter(Q(country__isnull=True) | Q(lat__isnull=True)):
+		# Q(country__isnull=True) | Q(lat__isnull=True)
+		for ip in IpAddress.objects.all():
 			try:
 				f = urlopen(api_url % ip.ip)
 				raw_response = f.read().decode("utf-8")
@@ -24,10 +25,10 @@ class Command(BaseCommand):
 				if response['status'] != "success":
 					raise Exception(response['status'])
 				ip.country_code = response['countryCode']
-				ip.isp = response['isp'],
-				ip.country = response['country'],
-				ip.region = response['regionName'],
-				ip.city = response['city'],
+				ip.isp = response['isp']
+				ip.country = response['country']
+				ip.region = response['regionName']
+				ip.city = response['city']
 				ip.country_code = response['countryCode']
 				ip.lat = response['lat']
 				ip.lon = response['lon']
@@ -36,6 +37,6 @@ class Command(BaseCommand):
 
 				ip.save()
 				print("Saved %s" % raw_response)
-				time.sleep(1) # do not get banned
+				time.sleep(5)  # do not get banned
 			except Exception as e:
 				print("Skip %s because %s" % (ip, e))
