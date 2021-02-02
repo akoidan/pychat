@@ -22,6 +22,7 @@ RUN set -x &&\
             libxslt-dev \
             gd-dev \
             geoip-dev \
+            jpeg-dev \
             mariadb-dev \
             python3-dev \
             build-base \
