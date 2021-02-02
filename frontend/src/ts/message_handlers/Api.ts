@@ -164,6 +164,7 @@ export default class Api extends MessageHandler {
           agent,
           is_mobile
         },
+        isJsonEncoded: true,
         checkOkString: true
       });
     } catch (e) {

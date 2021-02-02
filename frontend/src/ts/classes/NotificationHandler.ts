@@ -203,18 +203,25 @@ export default class NotifierHandler {
     } else if (!MANIFEST || ! SERVICE_WORKER_URL) {
      throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
     }
-    const r = await webpackServiceWorker.register( {scope: '/'});
+    const r: ServiceWorkerRegistration = await webpackServiceWorker.register( {scope: '/'}) as ServiceWorkerRegistration;
+
+
     this.logger.debug('Registered service worker {}', r)();
     this.serviceWorkerRegistration = await navigator.serviceWorker.ready;
     this.logger.debug('Service worker is ready {}', this.serviceWorkerRegistration)();
-    const subscription = await this.serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true});
-    this.logger.debug('Got subscription {}', subscription)();
-    this.subscriptionId = subscription.toJSON();
+
+    let subscription = await this.serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true});
+    if (!subscription) {
+      throw Error('Check permissions');
+    }
+    this.logger.log("Got subscription {}", subscription)();
+
+    this.subscriptionId = subscription.toJSON() as string;
     if (!this.subscriptionId) {
       throw Error('Current browser doesnt support offline notifications');
     }
 
-    await this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile);
+    await this.api.registerFCB(subscription.endpoint.split('/')[5], this.browserVersion, this.isMobile);
     this.logger.log('Saved subscription to server')();
 
   }
