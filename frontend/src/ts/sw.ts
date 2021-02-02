@@ -2,6 +2,7 @@ import {Logger} from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   BACKEND_ADDRESS,
+  IS_SSL,
   PUBLIC_PATH
 } from '@/ts/utils/consts';
 
@@ -118,13 +119,12 @@ async function getPlayBack(event: unknown) {
   // it's always https, since SW doesn't work in http.
   if (BACKEND_ADDRESS.indexOf('{}') >= 0) {
     // self.registration returns "https://pychat.org/"
-    address = BACKEND_ADDRESS.replace('{}', (self as any).registration.scope.slice(0, -1));
+    address = `https://${BACKEND_ADDRESS.replace('{}', new URL((self as any).registration.scope).hostname)}`;
   } else {
     address = `https://${BACKEND_ADDRESS}`;
   }
-  const response = await fetch(`${address}/get_firebase_playback`.replace('{}', window.location.host), {
+  const response = await fetch(`${address}/api/get_firebase_playback?registration_id=${subScr}`, {
     credentials: 'omit',
-    headers: {auth: subScr}
   });
   logger.log('Fetching finished {}', response)();
   const t = await response.text();
@@ -134,6 +134,12 @@ async function getPlayBack(event: unknown) {
   const notifications = await (<any>self).registration.getNotifications();
   let count = 1;
   if (m.options && m.options.data) {
+    if (m.options.icon) {
+      if (m.options.icon.startsWith('/photo')) {
+        let url = PUBLIC_PATH ? PUBLIC_PATH : address;
+        m.options.icon =  `${url}${m.options.icon}`;
+      }
+    }
     const room = m.options.data.room;
     const sender = m.options.data.sender;
     for (let i = 0; i < notifications.length; i++) {

@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import re
-
+from pyfcm import FCMNotification
 from PIL import Image as PilImage
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -17,7 +17,7 @@ from chat.models import Image, UploadedFile, MessageMention
 from chat.models import IpAddress
 from chat.models import User
 from chat.py2_3 import dict_values_to_list
-
+FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 
 logger = logging.getLogger(__name__)
@@ -193,6 +193,26 @@ def update_symbols(files, tags, message):
 		new_tag_symbol = get_max_symbol_dict(tags)
 		if message.symbol is None or new_tag_symbol > message.symbol:
 			message.symbol = new_tag_symbol
+
+def send_push(registrations_id, message_title, message_body):
+
+	push_service = FCMNotification(api_key=FIREBASE_API_KEY)
+
+	if len(registrations_id) == 1:
+		result = push_service.notify_single_device(
+			registration_id=registrations_id[0],
+			message_title=message_title,
+			message_body=message_body
+		)
+	else:
+		result = push_service.notify_multiple_devices(
+			registration_ids=registrations_id,
+			message_title=message_title, message_body=message_body
+		)
+
+
+def get_thumbnail_url(thumbnail):
+	return "{0}{1}".format(settings.MEDIA_URL, thumbnail) if thumbnail else None
 
 
 def create_thumbnail(input_file, up):

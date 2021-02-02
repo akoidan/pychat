@@ -16,7 +16,7 @@ from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
 from chat.tornado.message_creator import MessagesCreator, WebRtcMessageCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import create_id, get_or_create_ip_model
+from chat.utils import create_id, get_or_create_ip_model, get_thumbnail_url
 
 parent_logger = logging.getLogger(__name__)
 
@@ -215,7 +215,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				user['id'],
 				user['username'],
 				user['sex'],
-				"{0}{1}".format(settings.MEDIA_URL, user['thumbnail']) if user['thumbnail'] else None,
+				get_thumbnail_url(user['thumbnail'])
 			) for user in fetched_users]
 
 		self.ws_write(self.message_creator.set_room(room_users, user_dict, online, user_db, channels))

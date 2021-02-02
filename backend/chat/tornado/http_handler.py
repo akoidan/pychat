@@ -30,8 +30,8 @@ from chat.socials import GoogleAuth, FacebookAuth
 from chat.tornado.constants import Actions, RedisPrefix, VarNames, HandlerNames
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
-	add_missing_fields, extract_nginx_files, check_captcha, get_user_id
-from chat.utils import check_user, is_blank, get_or_create_ip_model, create_thumbnail
+	add_missing_fields, extract_nginx_files, check_captcha, get_user_id, json_response, json_request
+from chat.utils import check_user, is_blank, get_or_create_ip_model, create_thumbnail, get_thumbnail_url
 
 SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
 
@@ -375,10 +375,11 @@ class HttpHandler(MethodDispatcher):
 
 	@require_http_method('POST')
 	@login_required_no_redirect
+	@json_request
 	def register_fcb(self, registration_id, agent, is_mobile):
 		ip = yield from self.__get_or_create_ip()
 		Subscription.objects.update_or_create(
-			registration_id=registration_id, # TODO FCM
+			registration_id=registration_id,
 			defaults={
 				'user_id': self.user_id,
 				'inactive': False,
@@ -392,8 +393,7 @@ class HttpHandler(MethodDispatcher):
 
 	@require_http_method('GET')
 	# @transaction.atomic TODO, is this works in single thread?
-	def get_firebase_playback(self):
-		registration_id = self.request.headers('HTTP_AUTH')  # TODO FCM
+	def get_firebase_playback(self,registration_id):
 		self.logger.debug('Firebase playback, id %s', registration_id)
 		query_sub_message = SubscriptionMessages.objects.filter(
 			subscription__registration_id=registration_id,
@@ -401,17 +401,18 @@ class HttpHandler(MethodDispatcher):
 		).order_by('-message__time')[:1]
 		sub_message = query_sub_message[0]
 		SubscriptionMessages.objects.filter(id=sub_message.id).update(received=True)
-		message = Message.objects.select_related("sender__username", "room__name").get(id=sub_message.message_id)
+		message = Message.objects.values("sender__username", "sender__thumbnail", "room__name", "room_id", "content", "id").get(id=sub_message.message_id)
+		thumbnail = get_thumbnail_url(message['sender__thumbnail'])
 		data = {
-			'title': message.sender.username,
+			'title': message['sender__username'],
 			'options': {
-				'body': message.content,
-				'icon': '/favicon.ico',
+				'body': message['content'],
+				'icon': thumbnail if thumbnail else '/favicon.ico',
 				'data': {
-					'id': sub_message.message_id,
-					'sender': message.sender.username,
-					'room': message.room.name,
-					'roomId': message.room_id
+					'id': message['id'],
+					'sender': message['sender__username'],
+					'room': message['room__name'],
+					'roomId': message['room_id']
 				},
 				'requireInteraction': True
 			},
@@ -616,14 +617,14 @@ class HttpHandler(MethodDispatcher):
 				self.user_id,
 				up['username'],
 				up['sex'],
-				"{0}{1}".format(settings.MEDIA_URL, up['thumbnail']) if up['thumbnail'] else None,
+				get_thumbnail_url(up['thumbnail']),
 			)
 		)
 		global_redis.sync_redis.publish(settings.ALL_ROOM_ID, json.dumps(payload))
 		global_redis.sync_redis.publish( RedisPrefix.generate_user(self.user_id), json.dumps({
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_PROFILE_IMAGE,
-			VarNames.CONTENT: "{0}{1}".format(settings.MEDIA_URL, up['photo']) if up['photo'] else None,
+			VarNames.CONTENT: get_thumbnail_url(up['photo']),
 		}))
 		return settings.VALIDATION_IS_OK
 

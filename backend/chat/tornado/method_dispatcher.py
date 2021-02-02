@@ -188,6 +188,16 @@ def delist_arguments(args):
 	return args
 
 
+def json_request(function):
+	"""
+	Json.loads the body and passes and 1st arg
+	"""
+	def wrap_function(self, *args, **kwargs):
+		data = json.loads(self.request.body)
+		return function(self, **data)
+
+	return wrap_function
+
 def json_response(function):
 	"""
 	Json.dumps the result if it's not string
@@ -285,6 +295,5 @@ class MethodDispatcher(tornado.web.RequestHandler):
 
 	def set_default_headers(self):
 		self.set_header("Access-Control-Allow-Origin", "*")
-		self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+		self.set_header("Access-Control-Allow-Headers", "x-requested-with, session_id, Content-Type")
 		self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-		self.set_header('Access-Control-Allow-Headers', 'session_id')

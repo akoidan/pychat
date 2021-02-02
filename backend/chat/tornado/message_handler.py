@@ -22,7 +22,7 @@ from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix,
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_symbol, validate_edit_message, update_symbols, up_files_to_img, evaluate, check_user, \
-	http_client, get_max_symbol_dict, max_from_2
+	http_client, get_max_symbol_dict, max_from_2, send_push
 
 # from pywebpush import webpush
 
@@ -231,7 +231,7 @@ class MessagesHandler():
 		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
 		http_client.fetch(url, callback=on_giphy_reply)
 
-	def notify_offline(self, channel, message_id):
+	def notify_offline(self, channel, message):
 		if FIREBASE_API_KEY is None:
 			return
 		online = self.get_online_from_redis()
@@ -241,39 +241,10 @@ class MessagesHandler():
 		subscriptions = Subscription.objects.filter(user__in=offline_users, inactive=False)
 		if len(subscriptions) == 0:
 			return
-		new_sub_mess =[SubscriptionMessages(message_id=message_id, subscription_id=r.id) for r in subscriptions]
+		new_sub_mess =[SubscriptionMessages(message_id=message.id, subscription_id=r.id) for r in subscriptions]
 		reg_ids =[r.registration_id for r in subscriptions]
 		SubscriptionMessages.objects.bulk_create(new_sub_mess)
-		self.post_firebase(list(reg_ids))
-
-	def post_firebase(self, reg_ids):
-		def on_reply(response):
-			try:
-				self.logger.debug("!! FireBase response: " + str(response.body))
-				response_obj = json.loads(response.body)
-				delete = []
-				for index, elem in enumerate(response_obj['results']):
-					if elem.get('error') in ['NotRegistered', 'InvalidRegistration']:
-						delete.append(reg_ids[index])
-				if len(delete) > 0:
-					self.logger.info("Deactivating subscriptions: %s", delete)
-					Subscription.objects.filter(registration_id__in=delete).update(inactive=True)
-			except Exception as e:
-				self.logger.error("Unable to parse response" + str(e))
-				pass
-
-		headers = {"Content-Type": "application/json", "Authorization": "key=%s" % FIREBASE_API_KEY}
-		body = json.dumps({"registration_ids": reg_ids})
-		self.logger.debug("!! post_fire_message %s", body)
-
-		# TODO
-		# webpush(subscription_info,
-		# 		  data,
-		# 		  vapid_private_key="Private Key or File Path[1]",
-		# 		  vapid_claims={"sub": "mailto:YourEmailAddress"})
-
-		r = HTTPRequest(FIREBASE_URL, method="POST", headers=headers, body=body)
-		http_client.fetch(r, callback=on_reply)
+		send_push(reg_ids, self.user_id, message.content)
 
 	def isGiphy(self, content):
 		if GIPHY_API_KEY is not None and content is not None:
@@ -331,7 +302,7 @@ class MessagesHandler():
 			)
 			prepared_message[VarNames.JS_MESSAGE_ID] = js_id
 			self.publish(prepared_message, channel)
-			self.notify_offline(channel, message_db.id)
+			self.notify_offline(channel, message_db)
 		if giphy_match is not None:
 			self.search_giphy(message, giphy_match, send_message)
 		else:
