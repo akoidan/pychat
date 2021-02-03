@@ -20,21 +20,22 @@ self.addEventListener('install', (event: any) => {
   logger.log(' installed!')();
   event.waitUntil((async () => {
     const cache = await caches.open('static');
-    await cache.addAll(serviceWorkerOption.assets.filter(url =>
+    const assets = serviceWorkerOption.assets.filter(url =>
         url.includes('/smileys/') ||
         url.includes('/sounds/') ||
         url.includes('/js.?/') ||
         url.includes('/css.?/') ||
         url.includes('/json.?/') || // manifest
         url.includes('/img/')
-      ).map(url => {
-        if (PUBLIC_PATH) {
-          return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
-        } else {
-          return url;
-        }
-      })
-    );
+    ).map(url => {
+      if (PUBLIC_PATH) {
+        return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
+      } else {
+        return url;
+      }
+    });
+    await cache.addAll(assets);
+    logger.log('Put {} to static cache', assets)()
   })());
 });
 
@@ -44,6 +45,7 @@ self.addEventListener('fetch', async (event: any) => {
     let cachedResponse: any = await caches.match(event.request);
 
     if (cachedResponse && event.request.mode !== 'navigate') {
+      logger.debug(`Returning ${event.request.url} from cache`)()
       return cachedResponse;
     }
 
@@ -56,25 +58,26 @@ self.addEventListener('fetch', async (event: any) => {
     }
 
     if (fetchedResponse?.ok) {
-      if (event.request.method === "GET") {
+      // do not put partial response. E.g. preload audio
+      if (event.request.method === "GET" && fetchedResponse.status !== 206) {
         if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
+          logger.debug(`Adding ${event.request.url} to thumbnail cache`)()
           let cache = await caches.open('thumbnails') // users icon
           await cache.put(event.request, fetchedResponse.clone());
         } if (event.request.url.indexOf('/photo/') >= 0) {
           let cache = await caches.open('photos') // user sends image with a message
+          logger.debug(`Adding ${event.request.url} to photos cache`)()
           await cache.put(event.request, fetchedResponse.clone());
         } else if (serviceWorkerOption.assets.find(e => event.request.url.endsWith(e)) || event.request.mode === 'navigate') {
-          logger.log(`Putting ${event.request.url} to cache`)
-          if (fetchedResponse.status !== 206) { // do not put partial response. E.g. preload audio
-            let cache = await caches.open('static') // all static assets
-            await cache.put(event.request, fetchedResponse.clone())
-          }
+          logger.log(`Putting ${event.request.url} to static cache`)
+          let cache = await caches.open('static') // all static assets
+          await cache.put(event.request, fetchedResponse.clone())
         }
       }
       return fetchedResponse;
     }
     if (cachedResponse) {
-      logger.log(`Server returned {} for ${event.request.url}. Returning data from cache`, fetchedResponse || error)();
+      logger.warn(`Server returned {} for ${event.request.url}. Returning data from cache`, fetchedResponse || error)();
       return cachedResponse;
     }
 
