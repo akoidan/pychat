@@ -5,6 +5,7 @@ import re
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Max
+from pyfcm import FCMNotification
 from tornado import gen
 from tornado.gen import Task
 from tornado.httpclient import HTTPRequest
@@ -22,7 +23,7 @@ from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix,
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_symbol, validate_edit_message, update_symbols, up_files_to_img, evaluate, check_user, \
-	http_client, get_max_symbol_dict, max_from_2, send_push
+	http_client, get_max_symbol_dict, max_from_2
 
 # from pywebpush import webpush
 
@@ -48,6 +49,8 @@ class MessagesHandler():
 		self.message_creator = WebRtcMessageCreator(None, None)
 		super(MessagesHandler, self).__init__()
 		self.webrtc_ids = {}
+		if FIREBASE_API_KEY:
+			self.fcm = FCMNotification(api_key=FIREBASE_API_KEY)
 		self.id = None  # child init
 		self.last_client_ping = 0
 		self.user_id = 0  # anonymous by default
@@ -244,7 +247,10 @@ class MessagesHandler():
 		new_sub_mess =[SubscriptionMessages(message_id=message.id, subscription_id=r.id) for r in subscriptions]
 		reg_ids =[r.registration_id for r in subscriptions]
 		SubscriptionMessages.objects.bulk_create(new_sub_mess)
-		send_push(reg_ids, self.user_id, message.content)
+		self.fcm.multiple_devices_data_message(
+			registration_ids=reg_ids,
+			data_message={'message': message.content}
+		)
 
 	def isGiphy(self, content):
 		if GIPHY_API_KEY is not None and content is not None:
@@ -314,7 +320,7 @@ class MessagesHandler():
 		new_creator = message[VarNames.CHANNEL_CREATOR_ID]
 		if not channel_name or len(channel_name) > 16:
 			raise ValidationError('Incorrect channel name name "{}"'.format(channel_name))
-		channel = Channel.objects.get(id=channel_id)
+		channel = Channel.objects.get(id=channel_id, disabled=False)
 		main_room = Room.objects.get(channel_id=channel_id, is_main_in_channel=True)
 		users_id = list(RoomUsers.objects.filter(room_id=main_room.id).values_list('user_id', flat=True))
 		if channel.creator_id != self.user_id and self.user_id not in users_id:
@@ -435,7 +441,7 @@ class MessagesHandler():
 		if not is_private and channel_id not in self.get_users_channels_ids():
 			raise ValidationError("You don't have access to this channel")
 		if not is_private:
-			channel = Channel.objects.get(id=channel_id)
+			channel = Channel.objects.get(id=channel_id,  disabled=False)
 			channel_name = channel.name
 			channel_creator_id = channel.creator_id
 			main_room = Room.objects.get(is_main_in_channel=True, channel_id=channel.id)
@@ -521,7 +527,7 @@ class MessagesHandler():
 				room.creator_id = creator_id
 				update_all = True
 		if message.get(VarNames.CHANNEL_ID): # will be nOne for private room
-			channel = Channel.objects.get(id=message[VarNames.CHANNEL_ID])
+			channel = Channel.objects.get(id=message[VarNames.CHANNEL_ID], disabled=False)
 			channel_name = channel.name
 			channel_creator_id = channel.creator_id
 		else:
@@ -694,7 +700,7 @@ class MessagesHandler():
 	def leave_channel(self, message):
 		channel_id = message[VarNames.CHANNEL_ID]
 		js_id = message[VarNames.JS_MESSAGE_ID]
-		channel = Channel.objects.get(id=channel_id)
+		channel = Channel.objects.get(id=channel_id, disabled=False)
 		rooms = list(RoomUsers.objects.filter(room__channel_id=channel_id, user_id=self.user_id))
 		if len(rooms) > 1:
 			raise ValidationError(f"Please leave all the rooms first")
@@ -714,7 +720,7 @@ class MessagesHandler():
 	def delete_channel(self, message):
 		channel_id = message[VarNames.CHANNEL_ID]
 		js_id = message[VarNames.JS_MESSAGE_ID]
-		channel = Channel.objects.get(id=channel_id)
+		channel = Channel.objects.get(id=channel_id, disabled=False)
 		if channel.creator_id != self.user_id:
 			raise ValidationError(f"Only admin can delete this channel. Please ask ${User.objects.get(id=channel.creator_id).username}")
 		room_ids = list(Room.objects.filter(channel_id=channel_id, is_main_in_channel=False, disabled=False).values_list('id', flat=True))
@@ -1012,7 +1018,7 @@ class MessagesHandler():
 			on_server_to_received_ids = []
 
 		if in_message[VarNames.RECEIVED_MESSAGE_IDS] or in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
-			ids_to_search = in_message[VarNames.RECEIVED_MESSAGE_IDS] + in_message[VarNames.ON_SERVER_MESSAGE_IDS] 
+			ids_to_search = in_message[VarNames.RECEIVED_MESSAGE_IDS] + in_message[VarNames.ON_SERVER_MESSAGE_IDS]
 			read_ids = list(Message.objects.filter(
 				Q(room_id__in=room_ids)
 				& Q(id__in=ids_to_search)

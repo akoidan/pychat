@@ -113,7 +113,7 @@ class User(AbstractBaseUser):
 class Subscription(Model):
 	user = ForeignKey(User, CASCADE, null=False)
 	inactive = BooleanField(default=False, null=False)
-	registration_id = CharField(null=False, max_length=1024, unique=False) # too long for unique
+	registration_id = CharField(null=False, max_length=255, unique=True) # too long for unique
 	created = DateTimeField(default=datetime.datetime.now)
 	updated = DateTimeField(default=datetime.datetime.now)
 	agent = CharField(max_length=64, null=True, blank=True)

@@ -2,7 +2,6 @@ import {Logger} from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   BACKEND_ADDRESS,
-  IS_SSL,
   PUBLIC_PATH
 } from '@/ts/utils/consts';
 
@@ -20,28 +19,32 @@ let subScr: null | string = null;
 self.addEventListener('install', (event: any) => {
   logger.log(' installed!')();
   event.waitUntil((async () => {
-    const cache = await caches.open('smileys');
-    await cache.addAll(serviceWorkerOption.assets
-        .filter(a => a.startsWith('/smileys/'))
-        .map(url => {
-          if (PUBLIC_PATH) {
-            return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
-          } else {
-            return url;
-          }
-        }));
+    const cache = await caches.open('static');
+    await cache.addAll(serviceWorkerOption.assets.filter(url =>
+        url.includes('/smileys/') ||
+        url.includes('/sounds/') ||
+        url.includes('/js.?/') ||
+        url.includes('/css.?/') ||
+        url.includes('/json.?/') || // manifest
+        url.includes('/img/')
+      ).map(url => {
+        if (PUBLIC_PATH) {
+          return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
+        } else {
+          return url;
+        }
+      })
+    );
   })());
 });
 
 // Cache and return requests
 self.addEventListener('fetch', async (event: any) => {
   event.respondWith((async function() {
-    let response: any = await caches.match(event.request);
+    let cachedResponse: any = await caches.match(event.request);
 
-    // cache only static files + photos, exclude api backend calls
-    let matchesExistingCache = ['/smileys/', '/photo/thumbnail/', '/flags/'].find(e => event.request.url.indexOf(e) >=0);
-    if (response && matchesExistingCache ) {
-      return response;
+    if (cachedResponse && event.request.mode !== 'navigate') {
+      return cachedResponse;
     }
 
     let fetchedResponse: Response|null = null;
@@ -52,32 +55,34 @@ self.addEventListener('fetch', async (event: any) => {
       error = e;
     }
 
-    if (fetchedResponse?.ok ) {
-      if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
-        let cache = await caches.open('thumbnails')
-        await cache.put(event.request, fetchedResponse.clone());
-      } else if (event.request.url.indexOf('/flags/') >= 0) {
-        let cache = await caches.open('flags')
-        await cache.put(event.request, fetchedResponse.clone());
-      } else if ( // cache index.html, main.js , main.css and other trash only if response is not ok
-          (serviceWorkerOption.assets.find(e => event.request.url.indexOf(e) >=0)
-          && !matchesExistingCache) || event.request.mode == 'navigate') {
-        if (fetchedResponse.status !== 206) { // do not put partial response. E.g. preload audio
-          let cache = await caches.open('static')
-          await cache.put(event.request, fetchedResponse.clone())
+    if (fetchedResponse?.ok) {
+      if (event.request.method === "GET") {
+        if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
+          let cache = await caches.open('thumbnails') // users icon
+          await cache.put(event.request, fetchedResponse.clone());
+        } if (event.request.url.indexOf('/photo/') >= 0) {
+          let cache = await caches.open('photos') // user sends image with a message
+          await cache.put(event.request, fetchedResponse.clone());
+        } else if (serviceWorkerOption.assets.find(e => event.request.url.endsWith(e)) || event.request.mode === 'navigate') {
+          logger.log(`Putting ${event.request.url} to cache`)
+          if (fetchedResponse.status !== 206) { // do not put partial response. E.g. preload audio
+            let cache = await caches.open('static') // all static assets
+            await cache.put(event.request, fetchedResponse.clone())
+          }
         }
       }
       return fetchedResponse;
     }
-    if (response && error) {
-      logger.warn("Site is offline returning {} from cache", event.request)();
-      return response;
+    if (cachedResponse) {
+      logger.log(`Server returned {} for ${event.request.url}. Returning data from cache`, fetchedResponse || error)();
+      return cachedResponse;
     }
+
     if (error) {
       throw error
     }
     return fetchedResponse
-  })())
+  })());
 });
 
 // Service Worker Active

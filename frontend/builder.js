@@ -12,7 +12,8 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const name = '[name].[ext]?[sha512:hash:base64:6]';
+const hashType = '?[sha512:hash:base64:6]';
+const name = `[name].[ext]${hashType}`;
 const child_process = require('child_process');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin')
@@ -182,7 +183,7 @@ const getConfig = async () => {
 
 
   let webpackOptions = {
-    hash: true,
+    hash: false,
     favicon: 'src/assets/img/favicon.ico',
     template: 'src/assets/index.ejs',
     inject: false
@@ -213,6 +214,7 @@ const getConfig = async () => {
     new CleanTerminalPlugin(),
     new ServiceWorkerWepbackPlugin({
       entry: './src/ts/sw.ts',
+      minimize: options.IS_WEB && options.UGLIFY,
     }),
     new CopyWebpackPlugin([
       {from: './src/assets/manifest.json', to: ''},
@@ -262,7 +264,9 @@ const getConfig = async () => {
       }));
     }
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: getDist()}));
-    plugins.push(new MiniCssExtractPlugin());
+    plugins.push(new MiniCssExtractPlugin({
+      filename: '[name].css?[contenthash]'
+    }));
     let minicssPlugin = {
       loader: MiniCssExtractPlugin.loader,
     };
@@ -344,6 +348,7 @@ const getConfig = async () => {
     },
     mode: options.IS_PROD ? 'production' : 'development',
     output: {
+      filename: options.IS_PROD ? `[name].js?[contenthash]` :  `[name].js?[hash]`, // webpack doesn't allow to use contenthash for dev server
       crossOriginLoading: 'anonymous',
       path: getDist(),
       publicPath: options.PUBLIC_PATH || '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814

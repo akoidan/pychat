@@ -628,13 +628,6 @@ class HttpHandler(MethodDispatcher):
 		}))
 		return settings.VALIDATION_IS_OK
 
-
-
-	@require_http_method('GET')
-	def statistics(self):
-		pie_data = IpAddress.objects.values('country').filter(country__isnull=False).annotate(count=Count("country"))
-		return list(pie_data)
-
 	@require_http_method('POST')
 	@login_required_no_redirect
 	@extract_nginx_files

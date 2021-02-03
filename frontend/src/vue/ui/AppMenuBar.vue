@@ -27,13 +27,6 @@
           Settings
         </router-link>
         <router-link
-          v-if="consts.STATISTICS"
-          to="/statistics"
-          title="Statistics"
-        >
-          Statistics
-        </router-link>
-        <router-link
           v-if="consts.ISSUES"
           to="/report-issue"
           title="Report an issue"
@@ -53,7 +46,7 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
-  import {GITHUB_LINK, ISSUES, STATISTICS} from '@/ts/utils/consts';
+  import {GITHUB_LINK, ISSUES} from '@/ts/utils/consts';
   import {State} from '@/ts/instances/storeInstance';
   import {CurrentUserInfoModel} from '@/ts/types/model';
   import AppModal from '@/vue/ui/AppModal.vue';
@@ -77,8 +70,7 @@
     public get consts(): object {
       return {
         GITHUB_LINK,
-        ISSUES,
-        STATISTICS
+        ISSUES
       }
     }
   }

@@ -194,22 +194,6 @@ def update_symbols(files, tags, message):
 		if message.symbol is None or new_tag_symbol > message.symbol:
 			message.symbol = new_tag_symbol
 
-def send_push(registrations_id, message_title, message_body):
-
-	push_service = FCMNotification(api_key=FIREBASE_API_KEY)
-
-	if len(registrations_id) == 1:
-		result = push_service.notify_single_device(
-			registration_id=registrations_id[0],
-			message_title=message_title,
-			message_body=message_body
-		)
-	else:
-		result = push_service.notify_multiple_devices(
-			registration_ids=registrations_id,
-			message_title=message_title, message_body=message_body
-		)
-
 
 def get_thumbnail_url(thumbnail):
 	return "{0}{1}".format(settings.MEDIA_URL, thumbnail) if thumbnail else None

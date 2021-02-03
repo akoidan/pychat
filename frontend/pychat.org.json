@@ -9,7 +9,6 @@
   "MANIFEST": "/manifest.json",
   "AUTO_REGISTRATION": false,
   "ISSUES": false,
-  "STATISTICS": false,
   "GITHUB_LINK": "https://github.com/akoidan/pychat",
   "FLAGS": true,
   "PUBLIC_PATH": "https://static.pychat.org/",

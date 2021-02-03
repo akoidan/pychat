@@ -138,11 +138,6 @@ export default class Api extends MessageHandler {
       }
     });
   }
-
-  public async statistics(): Promise<void> {
-    await this.xhr.doGet('/statistics', true);
-  }
-
   public async loadGoogle(): Promise<void> {
     await this.xhr.loadJs('https://apis.google.com/js/platform.js');
   }
