@@ -366,7 +366,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public logout(a: LogoutMessage) {
-    this.sessionHolder.session = '';
     const info = [];
     if (this.listenWsTimeout) {
       this.listenWsTimeout = null;

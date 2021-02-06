@@ -2,16 +2,15 @@ import {Logger} from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   BACKEND_ADDRESS,
-  PUBLIC_PATH
+  PUBLIC_PATH,
+  SERVICE_WORKER_VERSION
 } from '@/ts/utils/consts';
 
 declare var clients: any;
 declare var serviceWorkerOption: {assets: string[]};
-const logger: Logger = loggerFactory.getLogger('SW_S');
+const logger: Logger = loggerFactory.getLogger(`SW_${SERVICE_WORKER_VERSION}`);
 
-//
-const SW_VERSION = '1.5';
-logger.debug('startup, version {}', SW_VERSION)();
+logger.debug('Evaluating...')();
 
 let subScr: null | string = null;
 

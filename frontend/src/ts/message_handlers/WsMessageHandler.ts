@@ -60,7 +60,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     printMessage:  <HandlerType<'printMessage', 'ws-message'>>this.printMessage,
     internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
     setMessageStatus:  <HandlerType<'setMessageStatus', 'ws-message'>>this.setMessageStatus,
-    logout:  <HandlerType<'logout', HandlerName>>this.logout,
   };
 
   // messageRetrier uses MessageModel.id as unique identifier, do NOT use it with any types but
@@ -351,10 +350,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       status: m.status,
       messagesIds: m.messagesIds
     });
-  }
-
-  public logout(m: LogoutMessage) {
-    localStorage.removeItem(LAST_SYNCED);
   }
 
   private getFileIdsFromMessage(storeMessage: MessageModel): number[] {

@@ -2,7 +2,7 @@ import { SessionHolder } from '@/ts/types/types';
 
 export class SessionHolderImpl implements SessionHolder {
 
-  private static readonly SESSION_KEY = 'session_id';
+  private static readonly SESSION_KEY = 'sessionId';
 
   set session(value: string|null) {
     if (value) {

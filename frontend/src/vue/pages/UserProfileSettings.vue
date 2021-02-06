@@ -85,12 +85,12 @@
           </td>
         </tr>
         <tr>
-          <th><label>Clear history</label></th>
+          <th><label>Cache</label></th>
           <td>
             <input
               type="button"
               class="lor-btn"
-              value="clear now"
+              value="Delete app cache"
               @click="clearHistory"
             >
           </td>
@@ -129,7 +129,10 @@
     LogLevel,
     logLevels
   } from 'lines-logger';
-  import {LAST_SYNCED} from '@/ts/utils/consts';
+  import {
+    LAST_SYNCED,
+    SERVICE_WORKER_VERSION_LS_NAME
+  } from '@/ts/utils/consts';
 
   @Component({
     name: 'UserProfileSettings' ,
@@ -153,14 +156,21 @@ export default class UserProfileSettings extends Vue {
     this.model = userSettingsDtoToModel(this.userSettings);
   }
 
-  public clearHistory() {
-    if (!confirm(`This actions clears local cache. Are you sure you want to proceed?`)) {
+  public async clearHistory() {
+    if (!confirm(`This action will delete Service Worker cache and Websql data on your device. Proceed?`)) {
       return
     }
 
-    localStorage.removeItem(LAST_SYNCED); // TODO this should not be here, but in wsmessgehenader
+    localStorage.removeItem(LAST_SYNCED);
+    if (typeof self !== 'undefined') {
+      await self.caches.keys().then((cacheNames) =>Promise.all(cacheNames.map(cn => {
+       this.$logger.log(`Deleting cache '${cn}'`)();
+       return caches.delete(cn);
+      })))
+    }
+    localStorage.removeItem(SERVICE_WORKER_VERSION_LS_NAME);
     this.$store.clearMessages();
-    this.$store.growlSuccess("History has been cleared");
+    this.$store.growlSuccess("Cash has been deleted ");
   }
 
   @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})

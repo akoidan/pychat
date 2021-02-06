@@ -8,7 +8,9 @@ import webpackServiceWorker from 'serviceworker-webpack-plugin/lib/runtime';
 import {
   IS_DEBUG,
   MANIFEST,
-  SERVICE_WORKER_URL
+  SERVICE_WORKER_URL,
+  SERVICE_WORKER_VERSION,
+  SERVICE_WORKER_VERSION_LS_NAME
 } from '@/ts/utils/consts';
 import {
   HandlerType,
@@ -52,7 +54,7 @@ export default class NotifierHandler extends MessageHandler {
     this.ws = ws;
     this.documentTitle = document.title;
     this.store = store;
-    this.logger = loggerFactory.getLogger('notify');
+    this.logger = loggerFactory.getLogger(`notif_${SERVICE_WORKER_VERSION}`);
     this.currentTabId = Date.now().toString();
     window.addEventListener('blur', this.onFocusOut.bind(this));
     window.addEventListener('focus', this.onFocus.bind(this));
@@ -223,10 +225,19 @@ export default class NotifierHandler extends MessageHandler {
     } else if (!MANIFEST || ! SERVICE_WORKER_URL) {
      throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
     }
-    const r: ServiceWorkerRegistration = await webpackServiceWorker.register( {scope: '/'}) as ServiceWorkerRegistration;
+    let r: ServiceWorkerRegistration = (await navigator.serviceWorker.getRegistration(SERVICE_WORKER_URL))!;
+    let version = parseInt(localStorage.getItem(SERVICE_WORKER_VERSION_LS_NAME)!) || 0;
+    if (version < SERVICE_WORKER_VERSION || !r) {
+      this.logger.log(`Updating sw {} version ${version} to ${SERVICE_WORKER_VERSION}`, r)();
+      r = await webpackServiceWorker.register( {scope: '/'}) as ServiceWorkerRegistration;
+      this.logger.log(`Registered SW ${SERVICE_WORKER_VERSION} {}`, r)();
+      if (r) {
+        localStorage.setItem(SERVICE_WORKER_VERSION_LS_NAME, `${SERVICE_WORKER_VERSION}`);
+      }
+    } else {
+      this.logger.log(`SW is up to date, v=${version} {}, skipping the update`, r)();
+    }
 
-
-    this.logger.debug('Registered service worker {}', r)();
     this.serviceWorkerRegistration = await navigator.serviceWorker.ready;
     this.logger.debug('Service worker is ready {}', this.serviceWorkerRegistration)();
 
