@@ -30,6 +30,7 @@
     padding: 8px
     justify-content: space-between
     a
+      padding: 0 10px
       color: $link-color
       &:hover
         cursor: pointer
