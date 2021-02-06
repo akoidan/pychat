@@ -334,11 +334,24 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public startListening() {
-    this.logger.log('Starting webSocket')();
-    if (!this.listenWsTimeout && !this.ws) {
-      this.listenWS();
-    }
+  public async startListening(): Promise<void> {
+    return new Promise(((resolve, reject) => {
+      this.logger.log('Starting webSocket')();
+      if (!this.listenWsTimeout && !this.ws) {
+        this.ws = new WebSocket(this.wsUrl);
+        this.ws.onmessage = this.onWsMessage.bind(this);
+        this.ws.onclose = (e) => {
+          setTimeout(reject);
+          this.onWsClose(e);
+        }
+        this.ws.onopen = () => {
+          setTimeout(resolve);
+          this.onWsOpen();
+        }
+      } else {
+        resolve();
+      }
+    }));
   }
 
   public pingServer() {
@@ -557,6 +570,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.store.setUserImage(image);
   }
 
+  private onWsOpen() {
+    this.setStatus(true);
+    this.startNoPingTimeout();
+    this.wsState = WsState.CONNECTED;
+    this.logger.debug('Connection has been established')();
+  }
+
   private onWsMessage(message: MessageEvent) {
     let data = this.messageProc.parseMessage(message.data);
     if (data) {
@@ -636,21 +656,18 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       this.wsState = WsState.CONNECTION_IS_LOST;
     }
     // Try to reconnect in 10 seconds
-    this.listenWsTimeout = window.setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
+    this.listenWsTimeout = window.setTimeout(() => this.listenWS(), CONNECTION_RETRY_TIME);
   }
 
   private listenWS() {
-    const wsUrls = `${this.API_URL}?id=${this.wsConnectionId}&sessionId=${this.sessionHolder.session}`;
-
-    this.ws = new WebSocket(wsUrls);
+    this.ws = new WebSocket(this.wsUrl);
     this.ws.onmessage = this.onWsMessage.bind(this);
     this.ws.onclose = this.onWsClose.bind(this);
-    this.ws.onopen = () => {
-      this.setStatus(true);
-      this.startNoPingTimeout();
-      this.wsState = WsState.CONNECTED;
-      this.logger.debug('Connection has been established')();
-    };
+    this.ws.onopen = this.onWsOpen.bind(this);
+  }
+
+  private get wsUrl() {
+    return `${this.API_URL}?id=${this.wsConnectionId}&sessionId=${this.sessionHolder.session}`;
   }
 
   private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {

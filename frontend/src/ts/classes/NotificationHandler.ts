@@ -10,11 +10,18 @@ import {
   MANIFEST,
   SERVICE_WORKER_URL
 } from '@/ts/utils/consts';
+import {
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import {InternetAppearMessage} from '@/ts/types/messages/innerMessages';
+import MessageHandler from '@/ts/message_handlers/MesageHandler';
+import {sub} from '@/ts/instances/subInstance';
 
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 
-export default class NotifierHandler {
-  private readonly logger: Logger;
+export default class NotifierHandler extends MessageHandler {
+  protected readonly logger: Logger;
   private readonly currentTabId: string;
   private readonly popedNotifQueue: Notification[] = [];
   /*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
@@ -31,7 +38,13 @@ export default class NotifierHandler {
   private readonly ws: WsHandler;
   private readonly documentTitle: string;
 
+  protected readonly handlers:  HandlerTypes<keyof Api, 'any'> = {
+    internetAppear: <HandlerType<'internetAppear', 'any'>>this.internetAppear
+  };
+
+
   constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore) {
+    super();
     this.api = api;
     this.browserVersion = browserVersion;
     this.isChrome = isChrome;
@@ -45,8 +58,15 @@ export default class NotifierHandler {
     window.addEventListener('focus', this.onFocus.bind(this));
     window.addEventListener('beforeunload', this.onUnload.bind(this));
     window.addEventListener('unload', this.onUnload.bind(this));
+    sub.subscribe('notifier', this);
     this.onFocus(null);
 
+  }
+
+  public async internetAppear(p: InternetAppearMessage) {
+    if (!this.serviceWorkedTried) {
+      await this.tryAgainRegisterServiceWorker();
+    }
   }
 
   public replaceIfMultiple(data: {title: string; options: NotificationOptions}) {

@@ -17,7 +17,6 @@ import Subscription from '@/ts/classes/Subscription';
 import Http from '@/ts/classes/Http';
 import Vue, { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
-import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 import { RoomHandler } from '@/ts/message_handlers/RomHandler';
 
@@ -75,7 +74,6 @@ declare module 'vue/types/vue' {
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;
     $messageBus: Vue;
-    $notifier: NotifierHandler;
     $webrtcApi: WebRtcApi;
   }
 }

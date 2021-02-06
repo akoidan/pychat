@@ -48,10 +48,9 @@ export default class MainPage extends Vue {
     return this.userInfo;
   }
 
-  public created() {
+  public async created() {
     this.$logger.log('Main page has been created, fire listening ws, and register notification')();
-    this.$ws.startListening();
-    this.$notifier.tryAgainRegisterServiceWorker();
+    await this.$ws.startListening();
   }
 
 }

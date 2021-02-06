@@ -170,7 +170,6 @@ async function init() {
   Vue.prototype.$ws = ws;
   Vue.prototype.$store = store;
   Vue.prototype.$messageBus = messageBus;
-  Vue.prototype.$notifier = notifier;
   Vue.prototype.$webrtcApi = webrtcApi;
   Vue.prototype.$platformUtil = platformUtil;
   Vue.prototype.$messageSenderProxy = messageSenderProxy;
