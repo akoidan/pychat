@@ -37,11 +37,11 @@ import {
   RoomUsersDB,
   SettingsDB,
   TagDB,
-  TransactionType,
   UserDB
 } from '@/ts/types/db';
 import {browserVersion} from '@/ts/utils/runtimeConsts';
 import {SetStateFromStorage} from '@/ts/types/dto';
+import {MainWindow} from '@/ts/classes/MainWindow';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];
@@ -51,9 +51,12 @@ export default class DatabaseWrapper implements IStorage {
   private readonly dbName: String;
   private db: Database|null = null;
   private readonly cache: { [id: number]: number } = {};
+  private mainWindow: MainWindow;
+  private skipSqlCache: Record<string, boolean> = {}
 
-  constructor() {
+  constructor(mainWindow: MainWindow) {
     this.dbName = 'v153';
+    this.mainWindow = mainWindow;
     this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
@@ -97,19 +100,23 @@ export default class DatabaseWrapper implements IStorage {
       'select * from channel where deleted = 0',
       'select * from tag'
     ].map(sql => new Promise((resolve, reject) => {
-      this.executeSql(t, sql, [], (t: SQLTransaction, d: SQLResultSet) => {
-        this.logger.debug('sql {} fetched {} ', sql, d)();
-        const res: unknown[] = [];
-        for (let i = 0; i < d.rows.length; i++) {
-          const rows: SQLResultSetRowList = d.rows;
-          res.push(rows.item(i)); // TODO does that work
+      this.executeSql(
+        t,
+        sql,
+        [],
+        (t: SQLTransaction, d: SQLResultSet) => {
+          this.logger.debug('sql {} fetched {} ', sql, d)();
+          const res: unknown[] = [];
+          for (let i = 0; i < d.rows.length; i++) {
+            const rows: SQLResultSetRowList = d.rows;
+            res.push(rows.item(i)); // TODO does that work
+          }
+          resolve(res);
+        }, (t: SQLTransaction, e: SQLError) => {
+          reject(e);
+          return false;
         }
-        resolve(res);
-      },              (t: SQLTransaction, e: SQLError) => {
-        reject(e);
-
-        return false;
-      })();
+      )();
     })));
 
     const dbFiles: FileDB[] = f[0] as FileDB[],
@@ -547,8 +554,7 @@ export default class DatabaseWrapper implements IStorage {
       return false;
     };
     t.executeSql(sql, args, cb, err);
-
-    return this.logger.debug('{} {}', sql, args);
+    return this.logQuery(this, sql, this.logger.debug('{} {}', sql, args));
   }
 
   private async runSql(t: SQLTransaction, sql: string): Promise<SQLTransaction> {
@@ -567,11 +573,18 @@ export default class DatabaseWrapper implements IStorage {
     }));
   }
 
-  private transaction(transactionType: TransactionType, cb: TransactionCb) {
+  private write(cb: TransactionCb) {
     if (!this.db) { // TODO TypeError: undefined is not an object (evaluating 'this.db[transactionType]')
       throw Error(`${browserVersion} failed to get db`);
     }
-    this.db[transactionType](
+    if (!this.mainWindow.isTabMain()) {
+      const that = this;
+      cb({executeSql(sql: string, args: any[]) {
+          that.logQuery(that, sql, that.logger.warn('Skipping sql {} with args {}, since this is not a main tab', sql, args))();
+        }})
+      return
+    }
+    this.db.transaction(
         t => {
           cb(t);
         },
@@ -581,8 +594,17 @@ export default class DatabaseWrapper implements IStorage {
     );
   }
 
-  private write(cb: TransactionCb) {
-    return this.transaction('transaction', cb);
+  private logQuery(that: this, sql: string, logFn: () => void) : () => void {
+    if (that.skipSqlCache[sql]) {
+      return () => () => {};
+    }
+    that.skipSqlCache[sql] = true;
+    setTimeout(() => {
+      that.skipSqlCache[sql] = false;
+    }, 1000);
+    // prevent spam
+    // @ts-ignore
+    return logFn;
   }
 
   private async asyncWrite(): Promise<SQLTransaction> {
@@ -598,6 +620,5 @@ export default class DatabaseWrapper implements IStorage {
   private setChannel(t: SQLTransaction, channel: ChannelModel) {
     this.executeSql(t, 'insert or replace into channel (id, name, deleted, creator) values (?, ?, ?, ?)', [channel.id, channel.name, 0, channel.creator])();
   }
-
 
 }

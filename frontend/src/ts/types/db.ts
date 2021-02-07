@@ -100,5 +100,3 @@ export interface RoomUsersDB {
   room_id: number;
   user_id: number;
 }
-
-export type TransactionType = 'transaction';

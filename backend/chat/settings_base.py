@@ -37,7 +37,7 @@ MULTI_CAPTCHA_ADMIN = {
     'engine': 'recaptcha2',
 }
 
-SHOW_COUNTRY_CODE = True
+SHOW_COUNTRY_CODE = False
 
 EMAIL_SUBJECT_PREFIX = '[Pychat] '
 

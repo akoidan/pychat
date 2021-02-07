@@ -31,8 +31,8 @@
 ### Every email (like magic link will be marked with this lable)
 # FROM_EMAIL = 'pychat'
 
-### Uncomment this setting if you don't need user location info to be shown for all. You may also want to disable FLAGS in production.json inside frontend
-# SHOW_COUNTRY_CODE = false
+### Uncomment this setting if you want to see everyone location. You may also need to enable FLAGS in production.json inside frontend directory
+# SHOW_COUNTRY_CODE = True
 
 
 ### Replace with your timezone. You can find list of timezones here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones

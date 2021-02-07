@@ -19,19 +19,19 @@ import {
 import {InternetAppearMessage} from '@/ts/types/messages/innerMessages';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {sub} from '@/ts/instances/subInstance';
+import {MainWindow} from '@/ts/classes/MainWindow';
 
-const LAST_TAB_ID_VARNAME = 'lastTabId';
+
 
 export default class NotifierHandler extends MessageHandler {
   protected readonly logger: Logger;
-  private readonly currentTabId: string;
+  private readonly mainWindow: MainWindow;
   private readonly popedNotifQueue: Notification[] = [];
   /*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
   private serviceWorkedTried = false;
   private serviceWorkerRegistration: any = null;
   private subscriptionId: string|null = null;
   private newMessagesCount: number = 0;
-  private unloaded: boolean = false;
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly browserVersion: string;
@@ -45,21 +45,18 @@ export default class NotifierHandler extends MessageHandler {
   };
 
 
-  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore) {
+  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow) {
     super();
     this.api = api;
     this.browserVersion = browserVersion;
     this.isChrome = isChrome;
     this.isMobile = isMobile;
     this.ws = ws;
+    this.mainWindow = mainWindow;
     this.documentTitle = document.title;
     this.store = store;
     this.logger = loggerFactory.getLogger(`notif_${SERVICE_WORKER_VERSION}`);
-    this.currentTabId = Date.now().toString();
-    window.addEventListener('blur', this.onFocusOut.bind(this));
     window.addEventListener('focus', this.onFocus.bind(this));
-    window.addEventListener('beforeunload', this.onUnload.bind(this));
-    window.addEventListener('unload', this.onUnload.bind(this));
     sub.subscribe('notifier', this);
     this.onFocus(null);
 
@@ -139,35 +136,14 @@ export default class NotifierHandler extends MessageHandler {
     }
     // last opened tab not this one, leave the oppotunity to show notification from last tab
     if (!(<any>window).Notification
-        || !this.isTabMain()) {
+        || !this.mainWindow.isTabMain()) {
       return;
     }
     await this.checkPermissions();
     await this.showNot(title, options);
   }
 
-  public isTabMain() {
-    let activeTab = localStorage.getItem(LAST_TAB_ID_VARNAME);
-    if (activeTab === '0') {
-      localStorage.setItem(LAST_TAB_ID_VARNAME, this.currentTabId);
-      activeTab = this.currentTabId;
-    }
-
-    return activeTab === this.currentTabId;
-  }
-
-  public onUnload() {
-    if (this.unloaded) {
-      return;
-    }
-    if (this.isTabMain()) {
-      localStorage.setItem(LAST_TAB_ID_VARNAME, '0');
-    }
-    this.unloaded = true;
-  }
-
   public onFocus(e: Event|null) {
-    localStorage.setItem(LAST_TAB_ID_VARNAME, this.currentTabId);
     if (e) {
       this.logger.debug('Marking current tab as active, pinging server')();
       if (this.store.userInfo && this.ws.isWsOpen() && !IS_DEBUG) {
@@ -176,7 +152,6 @@ export default class NotifierHandler extends MessageHandler {
     } else {
       this.logger.debug('Marking current tab as active')();
     }
-    this.store.setIsCurrentWindowActive(true);
     this.newMessagesCount = 0;
     document.title = this.documentTitle;
     this.popedNotifQueue.forEach((n) => {
@@ -184,10 +159,7 @@ export default class NotifierHandler extends MessageHandler {
     });
   }
 
-  public onFocusOut() {
-    this.store.setIsCurrentWindowActive(false);
-    this.logger.debug('Deactivating current tab')();
-  }
+
 
 // Permissions are granted here!
   private async showNot(title: string, options: NotificationOptions) {

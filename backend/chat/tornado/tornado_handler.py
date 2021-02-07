@@ -112,7 +112,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		self.id, random = create_id(self.user_id, random)
 		self.restored_connection = random == conn_arg
 		self.restored_connection = False
-		self.save_ip()
 
 	def open(self):
 		session_key = self.get_argument('sessionId', None)
@@ -130,6 +129,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			return
 		self.ip = self.get_client_ip()
 		self.generate_self_id()
+		self.save_ip()
 		self.message_creator = WebRtcMessageCreator(self.user_id, self.id)
 		self._logger = logging.LoggerAdapter(parent_logger, {
 			'id': self.id,
@@ -146,7 +146,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		if self.id not in my_online:
 			my_online.append(self.id)
 
-		was_online = len(online.get(self.user_id)) > 1 # if other tabs are opened
 		user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
 			.values('id', 'name', 'creator_id', 'is_main_in_channel', 'channel_id', 'p2p', 'roomusers__notifications', 'roomusers__volume')
 		room_users = [{
@@ -188,35 +187,14 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		# 	if o:
 		# 		room[VarNames.LOAD_MESSAGES_OFFLINE] = o
 
-		if settings.SHOW_COUNTRY_CODE:
-			user_dict = []
-			fetched_users = UserProfile.objects.all().only('id', 'username', 'sex', 'thumbnail').prefetch_related(
-				Prefetch('userjoinedinfo_set__ip', queryset=IpAddress.objects.all().only('country_code', 'country', 'region', 'city'))
-			)
-			for user in fetched_users:
 
-				ip = user.userjoinedinfo_set.all()[0].ip if len(user.userjoinedinfo_set.all()) > 0 else None
-
-				user_dict.append(RedisPrefix.set_js_user_structure_flag(
-					user.id,
-					user.username,
-					user.sex,
-					user.thumbnail.url if user.thumbnail else None,
-					ip.country_code if ip else None,
-					ip.country if ip else None,
-					ip.region if ip else None,
-					ip.city if ip else None
-				))
-
-			# user_dict =
-		else:
-			fetched_users = UserProfile.objects.values('id', 'username', 'sex', 'thumbnail')
-			user_dict = [RedisPrefix.set_js_user_structure(
-				user['id'],
-				user['username'],
-				user['sex'],
-				get_thumbnail_url(user['thumbnail'])
-			) for user in fetched_users]
+		fetched_users = User.objects.values('id', 'username', 'sex', 'thumbnail')
+		user_dict = [RedisPrefix.set_js_user_structure(
+			user['id'],
+			user['username'],
+			user['sex'],
+			get_thumbnail_url(user['thumbnail'])
+		) for user in fetched_users]
 
 		self.ws_write(self.message_creator.set_room(room_users, user_dict, online, user_db, channels))
 		online_user_names_mes = self.message_creator.room_online_login(online)

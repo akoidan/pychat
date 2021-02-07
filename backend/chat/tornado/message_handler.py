@@ -4,7 +4,7 @@ import re
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Q, Max
+from django.db.models import Q, Max, Prefetch
 from pyfcm import FCMNotification
 from tornado import gen
 from tornado.gen import Task
@@ -15,12 +15,12 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds, UserProfile, Channel, User, MessageMention
+	UploadedFile, Image, get_milliseconds, UserProfile, Channel, User, MessageMention, IpAddress
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
 	REDIS_DB
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
-	UserSettingsVarNames, UserProfileVarNames
+	UserSettingsVarNames, UserProfileVarNames, IpVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_symbol, validate_edit_message, update_symbols, up_files_to_img, evaluate, check_user, \
 	http_client, get_max_symbol_dict, max_from_2
@@ -68,6 +68,7 @@ class MessagesHandler():
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.GET_MESSAGES_BY_IDS: self.process_get_messages_by_ids,
 			Actions.PRINT_MESSAGE: self.process_send_message,
+			Actions.GET_COUNTRY_CODES: self.get_country_code,
 			Actions.DELETE_ROOM: self.delete_room,
 			Actions.USER_LEAVES_ROOM: self.leave_room,
 			Actions.EDIT_MESSAGE: self.edit_message,
@@ -251,6 +252,30 @@ class MessagesHandler():
 			registration_ids=reg_ids,
 			data_message={'message': message.content}
 		)
+
+	def get_country_code(self, data):
+		if not settings.SHOW_COUNTRY_CODE:
+			raise ValidationError("This api is not available, please configure your server to use SHOW_COUNTRY_CODE in settings.py")
+		
+		user_dict = {}
+		fetched_users = UserProfile.objects.all().only('id').prefetch_related(
+			Prefetch('userjoinedinfo_set__ip', queryset=IpAddress.objects.all().only('country_code', 'country', 'region', 'city'))
+		)
+		for user in fetched_users:
+			ip = user.userjoinedinfo_set.all()[0].ip if len(user.userjoinedinfo_set.all()) > 0 else None
+			if ip:
+				user_dict[user.id] = {
+					IpVarNames.COUNTRY_CODE: ip.country_code,
+					IpVarNames.COUNTRY: ip.country,
+					IpVarNames.REGION: ip.region,
+					IpVarNames.CITY: ip.city
+				}
+		self.ws_write({
+			VarNames.CONTENT: user_dict,
+			VarNames.JS_MESSAGE_ID: data[VarNames.JS_MESSAGE_ID],
+			VarNames.HANDLER_NAME: HandlerNames.NULL
+		})
+		
 
 	def isGiphy(self, content):
 		if GIPHY_API_KEY is not None and content is not None:

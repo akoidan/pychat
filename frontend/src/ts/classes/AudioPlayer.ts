@@ -1,19 +1,20 @@
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
+import {MainWindow} from '@/ts/classes/MainWindow';
 
 
 export class AudioPlayer {
-  private readonly notifier: NotifierHandler;
+  private readonly mainWindow: MainWindow;
   private readonly logger: Logger;
 
-  constructor(notifier: NotifierHandler) {
-    this.notifier = notifier;
+  constructor(mainWindow: MainWindow) {
+    this.mainWindow = mainWindow;
     this.logger = loggerFactory.getLogger('audio');
   }
 
   checkAndPlay(element: HTMLAudioElement, volume: number) {
-    if (volume && this.notifier.isTabMain()) {
+    if (volume && this.mainWindow.isTabMain()) {
       try {
         element.pause();
         element.currentTime = 0;

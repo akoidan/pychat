@@ -28,16 +28,18 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
   const processError = function (e: Error|string) {
 
     const strError: string = String((<Error>e)?.message || e || 'Unknown error');
+    // @ts-ignore: next-line
+    let processError: Vue = this;
     if (vueProperty && message) {
       // @ts-ignore: next-line
-      this[vueProperty] = `${message}: ${strError}`;
+      processError[vueProperty] = `${message}: ${strError}`;
     } else if (message) {
-      store.showGrowl({html: encodeHTML(`${message}:  ${strError}`), type: GrowlType.ERROR, time: 20000 });
+      processError.$store.showGrowl({html: encodeHTML(`${message}:  ${strError}`), type: GrowlType.ERROR, time: 20000 });
     } else if (vueProperty) {
       // @ts-ignore: next-line
       this[vueProperty] = `Error: ${strError}`;
     } else {
-      store.showGrowl({html: encodeHTML(strError), type: GrowlType.ERROR, time: 20000 });
+      processError.$store.showGrowl({html: encodeHTML(strError), type: GrowlType.ERROR, time: 20000 });
     }
   };
 
@@ -76,6 +78,3 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
   };
 }
 
-if (IS_DEBUG) {
-  window.store = store;
-}

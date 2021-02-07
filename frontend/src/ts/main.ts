@@ -46,6 +46,7 @@ import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 import { SetStateFromStorage } from '@/ts/types/dto';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import { RoomHandler } from '@/ts/message_handlers/RomHandler';
+import {mainWindow} from '@/ts/instances/mainWindow';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -154,10 +155,11 @@ async function init() {
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
-  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper() : new LocalStorage();
+  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper(mainWindow) : new LocalStorage();
+  const audioPlayer: AudioPlayer = new AudioPlayer(mainWindow);
+  store.setStorage(storage);
   const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
-  const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
-  const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
+  const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow);
   const messageBus = new Vue();
   const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
   const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
@@ -202,11 +204,10 @@ async function init() {
     window.webrtcApi = webrtcApi;
     window.sub = sub;
     window.consts = constants;
+    window.store = store;
     window.runtimeConsts = runtimeConsts;
     logger.log('Constants {}', constants)();
   }
-
-  store.setStorage(storage);
 
   const isNew = await storage.connect();
 

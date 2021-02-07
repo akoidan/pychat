@@ -16,6 +16,7 @@ class Actions(object):
 	GROWL_ERROR_MESSAGE = 'growlError'
 	GET_MESSAGES = 'loadMessages'
 	GET_MESSAGES_BY_IDS = 'loadMessagesByIds'
+	GET_COUNTRY_CODES = 'getCountryCode'
 	DELETE_ROOM = 'deleteRoom'
 	USER_LEAVES_ROOM = 'leaveUser'
 	EDIT_MESSAGE = 'editMessage'
@@ -167,17 +168,6 @@ class RedisPrefix:
 	P2P_MESSAGE_VAR = 'p2p'
 	WEBRTC_CONNECTION = 'webrtc_conn'
 	CONNECTION_ID_LENGTH = 8  # should be secure
-
-	@classmethod
-	def set_js_user_structure_flag(cls, id, name, sex, image, flag, country, region, city):
-		res = cls.set_js_user_structure(id, name, sex, image)
-		res[VarNames.LOCATION] = {
-			IpVarNames.COUNTRY_CODE: flag,
-			IpVarNames.COUNTRY: country,
-			IpVarNames.REGION: region,
-			IpVarNames.CITY: city
-		}
-		return res
 
 	@staticmethod
 	def set_js_user_structure(id, name, sex, image):

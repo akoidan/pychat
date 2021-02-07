@@ -25,7 +25,8 @@ TORNADO_SSL_OPTIONS = {
 }
 
 # Prevent host header attacks in emails
-SERVER_ADDRESS = 'https://localhost:8080'
+SERVER_ADDRESS = 'https://localhost:8080' 
+SHOW_COUNTRY_CODE = True
 
 LOGGING['handlers'] = {
 	'default': {
