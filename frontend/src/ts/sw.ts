@@ -41,42 +41,56 @@ self.addEventListener('install', (event: any) => {
 // Cache and return requests
 self.addEventListener('fetch', async (event: any) => {
   event.respondWith((async function() {
-    let cachedResponse: any = await caches.match(event.request);
+    let request = event.request;
+    let cachedResponse: any = await caches.match(request);
 
-    if (cachedResponse && event.request.mode !== 'navigate') {
-      logger.debug(`Returning ${event.request.url} from cache`)()
+    if (cachedResponse && request.mode !== 'navigate') {
+      logger.debug(`Returning ${request.url} from cache`)()
       return cachedResponse;
     }
+
+    let isStaticAsset = serviceWorkerOption.assets.find(e => request.url.endsWith(e));
 
     let fetchedResponse: Response|null = null;
     let error = null;
     try {
-      fetchedResponse = await fetch(event.request);
+      if (isStaticAsset) {
+        request = new Request(request.url, {
+          method: request.method,
+          headers: request.headers,
+          mode: 'cors', // override static assets to access cors if required
+          credentials: request.credentials,
+          redirect: request.redirect,
+        });
+      }
+      fetchedResponse = await fetch(request);
     } catch (e) {
       error = e;
     }
 
     if (fetchedResponse?.ok) {
       // do not put partial response. E.g. preload audio
-      if (event.request.method === "GET" && fetchedResponse.status !== 206) {
-        if (event.request.url.indexOf('/photo/thumbnail/') >= 0) {
-          logger.debug(`Adding ${event.request.url} to thumbnail cache`)()
+      if (request.method === "GET" && fetchedResponse.status !== 206) {
+        if (request.url.indexOf('/photo/thumbnail/') >= 0) {
+          logger.debug(`Adding ${request.url} to thumbnail cache`)()
           let cache = await caches.open('thumbnails') // users icon
-          await cache.put(event.request, fetchedResponse.clone());
-        } if (event.request.url.indexOf('/photo/') >= 0) {
+          await cache.put(request, fetchedResponse.clone());
+        } if (request.url.indexOf('/photo/') >= 0) {
           let cache = await caches.open('photos') // user sends image with a message
-          logger.debug(`Adding ${event.request.url} to photos cache`)()
-          await cache.put(event.request, fetchedResponse.clone());
-        } else if (serviceWorkerOption.assets.find(e => event.request.url.endsWith(e)) || event.request.mode === 'navigate') {
-          logger.log(`Putting ${event.request.url} to static cache`)()
-          let cache = await caches.open('static') // all static assets
-          await cache.put(event.request, fetchedResponse.clone())
+          logger.debug(`Adding ${request.url} to photos cache`)()
+          await cache.put(request, fetchedResponse.clone());
+        } else {
+          if (isStaticAsset || request.mode === 'navigate') {
+            logger.log(`Putting ${request.url} to static cache`)()
+            let cache = await caches.open('static') // all static assets
+            await cache.put(request, fetchedResponse.clone())
+          }
         }
       }
       return fetchedResponse;
     }
     if (cachedResponse) {
-      logger.warn(`Server returned {} for ${event.request.url}. Returning data from cache`, fetchedResponse || error)();
+      logger.warn(`Server returned {} for ${request.url}. Returning data from cache`, fetchedResponse || error)();
       return cachedResponse;
     }
 
