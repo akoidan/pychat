@@ -54,12 +54,13 @@ self.addEventListener('fetch', async (event: any) => {
     let fetchedResponse: Response|null = null;
     let error = null;
     try {
-      if (isStaticAsset) {
+      if (isStaticAsset && !request.url.startsWith(event.currentTarget.origin)) {
+        // this is a cors request, so override mode
         request = new Request(request.url, {
           method: request.method,
           headers: request.headers,
-          mode: 'cors', // override static assets to access cors if required
-          credentials: request.credentials,
+          mode: 'cors',
+          credentials: 'omit',
           redirect: request.redirect,
           body: request.body,
           referrer: request.referrer,
