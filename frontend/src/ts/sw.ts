@@ -61,6 +61,11 @@ self.addEventListener('fetch', async (event: any) => {
           mode: 'cors', // override static assets to access cors if required
           credentials: request.credentials,
           redirect: request.redirect,
+          body: request.body,
+          referrer: request.referrer,
+          referrerPolicy: request.referrerPolicy,
+          cache: request.cache,
+          integrity: request.integrity,
         });
       }
       fetchedResponse = await fetch(request);
