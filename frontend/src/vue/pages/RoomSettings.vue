@@ -122,8 +122,8 @@ import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 import {CurrentUserInfoModel, RoomDictModel, RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
-import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
-import PickUser from '@/vue/pages/parts/PickUser.vue';
+import ParentChannel from '@/vue/parts/ParentChannel.vue';
+import PickUser from '@/vue/parts/PickUser.vue';
 import {PrivateRoomsIds} from '@/ts/types/types';
 
 @Component({

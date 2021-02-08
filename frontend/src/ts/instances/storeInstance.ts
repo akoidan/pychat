@@ -25,8 +25,19 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       vueProperty?: ValueFilterForKey<T, string>;
     }
 ) {
-  const processError = function (e: Error|string) {
-    const strError: string = String((<Error>e)?.message || String((<any>e)?.error)  || e || 'Unknown error');
+  const processError = function (e: any) {
+    let strError;
+    if (e) {
+      if (e.message) {
+        strError = e.message;
+      } else if (e.error) {
+        strError = String(e.error);
+      } else {
+        strError = String(e);
+      }
+    } else {
+      e = 'Unknown error';
+    }
     // @ts-ignore: next-line
     let processError: Vue = this;
     processError.$logger.error(`Error during ${message} {}`, e)();

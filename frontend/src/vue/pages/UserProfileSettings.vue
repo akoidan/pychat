@@ -163,10 +163,11 @@ export default class UserProfileSettings extends Vue {
 
     localStorage.removeItem(LAST_SYNCED);
     if (typeof self !== 'undefined') {
-      await self.caches.keys().then((cacheNames) =>Promise.all(cacheNames.map(cn => {
+      let cacheNames = await self.caches.keys()
+      await Promise.all(cacheNames.map(cn => {
        this.$logger.log(`Deleting cache '${cn}'`)();
        return caches.delete(cn);
-      })))
+      }))
     }
     localStorage.removeItem(SERVICE_WORKER_VERSION_LS_NAME);
     this.$store.clearMessages();

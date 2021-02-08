@@ -883,6 +883,11 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public clearGrowls() {
+    this.growls = [];
+  }
+
+  @Mutation
   public logout() {
     this.userInfo = null;
     this.userSettings = null;
