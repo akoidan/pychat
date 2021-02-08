@@ -69,9 +69,19 @@ export default class GoogleAuth extends Vue {
     await this.loadGoogle();
   }
 
-  public async onGoogleSignIn(auth2: unknown) {
+
+  @ApplyGrowlErr({ message: 'Unable to login in with google', runningProp: 'grunning'})
+  public async logWithGoogle() {
+
+    const auth2 = gapi.auth2.getAuthInstance();
+    this.$logger.log("Calling signin on google api object")();
+    await auth2.signIn();
+    this.$logger.log("Signin resolved. Checking if we're signed....")();
     // @ts-ignore: next-line
     const googleUser = auth2.currentUser.get();
+    if (!googleUser) {
+      throw Error("Not signed");
+    }
     const profile = googleUser.getBasicProfile();
     this.$logger.log(
         'Signed as {} with id {} and email {}  ',
@@ -83,28 +93,6 @@ export default class GoogleAuth extends Vue {
     await new Promise((resolve, reject) => {
       this.$emit('token', {resolve, reject, token: this.googleToken})
     });
-
-  }
-
-  @ApplyGrowlErr({ message: 'Unable to login in with google', runningProp: 'grunning'})
-  public async logWithGoogle() {
-
-    const auth2 = gapi.auth2.getAuthInstance();
-    if (auth2.isSignedIn.get()) {
-      await this.onGoogleSignIn(auth2);
-    } else {
-      await auth2.signIn();
-      await new Promise((resolve, reject) => {
-        auth2.isSignedIn.listen(async (isSignedIn: boolean) => {
-          if (isSignedIn) {
-            resolve();
-          } else {
-            reject();
-          }
-        });
-      });
-      await this.onGoogleSignIn(auth2);
-    }
   }
 
 }

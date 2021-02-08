@@ -159,7 +159,7 @@ export class RoomHandler extends MessageHandler  {
   }
 
   public createNewUser(message: CreateNewUsedMessage) {
-    const newVar: UserModel = convertUser(message);
+    const newVar: UserModel = convertUser(message, null);
     this.store.addUser(newVar);
     message.rooms.forEach(({roomId, users}) => {
       this.store.setRoomsUsers({
@@ -271,7 +271,7 @@ export class RoomHandler extends MessageHandler  {
     this.logger.debug('set users {}', users)();
     const um: UserDictModel = {};
     users.forEach(u => {
-      um[u.userId] = convertUser(u);
+      um[u.userId] = convertUser(u, null);
     });
 
     this.logger.debug('Setting rooms')();

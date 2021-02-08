@@ -26,10 +26,10 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     }
 ) {
   const processError = function (e: Error|string) {
-
-    const strError: string = String((<Error>e)?.message || e || 'Unknown error');
+    const strError: string = String((<Error>e)?.message || String((<any>e)?.error)  || e || 'Unknown error');
     // @ts-ignore: next-line
     let processError: Vue = this;
+    processError.$logger.error(`Error during ${message} {}`, e)();
     if (vueProperty && message) {
       // @ts-ignore: next-line
       processError[vueProperty] = `${message}: ${strError}`;
