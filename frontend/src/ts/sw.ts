@@ -68,7 +68,7 @@ self.addEventListener('fetch', async (event: any) => {
           logger.debug(`Adding ${event.request.url} to photos cache`)()
           await cache.put(event.request, fetchedResponse.clone());
         } else if (serviceWorkerOption.assets.find(e => event.request.url.endsWith(e)) || event.request.mode === 'navigate') {
-          logger.log(`Putting ${event.request.url} to static cache`)
+          logger.log(`Putting ${event.request.url} to static cache`)()
           let cache = await caches.open('static') // all static assets
           await cache.put(event.request, fetchedResponse.clone())
         }
