@@ -12,8 +12,8 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const hashType = '?[contenthash:6]';
-const name = `[name].[ext]${hashType}`;
+const hashType = '?[contenthash]';
+const name = `[name].[ext]${hashType}=`; // https://github.com/webpack-contrib/mini-css-extract-plugin/issues/699#issuecomment-776290258
 const child_process = require('child_process');
 const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin')
@@ -348,7 +348,7 @@ const getConfig = async () => {
     },
     mode: options.IS_PROD ? 'production' : 'development',
     output: {
-      filename: options.IS_PROD ? `[name].js?[contenthash]` :  `[name].js?[hash]`, // webpack doesn't allow to use contenthash for dev server
+      filename: options.IS_PROD ? `[name].js${hashType}` :  `[name].js?[hash]`, // webpack doesn't allow to use contenthash for dev server
       crossOriginLoading: 'anonymous',
       path: getDist(),
       publicPath: options.PUBLIC_PATH || '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814
