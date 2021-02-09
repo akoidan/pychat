@@ -55,6 +55,7 @@ self.addEventListener('fetch', async (event: any) => {
     let error = null;
     try {
       if (isStaticAsset && !request.url.startsWith(event.currentTarget.origin)) {
+        logger.log(`Replacing cors request for ${request.url}`)()
         // this is a cors request, so override mode
         request = new Request(request.url, {
           method: request.method,
