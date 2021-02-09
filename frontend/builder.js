@@ -265,7 +265,7 @@ const getConfig = async () => {
     }
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: getDist()}));
     plugins.push(new MiniCssExtractPlugin({
-      filename: '[name].css?[contenthash]'
+      filename: `[name].css${hashType}`
     }));
     let minicssPlugin = {
       loader: MiniCssExtractPlugin.loader,
