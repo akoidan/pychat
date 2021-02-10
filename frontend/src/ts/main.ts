@@ -192,6 +192,17 @@ async function init() {
     return false;
   };
 
+  Vue.config.errorHandler = (err, vm, info) => {
+    const message = `Error occurred in ${err}:${vm}\n${info}`;
+    if (store?.userSettings?.sendLogs && api) {
+      api.sendLogs(`${vm}:${err}:${info}`, browserVersion, GIT_HASH);
+    }
+    store.growlError(message);
+    logger.error("Error occured in vue component err: '{}', vm '{}', info '{}'", err, vm, info)()
+    return false;
+
+  };
+
   window.GIT_VERSION = GIT_HASH;
   if (IS_DEBUG) {
     window.vue = vue;

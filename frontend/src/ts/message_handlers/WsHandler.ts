@@ -351,7 +351,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
         this.ws = new WebSocket(this.wsUrl);
         this.ws.onmessage = this.onWsMessage.bind(this);
         this.ws.onclose = (e) => {
-          setTimeout(reject);
+          setTimeout(() => reject(Error('Cannot connect to websocket')));
           this.onWsClose(e);
         }
         this.ws.onopen = () => {
