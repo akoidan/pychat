@@ -215,6 +215,11 @@ const getConfig = async () => {
     new ServiceWorkerWepbackPlugin({
       entry: './src/ts/sw.ts',
       minimize: options.IS_WEB && options.UGLIFY,
+      excludes: ['**/sounds/**', '**/*.map?*', '**/*.map'] // ignore .sw.js.map and
+      // exclude audio from being cached, since
+      // 1: 206 partial response is uncacheable
+      // audio request generate header range, which creates option request, which fails
+      // https://stackoverflow.com/a/37614302/3872976
     }),
     new CopyWebpackPlugin([
       {from: './src/assets/manifest.json', to: ''},

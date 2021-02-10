@@ -21,10 +21,8 @@ self.addEventListener('install', (event: any) => {
     const cache = await caches.open('static');
     const assets = serviceWorkerOption.assets.filter(url =>
         url.includes('/smileys/') ||
-        url.includes('/sounds/') ||
-        url.includes('/js.?/') ||
-        url.includes('/css.?/') ||
-        url.includes('/json.?/') || // manifest
+        url.includes('.js?') ||
+        url.includes('.css?') ||
         url.includes('/img/')
     ).map(url => {
       if (PUBLIC_PATH) {
@@ -40,6 +38,9 @@ self.addEventListener('install', (event: any) => {
 
 // Cache and return requests
 self.addEventListener('fetch', async (event: any) => {
+  if (event.request.url.indexOf('/sounds/') >= 0) {
+    return ;// ignore audio, we can't precache cors
+  }
   event.respondWith((async function() {
     let request = event.request;
     let cachedResponse: any = await caches.match(request);
@@ -54,22 +55,22 @@ self.addEventListener('fetch', async (event: any) => {
     let fetchedResponse: Response|null = null;
     let error = null;
     try {
-      if (isStaticAsset && !request.url.startsWith(event.currentTarget.origin)) {
-        logger.log(`Replacing cors request for ${request.url}`)()
-        // this is a cors request, so override mode
-        request = new Request(request.url, {
-          method: request.method,
-          headers: request.headers,
-          mode: 'cors',
-          credentials: 'omit',
-          redirect: request.redirect,
-          body: request.body,
-          referrer: request.referrer,
-          referrerPolicy: request.referrerPolicy,
-          cache: request.cache,
-          integrity: request.integrity,
-        });
-      }
+      // if (isStaticAsset && !request.url.startsWith(event.currentTarget.origin)) {
+      //   logger.log(`Replacing cors request for ${request.url}`)()
+      //   // this is a cors request, so override mode
+      //   request = new Request(request.url, {
+      //     method: request.method,
+      //     headers: request.headers, // TODO headers are unavilable for CORS mode is sw, because of sw security policy
+      //     mode: 'cors',
+      //     credentials: 'omit',
+      //     redirect: request.redirect,
+      //     body: request.body,
+      //     referrer: request.referrer,
+      //     referrerPolicy: request.referrerPolicy,
+      //     cache: request.cache,
+      //     integrity: request.integrity,
+      //   });
+      // }
       fetchedResponse = await fetch(request);
     } catch (e) {
       error = e;
