@@ -14,6 +14,12 @@ logger.debug('Evaluating...')();
 
 let subScr: null | string = null;
 
+// exclude audio from being cached, since
+// 1: 206 partial response is uncacheable
+// audio request generate header range, which creates option request, which fails
+// https://stackoverflow.com/a/37614302/3872976
+serviceWorkerOption.assets = serviceWorkerOption.assets.filter(url => !url.includes('/sounds/'));
+
 // Install Service Worker
 self.addEventListener('install', (event: any) => {
   logger.log(' installed!')();
