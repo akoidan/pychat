@@ -21,11 +21,13 @@ import {
   RoomNoUsersDto,
   SexModelDto,
   UserDto,
-  UserProfileDto,
   UserProfileDtoWoImage,
   UserSettingsDto
 } from '@/ts/types/dto';
-import {BooleanDB, SexDB} from '@/ts/types/db';
+import {
+  BooleanDB,
+  SexDB
+} from '@/ts/types/db';
 import {MessageP2pDto} from '@/ts/types/messages/p2pDto';
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
@@ -44,7 +46,15 @@ export function convertSex(dto: SexModelDto): SexModelString {
   return dto;
 }
 
-export function convertLocation(dto: LocationDto): Location {
+export function convertLocation(dto: LocationDto | null): Location {
+  if (!dto) {
+    return {
+      city: null,
+      country: null,
+      countryCode: null,
+      region: null
+    };
+  }
   return {...dto};
 }
 
@@ -262,20 +272,13 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
   };
 }
 
-export function convertUser(u: UserDto): UserModel {
-  const location: Location = u.location ? convertLocation(u.location) : {
-    city: null,
-    country: null,
-    countryCode: null,
-    region: null
-  };
-
+export function convertUser(u: UserDto, location: LocationDto|null): UserModel {
   return {
     user: u.user,
     id: u.userId,
     image: u.userImage,
     lastTimeOnline: u.lastTimeOnline,
     sex: convertSex(u.sex),
-    location
+    location: convertLocation(location)
   };
 }

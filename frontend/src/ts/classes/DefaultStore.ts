@@ -14,6 +14,7 @@ import {
   GrowlModel,
   GrowlType,
   IncomingCallModel,
+  Location,
   MessageModel,
   MessageStatus,
   PastingTextAreaElement,
@@ -23,6 +24,7 @@ import {
   RoomSettingsModel,
   SendingFile,
   SendingFileTransfer,
+  SexModelString,
   UserDictModel,
   UserModel
 } from '@/ts/types/model';
@@ -787,11 +789,11 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setUser(user: UserModel) {
+  public setUser(user: {id: number; sex: SexModelString; user: string; image: string}) {
     this.allUsersDict[user.id].user = user.user;
     this.allUsersDict[user.id].sex = user.sex;
     this.allUsersDict[user.id].image = user.image;
-    this.storage.saveUser(user);
+    this.storage.saveUser(this.allUsersDict[user.id]);
   }
 
   @Mutation
@@ -827,9 +829,19 @@ export class DefaultStore extends VuexModule {
     this.channelsDict = state.channelsDict;
     this.allUsersDict = state.allUsersDict;
 
-    this.storage.setChannels(Object.values(state.channelsDict));
-    this.storage.setRooms(Object.values(state.roomsDict));
-    this.storage.setUsers(Object.values(state.allUsersDict));
+    this.storage.setChannels(Object.values(this.channelsDict));
+    this.storage.setRooms(Object.values(this.roomsDict ));
+    this.storage.setUsers(Object.values(this.allUsersDict));
+  }
+
+  @Mutation
+  public setCountryCode(locations: Record<string, Location>) {
+    Object.values(this.allUsersDict).forEach(u => {
+      if (locations[u.id]) {
+        u.location = locations[u.id];
+      }
+    })
+    this.storage.setUsers(Object.values(this.allUsersDict));
   }
 
   @Mutation
@@ -868,6 +880,11 @@ export class DefaultStore extends VuexModule {
     } else {
       Vue.set(this.roomsDict[roomId].usersTyping, userId, date);
     }
+  }
+
+  @Mutation
+  public clearGrowls() {
+    this.growls = [];
   }
 
   @Mutation

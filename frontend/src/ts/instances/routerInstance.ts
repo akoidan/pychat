@@ -198,11 +198,11 @@ router.beforeEach((to, from, next) => {
 });
 
 
-sub.subscribe('router', new class RouterProcesssor extends MessageHandler {
+sub.subscribe('router', new class RouterProcessor extends MessageHandler {
 
   protected readonly logger: Logger = logger;
 
-  protected readonly handlers: HandlerTypes<keyof RouterProcesssor, 'router'> = {
+  protected readonly handlers: HandlerTypes<keyof RouterProcessor, 'router'> = {
     login: <HandlerType<'login', 'router'>>this.login,
     logout: <HandlerType<'logout', 'router'>>this.logout,
     navigate:<HandlerType<'navigate', 'router'>>this.navigate

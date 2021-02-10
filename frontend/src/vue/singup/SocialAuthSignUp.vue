@@ -1,5 +1,5 @@
 <template>
-  <div v-if="FACEBOOK_APP_ID && GOOGLE_OAUTH_2_CLIENT_ID">
+  <div v-if="FACEBOOK_APP_ID || GOOGLE_OAUTH_2_CLIENT_ID">
     <google-auth @token="googleAuth" button-name="Via Google"/>
     <facebook-auth @token="facebookAuth" button-name="Via Facebook"/>
   </div>

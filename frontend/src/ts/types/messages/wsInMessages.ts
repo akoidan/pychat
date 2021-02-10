@@ -5,6 +5,7 @@
 
 import {
   ChannelDto,
+  LocationDto,
   MessageModelDto,
   RoomDto,
   RoomNoUsersDto,
@@ -80,6 +81,10 @@ export interface RemoveOnlineUserMessage extends DefaultWsInMessage<'removeOnlin
 
 export interface DeleteRoomMessage extends DefaultWsInMessage<'deleteRoom', 'room'> {
   roomId: number;
+}
+
+export interface GetCountryCodeMessage extends DefaultInMessage<'getCountryCode', 'void'> {
+  content: Record<string, LocationDto>;
 }
 
 export interface LeaveUserMessage extends DefaultWsInMessage<'leaveUser', 'room'> {

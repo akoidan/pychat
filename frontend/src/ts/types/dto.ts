@@ -54,7 +54,6 @@ export interface UserDto {
   userImage: string;
   lastTimeOnline: number;
   sex: SexModelString;
-  location: LocationDto;
 }
 
 export interface LocationDto {

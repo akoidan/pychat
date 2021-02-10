@@ -1,7 +1,8 @@
 import {
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
-  IS_DEBUG
+  IS_DEBUG,
+  FLAGS
 } from '@/ts/utils/consts';
 import {
   Logger,
@@ -12,6 +13,7 @@ import {
   CurrentUserInfoModel,
   CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
+  Location,
   MessageStatus,
   UserModel
 } from '@/ts/types/model';
@@ -20,6 +22,7 @@ import {
   SessionHolder
 } from '@/ts/types/types';
 import {
+  convertLocation,
   convertUser,
   currentUserInfoDtoToModel,
   userSettingsDtoToModel
@@ -52,7 +55,8 @@ import {
   MessagesResponseMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
-  SyncHistoryResponseMessage
+  SyncHistoryResponseMessage,
+  GetCountryCodeMessage
 } from '@/ts/types/messages/wsInMessages';
 import {
   InternetAppearMessage,
@@ -129,6 +133,12 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   public getWsConnectionId () {
     return this.wsConnectionId;
+  }
+
+  public async getCountryCode(): Promise<GetCountryCodeMessage> {
+    return this.messageProc.sendToServerAndAwait({
+      action: 'getCountryCode'
+    });
   }
 
   public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number|null): Promise<WebRtcSetConnectionIdMessage> {
@@ -341,7 +351,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
         this.ws = new WebSocket(this.wsUrl);
         this.ws.onmessage = this.onWsMessage.bind(this);
         this.ws.onclose = (e) => {
-          setTimeout(reject);
+          setTimeout(() => reject(Error('Cannot connect to websocket')));
           this.onWsClose(e);
         }
         this.ws.onopen = () => {
@@ -509,7 +519,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return serverTime + this.timeDiffWithServer; // serverTime + (Date.now - serverTime) === Date.now
   }
 
-  public setWsId(message: SetWsIdMessage) {
+  public async setWsId(message: SetWsIdMessage) {
     this.wsConnectionId = message.opponentWsId;
     this.setUserInfo(message.userInfo);
     this.setUserSettings(message.userSettings);
@@ -528,13 +538,26 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       action: 'internetAppear',
       handler: 'any'
     };
+
     sub.notify(inetAppear);
     this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+    if (FLAGS) {
+      let getCountryCodeMessage = await this.getCountryCode();
+      let modelLocal: Record<string, Location> = {}
+      Object.entries(getCountryCodeMessage.content).forEach(([k, v]) => {
+        modelLocal[k] = convertLocation(v);
+      });
+      this.store.setCountryCode(modelLocal);
+    }
   }
 
   public userProfileChanged(message: UserProfileChangedMessage) {
-    const user: UserModel = convertUser(message);
-    this.store.setUser(user);
+    this.store.setUser({
+      id: message.userId,
+      user: message.user,
+      image: message.userImage,
+      sex: message.sex
+    });
   }
 
   public ping(message: PingMessage) {

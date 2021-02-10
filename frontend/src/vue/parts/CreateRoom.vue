@@ -72,14 +72,14 @@ import {
 } from 'vue-property-decorator';
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import PickUser from '@/vue/pages/parts/PickUser.vue';
+import PickUser from '@/vue/parts/PickUser.vue';
 import {
   ChannelsDictUIModel,
   CurrentUserInfoModel
 } from '@/ts/types/model';
 import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 import {PrivateRoomsIds} from '@/ts/types/types';
-import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
+import ParentChannel from '@/vue/parts/ParentChannel.vue';
 
 @Component({
   name: 'CreateRoom' ,

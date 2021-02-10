@@ -43,7 +43,7 @@
     UserDictModel
   } from '@/ts/types/model';
   import AppSubmit from '@/vue/ui/AppSubmit.vue';
-  import PickUser from '@/vue/pages/parts/PickUser.vue';
+  import PickUser from '@/vue/parts/PickUser.vue';
   import UserFlagRow from '@/vue/chat/right/UserFlagRow.vue';
 
   @Component({
