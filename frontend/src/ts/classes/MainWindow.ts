@@ -16,6 +16,7 @@ export class MainWindow {
     window.addEventListener('blur', this.onFocusOut.bind(this));
     window.addEventListener('focus', this.onFocus.bind(this));
     this.currentTabId = Date.now().toString();
+    this.markCurrentTabAsMain();
     this.logger = loggerFactory.getLogger('mainWindow');
     this.store = store;
   }
@@ -39,7 +40,7 @@ export class MainWindow {
       return;
     }
     if (this.isTabMain()) {
-      localStorage.setItem(LAST_TAB_ID_VARNAME, '0');
+      localStorage.removeItem(LAST_TAB_ID_VARNAME);
     }
     this.unloaded = true;
   }
@@ -47,7 +48,7 @@ export class MainWindow {
 
   public isTabMain() {
     let activeTab = localStorage.getItem(LAST_TAB_ID_VARNAME);
-    if (activeTab === '0') {
+    if (!activeTab) {
       localStorage.setItem(LAST_TAB_ID_VARNAME, this.currentTabId);
       activeTab = this.currentTabId;
     }

@@ -88,7 +88,12 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   public async getAllTree(): Promise<SetStateFromStorage|null> {
-    const t: SQLTransaction = await this.asyncWrite();
+    debugger
+    if (!this.db) {
+      throw Error(`${browserVersion} failed to get db`);
+    }
+    const t: SQLTransaction  = await new Promise((resolve, reject) => this.db!.transaction(resolve, reject));
+
     const f: unknown[][] = await Promise.all<unknown[]>([
       'select * from file',
       'select * from profile',
