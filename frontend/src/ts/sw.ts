@@ -74,8 +74,9 @@ self.addEventListener('fetch', async (event: any) => {
   // cache photos in Chat, like images with messages
   let belongsToPhotoCache = event.request.url.indexOf('/photo/') >= 0;
 
-  // cache .js files, .css files and etc, with index.html (navigate) if they didn't hit install event
-  let belongsToStaticCache = allAssetsSet[event.request.url];
+  // cache .js files, .css files and etc if they didn't hit install event
+  // if index.html request.url will be with `#`, but allAssetsSet doesn't contain a `#`
+  let belongsToStaticCache = allAssetsSet[event.request.url] || event.request.mode === 'navigate';
 
   // if this request is not in cache mod, exit
   if (!belongsToThumbnailCache && !belongsToPhotoCache && !belongsToStaticCache || isSound) {
