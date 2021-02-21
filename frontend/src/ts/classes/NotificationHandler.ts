@@ -9,8 +9,8 @@ import {
   IS_DEBUG,
   MANIFEST,
   SERVICE_WORKER_URL,
-  SERVICE_WORKER_VERSION,
-  SERVICE_WORKER_VERSION_LS_NAME
+  SERVICE_WORKER_VERSION_LS_NAME,
+  GIT_HASH
 } from '@/ts/utils/consts';
 import {
   HandlerType,
@@ -55,7 +55,7 @@ export default class NotifierHandler extends MessageHandler {
     this.mainWindow = mainWindow;
     this.documentTitle = document.title;
     this.store = store;
-    this.logger = loggerFactory.getLogger(`notif_${SERVICE_WORKER_VERSION}`);
+    this.logger = loggerFactory.getLogger(`notify`);
     window.addEventListener('focus', this.onFocus.bind(this));
     sub.subscribe('notifier', this);
     this.onFocus(null);
@@ -108,7 +108,7 @@ export default class NotifierHandler extends MessageHandler {
       }
       const granted = await this.checkPermissions();
       if (granted) {
-        await this.showNot('Pychat notifications enabled', {
+        await this.showNot('Pychat notifications are enabled', {
           body: 'You can disable them in room\'s settings',
           replaced: 1
         });
@@ -198,13 +198,13 @@ export default class NotifierHandler extends MessageHandler {
      throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
     }
     let r: ServiceWorkerRegistration = (await navigator.serviceWorker.getRegistration(SERVICE_WORKER_URL))!;
-    let version = parseInt(localStorage.getItem(SERVICE_WORKER_VERSION_LS_NAME)!) || 0;
-    if (version < SERVICE_WORKER_VERSION || !r) {
-      this.logger.log(`Updating sw {} version ${version} to ${SERVICE_WORKER_VERSION}`, r)();
+    let version = localStorage.getItem(SERVICE_WORKER_VERSION_LS_NAME) || '';
+    if (version !== GIT_HASH || !r) {
+      this.logger.log(`Updating sw {} version ${version} to ${GIT_HASH}`, r)();
       r = await webpackServiceWorker.register( {scope: '/'}) as ServiceWorkerRegistration;
-      this.logger.log(`Registered SW ${SERVICE_WORKER_VERSION} {}`, r)();
+      this.logger.log(`Registered SW ${GIT_HASH} {}`, r)();
       if (r) {
-        localStorage.setItem(SERVICE_WORKER_VERSION_LS_NAME, `${SERVICE_WORKER_VERSION}`);
+        localStorage.setItem(SERVICE_WORKER_VERSION_LS_NAME, `${GIT_HASH}`);
       }
     } else {
       this.logger.log(`SW is up to date, v=${version} {}, skipping the update`, r)();

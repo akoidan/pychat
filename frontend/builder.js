@@ -125,7 +125,18 @@ const {options, definePlugin, optimization, configFile, startCordova, linting, b
     options.GIT_HASH = gitHash;
     console.log(`Git hash = ${gitHash}`)
   } catch (e) {
-    console.error("Git hash is unavailable");
+    function makeid(length) {
+      var result           = '';
+      var characters       = 'abcdefghijklmnopqrstuvwxyz0123456789';
+      var charactersLength = characters.length;
+      for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      }
+      return result;
+    }
+
+    options.GIT_HASH = `_${makeid(9)}`;
+    console.log(`Git hash is unavailable, mocking with randoms string ${options.GIT_HASH}`);
   }
   options.IS_SSL = true;
   if (options.IS_ELECTRON || options.IS_ANDROID) {

@@ -2,13 +2,13 @@ import {Logger} from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   BACKEND_ADDRESS,
-  PUBLIC_PATH,
-  SERVICE_WORKER_VERSION
+  GIT_HASH,
+  PUBLIC_PATH
 } from '@/ts/utils/consts';
 
 declare var clients: any;
 declare var serviceWorkerOption: {assets: string[]};
-const logger: Logger = loggerFactory.getLogger(`SW_${SERVICE_WORKER_VERSION}`);
+const logger: Logger = loggerFactory.getLogger(`SW_${GIT_HASH}`);
 
 logger.debug('Evaluating...')();
 
@@ -20,34 +20,68 @@ let subScr: null | string = null;
 // https://stackoverflow.com/a/37614302/3872976
 serviceWorkerOption.assets = serviceWorkerOption.assets.filter(url => !url.includes('/sounds/'));
 
-// Install Service Worker
+const allAssetsSet: Record<string, boolean> = {}
+const allAssets = serviceWorkerOption.assets.map(url => {
+  let value;
+  // https://pychat.org/ + /asdf/ = invalid url, so use new URL
+  if (PUBLIC_PATH) {
+    value = new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
+  } else {
+    value = new URL(url, (self as any).registration.scope).href;
+  }
+  allAssetsSet[value] = true;
+  return value;
+})
+
+allAssets.push((self as any).registration.scope);
+allAssetsSet[(self as any).registration.scope] = true;
+// this event fires when service worker registers the first time
 self.addEventListener('install', (event: any) => {
-  logger.log(' installed!')();
+  logger.log(' Delaying install event to put static resources')();
   event.waitUntil((async () => {
-    const cache = await caches.open('static');
-    const assets = serviceWorkerOption.assets.filter(url =>
+    const staticCache = await caches.open('static');
+    const assets = allAssets.filter(url =>
         url.includes('/smileys/') ||
         url.includes('.js?') ||
         url.includes('.css?') ||
-        url.includes('/img/')
-    ).map(url => {
-      if (PUBLIC_PATH) {
-        return new URL(url, PUBLIC_PATH).href; // https://pychat.org/ + /asdf/ = invalid url, so use new URL
-      } else {
-        return url;
-      }
-    });
-    await cache.addAll(assets);
-    logger.log('Put {} to static cache', assets)()
+        url.includes('/img/') ||
+        url === (self as any).registration.scope
+    );
+    logger.log('Putting to static cache {}', assets)();
+    await staticCache.addAll(assets);
+    let allFiles = await staticCache.keys();
+    const oldFiles = allFiles.filter(r => !allAssetsSet[r.url]);
+    logger.log('Putting to static cache finished, removing old files {}', oldFiles)();
+    await Promise.all(oldFiles.map(oldFile => staticCache.delete(oldFile)));
+    logger.log('Removed old files finished. Can proceed to activate now..')();
   })());
 });
 
 // Cache and return requests
 self.addEventListener('fetch', async (event: any) => {
-  if (event.request.url.indexOf('/sounds/') >= 0) {
-    return ;// ignore audio, we can't precache cors
+
+  // Cache only files, do not cache XHR API, so exist on POST immediately
+  if (event.request.method !== "GET") {
+    return
   }
-  event.respondWith((async function() {
+
+  // do not cache sounds as they preload with 206
+  let isSound = event.request.url.indexOf('/sounds/') >= 0;
+
+  // cache user mini avatars
+  let belongsToThumbnailCache = event.request.url.indexOf('/photo/thumbnail/') >= 0;
+
+  // cache photos in Chat, like images with messages
+  let belongsToPhotoCache = event.request.url.indexOf('/photo/') >= 0;
+
+  // cache .js files, .css files and etc, with index.html (navigate) if they didn't hit install event
+  let belongsToStaticCache = allAssetsSet[event.request.url];
+
+  // if this request is not in cache mod, exit
+  if (!belongsToThumbnailCache && !belongsToPhotoCache && !belongsToStaticCache || isSound) {
+    return
+  }
+  event.respondWith((async () => {
     let request = event.request;
     let cachedResponse: any = await caches.match(request);
 
@@ -56,50 +90,31 @@ self.addEventListener('fetch', async (event: any) => {
       return cachedResponse;
     }
 
-    let isStaticAsset = serviceWorkerOption.assets.find(e => request.url.endsWith(e));
-
     let fetchedResponse: Response|null = null;
     let error = null;
     try {
-      // if (isStaticAsset && !request.url.startsWith(event.currentTarget.origin)) {
-      //   logger.log(`Replacing cors request for ${request.url}`)()
-      //   // this is a cors request, so override mode
-      //   request = new Request(request.url, {
-      //     method: request.method,
-      //     headers: request.headers, // TODO headers are unavilable for CORS mode is sw, because of sw security policy
-      //     mode: 'cors',
-      //     credentials: 'omit',
-      //     redirect: request.redirect,
-      //     body: request.body,
-      //     referrer: request.referrer,
-      //     referrerPolicy: request.referrerPolicy,
-      //     cache: request.cache,
-      //     integrity: request.integrity,
-      //   });
-      // }
       fetchedResponse = await fetch(request);
     } catch (e) {
       error = e;
     }
 
+    if (fetchedResponse?.status === 206) {
+      return fetchedResponse;
+    }
     if (fetchedResponse?.ok) {
       // do not put partial response. E.g. preload audio
-      if (request.method === "GET" && fetchedResponse.status !== 206) {
-        if (request.url.indexOf('/photo/thumbnail/') >= 0) {
-          logger.debug(`Adding ${request.url} to thumbnail cache`)()
-          let cache = await caches.open('thumbnails') // users icon
-          await cache.put(request, fetchedResponse.clone());
-        } if (request.url.indexOf('/photo/') >= 0) {
-          let cache = await caches.open('photos') // user sends image with a message
-          logger.debug(`Adding ${request.url} to photos cache`)()
-          await cache.put(request, fetchedResponse.clone());
-        } else {
-          if (isStaticAsset || request.mode === 'navigate') {
-            logger.log(`Putting ${request.url} to static cache`)()
-            let cache = await caches.open('static') // all static assets
-            await cache.put(request, fetchedResponse.clone())
-          }
-        }
+      if (belongsToThumbnailCache) {
+        logger.debug(`Adding ${request.url} to thumbnail cache`)()
+        let cache = await caches.open('thumbnails') // users icon
+        await cache.put(request, fetchedResponse.clone());
+      } else if (belongsToPhotoCache) {
+        let cache = await caches.open('photos') // user sends image with a message
+        logger.debug(`Adding ${request.url} to photos cache`)()
+        await cache.put(request, fetchedResponse.clone());
+      } else if (belongsToStaticCache) {
+        logger.log(`Putting ${request.url} to static cache`)()
+        let cache = await caches.open('static') // all static assets
+        await cache.put(request, fetchedResponse.clone())
       }
       return fetchedResponse;
     }
@@ -115,10 +130,6 @@ self.addEventListener('fetch', async (event: any) => {
   })());
 });
 
-// Service Worker Active
-self.addEventListener('activate', () => {
-  logger.log(' activated!')();
-});
 
 function getSubscriptionId(pushSubscription: any) {
   let mergedEndpoint = pushSubscription.endpoint;
