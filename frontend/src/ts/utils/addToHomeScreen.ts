@@ -35,18 +35,22 @@ interface BeforeInstallPromptEvent extends Event {
 
 }
 let resolvePromiseInstallMethod: null| Function = null;
-// @ts-ignore
-window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
-  logger.log("Got beforeinstallprompt")();
-  // Prevent Chrome 67 and earlier from automatically showing the prompt
-  e.preventDefault();
-  // Stash the event so it can be triggered later.
-  deferredPrompt = e;
-  if (resolvePromiseInstallMethod) {
-    resolvePromiseInstallMethod();
-    resolvePromiseInstallMethod = null;
-  }
-});
+
+export function initHomeScreen() {
+  // @ts-ignore
+  window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
+    logger.log("Got beforeinstallprompt")();
+    // Prevent Chrome 67 and earlier from automatically showing the prompt
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    if (resolvePromiseInstallMethod) {
+      resolvePromiseInstallMethod();
+      resolvePromiseInstallMethod = null;
+    }
+  });
+}
+
 
 export async function canBeInstalled () {
   if (!isChrome) {
@@ -66,7 +70,7 @@ export async function addToHomeScreen() {
 
   // Show the prompt
   if (!deferredPrompt) {
-    throw Error("This platform doesn't support applications");
+    throw Error("This platform doesn't support Home applications");
   }
   await deferredPrompt.prompt();
   // Wait for the user to respond to the prompt

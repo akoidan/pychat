@@ -50,25 +50,22 @@ type QueryObject = [string, any[]];
 
 export default class DatabaseWrapper implements IStorage {
   private readonly logger: Logger;
-  private readonly dbName: String;
-  private db: Database|null = null;
+  private readonly db: Database;
   private readonly cache: { [id: number]: number } = {};
   private mainWindow: MainWindow;
   private skipSqlCache: Record<string, boolean> = {}
 
-  constructor(mainWindow: MainWindow) {
-    this.dbName = 'v153';
+  constructor(mainWindow: MainWindow, db: Database) {
     this.mainWindow = mainWindow;
-    this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
+    this.db = db;
+    this.logger = loggerFactory.getLoggerColor(`db`, '#753e01');
   }
 
   public async connect(): Promise<SetStateFromStorage|null> {
-    // opendatabase is already checked when creating DBWrapper, on this method it's suppported
-    this.db = window.openDatabase(this.dbName, '', 'Messages database', 10 * 1024 * 1024);
     if (this.db.version === '') {
       this.logger.log('Initializing database')();
       let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
-        this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
+        this.db.changeVersion(this.db.version, '1.0', resolve, reject);
       });
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, thumbnail text, last_time_online integer)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
@@ -83,13 +80,13 @@ export default class DatabaseWrapper implements IStorage {
       return null;
     } else {
       this.logger.log('Created new db connection')();
-      return this.getAllTree(this.db);
+      return this.getAllTree();
 
     }
   }
 
-  private async getAllTree(db: Database): Promise<SetStateFromStorage|null> {
-    const t: SQLTransaction  = await new Promise((resolve, reject) => db.transaction(resolve, reject));
+  private async getAllTree(): Promise<SetStateFromStorage|null> {
+    const t: SQLTransaction  = await new Promise((resolve, reject) => this.db.transaction(resolve, reject));
 
     const f: unknown[][] = await Promise.all<unknown[]>([
       'select * from file',
@@ -599,9 +596,6 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   private write(cb: TransactionCb) {
-    if (!this.db) { // TODO TypeError: undefined is not an object (evaluating 'this.db[transactionType]')
-      throw Error(`${browserVersion} failed to get db`);
-    }
     if (!this.mainWindow.isTabMain()) {
       const that = this;
       cb({executeSql(sql: string, args: any[]) {

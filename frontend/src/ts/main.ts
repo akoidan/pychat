@@ -31,7 +31,7 @@ import {
 import { VNode } from 'vue/types/vnode';
 import Xhr from '@/ts/classes/Xhr';
 import '@/assets/icon.png';
-import '@/ts/utils/addToHomeScreen'
+import {initHomeScreen} from '@/ts/utils/addToHomeScreen'
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import WsMessageHandler from '@/ts/message_handlers/WsMessageHandler';
 import DatabaseWrapper from '@/ts/classes/DatabaseWrapper';
@@ -155,10 +155,22 @@ async function init() {
   declareMixins();
   declareDirectives();
 
+  const logger: Logger = loggerFactory.getLoggerColor(`main:${GIT_HASH ?? ''}`, '#007a70');
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
-  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper(mainWindow) : new LocalStorage();
+  let storage;
+  try {
+    if (!window.openDatabase) {
+      throw Error("Not supported")
+    }
+    const db = window.openDatabase('v153', '', 'Messages database', 10 * 1024 * 1024);
+    storage = new DatabaseWrapper(mainWindow, db);
+  } catch (e) {
+    logger.error("Unable to init websql, because {}. Falling back to localstorage", e)();
+    storage =  new LocalStorage();
+  }
+
   const audioPlayer: AudioPlayer = new AudioPlayer(mainWindow);
   store.setStorage(storage);
   const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
@@ -179,7 +191,7 @@ async function init() {
   Vue.prototype.$platformUtil = platformUtil;
   Vue.prototype.$messageSenderProxy = messageSenderProxy;
 
-  const logger: Logger = loggerFactory.getLoggerColor(`main:${GIT_HASH ?? ''}`, '#007a70');
+
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
   const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
@@ -252,6 +264,9 @@ async function init() {
   // }
 
 }
+
+
+initHomeScreen();
 
 if (document.readyState !== 'loading') {
   init();
