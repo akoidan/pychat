@@ -26,6 +26,7 @@ declare global {
     vue: Vue;
     router: VueRouter;
     api: Api;
+    deferredPrompt: BeforeInstallPromptEvent;
     wsMessageHandler: WsMessageHandler;
     roomHandler: RoomHandler;
     xhr: Http;

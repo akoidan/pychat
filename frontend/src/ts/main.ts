@@ -1,37 +1,29 @@
 import '@/ts/utils/classComponentHooks.ts';
 import '@/assets/sass/common.sass';
 import * as constants from '@/ts/utils/consts';
+
 import * as runtimeConsts from '@/ts/utils/runtimeConsts';
-import {
-  GIT_HASH,
-  IS_ANDROID,
-  IS_DEBUG,
-} from '@/ts/utils/consts';
-import App from '@/vue/App.vue'; // should be after initStore
-import { sub } from '@/ts/instances/subInstance';
-import Vue, { ComponentOptions } from 'vue';
-import { store } from '@/ts/instances/storeInstance';
 import {
   browserVersion,
   isChrome,
   isMobile,
   WS_API_URL
 } from '@/ts/utils/runtimeConsts';
-import { Logger } from 'lines-logger';
+import App from '@/vue/App.vue'; // should be after initStore
+import {sub} from '@/ts/instances/subInstance';
+import Vue, {ComponentOptions} from 'vue';
+import {store} from '@/ts/instances/storeInstance';
+import {Logger} from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
-import {
-  IStorage,
-} from '@/ts/types/types';
 import sessionHolder from '@/ts/instances/sessionInstance';
 import {
   MessageModel,
   PlatformUtil,
   RoomModel
 } from '@/ts/types/model';
-import { VNode } from 'vue/types/vnode';
+import {VNode} from 'vue/types/vnode';
 import Xhr from '@/ts/classes/Xhr';
 import '@/assets/icon.png';
-import {initHomeScreen} from '@/ts/utils/addToHomeScreen'
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import WsMessageHandler from '@/ts/message_handlers/WsMessageHandler';
 import DatabaseWrapper from '@/ts/classes/DatabaseWrapper';
@@ -40,14 +32,14 @@ import Api from '@/ts/message_handlers/Api';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import Http from '@/ts/classes/Http';
 import WebRtcApi from '@/ts/webrtc/WebRtcApi';
-import { router } from '@/ts/instances/routerInstance';
-import { AudioPlayer } from '@/ts/classes/AudioPlayer';
-import { AndroidPlatformUtil } from '@/ts/devices/AndroidPlatformUtils';
-import { WebPlatformUtils } from '@/ts/devices/WebPlatformUtils';
-import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
-import { SetStateFromStorage } from '@/ts/types/dto';
-import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
-import { RoomHandler } from '@/ts/message_handlers/RomHandler';
+import {router} from '@/ts/instances/routerInstance';
+import {AudioPlayer} from '@/ts/classes/AudioPlayer';
+import {AndroidPlatformUtil} from '@/ts/devices/AndroidPlatformUtils';
+import {WebPlatformUtils} from '@/ts/devices/WebPlatformUtils';
+import {MessageSenderProxy} from '@/ts/message_handlers/MessageSenderProxy';
+import {SetStateFromStorage} from '@/ts/types/dto';
+import {MessageHelper} from '@/ts/message_handlers/MessageHelper';
+import {RoomHandler} from '@/ts/message_handlers/RomHandler';
 import {mainWindow} from '@/ts/instances/mainWindow';
 
 
@@ -63,7 +55,7 @@ function declareDirectives() {
   }
 
   function getEventName(eventType: 'start' | 'end'): string[] {
-    if (IS_ANDROID || isMobile) {
+    if (constants.IS_ANDROID || isMobile) {
       return eventType === 'start' ? ['touchstart'] : ['touchend'];
     } else {
       return eventType === 'start' ? ['mousedown'] : ['mouseleave', 'mouseup'];
@@ -149,13 +141,13 @@ function declareMixins() {
   };
   Vue.mixin(<ComponentOptions<Vue>><unknown>mixin);
 }
-
+const logger: Logger = loggerFactory.getLoggerColor(`main`, '#007a70');
+logger.log(`Evaluating main script ${constants.GIT_HASH}`)();
 
 async function init() {
   declareMixins();
   declareDirectives();
 
-  const logger: Logger = loggerFactory.getLoggerColor(`main:${GIT_HASH ?? ''}`, '#007a70');
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
@@ -180,7 +172,7 @@ async function init() {
   const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
   const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
-  const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
+  const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
 
   Vue.prototype.$api = api;
@@ -200,7 +192,7 @@ async function init() {
   window.onerror = function (msg, url, linenumber, column, errorObj) {
     const message = `Error occurred in ${url}:${linenumber}\n${msg}`;
     if (store?.userSettings?.sendLogs && api) {
-      api.sendLogs(`${url}:${linenumber}:${column || '?'}\n${msg}\n\nOBJ:  ${errorObj || '?'}`, browserVersion, GIT_HASH);
+      api.sendLogs(`${url}:${linenumber}:${column || '?'}\n${msg}\n\nOBJ:  ${errorObj || '?'}`, browserVersion, constants.GIT_HASH);
     }
     store.growlError(message);
 
@@ -210,7 +202,7 @@ async function init() {
   Vue.config.errorHandler = (err, vm, info) => {
     const message = `Error occurred in ${err}:${vm}\n${info}`;
     if (store?.userSettings?.sendLogs && api) {
-      api.sendLogs(`${vm}:${err}:${info}`, browserVersion, GIT_HASH);
+      api.sendLogs(`${vm}:${err}:${info}`, browserVersion, constants.GIT_HASH);
     }
     store.growlError(message);
     logger.error("Error occured in vue component err: '{}', vm '{}', info '{}'", err, vm, info)()
@@ -218,8 +210,8 @@ async function init() {
 
   };
 
-  window.GIT_VERSION = GIT_HASH;
-  if (IS_DEBUG) {
+  window.GIT_VERSION = constants.GIT_HASH;
+  if (constants.IS_DEBUG) {
     window.vue = vue;
     window.wsMessageHandler = wsMessageHandler;
     window.roomHandler = roomHandler;
@@ -266,7 +258,14 @@ async function init() {
 }
 
 
-initHomeScreen();
+// @ts-ignore
+window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
+  // Prevent Chrome 67 and earlier from automatically showing the prompt
+  e.preventDefault();
+  logger.log("beforeinstallprompt fired")()
+  // Stash the event so it can be triggered later.
+  window.deferredPrompt = e;
+});
 
 if (document.readyState !== 'loading') {
   init();
