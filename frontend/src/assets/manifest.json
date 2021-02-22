@@ -1,10 +1,10 @@
 {
   "name": "Pychat",
-  "short_name": "PyPush",
+  "short_name": "Pychat",
   "start_url": "/",
   "display": "standalone",
   "gcm_sender_id": "620421656154",
-  "background_color": "purple",
+  "background_color": "black",
   "description": "Opensource web chat",
   "icons": [
     {
