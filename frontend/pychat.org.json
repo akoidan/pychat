@@ -6,7 +6,7 @@
   "GOOGLE_OAUTH_2_CLIENT_ID": "620421656154-8boctt2h7h5meskhe7vh8aiargj0nae9.apps.googleusercontent.com",
   "FACEBOOK_APP_ID": "894051850700207",
   "RECAPTCHA_PUBLIC_KEY": "6LchGhwTAAAAAJwCRgfNKraWrFtCdKPFo0Ri8DLt",
-  "MANIFEST": "/manifest.json",
+  "MANIFEST": "/manifest.json?v2",
   "AUTO_REGISTRATION": false,
   "ISSUES": false,
   "GITHUB_LINK": "https://github.com/akoidan/pychat",

@@ -256,6 +256,10 @@ async function init() {
   // }
 
 }
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  window.deferredPrompt = (e as any);
+});
 
 if (document.readyState !== 'loading') {
   init();
