@@ -152,7 +152,12 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
  - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
 
 ## Desktop app
-Pychat uses websql and built the way so it renders everything possible w/o network. You have 2 options:
+Pychat uses websql and built the way so it renders everything possible w/o network. You have 3 options:
+
+### PWA
+This is the simplest one. Just open settings page from you user and click "Add to home screen".
+Note that PWA is only available from chrome and chrome android. No support for IOS and other browsers.
+But PWA is the most stable from ones below.
 
 ### Natifier
 Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a client (replace pychat.org for your server): `npx run nativifier pychat.org`
@@ -162,7 +167,8 @@ Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a
  - Run `cd frontend; yarn run electronProd`.
 
 ## Android app
-This is harsh. If you're not familiar with android SDK I would recommend doing the steps below from AndroidStudio:
+
+You can use PWA as it's described in desktop app section which I recommend. Other way is cordova which is a lot harder. If you're not familiar with android SDK I would recommend doing the steps below from AndroidStudio:
  - Install android sdk, android platform tools. accept license
  - Create production.json based on [Frontend config](#frontend-config)
  - production.json `"PUBLIC_PATH": "./"`,  `"BACKEND_ADDRESS": "pychat.org"` build into dist, rm .gz. , copy to `www`. In index.html include ` <script src="cordova.js"></script>`

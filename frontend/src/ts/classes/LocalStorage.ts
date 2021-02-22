@@ -80,10 +80,6 @@ export default class LocalStorage implements IStorage {
   public saveUser(users: UserModel)  {}
   public markMessageAsSent(m: number[]) {}
 
-  public async getAllTree(): Promise<SetStateFromStorage|null> {
-    return null;
-  }
-
   public clearMessages() {
     this.clearStorage();
   }
@@ -99,8 +95,8 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  public async connect(): Promise<boolean> {
-    return false;
+  public async connect(): Promise<null> {
+    return null;
   }
 
   // public getRoomHeaderId(roomId: number, cb: SingleParamCB<number>) {

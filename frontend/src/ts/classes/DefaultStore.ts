@@ -592,6 +592,15 @@ export class DefaultStore extends VuexModule {
     this.storage.saveMessage(m);
   }
 
+  // we're saving it to database, we restored this message from.
+  // seems like we can't split 2 methods, since 1 should be in actions
+  // and one in mutation, but storage is not available in actions
+  @Mutation
+  public addMessageWoDB(m: MessageModel) {
+    const om: { [id: number]: MessageModel } = this.roomsDict[m.roomId].messages;
+    Vue.set(om, String(m.id), m);
+  }
+
   @Mutation
   public addLiveConnectionToRoom(m: LiveConnectionLocation) {
     if (this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection) >= 0) {

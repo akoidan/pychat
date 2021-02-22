@@ -85,13 +85,23 @@
           </td>
         </tr>
         <tr>
-          <th><label>Cache</label></th>
-          <td>
+          <td colspan="2">
             <input
               type="button"
               class="lor-btn"
               value="Delete app cache"
               @click="clearHistory"
+            >
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <input
+              type="button"
+              class="lor-btn"
+              value="Add to home screen"
+              v-if="canBeInstalled"
+              @click="addToHomeScreen"
             >
           </td>
         </tr>
@@ -133,6 +143,8 @@
     LAST_SYNCED,
     SERVICE_WORKER_VERSION_LS_NAME
   } from '@/ts/utils/consts';
+  import {isChrome} from '@/ts/utils/runtimeConsts';
+  import {addToHomeScreen, canBeInstalled} from '@/ts/utils/addToHomeScreen';
 
   @Component({
     name: 'UserProfileSettings' ,
@@ -140,6 +152,7 @@
 })
 export default class UserProfileSettings extends Vue {
   public running: boolean = false;
+  public canBeInstalled: boolean = true;
   @State
   public readonly userSettings!: CurrentUserSettingsModel;
 
@@ -147,13 +160,18 @@ export default class UserProfileSettings extends Vue {
 
   private readonly logLevels: LogLevel[] = Object.keys(logLevels) as LogLevel[];
 
-  public created() {
+  public async created() {
     this.model = userSettingsDtoToModel(this.userSettings);
+    this.canBeInstalled = await canBeInstalled();
   }
 
   @Watch('userSettings', {deep: true})
   public onUserSettingsChange() {
     this.model = userSettingsDtoToModel(this.userSettings);
+  }
+
+  public async addToHomeScreen() {
+    await addToHomeScreen()
   }
 
   public async clearHistory() {

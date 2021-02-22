@@ -30,6 +30,8 @@ import {
 } from '@/ts/types/model';
 import { VNode } from 'vue/types/vnode';
 import Xhr from '@/ts/classes/Xhr';
+import '@/assets/icon.png';
+import '@/ts/utils/addToHomeScreen'
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import WsMessageHandler from '@/ts/message_handlers/WsMessageHandler';
 import DatabaseWrapper from '@/ts/classes/DatabaseWrapper';
@@ -47,6 +49,7 @@ import { SetStateFromStorage } from '@/ts/types/dto';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import { RoomHandler } from '@/ts/message_handlers/RomHandler';
 import {mainWindow} from '@/ts/instances/mainWindow';
+
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -220,41 +223,33 @@ async function init() {
     logger.log('Constants {}', constants)();
   }
 
-  const isNew = await storage.connect();
-
-  if (!isNew) {
-    const data: SetStateFromStorage | null = await storage.getAllTree();
-    const session = sessionHolder.session;
-    logger.log('restored state from db {}, userId: {}, session {}', data, store.myId, session)();
-    if (data) {
-      if (!store.userInfo && session) {
-        store.setStateFromStorage(data);
-      } else {
-        store.roomsArray.forEach((storeRoom: RoomModel) => {
-          if (data.roomsDict[storeRoom.id]) {
-            const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
-            for (const dbMessagesKey in dbMessages) {
-              if (!storeRoom.messages[dbMessagesKey]) {
-                // TODO we put it into db again :(
-                // we're saving it to database, we restored this message from.
-                // seems like we can't split 2 methods, since 1 should be in actions
-                // and one in mutation, but storage is not available in actions
-                store.addMessage(dbMessages[dbMessagesKey]);
-              }
+  const data: SetStateFromStorage | null = await storage.connect();
+  const session = sessionHolder.session;
+  logger.log('restored state from db {}, userId: {}, session {}', data, store.myId, session)();
+  if (data) {
+    if (!store.userInfo && session) {
+      store.setStateFromStorage(data);
+    } else {
+      store.roomsArray.forEach((storeRoom: RoomModel) => {
+        if (data.roomsDict[storeRoom.id]) {
+          const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
+          for (const dbMessagesKey in dbMessages) {
+            if (!storeRoom.messages[dbMessagesKey]) {
+              store.addMessageWoDB(dbMessages[dbMessagesKey]);
             }
           }
-        });
-        logger.debug('Skipping settings state {}', data)();
-      }
+        }
+      });
+      logger.debug('Skipping settings state {}', data)();
     }
-    // sync is not required here, I tested every time this code branch is executed messages sync even if we don't use it here.
-    // weird ha? they could be not in the storage ...
-    // if (ws.isWsOpen()) {
-    //   logger.error("Init ws open")();
-    //   // channelsHandler.syncMessages();
-    //   // webrtcApi.initAndSyncMessages()
-    // }
   }
+  // sync is not required here, I tested every time this code branch is executed messages sync even if we don't use it here.
+  // weird ha? they could be not in the storage ...
+  // if (ws.isWsOpen()) {
+  //   logger.error("Init ws open")();
+  //   // channelsHandler.syncMessages();
+  //   // webrtcApi.initAndSyncMessages()
+  // }
 
 }
 

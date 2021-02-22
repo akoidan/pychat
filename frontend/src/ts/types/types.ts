@@ -197,11 +197,10 @@ export interface IStorage {
   saveRoomUsers(ru: SetRoomsUsers): void;
   setUsers(users: UserModel[]): void;
   setMessagesStatus(messagesIds: number[], status: MessageStatus): void;
-  getAllTree(): Promise<SetStateFromStorage|null>;
   saveUser(users: UserModel): void;
   clearStorage(): void;
   clearMessages(): void;
-  connect(): Promise<boolean>;
+  connect(): Promise<SetStateFromStorage|null>;
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
   markMessageAsSent(messagesId: number[]): void;

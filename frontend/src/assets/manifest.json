@@ -1,7 +1,16 @@
 {
-  "name": "PyChat Push Notification",
+  "name": "Pychat",
   "short_name": "PyPush",
   "start_url": "/",
   "display": "standalone",
-  "gcm_sender_id": "620421656154"
+  "gcm_sender_id": "620421656154",
+  "background_color": "purple",
+  "description": "Opensource web chat",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
 }

@@ -42,6 +42,8 @@ import {
 import {browserVersion} from '@/ts/utils/runtimeConsts';
 import {SetStateFromStorage} from '@/ts/types/dto';
 import {MainWindow} from '@/ts/classes/MainWindow';
+import sessionHolder from '@/ts/instances/sessionInstance';
+import {store} from '@/ts/instances/storeInstance';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];
@@ -60,7 +62,8 @@ export default class DatabaseWrapper implements IStorage {
     this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
-  public async connect(): Promise<boolean> {
+  public async connect(): Promise<SetStateFromStorage|null> {
+    // opendatabase is already checked when creating DBWrapper, on this method it's suppported
     this.db = window.openDatabase(this.dbName, '', 'Messages database', 10 * 1024 * 1024);
     if (this.db.version === '') {
       this.logger.log('Initializing database')();
@@ -77,22 +80,16 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, 'CREATE TABLE profile (user_id integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, image text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
       t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
       this.logger.log('DatabaseWrapper has been initialized')();
-      return true;
-    } else if (this.db.version === '1.0') {
+      return null;
+    } else {
       this.logger.log('Created new db connection')();
+      return this.getAllTree(this.db);
 
-      return false;
     }
-
-    return false;
   }
 
-  public async getAllTree(): Promise<SetStateFromStorage|null> {
-    debugger
-    if (!this.db) {
-      throw Error(`${browserVersion} failed to get db`);
-    }
-    const t: SQLTransaction  = await new Promise((resolve, reject) => this.db!.transaction(resolve, reject));
+  private async getAllTree(db: Database): Promise<SetStateFromStorage|null> {
+    const t: SQLTransaction  = await new Promise((resolve, reject) => db.transaction(resolve, reject));
 
     const f: unknown[][] = await Promise.all<unknown[]>([
       'select * from file',
@@ -135,141 +132,170 @@ export default class DatabaseWrapper implements IStorage {
         dbTags: TagDB[] = f[8] as TagDB[];
     this.logger.debug('resolved all sqls')();
 
-    if (dbProfile.length) {
-      const profile: CurrentUserInfoModel = {
-        sex: convertSexToString(dbProfile[0].sex),
-        contacts: dbProfile[0].contacts,
-        image: dbProfile[0].image,
-        birthday: dbProfile[0].birthday,
-        email: dbProfile[0].email,
-        surname: dbProfile[0].surname,
-        city: dbProfile[0].city,
-        name: dbProfile[0].name,
-        userId: dbProfile[0].user_id,
-        user: dbProfile[0].user
-      };
-      const settings: CurrentUserSettingsModel = {
-        embeddedYoutube: convertToBoolean(dbSettings[0].embedded_youtube),
-        highlightCode: convertToBoolean(dbSettings[0].highlight_code),
-        incomingFileCallSound: convertToBoolean(dbSettings[0].incoming_file_call_sound),
-        messageSound: convertToBoolean(dbSettings[0].message_sound),
-        showWhenITyping: convertToBoolean(dbSettings[0].show_when_i_typing),
-        onlineChangeSound: convertToBoolean(dbSettings[0].online_change_sound),
-        sendLogs: convertToBoolean(dbSettings[0].send_logs),
-        suggestions: convertToBoolean(dbSettings[0].suggestions),
-        theme: dbSettings[0].theme,
-        logs: dbSettings[0].logs,
-      };
-      const roomsDict: RoomDictModel = {};
-      dbRooms.forEach((r: RoomDB) => {
-        const rm: RoomModel = getRoomsBaseDict({
-          roomId: r.id,
-          p2p: convertToBoolean(r.p2p),
-          notifications: convertToBoolean(r.notifications),
-          isMainInChannel: convertToBoolean(r.is_main_in_channel),
-          name: r.name,
-          channelId: r.channel_id,
-          roomCreatorId: r.creator,
-          users: [],
-          volume: r.volume
-        });
-        roomsDict[r.id] = rm;
-      });
-      dbRoomUsers.forEach(ru => {
-        roomsDict[ru.room_id].users.push(ru.user_id);
-      });
-      const allUsersDict: { [id: number]: UserModel } = {};
-      dbUsers.forEach(u => {
-        const user: UserModel = {
-          id: u.id,
-          lastTimeOnline: u.last_time_online,
-          sex: convertNumberToSex(u.sex),
-          image: u.thumbnail,
-          user: u.user,
-          location: {
-            region: u.region,
-            city: u.city,
-            countryCode: u.country_code,
-            country: u.country
-          }
-        };
-        allUsersDict[u.id] = user;
-      });
-
-      let messageTags: Record<string, Record<string, number>> = {}
-      dbTags.forEach(a => {
-        if (!messageTags[a.message_id]) {
-          messageTags[a.message_id] = {}
-        }
-        messageTags[a.message_id][a.symbol] = a.user_id
-      })
-
-      const am: Record<string, MessageModel> = {};
-      dbMessages.forEach(m => {
-        let tags = messageTags[m.id] ? messageTags[m.id] : {};
-        const message: MessageModel = {
-          id: m.id,
-          roomId: m.room_id,
-          isHighlighted: false,
-          time: m.time,
-          isEditingActive: false,
-          isThreadOpened: false,
-          threadMessagesCount: m.thread_messages_count,
-          deleted: convertToBoolean(m.deleted),
-          tags,
-          transfer: m.status === 'sending' ? {
-            error: null,
-            xhr: null,
-            upload: null
-          } : null,
-          files: {},
-          status: m.status,
-          edited: m.edited,
-          parentMessage: m.parent_message_id,
-          symbol: m.symbol,
-          content: m.content,
-          userId: m.user_id,
-          giphy: m.giphy
-        };
-        if (roomsDict[m.room_id]) {
-          roomsDict[m.room_id].messages[m.id] = message;
-        }
-        am[m.id] = message;
-      });
-      // if database didn't have negative number, mark that this field initialize,
-      // so we can compare it with 0 when decreasing and get
-      dbFiles.forEach(f => {
-        const amElement: MessageModel = am[f.message_id];
-        if (amElement) {
-          const file: FileModel = {
-            url: f.url,
-            fileId: f.file_id,
-            previewFileId: f.preview_file_id,
-            sending: convertToBoolean(f.sending),
-            type: f.type as BlobType,
-            preview: f.preview
-
-          };
-          amElement.files![f.symbol] = file;
-        }
-      });
-
-      const channelsDict: ChannelsDictModel = {};
-      dbChannels.forEach((c: ChannelDB) => {
-        const chm: ChannelModel = getChannelDict({
-          channelId: c.id,
-          channelName: c.name,
-          channelCreatorId: c.creator
-        });
-        channelsDict[c.id] = chm;
-      });
-      return {roomsDict, settings, profile, channelsDict, allUsersDict};
-    } else {
-      return null;
+    if (!dbProfile.length) {
+      return null
     }
+    const profile: CurrentUserInfoModel = this.getProfileModel(dbProfile[0]);
+    const settings: CurrentUserSettingsModel = this.getSettings(dbSettings[0]);
+    const channelsDict: ChannelsDictModel = this.getChannels(dbChannels);
+    const allUsersDict: { [id: number]: UserModel } = this.getUsers(dbUsers);
+    const roomsDict: RoomDictModel = this.getRooms(dbRooms, dbRoomUsers, dbTags, dbMessages, dbFiles);
+
+    return  { settings, profile, channelsDict, allUsersDict, roomsDict};
   }
 
-  // public getRoomHeaderId (id: number, cb: Function) {
+  private getRooms(
+      dbRooms: RoomDB[],
+      dbRoomUsers: RoomUsersDB[],
+      dbTags: TagDB[],
+      dbMessages: MessageDB[],
+      dbFiles: FileDB[]
+  ): RoomDictModel {
+    const roomsDict: RoomDictModel = {};
+    dbRooms.forEach((r: RoomDB) => {
+      const rm: RoomModel = getRoomsBaseDict({
+        roomId: r.id,
+        p2p: convertToBoolean(r.p2p),
+        notifications: convertToBoolean(r.notifications),
+        isMainInChannel: convertToBoolean(r.is_main_in_channel),
+        name: r.name,
+        channelId: r.channel_id,
+        roomCreatorId: r.creator,
+        users: [],
+        volume: r.volume
+      });
+      roomsDict[r.id] = rm;
+    });
+    dbRoomUsers.forEach(ru => {
+      roomsDict[ru.room_id].users.push(ru.user_id);
+    });
+
+
+    let messageTags: Record<string, Record<string, number>> = {};
+    dbTags.forEach(a => {
+      if (!messageTags[a.message_id]) {
+        messageTags[a.message_id] = {};
+      }
+      messageTags[a.message_id][a.symbol] = a.user_id;
+    });
+
+    const am: Record<string, MessageModel> = {};
+    dbMessages.forEach(m => {
+      let tags = messageTags[m.id] ? messageTags[m.id] : {};
+      const message: MessageModel = {
+        id: m.id,
+        roomId: m.room_id,
+        isHighlighted: false,
+        time: m.time,
+        isEditingActive: false,
+        isThreadOpened: false,
+        threadMessagesCount: m.thread_messages_count,
+        deleted: convertToBoolean(m.deleted),
+        tags,
+        transfer: m.status === 'sending' ? {
+          error: null,
+          xhr: null,
+          upload: null
+        } : null,
+        files: {},
+        status: m.status,
+        edited: m.edited,
+        parentMessage: m.parent_message_id,
+        symbol: m.symbol,
+        content: m.content,
+        userId: m.user_id,
+        giphy: m.giphy
+      };
+      if (roomsDict[m.room_id]) {
+        roomsDict[m.room_id].messages[m.id] = message;
+      }
+      am[m.id] = message;
+    });
+    // if database didn't have negative number, mark that this field initialize,
+    // so we can compare it with 0 when decreasing and get
+    dbFiles.forEach(f => {
+      const amElement: MessageModel = am[f.message_id];
+      if (amElement) {
+        const file: FileModel = {
+          url: f.url,
+          fileId: f.file_id,
+          previewFileId: f.preview_file_id,
+          sending: convertToBoolean(f.sending),
+          type: f.type as BlobType,
+          preview: f.preview
+
+        };
+        amElement.files![f.symbol] = file;
+      }
+    });
+    return roomsDict;
+  }
+
+  private getUsers(dbUsers: UserDB[]): { [id: number]: UserModel } {
+    const allUsersDict: { [id: number]: UserModel } = {};
+    dbUsers.forEach(u => {
+      const user: UserModel = {
+        id: u.id,
+        lastTimeOnline: u.last_time_online,
+        sex: convertNumberToSex(u.sex),
+        image: u.thumbnail,
+        user: u.user,
+        location: {
+          region: u.region,
+          city: u.city,
+          countryCode: u.country_code,
+          country: u.country
+        }
+      };
+      allUsersDict[u.id] = user;
+    });
+    return allUsersDict;
+  }
+
+  private getChannels(dbChannels: ChannelDB[]): ChannelsDictModel {
+    const channelsDict: ChannelsDictModel = {};
+    dbChannels.forEach((c: ChannelDB) => {
+      const chm: ChannelModel = getChannelDict({
+        channelId: c.id,
+        channelName: c.name,
+        channelCreatorId: c.creator
+      });
+      channelsDict[c.id] = chm;
+    });
+    return channelsDict;
+  }
+
+  private getSettings(dbSettings: SettingsDB): CurrentUserSettingsModel {
+    return  {
+      embeddedYoutube: convertToBoolean(dbSettings.embedded_youtube),
+      highlightCode: convertToBoolean(dbSettings.highlight_code),
+      incomingFileCallSound: convertToBoolean(dbSettings.incoming_file_call_sound),
+      messageSound: convertToBoolean(dbSettings.message_sound),
+      showWhenITyping: convertToBoolean(dbSettings.show_when_i_typing),
+      onlineChangeSound: convertToBoolean(dbSettings.online_change_sound),
+      sendLogs: convertToBoolean(dbSettings.send_logs),
+      suggestions: convertToBoolean(dbSettings.suggestions),
+      theme: dbSettings.theme,
+      logs: dbSettings.logs,
+    };
+  }
+
+  private getProfileModel(dbProfile: ProfileDB): CurrentUserInfoModel {
+    return {
+      sex: convertSexToString(dbProfile.sex),
+      contacts: dbProfile.contacts,
+      image: dbProfile.image,
+      birthday: dbProfile.birthday,
+      email: dbProfile.email,
+      surname: dbProfile.surname,
+      city: dbProfile.city,
+      name: dbProfile.name,
+      userId: dbProfile.user_id,
+      user: dbProfile.user
+    };
+  }
+
+// public getRoomHeaderId (id: number, cb: Function) {
   //   this.read((t, id, cb ) => {
   //     this.executeSql(t, 'select min(id) as min from message where room_id = ?', [id], (t, d) => {
   //       cb(d.rows.length ? d.rows[0].min : null);
@@ -570,12 +596,6 @@ export default class DatabaseWrapper implements IStorage {
         return false;
       })();
     });
-  }
-
-  private getStart() {
-    return Promise.resolve().then(() => new Promise((resolve, reject) => {
-      this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
-    }));
   }
 
   private write(cb: TransactionCb) {

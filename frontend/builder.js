@@ -388,7 +388,7 @@ const getConfig = async () => {
           options: getOptions('font')
         },
         {
-          test: /favicon\.ico$/,
+          test: /(favicon\.ico)|(icon\.png)$/,
           loader: 'file-loader',
           options: getOptions('')
         },
