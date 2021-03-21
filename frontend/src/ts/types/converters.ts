@@ -128,7 +128,7 @@ export function getRoomsBaseDict(
       sharePaint: false,
       callActive: false,
       shareScreen: false,
-      showVideo: true,
+      showVideo: false,
       currentMic: null,
       currentSpeaker: null,
       currentWebcam: null,

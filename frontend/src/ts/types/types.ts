@@ -62,6 +62,7 @@ export interface SetDevices {
   microphones: { [id: string]: string };
   speakers: { [id: string]: string };
   webcams: { [id: string]: string };
+  roomId: number;
 }
 
 export interface MessageSender {

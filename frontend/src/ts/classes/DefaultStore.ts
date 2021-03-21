@@ -468,6 +468,14 @@ export class DefaultStore extends VuexModule {
     this.microphones = payload.microphones;
     this.webcams = payload.webcams;
     this.speakers = payload.speakers;
+    if (this.roomsDict[payload.roomId].callInfo) {
+      if (Object.keys(payload.microphones).length === 0) {
+        this.roomsDict[payload.roomId].callInfo.showMic = false;
+      }
+      if (Object.keys(payload.webcams).length === 0) {
+        this.roomsDict[payload.roomId].callInfo.showVideo = false;
+      }
+    }
   }
 
   @Mutation

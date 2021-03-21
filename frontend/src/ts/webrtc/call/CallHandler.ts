@@ -86,7 +86,8 @@ export default class CallHandler extends FileAndCallTransfer {
     const payload: SetDevices = {
       microphones,
       webcams,
-      speakers
+      speakers,
+      roomId: this.roomId
     };
     if (devices) {
       devices.forEach((device: MediaDeviceInfo) => {
@@ -541,7 +542,23 @@ export default class CallHandler extends FileAndCallTransfer {
 
   private async captureMic(): Promise<MediaStream|null> {
     let stream: MediaStream|null = null;
-    if (this.callInfo.showMic || this.callInfo.showVideo) {
+    let showMic = this.callInfo.showMic;
+    let showVideo = this.callInfo.showVideo;
+    if (showMic || showVideo) {
+      // inflate devices b4 capture, in this case we can disable video if user enabled it but has no webcam
+      if (navigator.mediaDevices.enumerateDevices) {
+        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+        this.inflateDevices(devices);
+        if (showMic !== this.callInfo.showMic) {
+          this.store.growlError("Unable to capture audio, because no microphones found")
+        }
+        if (showVideo !== this.callInfo.showVideo) {
+          this.store.growlError("Unable to capture video, because no webcam found")
+        }
+        if (!this.callInfo.showMic && !this.callInfo.showVideo) {
+          return null; //inflate devices could have set them to null if they are absent
+        }
+      }
       let audio: any = this.callInfo.showMic;
       if (this.callInfo.currentMic && audio) {
         audio = {deviceId: this.callInfo.currentMic};
@@ -550,12 +567,9 @@ export default class CallHandler extends FileAndCallTransfer {
       if (this.callInfo.currentWebcam && video) {
         video = {deviceId: this.callInfo.currentWebcam};
       }
+      this.logger.debug('navigator.mediaDevices.getUserMedia({audio, video})')();
       stream = await navigator.mediaDevices.getUserMedia({audio, video});
       this.logger.debug('navigator.mediaDevices.getUserMedia({audio, video})')();
-      if (navigator.mediaDevices.enumerateDevices) {
-        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
-        this.inflateDevices(devices);
-      }
       if (!stream) {
         throw new Error('Unable to capture stream');
       }
