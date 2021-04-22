@@ -565,8 +565,8 @@ export function pasteBlobFileToTextArea(file: Blob, textArea: HTMLElement) {
 
 
 export function pasteFileToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
-  if (file.size > 10_000_000) {
-    errCb(`Can't upload file greater than 10MB`);
+  if (file.size > 90_000_000) {
+    errCb(`Can't upload file greater than 90MB`);
   } else {
     pasteBlobFileToTextArea(file, textArea);
   }
