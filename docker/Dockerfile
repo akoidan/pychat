@@ -1,4 +1,7 @@
 FROM alpine:3.10.0
+# 3.12 alpine contains node 12.x.x which is specified in frontend/.nvmrc
+# alpine 3.13 + has node v14+, which is incompatible atm with frontend
+# 3.10 has incorrect version , but doesnt have issues with mariadb
 
 ENV DB_DATA_PATH=/var/lib/mysql \
     DB_ROOT_PASS=pypass_root \
@@ -43,6 +46,7 @@ RUN set -x &&\
             bash \
             libffi-dev \
             vim
+# py3-pip is required for alpine 3.12+
 # mariadb-client - mysqlamin for db install
 # mariadb-connector-c  for pip install mysqlclient
 COPY ./download_content.sh .

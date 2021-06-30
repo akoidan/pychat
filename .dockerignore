@@ -8,6 +8,7 @@
 !frontend/src
 !frontend/patches
 !frontend/package.json
+!frontend/yarn.lock
 !frontend/tsconfig.json
 !frontend/DefaultSmilies.cfpack
 !frontend/extract_cfpack.py
