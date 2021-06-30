@@ -256,7 +256,7 @@ Remember that Service Worker will work only if certificate is trusted. So flags 
  2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
  3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv`. For ubuntu you can omit `--system-site-packages `. Activate it: `source .venv/bin/activate`
  4. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
- 5. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 5. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
  6. Fill database with tables: `bash ../download_content.sh create_django_tables`. (Remember you're still in `backend` dir)
 
 ## Build frontend

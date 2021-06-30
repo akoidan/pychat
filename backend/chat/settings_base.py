@@ -87,12 +87,13 @@ CONCURRENT_THREAD_WORKERS = 10
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'mysql_server_has_gone_away',  # django.db.backends.sqlite3
+		'ENGINE': 'chat',  # django.db.backends.sqlite3
 		'NAME': 'pychat',
 		'USER': 'pychat',
 		'PASSWORD': 'pypass',
 		'HOST': 'localhost',
-		'default-character-set': 'utf8',
+		'default-character-set': 'utf8mb4',
+		'charset': 'utf8mb4',
 		'OPTIONS': {
 			'autocommit': True,
 		},

@@ -361,7 +361,7 @@ create_db() {
         echo "GRANT ALL ON *.* TO ${DB_USER}@'127.0.0.1' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
         GRANT ALL ON *.* TO ${DB_USER}@'localhost' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
         GRANT ALL ON *.* TO ${DB_USER}@'::1' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
-        create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; \
+        create database pychat CHARACTER SET utf8mb4 COLLATE = utf8mb4_general_ci; \
         DELETE FROM mysql.user WHERE User='';\
         DROP DATABASE test;\
         FLUSH PRIVILEGES;"| mysql -u root --password="${DB_ROOT_PASS}" || exit 4
