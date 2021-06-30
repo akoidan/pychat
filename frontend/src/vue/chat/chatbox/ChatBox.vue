@@ -176,7 +176,7 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
     public markMessagesInCurrentRoomAsRead() {
       this.$logger.debug("Checking if we can set some messages to status read")();
       let messagesIds = Object.values(this.room!.messages)
-          .filter(m => m.userId !== this.myId && m.status === 'received' ||  m.status === 'on_server')
+          .filter(m => m.userId !== this.myId && (m.status === 'received' ||  m.status === 'on_server'))
           .map(m => m.id);
       if (messagesIds.length > 0) {
         this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);

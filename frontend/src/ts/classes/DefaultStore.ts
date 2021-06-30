@@ -158,7 +158,11 @@ export class DefaultStore extends VuexModule {
   get calculatedMessagesForRoom() : (roomId: number) => any[] {
     return (roomId: number): any[] => {
       let room = this.roomsDict[roomId];
-      let newArray: any[] = room.roomLog.map(value => ({
+      let roomLog = room.roomLog;
+      if (!this.userSettings?.onlineChangeSound) {
+        roomLog = roomLog.filter(l => l.action !== 'appeared online' && l.action !== 'gone offline')
+      }
+      let newArray: any[] = roomLog.map(value => ({
         isUserAction: true,
         ...value
       }));

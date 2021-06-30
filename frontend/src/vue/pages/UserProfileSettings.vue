@@ -40,7 +40,7 @@
           </td>
         </tr>
         <tr>
-          <th>Online change sound:</th>
+          <th>Online change messages:</th>
           <td>
             <app-checkbox v-model="model.onlineChangeSound" />
           </td>
