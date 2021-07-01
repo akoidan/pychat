@@ -32,6 +32,10 @@ def check_mysql_gone_away(db_wrapper):
 
 class DatabaseWrapper(base.DatabaseWrapper):
 
+    @check_mysql_gone_away
+    def patch_cursor(self):
+        self.connection.query('SET NAMES utf8mb4')
+
     def create_cursor(self, name=None):
 
         class CursorWrapper(base.CursorWrapper):
@@ -45,6 +49,6 @@ class DatabaseWrapper(base.DatabaseWrapper):
                 return self.cursor.executemany(query, args)
 
         cursor = self.connection.cursor()
-        self.connection.query('SET NAMES utf8mb4')
+        self.patch_cursor()
 
         return CursorWrapper(cursor)
