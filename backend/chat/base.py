@@ -1,54 +1,19 @@
-"""
-https://stackoverflow.com/a/60894948/3872976
-"""
-
-import logging
-
-from django.db.backends.mysql import base
-
-logger = logging.getLogger('mysql_server_has_gone_away')
-
-def check_mysql_gone_away(db_wrapper):
-    def decorate(f):
-        def wrapper(self, query, args=None):
-            try:
-                return f(self, query, args)
-            except (base.Database.OperationalError, base.Database.InterfaceError) as e:
-                logger.warn("MySQL server has gone away. Rerunning query: %s", query)
-                if 'MySQL server has gone away' in str(e):
-                    db_wrapper.connection.close()
-                    db_wrapper.connect()
-                    self.cursor = db_wrapper.connection.cursor()
-                    return f(self, query, args)
-                # Map some error codes to IntegrityError, since they seem to be
-                # misclassified and Django would prefer the more logical place.
-                if e.args[0] in self.codes_for_integrityerror:
-                    raise base.utils.IntegrityError(*tuple(e.args))
-                raise
-        return wrapper
-
-    return decorate
+from mysql_server_has_gone_away.base import DatabaseWrapper as MySqlHasGoneAwayWrapper
 
 
-class DatabaseWrapper(base.DatabaseWrapper):
+class DatabaseWrapper(MySqlHasGoneAwayWrapper):
 
-    @check_mysql_gone_away
-    def patch_cursor(self):
-        self.connection.query('SET NAMES utf8mb4')
+    def init_connection_state(self):
+        assignments = ['SET NAMES utf8mb4']
+        if self.features.is_sql_auto_is_null_enabled:
+            # SQL_AUTO_IS_NULL controls whether an AUTO_INCREMENT column on
+            # a recently inserted row will return when the field is tested
+            # for NULL. Disabling this brings this aspect of MySQL in line
+            # with SQL standards.
+            assignments.append('SET SQL_AUTO_IS_NULL = 0')
 
-    def create_cursor(self, name=None):
+        if self.isolation_level:
+            assignments.append('SET SESSION TRANSACTION ISOLATION LEVEL %s' % self.isolation_level.upper())
 
-        class CursorWrapper(base.CursorWrapper):
-
-            @check_mysql_gone_away(self)
-            def execute(self, query, args=None):
-                return self.cursor.execute(query, args)
-
-            @check_mysql_gone_away(self)
-            def executemany(self, query, args):
-                return self.cursor.executemany(query, args)
-
-        cursor = self.connection.cursor()
-        self.patch_cursor()
-
-        return CursorWrapper(cursor)
+        with self.cursor() as cursor:
+            cursor.execute('; '.join(assignments))
