@@ -508,6 +508,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* pin messages feature, like telegram
 * webpack [ext] doesn't work for chunks. 
 * Serviceworkerplugin doesn't support hashmaps
 * Room should have image
