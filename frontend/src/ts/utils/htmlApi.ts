@@ -25,6 +25,7 @@ import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import { MEDIA_API_URL } from '@/ts/utils/runtimeConsts';
 import {DefaultStore} from '@/ts/classes/DefaultStore';
+import { hexEncode } from '@/ts/utils/pureFunctions';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -55,7 +56,16 @@ export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a
   }
 }
 
-const smileUnicodeRegex = /[\u3400-\u3500]/g;
+const smileUnicodeRegex = (function() {
+  let smileysUnicodeArray: string[] = []
+  Object.keys(smileys).forEach(s => {
+    smileysUnicodeArray.push(...Object.keys(smileys[s]))
+  });
+  let stringRegex = smileysUnicodeArray.map(hexEncode);
+  return new RegExp(stringRegex.join('|'), 'g');
+
+})();
+
 const imageUnicodeRegex = /[\u3501-\u3600]/g;
 const patterns = [
   {
@@ -140,7 +150,7 @@ export function getSmileyHtml(symbol: string) {
     throw Error(`Invalid smile ${symbol}`);
   }
 
-  return `<img src="${smile.src}" symbol="${symbol}" alt="${smile.alt}">`;
+  return `<img src="${smile.src}" symbol="${symbol}" class="emoji" alt="${smile.alt}">`;
 }
 
 export const isDateMissing = (function () {

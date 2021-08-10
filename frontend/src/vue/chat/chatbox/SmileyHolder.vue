@@ -19,6 +19,7 @@
         :key="tabName"
       >
         <img
+          class="emoji"
           v-for="(smiley, code) in allSmileys"
           :key="code"
           :src="smiley.src"
@@ -61,6 +62,11 @@ import { State } from '@/ts/instances/storeInstance';
 
   @import "~@/assets/sass/partials/abstract_classes"
   @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/variables"
+
+  .emoji
+    width: $emoji-width
+    cursor: pointer
 
   .icon-cancel-circled-outline
     position: relative // icon is broken a bit, it occupies 1 px above the screen
@@ -70,15 +76,19 @@ import { State } from '@/ts/instances/storeInstance';
 
   .smile-parent-holder
     padding: 10px
+    max-height: calc(100vh - 220px)
+    overflow: scroll
 
   .tabNames
     margin: 0
     padding-left: 0
-    display: flex
+    padding-bottom: 12px
+    display: block
 
     > li
       display: inline-block
       padding-left: 10px
+      font-size: 12px
       padding-right: 10px
 
       &:hover

@@ -15,6 +15,16 @@ export function bytesToSize(bytes: number): string {
   return `${Math.round(bytes / Math.pow(1024, power))} ${sizes[power]}`;
 }
 
+export function hexEncode(v: string) {
+  let hex, i;
+  let result = "";
+  for (i=0; i<v .length; i++) {
+    hex = v.charCodeAt(i).toString(16);
+    result += ('\\u' + ("000"+hex).slice(-4));
+  }
+  return result;
+}
+
 export function getChromeVersion () {
   const raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
 

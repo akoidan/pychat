@@ -1,251 +1,8560 @@
-import base_0000 from '@/assets/smileys/base/0000.gif';
-import base_0001 from '@/assets/smileys/base/0001.gif';
-import base_0002 from '@/assets/smileys/base/0002.gif';
-import base_0003 from '@/assets/smileys/base/0003.gif';
-import base_0004 from '@/assets/smileys/base/0004.gif';
-import base_0005 from '@/assets/smileys/base/0005.gif';
-import base_0006 from '@/assets/smileys/base/0006.gif';
-import base_0007 from '@/assets/smileys/base/0007.gif';
-import base_0008 from '@/assets/smileys/base/0008.gif';
-import base_0009 from '@/assets/smileys/base/0009.gif';
-import base_000a from '@/assets/smileys/base/000a.gif';
-import base_000b from '@/assets/smileys/base/000b.gif';
-import base_000c from '@/assets/smileys/base/000c.gif';
-import base_000d from '@/assets/smileys/base/000d.gif';
-import base_000e from '@/assets/smileys/base/000e.gif';
-import base_000f from '@/assets/smileys/base/000f.gif';
-import base_0010 from '@/assets/smileys/base/0010.gif';
-import base_0011 from '@/assets/smileys/base/0011.gif';
-import base_0012 from '@/assets/smileys/base/0012.gif';
-import base_0013 from '@/assets/smileys/base/0013.gif';
-import base_0014 from '@/assets/smileys/base/0014.gif';
-import base_0015 from '@/assets/smileys/base/0015.gif';
-import base_0016 from '@/assets/smileys/base/0016.gif';
-import base_0017 from '@/assets/smileys/base/0017.gif';
-import base_0018 from '@/assets/smileys/base/0018.gif';
-import base_0019 from '@/assets/smileys/base/0019.gif';
-import base_001a from '@/assets/smileys/base/001a.gif';
-import base_001b from '@/assets/smileys/base/001b.gif';
-import base_001c from '@/assets/smileys/base/001c.gif';
-import base_001d from '@/assets/smileys/base/001d.gif';
-import base_001e from '@/assets/smileys/base/001e.gif';
-import base_001f from '@/assets/smileys/base/001f.gif';
-import base_0020 from '@/assets/smileys/base/0020.gif';
-import base_0021 from '@/assets/smileys/base/0021.gif';
-import base_0022 from '@/assets/smileys/base/0022.gif';
-import base_0023 from '@/assets/smileys/base/0023.gif';
-import base_0024 from '@/assets/smileys/base/0024.gif';
-import base_0025 from '@/assets/smileys/base/0025.gif';
-import base_0026 from '@/assets/smileys/base/0026.gif';
-import base_0027 from '@/assets/smileys/base/0027.gif';
-import base_0028 from '@/assets/smileys/base/0028.gif';
-import base_0029 from '@/assets/smileys/base/0029.gif';
-import base_002a from '@/assets/smileys/base/002a.gif';
-import base_002b from '@/assets/smileys/base/002b.gif';
-import base_002c from '@/assets/smileys/base/002c.gif';
-import base_002d from '@/assets/smileys/base/002d.gif';
-import base_002e from '@/assets/smileys/base/002e.gif';
-import base_002f from '@/assets/smileys/base/002f.gif';
-import base_0030 from '@/assets/smileys/base/0030.gif';
-import base_0031 from '@/assets/smileys/base/0031.gif';
-import base_0032 from '@/assets/smileys/base/0032.gif';
-import base_0033 from '@/assets/smileys/base/0033.gif';
-import base_0034 from '@/assets/smileys/base/0034.gif';
-import base_0035 from '@/assets/smileys/base/0035.gif';
-import base_0036 from '@/assets/smileys/base/0036.gif';
-import base_0037 from '@/assets/smileys/base/0037.gif';
-import base_0038 from '@/assets/smileys/base/0038.gif';
-import base_0039 from '@/assets/smileys/base/0039.gif';
-import base_003a from '@/assets/smileys/base/003a.gif';
-import base_003b from '@/assets/smileys/base/003b.gif';
-import base_003c from '@/assets/smileys/base/003c.gif';
-import base_003d from '@/assets/smileys/base/003d.gif';
-import base_003e from '@/assets/smileys/base/003e.gif';
-import base_003f from '@/assets/smileys/base/003f.gif';
-import base_0040 from '@/assets/smileys/base/0040.gif';
-import base_0041 from '@/assets/smileys/base/0041.gif';
-import base_0042 from '@/assets/smileys/base/0042.gif';
-import base_0043 from '@/assets/smileys/base/0043.gif';
-import base_0044 from '@/assets/smileys/base/0044.gif';
-import base_0045 from '@/assets/smileys/base/0045.gif';
-import girls_0046 from '@/assets/smileys/girls/0046.gif';
-import girls_0047 from '@/assets/smileys/girls/0047.gif';
-import girls_0048 from '@/assets/smileys/girls/0048.gif';
-import girls_0049 from '@/assets/smileys/girls/0049.gif';
-import girls_004a from '@/assets/smileys/girls/004a.gif';
-import girls_004b from '@/assets/smileys/girls/004b.gif';
-import girls_004c from '@/assets/smileys/girls/004c.gif';
-import girls_004d from '@/assets/smileys/girls/004d.gif';
-import girls_004e from '@/assets/smileys/girls/004e.gif';
-import girls_004f from '@/assets/smileys/girls/004f.gif';
-import girls_0050 from '@/assets/smileys/girls/0050.gif';
-import girls_0051 from '@/assets/smileys/girls/0051.gif';
-import girls_0052 from '@/assets/smileys/girls/0052.gif';
-import girls_0053 from '@/assets/smileys/girls/0053.gif';
-import girls_0054 from '@/assets/smileys/girls/0054.gif';
-import girls_0055 from '@/assets/smileys/girls/0055.gif';
-import extra_0056 from '@/assets/smileys/extra/0056.gif';
-import extra_0057 from '@/assets/smileys/extra/0057.gif';
-import extra_0058 from '@/assets/smileys/extra/0058.gif';
-import extra_0059 from '@/assets/smileys/extra/0059.gif';
-import extra_005a from '@/assets/smileys/extra/005a.gif';
-import extra_005b from '@/assets/smileys/extra/005b.gif';
-import extra_005c from '@/assets/smileys/extra/005c.gif';
-import extra_005d from '@/assets/smileys/extra/005d.gif';
-import extra_005e from '@/assets/smileys/extra/005e.gif';
-import extra_005f from '@/assets/smileys/extra/005f.gif';
-import extra_0060 from '@/assets/smileys/extra/0060.gif';
-import extra_0061 from '@/assets/smileys/extra/0061.gif';
-import extra_0062 from '@/assets/smileys/extra/0062.gif';
-import extra_0063 from '@/assets/smileys/extra/0063.gif';
-import extra_0064 from '@/assets/smileys/extra/0064.gif';
-import extra_0065 from '@/assets/smileys/extra/0065.gif';
-import extra_0066 from '@/assets/smileys/extra/0066.gif';
-import extra_0067 from '@/assets/smileys/extra/0067.gif';
-import extra_0068 from '@/assets/smileys/extra/0068.gif';
-import extra_0069 from '@/assets/smileys/extra/0069.gif';
-import extra_006a from '@/assets/smileys/extra/006a.gif';
-import extra_006b from '@/assets/smileys/extra/006b.gif';
-import extra_006c from '@/assets/smileys/extra/006c.gif';
-import extra_006d from '@/assets/smileys/extra/006d.gif';
-import extra_006e from '@/assets/smileys/extra/006e.gif';
-import extra_006f from '@/assets/smileys/extra/006f.gif';
-import extra_0070 from '@/assets/smileys/extra/0070.gif';
-import extra_0071 from '@/assets/smileys/extra/0071.gif';
-import extra_0072 from '@/assets/smileys/extra/0072.gif';
-import extra_0073 from '@/assets/smileys/extra/0073.gif';
+// Do not edit this file manually. It was generated with "yarn generate-smileys"
+import s0023fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0023-fe0f-20e3.png';
+import s002afe0f20e3 from 'emoji-datasource-apple/img/apple/64/002a-fe0f-20e3.png';
+import s0030fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0030-fe0f-20e3.png';
+import s0031fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0031-fe0f-20e3.png';
+import s0032fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0032-fe0f-20e3.png';
+import s0033fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0033-fe0f-20e3.png';
+import s0034fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0034-fe0f-20e3.png';
+import s0035fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0035-fe0f-20e3.png';
+import s0036fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0036-fe0f-20e3.png';
+import s0037fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0037-fe0f-20e3.png';
+import s0038fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0038-fe0f-20e3.png';
+import s0039fe0f20e3 from 'emoji-datasource-apple/img/apple/64/0039-fe0f-20e3.png';
+import s00a9fe0f from 'emoji-datasource-apple/img/apple/64/00a9-fe0f.png';
+import s00aefe0f from 'emoji-datasource-apple/img/apple/64/00ae-fe0f.png';
+import s1f004 from 'emoji-datasource-apple/img/apple/64/1f004.png';
+import s1f0cf from 'emoji-datasource-apple/img/apple/64/1f0cf.png';
+import s1f170fe0f from 'emoji-datasource-apple/img/apple/64/1f170-fe0f.png';
+import s1f171fe0f from 'emoji-datasource-apple/img/apple/64/1f171-fe0f.png';
+import s1f17efe0f from 'emoji-datasource-apple/img/apple/64/1f17e-fe0f.png';
+import s1f17ffe0f from 'emoji-datasource-apple/img/apple/64/1f17f-fe0f.png';
+import s1f18e from 'emoji-datasource-apple/img/apple/64/1f18e.png';
+import s1f191 from 'emoji-datasource-apple/img/apple/64/1f191.png';
+import s1f192 from 'emoji-datasource-apple/img/apple/64/1f192.png';
+import s1f193 from 'emoji-datasource-apple/img/apple/64/1f193.png';
+import s1f194 from 'emoji-datasource-apple/img/apple/64/1f194.png';
+import s1f195 from 'emoji-datasource-apple/img/apple/64/1f195.png';
+import s1f196 from 'emoji-datasource-apple/img/apple/64/1f196.png';
+import s1f197 from 'emoji-datasource-apple/img/apple/64/1f197.png';
+import s1f198 from 'emoji-datasource-apple/img/apple/64/1f198.png';
+import s1f199 from 'emoji-datasource-apple/img/apple/64/1f199.png';
+import s1f19a from 'emoji-datasource-apple/img/apple/64/1f19a.png';
+import s1f1e61f1e8 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1e8.png';
+import s1f1e61f1e9 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1e9.png';
+import s1f1e61f1ea from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1ea.png';
+import s1f1e61f1eb from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1eb.png';
+import s1f1e61f1ec from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1ec.png';
+import s1f1e61f1ee from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1ee.png';
+import s1f1e61f1f1 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1f1.png';
+import s1f1e61f1f2 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1f2.png';
+import s1f1e61f1f4 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1f4.png';
+import s1f1e61f1f6 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1f6.png';
+import s1f1e61f1f7 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1f7.png';
+import s1f1e61f1f8 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1f8.png';
+import s1f1e61f1f9 from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1f9.png';
+import s1f1e61f1fa from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1fa.png';
+import s1f1e61f1fc from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1fc.png';
+import s1f1e61f1fd from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1fd.png';
+import s1f1e61f1ff from 'emoji-datasource-apple/img/apple/64/1f1e6-1f1ff.png';
+import s1f1e71f1e6 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1e6.png';
+import s1f1e71f1e7 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1e7.png';
+import s1f1e71f1e9 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1e9.png';
+import s1f1e71f1ea from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1ea.png';
+import s1f1e71f1eb from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1eb.png';
+import s1f1e71f1ec from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1ec.png';
+import s1f1e71f1ed from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1ed.png';
+import s1f1e71f1ee from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1ee.png';
+import s1f1e71f1ef from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1ef.png';
+import s1f1e71f1f1 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f1.png';
+import s1f1e71f1f2 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f2.png';
+import s1f1e71f1f3 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f3.png';
+import s1f1e71f1f4 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f4.png';
+import s1f1e71f1f6 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f6.png';
+import s1f1e71f1f7 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f7.png';
+import s1f1e71f1f8 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f8.png';
+import s1f1e71f1f9 from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1f9.png';
+import s1f1e71f1fb from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1fb.png';
+import s1f1e71f1fc from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1fc.png';
+import s1f1e71f1fe from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1fe.png';
+import s1f1e71f1ff from 'emoji-datasource-apple/img/apple/64/1f1e7-1f1ff.png';
+import s1f1e81f1e6 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1e6.png';
+import s1f1e81f1e8 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1e8.png';
+import s1f1e81f1e9 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1e9.png';
+import s1f1e81f1eb from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1eb.png';
+import s1f1e81f1ec from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1ec.png';
+import s1f1e81f1ed from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1ed.png';
+import s1f1e81f1ee from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1ee.png';
+import s1f1e81f1f0 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1f0.png';
+import s1f1e81f1f1 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1f1.png';
+import s1f1e81f1f2 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1f2.png';
+import s1f1e81f1f3 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1f3.png';
+import s1f1e81f1f4 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1f4.png';
+import s1f1e81f1f5 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1f5.png';
+import s1f1e81f1f7 from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1f7.png';
+import s1f1e81f1fa from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1fa.png';
+import s1f1e81f1fb from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1fb.png';
+import s1f1e81f1fc from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1fc.png';
+import s1f1e81f1fd from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1fd.png';
+import s1f1e81f1fe from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1fe.png';
+import s1f1e81f1ff from 'emoji-datasource-apple/img/apple/64/1f1e8-1f1ff.png';
+import s1f1e91f1ea from 'emoji-datasource-apple/img/apple/64/1f1e9-1f1ea.png';
+import s1f1e91f1ec from 'emoji-datasource-apple/img/apple/64/1f1e9-1f1ec.png';
+import s1f1e91f1ef from 'emoji-datasource-apple/img/apple/64/1f1e9-1f1ef.png';
+import s1f1e91f1f0 from 'emoji-datasource-apple/img/apple/64/1f1e9-1f1f0.png';
+import s1f1e91f1f2 from 'emoji-datasource-apple/img/apple/64/1f1e9-1f1f2.png';
+import s1f1e91f1f4 from 'emoji-datasource-apple/img/apple/64/1f1e9-1f1f4.png';
+import s1f1e91f1ff from 'emoji-datasource-apple/img/apple/64/1f1e9-1f1ff.png';
+import s1f1ea1f1e6 from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1e6.png';
+import s1f1ea1f1e8 from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1e8.png';
+import s1f1ea1f1ea from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1ea.png';
+import s1f1ea1f1ec from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1ec.png';
+import s1f1ea1f1ed from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1ed.png';
+import s1f1ea1f1f7 from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1f7.png';
+import s1f1ea1f1f8 from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1f8.png';
+import s1f1ea1f1f9 from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1f9.png';
+import s1f1ea1f1fa from 'emoji-datasource-apple/img/apple/64/1f1ea-1f1fa.png';
+import s1f1eb1f1ee from 'emoji-datasource-apple/img/apple/64/1f1eb-1f1ee.png';
+import s1f1eb1f1ef from 'emoji-datasource-apple/img/apple/64/1f1eb-1f1ef.png';
+import s1f1eb1f1f0 from 'emoji-datasource-apple/img/apple/64/1f1eb-1f1f0.png';
+import s1f1eb1f1f2 from 'emoji-datasource-apple/img/apple/64/1f1eb-1f1f2.png';
+import s1f1eb1f1f4 from 'emoji-datasource-apple/img/apple/64/1f1eb-1f1f4.png';
+import s1f1eb1f1f7 from 'emoji-datasource-apple/img/apple/64/1f1eb-1f1f7.png';
+import s1f1ec1f1e6 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1e6.png';
+import s1f1ec1f1e7 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1e7.png';
+import s1f1ec1f1e9 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1e9.png';
+import s1f1ec1f1ea from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1ea.png';
+import s1f1ec1f1eb from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1eb.png';
+import s1f1ec1f1ec from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1ec.png';
+import s1f1ec1f1ed from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1ed.png';
+import s1f1ec1f1ee from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1ee.png';
+import s1f1ec1f1f1 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f1.png';
+import s1f1ec1f1f2 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f2.png';
+import s1f1ec1f1f3 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f3.png';
+import s1f1ec1f1f5 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f5.png';
+import s1f1ec1f1f6 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f6.png';
+import s1f1ec1f1f7 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f7.png';
+import s1f1ec1f1f8 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f8.png';
+import s1f1ec1f1f9 from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1f9.png';
+import s1f1ec1f1fa from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1fa.png';
+import s1f1ec1f1fc from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1fc.png';
+import s1f1ec1f1fe from 'emoji-datasource-apple/img/apple/64/1f1ec-1f1fe.png';
+import s1f1ed1f1f0 from 'emoji-datasource-apple/img/apple/64/1f1ed-1f1f0.png';
+import s1f1ed1f1f2 from 'emoji-datasource-apple/img/apple/64/1f1ed-1f1f2.png';
+import s1f1ed1f1f3 from 'emoji-datasource-apple/img/apple/64/1f1ed-1f1f3.png';
+import s1f1ed1f1f7 from 'emoji-datasource-apple/img/apple/64/1f1ed-1f1f7.png';
+import s1f1ed1f1f9 from 'emoji-datasource-apple/img/apple/64/1f1ed-1f1f9.png';
+import s1f1ed1f1fa from 'emoji-datasource-apple/img/apple/64/1f1ed-1f1fa.png';
+import s1f1ee1f1e8 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1e8.png';
+import s1f1ee1f1e9 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1e9.png';
+import s1f1ee1f1ea from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1ea.png';
+import s1f1ee1f1f1 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f1.png';
+import s1f1ee1f1f2 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f2.png';
+import s1f1ee1f1f3 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f3.png';
+import s1f1ee1f1f4 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f4.png';
+import s1f1ee1f1f6 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f6.png';
+import s1f1ee1f1f7 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f7.png';
+import s1f1ee1f1f8 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f8.png';
+import s1f1ee1f1f9 from 'emoji-datasource-apple/img/apple/64/1f1ee-1f1f9.png';
+import s1f1ef1f1ea from 'emoji-datasource-apple/img/apple/64/1f1ef-1f1ea.png';
+import s1f1ef1f1f2 from 'emoji-datasource-apple/img/apple/64/1f1ef-1f1f2.png';
+import s1f1ef1f1f4 from 'emoji-datasource-apple/img/apple/64/1f1ef-1f1f4.png';
+import s1f1ef1f1f5 from 'emoji-datasource-apple/img/apple/64/1f1ef-1f1f5.png';
+import s1f1f01f1ea from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1ea.png';
+import s1f1f01f1ec from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1ec.png';
+import s1f1f01f1ed from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1ed.png';
+import s1f1f01f1ee from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1ee.png';
+import s1f1f01f1f2 from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1f2.png';
+import s1f1f01f1f3 from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1f3.png';
+import s1f1f01f1f5 from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1f5.png';
+import s1f1f01f1f7 from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1f7.png';
+import s1f1f01f1fc from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1fc.png';
+import s1f1f01f1fe from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1fe.png';
+import s1f1f01f1ff from 'emoji-datasource-apple/img/apple/64/1f1f0-1f1ff.png';
+import s1f1f11f1e6 from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1e6.png';
+import s1f1f11f1e7 from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1e7.png';
+import s1f1f11f1e8 from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1e8.png';
+import s1f1f11f1ee from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1ee.png';
+import s1f1f11f1f0 from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1f0.png';
+import s1f1f11f1f7 from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1f7.png';
+import s1f1f11f1f8 from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1f8.png';
+import s1f1f11f1f9 from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1f9.png';
+import s1f1f11f1fa from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1fa.png';
+import s1f1f11f1fb from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1fb.png';
+import s1f1f11f1fe from 'emoji-datasource-apple/img/apple/64/1f1f1-1f1fe.png';
+import s1f1f21f1e6 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1e6.png';
+import s1f1f21f1e8 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1e8.png';
+import s1f1f21f1e9 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1e9.png';
+import s1f1f21f1ea from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1ea.png';
+import s1f1f21f1eb from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1eb.png';
+import s1f1f21f1ec from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1ec.png';
+import s1f1f21f1ed from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1ed.png';
+import s1f1f21f1f0 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f0.png';
+import s1f1f21f1f1 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f1.png';
+import s1f1f21f1f2 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f2.png';
+import s1f1f21f1f3 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f3.png';
+import s1f1f21f1f4 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f4.png';
+import s1f1f21f1f5 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f5.png';
+import s1f1f21f1f6 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f6.png';
+import s1f1f21f1f7 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f7.png';
+import s1f1f21f1f8 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f8.png';
+import s1f1f21f1f9 from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1f9.png';
+import s1f1f21f1fa from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1fa.png';
+import s1f1f21f1fb from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1fb.png';
+import s1f1f21f1fc from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1fc.png';
+import s1f1f21f1fd from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1fd.png';
+import s1f1f21f1fe from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1fe.png';
+import s1f1f21f1ff from 'emoji-datasource-apple/img/apple/64/1f1f2-1f1ff.png';
+import s1f1f31f1e6 from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1e6.png';
+import s1f1f31f1e8 from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1e8.png';
+import s1f1f31f1ea from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1ea.png';
+import s1f1f31f1eb from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1eb.png';
+import s1f1f31f1ec from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1ec.png';
+import s1f1f31f1ee from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1ee.png';
+import s1f1f31f1f1 from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1f1.png';
+import s1f1f31f1f4 from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1f4.png';
+import s1f1f31f1f5 from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1f5.png';
+import s1f1f31f1f7 from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1f7.png';
+import s1f1f31f1fa from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1fa.png';
+import s1f1f31f1ff from 'emoji-datasource-apple/img/apple/64/1f1f3-1f1ff.png';
+import s1f1f41f1f2 from 'emoji-datasource-apple/img/apple/64/1f1f4-1f1f2.png';
+import s1f1f51f1e6 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1e6.png';
+import s1f1f51f1ea from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1ea.png';
+import s1f1f51f1eb from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1eb.png';
+import s1f1f51f1ec from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1ec.png';
+import s1f1f51f1ed from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1ed.png';
+import s1f1f51f1f0 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1f0.png';
+import s1f1f51f1f1 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1f1.png';
+import s1f1f51f1f2 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1f2.png';
+import s1f1f51f1f3 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1f3.png';
+import s1f1f51f1f7 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1f7.png';
+import s1f1f51f1f8 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1f8.png';
+import s1f1f51f1f9 from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1f9.png';
+import s1f1f51f1fc from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1fc.png';
+import s1f1f51f1fe from 'emoji-datasource-apple/img/apple/64/1f1f5-1f1fe.png';
+import s1f1f61f1e6 from 'emoji-datasource-apple/img/apple/64/1f1f6-1f1e6.png';
+import s1f1f71f1ea from 'emoji-datasource-apple/img/apple/64/1f1f7-1f1ea.png';
+import s1f1f71f1f4 from 'emoji-datasource-apple/img/apple/64/1f1f7-1f1f4.png';
+import s1f1f71f1f8 from 'emoji-datasource-apple/img/apple/64/1f1f7-1f1f8.png';
+import s1f1f71f1fa from 'emoji-datasource-apple/img/apple/64/1f1f7-1f1fa.png';
+import s1f1f71f1fc from 'emoji-datasource-apple/img/apple/64/1f1f7-1f1fc.png';
+import s1f1f81f1e6 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1e6.png';
+import s1f1f81f1e7 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1e7.png';
+import s1f1f81f1e8 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1e8.png';
+import s1f1f81f1e9 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1e9.png';
+import s1f1f81f1ea from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1ea.png';
+import s1f1f81f1ec from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1ec.png';
+import s1f1f81f1ed from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1ed.png';
+import s1f1f81f1ee from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1ee.png';
+import s1f1f81f1ef from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1ef.png';
+import s1f1f81f1f0 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f0.png';
+import s1f1f81f1f1 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f1.png';
+import s1f1f81f1f2 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f2.png';
+import s1f1f81f1f3 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f3.png';
+import s1f1f81f1f4 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f4.png';
+import s1f1f81f1f7 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f7.png';
+import s1f1f81f1f8 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f8.png';
+import s1f1f81f1f9 from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1f9.png';
+import s1f1f81f1fb from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1fb.png';
+import s1f1f81f1fd from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1fd.png';
+import s1f1f81f1fe from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1fe.png';
+import s1f1f81f1ff from 'emoji-datasource-apple/img/apple/64/1f1f8-1f1ff.png';
+import s1f1f91f1e6 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1e6.png';
+import s1f1f91f1e8 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1e8.png';
+import s1f1f91f1e9 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1e9.png';
+import s1f1f91f1eb from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1eb.png';
+import s1f1f91f1ec from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1ec.png';
+import s1f1f91f1ed from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1ed.png';
+import s1f1f91f1ef from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1ef.png';
+import s1f1f91f1f0 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1f0.png';
+import s1f1f91f1f1 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1f1.png';
+import s1f1f91f1f2 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1f2.png';
+import s1f1f91f1f3 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1f3.png';
+import s1f1f91f1f4 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1f4.png';
+import s1f1f91f1f7 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1f7.png';
+import s1f1f91f1f9 from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1f9.png';
+import s1f1f91f1fb from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1fb.png';
+import s1f1f91f1fc from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1fc.png';
+import s1f1f91f1ff from 'emoji-datasource-apple/img/apple/64/1f1f9-1f1ff.png';
+import s1f1fa1f1e6 from 'emoji-datasource-apple/img/apple/64/1f1fa-1f1e6.png';
+import s1f1fa1f1ec from 'emoji-datasource-apple/img/apple/64/1f1fa-1f1ec.png';
+import s1f1fa1f1f2 from 'emoji-datasource-apple/img/apple/64/1f1fa-1f1f2.png';
+import s1f1fa1f1f3 from 'emoji-datasource-apple/img/apple/64/1f1fa-1f1f3.png';
+import s1f1fa1f1f8 from 'emoji-datasource-apple/img/apple/64/1f1fa-1f1f8.png';
+import s1f1fa1f1fe from 'emoji-datasource-apple/img/apple/64/1f1fa-1f1fe.png';
+import s1f1fa1f1ff from 'emoji-datasource-apple/img/apple/64/1f1fa-1f1ff.png';
+import s1f1fb1f1e6 from 'emoji-datasource-apple/img/apple/64/1f1fb-1f1e6.png';
+import s1f1fb1f1e8 from 'emoji-datasource-apple/img/apple/64/1f1fb-1f1e8.png';
+import s1f1fb1f1ea from 'emoji-datasource-apple/img/apple/64/1f1fb-1f1ea.png';
+import s1f1fb1f1ec from 'emoji-datasource-apple/img/apple/64/1f1fb-1f1ec.png';
+import s1f1fb1f1ee from 'emoji-datasource-apple/img/apple/64/1f1fb-1f1ee.png';
+import s1f1fb1f1f3 from 'emoji-datasource-apple/img/apple/64/1f1fb-1f1f3.png';
+import s1f1fb1f1fa from 'emoji-datasource-apple/img/apple/64/1f1fb-1f1fa.png';
+import s1f1fc1f1eb from 'emoji-datasource-apple/img/apple/64/1f1fc-1f1eb.png';
+import s1f1fc1f1f8 from 'emoji-datasource-apple/img/apple/64/1f1fc-1f1f8.png';
+import s1f1fd1f1f0 from 'emoji-datasource-apple/img/apple/64/1f1fd-1f1f0.png';
+import s1f1fe1f1ea from 'emoji-datasource-apple/img/apple/64/1f1fe-1f1ea.png';
+import s1f1fe1f1f9 from 'emoji-datasource-apple/img/apple/64/1f1fe-1f1f9.png';
+import s1f1ff1f1e6 from 'emoji-datasource-apple/img/apple/64/1f1ff-1f1e6.png';
+import s1f1ff1f1f2 from 'emoji-datasource-apple/img/apple/64/1f1ff-1f1f2.png';
+import s1f1ff1f1fc from 'emoji-datasource-apple/img/apple/64/1f1ff-1f1fc.png';
+import s1f201 from 'emoji-datasource-apple/img/apple/64/1f201.png';
+import s1f202fe0f from 'emoji-datasource-apple/img/apple/64/1f202-fe0f.png';
+import s1f21a from 'emoji-datasource-apple/img/apple/64/1f21a.png';
+import s1f22f from 'emoji-datasource-apple/img/apple/64/1f22f.png';
+import s1f232 from 'emoji-datasource-apple/img/apple/64/1f232.png';
+import s1f233 from 'emoji-datasource-apple/img/apple/64/1f233.png';
+import s1f234 from 'emoji-datasource-apple/img/apple/64/1f234.png';
+import s1f235 from 'emoji-datasource-apple/img/apple/64/1f235.png';
+import s1f236 from 'emoji-datasource-apple/img/apple/64/1f236.png';
+import s1f237fe0f from 'emoji-datasource-apple/img/apple/64/1f237-fe0f.png';
+import s1f238 from 'emoji-datasource-apple/img/apple/64/1f238.png';
+import s1f239 from 'emoji-datasource-apple/img/apple/64/1f239.png';
+import s1f23a from 'emoji-datasource-apple/img/apple/64/1f23a.png';
+import s1f250 from 'emoji-datasource-apple/img/apple/64/1f250.png';
+import s1f251 from 'emoji-datasource-apple/img/apple/64/1f251.png';
+import s1f300 from 'emoji-datasource-apple/img/apple/64/1f300.png';
+import s1f301 from 'emoji-datasource-apple/img/apple/64/1f301.png';
+import s1f302 from 'emoji-datasource-apple/img/apple/64/1f302.png';
+import s1f303 from 'emoji-datasource-apple/img/apple/64/1f303.png';
+import s1f304 from 'emoji-datasource-apple/img/apple/64/1f304.png';
+import s1f305 from 'emoji-datasource-apple/img/apple/64/1f305.png';
+import s1f306 from 'emoji-datasource-apple/img/apple/64/1f306.png';
+import s1f307 from 'emoji-datasource-apple/img/apple/64/1f307.png';
+import s1f308 from 'emoji-datasource-apple/img/apple/64/1f308.png';
+import s1f309 from 'emoji-datasource-apple/img/apple/64/1f309.png';
+import s1f30a from 'emoji-datasource-apple/img/apple/64/1f30a.png';
+import s1f30b from 'emoji-datasource-apple/img/apple/64/1f30b.png';
+import s1f30c from 'emoji-datasource-apple/img/apple/64/1f30c.png';
+import s1f30d from 'emoji-datasource-apple/img/apple/64/1f30d.png';
+import s1f30e from 'emoji-datasource-apple/img/apple/64/1f30e.png';
+import s1f30f from 'emoji-datasource-apple/img/apple/64/1f30f.png';
+import s1f310 from 'emoji-datasource-apple/img/apple/64/1f310.png';
+import s1f311 from 'emoji-datasource-apple/img/apple/64/1f311.png';
+import s1f312 from 'emoji-datasource-apple/img/apple/64/1f312.png';
+import s1f313 from 'emoji-datasource-apple/img/apple/64/1f313.png';
+import s1f314 from 'emoji-datasource-apple/img/apple/64/1f314.png';
+import s1f315 from 'emoji-datasource-apple/img/apple/64/1f315.png';
+import s1f316 from 'emoji-datasource-apple/img/apple/64/1f316.png';
+import s1f317 from 'emoji-datasource-apple/img/apple/64/1f317.png';
+import s1f318 from 'emoji-datasource-apple/img/apple/64/1f318.png';
+import s1f319 from 'emoji-datasource-apple/img/apple/64/1f319.png';
+import s1f31a from 'emoji-datasource-apple/img/apple/64/1f31a.png';
+import s1f31b from 'emoji-datasource-apple/img/apple/64/1f31b.png';
+import s1f31c from 'emoji-datasource-apple/img/apple/64/1f31c.png';
+import s1f31d from 'emoji-datasource-apple/img/apple/64/1f31d.png';
+import s1f31e from 'emoji-datasource-apple/img/apple/64/1f31e.png';
+import s1f31f from 'emoji-datasource-apple/img/apple/64/1f31f.png';
+import s1f320 from 'emoji-datasource-apple/img/apple/64/1f320.png';
+import s1f321fe0f from 'emoji-datasource-apple/img/apple/64/1f321-fe0f.png';
+import s1f324fe0f from 'emoji-datasource-apple/img/apple/64/1f324-fe0f.png';
+import s1f325fe0f from 'emoji-datasource-apple/img/apple/64/1f325-fe0f.png';
+import s1f326fe0f from 'emoji-datasource-apple/img/apple/64/1f326-fe0f.png';
+import s1f327fe0f from 'emoji-datasource-apple/img/apple/64/1f327-fe0f.png';
+import s1f328fe0f from 'emoji-datasource-apple/img/apple/64/1f328-fe0f.png';
+import s1f329fe0f from 'emoji-datasource-apple/img/apple/64/1f329-fe0f.png';
+import s1f32afe0f from 'emoji-datasource-apple/img/apple/64/1f32a-fe0f.png';
+import s1f32bfe0f from 'emoji-datasource-apple/img/apple/64/1f32b-fe0f.png';
+import s1f32cfe0f from 'emoji-datasource-apple/img/apple/64/1f32c-fe0f.png';
+import s1f32d from 'emoji-datasource-apple/img/apple/64/1f32d.png';
+import s1f32e from 'emoji-datasource-apple/img/apple/64/1f32e.png';
+import s1f32f from 'emoji-datasource-apple/img/apple/64/1f32f.png';
+import s1f330 from 'emoji-datasource-apple/img/apple/64/1f330.png';
+import s1f331 from 'emoji-datasource-apple/img/apple/64/1f331.png';
+import s1f332 from 'emoji-datasource-apple/img/apple/64/1f332.png';
+import s1f333 from 'emoji-datasource-apple/img/apple/64/1f333.png';
+import s1f334 from 'emoji-datasource-apple/img/apple/64/1f334.png';
+import s1f335 from 'emoji-datasource-apple/img/apple/64/1f335.png';
+import s1f336fe0f from 'emoji-datasource-apple/img/apple/64/1f336-fe0f.png';
+import s1f337 from 'emoji-datasource-apple/img/apple/64/1f337.png';
+import s1f338 from 'emoji-datasource-apple/img/apple/64/1f338.png';
+import s1f339 from 'emoji-datasource-apple/img/apple/64/1f339.png';
+import s1f33a from 'emoji-datasource-apple/img/apple/64/1f33a.png';
+import s1f33b from 'emoji-datasource-apple/img/apple/64/1f33b.png';
+import s1f33c from 'emoji-datasource-apple/img/apple/64/1f33c.png';
+import s1f33d from 'emoji-datasource-apple/img/apple/64/1f33d.png';
+import s1f33e from 'emoji-datasource-apple/img/apple/64/1f33e.png';
+import s1f33f from 'emoji-datasource-apple/img/apple/64/1f33f.png';
+import s1f340 from 'emoji-datasource-apple/img/apple/64/1f340.png';
+import s1f341 from 'emoji-datasource-apple/img/apple/64/1f341.png';
+import s1f342 from 'emoji-datasource-apple/img/apple/64/1f342.png';
+import s1f343 from 'emoji-datasource-apple/img/apple/64/1f343.png';
+import s1f344 from 'emoji-datasource-apple/img/apple/64/1f344.png';
+import s1f345 from 'emoji-datasource-apple/img/apple/64/1f345.png';
+import s1f346 from 'emoji-datasource-apple/img/apple/64/1f346.png';
+import s1f347 from 'emoji-datasource-apple/img/apple/64/1f347.png';
+import s1f348 from 'emoji-datasource-apple/img/apple/64/1f348.png';
+import s1f349 from 'emoji-datasource-apple/img/apple/64/1f349.png';
+import s1f34a from 'emoji-datasource-apple/img/apple/64/1f34a.png';
+import s1f34b from 'emoji-datasource-apple/img/apple/64/1f34b.png';
+import s1f34c from 'emoji-datasource-apple/img/apple/64/1f34c.png';
+import s1f34d from 'emoji-datasource-apple/img/apple/64/1f34d.png';
+import s1f34e from 'emoji-datasource-apple/img/apple/64/1f34e.png';
+import s1f34f from 'emoji-datasource-apple/img/apple/64/1f34f.png';
+import s1f350 from 'emoji-datasource-apple/img/apple/64/1f350.png';
+import s1f351 from 'emoji-datasource-apple/img/apple/64/1f351.png';
+import s1f352 from 'emoji-datasource-apple/img/apple/64/1f352.png';
+import s1f353 from 'emoji-datasource-apple/img/apple/64/1f353.png';
+import s1f354 from 'emoji-datasource-apple/img/apple/64/1f354.png';
+import s1f355 from 'emoji-datasource-apple/img/apple/64/1f355.png';
+import s1f356 from 'emoji-datasource-apple/img/apple/64/1f356.png';
+import s1f357 from 'emoji-datasource-apple/img/apple/64/1f357.png';
+import s1f358 from 'emoji-datasource-apple/img/apple/64/1f358.png';
+import s1f359 from 'emoji-datasource-apple/img/apple/64/1f359.png';
+import s1f35a from 'emoji-datasource-apple/img/apple/64/1f35a.png';
+import s1f35b from 'emoji-datasource-apple/img/apple/64/1f35b.png';
+import s1f35c from 'emoji-datasource-apple/img/apple/64/1f35c.png';
+import s1f35d from 'emoji-datasource-apple/img/apple/64/1f35d.png';
+import s1f35e from 'emoji-datasource-apple/img/apple/64/1f35e.png';
+import s1f35f from 'emoji-datasource-apple/img/apple/64/1f35f.png';
+import s1f360 from 'emoji-datasource-apple/img/apple/64/1f360.png';
+import s1f361 from 'emoji-datasource-apple/img/apple/64/1f361.png';
+import s1f362 from 'emoji-datasource-apple/img/apple/64/1f362.png';
+import s1f363 from 'emoji-datasource-apple/img/apple/64/1f363.png';
+import s1f364 from 'emoji-datasource-apple/img/apple/64/1f364.png';
+import s1f365 from 'emoji-datasource-apple/img/apple/64/1f365.png';
+import s1f366 from 'emoji-datasource-apple/img/apple/64/1f366.png';
+import s1f367 from 'emoji-datasource-apple/img/apple/64/1f367.png';
+import s1f368 from 'emoji-datasource-apple/img/apple/64/1f368.png';
+import s1f369 from 'emoji-datasource-apple/img/apple/64/1f369.png';
+import s1f36a from 'emoji-datasource-apple/img/apple/64/1f36a.png';
+import s1f36b from 'emoji-datasource-apple/img/apple/64/1f36b.png';
+import s1f36c from 'emoji-datasource-apple/img/apple/64/1f36c.png';
+import s1f36d from 'emoji-datasource-apple/img/apple/64/1f36d.png';
+import s1f36e from 'emoji-datasource-apple/img/apple/64/1f36e.png';
+import s1f36f from 'emoji-datasource-apple/img/apple/64/1f36f.png';
+import s1f370 from 'emoji-datasource-apple/img/apple/64/1f370.png';
+import s1f371 from 'emoji-datasource-apple/img/apple/64/1f371.png';
+import s1f372 from 'emoji-datasource-apple/img/apple/64/1f372.png';
+import s1f373 from 'emoji-datasource-apple/img/apple/64/1f373.png';
+import s1f374 from 'emoji-datasource-apple/img/apple/64/1f374.png';
+import s1f375 from 'emoji-datasource-apple/img/apple/64/1f375.png';
+import s1f376 from 'emoji-datasource-apple/img/apple/64/1f376.png';
+import s1f377 from 'emoji-datasource-apple/img/apple/64/1f377.png';
+import s1f378 from 'emoji-datasource-apple/img/apple/64/1f378.png';
+import s1f379 from 'emoji-datasource-apple/img/apple/64/1f379.png';
+import s1f37a from 'emoji-datasource-apple/img/apple/64/1f37a.png';
+import s1f37b from 'emoji-datasource-apple/img/apple/64/1f37b.png';
+import s1f37c from 'emoji-datasource-apple/img/apple/64/1f37c.png';
+import s1f37dfe0f from 'emoji-datasource-apple/img/apple/64/1f37d-fe0f.png';
+import s1f37e from 'emoji-datasource-apple/img/apple/64/1f37e.png';
+import s1f37f from 'emoji-datasource-apple/img/apple/64/1f37f.png';
+import s1f380 from 'emoji-datasource-apple/img/apple/64/1f380.png';
+import s1f381 from 'emoji-datasource-apple/img/apple/64/1f381.png';
+import s1f382 from 'emoji-datasource-apple/img/apple/64/1f382.png';
+import s1f383 from 'emoji-datasource-apple/img/apple/64/1f383.png';
+import s1f384 from 'emoji-datasource-apple/img/apple/64/1f384.png';
+import s1f385 from 'emoji-datasource-apple/img/apple/64/1f385.png';
+import s1f386 from 'emoji-datasource-apple/img/apple/64/1f386.png';
+import s1f387 from 'emoji-datasource-apple/img/apple/64/1f387.png';
+import s1f388 from 'emoji-datasource-apple/img/apple/64/1f388.png';
+import s1f389 from 'emoji-datasource-apple/img/apple/64/1f389.png';
+import s1f38a from 'emoji-datasource-apple/img/apple/64/1f38a.png';
+import s1f38b from 'emoji-datasource-apple/img/apple/64/1f38b.png';
+import s1f38c from 'emoji-datasource-apple/img/apple/64/1f38c.png';
+import s1f38d from 'emoji-datasource-apple/img/apple/64/1f38d.png';
+import s1f38e from 'emoji-datasource-apple/img/apple/64/1f38e.png';
+import s1f38f from 'emoji-datasource-apple/img/apple/64/1f38f.png';
+import s1f390 from 'emoji-datasource-apple/img/apple/64/1f390.png';
+import s1f391 from 'emoji-datasource-apple/img/apple/64/1f391.png';
+import s1f392 from 'emoji-datasource-apple/img/apple/64/1f392.png';
+import s1f393 from 'emoji-datasource-apple/img/apple/64/1f393.png';
+import s1f396fe0f from 'emoji-datasource-apple/img/apple/64/1f396-fe0f.png';
+import s1f397fe0f from 'emoji-datasource-apple/img/apple/64/1f397-fe0f.png';
+import s1f399fe0f from 'emoji-datasource-apple/img/apple/64/1f399-fe0f.png';
+import s1f39afe0f from 'emoji-datasource-apple/img/apple/64/1f39a-fe0f.png';
+import s1f39bfe0f from 'emoji-datasource-apple/img/apple/64/1f39b-fe0f.png';
+import s1f39efe0f from 'emoji-datasource-apple/img/apple/64/1f39e-fe0f.png';
+import s1f39ffe0f from 'emoji-datasource-apple/img/apple/64/1f39f-fe0f.png';
+import s1f3a0 from 'emoji-datasource-apple/img/apple/64/1f3a0.png';
+import s1f3a1 from 'emoji-datasource-apple/img/apple/64/1f3a1.png';
+import s1f3a2 from 'emoji-datasource-apple/img/apple/64/1f3a2.png';
+import s1f3a3 from 'emoji-datasource-apple/img/apple/64/1f3a3.png';
+import s1f3a4 from 'emoji-datasource-apple/img/apple/64/1f3a4.png';
+import s1f3a5 from 'emoji-datasource-apple/img/apple/64/1f3a5.png';
+import s1f3a6 from 'emoji-datasource-apple/img/apple/64/1f3a6.png';
+import s1f3a7 from 'emoji-datasource-apple/img/apple/64/1f3a7.png';
+import s1f3a8 from 'emoji-datasource-apple/img/apple/64/1f3a8.png';
+import s1f3a9 from 'emoji-datasource-apple/img/apple/64/1f3a9.png';
+import s1f3aa from 'emoji-datasource-apple/img/apple/64/1f3aa.png';
+import s1f3ab from 'emoji-datasource-apple/img/apple/64/1f3ab.png';
+import s1f3ac from 'emoji-datasource-apple/img/apple/64/1f3ac.png';
+import s1f3ad from 'emoji-datasource-apple/img/apple/64/1f3ad.png';
+import s1f3ae from 'emoji-datasource-apple/img/apple/64/1f3ae.png';
+import s1f3af from 'emoji-datasource-apple/img/apple/64/1f3af.png';
+import s1f3b0 from 'emoji-datasource-apple/img/apple/64/1f3b0.png';
+import s1f3b1 from 'emoji-datasource-apple/img/apple/64/1f3b1.png';
+import s1f3b2 from 'emoji-datasource-apple/img/apple/64/1f3b2.png';
+import s1f3b3 from 'emoji-datasource-apple/img/apple/64/1f3b3.png';
+import s1f3b4 from 'emoji-datasource-apple/img/apple/64/1f3b4.png';
+import s1f3b5 from 'emoji-datasource-apple/img/apple/64/1f3b5.png';
+import s1f3b6 from 'emoji-datasource-apple/img/apple/64/1f3b6.png';
+import s1f3b7 from 'emoji-datasource-apple/img/apple/64/1f3b7.png';
+import s1f3b8 from 'emoji-datasource-apple/img/apple/64/1f3b8.png';
+import s1f3b9 from 'emoji-datasource-apple/img/apple/64/1f3b9.png';
+import s1f3ba from 'emoji-datasource-apple/img/apple/64/1f3ba.png';
+import s1f3bb from 'emoji-datasource-apple/img/apple/64/1f3bb.png';
+import s1f3bc from 'emoji-datasource-apple/img/apple/64/1f3bc.png';
+import s1f3bd from 'emoji-datasource-apple/img/apple/64/1f3bd.png';
+import s1f3be from 'emoji-datasource-apple/img/apple/64/1f3be.png';
+import s1f3bf from 'emoji-datasource-apple/img/apple/64/1f3bf.png';
+import s1f3c0 from 'emoji-datasource-apple/img/apple/64/1f3c0.png';
+import s1f3c1 from 'emoji-datasource-apple/img/apple/64/1f3c1.png';
+import s1f3c2 from 'emoji-datasource-apple/img/apple/64/1f3c2.png';
+import s1f3c3200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-200d-2640-fe0f.png';
+import s1f3c3200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-200d-2642-fe0f.png';
+import s1f3c3 from 'emoji-datasource-apple/img/apple/64/1f3c3.png';
+import s1f3c4200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-200d-2640-fe0f.png';
+import s1f3c4200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-200d-2642-fe0f.png';
+import s1f3c4 from 'emoji-datasource-apple/img/apple/64/1f3c4.png';
+import s1f3c5 from 'emoji-datasource-apple/img/apple/64/1f3c5.png';
+import s1f3c6 from 'emoji-datasource-apple/img/apple/64/1f3c6.png';
+import s1f3c7 from 'emoji-datasource-apple/img/apple/64/1f3c7.png';
+import s1f3c8 from 'emoji-datasource-apple/img/apple/64/1f3c8.png';
+import s1f3c9 from 'emoji-datasource-apple/img/apple/64/1f3c9.png';
+import s1f3ca200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-200d-2640-fe0f.png';
+import s1f3ca200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-200d-2642-fe0f.png';
+import s1f3ca from 'emoji-datasource-apple/img/apple/64/1f3ca.png';
+import s1f3cbfe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-fe0f-200d-2640-fe0f.png';
+import s1f3cbfe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-fe0f-200d-2642-fe0f.png';
+import s1f3cbfe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-fe0f.png';
+import s1f3ccfe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-fe0f-200d-2640-fe0f.png';
+import s1f3ccfe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-fe0f-200d-2642-fe0f.png';
+import s1f3ccfe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-fe0f.png';
+import s1f3cdfe0f from 'emoji-datasource-apple/img/apple/64/1f3cd-fe0f.png';
+import s1f3cefe0f from 'emoji-datasource-apple/img/apple/64/1f3ce-fe0f.png';
+import s1f3cf from 'emoji-datasource-apple/img/apple/64/1f3cf.png';
+import s1f3d0 from 'emoji-datasource-apple/img/apple/64/1f3d0.png';
+import s1f3d1 from 'emoji-datasource-apple/img/apple/64/1f3d1.png';
+import s1f3d2 from 'emoji-datasource-apple/img/apple/64/1f3d2.png';
+import s1f3d3 from 'emoji-datasource-apple/img/apple/64/1f3d3.png';
+import s1f3d4fe0f from 'emoji-datasource-apple/img/apple/64/1f3d4-fe0f.png';
+import s1f3d5fe0f from 'emoji-datasource-apple/img/apple/64/1f3d5-fe0f.png';
+import s1f3d6fe0f from 'emoji-datasource-apple/img/apple/64/1f3d6-fe0f.png';
+import s1f3d7fe0f from 'emoji-datasource-apple/img/apple/64/1f3d7-fe0f.png';
+import s1f3d8fe0f from 'emoji-datasource-apple/img/apple/64/1f3d8-fe0f.png';
+import s1f3d9fe0f from 'emoji-datasource-apple/img/apple/64/1f3d9-fe0f.png';
+import s1f3dafe0f from 'emoji-datasource-apple/img/apple/64/1f3da-fe0f.png';
+import s1f3dbfe0f from 'emoji-datasource-apple/img/apple/64/1f3db-fe0f.png';
+import s1f3dcfe0f from 'emoji-datasource-apple/img/apple/64/1f3dc-fe0f.png';
+import s1f3ddfe0f from 'emoji-datasource-apple/img/apple/64/1f3dd-fe0f.png';
+import s1f3defe0f from 'emoji-datasource-apple/img/apple/64/1f3de-fe0f.png';
+import s1f3dffe0f from 'emoji-datasource-apple/img/apple/64/1f3df-fe0f.png';
+import s1f3e0 from 'emoji-datasource-apple/img/apple/64/1f3e0.png';
+import s1f3e1 from 'emoji-datasource-apple/img/apple/64/1f3e1.png';
+import s1f3e2 from 'emoji-datasource-apple/img/apple/64/1f3e2.png';
+import s1f3e3 from 'emoji-datasource-apple/img/apple/64/1f3e3.png';
+import s1f3e4 from 'emoji-datasource-apple/img/apple/64/1f3e4.png';
+import s1f3e5 from 'emoji-datasource-apple/img/apple/64/1f3e5.png';
+import s1f3e6 from 'emoji-datasource-apple/img/apple/64/1f3e6.png';
+import s1f3e7 from 'emoji-datasource-apple/img/apple/64/1f3e7.png';
+import s1f3e8 from 'emoji-datasource-apple/img/apple/64/1f3e8.png';
+import s1f3e9 from 'emoji-datasource-apple/img/apple/64/1f3e9.png';
+import s1f3ea from 'emoji-datasource-apple/img/apple/64/1f3ea.png';
+import s1f3eb from 'emoji-datasource-apple/img/apple/64/1f3eb.png';
+import s1f3ec from 'emoji-datasource-apple/img/apple/64/1f3ec.png';
+import s1f3ed from 'emoji-datasource-apple/img/apple/64/1f3ed.png';
+import s1f3ee from 'emoji-datasource-apple/img/apple/64/1f3ee.png';
+import s1f3ef from 'emoji-datasource-apple/img/apple/64/1f3ef.png';
+import s1f3f0 from 'emoji-datasource-apple/img/apple/64/1f3f0.png';
+import s1f3f3fe0f200d1f308 from 'emoji-datasource-apple/img/apple/64/1f3f3-fe0f-200d-1f308.png';
+import s1f3f3fe0f200d26a7fe0f from 'emoji-datasource-apple/img/apple/64/1f3f3-fe0f-200d-26a7-fe0f.png';
+import s1f3f3fe0f from 'emoji-datasource-apple/img/apple/64/1f3f3-fe0f.png';
+import s1f3f4200d2620fe0f from 'emoji-datasource-apple/img/apple/64/1f3f4-200d-2620-fe0f.png';
+import s1f3f4e0067e0062e0065e006ee0067e007f from 'emoji-datasource-apple/img/apple/64/1f3f4-e0067-e0062-e0065-e006e-e0067-e007f.png';
+import s1f3f4e0067e0062e0073e0063e0074e007f from 'emoji-datasource-apple/img/apple/64/1f3f4-e0067-e0062-e0073-e0063-e0074-e007f.png';
+import s1f3f4e0067e0062e0077e006ce0073e007f from 'emoji-datasource-apple/img/apple/64/1f3f4-e0067-e0062-e0077-e006c-e0073-e007f.png';
+import s1f3f4 from 'emoji-datasource-apple/img/apple/64/1f3f4.png';
+import s1f3f5fe0f from 'emoji-datasource-apple/img/apple/64/1f3f5-fe0f.png';
+import s1f3f7fe0f from 'emoji-datasource-apple/img/apple/64/1f3f7-fe0f.png';
+import s1f3f8 from 'emoji-datasource-apple/img/apple/64/1f3f8.png';
+import s1f3f9 from 'emoji-datasource-apple/img/apple/64/1f3f9.png';
+import s1f3fa from 'emoji-datasource-apple/img/apple/64/1f3fa.png';
+import s1f3fb from 'emoji-datasource-apple/img/apple/64/1f3fb.png';
+import s1f3fc from 'emoji-datasource-apple/img/apple/64/1f3fc.png';
+import s1f3fd from 'emoji-datasource-apple/img/apple/64/1f3fd.png';
+import s1f3fe from 'emoji-datasource-apple/img/apple/64/1f3fe.png';
+import s1f3ff from 'emoji-datasource-apple/img/apple/64/1f3ff.png';
+import s1f400 from 'emoji-datasource-apple/img/apple/64/1f400.png';
+import s1f401 from 'emoji-datasource-apple/img/apple/64/1f401.png';
+import s1f402 from 'emoji-datasource-apple/img/apple/64/1f402.png';
+import s1f403 from 'emoji-datasource-apple/img/apple/64/1f403.png';
+import s1f404 from 'emoji-datasource-apple/img/apple/64/1f404.png';
+import s1f405 from 'emoji-datasource-apple/img/apple/64/1f405.png';
+import s1f406 from 'emoji-datasource-apple/img/apple/64/1f406.png';
+import s1f407 from 'emoji-datasource-apple/img/apple/64/1f407.png';
+import s1f408200d2b1b from 'emoji-datasource-apple/img/apple/64/1f408-200d-2b1b.png';
+import s1f408 from 'emoji-datasource-apple/img/apple/64/1f408.png';
+import s1f409 from 'emoji-datasource-apple/img/apple/64/1f409.png';
+import s1f40a from 'emoji-datasource-apple/img/apple/64/1f40a.png';
+import s1f40b from 'emoji-datasource-apple/img/apple/64/1f40b.png';
+import s1f40c from 'emoji-datasource-apple/img/apple/64/1f40c.png';
+import s1f40d from 'emoji-datasource-apple/img/apple/64/1f40d.png';
+import s1f40e from 'emoji-datasource-apple/img/apple/64/1f40e.png';
+import s1f40f from 'emoji-datasource-apple/img/apple/64/1f40f.png';
+import s1f410 from 'emoji-datasource-apple/img/apple/64/1f410.png';
+import s1f411 from 'emoji-datasource-apple/img/apple/64/1f411.png';
+import s1f412 from 'emoji-datasource-apple/img/apple/64/1f412.png';
+import s1f413 from 'emoji-datasource-apple/img/apple/64/1f413.png';
+import s1f414 from 'emoji-datasource-apple/img/apple/64/1f414.png';
+import s1f415200d1f9ba from 'emoji-datasource-apple/img/apple/64/1f415-200d-1f9ba.png';
+import s1f415 from 'emoji-datasource-apple/img/apple/64/1f415.png';
+import s1f416 from 'emoji-datasource-apple/img/apple/64/1f416.png';
+import s1f417 from 'emoji-datasource-apple/img/apple/64/1f417.png';
+import s1f418 from 'emoji-datasource-apple/img/apple/64/1f418.png';
+import s1f419 from 'emoji-datasource-apple/img/apple/64/1f419.png';
+import s1f41a from 'emoji-datasource-apple/img/apple/64/1f41a.png';
+import s1f41b from 'emoji-datasource-apple/img/apple/64/1f41b.png';
+import s1f41c from 'emoji-datasource-apple/img/apple/64/1f41c.png';
+import s1f41d from 'emoji-datasource-apple/img/apple/64/1f41d.png';
+import s1f41e from 'emoji-datasource-apple/img/apple/64/1f41e.png';
+import s1f41f from 'emoji-datasource-apple/img/apple/64/1f41f.png';
+import s1f420 from 'emoji-datasource-apple/img/apple/64/1f420.png';
+import s1f421 from 'emoji-datasource-apple/img/apple/64/1f421.png';
+import s1f422 from 'emoji-datasource-apple/img/apple/64/1f422.png';
+import s1f423 from 'emoji-datasource-apple/img/apple/64/1f423.png';
+import s1f424 from 'emoji-datasource-apple/img/apple/64/1f424.png';
+import s1f425 from 'emoji-datasource-apple/img/apple/64/1f425.png';
+import s1f426 from 'emoji-datasource-apple/img/apple/64/1f426.png';
+import s1f427 from 'emoji-datasource-apple/img/apple/64/1f427.png';
+import s1f428 from 'emoji-datasource-apple/img/apple/64/1f428.png';
+import s1f429 from 'emoji-datasource-apple/img/apple/64/1f429.png';
+import s1f42a from 'emoji-datasource-apple/img/apple/64/1f42a.png';
+import s1f42b from 'emoji-datasource-apple/img/apple/64/1f42b.png';
+import s1f42c from 'emoji-datasource-apple/img/apple/64/1f42c.png';
+import s1f42d from 'emoji-datasource-apple/img/apple/64/1f42d.png';
+import s1f42e from 'emoji-datasource-apple/img/apple/64/1f42e.png';
+import s1f42f from 'emoji-datasource-apple/img/apple/64/1f42f.png';
+import s1f430 from 'emoji-datasource-apple/img/apple/64/1f430.png';
+import s1f431 from 'emoji-datasource-apple/img/apple/64/1f431.png';
+import s1f432 from 'emoji-datasource-apple/img/apple/64/1f432.png';
+import s1f433 from 'emoji-datasource-apple/img/apple/64/1f433.png';
+import s1f434 from 'emoji-datasource-apple/img/apple/64/1f434.png';
+import s1f435 from 'emoji-datasource-apple/img/apple/64/1f435.png';
+import s1f436 from 'emoji-datasource-apple/img/apple/64/1f436.png';
+import s1f437 from 'emoji-datasource-apple/img/apple/64/1f437.png';
+import s1f438 from 'emoji-datasource-apple/img/apple/64/1f438.png';
+import s1f439 from 'emoji-datasource-apple/img/apple/64/1f439.png';
+import s1f43a from 'emoji-datasource-apple/img/apple/64/1f43a.png';
+import s1f43b200d2744fe0f from 'emoji-datasource-apple/img/apple/64/1f43b-200d-2744-fe0f.png';
+import s1f43b from 'emoji-datasource-apple/img/apple/64/1f43b.png';
+import s1f43c from 'emoji-datasource-apple/img/apple/64/1f43c.png';
+import s1f43d from 'emoji-datasource-apple/img/apple/64/1f43d.png';
+import s1f43e from 'emoji-datasource-apple/img/apple/64/1f43e.png';
+import s1f43ffe0f from 'emoji-datasource-apple/img/apple/64/1f43f-fe0f.png';
+import s1f440 from 'emoji-datasource-apple/img/apple/64/1f440.png';
+import s1f441fe0f200d1f5e8fe0f from 'emoji-datasource-apple/img/apple/64/1f441-fe0f-200d-1f5e8-fe0f.png';
+import s1f441fe0f from 'emoji-datasource-apple/img/apple/64/1f441-fe0f.png';
+import s1f442 from 'emoji-datasource-apple/img/apple/64/1f442.png';
+import s1f443 from 'emoji-datasource-apple/img/apple/64/1f443.png';
+import s1f444 from 'emoji-datasource-apple/img/apple/64/1f444.png';
+import s1f445 from 'emoji-datasource-apple/img/apple/64/1f445.png';
+import s1f446 from 'emoji-datasource-apple/img/apple/64/1f446.png';
+import s1f447 from 'emoji-datasource-apple/img/apple/64/1f447.png';
+import s1f448 from 'emoji-datasource-apple/img/apple/64/1f448.png';
+import s1f449 from 'emoji-datasource-apple/img/apple/64/1f449.png';
+import s1f44a from 'emoji-datasource-apple/img/apple/64/1f44a.png';
+import s1f44b from 'emoji-datasource-apple/img/apple/64/1f44b.png';
+import s1f44c from 'emoji-datasource-apple/img/apple/64/1f44c.png';
+import s1f44d from 'emoji-datasource-apple/img/apple/64/1f44d.png';
+import s1f44e from 'emoji-datasource-apple/img/apple/64/1f44e.png';
+import s1f44f from 'emoji-datasource-apple/img/apple/64/1f44f.png';
+import s1f450 from 'emoji-datasource-apple/img/apple/64/1f450.png';
+import s1f451 from 'emoji-datasource-apple/img/apple/64/1f451.png';
+import s1f452 from 'emoji-datasource-apple/img/apple/64/1f452.png';
+import s1f453 from 'emoji-datasource-apple/img/apple/64/1f453.png';
+import s1f454 from 'emoji-datasource-apple/img/apple/64/1f454.png';
+import s1f455 from 'emoji-datasource-apple/img/apple/64/1f455.png';
+import s1f456 from 'emoji-datasource-apple/img/apple/64/1f456.png';
+import s1f457 from 'emoji-datasource-apple/img/apple/64/1f457.png';
+import s1f458 from 'emoji-datasource-apple/img/apple/64/1f458.png';
+import s1f459 from 'emoji-datasource-apple/img/apple/64/1f459.png';
+import s1f45a from 'emoji-datasource-apple/img/apple/64/1f45a.png';
+import s1f45b from 'emoji-datasource-apple/img/apple/64/1f45b.png';
+import s1f45c from 'emoji-datasource-apple/img/apple/64/1f45c.png';
+import s1f45d from 'emoji-datasource-apple/img/apple/64/1f45d.png';
+import s1f45e from 'emoji-datasource-apple/img/apple/64/1f45e.png';
+import s1f45f from 'emoji-datasource-apple/img/apple/64/1f45f.png';
+import s1f460 from 'emoji-datasource-apple/img/apple/64/1f460.png';
+import s1f461 from 'emoji-datasource-apple/img/apple/64/1f461.png';
+import s1f462 from 'emoji-datasource-apple/img/apple/64/1f462.png';
+import s1f463 from 'emoji-datasource-apple/img/apple/64/1f463.png';
+import s1f464 from 'emoji-datasource-apple/img/apple/64/1f464.png';
+import s1f465 from 'emoji-datasource-apple/img/apple/64/1f465.png';
+import s1f466 from 'emoji-datasource-apple/img/apple/64/1f466.png';
+import s1f467 from 'emoji-datasource-apple/img/apple/64/1f467.png';
+import s1f468200d1f33e from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f33e.png';
+import s1f468200d1f373 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f373.png';
+import s1f468200d1f37c from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f37c.png';
+import s1f468200d1f393 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f393.png';
+import s1f468200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3a4.png';
+import s1f468200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3a8.png';
+import s1f468200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3eb.png';
+import s1f468200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3ed.png';
+import s1f468200d1f466200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f466-200d-1f466.png';
+import s1f468200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f466.png';
+import s1f468200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f467-200d-1f466.png';
+import s1f468200d1f467200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f467-200d-1f467.png';
+import s1f468200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f467.png';
+import s1f468200d1f468200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f468-200d-1f466.png';
+import s1f468200d1f468200d1f466200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f468-200d-1f466-200d-1f466.png';
+import s1f468200d1f468200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f468-200d-1f467.png';
+import s1f468200d1f468200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f468-200d-1f467-200d-1f466.png';
+import s1f468200d1f468200d1f467200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f468-200d-1f467-200d-1f467.png';
+import s1f468200d1f469200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f469-200d-1f466.png';
+import s1f468200d1f469200d1f466200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f469-200d-1f466-200d-1f466.png';
+import s1f468200d1f469200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f469-200d-1f467.png';
+import s1f468200d1f469200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f469-200d-1f467-200d-1f466.png';
+import s1f468200d1f469200d1f467200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f469-200d-1f467-200d-1f467.png';
+import s1f468200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f4bb.png';
+import s1f468200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f4bc.png';
+import s1f468200d1f527 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f527.png';
+import s1f468200d1f52c from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f52c.png';
+import s1f468200d1f680 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f680.png';
+import s1f468200d1f692 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f692.png';
+import s1f468200d1f9af from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9af.png';
+import s1f468200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b0.png';
+import s1f468200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b1.png';
+import s1f468200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b2.png';
+import s1f468200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b3.png';
+import s1f468200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9bc.png';
+import s1f468200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9bd.png';
+import s1f468200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f468-200d-2695-fe0f.png';
+import s1f468200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f468-200d-2696-fe0f.png';
+import s1f468200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f468-200d-2708-fe0f.png';
+import s1f468200d2764fe0f200d1f468 from 'emoji-datasource-apple/img/apple/64/1f468-200d-2764-fe0f-200d-1f468.png';
+import s1f468200d2764fe0f200d1f48b200d1f468 from 'emoji-datasource-apple/img/apple/64/1f468-200d-2764-fe0f-200d-1f48b-200d-1f468.png';
+import s1f468 from 'emoji-datasource-apple/img/apple/64/1f468.png';
+import s1f469200d1f33e from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f33e.png';
+import s1f469200d1f373 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f373.png';
+import s1f469200d1f37c from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f37c.png';
+import s1f469200d1f393 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f393.png';
+import s1f469200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3a4.png';
+import s1f469200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3a8.png';
+import s1f469200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3eb.png';
+import s1f469200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3ed.png';
+import s1f469200d1f466200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f466-200d-1f466.png';
+import s1f469200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f466.png';
+import s1f469200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f467-200d-1f466.png';
+import s1f469200d1f467200d1f467 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f467-200d-1f467.png';
+import s1f469200d1f467 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f467.png';
+import s1f469200d1f469200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f469-200d-1f466.png';
+import s1f469200d1f469200d1f466200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f469-200d-1f466-200d-1f466.png';
+import s1f469200d1f469200d1f467 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f469-200d-1f467.png';
+import s1f469200d1f469200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f469-200d-1f467-200d-1f466.png';
+import s1f469200d1f469200d1f467200d1f467 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f469-200d-1f467-200d-1f467.png';
+import s1f469200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f4bb.png';
+import s1f469200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f4bc.png';
+import s1f469200d1f527 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f527.png';
+import s1f469200d1f52c from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f52c.png';
+import s1f469200d1f680 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f680.png';
+import s1f469200d1f692 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f692.png';
+import s1f469200d1f9af from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9af.png';
+import s1f469200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b0.png';
+import s1f469200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b1.png';
+import s1f469200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b2.png';
+import s1f469200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b3.png';
+import s1f469200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9bc.png';
+import s1f469200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9bd.png';
+import s1f469200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f469-200d-2695-fe0f.png';
+import s1f469200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f469-200d-2696-fe0f.png';
+import s1f469200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f469-200d-2708-fe0f.png';
+import s1f469200d2764fe0f200d1f468 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f468.png';
+import s1f469200d2764fe0f200d1f469 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f469.png';
+import s1f469200d2764fe0f200d1f48b200d1f468 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f48b-200d-1f468.png';
+import s1f469200d2764fe0f200d1f48b200d1f469 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f48b-200d-1f469.png';
+import s1f469 from 'emoji-datasource-apple/img/apple/64/1f469.png';
+import s1f46a from 'emoji-datasource-apple/img/apple/64/1f46a.png';
+import s1f46b from 'emoji-datasource-apple/img/apple/64/1f46b.png';
+import s1f46c from 'emoji-datasource-apple/img/apple/64/1f46c.png';
+import s1f46d from 'emoji-datasource-apple/img/apple/64/1f46d.png';
+import s1f46e200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-200d-2640-fe0f.png';
+import s1f46e200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-200d-2642-fe0f.png';
+import s1f46e from 'emoji-datasource-apple/img/apple/64/1f46e.png';
+import s1f46f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46f-200d-2640-fe0f.png';
+import s1f46f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46f-200d-2642-fe0f.png';
+import s1f46f from 'emoji-datasource-apple/img/apple/64/1f46f.png';
+import s1f470200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f470-200d-2640-fe0f.png';
+import s1f470200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f470-200d-2642-fe0f.png';
+import s1f470 from 'emoji-datasource-apple/img/apple/64/1f470.png';
+import s1f471200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f471-200d-2640-fe0f.png';
+import s1f471200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f471-200d-2642-fe0f.png';
+import s1f471 from 'emoji-datasource-apple/img/apple/64/1f471.png';
+import s1f472 from 'emoji-datasource-apple/img/apple/64/1f472.png';
+import s1f473200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f473-200d-2640-fe0f.png';
+import s1f473200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f473-200d-2642-fe0f.png';
+import s1f473 from 'emoji-datasource-apple/img/apple/64/1f473.png';
+import s1f474 from 'emoji-datasource-apple/img/apple/64/1f474.png';
+import s1f475 from 'emoji-datasource-apple/img/apple/64/1f475.png';
+import s1f476 from 'emoji-datasource-apple/img/apple/64/1f476.png';
+import s1f477200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f477-200d-2640-fe0f.png';
+import s1f477200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f477-200d-2642-fe0f.png';
+import s1f477 from 'emoji-datasource-apple/img/apple/64/1f477.png';
+import s1f478 from 'emoji-datasource-apple/img/apple/64/1f478.png';
+import s1f479 from 'emoji-datasource-apple/img/apple/64/1f479.png';
+import s1f47a from 'emoji-datasource-apple/img/apple/64/1f47a.png';
+import s1f47b from 'emoji-datasource-apple/img/apple/64/1f47b.png';
+import s1f47c from 'emoji-datasource-apple/img/apple/64/1f47c.png';
+import s1f47d from 'emoji-datasource-apple/img/apple/64/1f47d.png';
+import s1f47e from 'emoji-datasource-apple/img/apple/64/1f47e.png';
+import s1f47f from 'emoji-datasource-apple/img/apple/64/1f47f.png';
+import s1f480 from 'emoji-datasource-apple/img/apple/64/1f480.png';
+import s1f481200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f481-200d-2640-fe0f.png';
+import s1f481200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f481-200d-2642-fe0f.png';
+import s1f481 from 'emoji-datasource-apple/img/apple/64/1f481.png';
+import s1f482200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f482-200d-2640-fe0f.png';
+import s1f482200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f482-200d-2642-fe0f.png';
+import s1f482 from 'emoji-datasource-apple/img/apple/64/1f482.png';
+import s1f483 from 'emoji-datasource-apple/img/apple/64/1f483.png';
+import s1f484 from 'emoji-datasource-apple/img/apple/64/1f484.png';
+import s1f485 from 'emoji-datasource-apple/img/apple/64/1f485.png';
+import s1f486200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f486-200d-2640-fe0f.png';
+import s1f486200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f486-200d-2642-fe0f.png';
+import s1f486 from 'emoji-datasource-apple/img/apple/64/1f486.png';
+import s1f487200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f487-200d-2640-fe0f.png';
+import s1f487200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f487-200d-2642-fe0f.png';
+import s1f487 from 'emoji-datasource-apple/img/apple/64/1f487.png';
+import s1f488 from 'emoji-datasource-apple/img/apple/64/1f488.png';
+import s1f489 from 'emoji-datasource-apple/img/apple/64/1f489.png';
+import s1f48a from 'emoji-datasource-apple/img/apple/64/1f48a.png';
+import s1f48b from 'emoji-datasource-apple/img/apple/64/1f48b.png';
+import s1f48c from 'emoji-datasource-apple/img/apple/64/1f48c.png';
+import s1f48d from 'emoji-datasource-apple/img/apple/64/1f48d.png';
+import s1f48e from 'emoji-datasource-apple/img/apple/64/1f48e.png';
+import s1f48f from 'emoji-datasource-apple/img/apple/64/1f48f.png';
+import s1f490 from 'emoji-datasource-apple/img/apple/64/1f490.png';
+import s1f491 from 'emoji-datasource-apple/img/apple/64/1f491.png';
+import s1f492 from 'emoji-datasource-apple/img/apple/64/1f492.png';
+import s1f493 from 'emoji-datasource-apple/img/apple/64/1f493.png';
+import s1f494 from 'emoji-datasource-apple/img/apple/64/1f494.png';
+import s1f495 from 'emoji-datasource-apple/img/apple/64/1f495.png';
+import s1f496 from 'emoji-datasource-apple/img/apple/64/1f496.png';
+import s1f497 from 'emoji-datasource-apple/img/apple/64/1f497.png';
+import s1f498 from 'emoji-datasource-apple/img/apple/64/1f498.png';
+import s1f499 from 'emoji-datasource-apple/img/apple/64/1f499.png';
+import s1f49a from 'emoji-datasource-apple/img/apple/64/1f49a.png';
+import s1f49b from 'emoji-datasource-apple/img/apple/64/1f49b.png';
+import s1f49c from 'emoji-datasource-apple/img/apple/64/1f49c.png';
+import s1f49d from 'emoji-datasource-apple/img/apple/64/1f49d.png';
+import s1f49e from 'emoji-datasource-apple/img/apple/64/1f49e.png';
+import s1f49f from 'emoji-datasource-apple/img/apple/64/1f49f.png';
+import s1f4a0 from 'emoji-datasource-apple/img/apple/64/1f4a0.png';
+import s1f4a1 from 'emoji-datasource-apple/img/apple/64/1f4a1.png';
+import s1f4a2 from 'emoji-datasource-apple/img/apple/64/1f4a2.png';
+import s1f4a3 from 'emoji-datasource-apple/img/apple/64/1f4a3.png';
+import s1f4a4 from 'emoji-datasource-apple/img/apple/64/1f4a4.png';
+import s1f4a5 from 'emoji-datasource-apple/img/apple/64/1f4a5.png';
+import s1f4a6 from 'emoji-datasource-apple/img/apple/64/1f4a6.png';
+import s1f4a7 from 'emoji-datasource-apple/img/apple/64/1f4a7.png';
+import s1f4a8 from 'emoji-datasource-apple/img/apple/64/1f4a8.png';
+import s1f4a9 from 'emoji-datasource-apple/img/apple/64/1f4a9.png';
+import s1f4aa from 'emoji-datasource-apple/img/apple/64/1f4aa.png';
+import s1f4ab from 'emoji-datasource-apple/img/apple/64/1f4ab.png';
+import s1f4ac from 'emoji-datasource-apple/img/apple/64/1f4ac.png';
+import s1f4ad from 'emoji-datasource-apple/img/apple/64/1f4ad.png';
+import s1f4ae from 'emoji-datasource-apple/img/apple/64/1f4ae.png';
+import s1f4af from 'emoji-datasource-apple/img/apple/64/1f4af.png';
+import s1f4b0 from 'emoji-datasource-apple/img/apple/64/1f4b0.png';
+import s1f4b1 from 'emoji-datasource-apple/img/apple/64/1f4b1.png';
+import s1f4b2 from 'emoji-datasource-apple/img/apple/64/1f4b2.png';
+import s1f4b3 from 'emoji-datasource-apple/img/apple/64/1f4b3.png';
+import s1f4b4 from 'emoji-datasource-apple/img/apple/64/1f4b4.png';
+import s1f4b5 from 'emoji-datasource-apple/img/apple/64/1f4b5.png';
+import s1f4b6 from 'emoji-datasource-apple/img/apple/64/1f4b6.png';
+import s1f4b7 from 'emoji-datasource-apple/img/apple/64/1f4b7.png';
+import s1f4b8 from 'emoji-datasource-apple/img/apple/64/1f4b8.png';
+import s1f4b9 from 'emoji-datasource-apple/img/apple/64/1f4b9.png';
+import s1f4ba from 'emoji-datasource-apple/img/apple/64/1f4ba.png';
+import s1f4bb from 'emoji-datasource-apple/img/apple/64/1f4bb.png';
+import s1f4bc from 'emoji-datasource-apple/img/apple/64/1f4bc.png';
+import s1f4bd from 'emoji-datasource-apple/img/apple/64/1f4bd.png';
+import s1f4be from 'emoji-datasource-apple/img/apple/64/1f4be.png';
+import s1f4bf from 'emoji-datasource-apple/img/apple/64/1f4bf.png';
+import s1f4c0 from 'emoji-datasource-apple/img/apple/64/1f4c0.png';
+import s1f4c1 from 'emoji-datasource-apple/img/apple/64/1f4c1.png';
+import s1f4c2 from 'emoji-datasource-apple/img/apple/64/1f4c2.png';
+import s1f4c3 from 'emoji-datasource-apple/img/apple/64/1f4c3.png';
+import s1f4c4 from 'emoji-datasource-apple/img/apple/64/1f4c4.png';
+import s1f4c5 from 'emoji-datasource-apple/img/apple/64/1f4c5.png';
+import s1f4c6 from 'emoji-datasource-apple/img/apple/64/1f4c6.png';
+import s1f4c7 from 'emoji-datasource-apple/img/apple/64/1f4c7.png';
+import s1f4c8 from 'emoji-datasource-apple/img/apple/64/1f4c8.png';
+import s1f4c9 from 'emoji-datasource-apple/img/apple/64/1f4c9.png';
+import s1f4ca from 'emoji-datasource-apple/img/apple/64/1f4ca.png';
+import s1f4cb from 'emoji-datasource-apple/img/apple/64/1f4cb.png';
+import s1f4cc from 'emoji-datasource-apple/img/apple/64/1f4cc.png';
+import s1f4cd from 'emoji-datasource-apple/img/apple/64/1f4cd.png';
+import s1f4ce from 'emoji-datasource-apple/img/apple/64/1f4ce.png';
+import s1f4cf from 'emoji-datasource-apple/img/apple/64/1f4cf.png';
+import s1f4d0 from 'emoji-datasource-apple/img/apple/64/1f4d0.png';
+import s1f4d1 from 'emoji-datasource-apple/img/apple/64/1f4d1.png';
+import s1f4d2 from 'emoji-datasource-apple/img/apple/64/1f4d2.png';
+import s1f4d3 from 'emoji-datasource-apple/img/apple/64/1f4d3.png';
+import s1f4d4 from 'emoji-datasource-apple/img/apple/64/1f4d4.png';
+import s1f4d5 from 'emoji-datasource-apple/img/apple/64/1f4d5.png';
+import s1f4d6 from 'emoji-datasource-apple/img/apple/64/1f4d6.png';
+import s1f4d7 from 'emoji-datasource-apple/img/apple/64/1f4d7.png';
+import s1f4d8 from 'emoji-datasource-apple/img/apple/64/1f4d8.png';
+import s1f4d9 from 'emoji-datasource-apple/img/apple/64/1f4d9.png';
+import s1f4da from 'emoji-datasource-apple/img/apple/64/1f4da.png';
+import s1f4db from 'emoji-datasource-apple/img/apple/64/1f4db.png';
+import s1f4dc from 'emoji-datasource-apple/img/apple/64/1f4dc.png';
+import s1f4dd from 'emoji-datasource-apple/img/apple/64/1f4dd.png';
+import s1f4de from 'emoji-datasource-apple/img/apple/64/1f4de.png';
+import s1f4df from 'emoji-datasource-apple/img/apple/64/1f4df.png';
+import s1f4e0 from 'emoji-datasource-apple/img/apple/64/1f4e0.png';
+import s1f4e1 from 'emoji-datasource-apple/img/apple/64/1f4e1.png';
+import s1f4e2 from 'emoji-datasource-apple/img/apple/64/1f4e2.png';
+import s1f4e3 from 'emoji-datasource-apple/img/apple/64/1f4e3.png';
+import s1f4e4 from 'emoji-datasource-apple/img/apple/64/1f4e4.png';
+import s1f4e5 from 'emoji-datasource-apple/img/apple/64/1f4e5.png';
+import s1f4e6 from 'emoji-datasource-apple/img/apple/64/1f4e6.png';
+import s1f4e7 from 'emoji-datasource-apple/img/apple/64/1f4e7.png';
+import s1f4e8 from 'emoji-datasource-apple/img/apple/64/1f4e8.png';
+import s1f4e9 from 'emoji-datasource-apple/img/apple/64/1f4e9.png';
+import s1f4ea from 'emoji-datasource-apple/img/apple/64/1f4ea.png';
+import s1f4eb from 'emoji-datasource-apple/img/apple/64/1f4eb.png';
+import s1f4ec from 'emoji-datasource-apple/img/apple/64/1f4ec.png';
+import s1f4ed from 'emoji-datasource-apple/img/apple/64/1f4ed.png';
+import s1f4ee from 'emoji-datasource-apple/img/apple/64/1f4ee.png';
+import s1f4ef from 'emoji-datasource-apple/img/apple/64/1f4ef.png';
+import s1f4f0 from 'emoji-datasource-apple/img/apple/64/1f4f0.png';
+import s1f4f1 from 'emoji-datasource-apple/img/apple/64/1f4f1.png';
+import s1f4f2 from 'emoji-datasource-apple/img/apple/64/1f4f2.png';
+import s1f4f3 from 'emoji-datasource-apple/img/apple/64/1f4f3.png';
+import s1f4f4 from 'emoji-datasource-apple/img/apple/64/1f4f4.png';
+import s1f4f5 from 'emoji-datasource-apple/img/apple/64/1f4f5.png';
+import s1f4f6 from 'emoji-datasource-apple/img/apple/64/1f4f6.png';
+import s1f4f7 from 'emoji-datasource-apple/img/apple/64/1f4f7.png';
+import s1f4f8 from 'emoji-datasource-apple/img/apple/64/1f4f8.png';
+import s1f4f9 from 'emoji-datasource-apple/img/apple/64/1f4f9.png';
+import s1f4fa from 'emoji-datasource-apple/img/apple/64/1f4fa.png';
+import s1f4fb from 'emoji-datasource-apple/img/apple/64/1f4fb.png';
+import s1f4fc from 'emoji-datasource-apple/img/apple/64/1f4fc.png';
+import s1f4fdfe0f from 'emoji-datasource-apple/img/apple/64/1f4fd-fe0f.png';
+import s1f4ff from 'emoji-datasource-apple/img/apple/64/1f4ff.png';
+import s1f500 from 'emoji-datasource-apple/img/apple/64/1f500.png';
+import s1f501 from 'emoji-datasource-apple/img/apple/64/1f501.png';
+import s1f502 from 'emoji-datasource-apple/img/apple/64/1f502.png';
+import s1f503 from 'emoji-datasource-apple/img/apple/64/1f503.png';
+import s1f504 from 'emoji-datasource-apple/img/apple/64/1f504.png';
+import s1f505 from 'emoji-datasource-apple/img/apple/64/1f505.png';
+import s1f506 from 'emoji-datasource-apple/img/apple/64/1f506.png';
+import s1f507 from 'emoji-datasource-apple/img/apple/64/1f507.png';
+import s1f508 from 'emoji-datasource-apple/img/apple/64/1f508.png';
+import s1f509 from 'emoji-datasource-apple/img/apple/64/1f509.png';
+import s1f50a from 'emoji-datasource-apple/img/apple/64/1f50a.png';
+import s1f50b from 'emoji-datasource-apple/img/apple/64/1f50b.png';
+import s1f50c from 'emoji-datasource-apple/img/apple/64/1f50c.png';
+import s1f50d from 'emoji-datasource-apple/img/apple/64/1f50d.png';
+import s1f50e from 'emoji-datasource-apple/img/apple/64/1f50e.png';
+import s1f50f from 'emoji-datasource-apple/img/apple/64/1f50f.png';
+import s1f510 from 'emoji-datasource-apple/img/apple/64/1f510.png';
+import s1f511 from 'emoji-datasource-apple/img/apple/64/1f511.png';
+import s1f512 from 'emoji-datasource-apple/img/apple/64/1f512.png';
+import s1f513 from 'emoji-datasource-apple/img/apple/64/1f513.png';
+import s1f514 from 'emoji-datasource-apple/img/apple/64/1f514.png';
+import s1f515 from 'emoji-datasource-apple/img/apple/64/1f515.png';
+import s1f516 from 'emoji-datasource-apple/img/apple/64/1f516.png';
+import s1f517 from 'emoji-datasource-apple/img/apple/64/1f517.png';
+import s1f518 from 'emoji-datasource-apple/img/apple/64/1f518.png';
+import s1f519 from 'emoji-datasource-apple/img/apple/64/1f519.png';
+import s1f51a from 'emoji-datasource-apple/img/apple/64/1f51a.png';
+import s1f51b from 'emoji-datasource-apple/img/apple/64/1f51b.png';
+import s1f51c from 'emoji-datasource-apple/img/apple/64/1f51c.png';
+import s1f51d from 'emoji-datasource-apple/img/apple/64/1f51d.png';
+import s1f51e from 'emoji-datasource-apple/img/apple/64/1f51e.png';
+import s1f51f from 'emoji-datasource-apple/img/apple/64/1f51f.png';
+import s1f520 from 'emoji-datasource-apple/img/apple/64/1f520.png';
+import s1f521 from 'emoji-datasource-apple/img/apple/64/1f521.png';
+import s1f522 from 'emoji-datasource-apple/img/apple/64/1f522.png';
+import s1f523 from 'emoji-datasource-apple/img/apple/64/1f523.png';
+import s1f524 from 'emoji-datasource-apple/img/apple/64/1f524.png';
+import s1f525 from 'emoji-datasource-apple/img/apple/64/1f525.png';
+import s1f526 from 'emoji-datasource-apple/img/apple/64/1f526.png';
+import s1f527 from 'emoji-datasource-apple/img/apple/64/1f527.png';
+import s1f528 from 'emoji-datasource-apple/img/apple/64/1f528.png';
+import s1f529 from 'emoji-datasource-apple/img/apple/64/1f529.png';
+import s1f52a from 'emoji-datasource-apple/img/apple/64/1f52a.png';
+import s1f52b from 'emoji-datasource-apple/img/apple/64/1f52b.png';
+import s1f52c from 'emoji-datasource-apple/img/apple/64/1f52c.png';
+import s1f52d from 'emoji-datasource-apple/img/apple/64/1f52d.png';
+import s1f52e from 'emoji-datasource-apple/img/apple/64/1f52e.png';
+import s1f52f from 'emoji-datasource-apple/img/apple/64/1f52f.png';
+import s1f530 from 'emoji-datasource-apple/img/apple/64/1f530.png';
+import s1f531 from 'emoji-datasource-apple/img/apple/64/1f531.png';
+import s1f532 from 'emoji-datasource-apple/img/apple/64/1f532.png';
+import s1f533 from 'emoji-datasource-apple/img/apple/64/1f533.png';
+import s1f534 from 'emoji-datasource-apple/img/apple/64/1f534.png';
+import s1f535 from 'emoji-datasource-apple/img/apple/64/1f535.png';
+import s1f536 from 'emoji-datasource-apple/img/apple/64/1f536.png';
+import s1f537 from 'emoji-datasource-apple/img/apple/64/1f537.png';
+import s1f538 from 'emoji-datasource-apple/img/apple/64/1f538.png';
+import s1f539 from 'emoji-datasource-apple/img/apple/64/1f539.png';
+import s1f53a from 'emoji-datasource-apple/img/apple/64/1f53a.png';
+import s1f53b from 'emoji-datasource-apple/img/apple/64/1f53b.png';
+import s1f53c from 'emoji-datasource-apple/img/apple/64/1f53c.png';
+import s1f53d from 'emoji-datasource-apple/img/apple/64/1f53d.png';
+import s1f549fe0f from 'emoji-datasource-apple/img/apple/64/1f549-fe0f.png';
+import s1f54afe0f from 'emoji-datasource-apple/img/apple/64/1f54a-fe0f.png';
+import s1f54b from 'emoji-datasource-apple/img/apple/64/1f54b.png';
+import s1f54c from 'emoji-datasource-apple/img/apple/64/1f54c.png';
+import s1f54d from 'emoji-datasource-apple/img/apple/64/1f54d.png';
+import s1f54e from 'emoji-datasource-apple/img/apple/64/1f54e.png';
+import s1f550 from 'emoji-datasource-apple/img/apple/64/1f550.png';
+import s1f551 from 'emoji-datasource-apple/img/apple/64/1f551.png';
+import s1f552 from 'emoji-datasource-apple/img/apple/64/1f552.png';
+import s1f553 from 'emoji-datasource-apple/img/apple/64/1f553.png';
+import s1f554 from 'emoji-datasource-apple/img/apple/64/1f554.png';
+import s1f555 from 'emoji-datasource-apple/img/apple/64/1f555.png';
+import s1f556 from 'emoji-datasource-apple/img/apple/64/1f556.png';
+import s1f557 from 'emoji-datasource-apple/img/apple/64/1f557.png';
+import s1f558 from 'emoji-datasource-apple/img/apple/64/1f558.png';
+import s1f559 from 'emoji-datasource-apple/img/apple/64/1f559.png';
+import s1f55a from 'emoji-datasource-apple/img/apple/64/1f55a.png';
+import s1f55b from 'emoji-datasource-apple/img/apple/64/1f55b.png';
+import s1f55c from 'emoji-datasource-apple/img/apple/64/1f55c.png';
+import s1f55d from 'emoji-datasource-apple/img/apple/64/1f55d.png';
+import s1f55e from 'emoji-datasource-apple/img/apple/64/1f55e.png';
+import s1f55f from 'emoji-datasource-apple/img/apple/64/1f55f.png';
+import s1f560 from 'emoji-datasource-apple/img/apple/64/1f560.png';
+import s1f561 from 'emoji-datasource-apple/img/apple/64/1f561.png';
+import s1f562 from 'emoji-datasource-apple/img/apple/64/1f562.png';
+import s1f563 from 'emoji-datasource-apple/img/apple/64/1f563.png';
+import s1f564 from 'emoji-datasource-apple/img/apple/64/1f564.png';
+import s1f565 from 'emoji-datasource-apple/img/apple/64/1f565.png';
+import s1f566 from 'emoji-datasource-apple/img/apple/64/1f566.png';
+import s1f567 from 'emoji-datasource-apple/img/apple/64/1f567.png';
+import s1f56ffe0f from 'emoji-datasource-apple/img/apple/64/1f56f-fe0f.png';
+import s1f570fe0f from 'emoji-datasource-apple/img/apple/64/1f570-fe0f.png';
+import s1f573fe0f from 'emoji-datasource-apple/img/apple/64/1f573-fe0f.png';
+import s1f574fe0f from 'emoji-datasource-apple/img/apple/64/1f574-fe0f.png';
+import s1f575fe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f575-fe0f-200d-2640-fe0f.png';
+import s1f575fe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f575-fe0f-200d-2642-fe0f.png';
+import s1f575fe0f from 'emoji-datasource-apple/img/apple/64/1f575-fe0f.png';
+import s1f576fe0f from 'emoji-datasource-apple/img/apple/64/1f576-fe0f.png';
+import s1f577fe0f from 'emoji-datasource-apple/img/apple/64/1f577-fe0f.png';
+import s1f578fe0f from 'emoji-datasource-apple/img/apple/64/1f578-fe0f.png';
+import s1f579fe0f from 'emoji-datasource-apple/img/apple/64/1f579-fe0f.png';
+import s1f57a from 'emoji-datasource-apple/img/apple/64/1f57a.png';
+import s1f587fe0f from 'emoji-datasource-apple/img/apple/64/1f587-fe0f.png';
+import s1f58afe0f from 'emoji-datasource-apple/img/apple/64/1f58a-fe0f.png';
+import s1f58bfe0f from 'emoji-datasource-apple/img/apple/64/1f58b-fe0f.png';
+import s1f58cfe0f from 'emoji-datasource-apple/img/apple/64/1f58c-fe0f.png';
+import s1f58dfe0f from 'emoji-datasource-apple/img/apple/64/1f58d-fe0f.png';
+import s1f590fe0f from 'emoji-datasource-apple/img/apple/64/1f590-fe0f.png';
+import s1f595 from 'emoji-datasource-apple/img/apple/64/1f595.png';
+import s1f596 from 'emoji-datasource-apple/img/apple/64/1f596.png';
+import s1f5a4 from 'emoji-datasource-apple/img/apple/64/1f5a4.png';
+import s1f5a5fe0f from 'emoji-datasource-apple/img/apple/64/1f5a5-fe0f.png';
+import s1f5a8fe0f from 'emoji-datasource-apple/img/apple/64/1f5a8-fe0f.png';
+import s1f5b1fe0f from 'emoji-datasource-apple/img/apple/64/1f5b1-fe0f.png';
+import s1f5b2fe0f from 'emoji-datasource-apple/img/apple/64/1f5b2-fe0f.png';
+import s1f5bcfe0f from 'emoji-datasource-apple/img/apple/64/1f5bc-fe0f.png';
+import s1f5c2fe0f from 'emoji-datasource-apple/img/apple/64/1f5c2-fe0f.png';
+import s1f5c3fe0f from 'emoji-datasource-apple/img/apple/64/1f5c3-fe0f.png';
+import s1f5c4fe0f from 'emoji-datasource-apple/img/apple/64/1f5c4-fe0f.png';
+import s1f5d1fe0f from 'emoji-datasource-apple/img/apple/64/1f5d1-fe0f.png';
+import s1f5d2fe0f from 'emoji-datasource-apple/img/apple/64/1f5d2-fe0f.png';
+import s1f5d3fe0f from 'emoji-datasource-apple/img/apple/64/1f5d3-fe0f.png';
+import s1f5dcfe0f from 'emoji-datasource-apple/img/apple/64/1f5dc-fe0f.png';
+import s1f5ddfe0f from 'emoji-datasource-apple/img/apple/64/1f5dd-fe0f.png';
+import s1f5defe0f from 'emoji-datasource-apple/img/apple/64/1f5de-fe0f.png';
+import s1f5e1fe0f from 'emoji-datasource-apple/img/apple/64/1f5e1-fe0f.png';
+import s1f5e3fe0f from 'emoji-datasource-apple/img/apple/64/1f5e3-fe0f.png';
+import s1f5e8fe0f from 'emoji-datasource-apple/img/apple/64/1f5e8-fe0f.png';
+import s1f5effe0f from 'emoji-datasource-apple/img/apple/64/1f5ef-fe0f.png';
+import s1f5f3fe0f from 'emoji-datasource-apple/img/apple/64/1f5f3-fe0f.png';
+import s1f5fafe0f from 'emoji-datasource-apple/img/apple/64/1f5fa-fe0f.png';
+import s1f5fb from 'emoji-datasource-apple/img/apple/64/1f5fb.png';
+import s1f5fc from 'emoji-datasource-apple/img/apple/64/1f5fc.png';
+import s1f5fd from 'emoji-datasource-apple/img/apple/64/1f5fd.png';
+import s1f5fe from 'emoji-datasource-apple/img/apple/64/1f5fe.png';
+import s1f5ff from 'emoji-datasource-apple/img/apple/64/1f5ff.png';
+import s1f600 from 'emoji-datasource-apple/img/apple/64/1f600.png';
+import s1f601 from 'emoji-datasource-apple/img/apple/64/1f601.png';
+import s1f602 from 'emoji-datasource-apple/img/apple/64/1f602.png';
+import s1f603 from 'emoji-datasource-apple/img/apple/64/1f603.png';
+import s1f604 from 'emoji-datasource-apple/img/apple/64/1f604.png';
+import s1f605 from 'emoji-datasource-apple/img/apple/64/1f605.png';
+import s1f606 from 'emoji-datasource-apple/img/apple/64/1f606.png';
+import s1f607 from 'emoji-datasource-apple/img/apple/64/1f607.png';
+import s1f608 from 'emoji-datasource-apple/img/apple/64/1f608.png';
+import s1f609 from 'emoji-datasource-apple/img/apple/64/1f609.png';
+import s1f60a from 'emoji-datasource-apple/img/apple/64/1f60a.png';
+import s1f60b from 'emoji-datasource-apple/img/apple/64/1f60b.png';
+import s1f60c from 'emoji-datasource-apple/img/apple/64/1f60c.png';
+import s1f60d from 'emoji-datasource-apple/img/apple/64/1f60d.png';
+import s1f60e from 'emoji-datasource-apple/img/apple/64/1f60e.png';
+import s1f60f from 'emoji-datasource-apple/img/apple/64/1f60f.png';
+import s1f610 from 'emoji-datasource-apple/img/apple/64/1f610.png';
+import s1f611 from 'emoji-datasource-apple/img/apple/64/1f611.png';
+import s1f612 from 'emoji-datasource-apple/img/apple/64/1f612.png';
+import s1f613 from 'emoji-datasource-apple/img/apple/64/1f613.png';
+import s1f614 from 'emoji-datasource-apple/img/apple/64/1f614.png';
+import s1f615 from 'emoji-datasource-apple/img/apple/64/1f615.png';
+import s1f616 from 'emoji-datasource-apple/img/apple/64/1f616.png';
+import s1f617 from 'emoji-datasource-apple/img/apple/64/1f617.png';
+import s1f618 from 'emoji-datasource-apple/img/apple/64/1f618.png';
+import s1f619 from 'emoji-datasource-apple/img/apple/64/1f619.png';
+import s1f61a from 'emoji-datasource-apple/img/apple/64/1f61a.png';
+import s1f61b from 'emoji-datasource-apple/img/apple/64/1f61b.png';
+import s1f61c from 'emoji-datasource-apple/img/apple/64/1f61c.png';
+import s1f61d from 'emoji-datasource-apple/img/apple/64/1f61d.png';
+import s1f61e from 'emoji-datasource-apple/img/apple/64/1f61e.png';
+import s1f61f from 'emoji-datasource-apple/img/apple/64/1f61f.png';
+import s1f620 from 'emoji-datasource-apple/img/apple/64/1f620.png';
+import s1f621 from 'emoji-datasource-apple/img/apple/64/1f621.png';
+import s1f622 from 'emoji-datasource-apple/img/apple/64/1f622.png';
+import s1f623 from 'emoji-datasource-apple/img/apple/64/1f623.png';
+import s1f624 from 'emoji-datasource-apple/img/apple/64/1f624.png';
+import s1f625 from 'emoji-datasource-apple/img/apple/64/1f625.png';
+import s1f626 from 'emoji-datasource-apple/img/apple/64/1f626.png';
+import s1f627 from 'emoji-datasource-apple/img/apple/64/1f627.png';
+import s1f628 from 'emoji-datasource-apple/img/apple/64/1f628.png';
+import s1f629 from 'emoji-datasource-apple/img/apple/64/1f629.png';
+import s1f62a from 'emoji-datasource-apple/img/apple/64/1f62a.png';
+import s1f62b from 'emoji-datasource-apple/img/apple/64/1f62b.png';
+import s1f62c from 'emoji-datasource-apple/img/apple/64/1f62c.png';
+import s1f62d from 'emoji-datasource-apple/img/apple/64/1f62d.png';
+import s1f62e200d1f4a8 from 'emoji-datasource-apple/img/apple/64/1f62e-200d-1f4a8.png';
+import s1f62e from 'emoji-datasource-apple/img/apple/64/1f62e.png';
+import s1f62f from 'emoji-datasource-apple/img/apple/64/1f62f.png';
+import s1f630 from 'emoji-datasource-apple/img/apple/64/1f630.png';
+import s1f631 from 'emoji-datasource-apple/img/apple/64/1f631.png';
+import s1f632 from 'emoji-datasource-apple/img/apple/64/1f632.png';
+import s1f633 from 'emoji-datasource-apple/img/apple/64/1f633.png';
+import s1f634 from 'emoji-datasource-apple/img/apple/64/1f634.png';
+import s1f635200d1f4ab from 'emoji-datasource-apple/img/apple/64/1f635-200d-1f4ab.png';
+import s1f635 from 'emoji-datasource-apple/img/apple/64/1f635.png';
+import s1f636200d1f32bfe0f from 'emoji-datasource-apple/img/apple/64/1f636-200d-1f32b-fe0f.png';
+import s1f636 from 'emoji-datasource-apple/img/apple/64/1f636.png';
+import s1f637 from 'emoji-datasource-apple/img/apple/64/1f637.png';
+import s1f638 from 'emoji-datasource-apple/img/apple/64/1f638.png';
+import s1f639 from 'emoji-datasource-apple/img/apple/64/1f639.png';
+import s1f63a from 'emoji-datasource-apple/img/apple/64/1f63a.png';
+import s1f63b from 'emoji-datasource-apple/img/apple/64/1f63b.png';
+import s1f63c from 'emoji-datasource-apple/img/apple/64/1f63c.png';
+import s1f63d from 'emoji-datasource-apple/img/apple/64/1f63d.png';
+import s1f63e from 'emoji-datasource-apple/img/apple/64/1f63e.png';
+import s1f63f from 'emoji-datasource-apple/img/apple/64/1f63f.png';
+import s1f640 from 'emoji-datasource-apple/img/apple/64/1f640.png';
+import s1f641 from 'emoji-datasource-apple/img/apple/64/1f641.png';
+import s1f642 from 'emoji-datasource-apple/img/apple/64/1f642.png';
+import s1f643 from 'emoji-datasource-apple/img/apple/64/1f643.png';
+import s1f644 from 'emoji-datasource-apple/img/apple/64/1f644.png';
+import s1f645200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f645-200d-2640-fe0f.png';
+import s1f645200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f645-200d-2642-fe0f.png';
+import s1f645 from 'emoji-datasource-apple/img/apple/64/1f645.png';
+import s1f646200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f646-200d-2640-fe0f.png';
+import s1f646200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f646-200d-2642-fe0f.png';
+import s1f646 from 'emoji-datasource-apple/img/apple/64/1f646.png';
+import s1f647200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f647-200d-2640-fe0f.png';
+import s1f647200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f647-200d-2642-fe0f.png';
+import s1f647 from 'emoji-datasource-apple/img/apple/64/1f647.png';
+import s1f648 from 'emoji-datasource-apple/img/apple/64/1f648.png';
+import s1f649 from 'emoji-datasource-apple/img/apple/64/1f649.png';
+import s1f64a from 'emoji-datasource-apple/img/apple/64/1f64a.png';
+import s1f64b200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-200d-2640-fe0f.png';
+import s1f64b200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-200d-2642-fe0f.png';
+import s1f64b from 'emoji-datasource-apple/img/apple/64/1f64b.png';
+import s1f64c from 'emoji-datasource-apple/img/apple/64/1f64c.png';
+import s1f64d200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-200d-2640-fe0f.png';
+import s1f64d200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-200d-2642-fe0f.png';
+import s1f64d from 'emoji-datasource-apple/img/apple/64/1f64d.png';
+import s1f64e200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-200d-2640-fe0f.png';
+import s1f64e200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-200d-2642-fe0f.png';
+import s1f64e from 'emoji-datasource-apple/img/apple/64/1f64e.png';
+import s1f64f from 'emoji-datasource-apple/img/apple/64/1f64f.png';
+import s1f680 from 'emoji-datasource-apple/img/apple/64/1f680.png';
+import s1f681 from 'emoji-datasource-apple/img/apple/64/1f681.png';
+import s1f682 from 'emoji-datasource-apple/img/apple/64/1f682.png';
+import s1f683 from 'emoji-datasource-apple/img/apple/64/1f683.png';
+import s1f684 from 'emoji-datasource-apple/img/apple/64/1f684.png';
+import s1f685 from 'emoji-datasource-apple/img/apple/64/1f685.png';
+import s1f686 from 'emoji-datasource-apple/img/apple/64/1f686.png';
+import s1f687 from 'emoji-datasource-apple/img/apple/64/1f687.png';
+import s1f688 from 'emoji-datasource-apple/img/apple/64/1f688.png';
+import s1f689 from 'emoji-datasource-apple/img/apple/64/1f689.png';
+import s1f68a from 'emoji-datasource-apple/img/apple/64/1f68a.png';
+import s1f68b from 'emoji-datasource-apple/img/apple/64/1f68b.png';
+import s1f68c from 'emoji-datasource-apple/img/apple/64/1f68c.png';
+import s1f68d from 'emoji-datasource-apple/img/apple/64/1f68d.png';
+import s1f68e from 'emoji-datasource-apple/img/apple/64/1f68e.png';
+import s1f68f from 'emoji-datasource-apple/img/apple/64/1f68f.png';
+import s1f690 from 'emoji-datasource-apple/img/apple/64/1f690.png';
+import s1f691 from 'emoji-datasource-apple/img/apple/64/1f691.png';
+import s1f692 from 'emoji-datasource-apple/img/apple/64/1f692.png';
+import s1f693 from 'emoji-datasource-apple/img/apple/64/1f693.png';
+import s1f694 from 'emoji-datasource-apple/img/apple/64/1f694.png';
+import s1f695 from 'emoji-datasource-apple/img/apple/64/1f695.png';
+import s1f696 from 'emoji-datasource-apple/img/apple/64/1f696.png';
+import s1f697 from 'emoji-datasource-apple/img/apple/64/1f697.png';
+import s1f698 from 'emoji-datasource-apple/img/apple/64/1f698.png';
+import s1f699 from 'emoji-datasource-apple/img/apple/64/1f699.png';
+import s1f69a from 'emoji-datasource-apple/img/apple/64/1f69a.png';
+import s1f69b from 'emoji-datasource-apple/img/apple/64/1f69b.png';
+import s1f69c from 'emoji-datasource-apple/img/apple/64/1f69c.png';
+import s1f69d from 'emoji-datasource-apple/img/apple/64/1f69d.png';
+import s1f69e from 'emoji-datasource-apple/img/apple/64/1f69e.png';
+import s1f69f from 'emoji-datasource-apple/img/apple/64/1f69f.png';
+import s1f6a0 from 'emoji-datasource-apple/img/apple/64/1f6a0.png';
+import s1f6a1 from 'emoji-datasource-apple/img/apple/64/1f6a1.png';
+import s1f6a2 from 'emoji-datasource-apple/img/apple/64/1f6a2.png';
+import s1f6a3200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-200d-2640-fe0f.png';
+import s1f6a3200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-200d-2642-fe0f.png';
+import s1f6a3 from 'emoji-datasource-apple/img/apple/64/1f6a3.png';
+import s1f6a4 from 'emoji-datasource-apple/img/apple/64/1f6a4.png';
+import s1f6a5 from 'emoji-datasource-apple/img/apple/64/1f6a5.png';
+import s1f6a6 from 'emoji-datasource-apple/img/apple/64/1f6a6.png';
+import s1f6a7 from 'emoji-datasource-apple/img/apple/64/1f6a7.png';
+import s1f6a8 from 'emoji-datasource-apple/img/apple/64/1f6a8.png';
+import s1f6a9 from 'emoji-datasource-apple/img/apple/64/1f6a9.png';
+import s1f6aa from 'emoji-datasource-apple/img/apple/64/1f6aa.png';
+import s1f6ab from 'emoji-datasource-apple/img/apple/64/1f6ab.png';
+import s1f6ac from 'emoji-datasource-apple/img/apple/64/1f6ac.png';
+import s1f6ad from 'emoji-datasource-apple/img/apple/64/1f6ad.png';
+import s1f6ae from 'emoji-datasource-apple/img/apple/64/1f6ae.png';
+import s1f6af from 'emoji-datasource-apple/img/apple/64/1f6af.png';
+import s1f6b0 from 'emoji-datasource-apple/img/apple/64/1f6b0.png';
+import s1f6b1 from 'emoji-datasource-apple/img/apple/64/1f6b1.png';
+import s1f6b2 from 'emoji-datasource-apple/img/apple/64/1f6b2.png';
+import s1f6b3 from 'emoji-datasource-apple/img/apple/64/1f6b3.png';
+import s1f6b4200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-200d-2640-fe0f.png';
+import s1f6b4200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-200d-2642-fe0f.png';
+import s1f6b4 from 'emoji-datasource-apple/img/apple/64/1f6b4.png';
+import s1f6b5200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-200d-2640-fe0f.png';
+import s1f6b5200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-200d-2642-fe0f.png';
+import s1f6b5 from 'emoji-datasource-apple/img/apple/64/1f6b5.png';
+import s1f6b6200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-200d-2640-fe0f.png';
+import s1f6b6200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-200d-2642-fe0f.png';
+import s1f6b6 from 'emoji-datasource-apple/img/apple/64/1f6b6.png';
+import s1f6b7 from 'emoji-datasource-apple/img/apple/64/1f6b7.png';
+import s1f6b8 from 'emoji-datasource-apple/img/apple/64/1f6b8.png';
+import s1f6b9 from 'emoji-datasource-apple/img/apple/64/1f6b9.png';
+import s1f6ba from 'emoji-datasource-apple/img/apple/64/1f6ba.png';
+import s1f6bb from 'emoji-datasource-apple/img/apple/64/1f6bb.png';
+import s1f6bc from 'emoji-datasource-apple/img/apple/64/1f6bc.png';
+import s1f6bd from 'emoji-datasource-apple/img/apple/64/1f6bd.png';
+import s1f6be from 'emoji-datasource-apple/img/apple/64/1f6be.png';
+import s1f6bf from 'emoji-datasource-apple/img/apple/64/1f6bf.png';
+import s1f6c0 from 'emoji-datasource-apple/img/apple/64/1f6c0.png';
+import s1f6c1 from 'emoji-datasource-apple/img/apple/64/1f6c1.png';
+import s1f6c2 from 'emoji-datasource-apple/img/apple/64/1f6c2.png';
+import s1f6c3 from 'emoji-datasource-apple/img/apple/64/1f6c3.png';
+import s1f6c4 from 'emoji-datasource-apple/img/apple/64/1f6c4.png';
+import s1f6c5 from 'emoji-datasource-apple/img/apple/64/1f6c5.png';
+import s1f6cbfe0f from 'emoji-datasource-apple/img/apple/64/1f6cb-fe0f.png';
+import s1f6cc from 'emoji-datasource-apple/img/apple/64/1f6cc.png';
+import s1f6cdfe0f from 'emoji-datasource-apple/img/apple/64/1f6cd-fe0f.png';
+import s1f6cefe0f from 'emoji-datasource-apple/img/apple/64/1f6ce-fe0f.png';
+import s1f6cffe0f from 'emoji-datasource-apple/img/apple/64/1f6cf-fe0f.png';
+import s1f6d0 from 'emoji-datasource-apple/img/apple/64/1f6d0.png';
+import s1f6d1 from 'emoji-datasource-apple/img/apple/64/1f6d1.png';
+import s1f6d2 from 'emoji-datasource-apple/img/apple/64/1f6d2.png';
+import s1f6d5 from 'emoji-datasource-apple/img/apple/64/1f6d5.png';
+import s1f6d6 from 'emoji-datasource-apple/img/apple/64/1f6d6.png';
+import s1f6d7 from 'emoji-datasource-apple/img/apple/64/1f6d7.png';
+import s1f6e0fe0f from 'emoji-datasource-apple/img/apple/64/1f6e0-fe0f.png';
+import s1f6e1fe0f from 'emoji-datasource-apple/img/apple/64/1f6e1-fe0f.png';
+import s1f6e2fe0f from 'emoji-datasource-apple/img/apple/64/1f6e2-fe0f.png';
+import s1f6e3fe0f from 'emoji-datasource-apple/img/apple/64/1f6e3-fe0f.png';
+import s1f6e4fe0f from 'emoji-datasource-apple/img/apple/64/1f6e4-fe0f.png';
+import s1f6e5fe0f from 'emoji-datasource-apple/img/apple/64/1f6e5-fe0f.png';
+import s1f6e9fe0f from 'emoji-datasource-apple/img/apple/64/1f6e9-fe0f.png';
+import s1f6eb from 'emoji-datasource-apple/img/apple/64/1f6eb.png';
+import s1f6ec from 'emoji-datasource-apple/img/apple/64/1f6ec.png';
+import s1f6f0fe0f from 'emoji-datasource-apple/img/apple/64/1f6f0-fe0f.png';
+import s1f6f3fe0f from 'emoji-datasource-apple/img/apple/64/1f6f3-fe0f.png';
+import s1f6f4 from 'emoji-datasource-apple/img/apple/64/1f6f4.png';
+import s1f6f5 from 'emoji-datasource-apple/img/apple/64/1f6f5.png';
+import s1f6f6 from 'emoji-datasource-apple/img/apple/64/1f6f6.png';
+import s1f6f7 from 'emoji-datasource-apple/img/apple/64/1f6f7.png';
+import s1f6f8 from 'emoji-datasource-apple/img/apple/64/1f6f8.png';
+import s1f6f9 from 'emoji-datasource-apple/img/apple/64/1f6f9.png';
+import s1f6fa from 'emoji-datasource-apple/img/apple/64/1f6fa.png';
+import s1f6fb from 'emoji-datasource-apple/img/apple/64/1f6fb.png';
+import s1f6fc from 'emoji-datasource-apple/img/apple/64/1f6fc.png';
+import s1f7e0 from 'emoji-datasource-apple/img/apple/64/1f7e0.png';
+import s1f7e1 from 'emoji-datasource-apple/img/apple/64/1f7e1.png';
+import s1f7e2 from 'emoji-datasource-apple/img/apple/64/1f7e2.png';
+import s1f7e3 from 'emoji-datasource-apple/img/apple/64/1f7e3.png';
+import s1f7e4 from 'emoji-datasource-apple/img/apple/64/1f7e4.png';
+import s1f7e5 from 'emoji-datasource-apple/img/apple/64/1f7e5.png';
+import s1f7e6 from 'emoji-datasource-apple/img/apple/64/1f7e6.png';
+import s1f7e7 from 'emoji-datasource-apple/img/apple/64/1f7e7.png';
+import s1f7e8 from 'emoji-datasource-apple/img/apple/64/1f7e8.png';
+import s1f7e9 from 'emoji-datasource-apple/img/apple/64/1f7e9.png';
+import s1f7ea from 'emoji-datasource-apple/img/apple/64/1f7ea.png';
+import s1f7eb from 'emoji-datasource-apple/img/apple/64/1f7eb.png';
+import s1f90c from 'emoji-datasource-apple/img/apple/64/1f90c.png';
+import s1f90d from 'emoji-datasource-apple/img/apple/64/1f90d.png';
+import s1f90e from 'emoji-datasource-apple/img/apple/64/1f90e.png';
+import s1f90f from 'emoji-datasource-apple/img/apple/64/1f90f.png';
+import s1f910 from 'emoji-datasource-apple/img/apple/64/1f910.png';
+import s1f911 from 'emoji-datasource-apple/img/apple/64/1f911.png';
+import s1f912 from 'emoji-datasource-apple/img/apple/64/1f912.png';
+import s1f913 from 'emoji-datasource-apple/img/apple/64/1f913.png';
+import s1f914 from 'emoji-datasource-apple/img/apple/64/1f914.png';
+import s1f915 from 'emoji-datasource-apple/img/apple/64/1f915.png';
+import s1f916 from 'emoji-datasource-apple/img/apple/64/1f916.png';
+import s1f917 from 'emoji-datasource-apple/img/apple/64/1f917.png';
+import s1f918 from 'emoji-datasource-apple/img/apple/64/1f918.png';
+import s1f919 from 'emoji-datasource-apple/img/apple/64/1f919.png';
+import s1f91a from 'emoji-datasource-apple/img/apple/64/1f91a.png';
+import s1f91b from 'emoji-datasource-apple/img/apple/64/1f91b.png';
+import s1f91c from 'emoji-datasource-apple/img/apple/64/1f91c.png';
+import s1f91d from 'emoji-datasource-apple/img/apple/64/1f91d.png';
+import s1f91e from 'emoji-datasource-apple/img/apple/64/1f91e.png';
+import s1f91f from 'emoji-datasource-apple/img/apple/64/1f91f.png';
+import s1f920 from 'emoji-datasource-apple/img/apple/64/1f920.png';
+import s1f921 from 'emoji-datasource-apple/img/apple/64/1f921.png';
+import s1f922 from 'emoji-datasource-apple/img/apple/64/1f922.png';
+import s1f923 from 'emoji-datasource-apple/img/apple/64/1f923.png';
+import s1f924 from 'emoji-datasource-apple/img/apple/64/1f924.png';
+import s1f925 from 'emoji-datasource-apple/img/apple/64/1f925.png';
+import s1f926200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f926-200d-2640-fe0f.png';
+import s1f926200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f926-200d-2642-fe0f.png';
+import s1f926 from 'emoji-datasource-apple/img/apple/64/1f926.png';
+import s1f927 from 'emoji-datasource-apple/img/apple/64/1f927.png';
+import s1f928 from 'emoji-datasource-apple/img/apple/64/1f928.png';
+import s1f929 from 'emoji-datasource-apple/img/apple/64/1f929.png';
+import s1f92a from 'emoji-datasource-apple/img/apple/64/1f92a.png';
+import s1f92b from 'emoji-datasource-apple/img/apple/64/1f92b.png';
+import s1f92c from 'emoji-datasource-apple/img/apple/64/1f92c.png';
+import s1f92d from 'emoji-datasource-apple/img/apple/64/1f92d.png';
+import s1f92e from 'emoji-datasource-apple/img/apple/64/1f92e.png';
+import s1f92f from 'emoji-datasource-apple/img/apple/64/1f92f.png';
+import s1f930 from 'emoji-datasource-apple/img/apple/64/1f930.png';
+import s1f931 from 'emoji-datasource-apple/img/apple/64/1f931.png';
+import s1f932 from 'emoji-datasource-apple/img/apple/64/1f932.png';
+import s1f933 from 'emoji-datasource-apple/img/apple/64/1f933.png';
+import s1f934 from 'emoji-datasource-apple/img/apple/64/1f934.png';
+import s1f935200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f935-200d-2640-fe0f.png';
+import s1f935200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f935-200d-2642-fe0f.png';
+import s1f935 from 'emoji-datasource-apple/img/apple/64/1f935.png';
+import s1f936 from 'emoji-datasource-apple/img/apple/64/1f936.png';
+import s1f937200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f937-200d-2640-fe0f.png';
+import s1f937200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f937-200d-2642-fe0f.png';
+import s1f937 from 'emoji-datasource-apple/img/apple/64/1f937.png';
+import s1f938200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f938-200d-2640-fe0f.png';
+import s1f938200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f938-200d-2642-fe0f.png';
+import s1f938 from 'emoji-datasource-apple/img/apple/64/1f938.png';
+import s1f939200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f939-200d-2640-fe0f.png';
+import s1f939200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f939-200d-2642-fe0f.png';
+import s1f939 from 'emoji-datasource-apple/img/apple/64/1f939.png';
+import s1f93a from 'emoji-datasource-apple/img/apple/64/1f93a.png';
+import s1f93c200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93c-200d-2640-fe0f.png';
+import s1f93c200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93c-200d-2642-fe0f.png';
+import s1f93c from 'emoji-datasource-apple/img/apple/64/1f93c.png';
+import s1f93d200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-200d-2640-fe0f.png';
+import s1f93d200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-200d-2642-fe0f.png';
+import s1f93d from 'emoji-datasource-apple/img/apple/64/1f93d.png';
+import s1f93e200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-200d-2640-fe0f.png';
+import s1f93e200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-200d-2642-fe0f.png';
+import s1f93e from 'emoji-datasource-apple/img/apple/64/1f93e.png';
+import s1f93f from 'emoji-datasource-apple/img/apple/64/1f93f.png';
+import s1f940 from 'emoji-datasource-apple/img/apple/64/1f940.png';
+import s1f941 from 'emoji-datasource-apple/img/apple/64/1f941.png';
+import s1f942 from 'emoji-datasource-apple/img/apple/64/1f942.png';
+import s1f943 from 'emoji-datasource-apple/img/apple/64/1f943.png';
+import s1f944 from 'emoji-datasource-apple/img/apple/64/1f944.png';
+import s1f945 from 'emoji-datasource-apple/img/apple/64/1f945.png';
+import s1f947 from 'emoji-datasource-apple/img/apple/64/1f947.png';
+import s1f948 from 'emoji-datasource-apple/img/apple/64/1f948.png';
+import s1f949 from 'emoji-datasource-apple/img/apple/64/1f949.png';
+import s1f94a from 'emoji-datasource-apple/img/apple/64/1f94a.png';
+import s1f94b from 'emoji-datasource-apple/img/apple/64/1f94b.png';
+import s1f94c from 'emoji-datasource-apple/img/apple/64/1f94c.png';
+import s1f94d from 'emoji-datasource-apple/img/apple/64/1f94d.png';
+import s1f94e from 'emoji-datasource-apple/img/apple/64/1f94e.png';
+import s1f94f from 'emoji-datasource-apple/img/apple/64/1f94f.png';
+import s1f950 from 'emoji-datasource-apple/img/apple/64/1f950.png';
+import s1f951 from 'emoji-datasource-apple/img/apple/64/1f951.png';
+import s1f952 from 'emoji-datasource-apple/img/apple/64/1f952.png';
+import s1f953 from 'emoji-datasource-apple/img/apple/64/1f953.png';
+import s1f954 from 'emoji-datasource-apple/img/apple/64/1f954.png';
+import s1f955 from 'emoji-datasource-apple/img/apple/64/1f955.png';
+import s1f956 from 'emoji-datasource-apple/img/apple/64/1f956.png';
+import s1f957 from 'emoji-datasource-apple/img/apple/64/1f957.png';
+import s1f958 from 'emoji-datasource-apple/img/apple/64/1f958.png';
+import s1f959 from 'emoji-datasource-apple/img/apple/64/1f959.png';
+import s1f95a from 'emoji-datasource-apple/img/apple/64/1f95a.png';
+import s1f95b from 'emoji-datasource-apple/img/apple/64/1f95b.png';
+import s1f95c from 'emoji-datasource-apple/img/apple/64/1f95c.png';
+import s1f95d from 'emoji-datasource-apple/img/apple/64/1f95d.png';
+import s1f95e from 'emoji-datasource-apple/img/apple/64/1f95e.png';
+import s1f95f from 'emoji-datasource-apple/img/apple/64/1f95f.png';
+import s1f960 from 'emoji-datasource-apple/img/apple/64/1f960.png';
+import s1f961 from 'emoji-datasource-apple/img/apple/64/1f961.png';
+import s1f962 from 'emoji-datasource-apple/img/apple/64/1f962.png';
+import s1f963 from 'emoji-datasource-apple/img/apple/64/1f963.png';
+import s1f964 from 'emoji-datasource-apple/img/apple/64/1f964.png';
+import s1f965 from 'emoji-datasource-apple/img/apple/64/1f965.png';
+import s1f966 from 'emoji-datasource-apple/img/apple/64/1f966.png';
+import s1f967 from 'emoji-datasource-apple/img/apple/64/1f967.png';
+import s1f968 from 'emoji-datasource-apple/img/apple/64/1f968.png';
+import s1f969 from 'emoji-datasource-apple/img/apple/64/1f969.png';
+import s1f96a from 'emoji-datasource-apple/img/apple/64/1f96a.png';
+import s1f96b from 'emoji-datasource-apple/img/apple/64/1f96b.png';
+import s1f96c from 'emoji-datasource-apple/img/apple/64/1f96c.png';
+import s1f96d from 'emoji-datasource-apple/img/apple/64/1f96d.png';
+import s1f96e from 'emoji-datasource-apple/img/apple/64/1f96e.png';
+import s1f96f from 'emoji-datasource-apple/img/apple/64/1f96f.png';
+import s1f970 from 'emoji-datasource-apple/img/apple/64/1f970.png';
+import s1f971 from 'emoji-datasource-apple/img/apple/64/1f971.png';
+import s1f972 from 'emoji-datasource-apple/img/apple/64/1f972.png';
+import s1f973 from 'emoji-datasource-apple/img/apple/64/1f973.png';
+import s1f974 from 'emoji-datasource-apple/img/apple/64/1f974.png';
+import s1f975 from 'emoji-datasource-apple/img/apple/64/1f975.png';
+import s1f976 from 'emoji-datasource-apple/img/apple/64/1f976.png';
+import s1f977 from 'emoji-datasource-apple/img/apple/64/1f977.png';
+import s1f978 from 'emoji-datasource-apple/img/apple/64/1f978.png';
+import s1f97a from 'emoji-datasource-apple/img/apple/64/1f97a.png';
+import s1f97b from 'emoji-datasource-apple/img/apple/64/1f97b.png';
+import s1f97c from 'emoji-datasource-apple/img/apple/64/1f97c.png';
+import s1f97d from 'emoji-datasource-apple/img/apple/64/1f97d.png';
+import s1f97e from 'emoji-datasource-apple/img/apple/64/1f97e.png';
+import s1f97f from 'emoji-datasource-apple/img/apple/64/1f97f.png';
+import s1f980 from 'emoji-datasource-apple/img/apple/64/1f980.png';
+import s1f981 from 'emoji-datasource-apple/img/apple/64/1f981.png';
+import s1f982 from 'emoji-datasource-apple/img/apple/64/1f982.png';
+import s1f983 from 'emoji-datasource-apple/img/apple/64/1f983.png';
+import s1f984 from 'emoji-datasource-apple/img/apple/64/1f984.png';
+import s1f985 from 'emoji-datasource-apple/img/apple/64/1f985.png';
+import s1f986 from 'emoji-datasource-apple/img/apple/64/1f986.png';
+import s1f987 from 'emoji-datasource-apple/img/apple/64/1f987.png';
+import s1f988 from 'emoji-datasource-apple/img/apple/64/1f988.png';
+import s1f989 from 'emoji-datasource-apple/img/apple/64/1f989.png';
+import s1f98a from 'emoji-datasource-apple/img/apple/64/1f98a.png';
+import s1f98b from 'emoji-datasource-apple/img/apple/64/1f98b.png';
+import s1f98c from 'emoji-datasource-apple/img/apple/64/1f98c.png';
+import s1f98d from 'emoji-datasource-apple/img/apple/64/1f98d.png';
+import s1f98e from 'emoji-datasource-apple/img/apple/64/1f98e.png';
+import s1f98f from 'emoji-datasource-apple/img/apple/64/1f98f.png';
+import s1f990 from 'emoji-datasource-apple/img/apple/64/1f990.png';
+import s1f991 from 'emoji-datasource-apple/img/apple/64/1f991.png';
+import s1f992 from 'emoji-datasource-apple/img/apple/64/1f992.png';
+import s1f993 from 'emoji-datasource-apple/img/apple/64/1f993.png';
+import s1f994 from 'emoji-datasource-apple/img/apple/64/1f994.png';
+import s1f995 from 'emoji-datasource-apple/img/apple/64/1f995.png';
+import s1f996 from 'emoji-datasource-apple/img/apple/64/1f996.png';
+import s1f997 from 'emoji-datasource-apple/img/apple/64/1f997.png';
+import s1f998 from 'emoji-datasource-apple/img/apple/64/1f998.png';
+import s1f999 from 'emoji-datasource-apple/img/apple/64/1f999.png';
+import s1f99a from 'emoji-datasource-apple/img/apple/64/1f99a.png';
+import s1f99b from 'emoji-datasource-apple/img/apple/64/1f99b.png';
+import s1f99c from 'emoji-datasource-apple/img/apple/64/1f99c.png';
+import s1f99d from 'emoji-datasource-apple/img/apple/64/1f99d.png';
+import s1f99e from 'emoji-datasource-apple/img/apple/64/1f99e.png';
+import s1f99f from 'emoji-datasource-apple/img/apple/64/1f99f.png';
+import s1f9a0 from 'emoji-datasource-apple/img/apple/64/1f9a0.png';
+import s1f9a1 from 'emoji-datasource-apple/img/apple/64/1f9a1.png';
+import s1f9a2 from 'emoji-datasource-apple/img/apple/64/1f9a2.png';
+import s1f9a3 from 'emoji-datasource-apple/img/apple/64/1f9a3.png';
+import s1f9a4 from 'emoji-datasource-apple/img/apple/64/1f9a4.png';
+import s1f9a5 from 'emoji-datasource-apple/img/apple/64/1f9a5.png';
+import s1f9a6 from 'emoji-datasource-apple/img/apple/64/1f9a6.png';
+import s1f9a7 from 'emoji-datasource-apple/img/apple/64/1f9a7.png';
+import s1f9a8 from 'emoji-datasource-apple/img/apple/64/1f9a8.png';
+import s1f9a9 from 'emoji-datasource-apple/img/apple/64/1f9a9.png';
+import s1f9aa from 'emoji-datasource-apple/img/apple/64/1f9aa.png';
+import s1f9ab from 'emoji-datasource-apple/img/apple/64/1f9ab.png';
+import s1f9ac from 'emoji-datasource-apple/img/apple/64/1f9ac.png';
+import s1f9ad from 'emoji-datasource-apple/img/apple/64/1f9ad.png';
+import s1f9ae from 'emoji-datasource-apple/img/apple/64/1f9ae.png';
+import s1f9af from 'emoji-datasource-apple/img/apple/64/1f9af.png';
+import s1f9b4 from 'emoji-datasource-apple/img/apple/64/1f9b4.png';
+import s1f9b5 from 'emoji-datasource-apple/img/apple/64/1f9b5.png';
+import s1f9b6 from 'emoji-datasource-apple/img/apple/64/1f9b6.png';
+import s1f9b7 from 'emoji-datasource-apple/img/apple/64/1f9b7.png';
+import s1f9b8200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-200d-2640-fe0f.png';
+import s1f9b8200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-200d-2642-fe0f.png';
+import s1f9b8 from 'emoji-datasource-apple/img/apple/64/1f9b8.png';
+import s1f9b9200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-200d-2640-fe0f.png';
+import s1f9b9200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-200d-2642-fe0f.png';
+import s1f9b9 from 'emoji-datasource-apple/img/apple/64/1f9b9.png';
+import s1f9ba from 'emoji-datasource-apple/img/apple/64/1f9ba.png';
+import s1f9bb from 'emoji-datasource-apple/img/apple/64/1f9bb.png';
+import s1f9bc from 'emoji-datasource-apple/img/apple/64/1f9bc.png';
+import s1f9bd from 'emoji-datasource-apple/img/apple/64/1f9bd.png';
+import s1f9be from 'emoji-datasource-apple/img/apple/64/1f9be.png';
+import s1f9bf from 'emoji-datasource-apple/img/apple/64/1f9bf.png';
+import s1f9c0 from 'emoji-datasource-apple/img/apple/64/1f9c0.png';
+import s1f9c1 from 'emoji-datasource-apple/img/apple/64/1f9c1.png';
+import s1f9c2 from 'emoji-datasource-apple/img/apple/64/1f9c2.png';
+import s1f9c3 from 'emoji-datasource-apple/img/apple/64/1f9c3.png';
+import s1f9c4 from 'emoji-datasource-apple/img/apple/64/1f9c4.png';
+import s1f9c5 from 'emoji-datasource-apple/img/apple/64/1f9c5.png';
+import s1f9c6 from 'emoji-datasource-apple/img/apple/64/1f9c6.png';
+import s1f9c7 from 'emoji-datasource-apple/img/apple/64/1f9c7.png';
+import s1f9c8 from 'emoji-datasource-apple/img/apple/64/1f9c8.png';
+import s1f9c9 from 'emoji-datasource-apple/img/apple/64/1f9c9.png';
+import s1f9ca from 'emoji-datasource-apple/img/apple/64/1f9ca.png';
+import s1f9cb from 'emoji-datasource-apple/img/apple/64/1f9cb.png';
+import s1f9cd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-200d-2640-fe0f.png';
+import s1f9cd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-200d-2642-fe0f.png';
+import s1f9cd from 'emoji-datasource-apple/img/apple/64/1f9cd.png';
+import s1f9ce200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-200d-2640-fe0f.png';
+import s1f9ce200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-200d-2642-fe0f.png';
+import s1f9ce from 'emoji-datasource-apple/img/apple/64/1f9ce.png';
+import s1f9cf200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-200d-2640-fe0f.png';
+import s1f9cf200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-200d-2642-fe0f.png';
+import s1f9cf from 'emoji-datasource-apple/img/apple/64/1f9cf.png';
+import s1f9d0 from 'emoji-datasource-apple/img/apple/64/1f9d0.png';
+import s1f9d1200d1f33e from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f33e.png';
+import s1f9d1200d1f373 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f373.png';
+import s1f9d1200d1f37c from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f37c.png';
+import s1f9d1200d1f384 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f384.png';
+import s1f9d1200d1f393 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f393.png';
+import s1f9d1200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3a4.png';
+import s1f9d1200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3a8.png';
+import s1f9d1200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3eb.png';
+import s1f9d1200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3ed.png';
+import s1f9d1200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f4bb.png';
+import s1f9d1200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f4bc.png';
+import s1f9d1200d1f527 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f527.png';
+import s1f9d1200d1f52c from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f52c.png';
+import s1f9d1200d1f680 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f680.png';
+import s1f9d1200d1f692 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f692.png';
+import s1f9d1200d1f91d200d1f9d1 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f91d-200d-1f9d1.png';
+import s1f9d1200d1f9af from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9af.png';
+import s1f9d1200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b0.png';
+import s1f9d1200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b1.png';
+import s1f9d1200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b2.png';
+import s1f9d1200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b3.png';
+import s1f9d1200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9bc.png';
+import s1f9d1200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9bd.png';
+import s1f9d1200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-2695-fe0f.png';
+import s1f9d1200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-2696-fe0f.png';
+import s1f9d1200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-2708-fe0f.png';
+import s1f9d1 from 'emoji-datasource-apple/img/apple/64/1f9d1.png';
+import s1f9d2 from 'emoji-datasource-apple/img/apple/64/1f9d2.png';
+import s1f9d3 from 'emoji-datasource-apple/img/apple/64/1f9d3.png';
+import s1f9d4200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-200d-2640-fe0f.png';
+import s1f9d4200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-200d-2642-fe0f.png';
+import s1f9d4 from 'emoji-datasource-apple/img/apple/64/1f9d4.png';
+import s1f9d5 from 'emoji-datasource-apple/img/apple/64/1f9d5.png';
+import s1f9d6200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-200d-2640-fe0f.png';
+import s1f9d6200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-200d-2642-fe0f.png';
+import s1f9d6 from 'emoji-datasource-apple/img/apple/64/1f9d6.png';
+import s1f9d7200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-200d-2640-fe0f.png';
+import s1f9d7200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-200d-2642-fe0f.png';
+import s1f9d7 from 'emoji-datasource-apple/img/apple/64/1f9d7.png';
+import s1f9d8200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-200d-2640-fe0f.png';
+import s1f9d8200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-200d-2642-fe0f.png';
+import s1f9d8 from 'emoji-datasource-apple/img/apple/64/1f9d8.png';
+import s1f9d9200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-200d-2640-fe0f.png';
+import s1f9d9200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-200d-2642-fe0f.png';
+import s1f9d9 from 'emoji-datasource-apple/img/apple/64/1f9d9.png';
+import s1f9da200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-200d-2640-fe0f.png';
+import s1f9da200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-200d-2642-fe0f.png';
+import s1f9da from 'emoji-datasource-apple/img/apple/64/1f9da.png';
+import s1f9db200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-200d-2640-fe0f.png';
+import s1f9db200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-200d-2642-fe0f.png';
+import s1f9db from 'emoji-datasource-apple/img/apple/64/1f9db.png';
+import s1f9dc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-200d-2640-fe0f.png';
+import s1f9dc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-200d-2642-fe0f.png';
+import s1f9dc from 'emoji-datasource-apple/img/apple/64/1f9dc.png';
+import s1f9dd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-200d-2640-fe0f.png';
+import s1f9dd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-200d-2642-fe0f.png';
+import s1f9dd from 'emoji-datasource-apple/img/apple/64/1f9dd.png';
+import s1f9de200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9de-200d-2640-fe0f.png';
+import s1f9de200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9de-200d-2642-fe0f.png';
+import s1f9de from 'emoji-datasource-apple/img/apple/64/1f9de.png';
+import s1f9df200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9df-200d-2640-fe0f.png';
+import s1f9df200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9df-200d-2642-fe0f.png';
+import s1f9df from 'emoji-datasource-apple/img/apple/64/1f9df.png';
+import s1f9e0 from 'emoji-datasource-apple/img/apple/64/1f9e0.png';
+import s1f9e1 from 'emoji-datasource-apple/img/apple/64/1f9e1.png';
+import s1f9e2 from 'emoji-datasource-apple/img/apple/64/1f9e2.png';
+import s1f9e3 from 'emoji-datasource-apple/img/apple/64/1f9e3.png';
+import s1f9e4 from 'emoji-datasource-apple/img/apple/64/1f9e4.png';
+import s1f9e5 from 'emoji-datasource-apple/img/apple/64/1f9e5.png';
+import s1f9e6 from 'emoji-datasource-apple/img/apple/64/1f9e6.png';
+import s1f9e7 from 'emoji-datasource-apple/img/apple/64/1f9e7.png';
+import s1f9e8 from 'emoji-datasource-apple/img/apple/64/1f9e8.png';
+import s1f9e9 from 'emoji-datasource-apple/img/apple/64/1f9e9.png';
+import s1f9ea from 'emoji-datasource-apple/img/apple/64/1f9ea.png';
+import s1f9eb from 'emoji-datasource-apple/img/apple/64/1f9eb.png';
+import s1f9ec from 'emoji-datasource-apple/img/apple/64/1f9ec.png';
+import s1f9ed from 'emoji-datasource-apple/img/apple/64/1f9ed.png';
+import s1f9ee from 'emoji-datasource-apple/img/apple/64/1f9ee.png';
+import s1f9ef from 'emoji-datasource-apple/img/apple/64/1f9ef.png';
+import s1f9f0 from 'emoji-datasource-apple/img/apple/64/1f9f0.png';
+import s1f9f1 from 'emoji-datasource-apple/img/apple/64/1f9f1.png';
+import s1f9f2 from 'emoji-datasource-apple/img/apple/64/1f9f2.png';
+import s1f9f3 from 'emoji-datasource-apple/img/apple/64/1f9f3.png';
+import s1f9f4 from 'emoji-datasource-apple/img/apple/64/1f9f4.png';
+import s1f9f5 from 'emoji-datasource-apple/img/apple/64/1f9f5.png';
+import s1f9f6 from 'emoji-datasource-apple/img/apple/64/1f9f6.png';
+import s1f9f7 from 'emoji-datasource-apple/img/apple/64/1f9f7.png';
+import s1f9f8 from 'emoji-datasource-apple/img/apple/64/1f9f8.png';
+import s1f9f9 from 'emoji-datasource-apple/img/apple/64/1f9f9.png';
+import s1f9fa from 'emoji-datasource-apple/img/apple/64/1f9fa.png';
+import s1f9fb from 'emoji-datasource-apple/img/apple/64/1f9fb.png';
+import s1f9fc from 'emoji-datasource-apple/img/apple/64/1f9fc.png';
+import s1f9fd from 'emoji-datasource-apple/img/apple/64/1f9fd.png';
+import s1f9fe from 'emoji-datasource-apple/img/apple/64/1f9fe.png';
+import s1f9ff from 'emoji-datasource-apple/img/apple/64/1f9ff.png';
+import s1fa70 from 'emoji-datasource-apple/img/apple/64/1fa70.png';
+import s1fa71 from 'emoji-datasource-apple/img/apple/64/1fa71.png';
+import s1fa72 from 'emoji-datasource-apple/img/apple/64/1fa72.png';
+import s1fa73 from 'emoji-datasource-apple/img/apple/64/1fa73.png';
+import s1fa74 from 'emoji-datasource-apple/img/apple/64/1fa74.png';
+import s1fa78 from 'emoji-datasource-apple/img/apple/64/1fa78.png';
+import s1fa79 from 'emoji-datasource-apple/img/apple/64/1fa79.png';
+import s1fa7a from 'emoji-datasource-apple/img/apple/64/1fa7a.png';
+import s1fa80 from 'emoji-datasource-apple/img/apple/64/1fa80.png';
+import s1fa81 from 'emoji-datasource-apple/img/apple/64/1fa81.png';
+import s1fa82 from 'emoji-datasource-apple/img/apple/64/1fa82.png';
+import s1fa83 from 'emoji-datasource-apple/img/apple/64/1fa83.png';
+import s1fa84 from 'emoji-datasource-apple/img/apple/64/1fa84.png';
+import s1fa85 from 'emoji-datasource-apple/img/apple/64/1fa85.png';
+import s1fa86 from 'emoji-datasource-apple/img/apple/64/1fa86.png';
+import s1fa90 from 'emoji-datasource-apple/img/apple/64/1fa90.png';
+import s1fa91 from 'emoji-datasource-apple/img/apple/64/1fa91.png';
+import s1fa92 from 'emoji-datasource-apple/img/apple/64/1fa92.png';
+import s1fa93 from 'emoji-datasource-apple/img/apple/64/1fa93.png';
+import s1fa94 from 'emoji-datasource-apple/img/apple/64/1fa94.png';
+import s1fa95 from 'emoji-datasource-apple/img/apple/64/1fa95.png';
+import s1fa96 from 'emoji-datasource-apple/img/apple/64/1fa96.png';
+import s1fa97 from 'emoji-datasource-apple/img/apple/64/1fa97.png';
+import s1fa98 from 'emoji-datasource-apple/img/apple/64/1fa98.png';
+import s1fa99 from 'emoji-datasource-apple/img/apple/64/1fa99.png';
+import s1fa9a from 'emoji-datasource-apple/img/apple/64/1fa9a.png';
+import s1fa9b from 'emoji-datasource-apple/img/apple/64/1fa9b.png';
+import s1fa9c from 'emoji-datasource-apple/img/apple/64/1fa9c.png';
+import s1fa9d from 'emoji-datasource-apple/img/apple/64/1fa9d.png';
+import s1fa9e from 'emoji-datasource-apple/img/apple/64/1fa9e.png';
+import s1fa9f from 'emoji-datasource-apple/img/apple/64/1fa9f.png';
+import s1faa0 from 'emoji-datasource-apple/img/apple/64/1faa0.png';
+import s1faa1 from 'emoji-datasource-apple/img/apple/64/1faa1.png';
+import s1faa2 from 'emoji-datasource-apple/img/apple/64/1faa2.png';
+import s1faa3 from 'emoji-datasource-apple/img/apple/64/1faa3.png';
+import s1faa4 from 'emoji-datasource-apple/img/apple/64/1faa4.png';
+import s1faa5 from 'emoji-datasource-apple/img/apple/64/1faa5.png';
+import s1faa6 from 'emoji-datasource-apple/img/apple/64/1faa6.png';
+import s1faa7 from 'emoji-datasource-apple/img/apple/64/1faa7.png';
+import s1faa8 from 'emoji-datasource-apple/img/apple/64/1faa8.png';
+import s1fab0 from 'emoji-datasource-apple/img/apple/64/1fab0.png';
+import s1fab1 from 'emoji-datasource-apple/img/apple/64/1fab1.png';
+import s1fab2 from 'emoji-datasource-apple/img/apple/64/1fab2.png';
+import s1fab3 from 'emoji-datasource-apple/img/apple/64/1fab3.png';
+import s1fab4 from 'emoji-datasource-apple/img/apple/64/1fab4.png';
+import s1fab5 from 'emoji-datasource-apple/img/apple/64/1fab5.png';
+import s1fab6 from 'emoji-datasource-apple/img/apple/64/1fab6.png';
+import s1fac0 from 'emoji-datasource-apple/img/apple/64/1fac0.png';
+import s1fac1 from 'emoji-datasource-apple/img/apple/64/1fac1.png';
+import s1fac2 from 'emoji-datasource-apple/img/apple/64/1fac2.png';
+import s1fad0 from 'emoji-datasource-apple/img/apple/64/1fad0.png';
+import s1fad1 from 'emoji-datasource-apple/img/apple/64/1fad1.png';
+import s1fad2 from 'emoji-datasource-apple/img/apple/64/1fad2.png';
+import s1fad3 from 'emoji-datasource-apple/img/apple/64/1fad3.png';
+import s1fad4 from 'emoji-datasource-apple/img/apple/64/1fad4.png';
+import s1fad5 from 'emoji-datasource-apple/img/apple/64/1fad5.png';
+import s1fad6 from 'emoji-datasource-apple/img/apple/64/1fad6.png';
+import s203cfe0f from 'emoji-datasource-apple/img/apple/64/203c-fe0f.png';
+import s2049fe0f from 'emoji-datasource-apple/img/apple/64/2049-fe0f.png';
+import s2122fe0f from 'emoji-datasource-apple/img/apple/64/2122-fe0f.png';
+import s2139fe0f from 'emoji-datasource-apple/img/apple/64/2139-fe0f.png';
+import s2194fe0f from 'emoji-datasource-apple/img/apple/64/2194-fe0f.png';
+import s2195fe0f from 'emoji-datasource-apple/img/apple/64/2195-fe0f.png';
+import s2196fe0f from 'emoji-datasource-apple/img/apple/64/2196-fe0f.png';
+import s2197fe0f from 'emoji-datasource-apple/img/apple/64/2197-fe0f.png';
+import s2198fe0f from 'emoji-datasource-apple/img/apple/64/2198-fe0f.png';
+import s2199fe0f from 'emoji-datasource-apple/img/apple/64/2199-fe0f.png';
+import s21a9fe0f from 'emoji-datasource-apple/img/apple/64/21a9-fe0f.png';
+import s21aafe0f from 'emoji-datasource-apple/img/apple/64/21aa-fe0f.png';
+import s231a from 'emoji-datasource-apple/img/apple/64/231a.png';
+import s231b from 'emoji-datasource-apple/img/apple/64/231b.png';
+import s2328fe0f from 'emoji-datasource-apple/img/apple/64/2328-fe0f.png';
+import s23cffe0f from 'emoji-datasource-apple/img/apple/64/23cf-fe0f.png';
+import s23e9 from 'emoji-datasource-apple/img/apple/64/23e9.png';
+import s23ea from 'emoji-datasource-apple/img/apple/64/23ea.png';
+import s23eb from 'emoji-datasource-apple/img/apple/64/23eb.png';
+import s23ec from 'emoji-datasource-apple/img/apple/64/23ec.png';
+import s23edfe0f from 'emoji-datasource-apple/img/apple/64/23ed-fe0f.png';
+import s23eefe0f from 'emoji-datasource-apple/img/apple/64/23ee-fe0f.png';
+import s23effe0f from 'emoji-datasource-apple/img/apple/64/23ef-fe0f.png';
+import s23f0 from 'emoji-datasource-apple/img/apple/64/23f0.png';
+import s23f1fe0f from 'emoji-datasource-apple/img/apple/64/23f1-fe0f.png';
+import s23f2fe0f from 'emoji-datasource-apple/img/apple/64/23f2-fe0f.png';
+import s23f3 from 'emoji-datasource-apple/img/apple/64/23f3.png';
+import s23f8fe0f from 'emoji-datasource-apple/img/apple/64/23f8-fe0f.png';
+import s23f9fe0f from 'emoji-datasource-apple/img/apple/64/23f9-fe0f.png';
+import s23fafe0f from 'emoji-datasource-apple/img/apple/64/23fa-fe0f.png';
+import s24c2fe0f from 'emoji-datasource-apple/img/apple/64/24c2-fe0f.png';
+import s25aafe0f from 'emoji-datasource-apple/img/apple/64/25aa-fe0f.png';
+import s25abfe0f from 'emoji-datasource-apple/img/apple/64/25ab-fe0f.png';
+import s25b6fe0f from 'emoji-datasource-apple/img/apple/64/25b6-fe0f.png';
+import s25c0fe0f from 'emoji-datasource-apple/img/apple/64/25c0-fe0f.png';
+import s25fbfe0f from 'emoji-datasource-apple/img/apple/64/25fb-fe0f.png';
+import s25fcfe0f from 'emoji-datasource-apple/img/apple/64/25fc-fe0f.png';
+import s25fd from 'emoji-datasource-apple/img/apple/64/25fd.png';
+import s25fe from 'emoji-datasource-apple/img/apple/64/25fe.png';
+import s2600fe0f from 'emoji-datasource-apple/img/apple/64/2600-fe0f.png';
+import s2601fe0f from 'emoji-datasource-apple/img/apple/64/2601-fe0f.png';
+import s2602fe0f from 'emoji-datasource-apple/img/apple/64/2602-fe0f.png';
+import s2603fe0f from 'emoji-datasource-apple/img/apple/64/2603-fe0f.png';
+import s2604fe0f from 'emoji-datasource-apple/img/apple/64/2604-fe0f.png';
+import s260efe0f from 'emoji-datasource-apple/img/apple/64/260e-fe0f.png';
+import s2611fe0f from 'emoji-datasource-apple/img/apple/64/2611-fe0f.png';
+import s2614 from 'emoji-datasource-apple/img/apple/64/2614.png';
+import s2615 from 'emoji-datasource-apple/img/apple/64/2615.png';
+import s2618fe0f from 'emoji-datasource-apple/img/apple/64/2618-fe0f.png';
+import s261dfe0f from 'emoji-datasource-apple/img/apple/64/261d-fe0f.png';
+import s2620fe0f from 'emoji-datasource-apple/img/apple/64/2620-fe0f.png';
+import s2622fe0f from 'emoji-datasource-apple/img/apple/64/2622-fe0f.png';
+import s2623fe0f from 'emoji-datasource-apple/img/apple/64/2623-fe0f.png';
+import s2626fe0f from 'emoji-datasource-apple/img/apple/64/2626-fe0f.png';
+import s262afe0f from 'emoji-datasource-apple/img/apple/64/262a-fe0f.png';
+import s262efe0f from 'emoji-datasource-apple/img/apple/64/262e-fe0f.png';
+import s262ffe0f from 'emoji-datasource-apple/img/apple/64/262f-fe0f.png';
+import s2638fe0f from 'emoji-datasource-apple/img/apple/64/2638-fe0f.png';
+import s2639fe0f from 'emoji-datasource-apple/img/apple/64/2639-fe0f.png';
+import s263afe0f from 'emoji-datasource-apple/img/apple/64/263a-fe0f.png';
+import s2648 from 'emoji-datasource-apple/img/apple/64/2648.png';
+import s2649 from 'emoji-datasource-apple/img/apple/64/2649.png';
+import s264a from 'emoji-datasource-apple/img/apple/64/264a.png';
+import s264b from 'emoji-datasource-apple/img/apple/64/264b.png';
+import s264c from 'emoji-datasource-apple/img/apple/64/264c.png';
+import s264d from 'emoji-datasource-apple/img/apple/64/264d.png';
+import s264e from 'emoji-datasource-apple/img/apple/64/264e.png';
+import s264f from 'emoji-datasource-apple/img/apple/64/264f.png';
+import s2650 from 'emoji-datasource-apple/img/apple/64/2650.png';
+import s2651 from 'emoji-datasource-apple/img/apple/64/2651.png';
+import s2652 from 'emoji-datasource-apple/img/apple/64/2652.png';
+import s2653 from 'emoji-datasource-apple/img/apple/64/2653.png';
+import s265ffe0f from 'emoji-datasource-apple/img/apple/64/265f-fe0f.png';
+import s2660fe0f from 'emoji-datasource-apple/img/apple/64/2660-fe0f.png';
+import s2663fe0f from 'emoji-datasource-apple/img/apple/64/2663-fe0f.png';
+import s2665fe0f from 'emoji-datasource-apple/img/apple/64/2665-fe0f.png';
+import s2666fe0f from 'emoji-datasource-apple/img/apple/64/2666-fe0f.png';
+import s2668fe0f from 'emoji-datasource-apple/img/apple/64/2668-fe0f.png';
+import s267bfe0f from 'emoji-datasource-apple/img/apple/64/267b-fe0f.png';
+import s267efe0f from 'emoji-datasource-apple/img/apple/64/267e-fe0f.png';
+import s267f from 'emoji-datasource-apple/img/apple/64/267f.png';
+import s2692fe0f from 'emoji-datasource-apple/img/apple/64/2692-fe0f.png';
+import s2693 from 'emoji-datasource-apple/img/apple/64/2693.png';
+import s2694fe0f from 'emoji-datasource-apple/img/apple/64/2694-fe0f.png';
+import s2696fe0f from 'emoji-datasource-apple/img/apple/64/2696-fe0f.png';
+import s2697fe0f from 'emoji-datasource-apple/img/apple/64/2697-fe0f.png';
+import s2699fe0f from 'emoji-datasource-apple/img/apple/64/2699-fe0f.png';
+import s269bfe0f from 'emoji-datasource-apple/img/apple/64/269b-fe0f.png';
+import s269cfe0f from 'emoji-datasource-apple/img/apple/64/269c-fe0f.png';
+import s26a0fe0f from 'emoji-datasource-apple/img/apple/64/26a0-fe0f.png';
+import s26a1 from 'emoji-datasource-apple/img/apple/64/26a1.png';
+import s26a7fe0f from 'emoji-datasource-apple/img/apple/64/26a7-fe0f.png';
+import s26aa from 'emoji-datasource-apple/img/apple/64/26aa.png';
+import s26ab from 'emoji-datasource-apple/img/apple/64/26ab.png';
+import s26b0fe0f from 'emoji-datasource-apple/img/apple/64/26b0-fe0f.png';
+import s26b1fe0f from 'emoji-datasource-apple/img/apple/64/26b1-fe0f.png';
+import s26bd from 'emoji-datasource-apple/img/apple/64/26bd.png';
+import s26be from 'emoji-datasource-apple/img/apple/64/26be.png';
+import s26c4 from 'emoji-datasource-apple/img/apple/64/26c4.png';
+import s26c5 from 'emoji-datasource-apple/img/apple/64/26c5.png';
+import s26c8fe0f from 'emoji-datasource-apple/img/apple/64/26c8-fe0f.png';
+import s26ce from 'emoji-datasource-apple/img/apple/64/26ce.png';
+import s26cffe0f from 'emoji-datasource-apple/img/apple/64/26cf-fe0f.png';
+import s26d1fe0f from 'emoji-datasource-apple/img/apple/64/26d1-fe0f.png';
+import s26d3fe0f from 'emoji-datasource-apple/img/apple/64/26d3-fe0f.png';
+import s26d4 from 'emoji-datasource-apple/img/apple/64/26d4.png';
+import s26e9fe0f from 'emoji-datasource-apple/img/apple/64/26e9-fe0f.png';
+import s26ea from 'emoji-datasource-apple/img/apple/64/26ea.png';
+import s26f0fe0f from 'emoji-datasource-apple/img/apple/64/26f0-fe0f.png';
+import s26f1fe0f from 'emoji-datasource-apple/img/apple/64/26f1-fe0f.png';
+import s26f2 from 'emoji-datasource-apple/img/apple/64/26f2.png';
+import s26f3 from 'emoji-datasource-apple/img/apple/64/26f3.png';
+import s26f4fe0f from 'emoji-datasource-apple/img/apple/64/26f4-fe0f.png';
+import s26f5 from 'emoji-datasource-apple/img/apple/64/26f5.png';
+import s26f7fe0f from 'emoji-datasource-apple/img/apple/64/26f7-fe0f.png';
+import s26f8fe0f from 'emoji-datasource-apple/img/apple/64/26f8-fe0f.png';
+import s26f9fe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/26f9-fe0f-200d-2640-fe0f.png';
+import s26f9fe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/26f9-fe0f-200d-2642-fe0f.png';
+import s26f9fe0f from 'emoji-datasource-apple/img/apple/64/26f9-fe0f.png';
+import s26fa from 'emoji-datasource-apple/img/apple/64/26fa.png';
+import s26fd from 'emoji-datasource-apple/img/apple/64/26fd.png';
+import s2702fe0f from 'emoji-datasource-apple/img/apple/64/2702-fe0f.png';
+import s2705 from 'emoji-datasource-apple/img/apple/64/2705.png';
+import s2708fe0f from 'emoji-datasource-apple/img/apple/64/2708-fe0f.png';
+import s2709fe0f from 'emoji-datasource-apple/img/apple/64/2709-fe0f.png';
+import s270a from 'emoji-datasource-apple/img/apple/64/270a.png';
+import s270b from 'emoji-datasource-apple/img/apple/64/270b.png';
+import s270cfe0f from 'emoji-datasource-apple/img/apple/64/270c-fe0f.png';
+import s270dfe0f from 'emoji-datasource-apple/img/apple/64/270d-fe0f.png';
+import s270ffe0f from 'emoji-datasource-apple/img/apple/64/270f-fe0f.png';
+import s2712fe0f from 'emoji-datasource-apple/img/apple/64/2712-fe0f.png';
+import s2714fe0f from 'emoji-datasource-apple/img/apple/64/2714-fe0f.png';
+import s2716fe0f from 'emoji-datasource-apple/img/apple/64/2716-fe0f.png';
+import s271dfe0f from 'emoji-datasource-apple/img/apple/64/271d-fe0f.png';
+import s2721fe0f from 'emoji-datasource-apple/img/apple/64/2721-fe0f.png';
+import s2728 from 'emoji-datasource-apple/img/apple/64/2728.png';
+import s2733fe0f from 'emoji-datasource-apple/img/apple/64/2733-fe0f.png';
+import s2734fe0f from 'emoji-datasource-apple/img/apple/64/2734-fe0f.png';
+import s2744fe0f from 'emoji-datasource-apple/img/apple/64/2744-fe0f.png';
+import s2747fe0f from 'emoji-datasource-apple/img/apple/64/2747-fe0f.png';
+import s274c from 'emoji-datasource-apple/img/apple/64/274c.png';
+import s274e from 'emoji-datasource-apple/img/apple/64/274e.png';
+import s2753 from 'emoji-datasource-apple/img/apple/64/2753.png';
+import s2754 from 'emoji-datasource-apple/img/apple/64/2754.png';
+import s2755 from 'emoji-datasource-apple/img/apple/64/2755.png';
+import s2757 from 'emoji-datasource-apple/img/apple/64/2757.png';
+import s2763fe0f from 'emoji-datasource-apple/img/apple/64/2763-fe0f.png';
+import s2764fe0f200d1f525 from 'emoji-datasource-apple/img/apple/64/2764-fe0f-200d-1f525.png';
+import s2764fe0f200d1fa79 from 'emoji-datasource-apple/img/apple/64/2764-fe0f-200d-1fa79.png';
+import s2764fe0f from 'emoji-datasource-apple/img/apple/64/2764-fe0f.png';
+import s2795 from 'emoji-datasource-apple/img/apple/64/2795.png';
+import s2796 from 'emoji-datasource-apple/img/apple/64/2796.png';
+import s2797 from 'emoji-datasource-apple/img/apple/64/2797.png';
+import s27a1fe0f from 'emoji-datasource-apple/img/apple/64/27a1-fe0f.png';
+import s27b0 from 'emoji-datasource-apple/img/apple/64/27b0.png';
+import s27bf from 'emoji-datasource-apple/img/apple/64/27bf.png';
+import s2934fe0f from 'emoji-datasource-apple/img/apple/64/2934-fe0f.png';
+import s2935fe0f from 'emoji-datasource-apple/img/apple/64/2935-fe0f.png';
+import s2b05fe0f from 'emoji-datasource-apple/img/apple/64/2b05-fe0f.png';
+import s2b06fe0f from 'emoji-datasource-apple/img/apple/64/2b06-fe0f.png';
+import s2b07fe0f from 'emoji-datasource-apple/img/apple/64/2b07-fe0f.png';
+import s2b1b from 'emoji-datasource-apple/img/apple/64/2b1b.png';
+import s2b1c from 'emoji-datasource-apple/img/apple/64/2b1c.png';
+import s2b50 from 'emoji-datasource-apple/img/apple/64/2b50.png';
+import s2b55 from 'emoji-datasource-apple/img/apple/64/2b55.png';
+import s3030fe0f from 'emoji-datasource-apple/img/apple/64/3030-fe0f.png';
+import s303dfe0f from 'emoji-datasource-apple/img/apple/64/303d-fe0f.png';
+import s3297fe0f from 'emoji-datasource-apple/img/apple/64/3297-fe0f.png';
+import s3299fe0f from 'emoji-datasource-apple/img/apple/64/3299-fe0f.png';
 
 export interface Smile {
   alt: string;
-  src: typeof import('.gif');
+  src: typeof import('.png');
 }
 
-export interface SmileysStructure {
-  base: { [id: string]: Smile };
-  girls: { [id: string]: Smile };
-  extra: { [id: string]: Smile };
-}
+export type SmileysStructure = Record<string, Record<string, Smile>>;
 export const smileys: SmileysStructure = {
-  base: {
-    㐂: {alt: '::))):', src: base_0000},
-    㐃: {alt: '::):', src: base_0001},
-    㐄: {alt: ':hehe:', src: base_0002},
-    㐅: {alt: ':haha:', src: base_0003},
-    㐆: {alt: ':haha2:', src: base_0004},
-    㐇: {alt: ':lol:', src: base_0005},
-    㐈: {alt: '::D:', src: base_0006},
-    㐉: {alt: ':;))):', src: base_0007},
-    㐊: {alt: ':;)):', src: base_0008},
-    㐋: {alt: ':;):', src: base_0009},
-    㐌: {alt: ':8-/:', src: base_000a},
-    㐍: {alt: '::(((:', src: base_000b},
-    㐎: {alt: '::((:', src: base_000c},
-    㐏: {alt: '::(:', src: base_000d},
-    㐐: {alt: '::\'(:', src: base_000e},
-    㐑: {alt: ':happy:', src: base_000f},
-    㐒: {alt: ':happy2:', src: base_0010},
-    㐓: {alt: ':mad:', src: base_0011},
-    㐔: {alt: ':mad2:', src: base_0012},
-    㐕: {alt: ':mad3:', src: base_0013},
-    㐖: {alt: ':mad4:', src: base_0014},
-    㐗: {alt: ':mad6:', src: base_0015},
-    㐘: {alt: ':idiot:', src: base_0016},
-    㐙: {alt: ':agree:', src: base_0017},
-    㐚: {alt: ':love:', src: base_0018},
-    㐛: {alt: ':love4:', src: base_0019},
-    㐜: {alt: ':rose:', src: base_001a},
-    㐝: {alt: ':kiss:', src: base_001b},
-    㐞: {alt: ':kiss2:', src: base_001c},
-    㐟: {alt: ':shy:', src: base_001d},
-    㐠: {alt: ':8-|:', src: base_001e},
-    㐡: {alt: ':shock:', src: base_001f},
-    㐢: {alt: '::PP:', src: base_0020},
-    㐣: {alt: '::P:', src: base_0021},
-    㐤: {alt: ':brows:', src: base_0022},
-    㐥: {alt: ':8-S:', src: base_0023},
-    㐦: {alt: ':crazy:', src: base_0024},
-    㐧: {alt: ':crazy2:', src: base_0025},
-    㐨: {alt: ':oops:', src: base_0026},
-    㐩: {alt: ':ahwell:', src: base_0027},
-    㐪: {alt: ':no:', src: base_0028},
-    㐫: {alt: ':no2:', src: base_0029},
-    㐬: {alt: ':no3:', src: base_002a},
-    㐭: {alt: ':yes:', src: base_002b},
-    㐮: {alt: ':yeah:', src: base_002c},
-    㐯: {alt: ':ok:', src: base_002d},
-    㐰: {alt: ':good:', src: base_002e},
-    㐱: {alt: ':bad:', src: base_002f},
-    㐲: {alt: ':bravo:', src: base_0030},
-    㐳: {alt: ':yahoo:', src: base_0031},
-    㐴: {alt: ':present:', src: base_0032},
-    㐵: {alt: ':thank:', src: base_0033},
-    㐶: {alt: ':thank2:', src: base_0034},
-    㐷: {alt: ':whistle:', src: base_0035},
-    㐸: {alt: ':noway:', src: base_0036},
-    㐹: {alt: ':rebuke:', src: base_0037},
-    㐺: {alt: ':stop:', src: base_0038},
-    㐻: {alt: ':secret:', src: base_0039},
-    㐼: {alt: ':innocent:', src: base_003a},
-    㐽: {alt: ':scare:', src: base_003b},
-    㐾: {alt: ':friends:', src: base_003c},
-    㐿: {alt: ':beaten:', src: base_003d},
-    㑀: {alt: ':beaten2:', src: base_003e},
-    㑁: {alt: ':dance:', src: base_003f},
-    㑂: {alt: ':dance2:', src: base_0040},
-    㑃: {alt: ':heat:', src: base_0041},
-    㑄: {alt: ':tough:', src: base_0042},
-    㑅: {alt: ':suicide:', src: base_0043},
-    㑆: {alt: ':weary:', src: base_0044},
-    㑇: {alt: ':bye:', src: base_0045}
+  "Smileys": {
+    "\u1F441\uFE0F\u200D\u1F5E8\uFE0F": {
+      "src": s1f441fe0f200d1f5e8fe0f,
+      "alt": "eye-in-speech-bubble"
+    },
+    "\u1F479": {
+      "src": s1f479,
+      "alt": "japanese_ogre"
+    },
+    "\u1F47A": {
+      "src": s1f47a,
+      "alt": "japanese_goblin"
+    },
+    "\u1F47B": {
+      "src": s1f47b,
+      "alt": "ghost"
+    },
+    "\u1F47D": {
+      "src": s1f47d,
+      "alt": "alien"
+    },
+    "\u1F47E": {
+      "src": s1f47e,
+      "alt": "space_invader"
+    },
+    "\u1F47F": {
+      "src": s1f47f,
+      "alt": "imp"
+    },
+    "\u1F480": {
+      "src": s1f480,
+      "alt": "skull"
+    },
+    "\u1F48B": {
+      "src": s1f48b,
+      "alt": "kiss"
+    },
+    "\u1F48C": {
+      "src": s1f48c,
+      "alt": "love_letter"
+    },
+    "\u1F493": {
+      "src": s1f493,
+      "alt": "heartbeat"
+    },
+    "\u1F494": {
+      "src": s1f494,
+      "alt": "broken_heart"
+    },
+    "\u1F495": {
+      "src": s1f495,
+      "alt": "two_hearts"
+    },
+    "\u1F496": {
+      "src": s1f496,
+      "alt": "sparkling_heart"
+    },
+    "\u1F497": {
+      "src": s1f497,
+      "alt": "heartpulse"
+    },
+    "\u1F498": {
+      "src": s1f498,
+      "alt": "cupid"
+    },
+    "\u1F499": {
+      "src": s1f499,
+      "alt": "blue_heart"
+    },
+    "\u1F49A": {
+      "src": s1f49a,
+      "alt": "green_heart"
+    },
+    "\u1F49B": {
+      "src": s1f49b,
+      "alt": "yellow_heart"
+    },
+    "\u1F49C": {
+      "src": s1f49c,
+      "alt": "purple_heart"
+    },
+    "\u1F49D": {
+      "src": s1f49d,
+      "alt": "gift_heart"
+    },
+    "\u1F49E": {
+      "src": s1f49e,
+      "alt": "revolving_hearts"
+    },
+    "\u1F49F": {
+      "src": s1f49f,
+      "alt": "heart_decoration"
+    },
+    "\u1F4A2": {
+      "src": s1f4a2,
+      "alt": "anger"
+    },
+    "\u1F4A3": {
+      "src": s1f4a3,
+      "alt": "bomb"
+    },
+    "\u1F4A4": {
+      "src": s1f4a4,
+      "alt": "zzz"
+    },
+    "\u1F4A5": {
+      "src": s1f4a5,
+      "alt": "boom"
+    },
+    "\u1F4A6": {
+      "src": s1f4a6,
+      "alt": "sweat_drops"
+    },
+    "\u1F4A8": {
+      "src": s1f4a8,
+      "alt": "dash"
+    },
+    "\u1F4A9": {
+      "src": s1f4a9,
+      "alt": "hankey"
+    },
+    "\u1F4AB": {
+      "src": s1f4ab,
+      "alt": "dizzy"
+    },
+    "\u1F4AC": {
+      "src": s1f4ac,
+      "alt": "speech_balloon"
+    },
+    "\u1F4AD": {
+      "src": s1f4ad,
+      "alt": "thought_balloon"
+    },
+    "\u1F4AF": {
+      "src": s1f4af,
+      "alt": "100"
+    },
+    "\u1F573\uFE0F": {
+      "src": s1f573fe0f,
+      "alt": "hole"
+    },
+    "\u1F5A4": {
+      "src": s1f5a4,
+      "alt": "black_heart"
+    },
+    "\u1F5E8\uFE0F": {
+      "src": s1f5e8fe0f,
+      "alt": "left_speech_bubble"
+    },
+    "\u1F5EF\uFE0F": {
+      "src": s1f5effe0f,
+      "alt": "right_anger_bubble"
+    },
+    "\u1F600": {
+      "src": s1f600,
+      "alt": "grinning"
+    },
+    "\u1F601": {
+      "src": s1f601,
+      "alt": "grin"
+    },
+    "\u1F602": {
+      "src": s1f602,
+      "alt": "joy"
+    },
+    "\u1F603": {
+      "src": s1f603,
+      "alt": "smiley"
+    },
+    "\u1F604": {
+      "src": s1f604,
+      "alt": "smile"
+    },
+    "\u1F605": {
+      "src": s1f605,
+      "alt": "sweat_smile"
+    },
+    "\u1F606": {
+      "src": s1f606,
+      "alt": "laughing"
+    },
+    "\u1F607": {
+      "src": s1f607,
+      "alt": "innocent"
+    },
+    "\u1F608": {
+      "src": s1f608,
+      "alt": "smiling_imp"
+    },
+    "\u1F609": {
+      "src": s1f609,
+      "alt": "wink"
+    },
+    "\u1F60A": {
+      "src": s1f60a,
+      "alt": "blush"
+    },
+    "\u1F60B": {
+      "src": s1f60b,
+      "alt": "yum"
+    },
+    "\u1F60C": {
+      "src": s1f60c,
+      "alt": "relieved"
+    },
+    "\u1F60D": {
+      "src": s1f60d,
+      "alt": "heart_eyes"
+    },
+    "\u1F60E": {
+      "src": s1f60e,
+      "alt": "sunglasses"
+    },
+    "\u1F60F": {
+      "src": s1f60f,
+      "alt": "smirk"
+    },
+    "\u1F610": {
+      "src": s1f610,
+      "alt": "neutral_face"
+    },
+    "\u1F611": {
+      "src": s1f611,
+      "alt": "expressionless"
+    },
+    "\u1F612": {
+      "src": s1f612,
+      "alt": "unamused"
+    },
+    "\u1F613": {
+      "src": s1f613,
+      "alt": "sweat"
+    },
+    "\u1F614": {
+      "src": s1f614,
+      "alt": "pensive"
+    },
+    "\u1F615": {
+      "src": s1f615,
+      "alt": "confused"
+    },
+    "\u1F616": {
+      "src": s1f616,
+      "alt": "confounded"
+    },
+    "\u1F617": {
+      "src": s1f617,
+      "alt": "kissing"
+    },
+    "\u1F618": {
+      "src": s1f618,
+      "alt": "kissing_heart"
+    },
+    "\u1F619": {
+      "src": s1f619,
+      "alt": "kissing_smiling_eyes"
+    },
+    "\u1F61A": {
+      "src": s1f61a,
+      "alt": "kissing_closed_eyes"
+    },
+    "\u1F61B": {
+      "src": s1f61b,
+      "alt": "stuck_out_tongue"
+    },
+    "\u1F61C": {
+      "src": s1f61c,
+      "alt": "stuck_out_tongue_winking_eye"
+    },
+    "\u1F61D": {
+      "src": s1f61d,
+      "alt": "stuck_out_tongue_closed_eyes"
+    },
+    "\u1F61E": {
+      "src": s1f61e,
+      "alt": "disappointed"
+    },
+    "\u1F61F": {
+      "src": s1f61f,
+      "alt": "worried"
+    },
+    "\u1F620": {
+      "src": s1f620,
+      "alt": "angry"
+    },
+    "\u1F621": {
+      "src": s1f621,
+      "alt": "rage"
+    },
+    "\u1F622": {
+      "src": s1f622,
+      "alt": "cry"
+    },
+    "\u1F623": {
+      "src": s1f623,
+      "alt": "persevere"
+    },
+    "\u1F624": {
+      "src": s1f624,
+      "alt": "triumph"
+    },
+    "\u1F625": {
+      "src": s1f625,
+      "alt": "disappointed_relieved"
+    },
+    "\u1F626": {
+      "src": s1f626,
+      "alt": "frowning"
+    },
+    "\u1F627": {
+      "src": s1f627,
+      "alt": "anguished"
+    },
+    "\u1F628": {
+      "src": s1f628,
+      "alt": "fearful"
+    },
+    "\u1F629": {
+      "src": s1f629,
+      "alt": "weary"
+    },
+    "\u1F62A": {
+      "src": s1f62a,
+      "alt": "sleepy"
+    },
+    "\u1F62B": {
+      "src": s1f62b,
+      "alt": "tired_face"
+    },
+    "\u1F62C": {
+      "src": s1f62c,
+      "alt": "grimacing"
+    },
+    "\u1F62D": {
+      "src": s1f62d,
+      "alt": "sob"
+    },
+    "\u1F62E\u200D\u1F4A8": {
+      "src": s1f62e200d1f4a8,
+      "alt": "face_exhaling"
+    },
+    "\u1F62E": {
+      "src": s1f62e,
+      "alt": "open_mouth"
+    },
+    "\u1F62F": {
+      "src": s1f62f,
+      "alt": "hushed"
+    },
+    "\u1F630": {
+      "src": s1f630,
+      "alt": "cold_sweat"
+    },
+    "\u1F631": {
+      "src": s1f631,
+      "alt": "scream"
+    },
+    "\u1F632": {
+      "src": s1f632,
+      "alt": "astonished"
+    },
+    "\u1F633": {
+      "src": s1f633,
+      "alt": "flushed"
+    },
+    "\u1F634": {
+      "src": s1f634,
+      "alt": "sleeping"
+    },
+    "\u1F635\u200D\u1F4AB": {
+      "src": s1f635200d1f4ab,
+      "alt": "face_with_spiral_eyes"
+    },
+    "\u1F635": {
+      "src": s1f635,
+      "alt": "dizzy_face"
+    },
+    "\u1F636\u200D\u1F32B\uFE0F": {
+      "src": s1f636200d1f32bfe0f,
+      "alt": "face_in_clouds"
+    },
+    "\u1F636": {
+      "src": s1f636,
+      "alt": "no_mouth"
+    },
+    "\u1F637": {
+      "src": s1f637,
+      "alt": "mask"
+    },
+    "\u1F638": {
+      "src": s1f638,
+      "alt": "smile_cat"
+    },
+    "\u1F639": {
+      "src": s1f639,
+      "alt": "joy_cat"
+    },
+    "\u1F63A": {
+      "src": s1f63a,
+      "alt": "smiley_cat"
+    },
+    "\u1F63B": {
+      "src": s1f63b,
+      "alt": "heart_eyes_cat"
+    },
+    "\u1F63C": {
+      "src": s1f63c,
+      "alt": "smirk_cat"
+    },
+    "\u1F63D": {
+      "src": s1f63d,
+      "alt": "kissing_cat"
+    },
+    "\u1F63E": {
+      "src": s1f63e,
+      "alt": "pouting_cat"
+    },
+    "\u1F63F": {
+      "src": s1f63f,
+      "alt": "crying_cat_face"
+    },
+    "\u1F640": {
+      "src": s1f640,
+      "alt": "scream_cat"
+    },
+    "\u1F641": {
+      "src": s1f641,
+      "alt": "slightly_frowning_face"
+    },
+    "\u1F642": {
+      "src": s1f642,
+      "alt": "slightly_smiling_face"
+    },
+    "\u1F643": {
+      "src": s1f643,
+      "alt": "upside_down_face"
+    },
+    "\u1F644": {
+      "src": s1f644,
+      "alt": "face_with_rolling_eyes"
+    },
+    "\u1F648": {
+      "src": s1f648,
+      "alt": "see_no_evil"
+    },
+    "\u1F649": {
+      "src": s1f649,
+      "alt": "hear_no_evil"
+    },
+    "\u1F64A": {
+      "src": s1f64a,
+      "alt": "speak_no_evil"
+    },
+    "\u1F90D": {
+      "src": s1f90d,
+      "alt": "white_heart"
+    },
+    "\u1F90E": {
+      "src": s1f90e,
+      "alt": "brown_heart"
+    },
+    "\u1F910": {
+      "src": s1f910,
+      "alt": "zipper_mouth_face"
+    },
+    "\u1F911": {
+      "src": s1f911,
+      "alt": "money_mouth_face"
+    },
+    "\u1F912": {
+      "src": s1f912,
+      "alt": "face_with_thermometer"
+    },
+    "\u1F913": {
+      "src": s1f913,
+      "alt": "nerd_face"
+    },
+    "\u1F914": {
+      "src": s1f914,
+      "alt": "thinking_face"
+    },
+    "\u1F915": {
+      "src": s1f915,
+      "alt": "face_with_head_bandage"
+    },
+    "\u1F916": {
+      "src": s1f916,
+      "alt": "robot_face"
+    },
+    "\u1F917": {
+      "src": s1f917,
+      "alt": "hugging_face"
+    },
+    "\u1F920": {
+      "src": s1f920,
+      "alt": "face_with_cowboy_hat"
+    },
+    "\u1F921": {
+      "src": s1f921,
+      "alt": "clown_face"
+    },
+    "\u1F922": {
+      "src": s1f922,
+      "alt": "nauseated_face"
+    },
+    "\u1F923": {
+      "src": s1f923,
+      "alt": "rolling_on_the_floor_laughing"
+    },
+    "\u1F924": {
+      "src": s1f924,
+      "alt": "drooling_face"
+    },
+    "\u1F925": {
+      "src": s1f925,
+      "alt": "lying_face"
+    },
+    "\u1F927": {
+      "src": s1f927,
+      "alt": "sneezing_face"
+    },
+    "\u1F928": {
+      "src": s1f928,
+      "alt": "face_with_raised_eyebrow"
+    },
+    "\u1F929": {
+      "src": s1f929,
+      "alt": "star-struck"
+    },
+    "\u1F92A": {
+      "src": s1f92a,
+      "alt": "zany_face"
+    },
+    "\u1F92B": {
+      "src": s1f92b,
+      "alt": "shushing_face"
+    },
+    "\u1F92C": {
+      "src": s1f92c,
+      "alt": "face_with_symbols_on_mouth"
+    },
+    "\u1F92D": {
+      "src": s1f92d,
+      "alt": "face_with_hand_over_mouth"
+    },
+    "\u1F92E": {
+      "src": s1f92e,
+      "alt": "face_vomiting"
+    },
+    "\u1F92F": {
+      "src": s1f92f,
+      "alt": "exploding_head"
+    },
+    "\u1F970": {
+      "src": s1f970,
+      "alt": "smiling_face_with_3_hearts"
+    },
+    "\u1F971": {
+      "src": s1f971,
+      "alt": "yawning_face"
+    },
+    "\u1F972": {
+      "src": s1f972,
+      "alt": "smiling_face_with_tear"
+    },
+    "\u1F973": {
+      "src": s1f973,
+      "alt": "partying_face"
+    },
+    "\u1F974": {
+      "src": s1f974,
+      "alt": "woozy_face"
+    },
+    "\u1F975": {
+      "src": s1f975,
+      "alt": "hot_face"
+    },
+    "\u1F976": {
+      "src": s1f976,
+      "alt": "cold_face"
+    },
+    "\u1F978": {
+      "src": s1f978,
+      "alt": "disguised_face"
+    },
+    "\u1F97A": {
+      "src": s1f97a,
+      "alt": "pleading_face"
+    },
+    "\u1F9D0": {
+      "src": s1f9d0,
+      "alt": "face_with_monocle"
+    },
+    "\u1F9E1": {
+      "src": s1f9e1,
+      "alt": "orange_heart"
+    },
+    "\u2620\uFE0F": {
+      "src": s2620fe0f,
+      "alt": "skull_and_crossbones"
+    },
+    "\u2639\uFE0F": {
+      "src": s2639fe0f,
+      "alt": "white_frowning_face"
+    },
+    "\u263A\uFE0F": {
+      "src": s263afe0f,
+      "alt": "relaxed"
+    },
+    "\u2763\uFE0F": {
+      "src": s2763fe0f,
+      "alt": "heavy_heart_exclamation_mark_ornament"
+    },
+    "\u2764\uFE0F\u200D\u1F525": {
+      "src": s2764fe0f200d1f525,
+      "alt": "heart_on_fire"
+    },
+    "\u2764\uFE0F\u200D\u1FA79": {
+      "src": s2764fe0f200d1fa79,
+      "alt": "mending_heart"
+    },
+    "\u2764\uFE0F": {
+      "src": s2764fe0f,
+      "alt": "heart"
+    }
   },
-  girls: {
-    㑈: {alt: ':makeup:', src: girls_0046},
-    㑉: {alt: ':;girl:', src: girls_0047},
-    㑊: {alt: ':girllisten:', src: girls_0048},
-    㑋: {alt: ':girllol:', src: girls_0049},
-    㑌: {alt: ':love2:', src: girls_004a},
-    㑍: {alt: ':love3:', src: girls_004b},
-    㑎: {alt: ':madgirl:', src: girls_004c},
-    㑏: {alt: ':crazygirl:', src: girls_004d},
-    㑐: {alt: ':crazygirl2:', src: girls_004e},
-    㑑: {alt: ':girlp:', src: girls_004f},
-    㑒: {alt: ':girl(((:', src: girls_0050},
-    㑓: {alt: ':girl((:', src: girls_0051},
-    㑔: {alt: ':girl(:', src: girls_0052},
-    㑕: {alt: ':girlcry2:', src: girls_0053},
-    㑖: {alt: ':girlcry:', src: girls_0054},
-    㑗: {alt: ':girlscream:', src: girls_0055}
+  "People": {
+    "\u1F385": {
+      "src": s1f385,
+      "alt": "santa"
+    },
+    "\u1F3C2": {
+      "src": s1f3c2,
+      "alt": "snowboarder"
+    },
+    "\u1F3C3\u200D\u2640\uFE0F": {
+      "src": s1f3c3200d2640fe0f,
+      "alt": "woman-running"
+    },
+    "\u1F3C3\u200D\u2642\uFE0F": {
+      "src": s1f3c3200d2642fe0f,
+      "alt": "man-running"
+    },
+    "\u1F3C3": {
+      "src": s1f3c3,
+      "alt": "runner"
+    },
+    "\u1F3C4\u200D\u2640\uFE0F": {
+      "src": s1f3c4200d2640fe0f,
+      "alt": "woman-surfing"
+    },
+    "\u1F3C4\u200D\u2642\uFE0F": {
+      "src": s1f3c4200d2642fe0f,
+      "alt": "man-surfing"
+    },
+    "\u1F3C4": {
+      "src": s1f3c4,
+      "alt": "surfer"
+    },
+    "\u1F3C7": {
+      "src": s1f3c7,
+      "alt": "horse_racing"
+    },
+    "\u1F3CA\u200D\u2640\uFE0F": {
+      "src": s1f3ca200d2640fe0f,
+      "alt": "woman-swimming"
+    },
+    "\u1F3CA\u200D\u2642\uFE0F": {
+      "src": s1f3ca200d2642fe0f,
+      "alt": "man-swimming"
+    },
+    "\u1F3CA": {
+      "src": s1f3ca,
+      "alt": "swimmer"
+    },
+    "\u1F3CB\uFE0F\u200D\u2640\uFE0F": {
+      "src": s1f3cbfe0f200d2640fe0f,
+      "alt": "woman-lifting-weights"
+    },
+    "\u1F3CB\uFE0F\u200D\u2642\uFE0F": {
+      "src": s1f3cbfe0f200d2642fe0f,
+      "alt": "man-lifting-weights"
+    },
+    "\u1F3CB\uFE0F": {
+      "src": s1f3cbfe0f,
+      "alt": "weight_lifter"
+    },
+    "\u1F3CC\uFE0F\u200D\u2640\uFE0F": {
+      "src": s1f3ccfe0f200d2640fe0f,
+      "alt": "woman-golfing"
+    },
+    "\u1F3CC\uFE0F\u200D\u2642\uFE0F": {
+      "src": s1f3ccfe0f200d2642fe0f,
+      "alt": "man-golfing"
+    },
+    "\u1F3CC\uFE0F": {
+      "src": s1f3ccfe0f,
+      "alt": "golfer"
+    },
+    "\u1F440": {
+      "src": s1f440,
+      "alt": "eyes"
+    },
+    "\u1F441\uFE0F": {
+      "src": s1f441fe0f,
+      "alt": "eye"
+    },
+    "\u1F442": {
+      "src": s1f442,
+      "alt": "ear"
+    },
+    "\u1F443": {
+      "src": s1f443,
+      "alt": "nose"
+    },
+    "\u1F444": {
+      "src": s1f444,
+      "alt": "lips"
+    },
+    "\u1F445": {
+      "src": s1f445,
+      "alt": "tongue"
+    },
+    "\u1F446": {
+      "src": s1f446,
+      "alt": "point_up_2"
+    },
+    "\u1F447": {
+      "src": s1f447,
+      "alt": "point_down"
+    },
+    "\u1F448": {
+      "src": s1f448,
+      "alt": "point_left"
+    },
+    "\u1F449": {
+      "src": s1f449,
+      "alt": "point_right"
+    },
+    "\u1F44A": {
+      "src": s1f44a,
+      "alt": "facepunch"
+    },
+    "\u1F44B": {
+      "src": s1f44b,
+      "alt": "wave"
+    },
+    "\u1F44C": {
+      "src": s1f44c,
+      "alt": "ok_hand"
+    },
+    "\u1F44D": {
+      "src": s1f44d,
+      "alt": "+1"
+    },
+    "\u1F44E": {
+      "src": s1f44e,
+      "alt": "-1"
+    },
+    "\u1F44F": {
+      "src": s1f44f,
+      "alt": "clap"
+    },
+    "\u1F450": {
+      "src": s1f450,
+      "alt": "open_hands"
+    },
+    "\u1F463": {
+      "src": s1f463,
+      "alt": "footprints"
+    },
+    "\u1F464": {
+      "src": s1f464,
+      "alt": "bust_in_silhouette"
+    },
+    "\u1F465": {
+      "src": s1f465,
+      "alt": "busts_in_silhouette"
+    },
+    "\u1F466": {
+      "src": s1f466,
+      "alt": "boy"
+    },
+    "\u1F467": {
+      "src": s1f467,
+      "alt": "girl"
+    },
+    "\u1F468\u200D\u1F33E": {
+      "src": s1f468200d1f33e,
+      "alt": "male-farmer"
+    },
+    "\u1F468\u200D\u1F373": {
+      "src": s1f468200d1f373,
+      "alt": "male-cook"
+    },
+    "\u1F468\u200D\u1F37C": {
+      "src": s1f468200d1f37c,
+      "alt": "man_feeding_baby"
+    },
+    "\u1F468\u200D\u1F393": {
+      "src": s1f468200d1f393,
+      "alt": "male-student"
+    },
+    "\u1F468\u200D\u1F3A4": {
+      "src": s1f468200d1f3a4,
+      "alt": "male-singer"
+    },
+    "\u1F468\u200D\u1F3A8": {
+      "src": s1f468200d1f3a8,
+      "alt": "male-artist"
+    },
+    "\u1F468\u200D\u1F3EB": {
+      "src": s1f468200d1f3eb,
+      "alt": "male-teacher"
+    },
+    "\u1F468\u200D\u1F3ED": {
+      "src": s1f468200d1f3ed,
+      "alt": "male-factory-worker"
+    },
+    "\u1F468\u200D\u1F466\u200D\u1F466": {
+      "src": s1f468200d1f466200d1f466,
+      "alt": "man-boy-boy"
+    },
+    "\u1F468\u200D\u1F466": {
+      "src": s1f468200d1f466,
+      "alt": "man-boy"
+    },
+    "\u1F468\u200D\u1F467\u200D\u1F466": {
+      "src": s1f468200d1f467200d1f466,
+      "alt": "man-girl-boy"
+    },
+    "\u1F468\u200D\u1F467\u200D\u1F467": {
+      "src": s1f468200d1f467200d1f467,
+      "alt": "man-girl-girl"
+    },
+    "\u1F468\u200D\u1F467": {
+      "src": s1f468200d1f467,
+      "alt": "man-girl"
+    },
+    "\u1F468\u200D\u1F468\u200D\u1F466": {
+      "src": s1f468200d1f468200d1f466,
+      "alt": "man-man-boy"
+    },
+    "\u1F468\u200D\u1F468\u200D\u1F466\u200D\u1F466": {
+      "src": s1f468200d1f468200d1f466200d1f466,
+      "alt": "man-man-boy-boy"
+    },
+    "\u1F468\u200D\u1F468\u200D\u1F467": {
+      "src": s1f468200d1f468200d1f467,
+      "alt": "man-man-girl"
+    },
+    "\u1F468\u200D\u1F468\u200D\u1F467\u200D\u1F466": {
+      "src": s1f468200d1f468200d1f467200d1f466,
+      "alt": "man-man-girl-boy"
+    },
+    "\u1F468\u200D\u1F468\u200D\u1F467\u200D\u1F467": {
+      "src": s1f468200d1f468200d1f467200d1f467,
+      "alt": "man-man-girl-girl"
+    },
+    "\u1F468\u200D\u1F469\u200D\u1F466": {
+      "src": s1f468200d1f469200d1f466,
+      "alt": "man-woman-boy"
+    },
+    "\u1F468\u200D\u1F469\u200D\u1F466\u200D\u1F466": {
+      "src": s1f468200d1f469200d1f466200d1f466,
+      "alt": "man-woman-boy-boy"
+    },
+    "\u1F468\u200D\u1F469\u200D\u1F467": {
+      "src": s1f468200d1f469200d1f467,
+      "alt": "man-woman-girl"
+    },
+    "\u1F468\u200D\u1F469\u200D\u1F467\u200D\u1F466": {
+      "src": s1f468200d1f469200d1f467200d1f466,
+      "alt": "man-woman-girl-boy"
+    },
+    "\u1F468\u200D\u1F469\u200D\u1F467\u200D\u1F467": {
+      "src": s1f468200d1f469200d1f467200d1f467,
+      "alt": "man-woman-girl-girl"
+    },
+    "\u1F468\u200D\u1F4BB": {
+      "src": s1f468200d1f4bb,
+      "alt": "male-technologist"
+    },
+    "\u1F468\u200D\u1F4BC": {
+      "src": s1f468200d1f4bc,
+      "alt": "male-office-worker"
+    },
+    "\u1F468\u200D\u1F527": {
+      "src": s1f468200d1f527,
+      "alt": "male-mechanic"
+    },
+    "\u1F468\u200D\u1F52C": {
+      "src": s1f468200d1f52c,
+      "alt": "male-scientist"
+    },
+    "\u1F468\u200D\u1F680": {
+      "src": s1f468200d1f680,
+      "alt": "male-astronaut"
+    },
+    "\u1F468\u200D\u1F692": {
+      "src": s1f468200d1f692,
+      "alt": "male-firefighter"
+    },
+    "\u1F468\u200D\u1F9AF": {
+      "src": s1f468200d1f9af,
+      "alt": "man_with_probing_cane"
+    },
+    "\u1F468\u200D\u1F9B0": {
+      "src": s1f468200d1f9b0,
+      "alt": "red_haired_man"
+    },
+    "\u1F468\u200D\u1F9B1": {
+      "src": s1f468200d1f9b1,
+      "alt": "curly_haired_man"
+    },
+    "\u1F468\u200D\u1F9B2": {
+      "src": s1f468200d1f9b2,
+      "alt": "bald_man"
+    },
+    "\u1F468\u200D\u1F9B3": {
+      "src": s1f468200d1f9b3,
+      "alt": "white_haired_man"
+    },
+    "\u1F468\u200D\u1F9BC": {
+      "src": s1f468200d1f9bc,
+      "alt": "man_in_motorized_wheelchair"
+    },
+    "\u1F468\u200D\u1F9BD": {
+      "src": s1f468200d1f9bd,
+      "alt": "man_in_manual_wheelchair"
+    },
+    "\u1F468\u200D\u2695\uFE0F": {
+      "src": s1f468200d2695fe0f,
+      "alt": "male-doctor"
+    },
+    "\u1F468\u200D\u2696\uFE0F": {
+      "src": s1f468200d2696fe0f,
+      "alt": "male-judge"
+    },
+    "\u1F468\u200D\u2708\uFE0F": {
+      "src": s1f468200d2708fe0f,
+      "alt": "male-pilot"
+    },
+    "\u1F468\u200D\u2764\uFE0F\u200D\u1F468": {
+      "src": s1f468200d2764fe0f200d1f468,
+      "alt": "man-heart-man"
+    },
+    "\u1F468\u200D\u2764\uFE0F\u200D\u1F48B\u200D\u1F468": {
+      "src": s1f468200d2764fe0f200d1f48b200d1f468,
+      "alt": "man-kiss-man"
+    },
+    "\u1F468": {
+      "src": s1f468,
+      "alt": "man"
+    },
+    "\u1F469\u200D\u1F33E": {
+      "src": s1f469200d1f33e,
+      "alt": "female-farmer"
+    },
+    "\u1F469\u200D\u1F373": {
+      "src": s1f469200d1f373,
+      "alt": "female-cook"
+    },
+    "\u1F469\u200D\u1F37C": {
+      "src": s1f469200d1f37c,
+      "alt": "woman_feeding_baby"
+    },
+    "\u1F469\u200D\u1F393": {
+      "src": s1f469200d1f393,
+      "alt": "female-student"
+    },
+    "\u1F469\u200D\u1F3A4": {
+      "src": s1f469200d1f3a4,
+      "alt": "female-singer"
+    },
+    "\u1F469\u200D\u1F3A8": {
+      "src": s1f469200d1f3a8,
+      "alt": "female-artist"
+    },
+    "\u1F469\u200D\u1F3EB": {
+      "src": s1f469200d1f3eb,
+      "alt": "female-teacher"
+    },
+    "\u1F469\u200D\u1F3ED": {
+      "src": s1f469200d1f3ed,
+      "alt": "female-factory-worker"
+    },
+    "\u1F469\u200D\u1F466\u200D\u1F466": {
+      "src": s1f469200d1f466200d1f466,
+      "alt": "woman-boy-boy"
+    },
+    "\u1F469\u200D\u1F466": {
+      "src": s1f469200d1f466,
+      "alt": "woman-boy"
+    },
+    "\u1F469\u200D\u1F467\u200D\u1F466": {
+      "src": s1f469200d1f467200d1f466,
+      "alt": "woman-girl-boy"
+    },
+    "\u1F469\u200D\u1F467\u200D\u1F467": {
+      "src": s1f469200d1f467200d1f467,
+      "alt": "woman-girl-girl"
+    },
+    "\u1F469\u200D\u1F467": {
+      "src": s1f469200d1f467,
+      "alt": "woman-girl"
+    },
+    "\u1F469\u200D\u1F469\u200D\u1F466": {
+      "src": s1f469200d1f469200d1f466,
+      "alt": "woman-woman-boy"
+    },
+    "\u1F469\u200D\u1F469\u200D\u1F466\u200D\u1F466": {
+      "src": s1f469200d1f469200d1f466200d1f466,
+      "alt": "woman-woman-boy-boy"
+    },
+    "\u1F469\u200D\u1F469\u200D\u1F467": {
+      "src": s1f469200d1f469200d1f467,
+      "alt": "woman-woman-girl"
+    },
+    "\u1F469\u200D\u1F469\u200D\u1F467\u200D\u1F466": {
+      "src": s1f469200d1f469200d1f467200d1f466,
+      "alt": "woman-woman-girl-boy"
+    },
+    "\u1F469\u200D\u1F469\u200D\u1F467\u200D\u1F467": {
+      "src": s1f469200d1f469200d1f467200d1f467,
+      "alt": "woman-woman-girl-girl"
+    },
+    "\u1F469\u200D\u1F4BB": {
+      "src": s1f469200d1f4bb,
+      "alt": "female-technologist"
+    },
+    "\u1F469\u200D\u1F4BC": {
+      "src": s1f469200d1f4bc,
+      "alt": "female-office-worker"
+    },
+    "\u1F469\u200D\u1F527": {
+      "src": s1f469200d1f527,
+      "alt": "female-mechanic"
+    },
+    "\u1F469\u200D\u1F52C": {
+      "src": s1f469200d1f52c,
+      "alt": "female-scientist"
+    },
+    "\u1F469\u200D\u1F680": {
+      "src": s1f469200d1f680,
+      "alt": "female-astronaut"
+    },
+    "\u1F469\u200D\u1F692": {
+      "src": s1f469200d1f692,
+      "alt": "female-firefighter"
+    },
+    "\u1F469\u200D\u1F9AF": {
+      "src": s1f469200d1f9af,
+      "alt": "woman_with_probing_cane"
+    },
+    "\u1F469\u200D\u1F9B0": {
+      "src": s1f469200d1f9b0,
+      "alt": "red_haired_woman"
+    },
+    "\u1F469\u200D\u1F9B1": {
+      "src": s1f469200d1f9b1,
+      "alt": "curly_haired_woman"
+    },
+    "\u1F469\u200D\u1F9B2": {
+      "src": s1f469200d1f9b2,
+      "alt": "bald_woman"
+    },
+    "\u1F469\u200D\u1F9B3": {
+      "src": s1f469200d1f9b3,
+      "alt": "white_haired_woman"
+    },
+    "\u1F469\u200D\u1F9BC": {
+      "src": s1f469200d1f9bc,
+      "alt": "woman_in_motorized_wheelchair"
+    },
+    "\u1F469\u200D\u1F9BD": {
+      "src": s1f469200d1f9bd,
+      "alt": "woman_in_manual_wheelchair"
+    },
+    "\u1F469\u200D\u2695\uFE0F": {
+      "src": s1f469200d2695fe0f,
+      "alt": "female-doctor"
+    },
+    "\u1F469\u200D\u2696\uFE0F": {
+      "src": s1f469200d2696fe0f,
+      "alt": "female-judge"
+    },
+    "\u1F469\u200D\u2708\uFE0F": {
+      "src": s1f469200d2708fe0f,
+      "alt": "female-pilot"
+    },
+    "\u1F469\u200D\u2764\uFE0F\u200D\u1F468": {
+      "src": s1f469200d2764fe0f200d1f468,
+      "alt": "woman-heart-man"
+    },
+    "\u1F469\u200D\u2764\uFE0F\u200D\u1F469": {
+      "src": s1f469200d2764fe0f200d1f469,
+      "alt": "woman-heart-woman"
+    },
+    "\u1F469\u200D\u2764\uFE0F\u200D\u1F48B\u200D\u1F468": {
+      "src": s1f469200d2764fe0f200d1f48b200d1f468,
+      "alt": "woman-kiss-man"
+    },
+    "\u1F469\u200D\u2764\uFE0F\u200D\u1F48B\u200D\u1F469": {
+      "src": s1f469200d2764fe0f200d1f48b200d1f469,
+      "alt": "woman-kiss-woman"
+    },
+    "\u1F469": {
+      "src": s1f469,
+      "alt": "woman"
+    },
+    "\u1F46A": {
+      "src": s1f46a,
+      "alt": "family"
+    },
+    "\u1F46B": {
+      "src": s1f46b,
+      "alt": "man_and_woman_holding_hands"
+    },
+    "\u1F46C": {
+      "src": s1f46c,
+      "alt": "two_men_holding_hands"
+    },
+    "\u1F46D": {
+      "src": s1f46d,
+      "alt": "two_women_holding_hands"
+    },
+    "\u1F46E\u200D\u2640\uFE0F": {
+      "src": s1f46e200d2640fe0f,
+      "alt": "female-police-officer"
+    },
+    "\u1F46E\u200D\u2642\uFE0F": {
+      "src": s1f46e200d2642fe0f,
+      "alt": "male-police-officer"
+    },
+    "\u1F46E": {
+      "src": s1f46e,
+      "alt": "cop"
+    },
+    "\u1F46F\u200D\u2640\uFE0F": {
+      "src": s1f46f200d2640fe0f,
+      "alt": "women-with-bunny-ears-partying"
+    },
+    "\u1F46F\u200D\u2642\uFE0F": {
+      "src": s1f46f200d2642fe0f,
+      "alt": "men-with-bunny-ears-partying"
+    },
+    "\u1F46F": {
+      "src": s1f46f,
+      "alt": "dancers"
+    },
+    "\u1F470\u200D\u2640\uFE0F": {
+      "src": s1f470200d2640fe0f,
+      "alt": "woman_with_veil"
+    },
+    "\u1F470\u200D\u2642\uFE0F": {
+      "src": s1f470200d2642fe0f,
+      "alt": "man_with_veil"
+    },
+    "\u1F470": {
+      "src": s1f470,
+      "alt": "bride_with_veil"
+    },
+    "\u1F471\u200D\u2640\uFE0F": {
+      "src": s1f471200d2640fe0f,
+      "alt": "blond-haired-woman"
+    },
+    "\u1F471\u200D\u2642\uFE0F": {
+      "src": s1f471200d2642fe0f,
+      "alt": "blond-haired-man"
+    },
+    "\u1F471": {
+      "src": s1f471,
+      "alt": "person_with_blond_hair"
+    },
+    "\u1F472": {
+      "src": s1f472,
+      "alt": "man_with_gua_pi_mao"
+    },
+    "\u1F473\u200D\u2640\uFE0F": {
+      "src": s1f473200d2640fe0f,
+      "alt": "woman-wearing-turban"
+    },
+    "\u1F473\u200D\u2642\uFE0F": {
+      "src": s1f473200d2642fe0f,
+      "alt": "man-wearing-turban"
+    },
+    "\u1F473": {
+      "src": s1f473,
+      "alt": "man_with_turban"
+    },
+    "\u1F474": {
+      "src": s1f474,
+      "alt": "older_man"
+    },
+    "\u1F475": {
+      "src": s1f475,
+      "alt": "older_woman"
+    },
+    "\u1F476": {
+      "src": s1f476,
+      "alt": "baby"
+    },
+    "\u1F477\u200D\u2640\uFE0F": {
+      "src": s1f477200d2640fe0f,
+      "alt": "female-construction-worker"
+    },
+    "\u1F477\u200D\u2642\uFE0F": {
+      "src": s1f477200d2642fe0f,
+      "alt": "male-construction-worker"
+    },
+    "\u1F477": {
+      "src": s1f477,
+      "alt": "construction_worker"
+    },
+    "\u1F478": {
+      "src": s1f478,
+      "alt": "princess"
+    },
+    "\u1F47C": {
+      "src": s1f47c,
+      "alt": "angel"
+    },
+    "\u1F481\u200D\u2640\uFE0F": {
+      "src": s1f481200d2640fe0f,
+      "alt": "woman-tipping-hand"
+    },
+    "\u1F481\u200D\u2642\uFE0F": {
+      "src": s1f481200d2642fe0f,
+      "alt": "man-tipping-hand"
+    },
+    "\u1F481": {
+      "src": s1f481,
+      "alt": "information_desk_person"
+    },
+    "\u1F482\u200D\u2640\uFE0F": {
+      "src": s1f482200d2640fe0f,
+      "alt": "female-guard"
+    },
+    "\u1F482\u200D\u2642\uFE0F": {
+      "src": s1f482200d2642fe0f,
+      "alt": "male-guard"
+    },
+    "\u1F482": {
+      "src": s1f482,
+      "alt": "guardsman"
+    },
+    "\u1F483": {
+      "src": s1f483,
+      "alt": "dancer"
+    },
+    "\u1F485": {
+      "src": s1f485,
+      "alt": "nail_care"
+    },
+    "\u1F486\u200D\u2640\uFE0F": {
+      "src": s1f486200d2640fe0f,
+      "alt": "woman-getting-massage"
+    },
+    "\u1F486\u200D\u2642\uFE0F": {
+      "src": s1f486200d2642fe0f,
+      "alt": "man-getting-massage"
+    },
+    "\u1F486": {
+      "src": s1f486,
+      "alt": "massage"
+    },
+    "\u1F487\u200D\u2640\uFE0F": {
+      "src": s1f487200d2640fe0f,
+      "alt": "woman-getting-haircut"
+    },
+    "\u1F487\u200D\u2642\uFE0F": {
+      "src": s1f487200d2642fe0f,
+      "alt": "man-getting-haircut"
+    },
+    "\u1F487": {
+      "src": s1f487,
+      "alt": "haircut"
+    },
+    "\u1F48F": {
+      "src": s1f48f,
+      "alt": "couplekiss"
+    },
+    "\u1F491": {
+      "src": s1f491,
+      "alt": "couple_with_heart"
+    },
+    "\u1F4AA": {
+      "src": s1f4aa,
+      "alt": "muscle"
+    },
+    "\u1F574\uFE0F": {
+      "src": s1f574fe0f,
+      "alt": "man_in_business_suit_levitating"
+    },
+    "\u1F575\uFE0F\u200D\u2640\uFE0F": {
+      "src": s1f575fe0f200d2640fe0f,
+      "alt": "female-detective"
+    },
+    "\u1F575\uFE0F\u200D\u2642\uFE0F": {
+      "src": s1f575fe0f200d2642fe0f,
+      "alt": "male-detective"
+    },
+    "\u1F575\uFE0F": {
+      "src": s1f575fe0f,
+      "alt": "sleuth_or_spy"
+    },
+    "\u1F57A": {
+      "src": s1f57a,
+      "alt": "man_dancing"
+    },
+    "\u1F590\uFE0F": {
+      "src": s1f590fe0f,
+      "alt": "raised_hand_with_fingers_splayed"
+    },
+    "\u1F595": {
+      "src": s1f595,
+      "alt": "middle_finger"
+    },
+    "\u1F596": {
+      "src": s1f596,
+      "alt": "spock-hand"
+    },
+    "\u1F5E3\uFE0F": {
+      "src": s1f5e3fe0f,
+      "alt": "speaking_head_in_silhouette"
+    },
+    "\u1F645\u200D\u2640\uFE0F": {
+      "src": s1f645200d2640fe0f,
+      "alt": "woman-gesturing-no"
+    },
+    "\u1F645\u200D\u2642\uFE0F": {
+      "src": s1f645200d2642fe0f,
+      "alt": "man-gesturing-no"
+    },
+    "\u1F645": {
+      "src": s1f645,
+      "alt": "no_good"
+    },
+    "\u1F646\u200D\u2640\uFE0F": {
+      "src": s1f646200d2640fe0f,
+      "alt": "woman-gesturing-ok"
+    },
+    "\u1F646\u200D\u2642\uFE0F": {
+      "src": s1f646200d2642fe0f,
+      "alt": "man-gesturing-ok"
+    },
+    "\u1F646": {
+      "src": s1f646,
+      "alt": "ok_woman"
+    },
+    "\u1F647\u200D\u2640\uFE0F": {
+      "src": s1f647200d2640fe0f,
+      "alt": "woman-bowing"
+    },
+    "\u1F647\u200D\u2642\uFE0F": {
+      "src": s1f647200d2642fe0f,
+      "alt": "man-bowing"
+    },
+    "\u1F647": {
+      "src": s1f647,
+      "alt": "bow"
+    },
+    "\u1F64B\u200D\u2640\uFE0F": {
+      "src": s1f64b200d2640fe0f,
+      "alt": "woman-raising-hand"
+    },
+    "\u1F64B\u200D\u2642\uFE0F": {
+      "src": s1f64b200d2642fe0f,
+      "alt": "man-raising-hand"
+    },
+    "\u1F64B": {
+      "src": s1f64b,
+      "alt": "raising_hand"
+    },
+    "\u1F64C": {
+      "src": s1f64c,
+      "alt": "raised_hands"
+    },
+    "\u1F64D\u200D\u2640\uFE0F": {
+      "src": s1f64d200d2640fe0f,
+      "alt": "woman-frowning"
+    },
+    "\u1F64D\u200D\u2642\uFE0F": {
+      "src": s1f64d200d2642fe0f,
+      "alt": "man-frowning"
+    },
+    "\u1F64D": {
+      "src": s1f64d,
+      "alt": "person_frowning"
+    },
+    "\u1F64E\u200D\u2640\uFE0F": {
+      "src": s1f64e200d2640fe0f,
+      "alt": "woman-pouting"
+    },
+    "\u1F64E\u200D\u2642\uFE0F": {
+      "src": s1f64e200d2642fe0f,
+      "alt": "man-pouting"
+    },
+    "\u1F64E": {
+      "src": s1f64e,
+      "alt": "person_with_pouting_face"
+    },
+    "\u1F64F": {
+      "src": s1f64f,
+      "alt": "pray"
+    },
+    "\u1F6A3\u200D\u2640\uFE0F": {
+      "src": s1f6a3200d2640fe0f,
+      "alt": "woman-rowing-boat"
+    },
+    "\u1F6A3\u200D\u2642\uFE0F": {
+      "src": s1f6a3200d2642fe0f,
+      "alt": "man-rowing-boat"
+    },
+    "\u1F6A3": {
+      "src": s1f6a3,
+      "alt": "rowboat"
+    },
+    "\u1F6B4\u200D\u2640\uFE0F": {
+      "src": s1f6b4200d2640fe0f,
+      "alt": "woman-biking"
+    },
+    "\u1F6B4\u200D\u2642\uFE0F": {
+      "src": s1f6b4200d2642fe0f,
+      "alt": "man-biking"
+    },
+    "\u1F6B4": {
+      "src": s1f6b4,
+      "alt": "bicyclist"
+    },
+    "\u1F6B5\u200D\u2640\uFE0F": {
+      "src": s1f6b5200d2640fe0f,
+      "alt": "woman-mountain-biking"
+    },
+    "\u1F6B5\u200D\u2642\uFE0F": {
+      "src": s1f6b5200d2642fe0f,
+      "alt": "man-mountain-biking"
+    },
+    "\u1F6B5": {
+      "src": s1f6b5,
+      "alt": "mountain_bicyclist"
+    },
+    "\u1F6B6\u200D\u2640\uFE0F": {
+      "src": s1f6b6200d2640fe0f,
+      "alt": "woman-walking"
+    },
+    "\u1F6B6\u200D\u2642\uFE0F": {
+      "src": s1f6b6200d2642fe0f,
+      "alt": "man-walking"
+    },
+    "\u1F6B6": {
+      "src": s1f6b6,
+      "alt": "walking"
+    },
+    "\u1F6C0": {
+      "src": s1f6c0,
+      "alt": "bath"
+    },
+    "\u1F6CC": {
+      "src": s1f6cc,
+      "alt": "sleeping_accommodation"
+    },
+    "\u1F90C": {
+      "src": s1f90c,
+      "alt": "pinched_fingers"
+    },
+    "\u1F90F": {
+      "src": s1f90f,
+      "alt": "pinching_hand"
+    },
+    "\u1F918": {
+      "src": s1f918,
+      "alt": "the_horns"
+    },
+    "\u1F919": {
+      "src": s1f919,
+      "alt": "call_me_hand"
+    },
+    "\u1F91A": {
+      "src": s1f91a,
+      "alt": "raised_back_of_hand"
+    },
+    "\u1F91B": {
+      "src": s1f91b,
+      "alt": "left-facing_fist"
+    },
+    "\u1F91C": {
+      "src": s1f91c,
+      "alt": "right-facing_fist"
+    },
+    "\u1F91D": {
+      "src": s1f91d,
+      "alt": "handshake"
+    },
+    "\u1F91E": {
+      "src": s1f91e,
+      "alt": "crossed_fingers"
+    },
+    "\u1F91F": {
+      "src": s1f91f,
+      "alt": "i_love_you_hand_sign"
+    },
+    "\u1F926\u200D\u2640\uFE0F": {
+      "src": s1f926200d2640fe0f,
+      "alt": "woman-facepalming"
+    },
+    "\u1F926\u200D\u2642\uFE0F": {
+      "src": s1f926200d2642fe0f,
+      "alt": "man-facepalming"
+    },
+    "\u1F926": {
+      "src": s1f926,
+      "alt": "face_palm"
+    },
+    "\u1F930": {
+      "src": s1f930,
+      "alt": "pregnant_woman"
+    },
+    "\u1F931": {
+      "src": s1f931,
+      "alt": "breast-feeding"
+    },
+    "\u1F932": {
+      "src": s1f932,
+      "alt": "palms_up_together"
+    },
+    "\u1F933": {
+      "src": s1f933,
+      "alt": "selfie"
+    },
+    "\u1F934": {
+      "src": s1f934,
+      "alt": "prince"
+    },
+    "\u1F935\u200D\u2640\uFE0F": {
+      "src": s1f935200d2640fe0f,
+      "alt": "woman_in_tuxedo"
+    },
+    "\u1F935\u200D\u2642\uFE0F": {
+      "src": s1f935200d2642fe0f,
+      "alt": "man_in_tuxedo"
+    },
+    "\u1F935": {
+      "src": s1f935,
+      "alt": "person_in_tuxedo"
+    },
+    "\u1F936": {
+      "src": s1f936,
+      "alt": "mrs_claus"
+    },
+    "\u1F937\u200D\u2640\uFE0F": {
+      "src": s1f937200d2640fe0f,
+      "alt": "woman-shrugging"
+    },
+    "\u1F937\u200D\u2642\uFE0F": {
+      "src": s1f937200d2642fe0f,
+      "alt": "man-shrugging"
+    },
+    "\u1F937": {
+      "src": s1f937,
+      "alt": "shrug"
+    },
+    "\u1F938\u200D\u2640\uFE0F": {
+      "src": s1f938200d2640fe0f,
+      "alt": "woman-cartwheeling"
+    },
+    "\u1F938\u200D\u2642\uFE0F": {
+      "src": s1f938200d2642fe0f,
+      "alt": "man-cartwheeling"
+    },
+    "\u1F938": {
+      "src": s1f938,
+      "alt": "person_doing_cartwheel"
+    },
+    "\u1F939\u200D\u2640\uFE0F": {
+      "src": s1f939200d2640fe0f,
+      "alt": "woman-juggling"
+    },
+    "\u1F939\u200D\u2642\uFE0F": {
+      "src": s1f939200d2642fe0f,
+      "alt": "man-juggling"
+    },
+    "\u1F939": {
+      "src": s1f939,
+      "alt": "juggling"
+    },
+    "\u1F93A": {
+      "src": s1f93a,
+      "alt": "fencer"
+    },
+    "\u1F93C\u200D\u2640\uFE0F": {
+      "src": s1f93c200d2640fe0f,
+      "alt": "woman-wrestling"
+    },
+    "\u1F93C\u200D\u2642\uFE0F": {
+      "src": s1f93c200d2642fe0f,
+      "alt": "man-wrestling"
+    },
+    "\u1F93C": {
+      "src": s1f93c,
+      "alt": "wrestlers"
+    },
+    "\u1F93D\u200D\u2640\uFE0F": {
+      "src": s1f93d200d2640fe0f,
+      "alt": "woman-playing-water-polo"
+    },
+    "\u1F93D\u200D\u2642\uFE0F": {
+      "src": s1f93d200d2642fe0f,
+      "alt": "man-playing-water-polo"
+    },
+    "\u1F93D": {
+      "src": s1f93d,
+      "alt": "water_polo"
+    },
+    "\u1F93E\u200D\u2640\uFE0F": {
+      "src": s1f93e200d2640fe0f,
+      "alt": "woman-playing-handball"
+    },
+    "\u1F93E\u200D\u2642\uFE0F": {
+      "src": s1f93e200d2642fe0f,
+      "alt": "man-playing-handball"
+    },
+    "\u1F93E": {
+      "src": s1f93e,
+      "alt": "handball"
+    },
+    "\u1F977": {
+      "src": s1f977,
+      "alt": "ninja"
+    },
+    "\u1F9B4": {
+      "src": s1f9b4,
+      "alt": "bone"
+    },
+    "\u1F9B5": {
+      "src": s1f9b5,
+      "alt": "leg"
+    },
+    "\u1F9B6": {
+      "src": s1f9b6,
+      "alt": "foot"
+    },
+    "\u1F9B7": {
+      "src": s1f9b7,
+      "alt": "tooth"
+    },
+    "\u1F9B8\u200D\u2640\uFE0F": {
+      "src": s1f9b8200d2640fe0f,
+      "alt": "female_superhero"
+    },
+    "\u1F9B8\u200D\u2642\uFE0F": {
+      "src": s1f9b8200d2642fe0f,
+      "alt": "male_superhero"
+    },
+    "\u1F9B8": {
+      "src": s1f9b8,
+      "alt": "superhero"
+    },
+    "\u1F9B9\u200D\u2640\uFE0F": {
+      "src": s1f9b9200d2640fe0f,
+      "alt": "female_supervillain"
+    },
+    "\u1F9B9\u200D\u2642\uFE0F": {
+      "src": s1f9b9200d2642fe0f,
+      "alt": "male_supervillain"
+    },
+    "\u1F9B9": {
+      "src": s1f9b9,
+      "alt": "supervillain"
+    },
+    "\u1F9BB": {
+      "src": s1f9bb,
+      "alt": "ear_with_hearing_aid"
+    },
+    "\u1F9BE": {
+      "src": s1f9be,
+      "alt": "mechanical_arm"
+    },
+    "\u1F9BF": {
+      "src": s1f9bf,
+      "alt": "mechanical_leg"
+    },
+    "\u1F9CD\u200D\u2640\uFE0F": {
+      "src": s1f9cd200d2640fe0f,
+      "alt": "woman_standing"
+    },
+    "\u1F9CD\u200D\u2642\uFE0F": {
+      "src": s1f9cd200d2642fe0f,
+      "alt": "man_standing"
+    },
+    "\u1F9CD": {
+      "src": s1f9cd,
+      "alt": "standing_person"
+    },
+    "\u1F9CE\u200D\u2640\uFE0F": {
+      "src": s1f9ce200d2640fe0f,
+      "alt": "woman_kneeling"
+    },
+    "\u1F9CE\u200D\u2642\uFE0F": {
+      "src": s1f9ce200d2642fe0f,
+      "alt": "man_kneeling"
+    },
+    "\u1F9CE": {
+      "src": s1f9ce,
+      "alt": "kneeling_person"
+    },
+    "\u1F9CF\u200D\u2640\uFE0F": {
+      "src": s1f9cf200d2640fe0f,
+      "alt": "deaf_woman"
+    },
+    "\u1F9CF\u200D\u2642\uFE0F": {
+      "src": s1f9cf200d2642fe0f,
+      "alt": "deaf_man"
+    },
+    "\u1F9CF": {
+      "src": s1f9cf,
+      "alt": "deaf_person"
+    },
+    "\u1F9D1\u200D\u1F33E": {
+      "src": s1f9d1200d1f33e,
+      "alt": "farmer"
+    },
+    "\u1F9D1\u200D\u1F373": {
+      "src": s1f9d1200d1f373,
+      "alt": "cook"
+    },
+    "\u1F9D1\u200D\u1F37C": {
+      "src": s1f9d1200d1f37c,
+      "alt": "person_feeding_baby"
+    },
+    "\u1F9D1\u200D\u1F384": {
+      "src": s1f9d1200d1f384,
+      "alt": "mx_claus"
+    },
+    "\u1F9D1\u200D\u1F393": {
+      "src": s1f9d1200d1f393,
+      "alt": "student"
+    },
+    "\u1F9D1\u200D\u1F3A4": {
+      "src": s1f9d1200d1f3a4,
+      "alt": "singer"
+    },
+    "\u1F9D1\u200D\u1F3A8": {
+      "src": s1f9d1200d1f3a8,
+      "alt": "artist"
+    },
+    "\u1F9D1\u200D\u1F3EB": {
+      "src": s1f9d1200d1f3eb,
+      "alt": "teacher"
+    },
+    "\u1F9D1\u200D\u1F3ED": {
+      "src": s1f9d1200d1f3ed,
+      "alt": "factory_worker"
+    },
+    "\u1F9D1\u200D\u1F4BB": {
+      "src": s1f9d1200d1f4bb,
+      "alt": "technologist"
+    },
+    "\u1F9D1\u200D\u1F4BC": {
+      "src": s1f9d1200d1f4bc,
+      "alt": "office_worker"
+    },
+    "\u1F9D1\u200D\u1F527": {
+      "src": s1f9d1200d1f527,
+      "alt": "mechanic"
+    },
+    "\u1F9D1\u200D\u1F52C": {
+      "src": s1f9d1200d1f52c,
+      "alt": "scientist"
+    },
+    "\u1F9D1\u200D\u1F680": {
+      "src": s1f9d1200d1f680,
+      "alt": "astronaut"
+    },
+    "\u1F9D1\u200D\u1F692": {
+      "src": s1f9d1200d1f692,
+      "alt": "firefighter"
+    },
+    "\u1F9D1\u200D\u1F91D\u200D\u1F9D1": {
+      "src": s1f9d1200d1f91d200d1f9d1,
+      "alt": "people_holding_hands"
+    },
+    "\u1F9D1\u200D\u1F9AF": {
+      "src": s1f9d1200d1f9af,
+      "alt": "person_with_probing_cane"
+    },
+    "\u1F9D1\u200D\u1F9B0": {
+      "src": s1f9d1200d1f9b0,
+      "alt": "red_haired_person"
+    },
+    "\u1F9D1\u200D\u1F9B1": {
+      "src": s1f9d1200d1f9b1,
+      "alt": "curly_haired_person"
+    },
+    "\u1F9D1\u200D\u1F9B2": {
+      "src": s1f9d1200d1f9b2,
+      "alt": "bald_person"
+    },
+    "\u1F9D1\u200D\u1F9B3": {
+      "src": s1f9d1200d1f9b3,
+      "alt": "white_haired_person"
+    },
+    "\u1F9D1\u200D\u1F9BC": {
+      "src": s1f9d1200d1f9bc,
+      "alt": "person_in_motorized_wheelchair"
+    },
+    "\u1F9D1\u200D\u1F9BD": {
+      "src": s1f9d1200d1f9bd,
+      "alt": "person_in_manual_wheelchair"
+    },
+    "\u1F9D1\u200D\u2695\uFE0F": {
+      "src": s1f9d1200d2695fe0f,
+      "alt": "health_worker"
+    },
+    "\u1F9D1\u200D\u2696\uFE0F": {
+      "src": s1f9d1200d2696fe0f,
+      "alt": "judge"
+    },
+    "\u1F9D1\u200D\u2708\uFE0F": {
+      "src": s1f9d1200d2708fe0f,
+      "alt": "pilot"
+    },
+    "\u1F9D1": {
+      "src": s1f9d1,
+      "alt": "adult"
+    },
+    "\u1F9D2": {
+      "src": s1f9d2,
+      "alt": "child"
+    },
+    "\u1F9D3": {
+      "src": s1f9d3,
+      "alt": "older_adult"
+    },
+    "\u1F9D4\u200D\u2640\uFE0F": {
+      "src": s1f9d4200d2640fe0f,
+      "alt": "woman_with_beard"
+    },
+    "\u1F9D4\u200D\u2642\uFE0F": {
+      "src": s1f9d4200d2642fe0f,
+      "alt": "man_with_beard"
+    },
+    "\u1F9D4": {
+      "src": s1f9d4,
+      "alt": "bearded_person"
+    },
+    "\u1F9D5": {
+      "src": s1f9d5,
+      "alt": "person_with_headscarf"
+    },
+    "\u1F9D6\u200D\u2640\uFE0F": {
+      "src": s1f9d6200d2640fe0f,
+      "alt": "woman_in_steamy_room"
+    },
+    "\u1F9D6\u200D\u2642\uFE0F": {
+      "src": s1f9d6200d2642fe0f,
+      "alt": "man_in_steamy_room"
+    },
+    "\u1F9D6": {
+      "src": s1f9d6,
+      "alt": "person_in_steamy_room"
+    },
+    "\u1F9D7\u200D\u2640\uFE0F": {
+      "src": s1f9d7200d2640fe0f,
+      "alt": "woman_climbing"
+    },
+    "\u1F9D7\u200D\u2642\uFE0F": {
+      "src": s1f9d7200d2642fe0f,
+      "alt": "man_climbing"
+    },
+    "\u1F9D7": {
+      "src": s1f9d7,
+      "alt": "person_climbing"
+    },
+    "\u1F9D8\u200D\u2640\uFE0F": {
+      "src": s1f9d8200d2640fe0f,
+      "alt": "woman_in_lotus_position"
+    },
+    "\u1F9D8\u200D\u2642\uFE0F": {
+      "src": s1f9d8200d2642fe0f,
+      "alt": "man_in_lotus_position"
+    },
+    "\u1F9D8": {
+      "src": s1f9d8,
+      "alt": "person_in_lotus_position"
+    },
+    "\u1F9D9\u200D\u2640\uFE0F": {
+      "src": s1f9d9200d2640fe0f,
+      "alt": "female_mage"
+    },
+    "\u1F9D9\u200D\u2642\uFE0F": {
+      "src": s1f9d9200d2642fe0f,
+      "alt": "male_mage"
+    },
+    "\u1F9D9": {
+      "src": s1f9d9,
+      "alt": "mage"
+    },
+    "\u1F9DA\u200D\u2640\uFE0F": {
+      "src": s1f9da200d2640fe0f,
+      "alt": "female_fairy"
+    },
+    "\u1F9DA\u200D\u2642\uFE0F": {
+      "src": s1f9da200d2642fe0f,
+      "alt": "male_fairy"
+    },
+    "\u1F9DA": {
+      "src": s1f9da,
+      "alt": "fairy"
+    },
+    "\u1F9DB\u200D\u2640\uFE0F": {
+      "src": s1f9db200d2640fe0f,
+      "alt": "female_vampire"
+    },
+    "\u1F9DB\u200D\u2642\uFE0F": {
+      "src": s1f9db200d2642fe0f,
+      "alt": "male_vampire"
+    },
+    "\u1F9DB": {
+      "src": s1f9db,
+      "alt": "vampire"
+    },
+    "\u1F9DC\u200D\u2640\uFE0F": {
+      "src": s1f9dc200d2640fe0f,
+      "alt": "mermaid"
+    },
+    "\u1F9DC\u200D\u2642\uFE0F": {
+      "src": s1f9dc200d2642fe0f,
+      "alt": "merman"
+    },
+    "\u1F9DC": {
+      "src": s1f9dc,
+      "alt": "merperson"
+    },
+    "\u1F9DD\u200D\u2640\uFE0F": {
+      "src": s1f9dd200d2640fe0f,
+      "alt": "female_elf"
+    },
+    "\u1F9DD\u200D\u2642\uFE0F": {
+      "src": s1f9dd200d2642fe0f,
+      "alt": "male_elf"
+    },
+    "\u1F9DD": {
+      "src": s1f9dd,
+      "alt": "elf"
+    },
+    "\u1F9DE\u200D\u2640\uFE0F": {
+      "src": s1f9de200d2640fe0f,
+      "alt": "female_genie"
+    },
+    "\u1F9DE\u200D\u2642\uFE0F": {
+      "src": s1f9de200d2642fe0f,
+      "alt": "male_genie"
+    },
+    "\u1F9DE": {
+      "src": s1f9de,
+      "alt": "genie"
+    },
+    "\u1F9DF\u200D\u2640\uFE0F": {
+      "src": s1f9df200d2640fe0f,
+      "alt": "female_zombie"
+    },
+    "\u1F9DF\u200D\u2642\uFE0F": {
+      "src": s1f9df200d2642fe0f,
+      "alt": "male_zombie"
+    },
+    "\u1F9DF": {
+      "src": s1f9df,
+      "alt": "zombie"
+    },
+    "\u1F9E0": {
+      "src": s1f9e0,
+      "alt": "brain"
+    },
+    "\u1FAC0": {
+      "src": s1fac0,
+      "alt": "anatomical_heart"
+    },
+    "\u1FAC1": {
+      "src": s1fac1,
+      "alt": "lungs"
+    },
+    "\u1FAC2": {
+      "src": s1fac2,
+      "alt": "people_hugging"
+    },
+    "\u261D\uFE0F": {
+      "src": s261dfe0f,
+      "alt": "point_up"
+    },
+    "\u26F7\uFE0F": {
+      "src": s26f7fe0f,
+      "alt": "skier"
+    },
+    "\u26F9\uFE0F\u200D\u2640\uFE0F": {
+      "src": s26f9fe0f200d2640fe0f,
+      "alt": "woman-bouncing-ball"
+    },
+    "\u26F9\uFE0F\u200D\u2642\uFE0F": {
+      "src": s26f9fe0f200d2642fe0f,
+      "alt": "man-bouncing-ball"
+    },
+    "\u26F9\uFE0F": {
+      "src": s26f9fe0f,
+      "alt": "person_with_ball"
+    },
+    "\u270A": {
+      "src": s270a,
+      "alt": "fist"
+    },
+    "\u270B": {
+      "src": s270b,
+      "alt": "hand"
+    },
+    "\u270C\uFE0F": {
+      "src": s270cfe0f,
+      "alt": "v"
+    },
+    "\u270D\uFE0F": {
+      "src": s270dfe0f,
+      "alt": "writing_hand"
+    }
   },
-  extra: {
-    㑘: {alt: ':angel:', src: extra_0056},
-    㑙: {alt: ':buffoon:', src: extra_0057},
-    㑚: {alt: ':child:', src: extra_0058},
-    㑛: {alt: ':smoke:', src: extra_0059},
-    㑜: {alt: ':np:', src: extra_005a},
-    㑝: {alt: ':king:', src: extra_005b},
-    㑞: {alt: ':tzar:', src: extra_005c},
-    㑟: {alt: ':cheers:', src: extra_005d},
-    㑠: {alt: ':party:', src: extra_005e},
-    㑡: {alt: ':queen:', src: extra_005f},
-    㑢: {alt: ':mic:', src: extra_0060},
-    㑣: {alt: ':mail:', src: extra_0061},
-    㑤: {alt: ':rtfm:', src: extra_0062},
-    㑥: {alt: ':rest:', src: extra_0063},
-    㑦: {alt: ':popcorn:', src: extra_0064},
-    㑧: {alt: ':exe:', src: extra_0065},
-    㑨: {alt: ':skull:', src: extra_0066},
-    㑩: {alt: ':gang:', src: extra_0067},
-    㑪: {alt: ':boss:', src: extra_0068},
-    㑫: {alt: ':georgian:', src: extra_0069},
-    㑬: {alt: ':hello:', src: extra_006a},
-    㑭: {alt: ':ninjia:', src: extra_006b},
-    㑮: {alt: ':security:', src: extra_006c},
-    㑯: {alt: ':search:', src: extra_006d},
-    㑰: {alt: ':help:', src: extra_006e},
-    㑱: {alt: ':pump:', src: extra_006f},
-    㑲: {alt: ':heart:', src: extra_0070},
-    㑳: {alt: ':athlete:', src: extra_0071},
-    㑴: {alt: ':smart:', src: extra_0072},
-    㑵: {alt: ':zzz:', src: extra_0073}
+  "Nature": {
+    "\u1F331": {
+      "src": s1f331,
+      "alt": "seedling"
+    },
+    "\u1F332": {
+      "src": s1f332,
+      "alt": "evergreen_tree"
+    },
+    "\u1F333": {
+      "src": s1f333,
+      "alt": "deciduous_tree"
+    },
+    "\u1F334": {
+      "src": s1f334,
+      "alt": "palm_tree"
+    },
+    "\u1F335": {
+      "src": s1f335,
+      "alt": "cactus"
+    },
+    "\u1F337": {
+      "src": s1f337,
+      "alt": "tulip"
+    },
+    "\u1F338": {
+      "src": s1f338,
+      "alt": "cherry_blossom"
+    },
+    "\u1F339": {
+      "src": s1f339,
+      "alt": "rose"
+    },
+    "\u1F33A": {
+      "src": s1f33a,
+      "alt": "hibiscus"
+    },
+    "\u1F33B": {
+      "src": s1f33b,
+      "alt": "sunflower"
+    },
+    "\u1F33C": {
+      "src": s1f33c,
+      "alt": "blossom"
+    },
+    "\u1F33E": {
+      "src": s1f33e,
+      "alt": "ear_of_rice"
+    },
+    "\u1F33F": {
+      "src": s1f33f,
+      "alt": "herb"
+    },
+    "\u1F340": {
+      "src": s1f340,
+      "alt": "four_leaf_clover"
+    },
+    "\u1F341": {
+      "src": s1f341,
+      "alt": "maple_leaf"
+    },
+    "\u1F342": {
+      "src": s1f342,
+      "alt": "fallen_leaf"
+    },
+    "\u1F343": {
+      "src": s1f343,
+      "alt": "leaves"
+    },
+    "\u1F3F5\uFE0F": {
+      "src": s1f3f5fe0f,
+      "alt": "rosette"
+    },
+    "\u1F400": {
+      "src": s1f400,
+      "alt": "rat"
+    },
+    "\u1F401": {
+      "src": s1f401,
+      "alt": "mouse2"
+    },
+    "\u1F402": {
+      "src": s1f402,
+      "alt": "ox"
+    },
+    "\u1F403": {
+      "src": s1f403,
+      "alt": "water_buffalo"
+    },
+    "\u1F404": {
+      "src": s1f404,
+      "alt": "cow2"
+    },
+    "\u1F405": {
+      "src": s1f405,
+      "alt": "tiger2"
+    },
+    "\u1F406": {
+      "src": s1f406,
+      "alt": "leopard"
+    },
+    "\u1F407": {
+      "src": s1f407,
+      "alt": "rabbit2"
+    },
+    "\u1F408\u200D\u2B1B": {
+      "src": s1f408200d2b1b,
+      "alt": "black_cat"
+    },
+    "\u1F408": {
+      "src": s1f408,
+      "alt": "cat2"
+    },
+    "\u1F409": {
+      "src": s1f409,
+      "alt": "dragon"
+    },
+    "\u1F40A": {
+      "src": s1f40a,
+      "alt": "crocodile"
+    },
+    "\u1F40B": {
+      "src": s1f40b,
+      "alt": "whale2"
+    },
+    "\u1F40C": {
+      "src": s1f40c,
+      "alt": "snail"
+    },
+    "\u1F40D": {
+      "src": s1f40d,
+      "alt": "snake"
+    },
+    "\u1F40E": {
+      "src": s1f40e,
+      "alt": "racehorse"
+    },
+    "\u1F40F": {
+      "src": s1f40f,
+      "alt": "ram"
+    },
+    "\u1F410": {
+      "src": s1f410,
+      "alt": "goat"
+    },
+    "\u1F411": {
+      "src": s1f411,
+      "alt": "sheep"
+    },
+    "\u1F412": {
+      "src": s1f412,
+      "alt": "monkey"
+    },
+    "\u1F413": {
+      "src": s1f413,
+      "alt": "rooster"
+    },
+    "\u1F414": {
+      "src": s1f414,
+      "alt": "chicken"
+    },
+    "\u1F415\u200D\u1F9BA": {
+      "src": s1f415200d1f9ba,
+      "alt": "service_dog"
+    },
+    "\u1F415": {
+      "src": s1f415,
+      "alt": "dog2"
+    },
+    "\u1F416": {
+      "src": s1f416,
+      "alt": "pig2"
+    },
+    "\u1F417": {
+      "src": s1f417,
+      "alt": "boar"
+    },
+    "\u1F418": {
+      "src": s1f418,
+      "alt": "elephant"
+    },
+    "\u1F419": {
+      "src": s1f419,
+      "alt": "octopus"
+    },
+    "\u1F41A": {
+      "src": s1f41a,
+      "alt": "shell"
+    },
+    "\u1F41B": {
+      "src": s1f41b,
+      "alt": "bug"
+    },
+    "\u1F41C": {
+      "src": s1f41c,
+      "alt": "ant"
+    },
+    "\u1F41D": {
+      "src": s1f41d,
+      "alt": "bee"
+    },
+    "\u1F41E": {
+      "src": s1f41e,
+      "alt": "ladybug"
+    },
+    "\u1F41F": {
+      "src": s1f41f,
+      "alt": "fish"
+    },
+    "\u1F420": {
+      "src": s1f420,
+      "alt": "tropical_fish"
+    },
+    "\u1F421": {
+      "src": s1f421,
+      "alt": "blowfish"
+    },
+    "\u1F422": {
+      "src": s1f422,
+      "alt": "turtle"
+    },
+    "\u1F423": {
+      "src": s1f423,
+      "alt": "hatching_chick"
+    },
+    "\u1F424": {
+      "src": s1f424,
+      "alt": "baby_chick"
+    },
+    "\u1F425": {
+      "src": s1f425,
+      "alt": "hatched_chick"
+    },
+    "\u1F426": {
+      "src": s1f426,
+      "alt": "bird"
+    },
+    "\u1F427": {
+      "src": s1f427,
+      "alt": "penguin"
+    },
+    "\u1F428": {
+      "src": s1f428,
+      "alt": "koala"
+    },
+    "\u1F429": {
+      "src": s1f429,
+      "alt": "poodle"
+    },
+    "\u1F42A": {
+      "src": s1f42a,
+      "alt": "dromedary_camel"
+    },
+    "\u1F42B": {
+      "src": s1f42b,
+      "alt": "camel"
+    },
+    "\u1F42C": {
+      "src": s1f42c,
+      "alt": "dolphin"
+    },
+    "\u1F42D": {
+      "src": s1f42d,
+      "alt": "mouse"
+    },
+    "\u1F42E": {
+      "src": s1f42e,
+      "alt": "cow"
+    },
+    "\u1F42F": {
+      "src": s1f42f,
+      "alt": "tiger"
+    },
+    "\u1F430": {
+      "src": s1f430,
+      "alt": "rabbit"
+    },
+    "\u1F431": {
+      "src": s1f431,
+      "alt": "cat"
+    },
+    "\u1F432": {
+      "src": s1f432,
+      "alt": "dragon_face"
+    },
+    "\u1F433": {
+      "src": s1f433,
+      "alt": "whale"
+    },
+    "\u1F434": {
+      "src": s1f434,
+      "alt": "horse"
+    },
+    "\u1F435": {
+      "src": s1f435,
+      "alt": "monkey_face"
+    },
+    "\u1F436": {
+      "src": s1f436,
+      "alt": "dog"
+    },
+    "\u1F437": {
+      "src": s1f437,
+      "alt": "pig"
+    },
+    "\u1F438": {
+      "src": s1f438,
+      "alt": "frog"
+    },
+    "\u1F439": {
+      "src": s1f439,
+      "alt": "hamster"
+    },
+    "\u1F43A": {
+      "src": s1f43a,
+      "alt": "wolf"
+    },
+    "\u1F43B\u200D\u2744\uFE0F": {
+      "src": s1f43b200d2744fe0f,
+      "alt": "polar_bear"
+    },
+    "\u1F43B": {
+      "src": s1f43b,
+      "alt": "bear"
+    },
+    "\u1F43C": {
+      "src": s1f43c,
+      "alt": "panda_face"
+    },
+    "\u1F43D": {
+      "src": s1f43d,
+      "alt": "pig_nose"
+    },
+    "\u1F43E": {
+      "src": s1f43e,
+      "alt": "feet"
+    },
+    "\u1F43F\uFE0F": {
+      "src": s1f43ffe0f,
+      "alt": "chipmunk"
+    },
+    "\u1F490": {
+      "src": s1f490,
+      "alt": "bouquet"
+    },
+    "\u1F4AE": {
+      "src": s1f4ae,
+      "alt": "white_flower"
+    },
+    "\u1F54A\uFE0F": {
+      "src": s1f54afe0f,
+      "alt": "dove_of_peace"
+    },
+    "\u1F577\uFE0F": {
+      "src": s1f577fe0f,
+      "alt": "spider"
+    },
+    "\u1F578\uFE0F": {
+      "src": s1f578fe0f,
+      "alt": "spider_web"
+    },
+    "\u1F940": {
+      "src": s1f940,
+      "alt": "wilted_flower"
+    },
+    "\u1F981": {
+      "src": s1f981,
+      "alt": "lion_face"
+    },
+    "\u1F982": {
+      "src": s1f982,
+      "alt": "scorpion"
+    },
+    "\u1F983": {
+      "src": s1f983,
+      "alt": "turkey"
+    },
+    "\u1F984": {
+      "src": s1f984,
+      "alt": "unicorn_face"
+    },
+    "\u1F985": {
+      "src": s1f985,
+      "alt": "eagle"
+    },
+    "\u1F986": {
+      "src": s1f986,
+      "alt": "duck"
+    },
+    "\u1F987": {
+      "src": s1f987,
+      "alt": "bat"
+    },
+    "\u1F988": {
+      "src": s1f988,
+      "alt": "shark"
+    },
+    "\u1F989": {
+      "src": s1f989,
+      "alt": "owl"
+    },
+    "\u1F98A": {
+      "src": s1f98a,
+      "alt": "fox_face"
+    },
+    "\u1F98B": {
+      "src": s1f98b,
+      "alt": "butterfly"
+    },
+    "\u1F98C": {
+      "src": s1f98c,
+      "alt": "deer"
+    },
+    "\u1F98D": {
+      "src": s1f98d,
+      "alt": "gorilla"
+    },
+    "\u1F98E": {
+      "src": s1f98e,
+      "alt": "lizard"
+    },
+    "\u1F98F": {
+      "src": s1f98f,
+      "alt": "rhinoceros"
+    },
+    "\u1F992": {
+      "src": s1f992,
+      "alt": "giraffe_face"
+    },
+    "\u1F993": {
+      "src": s1f993,
+      "alt": "zebra_face"
+    },
+    "\u1F994": {
+      "src": s1f994,
+      "alt": "hedgehog"
+    },
+    "\u1F995": {
+      "src": s1f995,
+      "alt": "sauropod"
+    },
+    "\u1F996": {
+      "src": s1f996,
+      "alt": "t-rex"
+    },
+    "\u1F997": {
+      "src": s1f997,
+      "alt": "cricket"
+    },
+    "\u1F998": {
+      "src": s1f998,
+      "alt": "kangaroo"
+    },
+    "\u1F999": {
+      "src": s1f999,
+      "alt": "llama"
+    },
+    "\u1F99A": {
+      "src": s1f99a,
+      "alt": "peacock"
+    },
+    "\u1F99B": {
+      "src": s1f99b,
+      "alt": "hippopotamus"
+    },
+    "\u1F99C": {
+      "src": s1f99c,
+      "alt": "parrot"
+    },
+    "\u1F99D": {
+      "src": s1f99d,
+      "alt": "raccoon"
+    },
+    "\u1F99F": {
+      "src": s1f99f,
+      "alt": "mosquito"
+    },
+    "\u1F9A0": {
+      "src": s1f9a0,
+      "alt": "microbe"
+    },
+    "\u1F9A1": {
+      "src": s1f9a1,
+      "alt": "badger"
+    },
+    "\u1F9A2": {
+      "src": s1f9a2,
+      "alt": "swan"
+    },
+    "\u1F9A3": {
+      "src": s1f9a3,
+      "alt": "mammoth"
+    },
+    "\u1F9A4": {
+      "src": s1f9a4,
+      "alt": "dodo"
+    },
+    "\u1F9A5": {
+      "src": s1f9a5,
+      "alt": "sloth"
+    },
+    "\u1F9A6": {
+      "src": s1f9a6,
+      "alt": "otter"
+    },
+    "\u1F9A7": {
+      "src": s1f9a7,
+      "alt": "orangutan"
+    },
+    "\u1F9A8": {
+      "src": s1f9a8,
+      "alt": "skunk"
+    },
+    "\u1F9A9": {
+      "src": s1f9a9,
+      "alt": "flamingo"
+    },
+    "\u1F9AB": {
+      "src": s1f9ab,
+      "alt": "beaver"
+    },
+    "\u1F9AC": {
+      "src": s1f9ac,
+      "alt": "bison"
+    },
+    "\u1F9AD": {
+      "src": s1f9ad,
+      "alt": "seal"
+    },
+    "\u1F9AE": {
+      "src": s1f9ae,
+      "alt": "guide_dog"
+    },
+    "\u1FAB0": {
+      "src": s1fab0,
+      "alt": "fly"
+    },
+    "\u1FAB1": {
+      "src": s1fab1,
+      "alt": "worm"
+    },
+    "\u1FAB2": {
+      "src": s1fab2,
+      "alt": "beetle"
+    },
+    "\u1FAB3": {
+      "src": s1fab3,
+      "alt": "cockroach"
+    },
+    "\u1FAB4": {
+      "src": s1fab4,
+      "alt": "potted_plant"
+    },
+    "\u1FAB6": {
+      "src": s1fab6,
+      "alt": "feather"
+    },
+    "\u2618\uFE0F": {
+      "src": s2618fe0f,
+      "alt": "shamrock"
+    }
+  },
+  "Activity": {
+    "\u1F004": {
+      "src": s1f004,
+      "alt": "mahjong"
+    },
+    "\u1F0CF": {
+      "src": s1f0cf,
+      "alt": "black_joker"
+    },
+    "\u1F380": {
+      "src": s1f380,
+      "alt": "ribbon"
+    },
+    "\u1F381": {
+      "src": s1f381,
+      "alt": "gift"
+    },
+    "\u1F383": {
+      "src": s1f383,
+      "alt": "jack_o_lantern"
+    },
+    "\u1F384": {
+      "src": s1f384,
+      "alt": "christmas_tree"
+    },
+    "\u1F386": {
+      "src": s1f386,
+      "alt": "fireworks"
+    },
+    "\u1F387": {
+      "src": s1f387,
+      "alt": "sparkler"
+    },
+    "\u1F388": {
+      "src": s1f388,
+      "alt": "balloon"
+    },
+    "\u1F389": {
+      "src": s1f389,
+      "alt": "tada"
+    },
+    "\u1F38A": {
+      "src": s1f38a,
+      "alt": "confetti_ball"
+    },
+    "\u1F38B": {
+      "src": s1f38b,
+      "alt": "tanabata_tree"
+    },
+    "\u1F38D": {
+      "src": s1f38d,
+      "alt": "bamboo"
+    },
+    "\u1F38E": {
+      "src": s1f38e,
+      "alt": "dolls"
+    },
+    "\u1F38F": {
+      "src": s1f38f,
+      "alt": "flags"
+    },
+    "\u1F390": {
+      "src": s1f390,
+      "alt": "wind_chime"
+    },
+    "\u1F391": {
+      "src": s1f391,
+      "alt": "rice_scene"
+    },
+    "\u1F396\uFE0F": {
+      "src": s1f396fe0f,
+      "alt": "medal"
+    },
+    "\u1F397\uFE0F": {
+      "src": s1f397fe0f,
+      "alt": "reminder_ribbon"
+    },
+    "\u1F39F\uFE0F": {
+      "src": s1f39ffe0f,
+      "alt": "admission_tickets"
+    },
+    "\u1F3A3": {
+      "src": s1f3a3,
+      "alt": "fishing_pole_and_fish"
+    },
+    "\u1F3A8": {
+      "src": s1f3a8,
+      "alt": "art"
+    },
+    "\u1F3AB": {
+      "src": s1f3ab,
+      "alt": "ticket"
+    },
+    "\u1F3AD": {
+      "src": s1f3ad,
+      "alt": "performing_arts"
+    },
+    "\u1F3AE": {
+      "src": s1f3ae,
+      "alt": "video_game"
+    },
+    "\u1F3AF": {
+      "src": s1f3af,
+      "alt": "dart"
+    },
+    "\u1F3B0": {
+      "src": s1f3b0,
+      "alt": "slot_machine"
+    },
+    "\u1F3B1": {
+      "src": s1f3b1,
+      "alt": "8ball"
+    },
+    "\u1F3B2": {
+      "src": s1f3b2,
+      "alt": "game_die"
+    },
+    "\u1F3B3": {
+      "src": s1f3b3,
+      "alt": "bowling"
+    },
+    "\u1F3B4": {
+      "src": s1f3b4,
+      "alt": "flower_playing_cards"
+    },
+    "\u1F3BD": {
+      "src": s1f3bd,
+      "alt": "running_shirt_with_sash"
+    },
+    "\u1F3BE": {
+      "src": s1f3be,
+      "alt": "tennis"
+    },
+    "\u1F3BF": {
+      "src": s1f3bf,
+      "alt": "ski"
+    },
+    "\u1F3C0": {
+      "src": s1f3c0,
+      "alt": "basketball"
+    },
+    "\u1F3C5": {
+      "src": s1f3c5,
+      "alt": "sports_medal"
+    },
+    "\u1F3C6": {
+      "src": s1f3c6,
+      "alt": "trophy"
+    },
+    "\u1F3C8": {
+      "src": s1f3c8,
+      "alt": "football"
+    },
+    "\u1F3C9": {
+      "src": s1f3c9,
+      "alt": "rugby_football"
+    },
+    "\u1F3CF": {
+      "src": s1f3cf,
+      "alt": "cricket_bat_and_ball"
+    },
+    "\u1F3D0": {
+      "src": s1f3d0,
+      "alt": "volleyball"
+    },
+    "\u1F3D1": {
+      "src": s1f3d1,
+      "alt": "field_hockey_stick_and_ball"
+    },
+    "\u1F3D2": {
+      "src": s1f3d2,
+      "alt": "ice_hockey_stick_and_puck"
+    },
+    "\u1F3D3": {
+      "src": s1f3d3,
+      "alt": "table_tennis_paddle_and_ball"
+    },
+    "\u1F3F8": {
+      "src": s1f3f8,
+      "alt": "badminton_racquet_and_shuttlecock"
+    },
+    "\u1F52E": {
+      "src": s1f52e,
+      "alt": "crystal_ball"
+    },
+    "\u1F579\uFE0F": {
+      "src": s1f579fe0f,
+      "alt": "joystick"
+    },
+    "\u1F5BC\uFE0F": {
+      "src": s1f5bcfe0f,
+      "alt": "frame_with_picture"
+    },
+    "\u1F6F7": {
+      "src": s1f6f7,
+      "alt": "sled"
+    },
+    "\u1F93F": {
+      "src": s1f93f,
+      "alt": "diving_mask"
+    },
+    "\u1F945": {
+      "src": s1f945,
+      "alt": "goal_net"
+    },
+    "\u1F947": {
+      "src": s1f947,
+      "alt": "first_place_medal"
+    },
+    "\u1F948": {
+      "src": s1f948,
+      "alt": "second_place_medal"
+    },
+    "\u1F949": {
+      "src": s1f949,
+      "alt": "third_place_medal"
+    },
+    "\u1F94A": {
+      "src": s1f94a,
+      "alt": "boxing_glove"
+    },
+    "\u1F94B": {
+      "src": s1f94b,
+      "alt": "martial_arts_uniform"
+    },
+    "\u1F94C": {
+      "src": s1f94c,
+      "alt": "curling_stone"
+    },
+    "\u1F94D": {
+      "src": s1f94d,
+      "alt": "lacrosse"
+    },
+    "\u1F94E": {
+      "src": s1f94e,
+      "alt": "softball"
+    },
+    "\u1F94F": {
+      "src": s1f94f,
+      "alt": "flying_disc"
+    },
+    "\u1F9E7": {
+      "src": s1f9e7,
+      "alt": "red_envelope"
+    },
+    "\u1F9E8": {
+      "src": s1f9e8,
+      "alt": "firecracker"
+    },
+    "\u1F9E9": {
+      "src": s1f9e9,
+      "alt": "jigsaw"
+    },
+    "\u1F9F5": {
+      "src": s1f9f5,
+      "alt": "thread"
+    },
+    "\u1F9F6": {
+      "src": s1f9f6,
+      "alt": "yarn"
+    },
+    "\u1F9F8": {
+      "src": s1f9f8,
+      "alt": "teddy_bear"
+    },
+    "\u1F9FF": {
+      "src": s1f9ff,
+      "alt": "nazar_amulet"
+    },
+    "\u1FA80": {
+      "src": s1fa80,
+      "alt": "yo-yo"
+    },
+    "\u1FA81": {
+      "src": s1fa81,
+      "alt": "kite"
+    },
+    "\u1FA84": {
+      "src": s1fa84,
+      "alt": "magic_wand"
+    },
+    "\u1FA85": {
+      "src": s1fa85,
+      "alt": "pinata"
+    },
+    "\u1FA86": {
+      "src": s1fa86,
+      "alt": "nesting_dolls"
+    },
+    "\u1FAA1": {
+      "src": s1faa1,
+      "alt": "sewing_needle"
+    },
+    "\u1FAA2": {
+      "src": s1faa2,
+      "alt": "knot"
+    },
+    "\u265F\uFE0F": {
+      "src": s265ffe0f,
+      "alt": "chess_pawn"
+    },
+    "\u2660\uFE0F": {
+      "src": s2660fe0f,
+      "alt": "spades"
+    },
+    "\u2663\uFE0F": {
+      "src": s2663fe0f,
+      "alt": "clubs"
+    },
+    "\u2665\uFE0F": {
+      "src": s2665fe0f,
+      "alt": "hearts"
+    },
+    "\u2666\uFE0F": {
+      "src": s2666fe0f,
+      "alt": "diamonds"
+    },
+    "\u26BD": {
+      "src": s26bd,
+      "alt": "soccer"
+    },
+    "\u26BE": {
+      "src": s26be,
+      "alt": "baseball"
+    },
+    "\u26F3": {
+      "src": s26f3,
+      "alt": "golf"
+    },
+    "\u26F8\uFE0F": {
+      "src": s26f8fe0f,
+      "alt": "ice_skate"
+    },
+    "\u2728": {
+      "src": s2728,
+      "alt": "sparkles"
+    }
+  },
+  "Travel & Places": {
+    "\u1F300": {
+      "src": s1f300,
+      "alt": "cyclone"
+    },
+    "\u1F301": {
+      "src": s1f301,
+      "alt": "foggy"
+    },
+    "\u1F302": {
+      "src": s1f302,
+      "alt": "closed_umbrella"
+    },
+    "\u1F303": {
+      "src": s1f303,
+      "alt": "night_with_stars"
+    },
+    "\u1F304": {
+      "src": s1f304,
+      "alt": "sunrise_over_mountains"
+    },
+    "\u1F305": {
+      "src": s1f305,
+      "alt": "sunrise"
+    },
+    "\u1F306": {
+      "src": s1f306,
+      "alt": "city_sunset"
+    },
+    "\u1F307": {
+      "src": s1f307,
+      "alt": "city_sunrise"
+    },
+    "\u1F308": {
+      "src": s1f308,
+      "alt": "rainbow"
+    },
+    "\u1F309": {
+      "src": s1f309,
+      "alt": "bridge_at_night"
+    },
+    "\u1F30A": {
+      "src": s1f30a,
+      "alt": "ocean"
+    },
+    "\u1F30B": {
+      "src": s1f30b,
+      "alt": "volcano"
+    },
+    "\u1F30C": {
+      "src": s1f30c,
+      "alt": "milky_way"
+    },
+    "\u1F30D": {
+      "src": s1f30d,
+      "alt": "earth_africa"
+    },
+    "\u1F30E": {
+      "src": s1f30e,
+      "alt": "earth_americas"
+    },
+    "\u1F30F": {
+      "src": s1f30f,
+      "alt": "earth_asia"
+    },
+    "\u1F310": {
+      "src": s1f310,
+      "alt": "globe_with_meridians"
+    },
+    "\u1F311": {
+      "src": s1f311,
+      "alt": "new_moon"
+    },
+    "\u1F312": {
+      "src": s1f312,
+      "alt": "waxing_crescent_moon"
+    },
+    "\u1F313": {
+      "src": s1f313,
+      "alt": "first_quarter_moon"
+    },
+    "\u1F314": {
+      "src": s1f314,
+      "alt": "moon"
+    },
+    "\u1F315": {
+      "src": s1f315,
+      "alt": "full_moon"
+    },
+    "\u1F316": {
+      "src": s1f316,
+      "alt": "waning_gibbous_moon"
+    },
+    "\u1F317": {
+      "src": s1f317,
+      "alt": "last_quarter_moon"
+    },
+    "\u1F318": {
+      "src": s1f318,
+      "alt": "waning_crescent_moon"
+    },
+    "\u1F319": {
+      "src": s1f319,
+      "alt": "crescent_moon"
+    },
+    "\u1F31A": {
+      "src": s1f31a,
+      "alt": "new_moon_with_face"
+    },
+    "\u1F31B": {
+      "src": s1f31b,
+      "alt": "first_quarter_moon_with_face"
+    },
+    "\u1F31C": {
+      "src": s1f31c,
+      "alt": "last_quarter_moon_with_face"
+    },
+    "\u1F31D": {
+      "src": s1f31d,
+      "alt": "full_moon_with_face"
+    },
+    "\u1F31E": {
+      "src": s1f31e,
+      "alt": "sun_with_face"
+    },
+    "\u1F31F": {
+      "src": s1f31f,
+      "alt": "star2"
+    },
+    "\u1F320": {
+      "src": s1f320,
+      "alt": "stars"
+    },
+    "\u1F321\uFE0F": {
+      "src": s1f321fe0f,
+      "alt": "thermometer"
+    },
+    "\u1F324\uFE0F": {
+      "src": s1f324fe0f,
+      "alt": "mostly_sunny"
+    },
+    "\u1F325\uFE0F": {
+      "src": s1f325fe0f,
+      "alt": "barely_sunny"
+    },
+    "\u1F326\uFE0F": {
+      "src": s1f326fe0f,
+      "alt": "partly_sunny_rain"
+    },
+    "\u1F327\uFE0F": {
+      "src": s1f327fe0f,
+      "alt": "rain_cloud"
+    },
+    "\u1F328\uFE0F": {
+      "src": s1f328fe0f,
+      "alt": "snow_cloud"
+    },
+    "\u1F329\uFE0F": {
+      "src": s1f329fe0f,
+      "alt": "lightning"
+    },
+    "\u1F32A\uFE0F": {
+      "src": s1f32afe0f,
+      "alt": "tornado"
+    },
+    "\u1F32B\uFE0F": {
+      "src": s1f32bfe0f,
+      "alt": "fog"
+    },
+    "\u1F32C\uFE0F": {
+      "src": s1f32cfe0f,
+      "alt": "wind_blowing_face"
+    },
+    "\u1F3A0": {
+      "src": s1f3a0,
+      "alt": "carousel_horse"
+    },
+    "\u1F3A1": {
+      "src": s1f3a1,
+      "alt": "ferris_wheel"
+    },
+    "\u1F3A2": {
+      "src": s1f3a2,
+      "alt": "roller_coaster"
+    },
+    "\u1F3AA": {
+      "src": s1f3aa,
+      "alt": "circus_tent"
+    },
+    "\u1F3CD\uFE0F": {
+      "src": s1f3cdfe0f,
+      "alt": "racing_motorcycle"
+    },
+    "\u1F3CE\uFE0F": {
+      "src": s1f3cefe0f,
+      "alt": "racing_car"
+    },
+    "\u1F3D4\uFE0F": {
+      "src": s1f3d4fe0f,
+      "alt": "snow_capped_mountain"
+    },
+    "\u1F3D5\uFE0F": {
+      "src": s1f3d5fe0f,
+      "alt": "camping"
+    },
+    "\u1F3D6\uFE0F": {
+      "src": s1f3d6fe0f,
+      "alt": "beach_with_umbrella"
+    },
+    "\u1F3D7\uFE0F": {
+      "src": s1f3d7fe0f,
+      "alt": "building_construction"
+    },
+    "\u1F3D8\uFE0F": {
+      "src": s1f3d8fe0f,
+      "alt": "house_buildings"
+    },
+    "\u1F3D9\uFE0F": {
+      "src": s1f3d9fe0f,
+      "alt": "cityscape"
+    },
+    "\u1F3DA\uFE0F": {
+      "src": s1f3dafe0f,
+      "alt": "derelict_house_building"
+    },
+    "\u1F3DB\uFE0F": {
+      "src": s1f3dbfe0f,
+      "alt": "classical_building"
+    },
+    "\u1F3DC\uFE0F": {
+      "src": s1f3dcfe0f,
+      "alt": "desert"
+    },
+    "\u1F3DD\uFE0F": {
+      "src": s1f3ddfe0f,
+      "alt": "desert_island"
+    },
+    "\u1F3DE\uFE0F": {
+      "src": s1f3defe0f,
+      "alt": "national_park"
+    },
+    "\u1F3DF\uFE0F": {
+      "src": s1f3dffe0f,
+      "alt": "stadium"
+    },
+    "\u1F3E0": {
+      "src": s1f3e0,
+      "alt": "house"
+    },
+    "\u1F3E1": {
+      "src": s1f3e1,
+      "alt": "house_with_garden"
+    },
+    "\u1F3E2": {
+      "src": s1f3e2,
+      "alt": "office"
+    },
+    "\u1F3E3": {
+      "src": s1f3e3,
+      "alt": "post_office"
+    },
+    "\u1F3E4": {
+      "src": s1f3e4,
+      "alt": "european_post_office"
+    },
+    "\u1F3E5": {
+      "src": s1f3e5,
+      "alt": "hospital"
+    },
+    "\u1F3E6": {
+      "src": s1f3e6,
+      "alt": "bank"
+    },
+    "\u1F3E8": {
+      "src": s1f3e8,
+      "alt": "hotel"
+    },
+    "\u1F3E9": {
+      "src": s1f3e9,
+      "alt": "love_hotel"
+    },
+    "\u1F3EA": {
+      "src": s1f3ea,
+      "alt": "convenience_store"
+    },
+    "\u1F3EB": {
+      "src": s1f3eb,
+      "alt": "school"
+    },
+    "\u1F3EC": {
+      "src": s1f3ec,
+      "alt": "department_store"
+    },
+    "\u1F3ED": {
+      "src": s1f3ed,
+      "alt": "factory"
+    },
+    "\u1F3EF": {
+      "src": s1f3ef,
+      "alt": "japanese_castle"
+    },
+    "\u1F3F0": {
+      "src": s1f3f0,
+      "alt": "european_castle"
+    },
+    "\u1F488": {
+      "src": s1f488,
+      "alt": "barber"
+    },
+    "\u1F492": {
+      "src": s1f492,
+      "alt": "wedding"
+    },
+    "\u1F4A7": {
+      "src": s1f4a7,
+      "alt": "droplet"
+    },
+    "\u1F4BA": {
+      "src": s1f4ba,
+      "alt": "seat"
+    },
+    "\u1F525": {
+      "src": s1f525,
+      "alt": "fire"
+    },
+    "\u1F54B": {
+      "src": s1f54b,
+      "alt": "kaaba"
+    },
+    "\u1F54C": {
+      "src": s1f54c,
+      "alt": "mosque"
+    },
+    "\u1F54D": {
+      "src": s1f54d,
+      "alt": "synagogue"
+    },
+    "\u1F550": {
+      "src": s1f550,
+      "alt": "clock1"
+    },
+    "\u1F551": {
+      "src": s1f551,
+      "alt": "clock2"
+    },
+    "\u1F552": {
+      "src": s1f552,
+      "alt": "clock3"
+    },
+    "\u1F553": {
+      "src": s1f553,
+      "alt": "clock4"
+    },
+    "\u1F554": {
+      "src": s1f554,
+      "alt": "clock5"
+    },
+    "\u1F555": {
+      "src": s1f555,
+      "alt": "clock6"
+    },
+    "\u1F556": {
+      "src": s1f556,
+      "alt": "clock7"
+    },
+    "\u1F557": {
+      "src": s1f557,
+      "alt": "clock8"
+    },
+    "\u1F558": {
+      "src": s1f558,
+      "alt": "clock9"
+    },
+    "\u1F559": {
+      "src": s1f559,
+      "alt": "clock10"
+    },
+    "\u1F55A": {
+      "src": s1f55a,
+      "alt": "clock11"
+    },
+    "\u1F55B": {
+      "src": s1f55b,
+      "alt": "clock12"
+    },
+    "\u1F55C": {
+      "src": s1f55c,
+      "alt": "clock130"
+    },
+    "\u1F55D": {
+      "src": s1f55d,
+      "alt": "clock230"
+    },
+    "\u1F55E": {
+      "src": s1f55e,
+      "alt": "clock330"
+    },
+    "\u1F55F": {
+      "src": s1f55f,
+      "alt": "clock430"
+    },
+    "\u1F560": {
+      "src": s1f560,
+      "alt": "clock530"
+    },
+    "\u1F561": {
+      "src": s1f561,
+      "alt": "clock630"
+    },
+    "\u1F562": {
+      "src": s1f562,
+      "alt": "clock730"
+    },
+    "\u1F563": {
+      "src": s1f563,
+      "alt": "clock830"
+    },
+    "\u1F564": {
+      "src": s1f564,
+      "alt": "clock930"
+    },
+    "\u1F565": {
+      "src": s1f565,
+      "alt": "clock1030"
+    },
+    "\u1F566": {
+      "src": s1f566,
+      "alt": "clock1130"
+    },
+    "\u1F567": {
+      "src": s1f567,
+      "alt": "clock1230"
+    },
+    "\u1F570\uFE0F": {
+      "src": s1f570fe0f,
+      "alt": "mantelpiece_clock"
+    },
+    "\u1F5FA\uFE0F": {
+      "src": s1f5fafe0f,
+      "alt": "world_map"
+    },
+    "\u1F5FB": {
+      "src": s1f5fb,
+      "alt": "mount_fuji"
+    },
+    "\u1F5FC": {
+      "src": s1f5fc,
+      "alt": "tokyo_tower"
+    },
+    "\u1F5FD": {
+      "src": s1f5fd,
+      "alt": "statue_of_liberty"
+    },
+    "\u1F5FE": {
+      "src": s1f5fe,
+      "alt": "japan"
+    },
+    "\u1F680": {
+      "src": s1f680,
+      "alt": "rocket"
+    },
+    "\u1F681": {
+      "src": s1f681,
+      "alt": "helicopter"
+    },
+    "\u1F682": {
+      "src": s1f682,
+      "alt": "steam_locomotive"
+    },
+    "\u1F683": {
+      "src": s1f683,
+      "alt": "railway_car"
+    },
+    "\u1F684": {
+      "src": s1f684,
+      "alt": "bullettrain_side"
+    },
+    "\u1F685": {
+      "src": s1f685,
+      "alt": "bullettrain_front"
+    },
+    "\u1F686": {
+      "src": s1f686,
+      "alt": "train2"
+    },
+    "\u1F687": {
+      "src": s1f687,
+      "alt": "metro"
+    },
+    "\u1F688": {
+      "src": s1f688,
+      "alt": "light_rail"
+    },
+    "\u1F689": {
+      "src": s1f689,
+      "alt": "station"
+    },
+    "\u1F68A": {
+      "src": s1f68a,
+      "alt": "tram"
+    },
+    "\u1F68B": {
+      "src": s1f68b,
+      "alt": "train"
+    },
+    "\u1F68C": {
+      "src": s1f68c,
+      "alt": "bus"
+    },
+    "\u1F68D": {
+      "src": s1f68d,
+      "alt": "oncoming_bus"
+    },
+    "\u1F68E": {
+      "src": s1f68e,
+      "alt": "trolleybus"
+    },
+    "\u1F68F": {
+      "src": s1f68f,
+      "alt": "busstop"
+    },
+    "\u1F690": {
+      "src": s1f690,
+      "alt": "minibus"
+    },
+    "\u1F691": {
+      "src": s1f691,
+      "alt": "ambulance"
+    },
+    "\u1F692": {
+      "src": s1f692,
+      "alt": "fire_engine"
+    },
+    "\u1F693": {
+      "src": s1f693,
+      "alt": "police_car"
+    },
+    "\u1F694": {
+      "src": s1f694,
+      "alt": "oncoming_police_car"
+    },
+    "\u1F695": {
+      "src": s1f695,
+      "alt": "taxi"
+    },
+    "\u1F696": {
+      "src": s1f696,
+      "alt": "oncoming_taxi"
+    },
+    "\u1F697": {
+      "src": s1f697,
+      "alt": "car"
+    },
+    "\u1F698": {
+      "src": s1f698,
+      "alt": "oncoming_automobile"
+    },
+    "\u1F699": {
+      "src": s1f699,
+      "alt": "blue_car"
+    },
+    "\u1F69A": {
+      "src": s1f69a,
+      "alt": "truck"
+    },
+    "\u1F69B": {
+      "src": s1f69b,
+      "alt": "articulated_lorry"
+    },
+    "\u1F69C": {
+      "src": s1f69c,
+      "alt": "tractor"
+    },
+    "\u1F69D": {
+      "src": s1f69d,
+      "alt": "monorail"
+    },
+    "\u1F69E": {
+      "src": s1f69e,
+      "alt": "mountain_railway"
+    },
+    "\u1F69F": {
+      "src": s1f69f,
+      "alt": "suspension_railway"
+    },
+    "\u1F6A0": {
+      "src": s1f6a0,
+      "alt": "mountain_cableway"
+    },
+    "\u1F6A1": {
+      "src": s1f6a1,
+      "alt": "aerial_tramway"
+    },
+    "\u1F6A2": {
+      "src": s1f6a2,
+      "alt": "ship"
+    },
+    "\u1F6A4": {
+      "src": s1f6a4,
+      "alt": "speedboat"
+    },
+    "\u1F6A5": {
+      "src": s1f6a5,
+      "alt": "traffic_light"
+    },
+    "\u1F6A6": {
+      "src": s1f6a6,
+      "alt": "vertical_traffic_light"
+    },
+    "\u1F6A7": {
+      "src": s1f6a7,
+      "alt": "construction"
+    },
+    "\u1F6A8": {
+      "src": s1f6a8,
+      "alt": "rotating_light"
+    },
+    "\u1F6B2": {
+      "src": s1f6b2,
+      "alt": "bike"
+    },
+    "\u1F6CE\uFE0F": {
+      "src": s1f6cefe0f,
+      "alt": "bellhop_bell"
+    },
+    "\u1F6D1": {
+      "src": s1f6d1,
+      "alt": "octagonal_sign"
+    },
+    "\u1F6D5": {
+      "src": s1f6d5,
+      "alt": "hindu_temple"
+    },
+    "\u1F6D6": {
+      "src": s1f6d6,
+      "alt": "hut"
+    },
+    "\u1F6E2\uFE0F": {
+      "src": s1f6e2fe0f,
+      "alt": "oil_drum"
+    },
+    "\u1F6E3\uFE0F": {
+      "src": s1f6e3fe0f,
+      "alt": "motorway"
+    },
+    "\u1F6E4\uFE0F": {
+      "src": s1f6e4fe0f,
+      "alt": "railway_track"
+    },
+    "\u1F6E5\uFE0F": {
+      "src": s1f6e5fe0f,
+      "alt": "motor_boat"
+    },
+    "\u1F6E9\uFE0F": {
+      "src": s1f6e9fe0f,
+      "alt": "small_airplane"
+    },
+    "\u1F6EB": {
+      "src": s1f6eb,
+      "alt": "airplane_departure"
+    },
+    "\u1F6EC": {
+      "src": s1f6ec,
+      "alt": "airplane_arriving"
+    },
+    "\u1F6F0\uFE0F": {
+      "src": s1f6f0fe0f,
+      "alt": "satellite"
+    },
+    "\u1F6F3\uFE0F": {
+      "src": s1f6f3fe0f,
+      "alt": "passenger_ship"
+    },
+    "\u1F6F4": {
+      "src": s1f6f4,
+      "alt": "scooter"
+    },
+    "\u1F6F5": {
+      "src": s1f6f5,
+      "alt": "motor_scooter"
+    },
+    "\u1F6F6": {
+      "src": s1f6f6,
+      "alt": "canoe"
+    },
+    "\u1F6F8": {
+      "src": s1f6f8,
+      "alt": "flying_saucer"
+    },
+    "\u1F6F9": {
+      "src": s1f6f9,
+      "alt": "skateboard"
+    },
+    "\u1F6FA": {
+      "src": s1f6fa,
+      "alt": "auto_rickshaw"
+    },
+    "\u1F6FB": {
+      "src": s1f6fb,
+      "alt": "pickup_truck"
+    },
+    "\u1F6FC": {
+      "src": s1f6fc,
+      "alt": "roller_skate"
+    },
+    "\u1F9BC": {
+      "src": s1f9bc,
+      "alt": "motorized_wheelchair"
+    },
+    "\u1F9BD": {
+      "src": s1f9bd,
+      "alt": "manual_wheelchair"
+    },
+    "\u1F9ED": {
+      "src": s1f9ed,
+      "alt": "compass"
+    },
+    "\u1F9F1": {
+      "src": s1f9f1,
+      "alt": "bricks"
+    },
+    "\u1F9F3": {
+      "src": s1f9f3,
+      "alt": "luggage"
+    },
+    "\u1FA82": {
+      "src": s1fa82,
+      "alt": "parachute"
+    },
+    "\u1FA90": {
+      "src": s1fa90,
+      "alt": "ringed_planet"
+    },
+    "\u1FAA8": {
+      "src": s1faa8,
+      "alt": "rock"
+    },
+    "\u1FAB5": {
+      "src": s1fab5,
+      "alt": "wood"
+    },
+    "\u231A": {
+      "src": s231a,
+      "alt": "watch"
+    },
+    "\u231B": {
+      "src": s231b,
+      "alt": "hourglass"
+    },
+    "\u23F0": {
+      "src": s23f0,
+      "alt": "alarm_clock"
+    },
+    "\u23F1\uFE0F": {
+      "src": s23f1fe0f,
+      "alt": "stopwatch"
+    },
+    "\u23F2\uFE0F": {
+      "src": s23f2fe0f,
+      "alt": "timer_clock"
+    },
+    "\u23F3": {
+      "src": s23f3,
+      "alt": "hourglass_flowing_sand"
+    },
+    "\u2600\uFE0F": {
+      "src": s2600fe0f,
+      "alt": "sunny"
+    },
+    "\u2601\uFE0F": {
+      "src": s2601fe0f,
+      "alt": "cloud"
+    },
+    "\u2602\uFE0F": {
+      "src": s2602fe0f,
+      "alt": "umbrella"
+    },
+    "\u2603\uFE0F": {
+      "src": s2603fe0f,
+      "alt": "snowman"
+    },
+    "\u2604\uFE0F": {
+      "src": s2604fe0f,
+      "alt": "comet"
+    },
+    "\u2614": {
+      "src": s2614,
+      "alt": "umbrella_with_rain_drops"
+    },
+    "\u2668\uFE0F": {
+      "src": s2668fe0f,
+      "alt": "hotsprings"
+    },
+    "\u2693": {
+      "src": s2693,
+      "alt": "anchor"
+    },
+    "\u26A1": {
+      "src": s26a1,
+      "alt": "zap"
+    },
+    "\u26C4": {
+      "src": s26c4,
+      "alt": "snowman_without_snow"
+    },
+    "\u26C5": {
+      "src": s26c5,
+      "alt": "partly_sunny"
+    },
+    "\u26C8\uFE0F": {
+      "src": s26c8fe0f,
+      "alt": "thunder_cloud_and_rain"
+    },
+    "\u26E9\uFE0F": {
+      "src": s26e9fe0f,
+      "alt": "shinto_shrine"
+    },
+    "\u26EA": {
+      "src": s26ea,
+      "alt": "church"
+    },
+    "\u26F0\uFE0F": {
+      "src": s26f0fe0f,
+      "alt": "mountain"
+    },
+    "\u26F1\uFE0F": {
+      "src": s26f1fe0f,
+      "alt": "umbrella_on_ground"
+    },
+    "\u26F2": {
+      "src": s26f2,
+      "alt": "fountain"
+    },
+    "\u26F4\uFE0F": {
+      "src": s26f4fe0f,
+      "alt": "ferry"
+    },
+    "\u26F5": {
+      "src": s26f5,
+      "alt": "boat"
+    },
+    "\u26FA": {
+      "src": s26fa,
+      "alt": "tent"
+    },
+    "\u26FD": {
+      "src": s26fd,
+      "alt": "fuelpump"
+    },
+    "\u2708\uFE0F": {
+      "src": s2708fe0f,
+      "alt": "airplane"
+    },
+    "\u2744\uFE0F": {
+      "src": s2744fe0f,
+      "alt": "snowflake"
+    },
+    "\u2B50": {
+      "src": s2b50,
+      "alt": "star"
+    }
+  },
+  "Objects": {
+    "\u1F392": {
+      "src": s1f392,
+      "alt": "school_satchel"
+    },
+    "\u1F393": {
+      "src": s1f393,
+      "alt": "mortar_board"
+    },
+    "\u1F399\uFE0F": {
+      "src": s1f399fe0f,
+      "alt": "studio_microphone"
+    },
+    "\u1F39A\uFE0F": {
+      "src": s1f39afe0f,
+      "alt": "level_slider"
+    },
+    "\u1F39B\uFE0F": {
+      "src": s1f39bfe0f,
+      "alt": "control_knobs"
+    },
+    "\u1F39E\uFE0F": {
+      "src": s1f39efe0f,
+      "alt": "film_frames"
+    },
+    "\u1F3A4": {
+      "src": s1f3a4,
+      "alt": "microphone"
+    },
+    "\u1F3A5": {
+      "src": s1f3a5,
+      "alt": "movie_camera"
+    },
+    "\u1F3A7": {
+      "src": s1f3a7,
+      "alt": "headphones"
+    },
+    "\u1F3A9": {
+      "src": s1f3a9,
+      "alt": "tophat"
+    },
+    "\u1F3AC": {
+      "src": s1f3ac,
+      "alt": "clapper"
+    },
+    "\u1F3B5": {
+      "src": s1f3b5,
+      "alt": "musical_note"
+    },
+    "\u1F3B6": {
+      "src": s1f3b6,
+      "alt": "notes"
+    },
+    "\u1F3B7": {
+      "src": s1f3b7,
+      "alt": "saxophone"
+    },
+    "\u1F3B8": {
+      "src": s1f3b8,
+      "alt": "guitar"
+    },
+    "\u1F3B9": {
+      "src": s1f3b9,
+      "alt": "musical_keyboard"
+    },
+    "\u1F3BA": {
+      "src": s1f3ba,
+      "alt": "trumpet"
+    },
+    "\u1F3BB": {
+      "src": s1f3bb,
+      "alt": "violin"
+    },
+    "\u1F3BC": {
+      "src": s1f3bc,
+      "alt": "musical_score"
+    },
+    "\u1F3EE": {
+      "src": s1f3ee,
+      "alt": "izakaya_lantern"
+    },
+    "\u1F3F7\uFE0F": {
+      "src": s1f3f7fe0f,
+      "alt": "label"
+    },
+    "\u1F3F9": {
+      "src": s1f3f9,
+      "alt": "bow_and_arrow"
+    },
+    "\u1F451": {
+      "src": s1f451,
+      "alt": "crown"
+    },
+    "\u1F452": {
+      "src": s1f452,
+      "alt": "womans_hat"
+    },
+    "\u1F453": {
+      "src": s1f453,
+      "alt": "eyeglasses"
+    },
+    "\u1F454": {
+      "src": s1f454,
+      "alt": "necktie"
+    },
+    "\u1F455": {
+      "src": s1f455,
+      "alt": "shirt"
+    },
+    "\u1F456": {
+      "src": s1f456,
+      "alt": "jeans"
+    },
+    "\u1F457": {
+      "src": s1f457,
+      "alt": "dress"
+    },
+    "\u1F458": {
+      "src": s1f458,
+      "alt": "kimono"
+    },
+    "\u1F459": {
+      "src": s1f459,
+      "alt": "bikini"
+    },
+    "\u1F45A": {
+      "src": s1f45a,
+      "alt": "womans_clothes"
+    },
+    "\u1F45B": {
+      "src": s1f45b,
+      "alt": "purse"
+    },
+    "\u1F45C": {
+      "src": s1f45c,
+      "alt": "handbag"
+    },
+    "\u1F45D": {
+      "src": s1f45d,
+      "alt": "pouch"
+    },
+    "\u1F45E": {
+      "src": s1f45e,
+      "alt": "mans_shoe"
+    },
+    "\u1F45F": {
+      "src": s1f45f,
+      "alt": "athletic_shoe"
+    },
+    "\u1F460": {
+      "src": s1f460,
+      "alt": "high_heel"
+    },
+    "\u1F461": {
+      "src": s1f461,
+      "alt": "sandal"
+    },
+    "\u1F462": {
+      "src": s1f462,
+      "alt": "boot"
+    },
+    "\u1F484": {
+      "src": s1f484,
+      "alt": "lipstick"
+    },
+    "\u1F489": {
+      "src": s1f489,
+      "alt": "syringe"
+    },
+    "\u1F48A": {
+      "src": s1f48a,
+      "alt": "pill"
+    },
+    "\u1F48D": {
+      "src": s1f48d,
+      "alt": "ring"
+    },
+    "\u1F48E": {
+      "src": s1f48e,
+      "alt": "gem"
+    },
+    "\u1F4A1": {
+      "src": s1f4a1,
+      "alt": "bulb"
+    },
+    "\u1F4B0": {
+      "src": s1f4b0,
+      "alt": "moneybag"
+    },
+    "\u1F4B3": {
+      "src": s1f4b3,
+      "alt": "credit_card"
+    },
+    "\u1F4B4": {
+      "src": s1f4b4,
+      "alt": "yen"
+    },
+    "\u1F4B5": {
+      "src": s1f4b5,
+      "alt": "dollar"
+    },
+    "\u1F4B6": {
+      "src": s1f4b6,
+      "alt": "euro"
+    },
+    "\u1F4B7": {
+      "src": s1f4b7,
+      "alt": "pound"
+    },
+    "\u1F4B8": {
+      "src": s1f4b8,
+      "alt": "money_with_wings"
+    },
+    "\u1F4B9": {
+      "src": s1f4b9,
+      "alt": "chart"
+    },
+    "\u1F4BB": {
+      "src": s1f4bb,
+      "alt": "computer"
+    },
+    "\u1F4BC": {
+      "src": s1f4bc,
+      "alt": "briefcase"
+    },
+    "\u1F4BD": {
+      "src": s1f4bd,
+      "alt": "minidisc"
+    },
+    "\u1F4BE": {
+      "src": s1f4be,
+      "alt": "floppy_disk"
+    },
+    "\u1F4BF": {
+      "src": s1f4bf,
+      "alt": "cd"
+    },
+    "\u1F4C0": {
+      "src": s1f4c0,
+      "alt": "dvd"
+    },
+    "\u1F4C1": {
+      "src": s1f4c1,
+      "alt": "file_folder"
+    },
+    "\u1F4C2": {
+      "src": s1f4c2,
+      "alt": "open_file_folder"
+    },
+    "\u1F4C3": {
+      "src": s1f4c3,
+      "alt": "page_with_curl"
+    },
+    "\u1F4C4": {
+      "src": s1f4c4,
+      "alt": "page_facing_up"
+    },
+    "\u1F4C5": {
+      "src": s1f4c5,
+      "alt": "date"
+    },
+    "\u1F4C6": {
+      "src": s1f4c6,
+      "alt": "calendar"
+    },
+    "\u1F4C7": {
+      "src": s1f4c7,
+      "alt": "card_index"
+    },
+    "\u1F4C8": {
+      "src": s1f4c8,
+      "alt": "chart_with_upwards_trend"
+    },
+    "\u1F4C9": {
+      "src": s1f4c9,
+      "alt": "chart_with_downwards_trend"
+    },
+    "\u1F4CA": {
+      "src": s1f4ca,
+      "alt": "bar_chart"
+    },
+    "\u1F4CB": {
+      "src": s1f4cb,
+      "alt": "clipboard"
+    },
+    "\u1F4CC": {
+      "src": s1f4cc,
+      "alt": "pushpin"
+    },
+    "\u1F4CD": {
+      "src": s1f4cd,
+      "alt": "round_pushpin"
+    },
+    "\u1F4CE": {
+      "src": s1f4ce,
+      "alt": "paperclip"
+    },
+    "\u1F4CF": {
+      "src": s1f4cf,
+      "alt": "straight_ruler"
+    },
+    "\u1F4D0": {
+      "src": s1f4d0,
+      "alt": "triangular_ruler"
+    },
+    "\u1F4D1": {
+      "src": s1f4d1,
+      "alt": "bookmark_tabs"
+    },
+    "\u1F4D2": {
+      "src": s1f4d2,
+      "alt": "ledger"
+    },
+    "\u1F4D3": {
+      "src": s1f4d3,
+      "alt": "notebook"
+    },
+    "\u1F4D4": {
+      "src": s1f4d4,
+      "alt": "notebook_with_decorative_cover"
+    },
+    "\u1F4D5": {
+      "src": s1f4d5,
+      "alt": "closed_book"
+    },
+    "\u1F4D6": {
+      "src": s1f4d6,
+      "alt": "book"
+    },
+    "\u1F4D7": {
+      "src": s1f4d7,
+      "alt": "green_book"
+    },
+    "\u1F4D8": {
+      "src": s1f4d8,
+      "alt": "blue_book"
+    },
+    "\u1F4D9": {
+      "src": s1f4d9,
+      "alt": "orange_book"
+    },
+    "\u1F4DA": {
+      "src": s1f4da,
+      "alt": "books"
+    },
+    "\u1F4DC": {
+      "src": s1f4dc,
+      "alt": "scroll"
+    },
+    "\u1F4DD": {
+      "src": s1f4dd,
+      "alt": "memo"
+    },
+    "\u1F4DE": {
+      "src": s1f4de,
+      "alt": "telephone_receiver"
+    },
+    "\u1F4DF": {
+      "src": s1f4df,
+      "alt": "pager"
+    },
+    "\u1F4E0": {
+      "src": s1f4e0,
+      "alt": "fax"
+    },
+    "\u1F4E1": {
+      "src": s1f4e1,
+      "alt": "satellite_antenna"
+    },
+    "\u1F4E2": {
+      "src": s1f4e2,
+      "alt": "loudspeaker"
+    },
+    "\u1F4E3": {
+      "src": s1f4e3,
+      "alt": "mega"
+    },
+    "\u1F4E4": {
+      "src": s1f4e4,
+      "alt": "outbox_tray"
+    },
+    "\u1F4E5": {
+      "src": s1f4e5,
+      "alt": "inbox_tray"
+    },
+    "\u1F4E6": {
+      "src": s1f4e6,
+      "alt": "package"
+    },
+    "\u1F4E7": {
+      "src": s1f4e7,
+      "alt": "e-mail"
+    },
+    "\u1F4E8": {
+      "src": s1f4e8,
+      "alt": "incoming_envelope"
+    },
+    "\u1F4E9": {
+      "src": s1f4e9,
+      "alt": "envelope_with_arrow"
+    },
+    "\u1F4EA": {
+      "src": s1f4ea,
+      "alt": "mailbox_closed"
+    },
+    "\u1F4EB": {
+      "src": s1f4eb,
+      "alt": "mailbox"
+    },
+    "\u1F4EC": {
+      "src": s1f4ec,
+      "alt": "mailbox_with_mail"
+    },
+    "\u1F4ED": {
+      "src": s1f4ed,
+      "alt": "mailbox_with_no_mail"
+    },
+    "\u1F4EE": {
+      "src": s1f4ee,
+      "alt": "postbox"
+    },
+    "\u1F4EF": {
+      "src": s1f4ef,
+      "alt": "postal_horn"
+    },
+    "\u1F4F0": {
+      "src": s1f4f0,
+      "alt": "newspaper"
+    },
+    "\u1F4F1": {
+      "src": s1f4f1,
+      "alt": "iphone"
+    },
+    "\u1F4F2": {
+      "src": s1f4f2,
+      "alt": "calling"
+    },
+    "\u1F4F7": {
+      "src": s1f4f7,
+      "alt": "camera"
+    },
+    "\u1F4F8": {
+      "src": s1f4f8,
+      "alt": "camera_with_flash"
+    },
+    "\u1F4F9": {
+      "src": s1f4f9,
+      "alt": "video_camera"
+    },
+    "\u1F4FA": {
+      "src": s1f4fa,
+      "alt": "tv"
+    },
+    "\u1F4FB": {
+      "src": s1f4fb,
+      "alt": "radio"
+    },
+    "\u1F4FC": {
+      "src": s1f4fc,
+      "alt": "vhs"
+    },
+    "\u1F4FD\uFE0F": {
+      "src": s1f4fdfe0f,
+      "alt": "film_projector"
+    },
+    "\u1F4FF": {
+      "src": s1f4ff,
+      "alt": "prayer_beads"
+    },
+    "\u1F507": {
+      "src": s1f507,
+      "alt": "mute"
+    },
+    "\u1F508": {
+      "src": s1f508,
+      "alt": "speaker"
+    },
+    "\u1F509": {
+      "src": s1f509,
+      "alt": "sound"
+    },
+    "\u1F50A": {
+      "src": s1f50a,
+      "alt": "loud_sound"
+    },
+    "\u1F50B": {
+      "src": s1f50b,
+      "alt": "battery"
+    },
+    "\u1F50C": {
+      "src": s1f50c,
+      "alt": "electric_plug"
+    },
+    "\u1F50D": {
+      "src": s1f50d,
+      "alt": "mag"
+    },
+    "\u1F50E": {
+      "src": s1f50e,
+      "alt": "mag_right"
+    },
+    "\u1F50F": {
+      "src": s1f50f,
+      "alt": "lock_with_ink_pen"
+    },
+    "\u1F510": {
+      "src": s1f510,
+      "alt": "closed_lock_with_key"
+    },
+    "\u1F511": {
+      "src": s1f511,
+      "alt": "key"
+    },
+    "\u1F512": {
+      "src": s1f512,
+      "alt": "lock"
+    },
+    "\u1F513": {
+      "src": s1f513,
+      "alt": "unlock"
+    },
+    "\u1F514": {
+      "src": s1f514,
+      "alt": "bell"
+    },
+    "\u1F515": {
+      "src": s1f515,
+      "alt": "no_bell"
+    },
+    "\u1F516": {
+      "src": s1f516,
+      "alt": "bookmark"
+    },
+    "\u1F517": {
+      "src": s1f517,
+      "alt": "link"
+    },
+    "\u1F526": {
+      "src": s1f526,
+      "alt": "flashlight"
+    },
+    "\u1F527": {
+      "src": s1f527,
+      "alt": "wrench"
+    },
+    "\u1F528": {
+      "src": s1f528,
+      "alt": "hammer"
+    },
+    "\u1F529": {
+      "src": s1f529,
+      "alt": "nut_and_bolt"
+    },
+    "\u1F52B": {
+      "src": s1f52b,
+      "alt": "gun"
+    },
+    "\u1F52C": {
+      "src": s1f52c,
+      "alt": "microscope"
+    },
+    "\u1F52D": {
+      "src": s1f52d,
+      "alt": "telescope"
+    },
+    "\u1F56F\uFE0F": {
+      "src": s1f56ffe0f,
+      "alt": "candle"
+    },
+    "\u1F576\uFE0F": {
+      "src": s1f576fe0f,
+      "alt": "dark_sunglasses"
+    },
+    "\u1F587\uFE0F": {
+      "src": s1f587fe0f,
+      "alt": "linked_paperclips"
+    },
+    "\u1F58A\uFE0F": {
+      "src": s1f58afe0f,
+      "alt": "lower_left_ballpoint_pen"
+    },
+    "\u1F58B\uFE0F": {
+      "src": s1f58bfe0f,
+      "alt": "lower_left_fountain_pen"
+    },
+    "\u1F58C\uFE0F": {
+      "src": s1f58cfe0f,
+      "alt": "lower_left_paintbrush"
+    },
+    "\u1F58D\uFE0F": {
+      "src": s1f58dfe0f,
+      "alt": "lower_left_crayon"
+    },
+    "\u1F5A5\uFE0F": {
+      "src": s1f5a5fe0f,
+      "alt": "desktop_computer"
+    },
+    "\u1F5A8\uFE0F": {
+      "src": s1f5a8fe0f,
+      "alt": "printer"
+    },
+    "\u1F5B1\uFE0F": {
+      "src": s1f5b1fe0f,
+      "alt": "three_button_mouse"
+    },
+    "\u1F5B2\uFE0F": {
+      "src": s1f5b2fe0f,
+      "alt": "trackball"
+    },
+    "\u1F5C2\uFE0F": {
+      "src": s1f5c2fe0f,
+      "alt": "card_index_dividers"
+    },
+    "\u1F5C3\uFE0F": {
+      "src": s1f5c3fe0f,
+      "alt": "card_file_box"
+    },
+    "\u1F5C4\uFE0F": {
+      "src": s1f5c4fe0f,
+      "alt": "file_cabinet"
+    },
+    "\u1F5D1\uFE0F": {
+      "src": s1f5d1fe0f,
+      "alt": "wastebasket"
+    },
+    "\u1F5D2\uFE0F": {
+      "src": s1f5d2fe0f,
+      "alt": "spiral_note_pad"
+    },
+    "\u1F5D3\uFE0F": {
+      "src": s1f5d3fe0f,
+      "alt": "spiral_calendar_pad"
+    },
+    "\u1F5DC\uFE0F": {
+      "src": s1f5dcfe0f,
+      "alt": "compression"
+    },
+    "\u1F5DD\uFE0F": {
+      "src": s1f5ddfe0f,
+      "alt": "old_key"
+    },
+    "\u1F5DE\uFE0F": {
+      "src": s1f5defe0f,
+      "alt": "rolled_up_newspaper"
+    },
+    "\u1F5E1\uFE0F": {
+      "src": s1f5e1fe0f,
+      "alt": "dagger_knife"
+    },
+    "\u1F5F3\uFE0F": {
+      "src": s1f5f3fe0f,
+      "alt": "ballot_box_with_ballot"
+    },
+    "\u1F5FF": {
+      "src": s1f5ff,
+      "alt": "moyai"
+    },
+    "\u1F6AA": {
+      "src": s1f6aa,
+      "alt": "door"
+    },
+    "\u1F6AC": {
+      "src": s1f6ac,
+      "alt": "smoking"
+    },
+    "\u1F6BD": {
+      "src": s1f6bd,
+      "alt": "toilet"
+    },
+    "\u1F6BF": {
+      "src": s1f6bf,
+      "alt": "shower"
+    },
+    "\u1F6C1": {
+      "src": s1f6c1,
+      "alt": "bathtub"
+    },
+    "\u1F6CB\uFE0F": {
+      "src": s1f6cbfe0f,
+      "alt": "couch_and_lamp"
+    },
+    "\u1F6CD\uFE0F": {
+      "src": s1f6cdfe0f,
+      "alt": "shopping_bags"
+    },
+    "\u1F6CF\uFE0F": {
+      "src": s1f6cffe0f,
+      "alt": "bed"
+    },
+    "\u1F6D2": {
+      "src": s1f6d2,
+      "alt": "shopping_trolley"
+    },
+    "\u1F6D7": {
+      "src": s1f6d7,
+      "alt": "elevator"
+    },
+    "\u1F6E0\uFE0F": {
+      "src": s1f6e0fe0f,
+      "alt": "hammer_and_wrench"
+    },
+    "\u1F6E1\uFE0F": {
+      "src": s1f6e1fe0f,
+      "alt": "shield"
+    },
+    "\u1F941": {
+      "src": s1f941,
+      "alt": "drum_with_drumsticks"
+    },
+    "\u1F97B": {
+      "src": s1f97b,
+      "alt": "sari"
+    },
+    "\u1F97C": {
+      "src": s1f97c,
+      "alt": "lab_coat"
+    },
+    "\u1F97D": {
+      "src": s1f97d,
+      "alt": "goggles"
+    },
+    "\u1F97E": {
+      "src": s1f97e,
+      "alt": "hiking_boot"
+    },
+    "\u1F97F": {
+      "src": s1f97f,
+      "alt": "womans_flat_shoe"
+    },
+    "\u1F9AF": {
+      "src": s1f9af,
+      "alt": "probing_cane"
+    },
+    "\u1F9BA": {
+      "src": s1f9ba,
+      "alt": "safety_vest"
+    },
+    "\u1F9E2": {
+      "src": s1f9e2,
+      "alt": "billed_cap"
+    },
+    "\u1F9E3": {
+      "src": s1f9e3,
+      "alt": "scarf"
+    },
+    "\u1F9E4": {
+      "src": s1f9e4,
+      "alt": "gloves"
+    },
+    "\u1F9E5": {
+      "src": s1f9e5,
+      "alt": "coat"
+    },
+    "\u1F9E6": {
+      "src": s1f9e6,
+      "alt": "socks"
+    },
+    "\u1F9EA": {
+      "src": s1f9ea,
+      "alt": "test_tube"
+    },
+    "\u1F9EB": {
+      "src": s1f9eb,
+      "alt": "petri_dish"
+    },
+    "\u1F9EC": {
+      "src": s1f9ec,
+      "alt": "dna"
+    },
+    "\u1F9EE": {
+      "src": s1f9ee,
+      "alt": "abacus"
+    },
+    "\u1F9EF": {
+      "src": s1f9ef,
+      "alt": "fire_extinguisher"
+    },
+    "\u1F9F0": {
+      "src": s1f9f0,
+      "alt": "toolbox"
+    },
+    "\u1F9F2": {
+      "src": s1f9f2,
+      "alt": "magnet"
+    },
+    "\u1F9F4": {
+      "src": s1f9f4,
+      "alt": "lotion_bottle"
+    },
+    "\u1F9F7": {
+      "src": s1f9f7,
+      "alt": "safety_pin"
+    },
+    "\u1F9F9": {
+      "src": s1f9f9,
+      "alt": "broom"
+    },
+    "\u1F9FA": {
+      "src": s1f9fa,
+      "alt": "basket"
+    },
+    "\u1F9FB": {
+      "src": s1f9fb,
+      "alt": "roll_of_paper"
+    },
+    "\u1F9FC": {
+      "src": s1f9fc,
+      "alt": "soap"
+    },
+    "\u1F9FD": {
+      "src": s1f9fd,
+      "alt": "sponge"
+    },
+    "\u1F9FE": {
+      "src": s1f9fe,
+      "alt": "receipt"
+    },
+    "\u1FA70": {
+      "src": s1fa70,
+      "alt": "ballet_shoes"
+    },
+    "\u1FA71": {
+      "src": s1fa71,
+      "alt": "one-piece_swimsuit"
+    },
+    "\u1FA72": {
+      "src": s1fa72,
+      "alt": "briefs"
+    },
+    "\u1FA73": {
+      "src": s1fa73,
+      "alt": "shorts"
+    },
+    "\u1FA74": {
+      "src": s1fa74,
+      "alt": "thong_sandal"
+    },
+    "\u1FA78": {
+      "src": s1fa78,
+      "alt": "drop_of_blood"
+    },
+    "\u1FA79": {
+      "src": s1fa79,
+      "alt": "adhesive_bandage"
+    },
+    "\u1FA7A": {
+      "src": s1fa7a,
+      "alt": "stethoscope"
+    },
+    "\u1FA83": {
+      "src": s1fa83,
+      "alt": "boomerang"
+    },
+    "\u1FA91": {
+      "src": s1fa91,
+      "alt": "chair"
+    },
+    "\u1FA92": {
+      "src": s1fa92,
+      "alt": "razor"
+    },
+    "\u1FA93": {
+      "src": s1fa93,
+      "alt": "axe"
+    },
+    "\u1FA94": {
+      "src": s1fa94,
+      "alt": "diya_lamp"
+    },
+    "\u1FA95": {
+      "src": s1fa95,
+      "alt": "banjo"
+    },
+    "\u1FA96": {
+      "src": s1fa96,
+      "alt": "military_helmet"
+    },
+    "\u1FA97": {
+      "src": s1fa97,
+      "alt": "accordion"
+    },
+    "\u1FA98": {
+      "src": s1fa98,
+      "alt": "long_drum"
+    },
+    "\u1FA99": {
+      "src": s1fa99,
+      "alt": "coin"
+    },
+    "\u1FA9A": {
+      "src": s1fa9a,
+      "alt": "carpentry_saw"
+    },
+    "\u1FA9B": {
+      "src": s1fa9b,
+      "alt": "screwdriver"
+    },
+    "\u1FA9C": {
+      "src": s1fa9c,
+      "alt": "ladder"
+    },
+    "\u1FA9D": {
+      "src": s1fa9d,
+      "alt": "hook"
+    },
+    "\u1FA9E": {
+      "src": s1fa9e,
+      "alt": "mirror"
+    },
+    "\u1FA9F": {
+      "src": s1fa9f,
+      "alt": "window"
+    },
+    "\u1FAA0": {
+      "src": s1faa0,
+      "alt": "plunger"
+    },
+    "\u1FAA3": {
+      "src": s1faa3,
+      "alt": "bucket"
+    },
+    "\u1FAA4": {
+      "src": s1faa4,
+      "alt": "mouse_trap"
+    },
+    "\u1FAA5": {
+      "src": s1faa5,
+      "alt": "toothbrush"
+    },
+    "\u1FAA6": {
+      "src": s1faa6,
+      "alt": "headstone"
+    },
+    "\u1FAA7": {
+      "src": s1faa7,
+      "alt": "placard"
+    },
+    "\u2328\uFE0F": {
+      "src": s2328fe0f,
+      "alt": "keyboard"
+    },
+    "\u260E\uFE0F": {
+      "src": s260efe0f,
+      "alt": "phone"
+    },
+    "\u2692\uFE0F": {
+      "src": s2692fe0f,
+      "alt": "hammer_and_pick"
+    },
+    "\u2694\uFE0F": {
+      "src": s2694fe0f,
+      "alt": "crossed_swords"
+    },
+    "\u2696\uFE0F": {
+      "src": s2696fe0f,
+      "alt": "scales"
+    },
+    "\u2697\uFE0F": {
+      "src": s2697fe0f,
+      "alt": "alembic"
+    },
+    "\u2699\uFE0F": {
+      "src": s2699fe0f,
+      "alt": "gear"
+    },
+    "\u26B0\uFE0F": {
+      "src": s26b0fe0f,
+      "alt": "coffin"
+    },
+    "\u26B1\uFE0F": {
+      "src": s26b1fe0f,
+      "alt": "funeral_urn"
+    },
+    "\u26CF\uFE0F": {
+      "src": s26cffe0f,
+      "alt": "pick"
+    },
+    "\u26D1\uFE0F": {
+      "src": s26d1fe0f,
+      "alt": "helmet_with_white_cross"
+    },
+    "\u26D3\uFE0F": {
+      "src": s26d3fe0f,
+      "alt": "chains"
+    },
+    "\u2702\uFE0F": {
+      "src": s2702fe0f,
+      "alt": "scissors"
+    },
+    "\u2709\uFE0F": {
+      "src": s2709fe0f,
+      "alt": "email"
+    },
+    "\u270F\uFE0F": {
+      "src": s270ffe0f,
+      "alt": "pencil2"
+    },
+    "\u2712\uFE0F": {
+      "src": s2712fe0f,
+      "alt": "black_nib"
+    }
+  },
+  "Flags": {
+    "\u1F1E6\u1F1E8": {
+      "src": s1f1e61f1e8,
+      "alt": "flag-ac"
+    },
+    "\u1F1E6\u1F1E9": {
+      "src": s1f1e61f1e9,
+      "alt": "flag-ad"
+    },
+    "\u1F1E6\u1F1EA": {
+      "src": s1f1e61f1ea,
+      "alt": "flag-ae"
+    },
+    "\u1F1E6\u1F1EB": {
+      "src": s1f1e61f1eb,
+      "alt": "flag-af"
+    },
+    "\u1F1E6\u1F1EC": {
+      "src": s1f1e61f1ec,
+      "alt": "flag-ag"
+    },
+    "\u1F1E6\u1F1EE": {
+      "src": s1f1e61f1ee,
+      "alt": "flag-ai"
+    },
+    "\u1F1E6\u1F1F1": {
+      "src": s1f1e61f1f1,
+      "alt": "flag-al"
+    },
+    "\u1F1E6\u1F1F2": {
+      "src": s1f1e61f1f2,
+      "alt": "flag-am"
+    },
+    "\u1F1E6\u1F1F4": {
+      "src": s1f1e61f1f4,
+      "alt": "flag-ao"
+    },
+    "\u1F1E6\u1F1F6": {
+      "src": s1f1e61f1f6,
+      "alt": "flag-aq"
+    },
+    "\u1F1E6\u1F1F7": {
+      "src": s1f1e61f1f7,
+      "alt": "flag-ar"
+    },
+    "\u1F1E6\u1F1F8": {
+      "src": s1f1e61f1f8,
+      "alt": "flag-as"
+    },
+    "\u1F1E6\u1F1F9": {
+      "src": s1f1e61f1f9,
+      "alt": "flag-at"
+    },
+    "\u1F1E6\u1F1FA": {
+      "src": s1f1e61f1fa,
+      "alt": "flag-au"
+    },
+    "\u1F1E6\u1F1FC": {
+      "src": s1f1e61f1fc,
+      "alt": "flag-aw"
+    },
+    "\u1F1E6\u1F1FD": {
+      "src": s1f1e61f1fd,
+      "alt": "flag-ax"
+    },
+    "\u1F1E6\u1F1FF": {
+      "src": s1f1e61f1ff,
+      "alt": "flag-az"
+    },
+    "\u1F1E7\u1F1E6": {
+      "src": s1f1e71f1e6,
+      "alt": "flag-ba"
+    },
+    "\u1F1E7\u1F1E7": {
+      "src": s1f1e71f1e7,
+      "alt": "flag-bb"
+    },
+    "\u1F1E7\u1F1E9": {
+      "src": s1f1e71f1e9,
+      "alt": "flag-bd"
+    },
+    "\u1F1E7\u1F1EA": {
+      "src": s1f1e71f1ea,
+      "alt": "flag-be"
+    },
+    "\u1F1E7\u1F1EB": {
+      "src": s1f1e71f1eb,
+      "alt": "flag-bf"
+    },
+    "\u1F1E7\u1F1EC": {
+      "src": s1f1e71f1ec,
+      "alt": "flag-bg"
+    },
+    "\u1F1E7\u1F1ED": {
+      "src": s1f1e71f1ed,
+      "alt": "flag-bh"
+    },
+    "\u1F1E7\u1F1EE": {
+      "src": s1f1e71f1ee,
+      "alt": "flag-bi"
+    },
+    "\u1F1E7\u1F1EF": {
+      "src": s1f1e71f1ef,
+      "alt": "flag-bj"
+    },
+    "\u1F1E7\u1F1F1": {
+      "src": s1f1e71f1f1,
+      "alt": "flag-bl"
+    },
+    "\u1F1E7\u1F1F2": {
+      "src": s1f1e71f1f2,
+      "alt": "flag-bm"
+    },
+    "\u1F1E7\u1F1F3": {
+      "src": s1f1e71f1f3,
+      "alt": "flag-bn"
+    },
+    "\u1F1E7\u1F1F4": {
+      "src": s1f1e71f1f4,
+      "alt": "flag-bo"
+    },
+    "\u1F1E7\u1F1F6": {
+      "src": s1f1e71f1f6,
+      "alt": "flag-bq"
+    },
+    "\u1F1E7\u1F1F7": {
+      "src": s1f1e71f1f7,
+      "alt": "flag-br"
+    },
+    "\u1F1E7\u1F1F8": {
+      "src": s1f1e71f1f8,
+      "alt": "flag-bs"
+    },
+    "\u1F1E7\u1F1F9": {
+      "src": s1f1e71f1f9,
+      "alt": "flag-bt"
+    },
+    "\u1F1E7\u1F1FB": {
+      "src": s1f1e71f1fb,
+      "alt": "flag-bv"
+    },
+    "\u1F1E7\u1F1FC": {
+      "src": s1f1e71f1fc,
+      "alt": "flag-bw"
+    },
+    "\u1F1E7\u1F1FE": {
+      "src": s1f1e71f1fe,
+      "alt": "flag-by"
+    },
+    "\u1F1E7\u1F1FF": {
+      "src": s1f1e71f1ff,
+      "alt": "flag-bz"
+    },
+    "\u1F1E8\u1F1E6": {
+      "src": s1f1e81f1e6,
+      "alt": "flag-ca"
+    },
+    "\u1F1E8\u1F1E8": {
+      "src": s1f1e81f1e8,
+      "alt": "flag-cc"
+    },
+    "\u1F1E8\u1F1E9": {
+      "src": s1f1e81f1e9,
+      "alt": "flag-cd"
+    },
+    "\u1F1E8\u1F1EB": {
+      "src": s1f1e81f1eb,
+      "alt": "flag-cf"
+    },
+    "\u1F1E8\u1F1EC": {
+      "src": s1f1e81f1ec,
+      "alt": "flag-cg"
+    },
+    "\u1F1E8\u1F1ED": {
+      "src": s1f1e81f1ed,
+      "alt": "flag-ch"
+    },
+    "\u1F1E8\u1F1EE": {
+      "src": s1f1e81f1ee,
+      "alt": "flag-ci"
+    },
+    "\u1F1E8\u1F1F0": {
+      "src": s1f1e81f1f0,
+      "alt": "flag-ck"
+    },
+    "\u1F1E8\u1F1F1": {
+      "src": s1f1e81f1f1,
+      "alt": "flag-cl"
+    },
+    "\u1F1E8\u1F1F2": {
+      "src": s1f1e81f1f2,
+      "alt": "flag-cm"
+    },
+    "\u1F1E8\u1F1F3": {
+      "src": s1f1e81f1f3,
+      "alt": "cn"
+    },
+    "\u1F1E8\u1F1F4": {
+      "src": s1f1e81f1f4,
+      "alt": "flag-co"
+    },
+    "\u1F1E8\u1F1F5": {
+      "src": s1f1e81f1f5,
+      "alt": "flag-cp"
+    },
+    "\u1F1E8\u1F1F7": {
+      "src": s1f1e81f1f7,
+      "alt": "flag-cr"
+    },
+    "\u1F1E8\u1F1FA": {
+      "src": s1f1e81f1fa,
+      "alt": "flag-cu"
+    },
+    "\u1F1E8\u1F1FB": {
+      "src": s1f1e81f1fb,
+      "alt": "flag-cv"
+    },
+    "\u1F1E8\u1F1FC": {
+      "src": s1f1e81f1fc,
+      "alt": "flag-cw"
+    },
+    "\u1F1E8\u1F1FD": {
+      "src": s1f1e81f1fd,
+      "alt": "flag-cx"
+    },
+    "\u1F1E8\u1F1FE": {
+      "src": s1f1e81f1fe,
+      "alt": "flag-cy"
+    },
+    "\u1F1E8\u1F1FF": {
+      "src": s1f1e81f1ff,
+      "alt": "flag-cz"
+    },
+    "\u1F1E9\u1F1EA": {
+      "src": s1f1e91f1ea,
+      "alt": "de"
+    },
+    "\u1F1E9\u1F1EC": {
+      "src": s1f1e91f1ec,
+      "alt": "flag-dg"
+    },
+    "\u1F1E9\u1F1EF": {
+      "src": s1f1e91f1ef,
+      "alt": "flag-dj"
+    },
+    "\u1F1E9\u1F1F0": {
+      "src": s1f1e91f1f0,
+      "alt": "flag-dk"
+    },
+    "\u1F1E9\u1F1F2": {
+      "src": s1f1e91f1f2,
+      "alt": "flag-dm"
+    },
+    "\u1F1E9\u1F1F4": {
+      "src": s1f1e91f1f4,
+      "alt": "flag-do"
+    },
+    "\u1F1E9\u1F1FF": {
+      "src": s1f1e91f1ff,
+      "alt": "flag-dz"
+    },
+    "\u1F1EA\u1F1E6": {
+      "src": s1f1ea1f1e6,
+      "alt": "flag-ea"
+    },
+    "\u1F1EA\u1F1E8": {
+      "src": s1f1ea1f1e8,
+      "alt": "flag-ec"
+    },
+    "\u1F1EA\u1F1EA": {
+      "src": s1f1ea1f1ea,
+      "alt": "flag-ee"
+    },
+    "\u1F1EA\u1F1EC": {
+      "src": s1f1ea1f1ec,
+      "alt": "flag-eg"
+    },
+    "\u1F1EA\u1F1ED": {
+      "src": s1f1ea1f1ed,
+      "alt": "flag-eh"
+    },
+    "\u1F1EA\u1F1F7": {
+      "src": s1f1ea1f1f7,
+      "alt": "flag-er"
+    },
+    "\u1F1EA\u1F1F8": {
+      "src": s1f1ea1f1f8,
+      "alt": "es"
+    },
+    "\u1F1EA\u1F1F9": {
+      "src": s1f1ea1f1f9,
+      "alt": "flag-et"
+    },
+    "\u1F1EA\u1F1FA": {
+      "src": s1f1ea1f1fa,
+      "alt": "flag-eu"
+    },
+    "\u1F1EB\u1F1EE": {
+      "src": s1f1eb1f1ee,
+      "alt": "flag-fi"
+    },
+    "\u1F1EB\u1F1EF": {
+      "src": s1f1eb1f1ef,
+      "alt": "flag-fj"
+    },
+    "\u1F1EB\u1F1F0": {
+      "src": s1f1eb1f1f0,
+      "alt": "flag-fk"
+    },
+    "\u1F1EB\u1F1F2": {
+      "src": s1f1eb1f1f2,
+      "alt": "flag-fm"
+    },
+    "\u1F1EB\u1F1F4": {
+      "src": s1f1eb1f1f4,
+      "alt": "flag-fo"
+    },
+    "\u1F1EB\u1F1F7": {
+      "src": s1f1eb1f1f7,
+      "alt": "fr"
+    },
+    "\u1F1EC\u1F1E6": {
+      "src": s1f1ec1f1e6,
+      "alt": "flag-ga"
+    },
+    "\u1F1EC\u1F1E7": {
+      "src": s1f1ec1f1e7,
+      "alt": "gb"
+    },
+    "\u1F1EC\u1F1E9": {
+      "src": s1f1ec1f1e9,
+      "alt": "flag-gd"
+    },
+    "\u1F1EC\u1F1EA": {
+      "src": s1f1ec1f1ea,
+      "alt": "flag-ge"
+    },
+    "\u1F1EC\u1F1EB": {
+      "src": s1f1ec1f1eb,
+      "alt": "flag-gf"
+    },
+    "\u1F1EC\u1F1EC": {
+      "src": s1f1ec1f1ec,
+      "alt": "flag-gg"
+    },
+    "\u1F1EC\u1F1ED": {
+      "src": s1f1ec1f1ed,
+      "alt": "flag-gh"
+    },
+    "\u1F1EC\u1F1EE": {
+      "src": s1f1ec1f1ee,
+      "alt": "flag-gi"
+    },
+    "\u1F1EC\u1F1F1": {
+      "src": s1f1ec1f1f1,
+      "alt": "flag-gl"
+    },
+    "\u1F1EC\u1F1F2": {
+      "src": s1f1ec1f1f2,
+      "alt": "flag-gm"
+    },
+    "\u1F1EC\u1F1F3": {
+      "src": s1f1ec1f1f3,
+      "alt": "flag-gn"
+    },
+    "\u1F1EC\u1F1F5": {
+      "src": s1f1ec1f1f5,
+      "alt": "flag-gp"
+    },
+    "\u1F1EC\u1F1F6": {
+      "src": s1f1ec1f1f6,
+      "alt": "flag-gq"
+    },
+    "\u1F1EC\u1F1F7": {
+      "src": s1f1ec1f1f7,
+      "alt": "flag-gr"
+    },
+    "\u1F1EC\u1F1F8": {
+      "src": s1f1ec1f1f8,
+      "alt": "flag-gs"
+    },
+    "\u1F1EC\u1F1F9": {
+      "src": s1f1ec1f1f9,
+      "alt": "flag-gt"
+    },
+    "\u1F1EC\u1F1FA": {
+      "src": s1f1ec1f1fa,
+      "alt": "flag-gu"
+    },
+    "\u1F1EC\u1F1FC": {
+      "src": s1f1ec1f1fc,
+      "alt": "flag-gw"
+    },
+    "\u1F1EC\u1F1FE": {
+      "src": s1f1ec1f1fe,
+      "alt": "flag-gy"
+    },
+    "\u1F1ED\u1F1F0": {
+      "src": s1f1ed1f1f0,
+      "alt": "flag-hk"
+    },
+    "\u1F1ED\u1F1F2": {
+      "src": s1f1ed1f1f2,
+      "alt": "flag-hm"
+    },
+    "\u1F1ED\u1F1F3": {
+      "src": s1f1ed1f1f3,
+      "alt": "flag-hn"
+    },
+    "\u1F1ED\u1F1F7": {
+      "src": s1f1ed1f1f7,
+      "alt": "flag-hr"
+    },
+    "\u1F1ED\u1F1F9": {
+      "src": s1f1ed1f1f9,
+      "alt": "flag-ht"
+    },
+    "\u1F1ED\u1F1FA": {
+      "src": s1f1ed1f1fa,
+      "alt": "flag-hu"
+    },
+    "\u1F1EE\u1F1E8": {
+      "src": s1f1ee1f1e8,
+      "alt": "flag-ic"
+    },
+    "\u1F1EE\u1F1E9": {
+      "src": s1f1ee1f1e9,
+      "alt": "flag-id"
+    },
+    "\u1F1EE\u1F1EA": {
+      "src": s1f1ee1f1ea,
+      "alt": "flag-ie"
+    },
+    "\u1F1EE\u1F1F1": {
+      "src": s1f1ee1f1f1,
+      "alt": "flag-il"
+    },
+    "\u1F1EE\u1F1F2": {
+      "src": s1f1ee1f1f2,
+      "alt": "flag-im"
+    },
+    "\u1F1EE\u1F1F3": {
+      "src": s1f1ee1f1f3,
+      "alt": "flag-in"
+    },
+    "\u1F1EE\u1F1F4": {
+      "src": s1f1ee1f1f4,
+      "alt": "flag-io"
+    },
+    "\u1F1EE\u1F1F6": {
+      "src": s1f1ee1f1f6,
+      "alt": "flag-iq"
+    },
+    "\u1F1EE\u1F1F7": {
+      "src": s1f1ee1f1f7,
+      "alt": "flag-ir"
+    },
+    "\u1F1EE\u1F1F8": {
+      "src": s1f1ee1f1f8,
+      "alt": "flag-is"
+    },
+    "\u1F1EE\u1F1F9": {
+      "src": s1f1ee1f1f9,
+      "alt": "it"
+    },
+    "\u1F1EF\u1F1EA": {
+      "src": s1f1ef1f1ea,
+      "alt": "flag-je"
+    },
+    "\u1F1EF\u1F1F2": {
+      "src": s1f1ef1f1f2,
+      "alt": "flag-jm"
+    },
+    "\u1F1EF\u1F1F4": {
+      "src": s1f1ef1f1f4,
+      "alt": "flag-jo"
+    },
+    "\u1F1EF\u1F1F5": {
+      "src": s1f1ef1f1f5,
+      "alt": "jp"
+    },
+    "\u1F1F0\u1F1EA": {
+      "src": s1f1f01f1ea,
+      "alt": "flag-ke"
+    },
+    "\u1F1F0\u1F1EC": {
+      "src": s1f1f01f1ec,
+      "alt": "flag-kg"
+    },
+    "\u1F1F0\u1F1ED": {
+      "src": s1f1f01f1ed,
+      "alt": "flag-kh"
+    },
+    "\u1F1F0\u1F1EE": {
+      "src": s1f1f01f1ee,
+      "alt": "flag-ki"
+    },
+    "\u1F1F0\u1F1F2": {
+      "src": s1f1f01f1f2,
+      "alt": "flag-km"
+    },
+    "\u1F1F0\u1F1F3": {
+      "src": s1f1f01f1f3,
+      "alt": "flag-kn"
+    },
+    "\u1F1F0\u1F1F5": {
+      "src": s1f1f01f1f5,
+      "alt": "flag-kp"
+    },
+    "\u1F1F0\u1F1F7": {
+      "src": s1f1f01f1f7,
+      "alt": "kr"
+    },
+    "\u1F1F0\u1F1FC": {
+      "src": s1f1f01f1fc,
+      "alt": "flag-kw"
+    },
+    "\u1F1F0\u1F1FE": {
+      "src": s1f1f01f1fe,
+      "alt": "flag-ky"
+    },
+    "\u1F1F0\u1F1FF": {
+      "src": s1f1f01f1ff,
+      "alt": "flag-kz"
+    },
+    "\u1F1F1\u1F1E6": {
+      "src": s1f1f11f1e6,
+      "alt": "flag-la"
+    },
+    "\u1F1F1\u1F1E7": {
+      "src": s1f1f11f1e7,
+      "alt": "flag-lb"
+    },
+    "\u1F1F1\u1F1E8": {
+      "src": s1f1f11f1e8,
+      "alt": "flag-lc"
+    },
+    "\u1F1F1\u1F1EE": {
+      "src": s1f1f11f1ee,
+      "alt": "flag-li"
+    },
+    "\u1F1F1\u1F1F0": {
+      "src": s1f1f11f1f0,
+      "alt": "flag-lk"
+    },
+    "\u1F1F1\u1F1F7": {
+      "src": s1f1f11f1f7,
+      "alt": "flag-lr"
+    },
+    "\u1F1F1\u1F1F8": {
+      "src": s1f1f11f1f8,
+      "alt": "flag-ls"
+    },
+    "\u1F1F1\u1F1F9": {
+      "src": s1f1f11f1f9,
+      "alt": "flag-lt"
+    },
+    "\u1F1F1\u1F1FA": {
+      "src": s1f1f11f1fa,
+      "alt": "flag-lu"
+    },
+    "\u1F1F1\u1F1FB": {
+      "src": s1f1f11f1fb,
+      "alt": "flag-lv"
+    },
+    "\u1F1F1\u1F1FE": {
+      "src": s1f1f11f1fe,
+      "alt": "flag-ly"
+    },
+    "\u1F1F2\u1F1E6": {
+      "src": s1f1f21f1e6,
+      "alt": "flag-ma"
+    },
+    "\u1F1F2\u1F1E8": {
+      "src": s1f1f21f1e8,
+      "alt": "flag-mc"
+    },
+    "\u1F1F2\u1F1E9": {
+      "src": s1f1f21f1e9,
+      "alt": "flag-md"
+    },
+    "\u1F1F2\u1F1EA": {
+      "src": s1f1f21f1ea,
+      "alt": "flag-me"
+    },
+    "\u1F1F2\u1F1EB": {
+      "src": s1f1f21f1eb,
+      "alt": "flag-mf"
+    },
+    "\u1F1F2\u1F1EC": {
+      "src": s1f1f21f1ec,
+      "alt": "flag-mg"
+    },
+    "\u1F1F2\u1F1ED": {
+      "src": s1f1f21f1ed,
+      "alt": "flag-mh"
+    },
+    "\u1F1F2\u1F1F0": {
+      "src": s1f1f21f1f0,
+      "alt": "flag-mk"
+    },
+    "\u1F1F2\u1F1F1": {
+      "src": s1f1f21f1f1,
+      "alt": "flag-ml"
+    },
+    "\u1F1F2\u1F1F2": {
+      "src": s1f1f21f1f2,
+      "alt": "flag-mm"
+    },
+    "\u1F1F2\u1F1F3": {
+      "src": s1f1f21f1f3,
+      "alt": "flag-mn"
+    },
+    "\u1F1F2\u1F1F4": {
+      "src": s1f1f21f1f4,
+      "alt": "flag-mo"
+    },
+    "\u1F1F2\u1F1F5": {
+      "src": s1f1f21f1f5,
+      "alt": "flag-mp"
+    },
+    "\u1F1F2\u1F1F6": {
+      "src": s1f1f21f1f6,
+      "alt": "flag-mq"
+    },
+    "\u1F1F2\u1F1F7": {
+      "src": s1f1f21f1f7,
+      "alt": "flag-mr"
+    },
+    "\u1F1F2\u1F1F8": {
+      "src": s1f1f21f1f8,
+      "alt": "flag-ms"
+    },
+    "\u1F1F2\u1F1F9": {
+      "src": s1f1f21f1f9,
+      "alt": "flag-mt"
+    },
+    "\u1F1F2\u1F1FA": {
+      "src": s1f1f21f1fa,
+      "alt": "flag-mu"
+    },
+    "\u1F1F2\u1F1FB": {
+      "src": s1f1f21f1fb,
+      "alt": "flag-mv"
+    },
+    "\u1F1F2\u1F1FC": {
+      "src": s1f1f21f1fc,
+      "alt": "flag-mw"
+    },
+    "\u1F1F2\u1F1FD": {
+      "src": s1f1f21f1fd,
+      "alt": "flag-mx"
+    },
+    "\u1F1F2\u1F1FE": {
+      "src": s1f1f21f1fe,
+      "alt": "flag-my"
+    },
+    "\u1F1F2\u1F1FF": {
+      "src": s1f1f21f1ff,
+      "alt": "flag-mz"
+    },
+    "\u1F1F3\u1F1E6": {
+      "src": s1f1f31f1e6,
+      "alt": "flag-na"
+    },
+    "\u1F1F3\u1F1E8": {
+      "src": s1f1f31f1e8,
+      "alt": "flag-nc"
+    },
+    "\u1F1F3\u1F1EA": {
+      "src": s1f1f31f1ea,
+      "alt": "flag-ne"
+    },
+    "\u1F1F3\u1F1EB": {
+      "src": s1f1f31f1eb,
+      "alt": "flag-nf"
+    },
+    "\u1F1F3\u1F1EC": {
+      "src": s1f1f31f1ec,
+      "alt": "flag-ng"
+    },
+    "\u1F1F3\u1F1EE": {
+      "src": s1f1f31f1ee,
+      "alt": "flag-ni"
+    },
+    "\u1F1F3\u1F1F1": {
+      "src": s1f1f31f1f1,
+      "alt": "flag-nl"
+    },
+    "\u1F1F3\u1F1F4": {
+      "src": s1f1f31f1f4,
+      "alt": "flag-no"
+    },
+    "\u1F1F3\u1F1F5": {
+      "src": s1f1f31f1f5,
+      "alt": "flag-np"
+    },
+    "\u1F1F3\u1F1F7": {
+      "src": s1f1f31f1f7,
+      "alt": "flag-nr"
+    },
+    "\u1F1F3\u1F1FA": {
+      "src": s1f1f31f1fa,
+      "alt": "flag-nu"
+    },
+    "\u1F1F3\u1F1FF": {
+      "src": s1f1f31f1ff,
+      "alt": "flag-nz"
+    },
+    "\u1F1F4\u1F1F2": {
+      "src": s1f1f41f1f2,
+      "alt": "flag-om"
+    },
+    "\u1F1F5\u1F1E6": {
+      "src": s1f1f51f1e6,
+      "alt": "flag-pa"
+    },
+    "\u1F1F5\u1F1EA": {
+      "src": s1f1f51f1ea,
+      "alt": "flag-pe"
+    },
+    "\u1F1F5\u1F1EB": {
+      "src": s1f1f51f1eb,
+      "alt": "flag-pf"
+    },
+    "\u1F1F5\u1F1EC": {
+      "src": s1f1f51f1ec,
+      "alt": "flag-pg"
+    },
+    "\u1F1F5\u1F1ED": {
+      "src": s1f1f51f1ed,
+      "alt": "flag-ph"
+    },
+    "\u1F1F5\u1F1F0": {
+      "src": s1f1f51f1f0,
+      "alt": "flag-pk"
+    },
+    "\u1F1F5\u1F1F1": {
+      "src": s1f1f51f1f1,
+      "alt": "flag-pl"
+    },
+    "\u1F1F5\u1F1F2": {
+      "src": s1f1f51f1f2,
+      "alt": "flag-pm"
+    },
+    "\u1F1F5\u1F1F3": {
+      "src": s1f1f51f1f3,
+      "alt": "flag-pn"
+    },
+    "\u1F1F5\u1F1F7": {
+      "src": s1f1f51f1f7,
+      "alt": "flag-pr"
+    },
+    "\u1F1F5\u1F1F8": {
+      "src": s1f1f51f1f8,
+      "alt": "flag-ps"
+    },
+    "\u1F1F5\u1F1F9": {
+      "src": s1f1f51f1f9,
+      "alt": "flag-pt"
+    },
+    "\u1F1F5\u1F1FC": {
+      "src": s1f1f51f1fc,
+      "alt": "flag-pw"
+    },
+    "\u1F1F5\u1F1FE": {
+      "src": s1f1f51f1fe,
+      "alt": "flag-py"
+    },
+    "\u1F1F6\u1F1E6": {
+      "src": s1f1f61f1e6,
+      "alt": "flag-qa"
+    },
+    "\u1F1F7\u1F1EA": {
+      "src": s1f1f71f1ea,
+      "alt": "flag-re"
+    },
+    "\u1F1F7\u1F1F4": {
+      "src": s1f1f71f1f4,
+      "alt": "flag-ro"
+    },
+    "\u1F1F7\u1F1F8": {
+      "src": s1f1f71f1f8,
+      "alt": "flag-rs"
+    },
+    "\u1F1F7\u1F1FA": {
+      "src": s1f1f71f1fa,
+      "alt": "ru"
+    },
+    "\u1F1F7\u1F1FC": {
+      "src": s1f1f71f1fc,
+      "alt": "flag-rw"
+    },
+    "\u1F1F8\u1F1E6": {
+      "src": s1f1f81f1e6,
+      "alt": "flag-sa"
+    },
+    "\u1F1F8\u1F1E7": {
+      "src": s1f1f81f1e7,
+      "alt": "flag-sb"
+    },
+    "\u1F1F8\u1F1E8": {
+      "src": s1f1f81f1e8,
+      "alt": "flag-sc"
+    },
+    "\u1F1F8\u1F1E9": {
+      "src": s1f1f81f1e9,
+      "alt": "flag-sd"
+    },
+    "\u1F1F8\u1F1EA": {
+      "src": s1f1f81f1ea,
+      "alt": "flag-se"
+    },
+    "\u1F1F8\u1F1EC": {
+      "src": s1f1f81f1ec,
+      "alt": "flag-sg"
+    },
+    "\u1F1F8\u1F1ED": {
+      "src": s1f1f81f1ed,
+      "alt": "flag-sh"
+    },
+    "\u1F1F8\u1F1EE": {
+      "src": s1f1f81f1ee,
+      "alt": "flag-si"
+    },
+    "\u1F1F8\u1F1EF": {
+      "src": s1f1f81f1ef,
+      "alt": "flag-sj"
+    },
+    "\u1F1F8\u1F1F0": {
+      "src": s1f1f81f1f0,
+      "alt": "flag-sk"
+    },
+    "\u1F1F8\u1F1F1": {
+      "src": s1f1f81f1f1,
+      "alt": "flag-sl"
+    },
+    "\u1F1F8\u1F1F2": {
+      "src": s1f1f81f1f2,
+      "alt": "flag-sm"
+    },
+    "\u1F1F8\u1F1F3": {
+      "src": s1f1f81f1f3,
+      "alt": "flag-sn"
+    },
+    "\u1F1F8\u1F1F4": {
+      "src": s1f1f81f1f4,
+      "alt": "flag-so"
+    },
+    "\u1F1F8\u1F1F7": {
+      "src": s1f1f81f1f7,
+      "alt": "flag-sr"
+    },
+    "\u1F1F8\u1F1F8": {
+      "src": s1f1f81f1f8,
+      "alt": "flag-ss"
+    },
+    "\u1F1F8\u1F1F9": {
+      "src": s1f1f81f1f9,
+      "alt": "flag-st"
+    },
+    "\u1F1F8\u1F1FB": {
+      "src": s1f1f81f1fb,
+      "alt": "flag-sv"
+    },
+    "\u1F1F8\u1F1FD": {
+      "src": s1f1f81f1fd,
+      "alt": "flag-sx"
+    },
+    "\u1F1F8\u1F1FE": {
+      "src": s1f1f81f1fe,
+      "alt": "flag-sy"
+    },
+    "\u1F1F8\u1F1FF": {
+      "src": s1f1f81f1ff,
+      "alt": "flag-sz"
+    },
+    "\u1F1F9\u1F1E6": {
+      "src": s1f1f91f1e6,
+      "alt": "flag-ta"
+    },
+    "\u1F1F9\u1F1E8": {
+      "src": s1f1f91f1e8,
+      "alt": "flag-tc"
+    },
+    "\u1F1F9\u1F1E9": {
+      "src": s1f1f91f1e9,
+      "alt": "flag-td"
+    },
+    "\u1F1F9\u1F1EB": {
+      "src": s1f1f91f1eb,
+      "alt": "flag-tf"
+    },
+    "\u1F1F9\u1F1EC": {
+      "src": s1f1f91f1ec,
+      "alt": "flag-tg"
+    },
+    "\u1F1F9\u1F1ED": {
+      "src": s1f1f91f1ed,
+      "alt": "flag-th"
+    },
+    "\u1F1F9\u1F1EF": {
+      "src": s1f1f91f1ef,
+      "alt": "flag-tj"
+    },
+    "\u1F1F9\u1F1F0": {
+      "src": s1f1f91f1f0,
+      "alt": "flag-tk"
+    },
+    "\u1F1F9\u1F1F1": {
+      "src": s1f1f91f1f1,
+      "alt": "flag-tl"
+    },
+    "\u1F1F9\u1F1F2": {
+      "src": s1f1f91f1f2,
+      "alt": "flag-tm"
+    },
+    "\u1F1F9\u1F1F3": {
+      "src": s1f1f91f1f3,
+      "alt": "flag-tn"
+    },
+    "\u1F1F9\u1F1F4": {
+      "src": s1f1f91f1f4,
+      "alt": "flag-to"
+    },
+    "\u1F1F9\u1F1F7": {
+      "src": s1f1f91f1f7,
+      "alt": "flag-tr"
+    },
+    "\u1F1F9\u1F1F9": {
+      "src": s1f1f91f1f9,
+      "alt": "flag-tt"
+    },
+    "\u1F1F9\u1F1FB": {
+      "src": s1f1f91f1fb,
+      "alt": "flag-tv"
+    },
+    "\u1F1F9\u1F1FC": {
+      "src": s1f1f91f1fc,
+      "alt": "flag-tw"
+    },
+    "\u1F1F9\u1F1FF": {
+      "src": s1f1f91f1ff,
+      "alt": "flag-tz"
+    },
+    "\u1F1FA\u1F1E6": {
+      "src": s1f1fa1f1e6,
+      "alt": "flag-ua"
+    },
+    "\u1F1FA\u1F1EC": {
+      "src": s1f1fa1f1ec,
+      "alt": "flag-ug"
+    },
+    "\u1F1FA\u1F1F2": {
+      "src": s1f1fa1f1f2,
+      "alt": "flag-um"
+    },
+    "\u1F1FA\u1F1F3": {
+      "src": s1f1fa1f1f3,
+      "alt": "flag-un"
+    },
+    "\u1F1FA\u1F1F8": {
+      "src": s1f1fa1f1f8,
+      "alt": "us"
+    },
+    "\u1F1FA\u1F1FE": {
+      "src": s1f1fa1f1fe,
+      "alt": "flag-uy"
+    },
+    "\u1F1FA\u1F1FF": {
+      "src": s1f1fa1f1ff,
+      "alt": "flag-uz"
+    },
+    "\u1F1FB\u1F1E6": {
+      "src": s1f1fb1f1e6,
+      "alt": "flag-va"
+    },
+    "\u1F1FB\u1F1E8": {
+      "src": s1f1fb1f1e8,
+      "alt": "flag-vc"
+    },
+    "\u1F1FB\u1F1EA": {
+      "src": s1f1fb1f1ea,
+      "alt": "flag-ve"
+    },
+    "\u1F1FB\u1F1EC": {
+      "src": s1f1fb1f1ec,
+      "alt": "flag-vg"
+    },
+    "\u1F1FB\u1F1EE": {
+      "src": s1f1fb1f1ee,
+      "alt": "flag-vi"
+    },
+    "\u1F1FB\u1F1F3": {
+      "src": s1f1fb1f1f3,
+      "alt": "flag-vn"
+    },
+    "\u1F1FB\u1F1FA": {
+      "src": s1f1fb1f1fa,
+      "alt": "flag-vu"
+    },
+    "\u1F1FC\u1F1EB": {
+      "src": s1f1fc1f1eb,
+      "alt": "flag-wf"
+    },
+    "\u1F1FC\u1F1F8": {
+      "src": s1f1fc1f1f8,
+      "alt": "flag-ws"
+    },
+    "\u1F1FD\u1F1F0": {
+      "src": s1f1fd1f1f0,
+      "alt": "flag-xk"
+    },
+    "\u1F1FE\u1F1EA": {
+      "src": s1f1fe1f1ea,
+      "alt": "flag-ye"
+    },
+    "\u1F1FE\u1F1F9": {
+      "src": s1f1fe1f1f9,
+      "alt": "flag-yt"
+    },
+    "\u1F1FF\u1F1E6": {
+      "src": s1f1ff1f1e6,
+      "alt": "flag-za"
+    },
+    "\u1F1FF\u1F1F2": {
+      "src": s1f1ff1f1f2,
+      "alt": "flag-zm"
+    },
+    "\u1F1FF\u1F1FC": {
+      "src": s1f1ff1f1fc,
+      "alt": "flag-zw"
+    },
+    "\u1F38C": {
+      "src": s1f38c,
+      "alt": "crossed_flags"
+    },
+    "\u1F3C1": {
+      "src": s1f3c1,
+      "alt": "checkered_flag"
+    },
+    "\u1F3F3\uFE0F\u200D\u1F308": {
+      "src": s1f3f3fe0f200d1f308,
+      "alt": "rainbow-flag"
+    },
+    "\u1F3F3\uFE0F\u200D\u26A7\uFE0F": {
+      "src": s1f3f3fe0f200d26a7fe0f,
+      "alt": "transgender_flag"
+    },
+    "\u1F3F3\uFE0F": {
+      "src": s1f3f3fe0f,
+      "alt": "waving_white_flag"
+    },
+    "\u1F3F4\u200D\u2620\uFE0F": {
+      "src": s1f3f4200d2620fe0f,
+      "alt": "pirate_flag"
+    },
+    "\u1F3F4\uE0067\uE0062\uE0065\uE006E\uE0067\uE007F": {
+      "src": s1f3f4e0067e0062e0065e006ee0067e007f,
+      "alt": "flag-england"
+    },
+    "\u1F3F4\uE0067\uE0062\uE0073\uE0063\uE0074\uE007F": {
+      "src": s1f3f4e0067e0062e0073e0063e0074e007f,
+      "alt": "flag-scotland"
+    },
+    "\u1F3F4\uE0067\uE0062\uE0077\uE006C\uE0073\uE007F": {
+      "src": s1f3f4e0067e0062e0077e006ce0073e007f,
+      "alt": "flag-wales"
+    },
+    "\u1F3F4": {
+      "src": s1f3f4,
+      "alt": "waving_black_flag"
+    },
+    "\u1F6A9": {
+      "src": s1f6a9,
+      "alt": "triangular_flag_on_post"
+    }
+  },
+  "Symbols": {
+    "\u0023\uFE0F\u20E3": {
+      "src": s0023fe0f20e3,
+      "alt": "hash"
+    },
+    "\u002A\uFE0F\u20E3": {
+      "src": s002afe0f20e3,
+      "alt": "keycap_star"
+    },
+    "\u0030\uFE0F\u20E3": {
+      "src": s0030fe0f20e3,
+      "alt": "zero"
+    },
+    "\u0031\uFE0F\u20E3": {
+      "src": s0031fe0f20e3,
+      "alt": "one"
+    },
+    "\u0032\uFE0F\u20E3": {
+      "src": s0032fe0f20e3,
+      "alt": "two"
+    },
+    "\u0033\uFE0F\u20E3": {
+      "src": s0033fe0f20e3,
+      "alt": "three"
+    },
+    "\u0034\uFE0F\u20E3": {
+      "src": s0034fe0f20e3,
+      "alt": "four"
+    },
+    "\u0035\uFE0F\u20E3": {
+      "src": s0035fe0f20e3,
+      "alt": "five"
+    },
+    "\u0036\uFE0F\u20E3": {
+      "src": s0036fe0f20e3,
+      "alt": "six"
+    },
+    "\u0037\uFE0F\u20E3": {
+      "src": s0037fe0f20e3,
+      "alt": "seven"
+    },
+    "\u0038\uFE0F\u20E3": {
+      "src": s0038fe0f20e3,
+      "alt": "eight"
+    },
+    "\u0039\uFE0F\u20E3": {
+      "src": s0039fe0f20e3,
+      "alt": "nine"
+    },
+    "\u00A9\uFE0F": {
+      "src": s00a9fe0f,
+      "alt": "copyright"
+    },
+    "\u00AE\uFE0F": {
+      "src": s00aefe0f,
+      "alt": "registered"
+    },
+    "\u1F170\uFE0F": {
+      "src": s1f170fe0f,
+      "alt": "a"
+    },
+    "\u1F171\uFE0F": {
+      "src": s1f171fe0f,
+      "alt": "b"
+    },
+    "\u1F17E\uFE0F": {
+      "src": s1f17efe0f,
+      "alt": "o2"
+    },
+    "\u1F17F\uFE0F": {
+      "src": s1f17ffe0f,
+      "alt": "parking"
+    },
+    "\u1F18E": {
+      "src": s1f18e,
+      "alt": "ab"
+    },
+    "\u1F191": {
+      "src": s1f191,
+      "alt": "cl"
+    },
+    "\u1F192": {
+      "src": s1f192,
+      "alt": "cool"
+    },
+    "\u1F193": {
+      "src": s1f193,
+      "alt": "free"
+    },
+    "\u1F194": {
+      "src": s1f194,
+      "alt": "id"
+    },
+    "\u1F195": {
+      "src": s1f195,
+      "alt": "new"
+    },
+    "\u1F196": {
+      "src": s1f196,
+      "alt": "ng"
+    },
+    "\u1F197": {
+      "src": s1f197,
+      "alt": "ok"
+    },
+    "\u1F198": {
+      "src": s1f198,
+      "alt": "sos"
+    },
+    "\u1F199": {
+      "src": s1f199,
+      "alt": "up"
+    },
+    "\u1F19A": {
+      "src": s1f19a,
+      "alt": "vs"
+    },
+    "\u1F201": {
+      "src": s1f201,
+      "alt": "koko"
+    },
+    "\u1F202\uFE0F": {
+      "src": s1f202fe0f,
+      "alt": "sa"
+    },
+    "\u1F21A": {
+      "src": s1f21a,
+      "alt": "u7121"
+    },
+    "\u1F22F": {
+      "src": s1f22f,
+      "alt": "u6307"
+    },
+    "\u1F232": {
+      "src": s1f232,
+      "alt": "u7981"
+    },
+    "\u1F233": {
+      "src": s1f233,
+      "alt": "u7a7a"
+    },
+    "\u1F234": {
+      "src": s1f234,
+      "alt": "u5408"
+    },
+    "\u1F235": {
+      "src": s1f235,
+      "alt": "u6e80"
+    },
+    "\u1F236": {
+      "src": s1f236,
+      "alt": "u6709"
+    },
+    "\u1F237\uFE0F": {
+      "src": s1f237fe0f,
+      "alt": "u6708"
+    },
+    "\u1F238": {
+      "src": s1f238,
+      "alt": "u7533"
+    },
+    "\u1F239": {
+      "src": s1f239,
+      "alt": "u5272"
+    },
+    "\u1F23A": {
+      "src": s1f23a,
+      "alt": "u55b6"
+    },
+    "\u1F250": {
+      "src": s1f250,
+      "alt": "ideograph_advantage"
+    },
+    "\u1F251": {
+      "src": s1f251,
+      "alt": "accept"
+    },
+    "\u1F3A6": {
+      "src": s1f3a6,
+      "alt": "cinema"
+    },
+    "\u1F3E7": {
+      "src": s1f3e7,
+      "alt": "atm"
+    },
+    "\u1F4A0": {
+      "src": s1f4a0,
+      "alt": "diamond_shape_with_a_dot_inside"
+    },
+    "\u1F4B1": {
+      "src": s1f4b1,
+      "alt": "currency_exchange"
+    },
+    "\u1F4B2": {
+      "src": s1f4b2,
+      "alt": "heavy_dollar_sign"
+    },
+    "\u1F4DB": {
+      "src": s1f4db,
+      "alt": "name_badge"
+    },
+    "\u1F4F3": {
+      "src": s1f4f3,
+      "alt": "vibration_mode"
+    },
+    "\u1F4F4": {
+      "src": s1f4f4,
+      "alt": "mobile_phone_off"
+    },
+    "\u1F4F5": {
+      "src": s1f4f5,
+      "alt": "no_mobile_phones"
+    },
+    "\u1F4F6": {
+      "src": s1f4f6,
+      "alt": "signal_strength"
+    },
+    "\u1F500": {
+      "src": s1f500,
+      "alt": "twisted_rightwards_arrows"
+    },
+    "\u1F501": {
+      "src": s1f501,
+      "alt": "repeat"
+    },
+    "\u1F502": {
+      "src": s1f502,
+      "alt": "repeat_one"
+    },
+    "\u1F503": {
+      "src": s1f503,
+      "alt": "arrows_clockwise"
+    },
+    "\u1F504": {
+      "src": s1f504,
+      "alt": "arrows_counterclockwise"
+    },
+    "\u1F505": {
+      "src": s1f505,
+      "alt": "low_brightness"
+    },
+    "\u1F506": {
+      "src": s1f506,
+      "alt": "high_brightness"
+    },
+    "\u1F518": {
+      "src": s1f518,
+      "alt": "radio_button"
+    },
+    "\u1F519": {
+      "src": s1f519,
+      "alt": "back"
+    },
+    "\u1F51A": {
+      "src": s1f51a,
+      "alt": "end"
+    },
+    "\u1F51B": {
+      "src": s1f51b,
+      "alt": "on"
+    },
+    "\u1F51C": {
+      "src": s1f51c,
+      "alt": "soon"
+    },
+    "\u1F51D": {
+      "src": s1f51d,
+      "alt": "top"
+    },
+    "\u1F51E": {
+      "src": s1f51e,
+      "alt": "underage"
+    },
+    "\u1F51F": {
+      "src": s1f51f,
+      "alt": "keycap_ten"
+    },
+    "\u1F520": {
+      "src": s1f520,
+      "alt": "capital_abcd"
+    },
+    "\u1F521": {
+      "src": s1f521,
+      "alt": "abcd"
+    },
+    "\u1F522": {
+      "src": s1f522,
+      "alt": "1234"
+    },
+    "\u1F523": {
+      "src": s1f523,
+      "alt": "symbols"
+    },
+    "\u1F524": {
+      "src": s1f524,
+      "alt": "abc"
+    },
+    "\u1F52F": {
+      "src": s1f52f,
+      "alt": "six_pointed_star"
+    },
+    "\u1F530": {
+      "src": s1f530,
+      "alt": "beginner"
+    },
+    "\u1F531": {
+      "src": s1f531,
+      "alt": "trident"
+    },
+    "\u1F532": {
+      "src": s1f532,
+      "alt": "black_square_button"
+    },
+    "\u1F533": {
+      "src": s1f533,
+      "alt": "white_square_button"
+    },
+    "\u1F534": {
+      "src": s1f534,
+      "alt": "red_circle"
+    },
+    "\u1F535": {
+      "src": s1f535,
+      "alt": "large_blue_circle"
+    },
+    "\u1F536": {
+      "src": s1f536,
+      "alt": "large_orange_diamond"
+    },
+    "\u1F537": {
+      "src": s1f537,
+      "alt": "large_blue_diamond"
+    },
+    "\u1F538": {
+      "src": s1f538,
+      "alt": "small_orange_diamond"
+    },
+    "\u1F539": {
+      "src": s1f539,
+      "alt": "small_blue_diamond"
+    },
+    "\u1F53A": {
+      "src": s1f53a,
+      "alt": "small_red_triangle"
+    },
+    "\u1F53B": {
+      "src": s1f53b,
+      "alt": "small_red_triangle_down"
+    },
+    "\u1F53C": {
+      "src": s1f53c,
+      "alt": "arrow_up_small"
+    },
+    "\u1F53D": {
+      "src": s1f53d,
+      "alt": "arrow_down_small"
+    },
+    "\u1F549\uFE0F": {
+      "src": s1f549fe0f,
+      "alt": "om_symbol"
+    },
+    "\u1F54E": {
+      "src": s1f54e,
+      "alt": "menorah_with_nine_branches"
+    },
+    "\u1F6AB": {
+      "src": s1f6ab,
+      "alt": "no_entry_sign"
+    },
+    "\u1F6AD": {
+      "src": s1f6ad,
+      "alt": "no_smoking"
+    },
+    "\u1F6AE": {
+      "src": s1f6ae,
+      "alt": "put_litter_in_its_place"
+    },
+    "\u1F6AF": {
+      "src": s1f6af,
+      "alt": "do_not_litter"
+    },
+    "\u1F6B0": {
+      "src": s1f6b0,
+      "alt": "potable_water"
+    },
+    "\u1F6B1": {
+      "src": s1f6b1,
+      "alt": "non-potable_water"
+    },
+    "\u1F6B3": {
+      "src": s1f6b3,
+      "alt": "no_bicycles"
+    },
+    "\u1F6B7": {
+      "src": s1f6b7,
+      "alt": "no_pedestrians"
+    },
+    "\u1F6B8": {
+      "src": s1f6b8,
+      "alt": "children_crossing"
+    },
+    "\u1F6B9": {
+      "src": s1f6b9,
+      "alt": "mens"
+    },
+    "\u1F6BA": {
+      "src": s1f6ba,
+      "alt": "womens"
+    },
+    "\u1F6BB": {
+      "src": s1f6bb,
+      "alt": "restroom"
+    },
+    "\u1F6BC": {
+      "src": s1f6bc,
+      "alt": "baby_symbol"
+    },
+    "\u1F6BE": {
+      "src": s1f6be,
+      "alt": "wc"
+    },
+    "\u1F6C2": {
+      "src": s1f6c2,
+      "alt": "passport_control"
+    },
+    "\u1F6C3": {
+      "src": s1f6c3,
+      "alt": "customs"
+    },
+    "\u1F6C4": {
+      "src": s1f6c4,
+      "alt": "baggage_claim"
+    },
+    "\u1F6C5": {
+      "src": s1f6c5,
+      "alt": "left_luggage"
+    },
+    "\u1F6D0": {
+      "src": s1f6d0,
+      "alt": "place_of_worship"
+    },
+    "\u1F7E0": {
+      "src": s1f7e0,
+      "alt": "large_orange_circle"
+    },
+    "\u1F7E1": {
+      "src": s1f7e1,
+      "alt": "large_yellow_circle"
+    },
+    "\u1F7E2": {
+      "src": s1f7e2,
+      "alt": "large_green_circle"
+    },
+    "\u1F7E3": {
+      "src": s1f7e3,
+      "alt": "large_purple_circle"
+    },
+    "\u1F7E4": {
+      "src": s1f7e4,
+      "alt": "large_brown_circle"
+    },
+    "\u1F7E5": {
+      "src": s1f7e5,
+      "alt": "large_red_square"
+    },
+    "\u1F7E6": {
+      "src": s1f7e6,
+      "alt": "large_blue_square"
+    },
+    "\u1F7E7": {
+      "src": s1f7e7,
+      "alt": "large_orange_square"
+    },
+    "\u1F7E8": {
+      "src": s1f7e8,
+      "alt": "large_yellow_square"
+    },
+    "\u1F7E9": {
+      "src": s1f7e9,
+      "alt": "large_green_square"
+    },
+    "\u1F7EA": {
+      "src": s1f7ea,
+      "alt": "large_purple_square"
+    },
+    "\u1F7EB": {
+      "src": s1f7eb,
+      "alt": "large_brown_square"
+    },
+    "\u203C\uFE0F": {
+      "src": s203cfe0f,
+      "alt": "bangbang"
+    },
+    "\u2049\uFE0F": {
+      "src": s2049fe0f,
+      "alt": "interrobang"
+    },
+    "\u2122\uFE0F": {
+      "src": s2122fe0f,
+      "alt": "tm"
+    },
+    "\u2139\uFE0F": {
+      "src": s2139fe0f,
+      "alt": "information_source"
+    },
+    "\u2194\uFE0F": {
+      "src": s2194fe0f,
+      "alt": "left_right_arrow"
+    },
+    "\u2195\uFE0F": {
+      "src": s2195fe0f,
+      "alt": "arrow_up_down"
+    },
+    "\u2196\uFE0F": {
+      "src": s2196fe0f,
+      "alt": "arrow_upper_left"
+    },
+    "\u2197\uFE0F": {
+      "src": s2197fe0f,
+      "alt": "arrow_upper_right"
+    },
+    "\u2198\uFE0F": {
+      "src": s2198fe0f,
+      "alt": "arrow_lower_right"
+    },
+    "\u2199\uFE0F": {
+      "src": s2199fe0f,
+      "alt": "arrow_lower_left"
+    },
+    "\u21A9\uFE0F": {
+      "src": s21a9fe0f,
+      "alt": "leftwards_arrow_with_hook"
+    },
+    "\u21AA\uFE0F": {
+      "src": s21aafe0f,
+      "alt": "arrow_right_hook"
+    },
+    "\u23CF\uFE0F": {
+      "src": s23cffe0f,
+      "alt": "eject"
+    },
+    "\u23E9": {
+      "src": s23e9,
+      "alt": "fast_forward"
+    },
+    "\u23EA": {
+      "src": s23ea,
+      "alt": "rewind"
+    },
+    "\u23EB": {
+      "src": s23eb,
+      "alt": "arrow_double_up"
+    },
+    "\u23EC": {
+      "src": s23ec,
+      "alt": "arrow_double_down"
+    },
+    "\u23ED\uFE0F": {
+      "src": s23edfe0f,
+      "alt": "black_right_pointing_double_triangle_with_vertical_bar"
+    },
+    "\u23EE\uFE0F": {
+      "src": s23eefe0f,
+      "alt": "black_left_pointing_double_triangle_with_vertical_bar"
+    },
+    "\u23EF\uFE0F": {
+      "src": s23effe0f,
+      "alt": "black_right_pointing_triangle_with_double_vertical_bar"
+    },
+    "\u23F8\uFE0F": {
+      "src": s23f8fe0f,
+      "alt": "double_vertical_bar"
+    },
+    "\u23F9\uFE0F": {
+      "src": s23f9fe0f,
+      "alt": "black_square_for_stop"
+    },
+    "\u23FA\uFE0F": {
+      "src": s23fafe0f,
+      "alt": "black_circle_for_record"
+    },
+    "\u24C2\uFE0F": {
+      "src": s24c2fe0f,
+      "alt": "m"
+    },
+    "\u25AA\uFE0F": {
+      "src": s25aafe0f,
+      "alt": "black_small_square"
+    },
+    "\u25AB\uFE0F": {
+      "src": s25abfe0f,
+      "alt": "white_small_square"
+    },
+    "\u25B6\uFE0F": {
+      "src": s25b6fe0f,
+      "alt": "arrow_forward"
+    },
+    "\u25C0\uFE0F": {
+      "src": s25c0fe0f,
+      "alt": "arrow_backward"
+    },
+    "\u25FB\uFE0F": {
+      "src": s25fbfe0f,
+      "alt": "white_medium_square"
+    },
+    "\u25FC\uFE0F": {
+      "src": s25fcfe0f,
+      "alt": "black_medium_square"
+    },
+    "\u25FD": {
+      "src": s25fd,
+      "alt": "white_medium_small_square"
+    },
+    "\u25FE": {
+      "src": s25fe,
+      "alt": "black_medium_small_square"
+    },
+    "\u2611\uFE0F": {
+      "src": s2611fe0f,
+      "alt": "ballot_box_with_check"
+    },
+    "\u2622\uFE0F": {
+      "src": s2622fe0f,
+      "alt": "radioactive_sign"
+    },
+    "\u2623\uFE0F": {
+      "src": s2623fe0f,
+      "alt": "biohazard_sign"
+    },
+    "\u2626\uFE0F": {
+      "src": s2626fe0f,
+      "alt": "orthodox_cross"
+    },
+    "\u262A\uFE0F": {
+      "src": s262afe0f,
+      "alt": "star_and_crescent"
+    },
+    "\u262E\uFE0F": {
+      "src": s262efe0f,
+      "alt": "peace_symbol"
+    },
+    "\u262F\uFE0F": {
+      "src": s262ffe0f,
+      "alt": "yin_yang"
+    },
+    "\u2638\uFE0F": {
+      "src": s2638fe0f,
+      "alt": "wheel_of_dharma"
+    },
+    "\u2648": {
+      "src": s2648,
+      "alt": "aries"
+    },
+    "\u2649": {
+      "src": s2649,
+      "alt": "taurus"
+    },
+    "\u264A": {
+      "src": s264a,
+      "alt": "gemini"
+    },
+    "\u264B": {
+      "src": s264b,
+      "alt": "cancer"
+    },
+    "\u264C": {
+      "src": s264c,
+      "alt": "leo"
+    },
+    "\u264D": {
+      "src": s264d,
+      "alt": "virgo"
+    },
+    "\u264E": {
+      "src": s264e,
+      "alt": "libra"
+    },
+    "\u264F": {
+      "src": s264f,
+      "alt": "scorpius"
+    },
+    "\u2650": {
+      "src": s2650,
+      "alt": "sagittarius"
+    },
+    "\u2651": {
+      "src": s2651,
+      "alt": "capricorn"
+    },
+    "\u2652": {
+      "src": s2652,
+      "alt": "aquarius"
+    },
+    "\u2653": {
+      "src": s2653,
+      "alt": "pisces"
+    },
+    "\u267B\uFE0F": {
+      "src": s267bfe0f,
+      "alt": "recycle"
+    },
+    "\u267E\uFE0F": {
+      "src": s267efe0f,
+      "alt": "infinity"
+    },
+    "\u267F": {
+      "src": s267f,
+      "alt": "wheelchair"
+    },
+    "\u269B\uFE0F": {
+      "src": s269bfe0f,
+      "alt": "atom_symbol"
+    },
+    "\u269C\uFE0F": {
+      "src": s269cfe0f,
+      "alt": "fleur_de_lis"
+    },
+    "\u26A0\uFE0F": {
+      "src": s26a0fe0f,
+      "alt": "warning"
+    },
+    "\u26A7\uFE0F": {
+      "src": s26a7fe0f,
+      "alt": "transgender_symbol"
+    },
+    "\u26AA": {
+      "src": s26aa,
+      "alt": "white_circle"
+    },
+    "\u26AB": {
+      "src": s26ab,
+      "alt": "black_circle"
+    },
+    "\u26CE": {
+      "src": s26ce,
+      "alt": "ophiuchus"
+    },
+    "\u26D4": {
+      "src": s26d4,
+      "alt": "no_entry"
+    },
+    "\u2705": {
+      "src": s2705,
+      "alt": "white_check_mark"
+    },
+    "\u2714\uFE0F": {
+      "src": s2714fe0f,
+      "alt": "heavy_check_mark"
+    },
+    "\u2716\uFE0F": {
+      "src": s2716fe0f,
+      "alt": "heavy_multiplication_x"
+    },
+    "\u271D\uFE0F": {
+      "src": s271dfe0f,
+      "alt": "latin_cross"
+    },
+    "\u2721\uFE0F": {
+      "src": s2721fe0f,
+      "alt": "star_of_david"
+    },
+    "\u2733\uFE0F": {
+      "src": s2733fe0f,
+      "alt": "eight_spoked_asterisk"
+    },
+    "\u2734\uFE0F": {
+      "src": s2734fe0f,
+      "alt": "eight_pointed_black_star"
+    },
+    "\u2747\uFE0F": {
+      "src": s2747fe0f,
+      "alt": "sparkle"
+    },
+    "\u274C": {
+      "src": s274c,
+      "alt": "x"
+    },
+    "\u274E": {
+      "src": s274e,
+      "alt": "negative_squared_cross_mark"
+    },
+    "\u2753": {
+      "src": s2753,
+      "alt": "question"
+    },
+    "\u2754": {
+      "src": s2754,
+      "alt": "grey_question"
+    },
+    "\u2755": {
+      "src": s2755,
+      "alt": "grey_exclamation"
+    },
+    "\u2757": {
+      "src": s2757,
+      "alt": "exclamation"
+    },
+    "\u2795": {
+      "src": s2795,
+      "alt": "heavy_plus_sign"
+    },
+    "\u2796": {
+      "src": s2796,
+      "alt": "heavy_minus_sign"
+    },
+    "\u2797": {
+      "src": s2797,
+      "alt": "heavy_division_sign"
+    },
+    "\u27A1\uFE0F": {
+      "src": s27a1fe0f,
+      "alt": "arrow_right"
+    },
+    "\u27B0": {
+      "src": s27b0,
+      "alt": "curly_loop"
+    },
+    "\u27BF": {
+      "src": s27bf,
+      "alt": "loop"
+    },
+    "\u2934\uFE0F": {
+      "src": s2934fe0f,
+      "alt": "arrow_heading_up"
+    },
+    "\u2935\uFE0F": {
+      "src": s2935fe0f,
+      "alt": "arrow_heading_down"
+    },
+    "\u2B05\uFE0F": {
+      "src": s2b05fe0f,
+      "alt": "arrow_left"
+    },
+    "\u2B06\uFE0F": {
+      "src": s2b06fe0f,
+      "alt": "arrow_up"
+    },
+    "\u2B07\uFE0F": {
+      "src": s2b07fe0f,
+      "alt": "arrow_down"
+    },
+    "\u2B1B": {
+      "src": s2b1b,
+      "alt": "black_large_square"
+    },
+    "\u2B1C": {
+      "src": s2b1c,
+      "alt": "white_large_square"
+    },
+    "\u2B55": {
+      "src": s2b55,
+      "alt": "o"
+    },
+    "\u3030\uFE0F": {
+      "src": s3030fe0f,
+      "alt": "wavy_dash"
+    },
+    "\u303D\uFE0F": {
+      "src": s303dfe0f,
+      "alt": "part_alternation_mark"
+    },
+    "\u3297\uFE0F": {
+      "src": s3297fe0f,
+      "alt": "congratulations"
+    },
+    "\u3299\uFE0F": {
+      "src": s3299fe0f,
+      "alt": "secret"
+    }
   }
-};
+}

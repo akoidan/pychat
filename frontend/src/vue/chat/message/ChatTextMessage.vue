@@ -158,6 +158,9 @@ export default class ChatTextMessage extends Vue {
   .message-text-style
     min-width: 0
 
+    /deep/ .emoji
+      width: $emoji-width
+
     /deep/ .youtube-player
       @extend %img-play-chat
       @extend %img-play

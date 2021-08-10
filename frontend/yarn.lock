@@ -3150,6 +3150,11 @@ elliptic@^6.0.0:
     minimalistic-assert "^1.0.0"
     minimalistic-crypto-utils "^1.0.0"
 
+emoji-datasource-apple@^7.0.2:
+  version "7.0.2"
+  resolved "https://registry.yarnpkg.com/emoji-datasource-apple/-/emoji-datasource-apple-7.0.2.tgz#20ba1788fbfa335147e1fd27bd54e11419964aa6"
+  integrity sha512-m127Ybt10utN5WF+0mehR2siDTh4CcS6N1Xq+0VE387XIZB+DYczrvc7amgAgEtema0lX1GpVzO2wEXKEChfqQ==
+
 emoji-regex@^7.0.1:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-7.0.3.tgz#933a04052860c85e83c122479c4748a8e4c72156"

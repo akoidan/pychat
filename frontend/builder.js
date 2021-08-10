@@ -403,7 +403,7 @@ const getConfig = async () => {
           options: getOptions('flags')
         },
         {
-          test: /assets\/smileys\/.*\.gif$/,
+          test: /emoji-datasource-apple/,
           loader: 'file-loader',
           options: getOptions('smileys')
         },

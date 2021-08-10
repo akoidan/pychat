@@ -494,6 +494,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
   .usermsg /deep/ img[alt] //smile
     @extend %img-code
 
+  .usermsg /deep/ .emoji
+    width: $emoji-width
+
   .usermsg.mobile-user-message
     padding-right: 50px // before smiley and send
 
