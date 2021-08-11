@@ -19,7 +19,6 @@ import { getFlag } from '@/ts/utils/flags';
 import {
   Smile,
   smileys,
-  SmileysStructure
 } from '@/ts/utils/smileys';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
@@ -56,14 +55,39 @@ export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a
   }
 }
 
-const smileUnicodeRegex = (function() {
-  let smileysUnicodeArray: string[] = []
-  Object.keys(smileys).forEach(s => {
-    smileysUnicodeArray.push(...Object.keys(smileys[s]))
-  });
-  let stringRegex = smileysUnicodeArray.map(hexEncode);
-  return new RegExp(stringRegex.join('|'), 'g');
+export const allSmileysKeys : Record<string, Smile> = (function() {
+  const result: Record<string, Smile>= {};
+  Object.entries(smileys).forEach(([tabName, tabSmileys]) => {
+    Object.entries(tabSmileys).forEach(([smileyCode, smileyValue]) => {
+      if (smileyValue.skinVariations) {
+        Object.entries(smileyValue.skinVariations).forEach(([smileyCodeVar, smileyValueVasr]) => {
+          if (smileyCode !== smileyCodeVar) {
+            // order of properties of object is js matter,
+            // first object added will be first in Object.keys array
+            // skin variation should be set first, in order to smileyUniceRegex to be gready
+            // since we have smileys like \u01 = smiley white person, and \u01\u02 = smiley black person
+            // they both start with \u01 so, we should replace \u01\u02, otherwiose we leave \u02 symbol undecoded
+            result[smileyCodeVar] = {
+              alt: smileyValueVasr.alt,
+              src: smileyValueVasr.src
+            }
+          }
+        });
+      }
+      result[smileyCode] = {
+        alt: smileyValue.alt,
+        src: smileyValue.src,
+        skinVariations: smileyValue.skinVariations,
+      }
+    });
+  })
+  return result;
+})()
 
+export const smileUnicodeRegex = (function() {
+  let allSmileyRegexarray = Object.keys(allSmileysKeys).map(hexEncode);
+  debugger
+  return new RegExp(allSmileyRegexarray.join('|'), 'g');
 })();
 
 const imageUnicodeRegex = /[\u3501-\u3600]/g;
@@ -140,12 +164,7 @@ export function getFlagPath(countryCode: string) {
 
 
 export function getSmileyHtml(symbol: string) {
-  let smile: Smile | undefined;
-  const keys22: (keyof SmileysStructure)[] = Object.keys(smileys) as (keyof SmileysStructure)[];
-  keys22.forEach((k: keyof SmileysStructure) => {
-    const smiley = smileys[k];
-    smile = smile || smiley[symbol];
-  });
+  let smile: Smile | undefined = allSmileysKeys[symbol];
   if (!smile) {
     throw Error(`Invalid smile ${symbol}`);
   }

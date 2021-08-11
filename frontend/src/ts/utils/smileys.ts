@@ -435,6 +435,11 @@ import s1f382 from 'emoji-datasource-apple/img/apple/64/1f382.png';
 import s1f383 from 'emoji-datasource-apple/img/apple/64/1f383.png';
 import s1f384 from 'emoji-datasource-apple/img/apple/64/1f384.png';
 import s1f385 from 'emoji-datasource-apple/img/apple/64/1f385.png';
+import s1f3851f3fb from 'emoji-datasource-apple/img/apple/64/1f385-1f3fb.png';
+import s1f3851f3fc from 'emoji-datasource-apple/img/apple/64/1f385-1f3fc.png';
+import s1f3851f3fd from 'emoji-datasource-apple/img/apple/64/1f385-1f3fd.png';
+import s1f3851f3fe from 'emoji-datasource-apple/img/apple/64/1f385-1f3fe.png';
+import s1f3851f3ff from 'emoji-datasource-apple/img/apple/64/1f385-1f3ff.png';
 import s1f386 from 'emoji-datasource-apple/img/apple/64/1f386.png';
 import s1f387 from 'emoji-datasource-apple/img/apple/64/1f387.png';
 import s1f388 from 'emoji-datasource-apple/img/apple/64/1f388.png';
@@ -491,26 +496,111 @@ import s1f3bf from 'emoji-datasource-apple/img/apple/64/1f3bf.png';
 import s1f3c0 from 'emoji-datasource-apple/img/apple/64/1f3c0.png';
 import s1f3c1 from 'emoji-datasource-apple/img/apple/64/1f3c1.png';
 import s1f3c2 from 'emoji-datasource-apple/img/apple/64/1f3c2.png';
+import s1f3c21f3fb from 'emoji-datasource-apple/img/apple/64/1f3c2-1f3fb.png';
+import s1f3c21f3fc from 'emoji-datasource-apple/img/apple/64/1f3c2-1f3fc.png';
+import s1f3c21f3fd from 'emoji-datasource-apple/img/apple/64/1f3c2-1f3fd.png';
+import s1f3c21f3fe from 'emoji-datasource-apple/img/apple/64/1f3c2-1f3fe.png';
+import s1f3c21f3ff from 'emoji-datasource-apple/img/apple/64/1f3c2-1f3ff.png';
 import s1f3c3200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-200d-2640-fe0f.png';
+import s1f3c31f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fb-200d-2640-fe0f.png';
+import s1f3c31f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fc-200d-2640-fe0f.png';
+import s1f3c31f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fd-200d-2640-fe0f.png';
+import s1f3c31f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fe-200d-2640-fe0f.png';
+import s1f3c31f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3ff-200d-2640-fe0f.png';
 import s1f3c3200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-200d-2642-fe0f.png';
+import s1f3c31f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fb-200d-2642-fe0f.png';
+import s1f3c31f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fc-200d-2642-fe0f.png';
+import s1f3c31f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fd-200d-2642-fe0f.png';
+import s1f3c31f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fe-200d-2642-fe0f.png';
+import s1f3c31f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3ff-200d-2642-fe0f.png';
 import s1f3c3 from 'emoji-datasource-apple/img/apple/64/1f3c3.png';
+import s1f3c31f3fb from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fb.png';
+import s1f3c31f3fc from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fc.png';
+import s1f3c31f3fd from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fd.png';
+import s1f3c31f3fe from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3fe.png';
+import s1f3c31f3ff from 'emoji-datasource-apple/img/apple/64/1f3c3-1f3ff.png';
 import s1f3c4200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-200d-2640-fe0f.png';
+import s1f3c41f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fb-200d-2640-fe0f.png';
+import s1f3c41f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fc-200d-2640-fe0f.png';
+import s1f3c41f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fd-200d-2640-fe0f.png';
+import s1f3c41f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fe-200d-2640-fe0f.png';
+import s1f3c41f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3ff-200d-2640-fe0f.png';
 import s1f3c4200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-200d-2642-fe0f.png';
+import s1f3c41f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fb-200d-2642-fe0f.png';
+import s1f3c41f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fc-200d-2642-fe0f.png';
+import s1f3c41f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fd-200d-2642-fe0f.png';
+import s1f3c41f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fe-200d-2642-fe0f.png';
+import s1f3c41f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3ff-200d-2642-fe0f.png';
 import s1f3c4 from 'emoji-datasource-apple/img/apple/64/1f3c4.png';
+import s1f3c41f3fb from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fb.png';
+import s1f3c41f3fc from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fc.png';
+import s1f3c41f3fd from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fd.png';
+import s1f3c41f3fe from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3fe.png';
+import s1f3c41f3ff from 'emoji-datasource-apple/img/apple/64/1f3c4-1f3ff.png';
 import s1f3c5 from 'emoji-datasource-apple/img/apple/64/1f3c5.png';
 import s1f3c6 from 'emoji-datasource-apple/img/apple/64/1f3c6.png';
 import s1f3c7 from 'emoji-datasource-apple/img/apple/64/1f3c7.png';
+import s1f3c71f3fb from 'emoji-datasource-apple/img/apple/64/1f3c7-1f3fb.png';
+import s1f3c71f3fc from 'emoji-datasource-apple/img/apple/64/1f3c7-1f3fc.png';
+import s1f3c71f3fd from 'emoji-datasource-apple/img/apple/64/1f3c7-1f3fd.png';
+import s1f3c71f3fe from 'emoji-datasource-apple/img/apple/64/1f3c7-1f3fe.png';
+import s1f3c71f3ff from 'emoji-datasource-apple/img/apple/64/1f3c7-1f3ff.png';
 import s1f3c8 from 'emoji-datasource-apple/img/apple/64/1f3c8.png';
 import s1f3c9 from 'emoji-datasource-apple/img/apple/64/1f3c9.png';
 import s1f3ca200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-200d-2640-fe0f.png';
+import s1f3ca1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fb-200d-2640-fe0f.png';
+import s1f3ca1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fc-200d-2640-fe0f.png';
+import s1f3ca1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fd-200d-2640-fe0f.png';
+import s1f3ca1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fe-200d-2640-fe0f.png';
+import s1f3ca1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3ff-200d-2640-fe0f.png';
 import s1f3ca200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-200d-2642-fe0f.png';
+import s1f3ca1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fb-200d-2642-fe0f.png';
+import s1f3ca1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fc-200d-2642-fe0f.png';
+import s1f3ca1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fd-200d-2642-fe0f.png';
+import s1f3ca1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fe-200d-2642-fe0f.png';
+import s1f3ca1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3ff-200d-2642-fe0f.png';
 import s1f3ca from 'emoji-datasource-apple/img/apple/64/1f3ca.png';
+import s1f3ca1f3fb from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fb.png';
+import s1f3ca1f3fc from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fc.png';
+import s1f3ca1f3fd from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fd.png';
+import s1f3ca1f3fe from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3fe.png';
+import s1f3ca1f3ff from 'emoji-datasource-apple/img/apple/64/1f3ca-1f3ff.png';
 import s1f3cbfe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-fe0f-200d-2640-fe0f.png';
+import s1f3cb1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fb-200d-2640-fe0f.png';
+import s1f3cb1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fc-200d-2640-fe0f.png';
+import s1f3cb1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fd-200d-2640-fe0f.png';
+import s1f3cb1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fe-200d-2640-fe0f.png';
+import s1f3cb1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3ff-200d-2640-fe0f.png';
 import s1f3cbfe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-fe0f-200d-2642-fe0f.png';
+import s1f3cb1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fb-200d-2642-fe0f.png';
+import s1f3cb1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fc-200d-2642-fe0f.png';
+import s1f3cb1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fd-200d-2642-fe0f.png';
+import s1f3cb1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fe-200d-2642-fe0f.png';
+import s1f3cb1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3ff-200d-2642-fe0f.png';
 import s1f3cbfe0f from 'emoji-datasource-apple/img/apple/64/1f3cb-fe0f.png';
+import s1f3cb1f3fb from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fb.png';
+import s1f3cb1f3fc from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fc.png';
+import s1f3cb1f3fd from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fd.png';
+import s1f3cb1f3fe from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3fe.png';
+import s1f3cb1f3ff from 'emoji-datasource-apple/img/apple/64/1f3cb-1f3ff.png';
 import s1f3ccfe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-fe0f-200d-2640-fe0f.png';
+import s1f3cc1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fb-200d-2640-fe0f.png';
+import s1f3cc1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fc-200d-2640-fe0f.png';
+import s1f3cc1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fd-200d-2640-fe0f.png';
+import s1f3cc1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fe-200d-2640-fe0f.png';
+import s1f3cc1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3ff-200d-2640-fe0f.png';
 import s1f3ccfe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-fe0f-200d-2642-fe0f.png';
+import s1f3cc1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fb-200d-2642-fe0f.png';
+import s1f3cc1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fc-200d-2642-fe0f.png';
+import s1f3cc1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fd-200d-2642-fe0f.png';
+import s1f3cc1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fe-200d-2642-fe0f.png';
+import s1f3cc1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3ff-200d-2642-fe0f.png';
 import s1f3ccfe0f from 'emoji-datasource-apple/img/apple/64/1f3cc-fe0f.png';
+import s1f3cc1f3fb from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fb.png';
+import s1f3cc1f3fc from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fc.png';
+import s1f3cc1f3fd from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fd.png';
+import s1f3cc1f3fe from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3fe.png';
+import s1f3cc1f3ff from 'emoji-datasource-apple/img/apple/64/1f3cc-1f3ff.png';
 import s1f3cdfe0f from 'emoji-datasource-apple/img/apple/64/1f3cd-fe0f.png';
 import s1f3cefe0f from 'emoji-datasource-apple/img/apple/64/1f3ce-fe0f.png';
 import s1f3cf from 'emoji-datasource-apple/img/apple/64/1f3cf.png';
@@ -636,20 +726,85 @@ import s1f440 from 'emoji-datasource-apple/img/apple/64/1f440.png';
 import s1f441fe0f200d1f5e8fe0f from 'emoji-datasource-apple/img/apple/64/1f441-fe0f-200d-1f5e8-fe0f.png';
 import s1f441fe0f from 'emoji-datasource-apple/img/apple/64/1f441-fe0f.png';
 import s1f442 from 'emoji-datasource-apple/img/apple/64/1f442.png';
+import s1f4421f3fb from 'emoji-datasource-apple/img/apple/64/1f442-1f3fb.png';
+import s1f4421f3fc from 'emoji-datasource-apple/img/apple/64/1f442-1f3fc.png';
+import s1f4421f3fd from 'emoji-datasource-apple/img/apple/64/1f442-1f3fd.png';
+import s1f4421f3fe from 'emoji-datasource-apple/img/apple/64/1f442-1f3fe.png';
+import s1f4421f3ff from 'emoji-datasource-apple/img/apple/64/1f442-1f3ff.png';
 import s1f443 from 'emoji-datasource-apple/img/apple/64/1f443.png';
+import s1f4431f3fb from 'emoji-datasource-apple/img/apple/64/1f443-1f3fb.png';
+import s1f4431f3fc from 'emoji-datasource-apple/img/apple/64/1f443-1f3fc.png';
+import s1f4431f3fd from 'emoji-datasource-apple/img/apple/64/1f443-1f3fd.png';
+import s1f4431f3fe from 'emoji-datasource-apple/img/apple/64/1f443-1f3fe.png';
+import s1f4431f3ff from 'emoji-datasource-apple/img/apple/64/1f443-1f3ff.png';
 import s1f444 from 'emoji-datasource-apple/img/apple/64/1f444.png';
 import s1f445 from 'emoji-datasource-apple/img/apple/64/1f445.png';
 import s1f446 from 'emoji-datasource-apple/img/apple/64/1f446.png';
+import s1f4461f3fb from 'emoji-datasource-apple/img/apple/64/1f446-1f3fb.png';
+import s1f4461f3fc from 'emoji-datasource-apple/img/apple/64/1f446-1f3fc.png';
+import s1f4461f3fd from 'emoji-datasource-apple/img/apple/64/1f446-1f3fd.png';
+import s1f4461f3fe from 'emoji-datasource-apple/img/apple/64/1f446-1f3fe.png';
+import s1f4461f3ff from 'emoji-datasource-apple/img/apple/64/1f446-1f3ff.png';
 import s1f447 from 'emoji-datasource-apple/img/apple/64/1f447.png';
+import s1f4471f3fb from 'emoji-datasource-apple/img/apple/64/1f447-1f3fb.png';
+import s1f4471f3fc from 'emoji-datasource-apple/img/apple/64/1f447-1f3fc.png';
+import s1f4471f3fd from 'emoji-datasource-apple/img/apple/64/1f447-1f3fd.png';
+import s1f4471f3fe from 'emoji-datasource-apple/img/apple/64/1f447-1f3fe.png';
+import s1f4471f3ff from 'emoji-datasource-apple/img/apple/64/1f447-1f3ff.png';
 import s1f448 from 'emoji-datasource-apple/img/apple/64/1f448.png';
+import s1f4481f3fb from 'emoji-datasource-apple/img/apple/64/1f448-1f3fb.png';
+import s1f4481f3fc from 'emoji-datasource-apple/img/apple/64/1f448-1f3fc.png';
+import s1f4481f3fd from 'emoji-datasource-apple/img/apple/64/1f448-1f3fd.png';
+import s1f4481f3fe from 'emoji-datasource-apple/img/apple/64/1f448-1f3fe.png';
+import s1f4481f3ff from 'emoji-datasource-apple/img/apple/64/1f448-1f3ff.png';
 import s1f449 from 'emoji-datasource-apple/img/apple/64/1f449.png';
+import s1f4491f3fb from 'emoji-datasource-apple/img/apple/64/1f449-1f3fb.png';
+import s1f4491f3fc from 'emoji-datasource-apple/img/apple/64/1f449-1f3fc.png';
+import s1f4491f3fd from 'emoji-datasource-apple/img/apple/64/1f449-1f3fd.png';
+import s1f4491f3fe from 'emoji-datasource-apple/img/apple/64/1f449-1f3fe.png';
+import s1f4491f3ff from 'emoji-datasource-apple/img/apple/64/1f449-1f3ff.png';
 import s1f44a from 'emoji-datasource-apple/img/apple/64/1f44a.png';
+import s1f44a1f3fb from 'emoji-datasource-apple/img/apple/64/1f44a-1f3fb.png';
+import s1f44a1f3fc from 'emoji-datasource-apple/img/apple/64/1f44a-1f3fc.png';
+import s1f44a1f3fd from 'emoji-datasource-apple/img/apple/64/1f44a-1f3fd.png';
+import s1f44a1f3fe from 'emoji-datasource-apple/img/apple/64/1f44a-1f3fe.png';
+import s1f44a1f3ff from 'emoji-datasource-apple/img/apple/64/1f44a-1f3ff.png';
 import s1f44b from 'emoji-datasource-apple/img/apple/64/1f44b.png';
+import s1f44b1f3fb from 'emoji-datasource-apple/img/apple/64/1f44b-1f3fb.png';
+import s1f44b1f3fc from 'emoji-datasource-apple/img/apple/64/1f44b-1f3fc.png';
+import s1f44b1f3fd from 'emoji-datasource-apple/img/apple/64/1f44b-1f3fd.png';
+import s1f44b1f3fe from 'emoji-datasource-apple/img/apple/64/1f44b-1f3fe.png';
+import s1f44b1f3ff from 'emoji-datasource-apple/img/apple/64/1f44b-1f3ff.png';
 import s1f44c from 'emoji-datasource-apple/img/apple/64/1f44c.png';
+import s1f44c1f3fb from 'emoji-datasource-apple/img/apple/64/1f44c-1f3fb.png';
+import s1f44c1f3fc from 'emoji-datasource-apple/img/apple/64/1f44c-1f3fc.png';
+import s1f44c1f3fd from 'emoji-datasource-apple/img/apple/64/1f44c-1f3fd.png';
+import s1f44c1f3fe from 'emoji-datasource-apple/img/apple/64/1f44c-1f3fe.png';
+import s1f44c1f3ff from 'emoji-datasource-apple/img/apple/64/1f44c-1f3ff.png';
 import s1f44d from 'emoji-datasource-apple/img/apple/64/1f44d.png';
+import s1f44d1f3fb from 'emoji-datasource-apple/img/apple/64/1f44d-1f3fb.png';
+import s1f44d1f3fc from 'emoji-datasource-apple/img/apple/64/1f44d-1f3fc.png';
+import s1f44d1f3fd from 'emoji-datasource-apple/img/apple/64/1f44d-1f3fd.png';
+import s1f44d1f3fe from 'emoji-datasource-apple/img/apple/64/1f44d-1f3fe.png';
+import s1f44d1f3ff from 'emoji-datasource-apple/img/apple/64/1f44d-1f3ff.png';
 import s1f44e from 'emoji-datasource-apple/img/apple/64/1f44e.png';
+import s1f44e1f3fb from 'emoji-datasource-apple/img/apple/64/1f44e-1f3fb.png';
+import s1f44e1f3fc from 'emoji-datasource-apple/img/apple/64/1f44e-1f3fc.png';
+import s1f44e1f3fd from 'emoji-datasource-apple/img/apple/64/1f44e-1f3fd.png';
+import s1f44e1f3fe from 'emoji-datasource-apple/img/apple/64/1f44e-1f3fe.png';
+import s1f44e1f3ff from 'emoji-datasource-apple/img/apple/64/1f44e-1f3ff.png';
 import s1f44f from 'emoji-datasource-apple/img/apple/64/1f44f.png';
+import s1f44f1f3fb from 'emoji-datasource-apple/img/apple/64/1f44f-1f3fb.png';
+import s1f44f1f3fc from 'emoji-datasource-apple/img/apple/64/1f44f-1f3fc.png';
+import s1f44f1f3fd from 'emoji-datasource-apple/img/apple/64/1f44f-1f3fd.png';
+import s1f44f1f3fe from 'emoji-datasource-apple/img/apple/64/1f44f-1f3fe.png';
+import s1f44f1f3ff from 'emoji-datasource-apple/img/apple/64/1f44f-1f3ff.png';
 import s1f450 from 'emoji-datasource-apple/img/apple/64/1f450.png';
+import s1f4501f3fb from 'emoji-datasource-apple/img/apple/64/1f450-1f3fb.png';
+import s1f4501f3fc from 'emoji-datasource-apple/img/apple/64/1f450-1f3fc.png';
+import s1f4501f3fd from 'emoji-datasource-apple/img/apple/64/1f450-1f3fd.png';
+import s1f4501f3fe from 'emoji-datasource-apple/img/apple/64/1f450-1f3fe.png';
+import s1f4501f3ff from 'emoji-datasource-apple/img/apple/64/1f450-1f3ff.png';
 import s1f451 from 'emoji-datasource-apple/img/apple/64/1f451.png';
 import s1f452 from 'emoji-datasource-apple/img/apple/64/1f452.png';
 import s1f453 from 'emoji-datasource-apple/img/apple/64/1f453.png';
@@ -672,15 +827,65 @@ import s1f463 from 'emoji-datasource-apple/img/apple/64/1f463.png';
 import s1f464 from 'emoji-datasource-apple/img/apple/64/1f464.png';
 import s1f465 from 'emoji-datasource-apple/img/apple/64/1f465.png';
 import s1f466 from 'emoji-datasource-apple/img/apple/64/1f466.png';
+import s1f4661f3fb from 'emoji-datasource-apple/img/apple/64/1f466-1f3fb.png';
+import s1f4661f3fc from 'emoji-datasource-apple/img/apple/64/1f466-1f3fc.png';
+import s1f4661f3fd from 'emoji-datasource-apple/img/apple/64/1f466-1f3fd.png';
+import s1f4661f3fe from 'emoji-datasource-apple/img/apple/64/1f466-1f3fe.png';
+import s1f4661f3ff from 'emoji-datasource-apple/img/apple/64/1f466-1f3ff.png';
 import s1f467 from 'emoji-datasource-apple/img/apple/64/1f467.png';
+import s1f4671f3fb from 'emoji-datasource-apple/img/apple/64/1f467-1f3fb.png';
+import s1f4671f3fc from 'emoji-datasource-apple/img/apple/64/1f467-1f3fc.png';
+import s1f4671f3fd from 'emoji-datasource-apple/img/apple/64/1f467-1f3fd.png';
+import s1f4671f3fe from 'emoji-datasource-apple/img/apple/64/1f467-1f3fe.png';
+import s1f4671f3ff from 'emoji-datasource-apple/img/apple/64/1f467-1f3ff.png';
 import s1f468200d1f33e from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f33e.png';
+import s1f4681f3fb200d1f33e from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f33e.png';
+import s1f4681f3fc200d1f33e from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f33e.png';
+import s1f4681f3fd200d1f33e from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f33e.png';
+import s1f4681f3fe200d1f33e from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f33e.png';
+import s1f4681f3ff200d1f33e from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f33e.png';
 import s1f468200d1f373 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f373.png';
+import s1f4681f3fb200d1f373 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f373.png';
+import s1f4681f3fc200d1f373 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f373.png';
+import s1f4681f3fd200d1f373 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f373.png';
+import s1f4681f3fe200d1f373 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f373.png';
+import s1f4681f3ff200d1f373 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f373.png';
 import s1f468200d1f37c from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f37c.png';
+import s1f4681f3fb200d1f37c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f37c.png';
+import s1f4681f3fc200d1f37c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f37c.png';
+import s1f4681f3fd200d1f37c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f37c.png';
+import s1f4681f3fe200d1f37c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f37c.png';
+import s1f4681f3ff200d1f37c from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f37c.png';
 import s1f468200d1f393 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f393.png';
+import s1f4681f3fb200d1f393 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f393.png';
+import s1f4681f3fc200d1f393 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f393.png';
+import s1f4681f3fd200d1f393 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f393.png';
+import s1f4681f3fe200d1f393 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f393.png';
+import s1f4681f3ff200d1f393 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f393.png';
 import s1f468200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3a4.png';
+import s1f4681f3fb200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f3a4.png';
+import s1f4681f3fc200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f3a4.png';
+import s1f4681f3fd200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f3a4.png';
+import s1f4681f3fe200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f3a4.png';
+import s1f4681f3ff200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f3a4.png';
 import s1f468200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3a8.png';
+import s1f4681f3fb200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f3a8.png';
+import s1f4681f3fc200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f3a8.png';
+import s1f4681f3fd200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f3a8.png';
+import s1f4681f3fe200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f3a8.png';
+import s1f4681f3ff200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f3a8.png';
 import s1f468200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3eb.png';
+import s1f4681f3fb200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f3eb.png';
+import s1f4681f3fc200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f3eb.png';
+import s1f4681f3fd200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f3eb.png';
+import s1f4681f3fe200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f3eb.png';
+import s1f4681f3ff200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f3eb.png';
 import s1f468200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f3ed.png';
+import s1f4681f3fb200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f3ed.png';
+import s1f4681f3fc200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f3ed.png';
+import s1f4681f3fd200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f3ed.png';
+import s1f4681f3fe200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f3ed.png';
+import s1f4681f3ff200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f3ed.png';
 import s1f468200d1f466200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f466-200d-1f466.png';
 import s1f468200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f466.png';
 import s1f468200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f467-200d-1f466.png';
@@ -697,32 +902,207 @@ import s1f468200d1f469200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-
 import s1f468200d1f469200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f469-200d-1f467-200d-1f466.png';
 import s1f468200d1f469200d1f467200d1f467 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f469-200d-1f467-200d-1f467.png';
 import s1f468200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f4bb.png';
+import s1f4681f3fb200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f4bb.png';
+import s1f4681f3fc200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f4bb.png';
+import s1f4681f3fd200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f4bb.png';
+import s1f4681f3fe200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f4bb.png';
+import s1f4681f3ff200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f4bb.png';
 import s1f468200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f4bc.png';
+import s1f4681f3fb200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f4bc.png';
+import s1f4681f3fc200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f4bc.png';
+import s1f4681f3fd200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f4bc.png';
+import s1f4681f3fe200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f4bc.png';
+import s1f4681f3ff200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f4bc.png';
 import s1f468200d1f527 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f527.png';
+import s1f4681f3fb200d1f527 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f527.png';
+import s1f4681f3fc200d1f527 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f527.png';
+import s1f4681f3fd200d1f527 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f527.png';
+import s1f4681f3fe200d1f527 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f527.png';
+import s1f4681f3ff200d1f527 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f527.png';
 import s1f468200d1f52c from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f52c.png';
+import s1f4681f3fb200d1f52c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f52c.png';
+import s1f4681f3fc200d1f52c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f52c.png';
+import s1f4681f3fd200d1f52c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f52c.png';
+import s1f4681f3fe200d1f52c from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f52c.png';
+import s1f4681f3ff200d1f52c from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f52c.png';
 import s1f468200d1f680 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f680.png';
+import s1f4681f3fb200d1f680 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f680.png';
+import s1f4681f3fc200d1f680 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f680.png';
+import s1f4681f3fd200d1f680 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f680.png';
+import s1f4681f3fe200d1f680 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f680.png';
+import s1f4681f3ff200d1f680 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f680.png';
 import s1f468200d1f692 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f692.png';
+import s1f4681f3fb200d1f692 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f692.png';
+import s1f4681f3fc200d1f692 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f692.png';
+import s1f4681f3fd200d1f692 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f692.png';
+import s1f4681f3fe200d1f692 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f692.png';
+import s1f4681f3ff200d1f692 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f692.png';
 import s1f468200d1f9af from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9af.png';
+import s1f4681f3fb200d1f9af from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f9af.png';
+import s1f4681f3fc200d1f9af from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f9af.png';
+import s1f4681f3fd200d1f9af from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f9af.png';
+import s1f4681f3fe200d1f9af from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f9af.png';
+import s1f4681f3ff200d1f9af from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f9af.png';
 import s1f468200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b0.png';
+import s1f4681f3fb200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f9b0.png';
+import s1f4681f3fc200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f9b0.png';
+import s1f4681f3fd200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f9b0.png';
+import s1f4681f3fe200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f9b0.png';
+import s1f4681f3ff200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f9b0.png';
 import s1f468200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b1.png';
+import s1f4681f3fb200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f9b1.png';
+import s1f4681f3fc200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f9b1.png';
+import s1f4681f3fd200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f9b1.png';
+import s1f4681f3fe200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f9b1.png';
+import s1f4681f3ff200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f9b1.png';
 import s1f468200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b2.png';
+import s1f4681f3fb200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f9b2.png';
+import s1f4681f3fc200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f9b2.png';
+import s1f4681f3fd200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f9b2.png';
+import s1f4681f3fe200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f9b2.png';
+import s1f4681f3ff200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f9b2.png';
 import s1f468200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9b3.png';
+import s1f4681f3fb200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f9b3.png';
+import s1f4681f3fc200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f9b3.png';
+import s1f4681f3fd200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f9b3.png';
+import s1f4681f3fe200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f9b3.png';
+import s1f4681f3ff200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f9b3.png';
 import s1f468200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9bc.png';
+import s1f4681f3fb200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f9bc.png';
+import s1f4681f3fc200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f9bc.png';
+import s1f4681f3fd200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f9bc.png';
+import s1f4681f3fe200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f9bc.png';
+import s1f4681f3ff200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f9bc.png';
 import s1f468200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f468-200d-1f9bd.png';
+import s1f4681f3fb200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f9bd.png';
+import s1f4681f3fc200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f9bd.png';
+import s1f4681f3fd200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f9bd.png';
+import s1f4681f3fe200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f9bd.png';
+import s1f4681f3ff200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f9bd.png';
 import s1f468200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f468-200d-2695-fe0f.png';
+import s1f4681f3fb200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2695-fe0f.png';
+import s1f4681f3fc200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2695-fe0f.png';
+import s1f4681f3fd200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2695-fe0f.png';
+import s1f4681f3fe200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2695-fe0f.png';
+import s1f4681f3ff200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2695-fe0f.png';
 import s1f468200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f468-200d-2696-fe0f.png';
+import s1f4681f3fb200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2696-fe0f.png';
+import s1f4681f3fc200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2696-fe0f.png';
+import s1f4681f3fd200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2696-fe0f.png';
+import s1f4681f3fe200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2696-fe0f.png';
+import s1f4681f3ff200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2696-fe0f.png';
 import s1f468200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f468-200d-2708-fe0f.png';
+import s1f4681f3fb200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2708-fe0f.png';
+import s1f4681f3fc200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2708-fe0f.png';
+import s1f4681f3fd200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2708-fe0f.png';
+import s1f4681f3fe200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2708-fe0f.png';
+import s1f4681f3ff200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2708-fe0f.png';
 import s1f468200d2764fe0f200d1f468 from 'emoji-datasource-apple/img/apple/64/1f468-200d-2764-fe0f-200d-1f468.png';
+import s1f4681f3fb200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4681f3fb200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4681f3fb200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4681f3fb200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4681f3fb200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4681f3fc200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4681f3fc200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4681f3fc200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4681f3fc200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4681f3fc200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4681f3fd200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4681f3fd200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4681f3fd200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4681f3fd200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4681f3fd200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4681f3fe200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4681f3fe200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4681f3fe200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4681f3fe200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4681f3fe200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4681f3ff200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4681f3ff200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4681f3ff200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4681f3ff200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4681f3ff200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f468-1f3ff.png';
 import s1f468200d2764fe0f200d1f48b200d1f468 from 'emoji-datasource-apple/img/apple/64/1f468-200d-2764-fe0f-200d-1f48b-200d-1f468.png';
+import s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
 import s1f468 from 'emoji-datasource-apple/img/apple/64/1f468.png';
+import s1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb.png';
+import s1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc.png';
+import s1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd.png';
+import s1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe.png';
+import s1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff.png';
 import s1f469200d1f33e from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f33e.png';
+import s1f4691f3fb200d1f33e from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f33e.png';
+import s1f4691f3fc200d1f33e from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f33e.png';
+import s1f4691f3fd200d1f33e from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f33e.png';
+import s1f4691f3fe200d1f33e from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f33e.png';
+import s1f4691f3ff200d1f33e from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f33e.png';
 import s1f469200d1f373 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f373.png';
+import s1f4691f3fb200d1f373 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f373.png';
+import s1f4691f3fc200d1f373 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f373.png';
+import s1f4691f3fd200d1f373 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f373.png';
+import s1f4691f3fe200d1f373 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f373.png';
+import s1f4691f3ff200d1f373 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f373.png';
 import s1f469200d1f37c from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f37c.png';
+import s1f4691f3fb200d1f37c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f37c.png';
+import s1f4691f3fc200d1f37c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f37c.png';
+import s1f4691f3fd200d1f37c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f37c.png';
+import s1f4691f3fe200d1f37c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f37c.png';
+import s1f4691f3ff200d1f37c from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f37c.png';
 import s1f469200d1f393 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f393.png';
+import s1f4691f3fb200d1f393 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f393.png';
+import s1f4691f3fc200d1f393 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f393.png';
+import s1f4691f3fd200d1f393 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f393.png';
+import s1f4691f3fe200d1f393 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f393.png';
+import s1f4691f3ff200d1f393 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f393.png';
 import s1f469200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3a4.png';
+import s1f4691f3fb200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f3a4.png';
+import s1f4691f3fc200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f3a4.png';
+import s1f4691f3fd200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f3a4.png';
+import s1f4691f3fe200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f3a4.png';
+import s1f4691f3ff200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f3a4.png';
 import s1f469200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3a8.png';
+import s1f4691f3fb200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f3a8.png';
+import s1f4691f3fc200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f3a8.png';
+import s1f4691f3fd200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f3a8.png';
+import s1f4691f3fe200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f3a8.png';
+import s1f4691f3ff200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f3a8.png';
 import s1f469200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3eb.png';
+import s1f4691f3fb200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f3eb.png';
+import s1f4691f3fc200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f3eb.png';
+import s1f4691f3fd200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f3eb.png';
+import s1f4691f3fe200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f3eb.png';
+import s1f4691f3ff200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f3eb.png';
 import s1f469200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f3ed.png';
+import s1f4691f3fb200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f3ed.png';
+import s1f4691f3fc200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f3ed.png';
+import s1f4691f3fd200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f3ed.png';
+import s1f4691f3fe200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f3ed.png';
+import s1f4691f3ff200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f3ed.png';
 import s1f469200d1f466200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f466-200d-1f466.png';
 import s1f469200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f466.png';
 import s1f469200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f467-200d-1f466.png';
@@ -734,76 +1114,511 @@ import s1f469200d1f469200d1f467 from 'emoji-datasource-apple/img/apple/64/1f469-
 import s1f469200d1f469200d1f467200d1f466 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f469-200d-1f467-200d-1f466.png';
 import s1f469200d1f469200d1f467200d1f467 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f469-200d-1f467-200d-1f467.png';
 import s1f469200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f4bb.png';
+import s1f4691f3fb200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f4bb.png';
+import s1f4691f3fc200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f4bb.png';
+import s1f4691f3fd200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f4bb.png';
+import s1f4691f3fe200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f4bb.png';
+import s1f4691f3ff200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f4bb.png';
 import s1f469200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f4bc.png';
+import s1f4691f3fb200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f4bc.png';
+import s1f4691f3fc200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f4bc.png';
+import s1f4691f3fd200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f4bc.png';
+import s1f4691f3fe200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f4bc.png';
+import s1f4691f3ff200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f4bc.png';
 import s1f469200d1f527 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f527.png';
+import s1f4691f3fb200d1f527 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f527.png';
+import s1f4691f3fc200d1f527 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f527.png';
+import s1f4691f3fd200d1f527 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f527.png';
+import s1f4691f3fe200d1f527 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f527.png';
+import s1f4691f3ff200d1f527 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f527.png';
 import s1f469200d1f52c from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f52c.png';
+import s1f4691f3fb200d1f52c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f52c.png';
+import s1f4691f3fc200d1f52c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f52c.png';
+import s1f4691f3fd200d1f52c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f52c.png';
+import s1f4691f3fe200d1f52c from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f52c.png';
+import s1f4691f3ff200d1f52c from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f52c.png';
 import s1f469200d1f680 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f680.png';
+import s1f4691f3fb200d1f680 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f680.png';
+import s1f4691f3fc200d1f680 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f680.png';
+import s1f4691f3fd200d1f680 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f680.png';
+import s1f4691f3fe200d1f680 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f680.png';
+import s1f4691f3ff200d1f680 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f680.png';
 import s1f469200d1f692 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f692.png';
+import s1f4691f3fb200d1f692 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f692.png';
+import s1f4691f3fc200d1f692 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f692.png';
+import s1f4691f3fd200d1f692 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f692.png';
+import s1f4691f3fe200d1f692 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f692.png';
+import s1f4691f3ff200d1f692 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f692.png';
 import s1f469200d1f9af from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9af.png';
+import s1f4691f3fb200d1f9af from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f9af.png';
+import s1f4691f3fc200d1f9af from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f9af.png';
+import s1f4691f3fd200d1f9af from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f9af.png';
+import s1f4691f3fe200d1f9af from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f9af.png';
+import s1f4691f3ff200d1f9af from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f9af.png';
 import s1f469200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b0.png';
+import s1f4691f3fb200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f9b0.png';
+import s1f4691f3fc200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f9b0.png';
+import s1f4691f3fd200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f9b0.png';
+import s1f4691f3fe200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f9b0.png';
+import s1f4691f3ff200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f9b0.png';
 import s1f469200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b1.png';
+import s1f4691f3fb200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f9b1.png';
+import s1f4691f3fc200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f9b1.png';
+import s1f4691f3fd200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f9b1.png';
+import s1f4691f3fe200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f9b1.png';
+import s1f4691f3ff200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f9b1.png';
 import s1f469200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b2.png';
+import s1f4691f3fb200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f9b2.png';
+import s1f4691f3fc200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f9b2.png';
+import s1f4691f3fd200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f9b2.png';
+import s1f4691f3fe200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f9b2.png';
+import s1f4691f3ff200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f9b2.png';
 import s1f469200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9b3.png';
+import s1f4691f3fb200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f9b3.png';
+import s1f4691f3fc200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f9b3.png';
+import s1f4691f3fd200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f9b3.png';
+import s1f4691f3fe200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f9b3.png';
+import s1f4691f3ff200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f9b3.png';
 import s1f469200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9bc.png';
+import s1f4691f3fb200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f9bc.png';
+import s1f4691f3fc200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f9bc.png';
+import s1f4691f3fd200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f9bc.png';
+import s1f4691f3fe200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f9bc.png';
+import s1f4691f3ff200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f9bc.png';
 import s1f469200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f469-200d-1f9bd.png';
+import s1f4691f3fb200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f9bd.png';
+import s1f4691f3fc200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f9bd.png';
+import s1f4691f3fd200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f9bd.png';
+import s1f4691f3fe200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f9bd.png';
+import s1f4691f3ff200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f9bd.png';
 import s1f469200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f469-200d-2695-fe0f.png';
+import s1f4691f3fb200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2695-fe0f.png';
+import s1f4691f3fc200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2695-fe0f.png';
+import s1f4691f3fd200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2695-fe0f.png';
+import s1f4691f3fe200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2695-fe0f.png';
+import s1f4691f3ff200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2695-fe0f.png';
 import s1f469200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f469-200d-2696-fe0f.png';
+import s1f4691f3fb200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2696-fe0f.png';
+import s1f4691f3fc200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2696-fe0f.png';
+import s1f4691f3fd200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2696-fe0f.png';
+import s1f4691f3fe200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2696-fe0f.png';
+import s1f4691f3ff200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2696-fe0f.png';
 import s1f469200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f469-200d-2708-fe0f.png';
+import s1f4691f3fb200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2708-fe0f.png';
+import s1f4691f3fc200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2708-fe0f.png';
+import s1f4691f3fd200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2708-fe0f.png';
+import s1f4691f3fe200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2708-fe0f.png';
+import s1f4691f3ff200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2708-fe0f.png';
 import s1f469200d2764fe0f200d1f468 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f468.png';
+import s1f4691f3fb200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4691f3fb200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4691f3fb200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4691f3fb200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4691f3fb200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4691f3fc200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4691f3fc200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4691f3fc200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4691f3fc200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4691f3fc200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4691f3fd200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4691f3fd200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4691f3fd200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4691f3fd200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4691f3fd200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4691f3fe200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4691f3fe200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4691f3fe200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4691f3fe200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4691f3fe200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f468-1f3ff.png';
+import s1f4691f3ff200d2764fe0f200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f468-1f3fb.png';
+import s1f4691f3ff200d2764fe0f200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f468-1f3fc.png';
+import s1f4691f3ff200d2764fe0f200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f468-1f3fd.png';
+import s1f4691f3ff200d2764fe0f200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f468-1f3fe.png';
+import s1f4691f3ff200d2764fe0f200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f468-1f3ff.png';
 import s1f469200d2764fe0f200d1f469 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f469.png';
+import s1f4691f3fb200d2764fe0f200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f469-1f3fb.png';
+import s1f4691f3fb200d2764fe0f200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f469-1f3fc.png';
+import s1f4691f3fb200d2764fe0f200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f469-1f3fd.png';
+import s1f4691f3fb200d2764fe0f200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f469-1f3fe.png';
+import s1f4691f3fb200d2764fe0f200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f469-1f3ff.png';
+import s1f4691f3fc200d2764fe0f200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f469-1f3fb.png';
+import s1f4691f3fc200d2764fe0f200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f469-1f3fc.png';
+import s1f4691f3fc200d2764fe0f200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f469-1f3fd.png';
+import s1f4691f3fc200d2764fe0f200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f469-1f3fe.png';
+import s1f4691f3fc200d2764fe0f200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f469-1f3ff.png';
+import s1f4691f3fd200d2764fe0f200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f469-1f3fb.png';
+import s1f4691f3fd200d2764fe0f200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f469-1f3fc.png';
+import s1f4691f3fd200d2764fe0f200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f469-1f3fd.png';
+import s1f4691f3fd200d2764fe0f200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f469-1f3fe.png';
+import s1f4691f3fd200d2764fe0f200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f469-1f3ff.png';
+import s1f4691f3fe200d2764fe0f200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f469-1f3fb.png';
+import s1f4691f3fe200d2764fe0f200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f469-1f3fc.png';
+import s1f4691f3fe200d2764fe0f200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f469-1f3fd.png';
+import s1f4691f3fe200d2764fe0f200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f469-1f3fe.png';
+import s1f4691f3fe200d2764fe0f200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f469-1f3ff.png';
+import s1f4691f3ff200d2764fe0f200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f469-1f3fb.png';
+import s1f4691f3ff200d2764fe0f200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f469-1f3fc.png';
+import s1f4691f3ff200d2764fe0f200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f469-1f3fd.png';
+import s1f4691f3ff200d2764fe0f200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f469-1f3fe.png';
+import s1f4691f3ff200d2764fe0f200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f469-1f3ff.png';
 import s1f469200d2764fe0f200d1f48b200d1f468 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f48b-200d-1f468.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fb.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fc.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fd.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3fe.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f468-1f3ff.png';
 import s1f469200d2764fe0f200d1f48b200d1f469 from 'emoji-datasource-apple/img/apple/64/1f469-200d-2764-fe0f-200d-1f48b-200d-1f469.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fb.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fc.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fd.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fe.png';
+import s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3ff.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fb.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fc.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fd.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fe.png';
+import s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3ff.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fb.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fc.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fd.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fe.png';
+import s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3ff.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fb.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fc.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fd.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fe.png';
+import s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3ff.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fb.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fc.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fd.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3fe.png';
+import s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f469-1f3ff.png';
 import s1f469 from 'emoji-datasource-apple/img/apple/64/1f469.png';
+import s1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb.png';
+import s1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc.png';
+import s1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd.png';
+import s1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe.png';
+import s1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff.png';
 import s1f46a from 'emoji-datasource-apple/img/apple/64/1f46a.png';
 import s1f46b from 'emoji-datasource-apple/img/apple/64/1f46b.png';
+import s1f46b1f3fb from 'emoji-datasource-apple/img/apple/64/1f46b-1f3fb.png';
+import s1f46b1f3fc from 'emoji-datasource-apple/img/apple/64/1f46b-1f3fc.png';
+import s1f46b1f3fd from 'emoji-datasource-apple/img/apple/64/1f46b-1f3fd.png';
+import s1f46b1f3fe from 'emoji-datasource-apple/img/apple/64/1f46b-1f3fe.png';
+import s1f46b1f3ff from 'emoji-datasource-apple/img/apple/64/1f46b-1f3ff.png';
+import s1f4691f3fb200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4691f3fb200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4691f3fb200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f468-1f3fe.png';
+import s1f4691f3fb200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4691f3fc200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4691f3fc200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4691f3fc200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f468-1f3fe.png';
+import s1f4691f3fc200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4691f3fd200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4691f3fd200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4691f3fd200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f468-1f3fe.png';
+import s1f4691f3fd200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4691f3fe200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4691f3fe200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4691f3fe200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4691f3fe200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4691f3ff200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4691f3ff200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4691f3ff200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4691f3ff200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f468-1f3fe.png';
 import s1f46c from 'emoji-datasource-apple/img/apple/64/1f46c.png';
+import s1f46c1f3fb from 'emoji-datasource-apple/img/apple/64/1f46c-1f3fb.png';
+import s1f46c1f3fc from 'emoji-datasource-apple/img/apple/64/1f46c-1f3fc.png';
+import s1f46c1f3fd from 'emoji-datasource-apple/img/apple/64/1f46c-1f3fd.png';
+import s1f46c1f3fe from 'emoji-datasource-apple/img/apple/64/1f46c-1f3fe.png';
+import s1f46c1f3ff from 'emoji-datasource-apple/img/apple/64/1f46c-1f3ff.png';
+import s1f4681f3fb200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4681f3fb200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4681f3fb200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f91d-200d-1f468-1f3fe.png';
+import s1f4681f3fb200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fb-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4681f3fc200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4681f3fc200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4681f3fc200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f91d-200d-1f468-1f3fe.png';
+import s1f4681f3fc200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fc-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4681f3fd200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4681f3fd200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4681f3fd200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f91d-200d-1f468-1f3fe.png';
+import s1f4681f3fd200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fd-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4681f3fe200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4681f3fe200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4681f3fe200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4681f3fe200d1f91d200d1f4681f3ff from 'emoji-datasource-apple/img/apple/64/1f468-1f3fe-200d-1f91d-200d-1f468-1f3ff.png';
+import s1f4681f3ff200d1f91d200d1f4681f3fb from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f91d-200d-1f468-1f3fb.png';
+import s1f4681f3ff200d1f91d200d1f4681f3fc from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f91d-200d-1f468-1f3fc.png';
+import s1f4681f3ff200d1f91d200d1f4681f3fd from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f91d-200d-1f468-1f3fd.png';
+import s1f4681f3ff200d1f91d200d1f4681f3fe from 'emoji-datasource-apple/img/apple/64/1f468-1f3ff-200d-1f91d-200d-1f468-1f3fe.png';
 import s1f46d from 'emoji-datasource-apple/img/apple/64/1f46d.png';
+import s1f46d1f3fb from 'emoji-datasource-apple/img/apple/64/1f46d-1f3fb.png';
+import s1f46d1f3fc from 'emoji-datasource-apple/img/apple/64/1f46d-1f3fc.png';
+import s1f46d1f3fd from 'emoji-datasource-apple/img/apple/64/1f46d-1f3fd.png';
+import s1f46d1f3fe from 'emoji-datasource-apple/img/apple/64/1f46d-1f3fe.png';
+import s1f46d1f3ff from 'emoji-datasource-apple/img/apple/64/1f46d-1f3ff.png';
+import s1f4691f3fb200d1f91d200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f469-1f3fc.png';
+import s1f4691f3fb200d1f91d200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f469-1f3fd.png';
+import s1f4691f3fb200d1f91d200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f469-1f3fe.png';
+import s1f4691f3fb200d1f91d200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fb-200d-1f91d-200d-1f469-1f3ff.png';
+import s1f4691f3fc200d1f91d200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f469-1f3fb.png';
+import s1f4691f3fc200d1f91d200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f469-1f3fd.png';
+import s1f4691f3fc200d1f91d200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f469-1f3fe.png';
+import s1f4691f3fc200d1f91d200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fc-200d-1f91d-200d-1f469-1f3ff.png';
+import s1f4691f3fd200d1f91d200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f469-1f3fb.png';
+import s1f4691f3fd200d1f91d200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f469-1f3fc.png';
+import s1f4691f3fd200d1f91d200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f469-1f3fe.png';
+import s1f4691f3fd200d1f91d200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fd-200d-1f91d-200d-1f469-1f3ff.png';
+import s1f4691f3fe200d1f91d200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f469-1f3fb.png';
+import s1f4691f3fe200d1f91d200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f469-1f3fc.png';
+import s1f4691f3fe200d1f91d200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f469-1f3fd.png';
+import s1f4691f3fe200d1f91d200d1f4691f3ff from 'emoji-datasource-apple/img/apple/64/1f469-1f3fe-200d-1f91d-200d-1f469-1f3ff.png';
+import s1f4691f3ff200d1f91d200d1f4691f3fb from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f469-1f3fb.png';
+import s1f4691f3ff200d1f91d200d1f4691f3fc from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f469-1f3fc.png';
+import s1f4691f3ff200d1f91d200d1f4691f3fd from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f469-1f3fd.png';
+import s1f4691f3ff200d1f91d200d1f4691f3fe from 'emoji-datasource-apple/img/apple/64/1f469-1f3ff-200d-1f91d-200d-1f469-1f3fe.png';
 import s1f46e200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-200d-2640-fe0f.png';
+import s1f46e1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fb-200d-2640-fe0f.png';
+import s1f46e1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fc-200d-2640-fe0f.png';
+import s1f46e1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fd-200d-2640-fe0f.png';
+import s1f46e1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fe-200d-2640-fe0f.png';
+import s1f46e1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3ff-200d-2640-fe0f.png';
 import s1f46e200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-200d-2642-fe0f.png';
+import s1f46e1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fb-200d-2642-fe0f.png';
+import s1f46e1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fc-200d-2642-fe0f.png';
+import s1f46e1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fd-200d-2642-fe0f.png';
+import s1f46e1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fe-200d-2642-fe0f.png';
+import s1f46e1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46e-1f3ff-200d-2642-fe0f.png';
 import s1f46e from 'emoji-datasource-apple/img/apple/64/1f46e.png';
+import s1f46e1f3fb from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fb.png';
+import s1f46e1f3fc from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fc.png';
+import s1f46e1f3fd from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fd.png';
+import s1f46e1f3fe from 'emoji-datasource-apple/img/apple/64/1f46e-1f3fe.png';
+import s1f46e1f3ff from 'emoji-datasource-apple/img/apple/64/1f46e-1f3ff.png';
 import s1f46f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f46f-200d-2640-fe0f.png';
 import s1f46f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f46f-200d-2642-fe0f.png';
 import s1f46f from 'emoji-datasource-apple/img/apple/64/1f46f.png';
 import s1f470200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f470-200d-2640-fe0f.png';
+import s1f4701f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fb-200d-2640-fe0f.png';
+import s1f4701f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fc-200d-2640-fe0f.png';
+import s1f4701f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fd-200d-2640-fe0f.png';
+import s1f4701f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fe-200d-2640-fe0f.png';
+import s1f4701f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3ff-200d-2640-fe0f.png';
 import s1f470200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f470-200d-2642-fe0f.png';
+import s1f4701f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fb-200d-2642-fe0f.png';
+import s1f4701f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fc-200d-2642-fe0f.png';
+import s1f4701f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fd-200d-2642-fe0f.png';
+import s1f4701f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3fe-200d-2642-fe0f.png';
+import s1f4701f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f470-1f3ff-200d-2642-fe0f.png';
 import s1f470 from 'emoji-datasource-apple/img/apple/64/1f470.png';
+import s1f4701f3fb from 'emoji-datasource-apple/img/apple/64/1f470-1f3fb.png';
+import s1f4701f3fc from 'emoji-datasource-apple/img/apple/64/1f470-1f3fc.png';
+import s1f4701f3fd from 'emoji-datasource-apple/img/apple/64/1f470-1f3fd.png';
+import s1f4701f3fe from 'emoji-datasource-apple/img/apple/64/1f470-1f3fe.png';
+import s1f4701f3ff from 'emoji-datasource-apple/img/apple/64/1f470-1f3ff.png';
 import s1f471200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f471-200d-2640-fe0f.png';
+import s1f4711f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fb-200d-2640-fe0f.png';
+import s1f4711f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fc-200d-2640-fe0f.png';
+import s1f4711f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fd-200d-2640-fe0f.png';
+import s1f4711f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fe-200d-2640-fe0f.png';
+import s1f4711f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3ff-200d-2640-fe0f.png';
 import s1f471200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f471-200d-2642-fe0f.png';
+import s1f4711f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fb-200d-2642-fe0f.png';
+import s1f4711f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fc-200d-2642-fe0f.png';
+import s1f4711f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fd-200d-2642-fe0f.png';
+import s1f4711f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3fe-200d-2642-fe0f.png';
+import s1f4711f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f471-1f3ff-200d-2642-fe0f.png';
 import s1f471 from 'emoji-datasource-apple/img/apple/64/1f471.png';
+import s1f4711f3fb from 'emoji-datasource-apple/img/apple/64/1f471-1f3fb.png';
+import s1f4711f3fc from 'emoji-datasource-apple/img/apple/64/1f471-1f3fc.png';
+import s1f4711f3fd from 'emoji-datasource-apple/img/apple/64/1f471-1f3fd.png';
+import s1f4711f3fe from 'emoji-datasource-apple/img/apple/64/1f471-1f3fe.png';
+import s1f4711f3ff from 'emoji-datasource-apple/img/apple/64/1f471-1f3ff.png';
 import s1f472 from 'emoji-datasource-apple/img/apple/64/1f472.png';
+import s1f4721f3fb from 'emoji-datasource-apple/img/apple/64/1f472-1f3fb.png';
+import s1f4721f3fc from 'emoji-datasource-apple/img/apple/64/1f472-1f3fc.png';
+import s1f4721f3fd from 'emoji-datasource-apple/img/apple/64/1f472-1f3fd.png';
+import s1f4721f3fe from 'emoji-datasource-apple/img/apple/64/1f472-1f3fe.png';
+import s1f4721f3ff from 'emoji-datasource-apple/img/apple/64/1f472-1f3ff.png';
 import s1f473200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f473-200d-2640-fe0f.png';
+import s1f4731f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fb-200d-2640-fe0f.png';
+import s1f4731f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fc-200d-2640-fe0f.png';
+import s1f4731f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fd-200d-2640-fe0f.png';
+import s1f4731f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fe-200d-2640-fe0f.png';
+import s1f4731f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3ff-200d-2640-fe0f.png';
 import s1f473200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f473-200d-2642-fe0f.png';
+import s1f4731f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fb-200d-2642-fe0f.png';
+import s1f4731f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fc-200d-2642-fe0f.png';
+import s1f4731f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fd-200d-2642-fe0f.png';
+import s1f4731f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3fe-200d-2642-fe0f.png';
+import s1f4731f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f473-1f3ff-200d-2642-fe0f.png';
 import s1f473 from 'emoji-datasource-apple/img/apple/64/1f473.png';
+import s1f4731f3fb from 'emoji-datasource-apple/img/apple/64/1f473-1f3fb.png';
+import s1f4731f3fc from 'emoji-datasource-apple/img/apple/64/1f473-1f3fc.png';
+import s1f4731f3fd from 'emoji-datasource-apple/img/apple/64/1f473-1f3fd.png';
+import s1f4731f3fe from 'emoji-datasource-apple/img/apple/64/1f473-1f3fe.png';
+import s1f4731f3ff from 'emoji-datasource-apple/img/apple/64/1f473-1f3ff.png';
 import s1f474 from 'emoji-datasource-apple/img/apple/64/1f474.png';
+import s1f4741f3fb from 'emoji-datasource-apple/img/apple/64/1f474-1f3fb.png';
+import s1f4741f3fc from 'emoji-datasource-apple/img/apple/64/1f474-1f3fc.png';
+import s1f4741f3fd from 'emoji-datasource-apple/img/apple/64/1f474-1f3fd.png';
+import s1f4741f3fe from 'emoji-datasource-apple/img/apple/64/1f474-1f3fe.png';
+import s1f4741f3ff from 'emoji-datasource-apple/img/apple/64/1f474-1f3ff.png';
 import s1f475 from 'emoji-datasource-apple/img/apple/64/1f475.png';
+import s1f4751f3fb from 'emoji-datasource-apple/img/apple/64/1f475-1f3fb.png';
+import s1f4751f3fc from 'emoji-datasource-apple/img/apple/64/1f475-1f3fc.png';
+import s1f4751f3fd from 'emoji-datasource-apple/img/apple/64/1f475-1f3fd.png';
+import s1f4751f3fe from 'emoji-datasource-apple/img/apple/64/1f475-1f3fe.png';
+import s1f4751f3ff from 'emoji-datasource-apple/img/apple/64/1f475-1f3ff.png';
 import s1f476 from 'emoji-datasource-apple/img/apple/64/1f476.png';
+import s1f4761f3fb from 'emoji-datasource-apple/img/apple/64/1f476-1f3fb.png';
+import s1f4761f3fc from 'emoji-datasource-apple/img/apple/64/1f476-1f3fc.png';
+import s1f4761f3fd from 'emoji-datasource-apple/img/apple/64/1f476-1f3fd.png';
+import s1f4761f3fe from 'emoji-datasource-apple/img/apple/64/1f476-1f3fe.png';
+import s1f4761f3ff from 'emoji-datasource-apple/img/apple/64/1f476-1f3ff.png';
 import s1f477200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f477-200d-2640-fe0f.png';
+import s1f4771f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fb-200d-2640-fe0f.png';
+import s1f4771f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fc-200d-2640-fe0f.png';
+import s1f4771f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fd-200d-2640-fe0f.png';
+import s1f4771f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fe-200d-2640-fe0f.png';
+import s1f4771f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3ff-200d-2640-fe0f.png';
 import s1f477200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f477-200d-2642-fe0f.png';
+import s1f4771f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fb-200d-2642-fe0f.png';
+import s1f4771f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fc-200d-2642-fe0f.png';
+import s1f4771f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fd-200d-2642-fe0f.png';
+import s1f4771f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3fe-200d-2642-fe0f.png';
+import s1f4771f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f477-1f3ff-200d-2642-fe0f.png';
 import s1f477 from 'emoji-datasource-apple/img/apple/64/1f477.png';
+import s1f4771f3fb from 'emoji-datasource-apple/img/apple/64/1f477-1f3fb.png';
+import s1f4771f3fc from 'emoji-datasource-apple/img/apple/64/1f477-1f3fc.png';
+import s1f4771f3fd from 'emoji-datasource-apple/img/apple/64/1f477-1f3fd.png';
+import s1f4771f3fe from 'emoji-datasource-apple/img/apple/64/1f477-1f3fe.png';
+import s1f4771f3ff from 'emoji-datasource-apple/img/apple/64/1f477-1f3ff.png';
 import s1f478 from 'emoji-datasource-apple/img/apple/64/1f478.png';
+import s1f4781f3fb from 'emoji-datasource-apple/img/apple/64/1f478-1f3fb.png';
+import s1f4781f3fc from 'emoji-datasource-apple/img/apple/64/1f478-1f3fc.png';
+import s1f4781f3fd from 'emoji-datasource-apple/img/apple/64/1f478-1f3fd.png';
+import s1f4781f3fe from 'emoji-datasource-apple/img/apple/64/1f478-1f3fe.png';
+import s1f4781f3ff from 'emoji-datasource-apple/img/apple/64/1f478-1f3ff.png';
 import s1f479 from 'emoji-datasource-apple/img/apple/64/1f479.png';
 import s1f47a from 'emoji-datasource-apple/img/apple/64/1f47a.png';
 import s1f47b from 'emoji-datasource-apple/img/apple/64/1f47b.png';
 import s1f47c from 'emoji-datasource-apple/img/apple/64/1f47c.png';
+import s1f47c1f3fb from 'emoji-datasource-apple/img/apple/64/1f47c-1f3fb.png';
+import s1f47c1f3fc from 'emoji-datasource-apple/img/apple/64/1f47c-1f3fc.png';
+import s1f47c1f3fd from 'emoji-datasource-apple/img/apple/64/1f47c-1f3fd.png';
+import s1f47c1f3fe from 'emoji-datasource-apple/img/apple/64/1f47c-1f3fe.png';
+import s1f47c1f3ff from 'emoji-datasource-apple/img/apple/64/1f47c-1f3ff.png';
 import s1f47d from 'emoji-datasource-apple/img/apple/64/1f47d.png';
 import s1f47e from 'emoji-datasource-apple/img/apple/64/1f47e.png';
 import s1f47f from 'emoji-datasource-apple/img/apple/64/1f47f.png';
 import s1f480 from 'emoji-datasource-apple/img/apple/64/1f480.png';
 import s1f481200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f481-200d-2640-fe0f.png';
+import s1f4811f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fb-200d-2640-fe0f.png';
+import s1f4811f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fc-200d-2640-fe0f.png';
+import s1f4811f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fd-200d-2640-fe0f.png';
+import s1f4811f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fe-200d-2640-fe0f.png';
+import s1f4811f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3ff-200d-2640-fe0f.png';
 import s1f481200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f481-200d-2642-fe0f.png';
+import s1f4811f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fb-200d-2642-fe0f.png';
+import s1f4811f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fc-200d-2642-fe0f.png';
+import s1f4811f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fd-200d-2642-fe0f.png';
+import s1f4811f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3fe-200d-2642-fe0f.png';
+import s1f4811f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f481-1f3ff-200d-2642-fe0f.png';
 import s1f481 from 'emoji-datasource-apple/img/apple/64/1f481.png';
+import s1f4811f3fb from 'emoji-datasource-apple/img/apple/64/1f481-1f3fb.png';
+import s1f4811f3fc from 'emoji-datasource-apple/img/apple/64/1f481-1f3fc.png';
+import s1f4811f3fd from 'emoji-datasource-apple/img/apple/64/1f481-1f3fd.png';
+import s1f4811f3fe from 'emoji-datasource-apple/img/apple/64/1f481-1f3fe.png';
+import s1f4811f3ff from 'emoji-datasource-apple/img/apple/64/1f481-1f3ff.png';
 import s1f482200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f482-200d-2640-fe0f.png';
+import s1f4821f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fb-200d-2640-fe0f.png';
+import s1f4821f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fc-200d-2640-fe0f.png';
+import s1f4821f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fd-200d-2640-fe0f.png';
+import s1f4821f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fe-200d-2640-fe0f.png';
+import s1f4821f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3ff-200d-2640-fe0f.png';
 import s1f482200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f482-200d-2642-fe0f.png';
+import s1f4821f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fb-200d-2642-fe0f.png';
+import s1f4821f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fc-200d-2642-fe0f.png';
+import s1f4821f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fd-200d-2642-fe0f.png';
+import s1f4821f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3fe-200d-2642-fe0f.png';
+import s1f4821f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f482-1f3ff-200d-2642-fe0f.png';
 import s1f482 from 'emoji-datasource-apple/img/apple/64/1f482.png';
+import s1f4821f3fb from 'emoji-datasource-apple/img/apple/64/1f482-1f3fb.png';
+import s1f4821f3fc from 'emoji-datasource-apple/img/apple/64/1f482-1f3fc.png';
+import s1f4821f3fd from 'emoji-datasource-apple/img/apple/64/1f482-1f3fd.png';
+import s1f4821f3fe from 'emoji-datasource-apple/img/apple/64/1f482-1f3fe.png';
+import s1f4821f3ff from 'emoji-datasource-apple/img/apple/64/1f482-1f3ff.png';
 import s1f483 from 'emoji-datasource-apple/img/apple/64/1f483.png';
+import s1f4831f3fb from 'emoji-datasource-apple/img/apple/64/1f483-1f3fb.png';
+import s1f4831f3fc from 'emoji-datasource-apple/img/apple/64/1f483-1f3fc.png';
+import s1f4831f3fd from 'emoji-datasource-apple/img/apple/64/1f483-1f3fd.png';
+import s1f4831f3fe from 'emoji-datasource-apple/img/apple/64/1f483-1f3fe.png';
+import s1f4831f3ff from 'emoji-datasource-apple/img/apple/64/1f483-1f3ff.png';
 import s1f484 from 'emoji-datasource-apple/img/apple/64/1f484.png';
 import s1f485 from 'emoji-datasource-apple/img/apple/64/1f485.png';
+import s1f4851f3fb from 'emoji-datasource-apple/img/apple/64/1f485-1f3fb.png';
+import s1f4851f3fc from 'emoji-datasource-apple/img/apple/64/1f485-1f3fc.png';
+import s1f4851f3fd from 'emoji-datasource-apple/img/apple/64/1f485-1f3fd.png';
+import s1f4851f3fe from 'emoji-datasource-apple/img/apple/64/1f485-1f3fe.png';
+import s1f4851f3ff from 'emoji-datasource-apple/img/apple/64/1f485-1f3ff.png';
 import s1f486200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f486-200d-2640-fe0f.png';
+import s1f4861f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fb-200d-2640-fe0f.png';
+import s1f4861f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fc-200d-2640-fe0f.png';
+import s1f4861f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fd-200d-2640-fe0f.png';
+import s1f4861f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fe-200d-2640-fe0f.png';
+import s1f4861f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3ff-200d-2640-fe0f.png';
 import s1f486200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f486-200d-2642-fe0f.png';
+import s1f4861f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fb-200d-2642-fe0f.png';
+import s1f4861f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fc-200d-2642-fe0f.png';
+import s1f4861f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fd-200d-2642-fe0f.png';
+import s1f4861f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3fe-200d-2642-fe0f.png';
+import s1f4861f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f486-1f3ff-200d-2642-fe0f.png';
 import s1f486 from 'emoji-datasource-apple/img/apple/64/1f486.png';
+import s1f4861f3fb from 'emoji-datasource-apple/img/apple/64/1f486-1f3fb.png';
+import s1f4861f3fc from 'emoji-datasource-apple/img/apple/64/1f486-1f3fc.png';
+import s1f4861f3fd from 'emoji-datasource-apple/img/apple/64/1f486-1f3fd.png';
+import s1f4861f3fe from 'emoji-datasource-apple/img/apple/64/1f486-1f3fe.png';
+import s1f4861f3ff from 'emoji-datasource-apple/img/apple/64/1f486-1f3ff.png';
 import s1f487200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f487-200d-2640-fe0f.png';
+import s1f4871f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fb-200d-2640-fe0f.png';
+import s1f4871f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fc-200d-2640-fe0f.png';
+import s1f4871f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fd-200d-2640-fe0f.png';
+import s1f4871f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fe-200d-2640-fe0f.png';
+import s1f4871f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3ff-200d-2640-fe0f.png';
 import s1f487200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f487-200d-2642-fe0f.png';
+import s1f4871f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fb-200d-2642-fe0f.png';
+import s1f4871f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fc-200d-2642-fe0f.png';
+import s1f4871f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fd-200d-2642-fe0f.png';
+import s1f4871f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3fe-200d-2642-fe0f.png';
+import s1f4871f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f487-1f3ff-200d-2642-fe0f.png';
 import s1f487 from 'emoji-datasource-apple/img/apple/64/1f487.png';
+import s1f4871f3fb from 'emoji-datasource-apple/img/apple/64/1f487-1f3fb.png';
+import s1f4871f3fc from 'emoji-datasource-apple/img/apple/64/1f487-1f3fc.png';
+import s1f4871f3fd from 'emoji-datasource-apple/img/apple/64/1f487-1f3fd.png';
+import s1f4871f3fe from 'emoji-datasource-apple/img/apple/64/1f487-1f3fe.png';
+import s1f4871f3ff from 'emoji-datasource-apple/img/apple/64/1f487-1f3ff.png';
 import s1f488 from 'emoji-datasource-apple/img/apple/64/1f488.png';
 import s1f489 from 'emoji-datasource-apple/img/apple/64/1f489.png';
 import s1f48a from 'emoji-datasource-apple/img/apple/64/1f48a.png';
@@ -812,8 +1627,58 @@ import s1f48c from 'emoji-datasource-apple/img/apple/64/1f48c.png';
 import s1f48d from 'emoji-datasource-apple/img/apple/64/1f48d.png';
 import s1f48e from 'emoji-datasource-apple/img/apple/64/1f48e.png';
 import s1f48f from 'emoji-datasource-apple/img/apple/64/1f48f.png';
+import s1f48f1f3fb from 'emoji-datasource-apple/img/apple/64/1f48f-1f3fb.png';
+import s1f48f1f3fc from 'emoji-datasource-apple/img/apple/64/1f48f-1f3fc.png';
+import s1f48f1f3fd from 'emoji-datasource-apple/img/apple/64/1f48f-1f3fd.png';
+import s1f48f1f3fe from 'emoji-datasource-apple/img/apple/64/1f48f-1f3fe.png';
+import s1f48f1f3ff from 'emoji-datasource-apple/img/apple/64/1f48f-1f3ff.png';
+import s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3ff.png';
+import s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fb.png';
+import s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fc.png';
+import s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fd.png';
+import s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f48b-200d-1f9d1-1f3fe.png';
 import s1f490 from 'emoji-datasource-apple/img/apple/64/1f490.png';
 import s1f491 from 'emoji-datasource-apple/img/apple/64/1f491.png';
+import s1f4911f3fb from 'emoji-datasource-apple/img/apple/64/1f491-1f3fb.png';
+import s1f4911f3fc from 'emoji-datasource-apple/img/apple/64/1f491-1f3fc.png';
+import s1f4911f3fd from 'emoji-datasource-apple/img/apple/64/1f491-1f3fd.png';
+import s1f4911f3fe from 'emoji-datasource-apple/img/apple/64/1f491-1f3fe.png';
+import s1f4911f3ff from 'emoji-datasource-apple/img/apple/64/1f491-1f3ff.png';
+import s1f9d11f3fb200d2764fe0f200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fb200d2764fe0f200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fb200d2764fe0f200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fb200d2764fe0f200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2764-fe0f-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fc200d2764fe0f200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fc200d2764fe0f200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fc200d2764fe0f200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fc200d2764fe0f200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2764-fe0f-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fd200d2764fe0f200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fd200d2764fe0f200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fd200d2764fe0f200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fd200d2764fe0f200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2764-fe0f-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fe200d2764fe0f200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fe200d2764fe0f200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fe200d2764fe0f200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fe200d2764fe0f200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2764-fe0f-200d-1f9d1-1f3ff.png';
+import s1f9d11f3ff200d2764fe0f200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f9d1-1f3fb.png';
+import s1f9d11f3ff200d2764fe0f200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f9d1-1f3fc.png';
+import s1f9d11f3ff200d2764fe0f200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f9d1-1f3fd.png';
+import s1f9d11f3ff200d2764fe0f200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2764-fe0f-200d-1f9d1-1f3fe.png';
 import s1f492 from 'emoji-datasource-apple/img/apple/64/1f492.png';
 import s1f493 from 'emoji-datasource-apple/img/apple/64/1f493.png';
 import s1f494 from 'emoji-datasource-apple/img/apple/64/1f494.png';
@@ -839,6 +1704,11 @@ import s1f4a7 from 'emoji-datasource-apple/img/apple/64/1f4a7.png';
 import s1f4a8 from 'emoji-datasource-apple/img/apple/64/1f4a8.png';
 import s1f4a9 from 'emoji-datasource-apple/img/apple/64/1f4a9.png';
 import s1f4aa from 'emoji-datasource-apple/img/apple/64/1f4aa.png';
+import s1f4aa1f3fb from 'emoji-datasource-apple/img/apple/64/1f4aa-1f3fb.png';
+import s1f4aa1f3fc from 'emoji-datasource-apple/img/apple/64/1f4aa-1f3fc.png';
+import s1f4aa1f3fd from 'emoji-datasource-apple/img/apple/64/1f4aa-1f3fd.png';
+import s1f4aa1f3fe from 'emoji-datasource-apple/img/apple/64/1f4aa-1f3fe.png';
+import s1f4aa1f3ff from 'emoji-datasource-apple/img/apple/64/1f4aa-1f3ff.png';
 import s1f4ab from 'emoji-datasource-apple/img/apple/64/1f4ab.png';
 import s1f4ac from 'emoji-datasource-apple/img/apple/64/1f4ac.png';
 import s1f4ad from 'emoji-datasource-apple/img/apple/64/1f4ad.png';
@@ -1019,22 +1889,62 @@ import s1f56ffe0f from 'emoji-datasource-apple/img/apple/64/1f56f-fe0f.png';
 import s1f570fe0f from 'emoji-datasource-apple/img/apple/64/1f570-fe0f.png';
 import s1f573fe0f from 'emoji-datasource-apple/img/apple/64/1f573-fe0f.png';
 import s1f574fe0f from 'emoji-datasource-apple/img/apple/64/1f574-fe0f.png';
+import s1f5741f3fb from 'emoji-datasource-apple/img/apple/64/1f574-1f3fb.png';
+import s1f5741f3fc from 'emoji-datasource-apple/img/apple/64/1f574-1f3fc.png';
+import s1f5741f3fd from 'emoji-datasource-apple/img/apple/64/1f574-1f3fd.png';
+import s1f5741f3fe from 'emoji-datasource-apple/img/apple/64/1f574-1f3fe.png';
+import s1f5741f3ff from 'emoji-datasource-apple/img/apple/64/1f574-1f3ff.png';
 import s1f575fe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f575-fe0f-200d-2640-fe0f.png';
+import s1f5751f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fb-200d-2640-fe0f.png';
+import s1f5751f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fc-200d-2640-fe0f.png';
+import s1f5751f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fd-200d-2640-fe0f.png';
+import s1f5751f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fe-200d-2640-fe0f.png';
+import s1f5751f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3ff-200d-2640-fe0f.png';
 import s1f575fe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f575-fe0f-200d-2642-fe0f.png';
+import s1f5751f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fb-200d-2642-fe0f.png';
+import s1f5751f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fc-200d-2642-fe0f.png';
+import s1f5751f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fd-200d-2642-fe0f.png';
+import s1f5751f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3fe-200d-2642-fe0f.png';
+import s1f5751f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f575-1f3ff-200d-2642-fe0f.png';
 import s1f575fe0f from 'emoji-datasource-apple/img/apple/64/1f575-fe0f.png';
+import s1f5751f3fb from 'emoji-datasource-apple/img/apple/64/1f575-1f3fb.png';
+import s1f5751f3fc from 'emoji-datasource-apple/img/apple/64/1f575-1f3fc.png';
+import s1f5751f3fd from 'emoji-datasource-apple/img/apple/64/1f575-1f3fd.png';
+import s1f5751f3fe from 'emoji-datasource-apple/img/apple/64/1f575-1f3fe.png';
+import s1f5751f3ff from 'emoji-datasource-apple/img/apple/64/1f575-1f3ff.png';
 import s1f576fe0f from 'emoji-datasource-apple/img/apple/64/1f576-fe0f.png';
 import s1f577fe0f from 'emoji-datasource-apple/img/apple/64/1f577-fe0f.png';
 import s1f578fe0f from 'emoji-datasource-apple/img/apple/64/1f578-fe0f.png';
 import s1f579fe0f from 'emoji-datasource-apple/img/apple/64/1f579-fe0f.png';
 import s1f57a from 'emoji-datasource-apple/img/apple/64/1f57a.png';
+import s1f57a1f3fb from 'emoji-datasource-apple/img/apple/64/1f57a-1f3fb.png';
+import s1f57a1f3fc from 'emoji-datasource-apple/img/apple/64/1f57a-1f3fc.png';
+import s1f57a1f3fd from 'emoji-datasource-apple/img/apple/64/1f57a-1f3fd.png';
+import s1f57a1f3fe from 'emoji-datasource-apple/img/apple/64/1f57a-1f3fe.png';
+import s1f57a1f3ff from 'emoji-datasource-apple/img/apple/64/1f57a-1f3ff.png';
 import s1f587fe0f from 'emoji-datasource-apple/img/apple/64/1f587-fe0f.png';
 import s1f58afe0f from 'emoji-datasource-apple/img/apple/64/1f58a-fe0f.png';
 import s1f58bfe0f from 'emoji-datasource-apple/img/apple/64/1f58b-fe0f.png';
 import s1f58cfe0f from 'emoji-datasource-apple/img/apple/64/1f58c-fe0f.png';
 import s1f58dfe0f from 'emoji-datasource-apple/img/apple/64/1f58d-fe0f.png';
 import s1f590fe0f from 'emoji-datasource-apple/img/apple/64/1f590-fe0f.png';
+import s1f5901f3fb from 'emoji-datasource-apple/img/apple/64/1f590-1f3fb.png';
+import s1f5901f3fc from 'emoji-datasource-apple/img/apple/64/1f590-1f3fc.png';
+import s1f5901f3fd from 'emoji-datasource-apple/img/apple/64/1f590-1f3fd.png';
+import s1f5901f3fe from 'emoji-datasource-apple/img/apple/64/1f590-1f3fe.png';
+import s1f5901f3ff from 'emoji-datasource-apple/img/apple/64/1f590-1f3ff.png';
 import s1f595 from 'emoji-datasource-apple/img/apple/64/1f595.png';
+import s1f5951f3fb from 'emoji-datasource-apple/img/apple/64/1f595-1f3fb.png';
+import s1f5951f3fc from 'emoji-datasource-apple/img/apple/64/1f595-1f3fc.png';
+import s1f5951f3fd from 'emoji-datasource-apple/img/apple/64/1f595-1f3fd.png';
+import s1f5951f3fe from 'emoji-datasource-apple/img/apple/64/1f595-1f3fe.png';
+import s1f5951f3ff from 'emoji-datasource-apple/img/apple/64/1f595-1f3ff.png';
 import s1f596 from 'emoji-datasource-apple/img/apple/64/1f596.png';
+import s1f5961f3fb from 'emoji-datasource-apple/img/apple/64/1f596-1f3fb.png';
+import s1f5961f3fc from 'emoji-datasource-apple/img/apple/64/1f596-1f3fc.png';
+import s1f5961f3fd from 'emoji-datasource-apple/img/apple/64/1f596-1f3fd.png';
+import s1f5961f3fe from 'emoji-datasource-apple/img/apple/64/1f596-1f3fe.png';
+import s1f5961f3ff from 'emoji-datasource-apple/img/apple/64/1f596-1f3ff.png';
 import s1f5a4 from 'emoji-datasource-apple/img/apple/64/1f5a4.png';
 import s1f5a5fe0f from 'emoji-datasource-apple/img/apple/64/1f5a5-fe0f.png';
 import s1f5a8fe0f from 'emoji-datasource-apple/img/apple/64/1f5a8-fe0f.png';
@@ -1134,28 +2044,128 @@ import s1f642 from 'emoji-datasource-apple/img/apple/64/1f642.png';
 import s1f643 from 'emoji-datasource-apple/img/apple/64/1f643.png';
 import s1f644 from 'emoji-datasource-apple/img/apple/64/1f644.png';
 import s1f645200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f645-200d-2640-fe0f.png';
+import s1f6451f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fb-200d-2640-fe0f.png';
+import s1f6451f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fc-200d-2640-fe0f.png';
+import s1f6451f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fd-200d-2640-fe0f.png';
+import s1f6451f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fe-200d-2640-fe0f.png';
+import s1f6451f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3ff-200d-2640-fe0f.png';
 import s1f645200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f645-200d-2642-fe0f.png';
+import s1f6451f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fb-200d-2642-fe0f.png';
+import s1f6451f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fc-200d-2642-fe0f.png';
+import s1f6451f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fd-200d-2642-fe0f.png';
+import s1f6451f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3fe-200d-2642-fe0f.png';
+import s1f6451f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f645-1f3ff-200d-2642-fe0f.png';
 import s1f645 from 'emoji-datasource-apple/img/apple/64/1f645.png';
+import s1f6451f3fb from 'emoji-datasource-apple/img/apple/64/1f645-1f3fb.png';
+import s1f6451f3fc from 'emoji-datasource-apple/img/apple/64/1f645-1f3fc.png';
+import s1f6451f3fd from 'emoji-datasource-apple/img/apple/64/1f645-1f3fd.png';
+import s1f6451f3fe from 'emoji-datasource-apple/img/apple/64/1f645-1f3fe.png';
+import s1f6451f3ff from 'emoji-datasource-apple/img/apple/64/1f645-1f3ff.png';
 import s1f646200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f646-200d-2640-fe0f.png';
+import s1f6461f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fb-200d-2640-fe0f.png';
+import s1f6461f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fc-200d-2640-fe0f.png';
+import s1f6461f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fd-200d-2640-fe0f.png';
+import s1f6461f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fe-200d-2640-fe0f.png';
+import s1f6461f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3ff-200d-2640-fe0f.png';
 import s1f646200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f646-200d-2642-fe0f.png';
+import s1f6461f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fb-200d-2642-fe0f.png';
+import s1f6461f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fc-200d-2642-fe0f.png';
+import s1f6461f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fd-200d-2642-fe0f.png';
+import s1f6461f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3fe-200d-2642-fe0f.png';
+import s1f6461f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f646-1f3ff-200d-2642-fe0f.png';
 import s1f646 from 'emoji-datasource-apple/img/apple/64/1f646.png';
+import s1f6461f3fb from 'emoji-datasource-apple/img/apple/64/1f646-1f3fb.png';
+import s1f6461f3fc from 'emoji-datasource-apple/img/apple/64/1f646-1f3fc.png';
+import s1f6461f3fd from 'emoji-datasource-apple/img/apple/64/1f646-1f3fd.png';
+import s1f6461f3fe from 'emoji-datasource-apple/img/apple/64/1f646-1f3fe.png';
+import s1f6461f3ff from 'emoji-datasource-apple/img/apple/64/1f646-1f3ff.png';
 import s1f647200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f647-200d-2640-fe0f.png';
+import s1f6471f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fb-200d-2640-fe0f.png';
+import s1f6471f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fc-200d-2640-fe0f.png';
+import s1f6471f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fd-200d-2640-fe0f.png';
+import s1f6471f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fe-200d-2640-fe0f.png';
+import s1f6471f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3ff-200d-2640-fe0f.png';
 import s1f647200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f647-200d-2642-fe0f.png';
+import s1f6471f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fb-200d-2642-fe0f.png';
+import s1f6471f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fc-200d-2642-fe0f.png';
+import s1f6471f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fd-200d-2642-fe0f.png';
+import s1f6471f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3fe-200d-2642-fe0f.png';
+import s1f6471f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f647-1f3ff-200d-2642-fe0f.png';
 import s1f647 from 'emoji-datasource-apple/img/apple/64/1f647.png';
+import s1f6471f3fb from 'emoji-datasource-apple/img/apple/64/1f647-1f3fb.png';
+import s1f6471f3fc from 'emoji-datasource-apple/img/apple/64/1f647-1f3fc.png';
+import s1f6471f3fd from 'emoji-datasource-apple/img/apple/64/1f647-1f3fd.png';
+import s1f6471f3fe from 'emoji-datasource-apple/img/apple/64/1f647-1f3fe.png';
+import s1f6471f3ff from 'emoji-datasource-apple/img/apple/64/1f647-1f3ff.png';
 import s1f648 from 'emoji-datasource-apple/img/apple/64/1f648.png';
 import s1f649 from 'emoji-datasource-apple/img/apple/64/1f649.png';
 import s1f64a from 'emoji-datasource-apple/img/apple/64/1f64a.png';
 import s1f64b200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-200d-2640-fe0f.png';
+import s1f64b1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fb-200d-2640-fe0f.png';
+import s1f64b1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fc-200d-2640-fe0f.png';
+import s1f64b1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fd-200d-2640-fe0f.png';
+import s1f64b1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fe-200d-2640-fe0f.png';
+import s1f64b1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3ff-200d-2640-fe0f.png';
 import s1f64b200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-200d-2642-fe0f.png';
+import s1f64b1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fb-200d-2642-fe0f.png';
+import s1f64b1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fc-200d-2642-fe0f.png';
+import s1f64b1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fd-200d-2642-fe0f.png';
+import s1f64b1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fe-200d-2642-fe0f.png';
+import s1f64b1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64b-1f3ff-200d-2642-fe0f.png';
 import s1f64b from 'emoji-datasource-apple/img/apple/64/1f64b.png';
+import s1f64b1f3fb from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fb.png';
+import s1f64b1f3fc from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fc.png';
+import s1f64b1f3fd from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fd.png';
+import s1f64b1f3fe from 'emoji-datasource-apple/img/apple/64/1f64b-1f3fe.png';
+import s1f64b1f3ff from 'emoji-datasource-apple/img/apple/64/1f64b-1f3ff.png';
 import s1f64c from 'emoji-datasource-apple/img/apple/64/1f64c.png';
+import s1f64c1f3fb from 'emoji-datasource-apple/img/apple/64/1f64c-1f3fb.png';
+import s1f64c1f3fc from 'emoji-datasource-apple/img/apple/64/1f64c-1f3fc.png';
+import s1f64c1f3fd from 'emoji-datasource-apple/img/apple/64/1f64c-1f3fd.png';
+import s1f64c1f3fe from 'emoji-datasource-apple/img/apple/64/1f64c-1f3fe.png';
+import s1f64c1f3ff from 'emoji-datasource-apple/img/apple/64/1f64c-1f3ff.png';
 import s1f64d200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-200d-2640-fe0f.png';
+import s1f64d1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fb-200d-2640-fe0f.png';
+import s1f64d1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fc-200d-2640-fe0f.png';
+import s1f64d1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fd-200d-2640-fe0f.png';
+import s1f64d1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fe-200d-2640-fe0f.png';
+import s1f64d1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3ff-200d-2640-fe0f.png';
 import s1f64d200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-200d-2642-fe0f.png';
+import s1f64d1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fb-200d-2642-fe0f.png';
+import s1f64d1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fc-200d-2642-fe0f.png';
+import s1f64d1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fd-200d-2642-fe0f.png';
+import s1f64d1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fe-200d-2642-fe0f.png';
+import s1f64d1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64d-1f3ff-200d-2642-fe0f.png';
 import s1f64d from 'emoji-datasource-apple/img/apple/64/1f64d.png';
+import s1f64d1f3fb from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fb.png';
+import s1f64d1f3fc from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fc.png';
+import s1f64d1f3fd from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fd.png';
+import s1f64d1f3fe from 'emoji-datasource-apple/img/apple/64/1f64d-1f3fe.png';
+import s1f64d1f3ff from 'emoji-datasource-apple/img/apple/64/1f64d-1f3ff.png';
 import s1f64e200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-200d-2640-fe0f.png';
+import s1f64e1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fb-200d-2640-fe0f.png';
+import s1f64e1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fc-200d-2640-fe0f.png';
+import s1f64e1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fd-200d-2640-fe0f.png';
+import s1f64e1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fe-200d-2640-fe0f.png';
+import s1f64e1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3ff-200d-2640-fe0f.png';
 import s1f64e200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-200d-2642-fe0f.png';
+import s1f64e1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fb-200d-2642-fe0f.png';
+import s1f64e1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fc-200d-2642-fe0f.png';
+import s1f64e1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fd-200d-2642-fe0f.png';
+import s1f64e1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fe-200d-2642-fe0f.png';
+import s1f64e1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f64e-1f3ff-200d-2642-fe0f.png';
 import s1f64e from 'emoji-datasource-apple/img/apple/64/1f64e.png';
+import s1f64e1f3fb from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fb.png';
+import s1f64e1f3fc from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fc.png';
+import s1f64e1f3fd from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fd.png';
+import s1f64e1f3fe from 'emoji-datasource-apple/img/apple/64/1f64e-1f3fe.png';
+import s1f64e1f3ff from 'emoji-datasource-apple/img/apple/64/1f64e-1f3ff.png';
 import s1f64f from 'emoji-datasource-apple/img/apple/64/1f64f.png';
+import s1f64f1f3fb from 'emoji-datasource-apple/img/apple/64/1f64f-1f3fb.png';
+import s1f64f1f3fc from 'emoji-datasource-apple/img/apple/64/1f64f-1f3fc.png';
+import s1f64f1f3fd from 'emoji-datasource-apple/img/apple/64/1f64f-1f3fd.png';
+import s1f64f1f3fe from 'emoji-datasource-apple/img/apple/64/1f64f-1f3fe.png';
+import s1f64f1f3ff from 'emoji-datasource-apple/img/apple/64/1f64f-1f3ff.png';
 import s1f680 from 'emoji-datasource-apple/img/apple/64/1f680.png';
 import s1f681 from 'emoji-datasource-apple/img/apple/64/1f681.png';
 import s1f682 from 'emoji-datasource-apple/img/apple/64/1f682.png';
@@ -1192,8 +2202,23 @@ import s1f6a0 from 'emoji-datasource-apple/img/apple/64/1f6a0.png';
 import s1f6a1 from 'emoji-datasource-apple/img/apple/64/1f6a1.png';
 import s1f6a2 from 'emoji-datasource-apple/img/apple/64/1f6a2.png';
 import s1f6a3200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-200d-2640-fe0f.png';
+import s1f6a31f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fb-200d-2640-fe0f.png';
+import s1f6a31f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fc-200d-2640-fe0f.png';
+import s1f6a31f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fd-200d-2640-fe0f.png';
+import s1f6a31f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fe-200d-2640-fe0f.png';
+import s1f6a31f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3ff-200d-2640-fe0f.png';
 import s1f6a3200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-200d-2642-fe0f.png';
+import s1f6a31f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fb-200d-2642-fe0f.png';
+import s1f6a31f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fc-200d-2642-fe0f.png';
+import s1f6a31f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fd-200d-2642-fe0f.png';
+import s1f6a31f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fe-200d-2642-fe0f.png';
+import s1f6a31f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3ff-200d-2642-fe0f.png';
 import s1f6a3 from 'emoji-datasource-apple/img/apple/64/1f6a3.png';
+import s1f6a31f3fb from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fb.png';
+import s1f6a31f3fc from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fc.png';
+import s1f6a31f3fd from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fd.png';
+import s1f6a31f3fe from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3fe.png';
+import s1f6a31f3ff from 'emoji-datasource-apple/img/apple/64/1f6a3-1f3ff.png';
 import s1f6a4 from 'emoji-datasource-apple/img/apple/64/1f6a4.png';
 import s1f6a5 from 'emoji-datasource-apple/img/apple/64/1f6a5.png';
 import s1f6a6 from 'emoji-datasource-apple/img/apple/64/1f6a6.png';
@@ -1211,14 +2236,59 @@ import s1f6b1 from 'emoji-datasource-apple/img/apple/64/1f6b1.png';
 import s1f6b2 from 'emoji-datasource-apple/img/apple/64/1f6b2.png';
 import s1f6b3 from 'emoji-datasource-apple/img/apple/64/1f6b3.png';
 import s1f6b4200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-200d-2640-fe0f.png';
+import s1f6b41f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fb-200d-2640-fe0f.png';
+import s1f6b41f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fc-200d-2640-fe0f.png';
+import s1f6b41f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fd-200d-2640-fe0f.png';
+import s1f6b41f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fe-200d-2640-fe0f.png';
+import s1f6b41f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3ff-200d-2640-fe0f.png';
 import s1f6b4200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-200d-2642-fe0f.png';
+import s1f6b41f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fb-200d-2642-fe0f.png';
+import s1f6b41f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fc-200d-2642-fe0f.png';
+import s1f6b41f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fd-200d-2642-fe0f.png';
+import s1f6b41f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fe-200d-2642-fe0f.png';
+import s1f6b41f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3ff-200d-2642-fe0f.png';
 import s1f6b4 from 'emoji-datasource-apple/img/apple/64/1f6b4.png';
+import s1f6b41f3fb from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fb.png';
+import s1f6b41f3fc from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fc.png';
+import s1f6b41f3fd from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fd.png';
+import s1f6b41f3fe from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3fe.png';
+import s1f6b41f3ff from 'emoji-datasource-apple/img/apple/64/1f6b4-1f3ff.png';
 import s1f6b5200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-200d-2640-fe0f.png';
+import s1f6b51f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fb-200d-2640-fe0f.png';
+import s1f6b51f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fc-200d-2640-fe0f.png';
+import s1f6b51f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fd-200d-2640-fe0f.png';
+import s1f6b51f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fe-200d-2640-fe0f.png';
+import s1f6b51f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3ff-200d-2640-fe0f.png';
 import s1f6b5200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-200d-2642-fe0f.png';
+import s1f6b51f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fb-200d-2642-fe0f.png';
+import s1f6b51f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fc-200d-2642-fe0f.png';
+import s1f6b51f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fd-200d-2642-fe0f.png';
+import s1f6b51f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fe-200d-2642-fe0f.png';
+import s1f6b51f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3ff-200d-2642-fe0f.png';
 import s1f6b5 from 'emoji-datasource-apple/img/apple/64/1f6b5.png';
+import s1f6b51f3fb from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fb.png';
+import s1f6b51f3fc from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fc.png';
+import s1f6b51f3fd from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fd.png';
+import s1f6b51f3fe from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3fe.png';
+import s1f6b51f3ff from 'emoji-datasource-apple/img/apple/64/1f6b5-1f3ff.png';
 import s1f6b6200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-200d-2640-fe0f.png';
+import s1f6b61f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fb-200d-2640-fe0f.png';
+import s1f6b61f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fc-200d-2640-fe0f.png';
+import s1f6b61f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fd-200d-2640-fe0f.png';
+import s1f6b61f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fe-200d-2640-fe0f.png';
+import s1f6b61f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3ff-200d-2640-fe0f.png';
 import s1f6b6200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-200d-2642-fe0f.png';
+import s1f6b61f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fb-200d-2642-fe0f.png';
+import s1f6b61f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fc-200d-2642-fe0f.png';
+import s1f6b61f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fd-200d-2642-fe0f.png';
+import s1f6b61f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fe-200d-2642-fe0f.png';
+import s1f6b61f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3ff-200d-2642-fe0f.png';
 import s1f6b6 from 'emoji-datasource-apple/img/apple/64/1f6b6.png';
+import s1f6b61f3fb from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fb.png';
+import s1f6b61f3fc from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fc.png';
+import s1f6b61f3fd from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fd.png';
+import s1f6b61f3fe from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3fe.png';
+import s1f6b61f3ff from 'emoji-datasource-apple/img/apple/64/1f6b6-1f3ff.png';
 import s1f6b7 from 'emoji-datasource-apple/img/apple/64/1f6b7.png';
 import s1f6b8 from 'emoji-datasource-apple/img/apple/64/1f6b8.png';
 import s1f6b9 from 'emoji-datasource-apple/img/apple/64/1f6b9.png';
@@ -1229,6 +2299,11 @@ import s1f6bd from 'emoji-datasource-apple/img/apple/64/1f6bd.png';
 import s1f6be from 'emoji-datasource-apple/img/apple/64/1f6be.png';
 import s1f6bf from 'emoji-datasource-apple/img/apple/64/1f6bf.png';
 import s1f6c0 from 'emoji-datasource-apple/img/apple/64/1f6c0.png';
+import s1f6c01f3fb from 'emoji-datasource-apple/img/apple/64/1f6c0-1f3fb.png';
+import s1f6c01f3fc from 'emoji-datasource-apple/img/apple/64/1f6c0-1f3fc.png';
+import s1f6c01f3fd from 'emoji-datasource-apple/img/apple/64/1f6c0-1f3fd.png';
+import s1f6c01f3fe from 'emoji-datasource-apple/img/apple/64/1f6c0-1f3fe.png';
+import s1f6c01f3ff from 'emoji-datasource-apple/img/apple/64/1f6c0-1f3ff.png';
 import s1f6c1 from 'emoji-datasource-apple/img/apple/64/1f6c1.png';
 import s1f6c2 from 'emoji-datasource-apple/img/apple/64/1f6c2.png';
 import s1f6c3 from 'emoji-datasource-apple/img/apple/64/1f6c3.png';
@@ -1236,6 +2311,11 @@ import s1f6c4 from 'emoji-datasource-apple/img/apple/64/1f6c4.png';
 import s1f6c5 from 'emoji-datasource-apple/img/apple/64/1f6c5.png';
 import s1f6cbfe0f from 'emoji-datasource-apple/img/apple/64/1f6cb-fe0f.png';
 import s1f6cc from 'emoji-datasource-apple/img/apple/64/1f6cc.png';
+import s1f6cc1f3fb from 'emoji-datasource-apple/img/apple/64/1f6cc-1f3fb.png';
+import s1f6cc1f3fc from 'emoji-datasource-apple/img/apple/64/1f6cc-1f3fc.png';
+import s1f6cc1f3fd from 'emoji-datasource-apple/img/apple/64/1f6cc-1f3fd.png';
+import s1f6cc1f3fe from 'emoji-datasource-apple/img/apple/64/1f6cc-1f3fe.png';
+import s1f6cc1f3ff from 'emoji-datasource-apple/img/apple/64/1f6cc-1f3ff.png';
 import s1f6cdfe0f from 'emoji-datasource-apple/img/apple/64/1f6cd-fe0f.png';
 import s1f6cefe0f from 'emoji-datasource-apple/img/apple/64/1f6ce-fe0f.png';
 import s1f6cffe0f from 'emoji-datasource-apple/img/apple/64/1f6cf-fe0f.png';
@@ -1278,9 +2358,19 @@ import s1f7e9 from 'emoji-datasource-apple/img/apple/64/1f7e9.png';
 import s1f7ea from 'emoji-datasource-apple/img/apple/64/1f7ea.png';
 import s1f7eb from 'emoji-datasource-apple/img/apple/64/1f7eb.png';
 import s1f90c from 'emoji-datasource-apple/img/apple/64/1f90c.png';
+import s1f90c1f3fb from 'emoji-datasource-apple/img/apple/64/1f90c-1f3fb.png';
+import s1f90c1f3fc from 'emoji-datasource-apple/img/apple/64/1f90c-1f3fc.png';
+import s1f90c1f3fd from 'emoji-datasource-apple/img/apple/64/1f90c-1f3fd.png';
+import s1f90c1f3fe from 'emoji-datasource-apple/img/apple/64/1f90c-1f3fe.png';
+import s1f90c1f3ff from 'emoji-datasource-apple/img/apple/64/1f90c-1f3ff.png';
 import s1f90d from 'emoji-datasource-apple/img/apple/64/1f90d.png';
 import s1f90e from 'emoji-datasource-apple/img/apple/64/1f90e.png';
 import s1f90f from 'emoji-datasource-apple/img/apple/64/1f90f.png';
+import s1f90f1f3fb from 'emoji-datasource-apple/img/apple/64/1f90f-1f3fb.png';
+import s1f90f1f3fc from 'emoji-datasource-apple/img/apple/64/1f90f-1f3fc.png';
+import s1f90f1f3fd from 'emoji-datasource-apple/img/apple/64/1f90f-1f3fd.png';
+import s1f90f1f3fe from 'emoji-datasource-apple/img/apple/64/1f90f-1f3fe.png';
+import s1f90f1f3ff from 'emoji-datasource-apple/img/apple/64/1f90f-1f3ff.png';
 import s1f910 from 'emoji-datasource-apple/img/apple/64/1f910.png';
 import s1f911 from 'emoji-datasource-apple/img/apple/64/1f911.png';
 import s1f912 from 'emoji-datasource-apple/img/apple/64/1f912.png';
@@ -1290,13 +2380,48 @@ import s1f915 from 'emoji-datasource-apple/img/apple/64/1f915.png';
 import s1f916 from 'emoji-datasource-apple/img/apple/64/1f916.png';
 import s1f917 from 'emoji-datasource-apple/img/apple/64/1f917.png';
 import s1f918 from 'emoji-datasource-apple/img/apple/64/1f918.png';
+import s1f9181f3fb from 'emoji-datasource-apple/img/apple/64/1f918-1f3fb.png';
+import s1f9181f3fc from 'emoji-datasource-apple/img/apple/64/1f918-1f3fc.png';
+import s1f9181f3fd from 'emoji-datasource-apple/img/apple/64/1f918-1f3fd.png';
+import s1f9181f3fe from 'emoji-datasource-apple/img/apple/64/1f918-1f3fe.png';
+import s1f9181f3ff from 'emoji-datasource-apple/img/apple/64/1f918-1f3ff.png';
 import s1f919 from 'emoji-datasource-apple/img/apple/64/1f919.png';
+import s1f9191f3fb from 'emoji-datasource-apple/img/apple/64/1f919-1f3fb.png';
+import s1f9191f3fc from 'emoji-datasource-apple/img/apple/64/1f919-1f3fc.png';
+import s1f9191f3fd from 'emoji-datasource-apple/img/apple/64/1f919-1f3fd.png';
+import s1f9191f3fe from 'emoji-datasource-apple/img/apple/64/1f919-1f3fe.png';
+import s1f9191f3ff from 'emoji-datasource-apple/img/apple/64/1f919-1f3ff.png';
 import s1f91a from 'emoji-datasource-apple/img/apple/64/1f91a.png';
+import s1f91a1f3fb from 'emoji-datasource-apple/img/apple/64/1f91a-1f3fb.png';
+import s1f91a1f3fc from 'emoji-datasource-apple/img/apple/64/1f91a-1f3fc.png';
+import s1f91a1f3fd from 'emoji-datasource-apple/img/apple/64/1f91a-1f3fd.png';
+import s1f91a1f3fe from 'emoji-datasource-apple/img/apple/64/1f91a-1f3fe.png';
+import s1f91a1f3ff from 'emoji-datasource-apple/img/apple/64/1f91a-1f3ff.png';
 import s1f91b from 'emoji-datasource-apple/img/apple/64/1f91b.png';
+import s1f91b1f3fb from 'emoji-datasource-apple/img/apple/64/1f91b-1f3fb.png';
+import s1f91b1f3fc from 'emoji-datasource-apple/img/apple/64/1f91b-1f3fc.png';
+import s1f91b1f3fd from 'emoji-datasource-apple/img/apple/64/1f91b-1f3fd.png';
+import s1f91b1f3fe from 'emoji-datasource-apple/img/apple/64/1f91b-1f3fe.png';
+import s1f91b1f3ff from 'emoji-datasource-apple/img/apple/64/1f91b-1f3ff.png';
 import s1f91c from 'emoji-datasource-apple/img/apple/64/1f91c.png';
+import s1f91c1f3fb from 'emoji-datasource-apple/img/apple/64/1f91c-1f3fb.png';
+import s1f91c1f3fc from 'emoji-datasource-apple/img/apple/64/1f91c-1f3fc.png';
+import s1f91c1f3fd from 'emoji-datasource-apple/img/apple/64/1f91c-1f3fd.png';
+import s1f91c1f3fe from 'emoji-datasource-apple/img/apple/64/1f91c-1f3fe.png';
+import s1f91c1f3ff from 'emoji-datasource-apple/img/apple/64/1f91c-1f3ff.png';
 import s1f91d from 'emoji-datasource-apple/img/apple/64/1f91d.png';
 import s1f91e from 'emoji-datasource-apple/img/apple/64/1f91e.png';
+import s1f91e1f3fb from 'emoji-datasource-apple/img/apple/64/1f91e-1f3fb.png';
+import s1f91e1f3fc from 'emoji-datasource-apple/img/apple/64/1f91e-1f3fc.png';
+import s1f91e1f3fd from 'emoji-datasource-apple/img/apple/64/1f91e-1f3fd.png';
+import s1f91e1f3fe from 'emoji-datasource-apple/img/apple/64/1f91e-1f3fe.png';
+import s1f91e1f3ff from 'emoji-datasource-apple/img/apple/64/1f91e-1f3ff.png';
 import s1f91f from 'emoji-datasource-apple/img/apple/64/1f91f.png';
+import s1f91f1f3fb from 'emoji-datasource-apple/img/apple/64/1f91f-1f3fb.png';
+import s1f91f1f3fc from 'emoji-datasource-apple/img/apple/64/1f91f-1f3fc.png';
+import s1f91f1f3fd from 'emoji-datasource-apple/img/apple/64/1f91f-1f3fd.png';
+import s1f91f1f3fe from 'emoji-datasource-apple/img/apple/64/1f91f-1f3fe.png';
+import s1f91f1f3ff from 'emoji-datasource-apple/img/apple/64/1f91f-1f3ff.png';
 import s1f920 from 'emoji-datasource-apple/img/apple/64/1f920.png';
 import s1f921 from 'emoji-datasource-apple/img/apple/64/1f921.png';
 import s1f922 from 'emoji-datasource-apple/img/apple/64/1f922.png';
@@ -1304,8 +2429,23 @@ import s1f923 from 'emoji-datasource-apple/img/apple/64/1f923.png';
 import s1f924 from 'emoji-datasource-apple/img/apple/64/1f924.png';
 import s1f925 from 'emoji-datasource-apple/img/apple/64/1f925.png';
 import s1f926200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f926-200d-2640-fe0f.png';
+import s1f9261f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fb-200d-2640-fe0f.png';
+import s1f9261f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fc-200d-2640-fe0f.png';
+import s1f9261f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fd-200d-2640-fe0f.png';
+import s1f9261f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fe-200d-2640-fe0f.png';
+import s1f9261f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3ff-200d-2640-fe0f.png';
 import s1f926200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f926-200d-2642-fe0f.png';
+import s1f9261f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fb-200d-2642-fe0f.png';
+import s1f9261f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fc-200d-2642-fe0f.png';
+import s1f9261f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fd-200d-2642-fe0f.png';
+import s1f9261f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3fe-200d-2642-fe0f.png';
+import s1f9261f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f926-1f3ff-200d-2642-fe0f.png';
 import s1f926 from 'emoji-datasource-apple/img/apple/64/1f926.png';
+import s1f9261f3fb from 'emoji-datasource-apple/img/apple/64/1f926-1f3fb.png';
+import s1f9261f3fc from 'emoji-datasource-apple/img/apple/64/1f926-1f3fc.png';
+import s1f9261f3fd from 'emoji-datasource-apple/img/apple/64/1f926-1f3fd.png';
+import s1f9261f3fe from 'emoji-datasource-apple/img/apple/64/1f926-1f3fe.png';
+import s1f9261f3ff from 'emoji-datasource-apple/img/apple/64/1f926-1f3ff.png';
 import s1f927 from 'emoji-datasource-apple/img/apple/64/1f927.png';
 import s1f928 from 'emoji-datasource-apple/img/apple/64/1f928.png';
 import s1f929 from 'emoji-datasource-apple/img/apple/64/1f929.png';
@@ -1316,33 +2456,153 @@ import s1f92d from 'emoji-datasource-apple/img/apple/64/1f92d.png';
 import s1f92e from 'emoji-datasource-apple/img/apple/64/1f92e.png';
 import s1f92f from 'emoji-datasource-apple/img/apple/64/1f92f.png';
 import s1f930 from 'emoji-datasource-apple/img/apple/64/1f930.png';
+import s1f9301f3fb from 'emoji-datasource-apple/img/apple/64/1f930-1f3fb.png';
+import s1f9301f3fc from 'emoji-datasource-apple/img/apple/64/1f930-1f3fc.png';
+import s1f9301f3fd from 'emoji-datasource-apple/img/apple/64/1f930-1f3fd.png';
+import s1f9301f3fe from 'emoji-datasource-apple/img/apple/64/1f930-1f3fe.png';
+import s1f9301f3ff from 'emoji-datasource-apple/img/apple/64/1f930-1f3ff.png';
 import s1f931 from 'emoji-datasource-apple/img/apple/64/1f931.png';
+import s1f9311f3fb from 'emoji-datasource-apple/img/apple/64/1f931-1f3fb.png';
+import s1f9311f3fc from 'emoji-datasource-apple/img/apple/64/1f931-1f3fc.png';
+import s1f9311f3fd from 'emoji-datasource-apple/img/apple/64/1f931-1f3fd.png';
+import s1f9311f3fe from 'emoji-datasource-apple/img/apple/64/1f931-1f3fe.png';
+import s1f9311f3ff from 'emoji-datasource-apple/img/apple/64/1f931-1f3ff.png';
 import s1f932 from 'emoji-datasource-apple/img/apple/64/1f932.png';
+import s1f9321f3fb from 'emoji-datasource-apple/img/apple/64/1f932-1f3fb.png';
+import s1f9321f3fc from 'emoji-datasource-apple/img/apple/64/1f932-1f3fc.png';
+import s1f9321f3fd from 'emoji-datasource-apple/img/apple/64/1f932-1f3fd.png';
+import s1f9321f3fe from 'emoji-datasource-apple/img/apple/64/1f932-1f3fe.png';
+import s1f9321f3ff from 'emoji-datasource-apple/img/apple/64/1f932-1f3ff.png';
 import s1f933 from 'emoji-datasource-apple/img/apple/64/1f933.png';
+import s1f9331f3fb from 'emoji-datasource-apple/img/apple/64/1f933-1f3fb.png';
+import s1f9331f3fc from 'emoji-datasource-apple/img/apple/64/1f933-1f3fc.png';
+import s1f9331f3fd from 'emoji-datasource-apple/img/apple/64/1f933-1f3fd.png';
+import s1f9331f3fe from 'emoji-datasource-apple/img/apple/64/1f933-1f3fe.png';
+import s1f9331f3ff from 'emoji-datasource-apple/img/apple/64/1f933-1f3ff.png';
 import s1f934 from 'emoji-datasource-apple/img/apple/64/1f934.png';
+import s1f9341f3fb from 'emoji-datasource-apple/img/apple/64/1f934-1f3fb.png';
+import s1f9341f3fc from 'emoji-datasource-apple/img/apple/64/1f934-1f3fc.png';
+import s1f9341f3fd from 'emoji-datasource-apple/img/apple/64/1f934-1f3fd.png';
+import s1f9341f3fe from 'emoji-datasource-apple/img/apple/64/1f934-1f3fe.png';
+import s1f9341f3ff from 'emoji-datasource-apple/img/apple/64/1f934-1f3ff.png';
 import s1f935200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f935-200d-2640-fe0f.png';
+import s1f9351f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fb-200d-2640-fe0f.png';
+import s1f9351f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fc-200d-2640-fe0f.png';
+import s1f9351f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fd-200d-2640-fe0f.png';
+import s1f9351f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fe-200d-2640-fe0f.png';
+import s1f9351f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3ff-200d-2640-fe0f.png';
 import s1f935200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f935-200d-2642-fe0f.png';
+import s1f9351f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fb-200d-2642-fe0f.png';
+import s1f9351f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fc-200d-2642-fe0f.png';
+import s1f9351f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fd-200d-2642-fe0f.png';
+import s1f9351f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3fe-200d-2642-fe0f.png';
+import s1f9351f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f935-1f3ff-200d-2642-fe0f.png';
 import s1f935 from 'emoji-datasource-apple/img/apple/64/1f935.png';
+import s1f9351f3fb from 'emoji-datasource-apple/img/apple/64/1f935-1f3fb.png';
+import s1f9351f3fc from 'emoji-datasource-apple/img/apple/64/1f935-1f3fc.png';
+import s1f9351f3fd from 'emoji-datasource-apple/img/apple/64/1f935-1f3fd.png';
+import s1f9351f3fe from 'emoji-datasource-apple/img/apple/64/1f935-1f3fe.png';
+import s1f9351f3ff from 'emoji-datasource-apple/img/apple/64/1f935-1f3ff.png';
 import s1f936 from 'emoji-datasource-apple/img/apple/64/1f936.png';
+import s1f9361f3fb from 'emoji-datasource-apple/img/apple/64/1f936-1f3fb.png';
+import s1f9361f3fc from 'emoji-datasource-apple/img/apple/64/1f936-1f3fc.png';
+import s1f9361f3fd from 'emoji-datasource-apple/img/apple/64/1f936-1f3fd.png';
+import s1f9361f3fe from 'emoji-datasource-apple/img/apple/64/1f936-1f3fe.png';
+import s1f9361f3ff from 'emoji-datasource-apple/img/apple/64/1f936-1f3ff.png';
 import s1f937200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f937-200d-2640-fe0f.png';
+import s1f9371f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fb-200d-2640-fe0f.png';
+import s1f9371f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fc-200d-2640-fe0f.png';
+import s1f9371f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fd-200d-2640-fe0f.png';
+import s1f9371f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fe-200d-2640-fe0f.png';
+import s1f9371f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3ff-200d-2640-fe0f.png';
 import s1f937200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f937-200d-2642-fe0f.png';
+import s1f9371f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fb-200d-2642-fe0f.png';
+import s1f9371f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fc-200d-2642-fe0f.png';
+import s1f9371f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fd-200d-2642-fe0f.png';
+import s1f9371f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3fe-200d-2642-fe0f.png';
+import s1f9371f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f937-1f3ff-200d-2642-fe0f.png';
 import s1f937 from 'emoji-datasource-apple/img/apple/64/1f937.png';
+import s1f9371f3fb from 'emoji-datasource-apple/img/apple/64/1f937-1f3fb.png';
+import s1f9371f3fc from 'emoji-datasource-apple/img/apple/64/1f937-1f3fc.png';
+import s1f9371f3fd from 'emoji-datasource-apple/img/apple/64/1f937-1f3fd.png';
+import s1f9371f3fe from 'emoji-datasource-apple/img/apple/64/1f937-1f3fe.png';
+import s1f9371f3ff from 'emoji-datasource-apple/img/apple/64/1f937-1f3ff.png';
 import s1f938200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f938-200d-2640-fe0f.png';
+import s1f9381f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fb-200d-2640-fe0f.png';
+import s1f9381f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fc-200d-2640-fe0f.png';
+import s1f9381f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fd-200d-2640-fe0f.png';
+import s1f9381f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fe-200d-2640-fe0f.png';
+import s1f9381f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3ff-200d-2640-fe0f.png';
 import s1f938200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f938-200d-2642-fe0f.png';
+import s1f9381f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fb-200d-2642-fe0f.png';
+import s1f9381f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fc-200d-2642-fe0f.png';
+import s1f9381f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fd-200d-2642-fe0f.png';
+import s1f9381f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3fe-200d-2642-fe0f.png';
+import s1f9381f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f938-1f3ff-200d-2642-fe0f.png';
 import s1f938 from 'emoji-datasource-apple/img/apple/64/1f938.png';
+import s1f9381f3fb from 'emoji-datasource-apple/img/apple/64/1f938-1f3fb.png';
+import s1f9381f3fc from 'emoji-datasource-apple/img/apple/64/1f938-1f3fc.png';
+import s1f9381f3fd from 'emoji-datasource-apple/img/apple/64/1f938-1f3fd.png';
+import s1f9381f3fe from 'emoji-datasource-apple/img/apple/64/1f938-1f3fe.png';
+import s1f9381f3ff from 'emoji-datasource-apple/img/apple/64/1f938-1f3ff.png';
 import s1f939200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f939-200d-2640-fe0f.png';
+import s1f9391f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fb-200d-2640-fe0f.png';
+import s1f9391f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fc-200d-2640-fe0f.png';
+import s1f9391f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fd-200d-2640-fe0f.png';
+import s1f9391f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fe-200d-2640-fe0f.png';
+import s1f9391f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3ff-200d-2640-fe0f.png';
 import s1f939200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f939-200d-2642-fe0f.png';
+import s1f9391f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fb-200d-2642-fe0f.png';
+import s1f9391f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fc-200d-2642-fe0f.png';
+import s1f9391f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fd-200d-2642-fe0f.png';
+import s1f9391f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3fe-200d-2642-fe0f.png';
+import s1f9391f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f939-1f3ff-200d-2642-fe0f.png';
 import s1f939 from 'emoji-datasource-apple/img/apple/64/1f939.png';
+import s1f9391f3fb from 'emoji-datasource-apple/img/apple/64/1f939-1f3fb.png';
+import s1f9391f3fc from 'emoji-datasource-apple/img/apple/64/1f939-1f3fc.png';
+import s1f9391f3fd from 'emoji-datasource-apple/img/apple/64/1f939-1f3fd.png';
+import s1f9391f3fe from 'emoji-datasource-apple/img/apple/64/1f939-1f3fe.png';
+import s1f9391f3ff from 'emoji-datasource-apple/img/apple/64/1f939-1f3ff.png';
 import s1f93a from 'emoji-datasource-apple/img/apple/64/1f93a.png';
 import s1f93c200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93c-200d-2640-fe0f.png';
 import s1f93c200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93c-200d-2642-fe0f.png';
 import s1f93c from 'emoji-datasource-apple/img/apple/64/1f93c.png';
 import s1f93d200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-200d-2640-fe0f.png';
+import s1f93d1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fb-200d-2640-fe0f.png';
+import s1f93d1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fc-200d-2640-fe0f.png';
+import s1f93d1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fd-200d-2640-fe0f.png';
+import s1f93d1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fe-200d-2640-fe0f.png';
+import s1f93d1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3ff-200d-2640-fe0f.png';
 import s1f93d200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-200d-2642-fe0f.png';
+import s1f93d1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fb-200d-2642-fe0f.png';
+import s1f93d1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fc-200d-2642-fe0f.png';
+import s1f93d1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fd-200d-2642-fe0f.png';
+import s1f93d1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fe-200d-2642-fe0f.png';
+import s1f93d1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93d-1f3ff-200d-2642-fe0f.png';
 import s1f93d from 'emoji-datasource-apple/img/apple/64/1f93d.png';
+import s1f93d1f3fb from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fb.png';
+import s1f93d1f3fc from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fc.png';
+import s1f93d1f3fd from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fd.png';
+import s1f93d1f3fe from 'emoji-datasource-apple/img/apple/64/1f93d-1f3fe.png';
+import s1f93d1f3ff from 'emoji-datasource-apple/img/apple/64/1f93d-1f3ff.png';
 import s1f93e200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-200d-2640-fe0f.png';
+import s1f93e1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fb-200d-2640-fe0f.png';
+import s1f93e1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fc-200d-2640-fe0f.png';
+import s1f93e1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fd-200d-2640-fe0f.png';
+import s1f93e1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fe-200d-2640-fe0f.png';
+import s1f93e1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3ff-200d-2640-fe0f.png';
 import s1f93e200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-200d-2642-fe0f.png';
+import s1f93e1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fb-200d-2642-fe0f.png';
+import s1f93e1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fc-200d-2642-fe0f.png';
+import s1f93e1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fd-200d-2642-fe0f.png';
+import s1f93e1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fe-200d-2642-fe0f.png';
+import s1f93e1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f93e-1f3ff-200d-2642-fe0f.png';
 import s1f93e from 'emoji-datasource-apple/img/apple/64/1f93e.png';
+import s1f93e1f3fb from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fb.png';
+import s1f93e1f3fc from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fc.png';
+import s1f93e1f3fd from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fd.png';
+import s1f93e1f3fe from 'emoji-datasource-apple/img/apple/64/1f93e-1f3fe.png';
+import s1f93e1f3ff from 'emoji-datasource-apple/img/apple/64/1f93e-1f3ff.png';
 import s1f93f from 'emoji-datasource-apple/img/apple/64/1f93f.png';
 import s1f940 from 'emoji-datasource-apple/img/apple/64/1f940.png';
 import s1f941 from 'emoji-datasource-apple/img/apple/64/1f941.png';
@@ -1399,6 +2659,11 @@ import s1f974 from 'emoji-datasource-apple/img/apple/64/1f974.png';
 import s1f975 from 'emoji-datasource-apple/img/apple/64/1f975.png';
 import s1f976 from 'emoji-datasource-apple/img/apple/64/1f976.png';
 import s1f977 from 'emoji-datasource-apple/img/apple/64/1f977.png';
+import s1f9771f3fb from 'emoji-datasource-apple/img/apple/64/1f977-1f3fb.png';
+import s1f9771f3fc from 'emoji-datasource-apple/img/apple/64/1f977-1f3fc.png';
+import s1f9771f3fd from 'emoji-datasource-apple/img/apple/64/1f977-1f3fd.png';
+import s1f9771f3fe from 'emoji-datasource-apple/img/apple/64/1f977-1f3fe.png';
+import s1f9771f3ff from 'emoji-datasource-apple/img/apple/64/1f977-1f3ff.png';
 import s1f978 from 'emoji-datasource-apple/img/apple/64/1f978.png';
 import s1f97a from 'emoji-datasource-apple/img/apple/64/1f97a.png';
 import s1f97b from 'emoji-datasource-apple/img/apple/64/1f97b.png';
@@ -1456,16 +2721,61 @@ import s1f9ae from 'emoji-datasource-apple/img/apple/64/1f9ae.png';
 import s1f9af from 'emoji-datasource-apple/img/apple/64/1f9af.png';
 import s1f9b4 from 'emoji-datasource-apple/img/apple/64/1f9b4.png';
 import s1f9b5 from 'emoji-datasource-apple/img/apple/64/1f9b5.png';
+import s1f9b51f3fb from 'emoji-datasource-apple/img/apple/64/1f9b5-1f3fb.png';
+import s1f9b51f3fc from 'emoji-datasource-apple/img/apple/64/1f9b5-1f3fc.png';
+import s1f9b51f3fd from 'emoji-datasource-apple/img/apple/64/1f9b5-1f3fd.png';
+import s1f9b51f3fe from 'emoji-datasource-apple/img/apple/64/1f9b5-1f3fe.png';
+import s1f9b51f3ff from 'emoji-datasource-apple/img/apple/64/1f9b5-1f3ff.png';
 import s1f9b6 from 'emoji-datasource-apple/img/apple/64/1f9b6.png';
+import s1f9b61f3fb from 'emoji-datasource-apple/img/apple/64/1f9b6-1f3fb.png';
+import s1f9b61f3fc from 'emoji-datasource-apple/img/apple/64/1f9b6-1f3fc.png';
+import s1f9b61f3fd from 'emoji-datasource-apple/img/apple/64/1f9b6-1f3fd.png';
+import s1f9b61f3fe from 'emoji-datasource-apple/img/apple/64/1f9b6-1f3fe.png';
+import s1f9b61f3ff from 'emoji-datasource-apple/img/apple/64/1f9b6-1f3ff.png';
 import s1f9b7 from 'emoji-datasource-apple/img/apple/64/1f9b7.png';
 import s1f9b8200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-200d-2640-fe0f.png';
+import s1f9b81f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fb-200d-2640-fe0f.png';
+import s1f9b81f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fc-200d-2640-fe0f.png';
+import s1f9b81f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fd-200d-2640-fe0f.png';
+import s1f9b81f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fe-200d-2640-fe0f.png';
+import s1f9b81f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3ff-200d-2640-fe0f.png';
 import s1f9b8200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-200d-2642-fe0f.png';
+import s1f9b81f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fb-200d-2642-fe0f.png';
+import s1f9b81f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fc-200d-2642-fe0f.png';
+import s1f9b81f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fd-200d-2642-fe0f.png';
+import s1f9b81f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fe-200d-2642-fe0f.png';
+import s1f9b81f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3ff-200d-2642-fe0f.png';
 import s1f9b8 from 'emoji-datasource-apple/img/apple/64/1f9b8.png';
+import s1f9b81f3fb from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fb.png';
+import s1f9b81f3fc from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fc.png';
+import s1f9b81f3fd from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fd.png';
+import s1f9b81f3fe from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3fe.png';
+import s1f9b81f3ff from 'emoji-datasource-apple/img/apple/64/1f9b8-1f3ff.png';
 import s1f9b9200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-200d-2640-fe0f.png';
+import s1f9b91f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fb-200d-2640-fe0f.png';
+import s1f9b91f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fc-200d-2640-fe0f.png';
+import s1f9b91f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fd-200d-2640-fe0f.png';
+import s1f9b91f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fe-200d-2640-fe0f.png';
+import s1f9b91f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3ff-200d-2640-fe0f.png';
 import s1f9b9200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-200d-2642-fe0f.png';
+import s1f9b91f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fb-200d-2642-fe0f.png';
+import s1f9b91f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fc-200d-2642-fe0f.png';
+import s1f9b91f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fd-200d-2642-fe0f.png';
+import s1f9b91f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fe-200d-2642-fe0f.png';
+import s1f9b91f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3ff-200d-2642-fe0f.png';
 import s1f9b9 from 'emoji-datasource-apple/img/apple/64/1f9b9.png';
+import s1f9b91f3fb from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fb.png';
+import s1f9b91f3fc from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fc.png';
+import s1f9b91f3fd from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fd.png';
+import s1f9b91f3fe from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3fe.png';
+import s1f9b91f3ff from 'emoji-datasource-apple/img/apple/64/1f9b9-1f3ff.png';
 import s1f9ba from 'emoji-datasource-apple/img/apple/64/1f9ba.png';
 import s1f9bb from 'emoji-datasource-apple/img/apple/64/1f9bb.png';
+import s1f9bb1f3fb from 'emoji-datasource-apple/img/apple/64/1f9bb-1f3fb.png';
+import s1f9bb1f3fc from 'emoji-datasource-apple/img/apple/64/1f9bb-1f3fc.png';
+import s1f9bb1f3fd from 'emoji-datasource-apple/img/apple/64/1f9bb-1f3fd.png';
+import s1f9bb1f3fe from 'emoji-datasource-apple/img/apple/64/1f9bb-1f3fe.png';
+import s1f9bb1f3ff from 'emoji-datasource-apple/img/apple/64/1f9bb-1f3ff.png';
 import s1f9bc from 'emoji-datasource-apple/img/apple/64/1f9bc.png';
 import s1f9bd from 'emoji-datasource-apple/img/apple/64/1f9bd.png';
 import s1f9be from 'emoji-datasource-apple/img/apple/64/1f9be.png';
@@ -1483,72 +2793,422 @@ import s1f9c9 from 'emoji-datasource-apple/img/apple/64/1f9c9.png';
 import s1f9ca from 'emoji-datasource-apple/img/apple/64/1f9ca.png';
 import s1f9cb from 'emoji-datasource-apple/img/apple/64/1f9cb.png';
 import s1f9cd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-200d-2640-fe0f.png';
+import s1f9cd1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fb-200d-2640-fe0f.png';
+import s1f9cd1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fc-200d-2640-fe0f.png';
+import s1f9cd1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fd-200d-2640-fe0f.png';
+import s1f9cd1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fe-200d-2640-fe0f.png';
+import s1f9cd1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3ff-200d-2640-fe0f.png';
 import s1f9cd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-200d-2642-fe0f.png';
+import s1f9cd1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fb-200d-2642-fe0f.png';
+import s1f9cd1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fc-200d-2642-fe0f.png';
+import s1f9cd1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fd-200d-2642-fe0f.png';
+import s1f9cd1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fe-200d-2642-fe0f.png';
+import s1f9cd1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3ff-200d-2642-fe0f.png';
 import s1f9cd from 'emoji-datasource-apple/img/apple/64/1f9cd.png';
+import s1f9cd1f3fb from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fb.png';
+import s1f9cd1f3fc from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fc.png';
+import s1f9cd1f3fd from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fd.png';
+import s1f9cd1f3fe from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3fe.png';
+import s1f9cd1f3ff from 'emoji-datasource-apple/img/apple/64/1f9cd-1f3ff.png';
 import s1f9ce200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-200d-2640-fe0f.png';
+import s1f9ce1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fb-200d-2640-fe0f.png';
+import s1f9ce1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fc-200d-2640-fe0f.png';
+import s1f9ce1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fd-200d-2640-fe0f.png';
+import s1f9ce1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fe-200d-2640-fe0f.png';
+import s1f9ce1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3ff-200d-2640-fe0f.png';
 import s1f9ce200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-200d-2642-fe0f.png';
+import s1f9ce1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fb-200d-2642-fe0f.png';
+import s1f9ce1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fc-200d-2642-fe0f.png';
+import s1f9ce1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fd-200d-2642-fe0f.png';
+import s1f9ce1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fe-200d-2642-fe0f.png';
+import s1f9ce1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3ff-200d-2642-fe0f.png';
 import s1f9ce from 'emoji-datasource-apple/img/apple/64/1f9ce.png';
+import s1f9ce1f3fb from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fb.png';
+import s1f9ce1f3fc from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fc.png';
+import s1f9ce1f3fd from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fd.png';
+import s1f9ce1f3fe from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3fe.png';
+import s1f9ce1f3ff from 'emoji-datasource-apple/img/apple/64/1f9ce-1f3ff.png';
 import s1f9cf200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-200d-2640-fe0f.png';
+import s1f9cf1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fb-200d-2640-fe0f.png';
+import s1f9cf1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fc-200d-2640-fe0f.png';
+import s1f9cf1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fd-200d-2640-fe0f.png';
+import s1f9cf1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fe-200d-2640-fe0f.png';
+import s1f9cf1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3ff-200d-2640-fe0f.png';
 import s1f9cf200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-200d-2642-fe0f.png';
+import s1f9cf1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fb-200d-2642-fe0f.png';
+import s1f9cf1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fc-200d-2642-fe0f.png';
+import s1f9cf1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fd-200d-2642-fe0f.png';
+import s1f9cf1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fe-200d-2642-fe0f.png';
+import s1f9cf1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3ff-200d-2642-fe0f.png';
 import s1f9cf from 'emoji-datasource-apple/img/apple/64/1f9cf.png';
+import s1f9cf1f3fb from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fb.png';
+import s1f9cf1f3fc from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fc.png';
+import s1f9cf1f3fd from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fd.png';
+import s1f9cf1f3fe from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3fe.png';
+import s1f9cf1f3ff from 'emoji-datasource-apple/img/apple/64/1f9cf-1f3ff.png';
 import s1f9d0 from 'emoji-datasource-apple/img/apple/64/1f9d0.png';
 import s1f9d1200d1f33e from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f33e.png';
+import s1f9d11f3fb200d1f33e from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f33e.png';
+import s1f9d11f3fc200d1f33e from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f33e.png';
+import s1f9d11f3fd200d1f33e from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f33e.png';
+import s1f9d11f3fe200d1f33e from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f33e.png';
+import s1f9d11f3ff200d1f33e from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f33e.png';
 import s1f9d1200d1f373 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f373.png';
+import s1f9d11f3fb200d1f373 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f373.png';
+import s1f9d11f3fc200d1f373 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f373.png';
+import s1f9d11f3fd200d1f373 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f373.png';
+import s1f9d11f3fe200d1f373 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f373.png';
+import s1f9d11f3ff200d1f373 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f373.png';
 import s1f9d1200d1f37c from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f37c.png';
+import s1f9d11f3fb200d1f37c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f37c.png';
+import s1f9d11f3fc200d1f37c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f37c.png';
+import s1f9d11f3fd200d1f37c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f37c.png';
+import s1f9d11f3fe200d1f37c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f37c.png';
+import s1f9d11f3ff200d1f37c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f37c.png';
 import s1f9d1200d1f384 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f384.png';
+import s1f9d11f3fb200d1f384 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f384.png';
+import s1f9d11f3fc200d1f384 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f384.png';
+import s1f9d11f3fd200d1f384 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f384.png';
+import s1f9d11f3fe200d1f384 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f384.png';
+import s1f9d11f3ff200d1f384 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f384.png';
 import s1f9d1200d1f393 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f393.png';
+import s1f9d11f3fb200d1f393 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f393.png';
+import s1f9d11f3fc200d1f393 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f393.png';
+import s1f9d11f3fd200d1f393 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f393.png';
+import s1f9d11f3fe200d1f393 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f393.png';
+import s1f9d11f3ff200d1f393 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f393.png';
 import s1f9d1200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3a4.png';
+import s1f9d11f3fb200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f3a4.png';
+import s1f9d11f3fc200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f3a4.png';
+import s1f9d11f3fd200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f3a4.png';
+import s1f9d11f3fe200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f3a4.png';
+import s1f9d11f3ff200d1f3a4 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f3a4.png';
 import s1f9d1200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3a8.png';
+import s1f9d11f3fb200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f3a8.png';
+import s1f9d11f3fc200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f3a8.png';
+import s1f9d11f3fd200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f3a8.png';
+import s1f9d11f3fe200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f3a8.png';
+import s1f9d11f3ff200d1f3a8 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f3a8.png';
 import s1f9d1200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3eb.png';
+import s1f9d11f3fb200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f3eb.png';
+import s1f9d11f3fc200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f3eb.png';
+import s1f9d11f3fd200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f3eb.png';
+import s1f9d11f3fe200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f3eb.png';
+import s1f9d11f3ff200d1f3eb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f3eb.png';
 import s1f9d1200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f3ed.png';
+import s1f9d11f3fb200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f3ed.png';
+import s1f9d11f3fc200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f3ed.png';
+import s1f9d11f3fd200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f3ed.png';
+import s1f9d11f3fe200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f3ed.png';
+import s1f9d11f3ff200d1f3ed from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f3ed.png';
 import s1f9d1200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f4bb.png';
+import s1f9d11f3fb200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f4bb.png';
+import s1f9d11f3fc200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f4bb.png';
+import s1f9d11f3fd200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f4bb.png';
+import s1f9d11f3fe200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f4bb.png';
+import s1f9d11f3ff200d1f4bb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f4bb.png';
 import s1f9d1200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f4bc.png';
+import s1f9d11f3fb200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f4bc.png';
+import s1f9d11f3fc200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f4bc.png';
+import s1f9d11f3fd200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f4bc.png';
+import s1f9d11f3fe200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f4bc.png';
+import s1f9d11f3ff200d1f4bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f4bc.png';
 import s1f9d1200d1f527 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f527.png';
+import s1f9d11f3fb200d1f527 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f527.png';
+import s1f9d11f3fc200d1f527 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f527.png';
+import s1f9d11f3fd200d1f527 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f527.png';
+import s1f9d11f3fe200d1f527 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f527.png';
+import s1f9d11f3ff200d1f527 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f527.png';
 import s1f9d1200d1f52c from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f52c.png';
+import s1f9d11f3fb200d1f52c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f52c.png';
+import s1f9d11f3fc200d1f52c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f52c.png';
+import s1f9d11f3fd200d1f52c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f52c.png';
+import s1f9d11f3fe200d1f52c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f52c.png';
+import s1f9d11f3ff200d1f52c from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f52c.png';
 import s1f9d1200d1f680 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f680.png';
+import s1f9d11f3fb200d1f680 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f680.png';
+import s1f9d11f3fc200d1f680 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f680.png';
+import s1f9d11f3fd200d1f680 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f680.png';
+import s1f9d11f3fe200d1f680 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f680.png';
+import s1f9d11f3ff200d1f680 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f680.png';
 import s1f9d1200d1f692 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f692.png';
+import s1f9d11f3fb200d1f692 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f692.png';
+import s1f9d11f3fc200d1f692 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f692.png';
+import s1f9d11f3fd200d1f692 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f692.png';
+import s1f9d11f3fe200d1f692 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f692.png';
+import s1f9d11f3ff200d1f692 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f692.png';
 import s1f9d1200d1f91d200d1f9d1 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f91d-200d-1f9d1.png';
+import s1f9d11f3fb200d1f91d200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fb200d1f91d200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fb200d1f91d200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fb200d1f91d200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fb200d1f91d200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f91d-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fc200d1f91d200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fc200d1f91d200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fc200d1f91d200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fc200d1f91d200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fc200d1f91d200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f91d-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fd200d1f91d200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fd200d1f91d200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fd200d1f91d200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fd200d1f91d200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fd200d1f91d200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f91d-200d-1f9d1-1f3ff.png';
+import s1f9d11f3fe200d1f91d200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f91d-200d-1f9d1-1f3fb.png';
+import s1f9d11f3fe200d1f91d200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f91d-200d-1f9d1-1f3fc.png';
+import s1f9d11f3fe200d1f91d200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f91d-200d-1f9d1-1f3fd.png';
+import s1f9d11f3fe200d1f91d200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f91d-200d-1f9d1-1f3fe.png';
+import s1f9d11f3fe200d1f91d200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f91d-200d-1f9d1-1f3ff.png';
+import s1f9d11f3ff200d1f91d200d1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f91d-200d-1f9d1-1f3fb.png';
+import s1f9d11f3ff200d1f91d200d1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f91d-200d-1f9d1-1f3fc.png';
+import s1f9d11f3ff200d1f91d200d1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f91d-200d-1f9d1-1f3fd.png';
+import s1f9d11f3ff200d1f91d200d1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f91d-200d-1f9d1-1f3fe.png';
+import s1f9d11f3ff200d1f91d200d1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f91d-200d-1f9d1-1f3ff.png';
 import s1f9d1200d1f9af from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9af.png';
+import s1f9d11f3fb200d1f9af from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f9af.png';
+import s1f9d11f3fc200d1f9af from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f9af.png';
+import s1f9d11f3fd200d1f9af from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f9af.png';
+import s1f9d11f3fe200d1f9af from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f9af.png';
+import s1f9d11f3ff200d1f9af from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f9af.png';
 import s1f9d1200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b0.png';
+import s1f9d11f3fb200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f9b0.png';
+import s1f9d11f3fc200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f9b0.png';
+import s1f9d11f3fd200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f9b0.png';
+import s1f9d11f3fe200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f9b0.png';
+import s1f9d11f3ff200d1f9b0 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f9b0.png';
 import s1f9d1200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b1.png';
+import s1f9d11f3fb200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f9b1.png';
+import s1f9d11f3fc200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f9b1.png';
+import s1f9d11f3fd200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f9b1.png';
+import s1f9d11f3fe200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f9b1.png';
+import s1f9d11f3ff200d1f9b1 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f9b1.png';
 import s1f9d1200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b2.png';
+import s1f9d11f3fb200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f9b2.png';
+import s1f9d11f3fc200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f9b2.png';
+import s1f9d11f3fd200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f9b2.png';
+import s1f9d11f3fe200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f9b2.png';
+import s1f9d11f3ff200d1f9b2 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f9b2.png';
 import s1f9d1200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9b3.png';
+import s1f9d11f3fb200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f9b3.png';
+import s1f9d11f3fc200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f9b3.png';
+import s1f9d11f3fd200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f9b3.png';
+import s1f9d11f3fe200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f9b3.png';
+import s1f9d11f3ff200d1f9b3 from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f9b3.png';
 import s1f9d1200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9bc.png';
+import s1f9d11f3fb200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f9bc.png';
+import s1f9d11f3fc200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f9bc.png';
+import s1f9d11f3fd200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f9bc.png';
+import s1f9d11f3fe200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f9bc.png';
+import s1f9d11f3ff200d1f9bc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f9bc.png';
 import s1f9d1200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-1f9bd.png';
+import s1f9d11f3fb200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-1f9bd.png';
+import s1f9d11f3fc200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-1f9bd.png';
+import s1f9d11f3fd200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-1f9bd.png';
+import s1f9d11f3fe200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-1f9bd.png';
+import s1f9d11f3ff200d1f9bd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-1f9bd.png';
 import s1f9d1200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-2695-fe0f.png';
+import s1f9d11f3fb200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2695-fe0f.png';
+import s1f9d11f3fc200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2695-fe0f.png';
+import s1f9d11f3fd200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2695-fe0f.png';
+import s1f9d11f3fe200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2695-fe0f.png';
+import s1f9d11f3ff200d2695fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2695-fe0f.png';
 import s1f9d1200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-2696-fe0f.png';
+import s1f9d11f3fb200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2696-fe0f.png';
+import s1f9d11f3fc200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2696-fe0f.png';
+import s1f9d11f3fd200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2696-fe0f.png';
+import s1f9d11f3fe200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2696-fe0f.png';
+import s1f9d11f3ff200d2696fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2696-fe0f.png';
 import s1f9d1200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-200d-2708-fe0f.png';
+import s1f9d11f3fb200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb-200d-2708-fe0f.png';
+import s1f9d11f3fc200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc-200d-2708-fe0f.png';
+import s1f9d11f3fd200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd-200d-2708-fe0f.png';
+import s1f9d11f3fe200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe-200d-2708-fe0f.png';
+import s1f9d11f3ff200d2708fe0f from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff-200d-2708-fe0f.png';
 import s1f9d1 from 'emoji-datasource-apple/img/apple/64/1f9d1.png';
+import s1f9d11f3fb from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fb.png';
+import s1f9d11f3fc from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fc.png';
+import s1f9d11f3fd from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fd.png';
+import s1f9d11f3fe from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3fe.png';
+import s1f9d11f3ff from 'emoji-datasource-apple/img/apple/64/1f9d1-1f3ff.png';
 import s1f9d2 from 'emoji-datasource-apple/img/apple/64/1f9d2.png';
+import s1f9d21f3fb from 'emoji-datasource-apple/img/apple/64/1f9d2-1f3fb.png';
+import s1f9d21f3fc from 'emoji-datasource-apple/img/apple/64/1f9d2-1f3fc.png';
+import s1f9d21f3fd from 'emoji-datasource-apple/img/apple/64/1f9d2-1f3fd.png';
+import s1f9d21f3fe from 'emoji-datasource-apple/img/apple/64/1f9d2-1f3fe.png';
+import s1f9d21f3ff from 'emoji-datasource-apple/img/apple/64/1f9d2-1f3ff.png';
 import s1f9d3 from 'emoji-datasource-apple/img/apple/64/1f9d3.png';
+import s1f9d31f3fb from 'emoji-datasource-apple/img/apple/64/1f9d3-1f3fb.png';
+import s1f9d31f3fc from 'emoji-datasource-apple/img/apple/64/1f9d3-1f3fc.png';
+import s1f9d31f3fd from 'emoji-datasource-apple/img/apple/64/1f9d3-1f3fd.png';
+import s1f9d31f3fe from 'emoji-datasource-apple/img/apple/64/1f9d3-1f3fe.png';
+import s1f9d31f3ff from 'emoji-datasource-apple/img/apple/64/1f9d3-1f3ff.png';
 import s1f9d4200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-200d-2640-fe0f.png';
+import s1f9d41f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fb-200d-2640-fe0f.png';
+import s1f9d41f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fc-200d-2640-fe0f.png';
+import s1f9d41f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fd-200d-2640-fe0f.png';
+import s1f9d41f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fe-200d-2640-fe0f.png';
+import s1f9d41f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3ff-200d-2640-fe0f.png';
 import s1f9d4200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-200d-2642-fe0f.png';
+import s1f9d41f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fb-200d-2642-fe0f.png';
+import s1f9d41f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fc-200d-2642-fe0f.png';
+import s1f9d41f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fd-200d-2642-fe0f.png';
+import s1f9d41f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fe-200d-2642-fe0f.png';
+import s1f9d41f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3ff-200d-2642-fe0f.png';
 import s1f9d4 from 'emoji-datasource-apple/img/apple/64/1f9d4.png';
+import s1f9d41f3fb from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fb.png';
+import s1f9d41f3fc from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fc.png';
+import s1f9d41f3fd from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fd.png';
+import s1f9d41f3fe from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3fe.png';
+import s1f9d41f3ff from 'emoji-datasource-apple/img/apple/64/1f9d4-1f3ff.png';
 import s1f9d5 from 'emoji-datasource-apple/img/apple/64/1f9d5.png';
+import s1f9d51f3fb from 'emoji-datasource-apple/img/apple/64/1f9d5-1f3fb.png';
+import s1f9d51f3fc from 'emoji-datasource-apple/img/apple/64/1f9d5-1f3fc.png';
+import s1f9d51f3fd from 'emoji-datasource-apple/img/apple/64/1f9d5-1f3fd.png';
+import s1f9d51f3fe from 'emoji-datasource-apple/img/apple/64/1f9d5-1f3fe.png';
+import s1f9d51f3ff from 'emoji-datasource-apple/img/apple/64/1f9d5-1f3ff.png';
 import s1f9d6200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-200d-2640-fe0f.png';
+import s1f9d61f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fb-200d-2640-fe0f.png';
+import s1f9d61f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fc-200d-2640-fe0f.png';
+import s1f9d61f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fd-200d-2640-fe0f.png';
+import s1f9d61f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fe-200d-2640-fe0f.png';
+import s1f9d61f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3ff-200d-2640-fe0f.png';
 import s1f9d6200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-200d-2642-fe0f.png';
+import s1f9d61f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fb-200d-2642-fe0f.png';
+import s1f9d61f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fc-200d-2642-fe0f.png';
+import s1f9d61f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fd-200d-2642-fe0f.png';
+import s1f9d61f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fe-200d-2642-fe0f.png';
+import s1f9d61f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3ff-200d-2642-fe0f.png';
 import s1f9d6 from 'emoji-datasource-apple/img/apple/64/1f9d6.png';
+import s1f9d61f3fb from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fb.png';
+import s1f9d61f3fc from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fc.png';
+import s1f9d61f3fd from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fd.png';
+import s1f9d61f3fe from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3fe.png';
+import s1f9d61f3ff from 'emoji-datasource-apple/img/apple/64/1f9d6-1f3ff.png';
 import s1f9d7200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-200d-2640-fe0f.png';
+import s1f9d71f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fb-200d-2640-fe0f.png';
+import s1f9d71f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fc-200d-2640-fe0f.png';
+import s1f9d71f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fd-200d-2640-fe0f.png';
+import s1f9d71f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fe-200d-2640-fe0f.png';
+import s1f9d71f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3ff-200d-2640-fe0f.png';
 import s1f9d7200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-200d-2642-fe0f.png';
+import s1f9d71f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fb-200d-2642-fe0f.png';
+import s1f9d71f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fc-200d-2642-fe0f.png';
+import s1f9d71f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fd-200d-2642-fe0f.png';
+import s1f9d71f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fe-200d-2642-fe0f.png';
+import s1f9d71f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3ff-200d-2642-fe0f.png';
 import s1f9d7 from 'emoji-datasource-apple/img/apple/64/1f9d7.png';
+import s1f9d71f3fb from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fb.png';
+import s1f9d71f3fc from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fc.png';
+import s1f9d71f3fd from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fd.png';
+import s1f9d71f3fe from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3fe.png';
+import s1f9d71f3ff from 'emoji-datasource-apple/img/apple/64/1f9d7-1f3ff.png';
 import s1f9d8200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-200d-2640-fe0f.png';
+import s1f9d81f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fb-200d-2640-fe0f.png';
+import s1f9d81f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fc-200d-2640-fe0f.png';
+import s1f9d81f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fd-200d-2640-fe0f.png';
+import s1f9d81f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fe-200d-2640-fe0f.png';
+import s1f9d81f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3ff-200d-2640-fe0f.png';
 import s1f9d8200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-200d-2642-fe0f.png';
+import s1f9d81f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fb-200d-2642-fe0f.png';
+import s1f9d81f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fc-200d-2642-fe0f.png';
+import s1f9d81f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fd-200d-2642-fe0f.png';
+import s1f9d81f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fe-200d-2642-fe0f.png';
+import s1f9d81f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3ff-200d-2642-fe0f.png';
 import s1f9d8 from 'emoji-datasource-apple/img/apple/64/1f9d8.png';
+import s1f9d81f3fb from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fb.png';
+import s1f9d81f3fc from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fc.png';
+import s1f9d81f3fd from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fd.png';
+import s1f9d81f3fe from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3fe.png';
+import s1f9d81f3ff from 'emoji-datasource-apple/img/apple/64/1f9d8-1f3ff.png';
 import s1f9d9200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-200d-2640-fe0f.png';
+import s1f9d91f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fb-200d-2640-fe0f.png';
+import s1f9d91f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fc-200d-2640-fe0f.png';
+import s1f9d91f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fd-200d-2640-fe0f.png';
+import s1f9d91f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fe-200d-2640-fe0f.png';
+import s1f9d91f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3ff-200d-2640-fe0f.png';
 import s1f9d9200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-200d-2642-fe0f.png';
+import s1f9d91f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fb-200d-2642-fe0f.png';
+import s1f9d91f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fc-200d-2642-fe0f.png';
+import s1f9d91f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fd-200d-2642-fe0f.png';
+import s1f9d91f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fe-200d-2642-fe0f.png';
+import s1f9d91f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3ff-200d-2642-fe0f.png';
 import s1f9d9 from 'emoji-datasource-apple/img/apple/64/1f9d9.png';
+import s1f9d91f3fb from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fb.png';
+import s1f9d91f3fc from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fc.png';
+import s1f9d91f3fd from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fd.png';
+import s1f9d91f3fe from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3fe.png';
+import s1f9d91f3ff from 'emoji-datasource-apple/img/apple/64/1f9d9-1f3ff.png';
 import s1f9da200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-200d-2640-fe0f.png';
+import s1f9da1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fb-200d-2640-fe0f.png';
+import s1f9da1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fc-200d-2640-fe0f.png';
+import s1f9da1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fd-200d-2640-fe0f.png';
+import s1f9da1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fe-200d-2640-fe0f.png';
+import s1f9da1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3ff-200d-2640-fe0f.png';
 import s1f9da200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-200d-2642-fe0f.png';
+import s1f9da1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fb-200d-2642-fe0f.png';
+import s1f9da1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fc-200d-2642-fe0f.png';
+import s1f9da1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fd-200d-2642-fe0f.png';
+import s1f9da1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fe-200d-2642-fe0f.png';
+import s1f9da1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9da-1f3ff-200d-2642-fe0f.png';
 import s1f9da from 'emoji-datasource-apple/img/apple/64/1f9da.png';
+import s1f9da1f3fb from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fb.png';
+import s1f9da1f3fc from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fc.png';
+import s1f9da1f3fd from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fd.png';
+import s1f9da1f3fe from 'emoji-datasource-apple/img/apple/64/1f9da-1f3fe.png';
+import s1f9da1f3ff from 'emoji-datasource-apple/img/apple/64/1f9da-1f3ff.png';
 import s1f9db200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-200d-2640-fe0f.png';
+import s1f9db1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fb-200d-2640-fe0f.png';
+import s1f9db1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fc-200d-2640-fe0f.png';
+import s1f9db1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fd-200d-2640-fe0f.png';
+import s1f9db1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fe-200d-2640-fe0f.png';
+import s1f9db1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3ff-200d-2640-fe0f.png';
 import s1f9db200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-200d-2642-fe0f.png';
+import s1f9db1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fb-200d-2642-fe0f.png';
+import s1f9db1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fc-200d-2642-fe0f.png';
+import s1f9db1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fd-200d-2642-fe0f.png';
+import s1f9db1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fe-200d-2642-fe0f.png';
+import s1f9db1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9db-1f3ff-200d-2642-fe0f.png';
 import s1f9db from 'emoji-datasource-apple/img/apple/64/1f9db.png';
+import s1f9db1f3fb from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fb.png';
+import s1f9db1f3fc from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fc.png';
+import s1f9db1f3fd from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fd.png';
+import s1f9db1f3fe from 'emoji-datasource-apple/img/apple/64/1f9db-1f3fe.png';
+import s1f9db1f3ff from 'emoji-datasource-apple/img/apple/64/1f9db-1f3ff.png';
 import s1f9dc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-200d-2640-fe0f.png';
+import s1f9dc1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fb-200d-2640-fe0f.png';
+import s1f9dc1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fc-200d-2640-fe0f.png';
+import s1f9dc1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fd-200d-2640-fe0f.png';
+import s1f9dc1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fe-200d-2640-fe0f.png';
+import s1f9dc1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3ff-200d-2640-fe0f.png';
 import s1f9dc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-200d-2642-fe0f.png';
+import s1f9dc1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fb-200d-2642-fe0f.png';
+import s1f9dc1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fc-200d-2642-fe0f.png';
+import s1f9dc1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fd-200d-2642-fe0f.png';
+import s1f9dc1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fe-200d-2642-fe0f.png';
+import s1f9dc1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3ff-200d-2642-fe0f.png';
 import s1f9dc from 'emoji-datasource-apple/img/apple/64/1f9dc.png';
+import s1f9dc1f3fb from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fb.png';
+import s1f9dc1f3fc from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fc.png';
+import s1f9dc1f3fd from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fd.png';
+import s1f9dc1f3fe from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3fe.png';
+import s1f9dc1f3ff from 'emoji-datasource-apple/img/apple/64/1f9dc-1f3ff.png';
 import s1f9dd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-200d-2640-fe0f.png';
+import s1f9dd1f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fb-200d-2640-fe0f.png';
+import s1f9dd1f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fc-200d-2640-fe0f.png';
+import s1f9dd1f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fd-200d-2640-fe0f.png';
+import s1f9dd1f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fe-200d-2640-fe0f.png';
+import s1f9dd1f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3ff-200d-2640-fe0f.png';
 import s1f9dd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-200d-2642-fe0f.png';
+import s1f9dd1f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fb-200d-2642-fe0f.png';
+import s1f9dd1f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fc-200d-2642-fe0f.png';
+import s1f9dd1f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fd-200d-2642-fe0f.png';
+import s1f9dd1f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fe-200d-2642-fe0f.png';
+import s1f9dd1f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3ff-200d-2642-fe0f.png';
 import s1f9dd from 'emoji-datasource-apple/img/apple/64/1f9dd.png';
+import s1f9dd1f3fb from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fb.png';
+import s1f9dd1f3fc from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fc.png';
+import s1f9dd1f3fd from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fd.png';
+import s1f9dd1f3fe from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3fe.png';
+import s1f9dd1f3ff from 'emoji-datasource-apple/img/apple/64/1f9dd-1f3ff.png';
 import s1f9de200d2640fe0f from 'emoji-datasource-apple/img/apple/64/1f9de-200d-2640-fe0f.png';
 import s1f9de200d2642fe0f from 'emoji-datasource-apple/img/apple/64/1f9de-200d-2642-fe0f.png';
 import s1f9de from 'emoji-datasource-apple/img/apple/64/1f9de.png';
@@ -1694,6 +3354,11 @@ import s2614 from 'emoji-datasource-apple/img/apple/64/2614.png';
 import s2615 from 'emoji-datasource-apple/img/apple/64/2615.png';
 import s2618fe0f from 'emoji-datasource-apple/img/apple/64/2618-fe0f.png';
 import s261dfe0f from 'emoji-datasource-apple/img/apple/64/261d-fe0f.png';
+import s261d1f3fb from 'emoji-datasource-apple/img/apple/64/261d-1f3fb.png';
+import s261d1f3fc from 'emoji-datasource-apple/img/apple/64/261d-1f3fc.png';
+import s261d1f3fd from 'emoji-datasource-apple/img/apple/64/261d-1f3fd.png';
+import s261d1f3fe from 'emoji-datasource-apple/img/apple/64/261d-1f3fe.png';
+import s261d1f3ff from 'emoji-datasource-apple/img/apple/64/261d-1f3ff.png';
 import s2620fe0f from 'emoji-datasource-apple/img/apple/64/2620-fe0f.png';
 import s2622fe0f from 'emoji-datasource-apple/img/apple/64/2622-fe0f.png';
 import s2623fe0f from 'emoji-datasource-apple/img/apple/64/2623-fe0f.png';
@@ -1761,8 +3426,23 @@ import s26f5 from 'emoji-datasource-apple/img/apple/64/26f5.png';
 import s26f7fe0f from 'emoji-datasource-apple/img/apple/64/26f7-fe0f.png';
 import s26f8fe0f from 'emoji-datasource-apple/img/apple/64/26f8-fe0f.png';
 import s26f9fe0f200d2640fe0f from 'emoji-datasource-apple/img/apple/64/26f9-fe0f-200d-2640-fe0f.png';
+import s26f91f3fb200d2640fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fb-200d-2640-fe0f.png';
+import s26f91f3fc200d2640fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fc-200d-2640-fe0f.png';
+import s26f91f3fd200d2640fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fd-200d-2640-fe0f.png';
+import s26f91f3fe200d2640fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fe-200d-2640-fe0f.png';
+import s26f91f3ff200d2640fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3ff-200d-2640-fe0f.png';
 import s26f9fe0f200d2642fe0f from 'emoji-datasource-apple/img/apple/64/26f9-fe0f-200d-2642-fe0f.png';
+import s26f91f3fb200d2642fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fb-200d-2642-fe0f.png';
+import s26f91f3fc200d2642fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fc-200d-2642-fe0f.png';
+import s26f91f3fd200d2642fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fd-200d-2642-fe0f.png';
+import s26f91f3fe200d2642fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3fe-200d-2642-fe0f.png';
+import s26f91f3ff200d2642fe0f from 'emoji-datasource-apple/img/apple/64/26f9-1f3ff-200d-2642-fe0f.png';
 import s26f9fe0f from 'emoji-datasource-apple/img/apple/64/26f9-fe0f.png';
+import s26f91f3fb from 'emoji-datasource-apple/img/apple/64/26f9-1f3fb.png';
+import s26f91f3fc from 'emoji-datasource-apple/img/apple/64/26f9-1f3fc.png';
+import s26f91f3fd from 'emoji-datasource-apple/img/apple/64/26f9-1f3fd.png';
+import s26f91f3fe from 'emoji-datasource-apple/img/apple/64/26f9-1f3fe.png';
+import s26f91f3ff from 'emoji-datasource-apple/img/apple/64/26f9-1f3ff.png';
 import s26fa from 'emoji-datasource-apple/img/apple/64/26fa.png';
 import s26fd from 'emoji-datasource-apple/img/apple/64/26fd.png';
 import s2702fe0f from 'emoji-datasource-apple/img/apple/64/2702-fe0f.png';
@@ -1770,9 +3450,29 @@ import s2705 from 'emoji-datasource-apple/img/apple/64/2705.png';
 import s2708fe0f from 'emoji-datasource-apple/img/apple/64/2708-fe0f.png';
 import s2709fe0f from 'emoji-datasource-apple/img/apple/64/2709-fe0f.png';
 import s270a from 'emoji-datasource-apple/img/apple/64/270a.png';
+import s270a1f3fb from 'emoji-datasource-apple/img/apple/64/270a-1f3fb.png';
+import s270a1f3fc from 'emoji-datasource-apple/img/apple/64/270a-1f3fc.png';
+import s270a1f3fd from 'emoji-datasource-apple/img/apple/64/270a-1f3fd.png';
+import s270a1f3fe from 'emoji-datasource-apple/img/apple/64/270a-1f3fe.png';
+import s270a1f3ff from 'emoji-datasource-apple/img/apple/64/270a-1f3ff.png';
 import s270b from 'emoji-datasource-apple/img/apple/64/270b.png';
+import s270b1f3fb from 'emoji-datasource-apple/img/apple/64/270b-1f3fb.png';
+import s270b1f3fc from 'emoji-datasource-apple/img/apple/64/270b-1f3fc.png';
+import s270b1f3fd from 'emoji-datasource-apple/img/apple/64/270b-1f3fd.png';
+import s270b1f3fe from 'emoji-datasource-apple/img/apple/64/270b-1f3fe.png';
+import s270b1f3ff from 'emoji-datasource-apple/img/apple/64/270b-1f3ff.png';
 import s270cfe0f from 'emoji-datasource-apple/img/apple/64/270c-fe0f.png';
+import s270c1f3fb from 'emoji-datasource-apple/img/apple/64/270c-1f3fb.png';
+import s270c1f3fc from 'emoji-datasource-apple/img/apple/64/270c-1f3fc.png';
+import s270c1f3fd from 'emoji-datasource-apple/img/apple/64/270c-1f3fd.png';
+import s270c1f3fe from 'emoji-datasource-apple/img/apple/64/270c-1f3fe.png';
+import s270c1f3ff from 'emoji-datasource-apple/img/apple/64/270c-1f3ff.png';
 import s270dfe0f from 'emoji-datasource-apple/img/apple/64/270d-fe0f.png';
+import s270d1f3fb from 'emoji-datasource-apple/img/apple/64/270d-1f3fb.png';
+import s270d1f3fc from 'emoji-datasource-apple/img/apple/64/270d-1f3fc.png';
+import s270d1f3fd from 'emoji-datasource-apple/img/apple/64/270d-1f3fd.png';
+import s270d1f3fe from 'emoji-datasource-apple/img/apple/64/270d-1f3fe.png';
+import s270d1f3ff from 'emoji-datasource-apple/img/apple/64/270d-1f3ff.png';
 import s270ffe0f from 'emoji-datasource-apple/img/apple/64/270f-fe0f.png';
 import s2712fe0f from 'emoji-datasource-apple/img/apple/64/2712-fe0f.png';
 import s2714fe0f from 'emoji-datasource-apple/img/apple/64/2714-fe0f.png';
@@ -1814,2929 +3514,11485 @@ import s303dfe0f from 'emoji-datasource-apple/img/apple/64/303d-fe0f.png';
 import s3297fe0f from 'emoji-datasource-apple/img/apple/64/3297-fe0f.png';
 import s3299fe0f from 'emoji-datasource-apple/img/apple/64/3299-fe0f.png';
 
-export interface Smile {
+export interface SmileVariation {
   alt: string;
   src: typeof import('.png');
+}
+
+export interface Smile extends SmileVariation {
+  skinVariations?: Record<string, SmileVariation>;
 }
 
 export type SmileysStructure = Record<string, Record<string, Smile>>;
 export const smileys: SmileysStructure = {
   "Smileys": {
-    "\u1F441\uFE0F\u200D\u1F5E8\uFE0F": {
+    "\ud83d\udc41\ufe0f\u200d\ud83d\udde8\ufe0f": {
       "src": s1f441fe0f200d1f5e8fe0f,
       "alt": "eye-in-speech-bubble"
     },
-    "\u1F479": {
+    "\ud83d\udc79": {
       "src": s1f479,
       "alt": "japanese_ogre"
     },
-    "\u1F47A": {
+    "\ud83d\udc7a": {
       "src": s1f47a,
       "alt": "japanese_goblin"
     },
-    "\u1F47B": {
+    "\ud83d\udc7b": {
       "src": s1f47b,
       "alt": "ghost"
     },
-    "\u1F47D": {
+    "\ud83d\udc7d": {
       "src": s1f47d,
       "alt": "alien"
     },
-    "\u1F47E": {
+    "\ud83d\udc7e": {
       "src": s1f47e,
       "alt": "space_invader"
     },
-    "\u1F47F": {
+    "\ud83d\udc7f": {
       "src": s1f47f,
       "alt": "imp"
     },
-    "\u1F480": {
+    "\ud83d\udc80": {
       "src": s1f480,
       "alt": "skull"
     },
-    "\u1F48B": {
+    "\ud83d\udc8b": {
       "src": s1f48b,
       "alt": "kiss"
     },
-    "\u1F48C": {
+    "\ud83d\udc8c": {
       "src": s1f48c,
       "alt": "love_letter"
     },
-    "\u1F493": {
+    "\ud83d\udc93": {
       "src": s1f493,
       "alt": "heartbeat"
     },
-    "\u1F494": {
+    "\ud83d\udc94": {
       "src": s1f494,
       "alt": "broken_heart"
     },
-    "\u1F495": {
+    "\ud83d\udc95": {
       "src": s1f495,
       "alt": "two_hearts"
     },
-    "\u1F496": {
+    "\ud83d\udc96": {
       "src": s1f496,
       "alt": "sparkling_heart"
     },
-    "\u1F497": {
+    "\ud83d\udc97": {
       "src": s1f497,
       "alt": "heartpulse"
     },
-    "\u1F498": {
+    "\ud83d\udc98": {
       "src": s1f498,
       "alt": "cupid"
     },
-    "\u1F499": {
+    "\ud83d\udc99": {
       "src": s1f499,
       "alt": "blue_heart"
     },
-    "\u1F49A": {
+    "\ud83d\udc9a": {
       "src": s1f49a,
       "alt": "green_heart"
     },
-    "\u1F49B": {
+    "\ud83d\udc9b": {
       "src": s1f49b,
       "alt": "yellow_heart"
     },
-    "\u1F49C": {
+    "\ud83d\udc9c": {
       "src": s1f49c,
       "alt": "purple_heart"
     },
-    "\u1F49D": {
+    "\ud83d\udc9d": {
       "src": s1f49d,
       "alt": "gift_heart"
     },
-    "\u1F49E": {
+    "\ud83d\udc9e": {
       "src": s1f49e,
       "alt": "revolving_hearts"
     },
-    "\u1F49F": {
+    "\ud83d\udc9f": {
       "src": s1f49f,
       "alt": "heart_decoration"
     },
-    "\u1F4A2": {
+    "\ud83d\udca2": {
       "src": s1f4a2,
       "alt": "anger"
     },
-    "\u1F4A3": {
+    "\ud83d\udca3": {
       "src": s1f4a3,
       "alt": "bomb"
     },
-    "\u1F4A4": {
+    "\ud83d\udca4": {
       "src": s1f4a4,
       "alt": "zzz"
     },
-    "\u1F4A5": {
+    "\ud83d\udca5": {
       "src": s1f4a5,
       "alt": "boom"
     },
-    "\u1F4A6": {
+    "\ud83d\udca6": {
       "src": s1f4a6,
       "alt": "sweat_drops"
     },
-    "\u1F4A8": {
+    "\ud83d\udca8": {
       "src": s1f4a8,
       "alt": "dash"
     },
-    "\u1F4A9": {
+    "\ud83d\udca9": {
       "src": s1f4a9,
       "alt": "hankey"
     },
-    "\u1F4AB": {
+    "\ud83d\udcab": {
       "src": s1f4ab,
       "alt": "dizzy"
     },
-    "\u1F4AC": {
+    "\ud83d\udcac": {
       "src": s1f4ac,
       "alt": "speech_balloon"
     },
-    "\u1F4AD": {
+    "\ud83d\udcad": {
       "src": s1f4ad,
       "alt": "thought_balloon"
     },
-    "\u1F4AF": {
+    "\ud83d\udcaf": {
       "src": s1f4af,
       "alt": "100"
     },
-    "\u1F573\uFE0F": {
+    "\ud83d\udd73\ufe0f": {
       "src": s1f573fe0f,
       "alt": "hole"
     },
-    "\u1F5A4": {
+    "\ud83d\udda4": {
       "src": s1f5a4,
       "alt": "black_heart"
     },
-    "\u1F5E8\uFE0F": {
+    "\ud83d\udde8\ufe0f": {
       "src": s1f5e8fe0f,
       "alt": "left_speech_bubble"
     },
-    "\u1F5EF\uFE0F": {
+    "\ud83d\uddef\ufe0f": {
       "src": s1f5effe0f,
       "alt": "right_anger_bubble"
     },
-    "\u1F600": {
+    "\ud83d\ude00": {
       "src": s1f600,
       "alt": "grinning"
     },
-    "\u1F601": {
+    "\ud83d\ude01": {
       "src": s1f601,
       "alt": "grin"
     },
-    "\u1F602": {
+    "\ud83d\ude02": {
       "src": s1f602,
       "alt": "joy"
     },
-    "\u1F603": {
+    "\ud83d\ude03": {
       "src": s1f603,
       "alt": "smiley"
     },
-    "\u1F604": {
+    "\ud83d\ude04": {
       "src": s1f604,
       "alt": "smile"
     },
-    "\u1F605": {
+    "\ud83d\ude05": {
       "src": s1f605,
       "alt": "sweat_smile"
     },
-    "\u1F606": {
+    "\ud83d\ude06": {
       "src": s1f606,
       "alt": "laughing"
     },
-    "\u1F607": {
+    "\ud83d\ude07": {
       "src": s1f607,
       "alt": "innocent"
     },
-    "\u1F608": {
+    "\ud83d\ude08": {
       "src": s1f608,
       "alt": "smiling_imp"
     },
-    "\u1F609": {
+    "\ud83d\ude09": {
       "src": s1f609,
       "alt": "wink"
     },
-    "\u1F60A": {
+    "\ud83d\ude0a": {
       "src": s1f60a,
       "alt": "blush"
     },
-    "\u1F60B": {
+    "\ud83d\ude0b": {
       "src": s1f60b,
       "alt": "yum"
     },
-    "\u1F60C": {
+    "\ud83d\ude0c": {
       "src": s1f60c,
       "alt": "relieved"
     },
-    "\u1F60D": {
+    "\ud83d\ude0d": {
       "src": s1f60d,
       "alt": "heart_eyes"
     },
-    "\u1F60E": {
+    "\ud83d\ude0e": {
       "src": s1f60e,
       "alt": "sunglasses"
     },
-    "\u1F60F": {
+    "\ud83d\ude0f": {
       "src": s1f60f,
       "alt": "smirk"
     },
-    "\u1F610": {
+    "\ud83d\ude10": {
       "src": s1f610,
       "alt": "neutral_face"
     },
-    "\u1F611": {
+    "\ud83d\ude11": {
       "src": s1f611,
       "alt": "expressionless"
     },
-    "\u1F612": {
+    "\ud83d\ude12": {
       "src": s1f612,
       "alt": "unamused"
     },
-    "\u1F613": {
+    "\ud83d\ude13": {
       "src": s1f613,
       "alt": "sweat"
     },
-    "\u1F614": {
+    "\ud83d\ude14": {
       "src": s1f614,
       "alt": "pensive"
     },
-    "\u1F615": {
+    "\ud83d\ude15": {
       "src": s1f615,
       "alt": "confused"
     },
-    "\u1F616": {
+    "\ud83d\ude16": {
       "src": s1f616,
       "alt": "confounded"
     },
-    "\u1F617": {
+    "\ud83d\ude17": {
       "src": s1f617,
       "alt": "kissing"
     },
-    "\u1F618": {
+    "\ud83d\ude18": {
       "src": s1f618,
       "alt": "kissing_heart"
     },
-    "\u1F619": {
+    "\ud83d\ude19": {
       "src": s1f619,
       "alt": "kissing_smiling_eyes"
     },
-    "\u1F61A": {
+    "\ud83d\ude1a": {
       "src": s1f61a,
       "alt": "kissing_closed_eyes"
     },
-    "\u1F61B": {
+    "\ud83d\ude1b": {
       "src": s1f61b,
       "alt": "stuck_out_tongue"
     },
-    "\u1F61C": {
+    "\ud83d\ude1c": {
       "src": s1f61c,
       "alt": "stuck_out_tongue_winking_eye"
     },
-    "\u1F61D": {
+    "\ud83d\ude1d": {
       "src": s1f61d,
       "alt": "stuck_out_tongue_closed_eyes"
     },
-    "\u1F61E": {
+    "\ud83d\ude1e": {
       "src": s1f61e,
       "alt": "disappointed"
     },
-    "\u1F61F": {
+    "\ud83d\ude1f": {
       "src": s1f61f,
       "alt": "worried"
     },
-    "\u1F620": {
+    "\ud83d\ude20": {
       "src": s1f620,
       "alt": "angry"
     },
-    "\u1F621": {
+    "\ud83d\ude21": {
       "src": s1f621,
       "alt": "rage"
     },
-    "\u1F622": {
+    "\ud83d\ude22": {
       "src": s1f622,
       "alt": "cry"
     },
-    "\u1F623": {
+    "\ud83d\ude23": {
       "src": s1f623,
       "alt": "persevere"
     },
-    "\u1F624": {
+    "\ud83d\ude24": {
       "src": s1f624,
       "alt": "triumph"
     },
-    "\u1F625": {
+    "\ud83d\ude25": {
       "src": s1f625,
       "alt": "disappointed_relieved"
     },
-    "\u1F626": {
+    "\ud83d\ude26": {
       "src": s1f626,
       "alt": "frowning"
     },
-    "\u1F627": {
+    "\ud83d\ude27": {
       "src": s1f627,
       "alt": "anguished"
     },
-    "\u1F628": {
+    "\ud83d\ude28": {
       "src": s1f628,
       "alt": "fearful"
     },
-    "\u1F629": {
+    "\ud83d\ude29": {
       "src": s1f629,
       "alt": "weary"
     },
-    "\u1F62A": {
+    "\ud83d\ude2a": {
       "src": s1f62a,
       "alt": "sleepy"
     },
-    "\u1F62B": {
+    "\ud83d\ude2b": {
       "src": s1f62b,
       "alt": "tired_face"
     },
-    "\u1F62C": {
+    "\ud83d\ude2c": {
       "src": s1f62c,
       "alt": "grimacing"
     },
-    "\u1F62D": {
+    "\ud83d\ude2d": {
       "src": s1f62d,
       "alt": "sob"
     },
-    "\u1F62E\u200D\u1F4A8": {
+    "\ud83d\ude2e\u200d\ud83d\udca8": {
       "src": s1f62e200d1f4a8,
       "alt": "face_exhaling"
     },
-    "\u1F62E": {
+    "\ud83d\ude2e": {
       "src": s1f62e,
       "alt": "open_mouth"
     },
-    "\u1F62F": {
+    "\ud83d\ude2f": {
       "src": s1f62f,
       "alt": "hushed"
     },
-    "\u1F630": {
+    "\ud83d\ude30": {
       "src": s1f630,
       "alt": "cold_sweat"
     },
-    "\u1F631": {
+    "\ud83d\ude31": {
       "src": s1f631,
       "alt": "scream"
     },
-    "\u1F632": {
+    "\ud83d\ude32": {
       "src": s1f632,
       "alt": "astonished"
     },
-    "\u1F633": {
+    "\ud83d\ude33": {
       "src": s1f633,
       "alt": "flushed"
     },
-    "\u1F634": {
+    "\ud83d\ude34": {
       "src": s1f634,
       "alt": "sleeping"
     },
-    "\u1F635\u200D\u1F4AB": {
+    "\ud83d\ude35\u200d\ud83d\udcab": {
       "src": s1f635200d1f4ab,
       "alt": "face_with_spiral_eyes"
     },
-    "\u1F635": {
+    "\ud83d\ude35": {
       "src": s1f635,
       "alt": "dizzy_face"
     },
-    "\u1F636\u200D\u1F32B\uFE0F": {
+    "\ud83d\ude36\u200d\ud83c\udf2b\ufe0f": {
       "src": s1f636200d1f32bfe0f,
       "alt": "face_in_clouds"
     },
-    "\u1F636": {
+    "\ud83d\ude36": {
       "src": s1f636,
       "alt": "no_mouth"
     },
-    "\u1F637": {
+    "\ud83d\ude37": {
       "src": s1f637,
       "alt": "mask"
     },
-    "\u1F638": {
+    "\ud83d\ude38": {
       "src": s1f638,
       "alt": "smile_cat"
     },
-    "\u1F639": {
+    "\ud83d\ude39": {
       "src": s1f639,
       "alt": "joy_cat"
     },
-    "\u1F63A": {
+    "\ud83d\ude3a": {
       "src": s1f63a,
       "alt": "smiley_cat"
     },
-    "\u1F63B": {
+    "\ud83d\ude3b": {
       "src": s1f63b,
       "alt": "heart_eyes_cat"
     },
-    "\u1F63C": {
+    "\ud83d\ude3c": {
       "src": s1f63c,
       "alt": "smirk_cat"
     },
-    "\u1F63D": {
+    "\ud83d\ude3d": {
       "src": s1f63d,
       "alt": "kissing_cat"
     },
-    "\u1F63E": {
+    "\ud83d\ude3e": {
       "src": s1f63e,
       "alt": "pouting_cat"
     },
-    "\u1F63F": {
+    "\ud83d\ude3f": {
       "src": s1f63f,
       "alt": "crying_cat_face"
     },
-    "\u1F640": {
+    "\ud83d\ude40": {
       "src": s1f640,
       "alt": "scream_cat"
     },
-    "\u1F641": {
+    "\ud83d\ude41": {
       "src": s1f641,
       "alt": "slightly_frowning_face"
     },
-    "\u1F642": {
+    "\ud83d\ude42": {
       "src": s1f642,
       "alt": "slightly_smiling_face"
     },
-    "\u1F643": {
+    "\ud83d\ude43": {
       "src": s1f643,
       "alt": "upside_down_face"
     },
-    "\u1F644": {
+    "\ud83d\ude44": {
       "src": s1f644,
       "alt": "face_with_rolling_eyes"
     },
-    "\u1F648": {
+    "\ud83d\ude48": {
       "src": s1f648,
       "alt": "see_no_evil"
     },
-    "\u1F649": {
+    "\ud83d\ude49": {
       "src": s1f649,
       "alt": "hear_no_evil"
     },
-    "\u1F64A": {
+    "\ud83d\ude4a": {
       "src": s1f64a,
       "alt": "speak_no_evil"
     },
-    "\u1F90D": {
+    "\ud83e\udd0d": {
       "src": s1f90d,
       "alt": "white_heart"
     },
-    "\u1F90E": {
+    "\ud83e\udd0e": {
       "src": s1f90e,
       "alt": "brown_heart"
     },
-    "\u1F910": {
+    "\ud83e\udd10": {
       "src": s1f910,
       "alt": "zipper_mouth_face"
     },
-    "\u1F911": {
+    "\ud83e\udd11": {
       "src": s1f911,
       "alt": "money_mouth_face"
     },
-    "\u1F912": {
+    "\ud83e\udd12": {
       "src": s1f912,
       "alt": "face_with_thermometer"
     },
-    "\u1F913": {
+    "\ud83e\udd13": {
       "src": s1f913,
       "alt": "nerd_face"
     },
-    "\u1F914": {
+    "\ud83e\udd14": {
       "src": s1f914,
       "alt": "thinking_face"
     },
-    "\u1F915": {
+    "\ud83e\udd15": {
       "src": s1f915,
       "alt": "face_with_head_bandage"
     },
-    "\u1F916": {
+    "\ud83e\udd16": {
       "src": s1f916,
       "alt": "robot_face"
     },
-    "\u1F917": {
+    "\ud83e\udd17": {
       "src": s1f917,
       "alt": "hugging_face"
     },
-    "\u1F920": {
+    "\ud83e\udd20": {
       "src": s1f920,
       "alt": "face_with_cowboy_hat"
     },
-    "\u1F921": {
+    "\ud83e\udd21": {
       "src": s1f921,
       "alt": "clown_face"
     },
-    "\u1F922": {
+    "\ud83e\udd22": {
       "src": s1f922,
       "alt": "nauseated_face"
     },
-    "\u1F923": {
+    "\ud83e\udd23": {
       "src": s1f923,
       "alt": "rolling_on_the_floor_laughing"
     },
-    "\u1F924": {
+    "\ud83e\udd24": {
       "src": s1f924,
       "alt": "drooling_face"
     },
-    "\u1F925": {
+    "\ud83e\udd25": {
       "src": s1f925,
       "alt": "lying_face"
     },
-    "\u1F927": {
+    "\ud83e\udd27": {
       "src": s1f927,
       "alt": "sneezing_face"
     },
-    "\u1F928": {
+    "\ud83e\udd28": {
       "src": s1f928,
       "alt": "face_with_raised_eyebrow"
     },
-    "\u1F929": {
+    "\ud83e\udd29": {
       "src": s1f929,
       "alt": "star-struck"
     },
-    "\u1F92A": {
+    "\ud83e\udd2a": {
       "src": s1f92a,
       "alt": "zany_face"
     },
-    "\u1F92B": {
+    "\ud83e\udd2b": {
       "src": s1f92b,
       "alt": "shushing_face"
     },
-    "\u1F92C": {
+    "\ud83e\udd2c": {
       "src": s1f92c,
       "alt": "face_with_symbols_on_mouth"
     },
-    "\u1F92D": {
+    "\ud83e\udd2d": {
       "src": s1f92d,
       "alt": "face_with_hand_over_mouth"
     },
-    "\u1F92E": {
+    "\ud83e\udd2e": {
       "src": s1f92e,
       "alt": "face_vomiting"
     },
-    "\u1F92F": {
+    "\ud83e\udd2f": {
       "src": s1f92f,
       "alt": "exploding_head"
     },
-    "\u1F970": {
+    "\ud83e\udd70": {
       "src": s1f970,
       "alt": "smiling_face_with_3_hearts"
     },
-    "\u1F971": {
+    "\ud83e\udd71": {
       "src": s1f971,
       "alt": "yawning_face"
     },
-    "\u1F972": {
+    "\ud83e\udd72": {
       "src": s1f972,
       "alt": "smiling_face_with_tear"
     },
-    "\u1F973": {
+    "\ud83e\udd73": {
       "src": s1f973,
       "alt": "partying_face"
     },
-    "\u1F974": {
+    "\ud83e\udd74": {
       "src": s1f974,
       "alt": "woozy_face"
     },
-    "\u1F975": {
+    "\ud83e\udd75": {
       "src": s1f975,
       "alt": "hot_face"
     },
-    "\u1F976": {
+    "\ud83e\udd76": {
       "src": s1f976,
       "alt": "cold_face"
     },
-    "\u1F978": {
+    "\ud83e\udd78": {
       "src": s1f978,
       "alt": "disguised_face"
     },
-    "\u1F97A": {
+    "\ud83e\udd7a": {
       "src": s1f97a,
       "alt": "pleading_face"
     },
-    "\u1F9D0": {
+    "\ud83e\uddd0": {
       "src": s1f9d0,
       "alt": "face_with_monocle"
     },
-    "\u1F9E1": {
+    "\ud83e\udde1": {
       "src": s1f9e1,
       "alt": "orange_heart"
     },
-    "\u2620\uFE0F": {
+    "\u2620\ufe0f": {
       "src": s2620fe0f,
       "alt": "skull_and_crossbones"
     },
-    "\u2639\uFE0F": {
+    "\u2639\ufe0f": {
       "src": s2639fe0f,
       "alt": "white_frowning_face"
     },
-    "\u263A\uFE0F": {
+    "\u263a\ufe0f": {
       "src": s263afe0f,
       "alt": "relaxed"
     },
-    "\u2763\uFE0F": {
+    "\u2763\ufe0f": {
       "src": s2763fe0f,
       "alt": "heavy_heart_exclamation_mark_ornament"
     },
-    "\u2764\uFE0F\u200D\u1F525": {
+    "\u2764\ufe0f\u200d\ud83d\udd25": {
       "src": s2764fe0f200d1f525,
       "alt": "heart_on_fire"
     },
-    "\u2764\uFE0F\u200D\u1FA79": {
+    "\u2764\ufe0f\u200d\ud83e\ude79": {
       "src": s2764fe0f200d1fa79,
       "alt": "mending_heart"
     },
-    "\u2764\uFE0F": {
+    "\u2764\ufe0f": {
       "src": s2764fe0f,
       "alt": "heart"
     }
   },
   "People": {
-    "\u1F385": {
+    "\ud83c\udf85": {
       "src": s1f385,
-      "alt": "santa"
+      "alt": "santa",
+      "skinVariations": {
+        "\ud83c\udf85": {
+          "src": s1f385,
+          "alt": "santa"
+        },
+        "\ud83c\udf85\ud83c\udffb": {
+          "src": s1f3851f3fb,
+          "alt": "santa"
+        },
+        "\ud83c\udf85\ud83c\udffc": {
+          "src": s1f3851f3fc,
+          "alt": "santa"
+        },
+        "\ud83c\udf85\ud83c\udffd": {
+          "src": s1f3851f3fd,
+          "alt": "santa"
+        },
+        "\ud83c\udf85\ud83c\udffe": {
+          "src": s1f3851f3fe,
+          "alt": "santa"
+        },
+        "\ud83c\udf85\ud83c\udfff": {
+          "src": s1f3851f3ff,
+          "alt": "santa"
+        }
+      }
     },
-    "\u1F3C2": {
+    "\ud83c\udfc2": {
       "src": s1f3c2,
-      "alt": "snowboarder"
+      "alt": "snowboarder",
+      "skinVariations": {
+        "\ud83c\udfc2": {
+          "src": s1f3c2,
+          "alt": "snowboarder"
+        },
+        "\ud83c\udfc2\ud83c\udffb": {
+          "src": s1f3c21f3fb,
+          "alt": "snowboarder"
+        },
+        "\ud83c\udfc2\ud83c\udffc": {
+          "src": s1f3c21f3fc,
+          "alt": "snowboarder"
+        },
+        "\ud83c\udfc2\ud83c\udffd": {
+          "src": s1f3c21f3fd,
+          "alt": "snowboarder"
+        },
+        "\ud83c\udfc2\ud83c\udffe": {
+          "src": s1f3c21f3fe,
+          "alt": "snowboarder"
+        },
+        "\ud83c\udfc2\ud83c\udfff": {
+          "src": s1f3c21f3ff,
+          "alt": "snowboarder"
+        }
+      }
     },
-    "\u1F3C3\u200D\u2640\uFE0F": {
+    "\ud83c\udfc3\u200d\u2640\ufe0f": {
       "src": s1f3c3200d2640fe0f,
-      "alt": "woman-running"
+      "alt": "woman-running",
+      "skinVariations": {
+        "\ud83c\udfc3\u200d\u2640\ufe0f": {
+          "src": s1f3c3200d2640fe0f,
+          "alt": "woman-running"
+        },
+        "\ud83c\udfc3\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f3c31f3fb200d2640fe0f,
+          "alt": "woman-running"
+        },
+        "\ud83c\udfc3\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f3c31f3fc200d2640fe0f,
+          "alt": "woman-running"
+        },
+        "\ud83c\udfc3\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f3c31f3fd200d2640fe0f,
+          "alt": "woman-running"
+        },
+        "\ud83c\udfc3\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f3c31f3fe200d2640fe0f,
+          "alt": "woman-running"
+        },
+        "\ud83c\udfc3\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f3c31f3ff200d2640fe0f,
+          "alt": "woman-running"
+        }
+      }
     },
-    "\u1F3C3\u200D\u2642\uFE0F": {
+    "\ud83c\udfc3\u200d\u2642\ufe0f": {
       "src": s1f3c3200d2642fe0f,
-      "alt": "man-running"
+      "alt": "man-running",
+      "skinVariations": {
+        "\ud83c\udfc3\u200d\u2642\ufe0f": {
+          "src": s1f3c3200d2642fe0f,
+          "alt": "man-running"
+        },
+        "\ud83c\udfc3\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f3c31f3fb200d2642fe0f,
+          "alt": "man-running"
+        },
+        "\ud83c\udfc3\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f3c31f3fc200d2642fe0f,
+          "alt": "man-running"
+        },
+        "\ud83c\udfc3\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f3c31f3fd200d2642fe0f,
+          "alt": "man-running"
+        },
+        "\ud83c\udfc3\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f3c31f3fe200d2642fe0f,
+          "alt": "man-running"
+        },
+        "\ud83c\udfc3\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f3c31f3ff200d2642fe0f,
+          "alt": "man-running"
+        }
+      }
     },
-    "\u1F3C3": {
+    "\ud83c\udfc3": {
       "src": s1f3c3,
-      "alt": "runner"
+      "alt": "runner",
+      "skinVariations": {
+        "\ud83c\udfc3": {
+          "src": s1f3c3,
+          "alt": "runner"
+        },
+        "\ud83c\udfc3\ud83c\udffb": {
+          "src": s1f3c31f3fb,
+          "alt": "runner"
+        },
+        "\ud83c\udfc3\ud83c\udffc": {
+          "src": s1f3c31f3fc,
+          "alt": "runner"
+        },
+        "\ud83c\udfc3\ud83c\udffd": {
+          "src": s1f3c31f3fd,
+          "alt": "runner"
+        },
+        "\ud83c\udfc3\ud83c\udffe": {
+          "src": s1f3c31f3fe,
+          "alt": "runner"
+        },
+        "\ud83c\udfc3\ud83c\udfff": {
+          "src": s1f3c31f3ff,
+          "alt": "runner"
+        }
+      }
     },
-    "\u1F3C4\u200D\u2640\uFE0F": {
+    "\ud83c\udfc4\u200d\u2640\ufe0f": {
       "src": s1f3c4200d2640fe0f,
-      "alt": "woman-surfing"
+      "alt": "woman-surfing",
+      "skinVariations": {
+        "\ud83c\udfc4\u200d\u2640\ufe0f": {
+          "src": s1f3c4200d2640fe0f,
+          "alt": "woman-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f3c41f3fb200d2640fe0f,
+          "alt": "woman-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f3c41f3fc200d2640fe0f,
+          "alt": "woman-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f3c41f3fd200d2640fe0f,
+          "alt": "woman-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f3c41f3fe200d2640fe0f,
+          "alt": "woman-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f3c41f3ff200d2640fe0f,
+          "alt": "woman-surfing"
+        }
+      }
     },
-    "\u1F3C4\u200D\u2642\uFE0F": {
+    "\ud83c\udfc4\u200d\u2642\ufe0f": {
       "src": s1f3c4200d2642fe0f,
-      "alt": "man-surfing"
+      "alt": "man-surfing",
+      "skinVariations": {
+        "\ud83c\udfc4\u200d\u2642\ufe0f": {
+          "src": s1f3c4200d2642fe0f,
+          "alt": "man-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f3c41f3fb200d2642fe0f,
+          "alt": "man-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f3c41f3fc200d2642fe0f,
+          "alt": "man-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f3c41f3fd200d2642fe0f,
+          "alt": "man-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f3c41f3fe200d2642fe0f,
+          "alt": "man-surfing"
+        },
+        "\ud83c\udfc4\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f3c41f3ff200d2642fe0f,
+          "alt": "man-surfing"
+        }
+      }
     },
-    "\u1F3C4": {
+    "\ud83c\udfc4": {
       "src": s1f3c4,
-      "alt": "surfer"
+      "alt": "surfer",
+      "skinVariations": {
+        "\ud83c\udfc4": {
+          "src": s1f3c4,
+          "alt": "surfer"
+        },
+        "\ud83c\udfc4\ud83c\udffb": {
+          "src": s1f3c41f3fb,
+          "alt": "surfer"
+        },
+        "\ud83c\udfc4\ud83c\udffc": {
+          "src": s1f3c41f3fc,
+          "alt": "surfer"
+        },
+        "\ud83c\udfc4\ud83c\udffd": {
+          "src": s1f3c41f3fd,
+          "alt": "surfer"
+        },
+        "\ud83c\udfc4\ud83c\udffe": {
+          "src": s1f3c41f3fe,
+          "alt": "surfer"
+        },
+        "\ud83c\udfc4\ud83c\udfff": {
+          "src": s1f3c41f3ff,
+          "alt": "surfer"
+        }
+      }
     },
-    "\u1F3C7": {
+    "\ud83c\udfc7": {
       "src": s1f3c7,
-      "alt": "horse_racing"
+      "alt": "horse_racing",
+      "skinVariations": {
+        "\ud83c\udfc7": {
+          "src": s1f3c7,
+          "alt": "horse_racing"
+        },
+        "\ud83c\udfc7\ud83c\udffb": {
+          "src": s1f3c71f3fb,
+          "alt": "horse_racing"
+        },
+        "\ud83c\udfc7\ud83c\udffc": {
+          "src": s1f3c71f3fc,
+          "alt": "horse_racing"
+        },
+        "\ud83c\udfc7\ud83c\udffd": {
+          "src": s1f3c71f3fd,
+          "alt": "horse_racing"
+        },
+        "\ud83c\udfc7\ud83c\udffe": {
+          "src": s1f3c71f3fe,
+          "alt": "horse_racing"
+        },
+        "\ud83c\udfc7\ud83c\udfff": {
+          "src": s1f3c71f3ff,
+          "alt": "horse_racing"
+        }
+      }
     },
-    "\u1F3CA\u200D\u2640\uFE0F": {
+    "\ud83c\udfca\u200d\u2640\ufe0f": {
       "src": s1f3ca200d2640fe0f,
-      "alt": "woman-swimming"
+      "alt": "woman-swimming",
+      "skinVariations": {
+        "\ud83c\udfca\u200d\u2640\ufe0f": {
+          "src": s1f3ca200d2640fe0f,
+          "alt": "woman-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f3ca1f3fb200d2640fe0f,
+          "alt": "woman-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f3ca1f3fc200d2640fe0f,
+          "alt": "woman-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f3ca1f3fd200d2640fe0f,
+          "alt": "woman-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f3ca1f3fe200d2640fe0f,
+          "alt": "woman-swimming"
+        },
+        "\ud83c\udfca\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f3ca1f3ff200d2640fe0f,
+          "alt": "woman-swimming"
+        }
+      }
     },
-    "\u1F3CA\u200D\u2642\uFE0F": {
+    "\ud83c\udfca\u200d\u2642\ufe0f": {
       "src": s1f3ca200d2642fe0f,
-      "alt": "man-swimming"
+      "alt": "man-swimming",
+      "skinVariations": {
+        "\ud83c\udfca\u200d\u2642\ufe0f": {
+          "src": s1f3ca200d2642fe0f,
+          "alt": "man-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f3ca1f3fb200d2642fe0f,
+          "alt": "man-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f3ca1f3fc200d2642fe0f,
+          "alt": "man-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f3ca1f3fd200d2642fe0f,
+          "alt": "man-swimming"
+        },
+        "\ud83c\udfca\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f3ca1f3fe200d2642fe0f,
+          "alt": "man-swimming"
+        },
+        "\ud83c\udfca\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f3ca1f3ff200d2642fe0f,
+          "alt": "man-swimming"
+        }
+      }
     },
-    "\u1F3CA": {
+    "\ud83c\udfca": {
       "src": s1f3ca,
-      "alt": "swimmer"
+      "alt": "swimmer",
+      "skinVariations": {
+        "\ud83c\udfca": {
+          "src": s1f3ca,
+          "alt": "swimmer"
+        },
+        "\ud83c\udfca\ud83c\udffb": {
+          "src": s1f3ca1f3fb,
+          "alt": "swimmer"
+        },
+        "\ud83c\udfca\ud83c\udffc": {
+          "src": s1f3ca1f3fc,
+          "alt": "swimmer"
+        },
+        "\ud83c\udfca\ud83c\udffd": {
+          "src": s1f3ca1f3fd,
+          "alt": "swimmer"
+        },
+        "\ud83c\udfca\ud83c\udffe": {
+          "src": s1f3ca1f3fe,
+          "alt": "swimmer"
+        },
+        "\ud83c\udfca\ud83c\udfff": {
+          "src": s1f3ca1f3ff,
+          "alt": "swimmer"
+        }
+      }
     },
-    "\u1F3CB\uFE0F\u200D\u2640\uFE0F": {
+    "\ud83c\udfcb\ufe0f\u200d\u2640\ufe0f": {
       "src": s1f3cbfe0f200d2640fe0f,
-      "alt": "woman-lifting-weights"
+      "alt": "woman-lifting-weights",
+      "skinVariations": {
+        "\ud83c\udfcb\ufe0f\u200d\u2640\ufe0f": {
+          "src": s1f3cbfe0f200d2640fe0f,
+          "alt": "woman-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f3cb1f3fb200d2640fe0f,
+          "alt": "woman-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f3cb1f3fc200d2640fe0f,
+          "alt": "woman-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f3cb1f3fd200d2640fe0f,
+          "alt": "woman-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f3cb1f3fe200d2640fe0f,
+          "alt": "woman-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f3cb1f3ff200d2640fe0f,
+          "alt": "woman-lifting-weights"
+        }
+      }
     },
-    "\u1F3CB\uFE0F\u200D\u2642\uFE0F": {
+    "\ud83c\udfcb\ufe0f\u200d\u2642\ufe0f": {
       "src": s1f3cbfe0f200d2642fe0f,
-      "alt": "man-lifting-weights"
+      "alt": "man-lifting-weights",
+      "skinVariations": {
+        "\ud83c\udfcb\ufe0f\u200d\u2642\ufe0f": {
+          "src": s1f3cbfe0f200d2642fe0f,
+          "alt": "man-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f3cb1f3fb200d2642fe0f,
+          "alt": "man-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f3cb1f3fc200d2642fe0f,
+          "alt": "man-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f3cb1f3fd200d2642fe0f,
+          "alt": "man-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f3cb1f3fe200d2642fe0f,
+          "alt": "man-lifting-weights"
+        },
+        "\ud83c\udfcb\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f3cb1f3ff200d2642fe0f,
+          "alt": "man-lifting-weights"
+        }
+      }
     },
-    "\u1F3CB\uFE0F": {
+    "\ud83c\udfcb\ufe0f": {
       "src": s1f3cbfe0f,
-      "alt": "weight_lifter"
+      "alt": "weight_lifter",
+      "skinVariations": {
+        "\ud83c\udfcb\ufe0f": {
+          "src": s1f3cbfe0f,
+          "alt": "weight_lifter"
+        },
+        "\ud83c\udfcb\ud83c\udffb": {
+          "src": s1f3cb1f3fb,
+          "alt": "weight_lifter"
+        },
+        "\ud83c\udfcb\ud83c\udffc": {
+          "src": s1f3cb1f3fc,
+          "alt": "weight_lifter"
+        },
+        "\ud83c\udfcb\ud83c\udffd": {
+          "src": s1f3cb1f3fd,
+          "alt": "weight_lifter"
+        },
+        "\ud83c\udfcb\ud83c\udffe": {
+          "src": s1f3cb1f3fe,
+          "alt": "weight_lifter"
+        },
+        "\ud83c\udfcb\ud83c\udfff": {
+          "src": s1f3cb1f3ff,
+          "alt": "weight_lifter"
+        }
+      }
     },
-    "\u1F3CC\uFE0F\u200D\u2640\uFE0F": {
+    "\ud83c\udfcc\ufe0f\u200d\u2640\ufe0f": {
       "src": s1f3ccfe0f200d2640fe0f,
-      "alt": "woman-golfing"
+      "alt": "woman-golfing",
+      "skinVariations": {
+        "\ud83c\udfcc\ufe0f\u200d\u2640\ufe0f": {
+          "src": s1f3ccfe0f200d2640fe0f,
+          "alt": "woman-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f3cc1f3fb200d2640fe0f,
+          "alt": "woman-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f3cc1f3fc200d2640fe0f,
+          "alt": "woman-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f3cc1f3fd200d2640fe0f,
+          "alt": "woman-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f3cc1f3fe200d2640fe0f,
+          "alt": "woman-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f3cc1f3ff200d2640fe0f,
+          "alt": "woman-golfing"
+        }
+      }
     },
-    "\u1F3CC\uFE0F\u200D\u2642\uFE0F": {
+    "\ud83c\udfcc\ufe0f\u200d\u2642\ufe0f": {
       "src": s1f3ccfe0f200d2642fe0f,
-      "alt": "man-golfing"
+      "alt": "man-golfing",
+      "skinVariations": {
+        "\ud83c\udfcc\ufe0f\u200d\u2642\ufe0f": {
+          "src": s1f3ccfe0f200d2642fe0f,
+          "alt": "man-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f3cc1f3fb200d2642fe0f,
+          "alt": "man-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f3cc1f3fc200d2642fe0f,
+          "alt": "man-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f3cc1f3fd200d2642fe0f,
+          "alt": "man-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f3cc1f3fe200d2642fe0f,
+          "alt": "man-golfing"
+        },
+        "\ud83c\udfcc\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f3cc1f3ff200d2642fe0f,
+          "alt": "man-golfing"
+        }
+      }
     },
-    "\u1F3CC\uFE0F": {
+    "\ud83c\udfcc\ufe0f": {
       "src": s1f3ccfe0f,
-      "alt": "golfer"
+      "alt": "golfer",
+      "skinVariations": {
+        "\ud83c\udfcc\ufe0f": {
+          "src": s1f3ccfe0f,
+          "alt": "golfer"
+        },
+        "\ud83c\udfcc\ud83c\udffb": {
+          "src": s1f3cc1f3fb,
+          "alt": "golfer"
+        },
+        "\ud83c\udfcc\ud83c\udffc": {
+          "src": s1f3cc1f3fc,
+          "alt": "golfer"
+        },
+        "\ud83c\udfcc\ud83c\udffd": {
+          "src": s1f3cc1f3fd,
+          "alt": "golfer"
+        },
+        "\ud83c\udfcc\ud83c\udffe": {
+          "src": s1f3cc1f3fe,
+          "alt": "golfer"
+        },
+        "\ud83c\udfcc\ud83c\udfff": {
+          "src": s1f3cc1f3ff,
+          "alt": "golfer"
+        }
+      }
     },
-    "\u1F440": {
+    "\ud83d\udc40": {
       "src": s1f440,
       "alt": "eyes"
     },
-    "\u1F441\uFE0F": {
+    "\ud83d\udc41\ufe0f": {
       "src": s1f441fe0f,
       "alt": "eye"
     },
-    "\u1F442": {
+    "\ud83d\udc42": {
       "src": s1f442,
-      "alt": "ear"
+      "alt": "ear",
+      "skinVariations": {
+        "\ud83d\udc42": {
+          "src": s1f442,
+          "alt": "ear"
+        },
+        "\ud83d\udc42\ud83c\udffb": {
+          "src": s1f4421f3fb,
+          "alt": "ear"
+        },
+        "\ud83d\udc42\ud83c\udffc": {
+          "src": s1f4421f3fc,
+          "alt": "ear"
+        },
+        "\ud83d\udc42\ud83c\udffd": {
+          "src": s1f4421f3fd,
+          "alt": "ear"
+        },
+        "\ud83d\udc42\ud83c\udffe": {
+          "src": s1f4421f3fe,
+          "alt": "ear"
+        },
+        "\ud83d\udc42\ud83c\udfff": {
+          "src": s1f4421f3ff,
+          "alt": "ear"
+        }
+      }
     },
-    "\u1F443": {
+    "\ud83d\udc43": {
       "src": s1f443,
-      "alt": "nose"
+      "alt": "nose",
+      "skinVariations": {
+        "\ud83d\udc43": {
+          "src": s1f443,
+          "alt": "nose"
+        },
+        "\ud83d\udc43\ud83c\udffb": {
+          "src": s1f4431f3fb,
+          "alt": "nose"
+        },
+        "\ud83d\udc43\ud83c\udffc": {
+          "src": s1f4431f3fc,
+          "alt": "nose"
+        },
+        "\ud83d\udc43\ud83c\udffd": {
+          "src": s1f4431f3fd,
+          "alt": "nose"
+        },
+        "\ud83d\udc43\ud83c\udffe": {
+          "src": s1f4431f3fe,
+          "alt": "nose"
+        },
+        "\ud83d\udc43\ud83c\udfff": {
+          "src": s1f4431f3ff,
+          "alt": "nose"
+        }
+      }
     },
-    "\u1F444": {
+    "\ud83d\udc44": {
       "src": s1f444,
       "alt": "lips"
     },
-    "\u1F445": {
+    "\ud83d\udc45": {
       "src": s1f445,
       "alt": "tongue"
     },
-    "\u1F446": {
+    "\ud83d\udc46": {
       "src": s1f446,
-      "alt": "point_up_2"
+      "alt": "point_up_2",
+      "skinVariations": {
+        "\ud83d\udc46": {
+          "src": s1f446,
+          "alt": "point_up_2"
+        },
+        "\ud83d\udc46\ud83c\udffb": {
+          "src": s1f4461f3fb,
+          "alt": "point_up_2"
+        },
+        "\ud83d\udc46\ud83c\udffc": {
+          "src": s1f4461f3fc,
+          "alt": "point_up_2"
+        },
+        "\ud83d\udc46\ud83c\udffd": {
+          "src": s1f4461f3fd,
+          "alt": "point_up_2"
+        },
+        "\ud83d\udc46\ud83c\udffe": {
+          "src": s1f4461f3fe,
+          "alt": "point_up_2"
+        },
+        "\ud83d\udc46\ud83c\udfff": {
+          "src": s1f4461f3ff,
+          "alt": "point_up_2"
+        }
+      }
     },
-    "\u1F447": {
+    "\ud83d\udc47": {
       "src": s1f447,
-      "alt": "point_down"
+      "alt": "point_down",
+      "skinVariations": {
+        "\ud83d\udc47": {
+          "src": s1f447,
+          "alt": "point_down"
+        },
+        "\ud83d\udc47\ud83c\udffb": {
+          "src": s1f4471f3fb,
+          "alt": "point_down"
+        },
+        "\ud83d\udc47\ud83c\udffc": {
+          "src": s1f4471f3fc,
+          "alt": "point_down"
+        },
+        "\ud83d\udc47\ud83c\udffd": {
+          "src": s1f4471f3fd,
+          "alt": "point_down"
+        },
+        "\ud83d\udc47\ud83c\udffe": {
+          "src": s1f4471f3fe,
+          "alt": "point_down"
+        },
+        "\ud83d\udc47\ud83c\udfff": {
+          "src": s1f4471f3ff,
+          "alt": "point_down"
+        }
+      }
     },
-    "\u1F448": {
+    "\ud83d\udc48": {
       "src": s1f448,
-      "alt": "point_left"
+      "alt": "point_left",
+      "skinVariations": {
+        "\ud83d\udc48": {
+          "src": s1f448,
+          "alt": "point_left"
+        },
+        "\ud83d\udc48\ud83c\udffb": {
+          "src": s1f4481f3fb,
+          "alt": "point_left"
+        },
+        "\ud83d\udc48\ud83c\udffc": {
+          "src": s1f4481f3fc,
+          "alt": "point_left"
+        },
+        "\ud83d\udc48\ud83c\udffd": {
+          "src": s1f4481f3fd,
+          "alt": "point_left"
+        },
+        "\ud83d\udc48\ud83c\udffe": {
+          "src": s1f4481f3fe,
+          "alt": "point_left"
+        },
+        "\ud83d\udc48\ud83c\udfff": {
+          "src": s1f4481f3ff,
+          "alt": "point_left"
+        }
+      }
     },
-    "\u1F449": {
+    "\ud83d\udc49": {
       "src": s1f449,
-      "alt": "point_right"
+      "alt": "point_right",
+      "skinVariations": {
+        "\ud83d\udc49": {
+          "src": s1f449,
+          "alt": "point_right"
+        },
+        "\ud83d\udc49\ud83c\udffb": {
+          "src": s1f4491f3fb,
+          "alt": "point_right"
+        },
+        "\ud83d\udc49\ud83c\udffc": {
+          "src": s1f4491f3fc,
+          "alt": "point_right"
+        },
+        "\ud83d\udc49\ud83c\udffd": {
+          "src": s1f4491f3fd,
+          "alt": "point_right"
+        },
+        "\ud83d\udc49\ud83c\udffe": {
+          "src": s1f4491f3fe,
+          "alt": "point_right"
+        },
+        "\ud83d\udc49\ud83c\udfff": {
+          "src": s1f4491f3ff,
+          "alt": "point_right"
+        }
+      }
     },
-    "\u1F44A": {
+    "\ud83d\udc4a": {
       "src": s1f44a,
-      "alt": "facepunch"
+      "alt": "facepunch",
+      "skinVariations": {
+        "\ud83d\udc4a": {
+          "src": s1f44a,
+          "alt": "facepunch"
+        },
+        "\ud83d\udc4a\ud83c\udffb": {
+          "src": s1f44a1f3fb,
+          "alt": "facepunch"
+        },
+        "\ud83d\udc4a\ud83c\udffc": {
+          "src": s1f44a1f3fc,
+          "alt": "facepunch"
+        },
+        "\ud83d\udc4a\ud83c\udffd": {
+          "src": s1f44a1f3fd,
+          "alt": "facepunch"
+        },
+        "\ud83d\udc4a\ud83c\udffe": {
+          "src": s1f44a1f3fe,
+          "alt": "facepunch"
+        },
+        "\ud83d\udc4a\ud83c\udfff": {
+          "src": s1f44a1f3ff,
+          "alt": "facepunch"
+        }
+      }
     },
-    "\u1F44B": {
+    "\ud83d\udc4b": {
       "src": s1f44b,
-      "alt": "wave"
+      "alt": "wave",
+      "skinVariations": {
+        "\ud83d\udc4b": {
+          "src": s1f44b,
+          "alt": "wave"
+        },
+        "\ud83d\udc4b\ud83c\udffb": {
+          "src": s1f44b1f3fb,
+          "alt": "wave"
+        },
+        "\ud83d\udc4b\ud83c\udffc": {
+          "src": s1f44b1f3fc,
+          "alt": "wave"
+        },
+        "\ud83d\udc4b\ud83c\udffd": {
+          "src": s1f44b1f3fd,
+          "alt": "wave"
+        },
+        "\ud83d\udc4b\ud83c\udffe": {
+          "src": s1f44b1f3fe,
+          "alt": "wave"
+        },
+        "\ud83d\udc4b\ud83c\udfff": {
+          "src": s1f44b1f3ff,
+          "alt": "wave"
+        }
+      }
     },
-    "\u1F44C": {
+    "\ud83d\udc4c": {
       "src": s1f44c,
-      "alt": "ok_hand"
+      "alt": "ok_hand",
+      "skinVariations": {
+        "\ud83d\udc4c": {
+          "src": s1f44c,
+          "alt": "ok_hand"
+        },
+        "\ud83d\udc4c\ud83c\udffb": {
+          "src": s1f44c1f3fb,
+          "alt": "ok_hand"
+        },
+        "\ud83d\udc4c\ud83c\udffc": {
+          "src": s1f44c1f3fc,
+          "alt": "ok_hand"
+        },
+        "\ud83d\udc4c\ud83c\udffd": {
+          "src": s1f44c1f3fd,
+          "alt": "ok_hand"
+        },
+        "\ud83d\udc4c\ud83c\udffe": {
+          "src": s1f44c1f3fe,
+          "alt": "ok_hand"
+        },
+        "\ud83d\udc4c\ud83c\udfff": {
+          "src": s1f44c1f3ff,
+          "alt": "ok_hand"
+        }
+      }
     },
-    "\u1F44D": {
+    "\ud83d\udc4d": {
       "src": s1f44d,
-      "alt": "+1"
+      "alt": "+1",
+      "skinVariations": {
+        "\ud83d\udc4d": {
+          "src": s1f44d,
+          "alt": "+1"
+        },
+        "\ud83d\udc4d\ud83c\udffb": {
+          "src": s1f44d1f3fb,
+          "alt": "+1"
+        },
+        "\ud83d\udc4d\ud83c\udffc": {
+          "src": s1f44d1f3fc,
+          "alt": "+1"
+        },
+        "\ud83d\udc4d\ud83c\udffd": {
+          "src": s1f44d1f3fd,
+          "alt": "+1"
+        },
+        "\ud83d\udc4d\ud83c\udffe": {
+          "src": s1f44d1f3fe,
+          "alt": "+1"
+        },
+        "\ud83d\udc4d\ud83c\udfff": {
+          "src": s1f44d1f3ff,
+          "alt": "+1"
+        }
+      }
     },
-    "\u1F44E": {
+    "\ud83d\udc4e": {
       "src": s1f44e,
-      "alt": "-1"
+      "alt": "-1",
+      "skinVariations": {
+        "\ud83d\udc4e": {
+          "src": s1f44e,
+          "alt": "-1"
+        },
+        "\ud83d\udc4e\ud83c\udffb": {
+          "src": s1f44e1f3fb,
+          "alt": "-1"
+        },
+        "\ud83d\udc4e\ud83c\udffc": {
+          "src": s1f44e1f3fc,
+          "alt": "-1"
+        },
+        "\ud83d\udc4e\ud83c\udffd": {
+          "src": s1f44e1f3fd,
+          "alt": "-1"
+        },
+        "\ud83d\udc4e\ud83c\udffe": {
+          "src": s1f44e1f3fe,
+          "alt": "-1"
+        },
+        "\ud83d\udc4e\ud83c\udfff": {
+          "src": s1f44e1f3ff,
+          "alt": "-1"
+        }
+      }
     },
-    "\u1F44F": {
+    "\ud83d\udc4f": {
       "src": s1f44f,
-      "alt": "clap"
+      "alt": "clap",
+      "skinVariations": {
+        "\ud83d\udc4f": {
+          "src": s1f44f,
+          "alt": "clap"
+        },
+        "\ud83d\udc4f\ud83c\udffb": {
+          "src": s1f44f1f3fb,
+          "alt": "clap"
+        },
+        "\ud83d\udc4f\ud83c\udffc": {
+          "src": s1f44f1f3fc,
+          "alt": "clap"
+        },
+        "\ud83d\udc4f\ud83c\udffd": {
+          "src": s1f44f1f3fd,
+          "alt": "clap"
+        },
+        "\ud83d\udc4f\ud83c\udffe": {
+          "src": s1f44f1f3fe,
+          "alt": "clap"
+        },
+        "\ud83d\udc4f\ud83c\udfff": {
+          "src": s1f44f1f3ff,
+          "alt": "clap"
+        }
+      }
     },
-    "\u1F450": {
+    "\ud83d\udc50": {
       "src": s1f450,
-      "alt": "open_hands"
+      "alt": "open_hands",
+      "skinVariations": {
+        "\ud83d\udc50": {
+          "src": s1f450,
+          "alt": "open_hands"
+        },
+        "\ud83d\udc50\ud83c\udffb": {
+          "src": s1f4501f3fb,
+          "alt": "open_hands"
+        },
+        "\ud83d\udc50\ud83c\udffc": {
+          "src": s1f4501f3fc,
+          "alt": "open_hands"
+        },
+        "\ud83d\udc50\ud83c\udffd": {
+          "src": s1f4501f3fd,
+          "alt": "open_hands"
+        },
+        "\ud83d\udc50\ud83c\udffe": {
+          "src": s1f4501f3fe,
+          "alt": "open_hands"
+        },
+        "\ud83d\udc50\ud83c\udfff": {
+          "src": s1f4501f3ff,
+          "alt": "open_hands"
+        }
+      }
     },
-    "\u1F463": {
+    "\ud83d\udc63": {
       "src": s1f463,
       "alt": "footprints"
     },
-    "\u1F464": {
+    "\ud83d\udc64": {
       "src": s1f464,
       "alt": "bust_in_silhouette"
     },
-    "\u1F465": {
+    "\ud83d\udc65": {
       "src": s1f465,
       "alt": "busts_in_silhouette"
     },
-    "\u1F466": {
+    "\ud83d\udc66": {
       "src": s1f466,
-      "alt": "boy"
+      "alt": "boy",
+      "skinVariations": {
+        "\ud83d\udc66": {
+          "src": s1f466,
+          "alt": "boy"
+        },
+        "\ud83d\udc66\ud83c\udffb": {
+          "src": s1f4661f3fb,
+          "alt": "boy"
+        },
+        "\ud83d\udc66\ud83c\udffc": {
+          "src": s1f4661f3fc,
+          "alt": "boy"
+        },
+        "\ud83d\udc66\ud83c\udffd": {
+          "src": s1f4661f3fd,
+          "alt": "boy"
+        },
+        "\ud83d\udc66\ud83c\udffe": {
+          "src": s1f4661f3fe,
+          "alt": "boy"
+        },
+        "\ud83d\udc66\ud83c\udfff": {
+          "src": s1f4661f3ff,
+          "alt": "boy"
+        }
+      }
     },
-    "\u1F467": {
+    "\ud83d\udc67": {
       "src": s1f467,
-      "alt": "girl"
+      "alt": "girl",
+      "skinVariations": {
+        "\ud83d\udc67": {
+          "src": s1f467,
+          "alt": "girl"
+        },
+        "\ud83d\udc67\ud83c\udffb": {
+          "src": s1f4671f3fb,
+          "alt": "girl"
+        },
+        "\ud83d\udc67\ud83c\udffc": {
+          "src": s1f4671f3fc,
+          "alt": "girl"
+        },
+        "\ud83d\udc67\ud83c\udffd": {
+          "src": s1f4671f3fd,
+          "alt": "girl"
+        },
+        "\ud83d\udc67\ud83c\udffe": {
+          "src": s1f4671f3fe,
+          "alt": "girl"
+        },
+        "\ud83d\udc67\ud83c\udfff": {
+          "src": s1f4671f3ff,
+          "alt": "girl"
+        }
+      }
     },
-    "\u1F468\u200D\u1F33E": {
+    "\ud83d\udc68\u200d\ud83c\udf3e": {
       "src": s1f468200d1f33e,
-      "alt": "male-farmer"
+      "alt": "male-farmer",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udf3e": {
+          "src": s1f468200d1f33e,
+          "alt": "male-farmer"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udf3e": {
+          "src": s1f4681f3fb200d1f33e,
+          "alt": "male-farmer"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udf3e": {
+          "src": s1f4681f3fc200d1f33e,
+          "alt": "male-farmer"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udf3e": {
+          "src": s1f4681f3fd200d1f33e,
+          "alt": "male-farmer"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udf3e": {
+          "src": s1f4681f3fe200d1f33e,
+          "alt": "male-farmer"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udf3e": {
+          "src": s1f4681f3ff200d1f33e,
+          "alt": "male-farmer"
+        }
+      }
     },
-    "\u1F468\u200D\u1F373": {
+    "\ud83d\udc68\u200d\ud83c\udf73": {
       "src": s1f468200d1f373,
-      "alt": "male-cook"
+      "alt": "male-cook",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udf73": {
+          "src": s1f468200d1f373,
+          "alt": "male-cook"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udf73": {
+          "src": s1f4681f3fb200d1f373,
+          "alt": "male-cook"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udf73": {
+          "src": s1f4681f3fc200d1f373,
+          "alt": "male-cook"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udf73": {
+          "src": s1f4681f3fd200d1f373,
+          "alt": "male-cook"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udf73": {
+          "src": s1f4681f3fe200d1f373,
+          "alt": "male-cook"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udf73": {
+          "src": s1f4681f3ff200d1f373,
+          "alt": "male-cook"
+        }
+      }
     },
-    "\u1F468\u200D\u1F37C": {
+    "\ud83d\udc68\u200d\ud83c\udf7c": {
       "src": s1f468200d1f37c,
-      "alt": "man_feeding_baby"
+      "alt": "man_feeding_baby",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udf7c": {
+          "src": s1f468200d1f37c,
+          "alt": "man_feeding_baby"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udf7c": {
+          "src": s1f4681f3fb200d1f37c,
+          "alt": "man_feeding_baby"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udf7c": {
+          "src": s1f4681f3fc200d1f37c,
+          "alt": "man_feeding_baby"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udf7c": {
+          "src": s1f4681f3fd200d1f37c,
+          "alt": "man_feeding_baby"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udf7c": {
+          "src": s1f4681f3fe200d1f37c,
+          "alt": "man_feeding_baby"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udf7c": {
+          "src": s1f4681f3ff200d1f37c,
+          "alt": "man_feeding_baby"
+        }
+      }
     },
-    "\u1F468\u200D\u1F393": {
+    "\ud83d\udc68\u200d\ud83c\udf93": {
       "src": s1f468200d1f393,
-      "alt": "male-student"
+      "alt": "male-student",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udf93": {
+          "src": s1f468200d1f393,
+          "alt": "male-student"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udf93": {
+          "src": s1f4681f3fb200d1f393,
+          "alt": "male-student"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udf93": {
+          "src": s1f4681f3fc200d1f393,
+          "alt": "male-student"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udf93": {
+          "src": s1f4681f3fd200d1f393,
+          "alt": "male-student"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udf93": {
+          "src": s1f4681f3fe200d1f393,
+          "alt": "male-student"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udf93": {
+          "src": s1f4681f3ff200d1f393,
+          "alt": "male-student"
+        }
+      }
     },
-    "\u1F468\u200D\u1F3A4": {
+    "\ud83d\udc68\u200d\ud83c\udfa4": {
       "src": s1f468200d1f3a4,
-      "alt": "male-singer"
+      "alt": "male-singer",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udfa4": {
+          "src": s1f468200d1f3a4,
+          "alt": "male-singer"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udfa4": {
+          "src": s1f4681f3fb200d1f3a4,
+          "alt": "male-singer"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udfa4": {
+          "src": s1f4681f3fc200d1f3a4,
+          "alt": "male-singer"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udfa4": {
+          "src": s1f4681f3fd200d1f3a4,
+          "alt": "male-singer"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udfa4": {
+          "src": s1f4681f3fe200d1f3a4,
+          "alt": "male-singer"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udfa4": {
+          "src": s1f4681f3ff200d1f3a4,
+          "alt": "male-singer"
+        }
+      }
     },
-    "\u1F468\u200D\u1F3A8": {
+    "\ud83d\udc68\u200d\ud83c\udfa8": {
       "src": s1f468200d1f3a8,
-      "alt": "male-artist"
+      "alt": "male-artist",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udfa8": {
+          "src": s1f468200d1f3a8,
+          "alt": "male-artist"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udfa8": {
+          "src": s1f4681f3fb200d1f3a8,
+          "alt": "male-artist"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udfa8": {
+          "src": s1f4681f3fc200d1f3a8,
+          "alt": "male-artist"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udfa8": {
+          "src": s1f4681f3fd200d1f3a8,
+          "alt": "male-artist"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udfa8": {
+          "src": s1f4681f3fe200d1f3a8,
+          "alt": "male-artist"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udfa8": {
+          "src": s1f4681f3ff200d1f3a8,
+          "alt": "male-artist"
+        }
+      }
     },
-    "\u1F468\u200D\u1F3EB": {
+    "\ud83d\udc68\u200d\ud83c\udfeb": {
       "src": s1f468200d1f3eb,
-      "alt": "male-teacher"
+      "alt": "male-teacher",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udfeb": {
+          "src": s1f468200d1f3eb,
+          "alt": "male-teacher"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udfeb": {
+          "src": s1f4681f3fb200d1f3eb,
+          "alt": "male-teacher"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udfeb": {
+          "src": s1f4681f3fc200d1f3eb,
+          "alt": "male-teacher"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udfeb": {
+          "src": s1f4681f3fd200d1f3eb,
+          "alt": "male-teacher"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udfeb": {
+          "src": s1f4681f3fe200d1f3eb,
+          "alt": "male-teacher"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udfeb": {
+          "src": s1f4681f3ff200d1f3eb,
+          "alt": "male-teacher"
+        }
+      }
     },
-    "\u1F468\u200D\u1F3ED": {
+    "\ud83d\udc68\u200d\ud83c\udfed": {
       "src": s1f468200d1f3ed,
-      "alt": "male-factory-worker"
+      "alt": "male-factory-worker",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83c\udfed": {
+          "src": s1f468200d1f3ed,
+          "alt": "male-factory-worker"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83c\udfed": {
+          "src": s1f4681f3fb200d1f3ed,
+          "alt": "male-factory-worker"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83c\udfed": {
+          "src": s1f4681f3fc200d1f3ed,
+          "alt": "male-factory-worker"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83c\udfed": {
+          "src": s1f4681f3fd200d1f3ed,
+          "alt": "male-factory-worker"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83c\udfed": {
+          "src": s1f4681f3fe200d1f3ed,
+          "alt": "male-factory-worker"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83c\udfed": {
+          "src": s1f4681f3ff200d1f3ed,
+          "alt": "male-factory-worker"
+        }
+      }
     },
-    "\u1F468\u200D\u1F466\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc66\u200d\ud83d\udc66": {
       "src": s1f468200d1f466200d1f466,
       "alt": "man-boy-boy"
     },
-    "\u1F468\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc66": {
       "src": s1f468200d1f466,
       "alt": "man-boy"
     },
-    "\u1F468\u200D\u1F467\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc67\u200d\ud83d\udc66": {
       "src": s1f468200d1f467200d1f466,
       "alt": "man-girl-boy"
     },
-    "\u1F468\u200D\u1F467\u200D\u1F467": {
+    "\ud83d\udc68\u200d\ud83d\udc67\u200d\ud83d\udc67": {
       "src": s1f468200d1f467200d1f467,
       "alt": "man-girl-girl"
     },
-    "\u1F468\u200D\u1F467": {
+    "\ud83d\udc68\u200d\ud83d\udc67": {
       "src": s1f468200d1f467,
       "alt": "man-girl"
     },
-    "\u1F468\u200D\u1F468\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc66": {
       "src": s1f468200d1f468200d1f466,
       "alt": "man-man-boy"
     },
-    "\u1F468\u200D\u1F468\u200D\u1F466\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc66\u200d\ud83d\udc66": {
       "src": s1f468200d1f468200d1f466200d1f466,
       "alt": "man-man-boy-boy"
     },
-    "\u1F468\u200D\u1F468\u200D\u1F467": {
+    "\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc67": {
       "src": s1f468200d1f468200d1f467,
       "alt": "man-man-girl"
     },
-    "\u1F468\u200D\u1F468\u200D\u1F467\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc67\u200d\ud83d\udc66": {
       "src": s1f468200d1f468200d1f467200d1f466,
       "alt": "man-man-girl-boy"
     },
-    "\u1F468\u200D\u1F468\u200D\u1F467\u200D\u1F467": {
+    "\ud83d\udc68\u200d\ud83d\udc68\u200d\ud83d\udc67\u200d\ud83d\udc67": {
       "src": s1f468200d1f468200d1f467200d1f467,
       "alt": "man-man-girl-girl"
     },
-    "\u1F468\u200D\u1F469\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc66": {
       "src": s1f468200d1f469200d1f466,
       "alt": "man-woman-boy"
     },
-    "\u1F468\u200D\u1F469\u200D\u1F466\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc66\u200d\ud83d\udc66": {
       "src": s1f468200d1f469200d1f466200d1f466,
       "alt": "man-woman-boy-boy"
     },
-    "\u1F468\u200D\u1F469\u200D\u1F467": {
+    "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67": {
       "src": s1f468200d1f469200d1f467,
       "alt": "man-woman-girl"
     },
-    "\u1F468\u200D\u1F469\u200D\u1F467\u200D\u1F466": {
+    "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66": {
       "src": s1f468200d1f469200d1f467200d1f466,
       "alt": "man-woman-girl-boy"
     },
-    "\u1F468\u200D\u1F469\u200D\u1F467\u200D\u1F467": {
+    "\ud83d\udc68\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc67": {
       "src": s1f468200d1f469200d1f467200d1f467,
       "alt": "man-woman-girl-girl"
     },
-    "\u1F468\u200D\u1F4BB": {
+    "\ud83d\udc68\u200d\ud83d\udcbb": {
       "src": s1f468200d1f4bb,
-      "alt": "male-technologist"
+      "alt": "male-technologist",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83d\udcbb": {
+          "src": s1f468200d1f4bb,
+          "alt": "male-technologist"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83d\udcbb": {
+          "src": s1f4681f3fb200d1f4bb,
+          "alt": "male-technologist"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83d\udcbb": {
+          "src": s1f4681f3fc200d1f4bb,
+          "alt": "male-technologist"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83d\udcbb": {
+          "src": s1f4681f3fd200d1f4bb,
+          "alt": "male-technologist"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83d\udcbb": {
+          "src": s1f4681f3fe200d1f4bb,
+          "alt": "male-technologist"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83d\udcbb": {
+          "src": s1f4681f3ff200d1f4bb,
+          "alt": "male-technologist"
+        }
+      }
     },
-    "\u1F468\u200D\u1F4BC": {
+    "\ud83d\udc68\u200d\ud83d\udcbc": {
       "src": s1f468200d1f4bc,
-      "alt": "male-office-worker"
+      "alt": "male-office-worker",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83d\udcbc": {
+          "src": s1f468200d1f4bc,
+          "alt": "male-office-worker"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83d\udcbc": {
+          "src": s1f4681f3fb200d1f4bc,
+          "alt": "male-office-worker"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83d\udcbc": {
+          "src": s1f4681f3fc200d1f4bc,
+          "alt": "male-office-worker"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83d\udcbc": {
+          "src": s1f4681f3fd200d1f4bc,
+          "alt": "male-office-worker"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83d\udcbc": {
+          "src": s1f4681f3fe200d1f4bc,
+          "alt": "male-office-worker"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83d\udcbc": {
+          "src": s1f4681f3ff200d1f4bc,
+          "alt": "male-office-worker"
+        }
+      }
     },
-    "\u1F468\u200D\u1F527": {
+    "\ud83d\udc68\u200d\ud83d\udd27": {
       "src": s1f468200d1f527,
-      "alt": "male-mechanic"
+      "alt": "male-mechanic",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83d\udd27": {
+          "src": s1f468200d1f527,
+          "alt": "male-mechanic"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83d\udd27": {
+          "src": s1f4681f3fb200d1f527,
+          "alt": "male-mechanic"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83d\udd27": {
+          "src": s1f4681f3fc200d1f527,
+          "alt": "male-mechanic"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83d\udd27": {
+          "src": s1f4681f3fd200d1f527,
+          "alt": "male-mechanic"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83d\udd27": {
+          "src": s1f4681f3fe200d1f527,
+          "alt": "male-mechanic"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83d\udd27": {
+          "src": s1f4681f3ff200d1f527,
+          "alt": "male-mechanic"
+        }
+      }
     },
-    "\u1F468\u200D\u1F52C": {
+    "\ud83d\udc68\u200d\ud83d\udd2c": {
       "src": s1f468200d1f52c,
-      "alt": "male-scientist"
+      "alt": "male-scientist",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83d\udd2c": {
+          "src": s1f468200d1f52c,
+          "alt": "male-scientist"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83d\udd2c": {
+          "src": s1f4681f3fb200d1f52c,
+          "alt": "male-scientist"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83d\udd2c": {
+          "src": s1f4681f3fc200d1f52c,
+          "alt": "male-scientist"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83d\udd2c": {
+          "src": s1f4681f3fd200d1f52c,
+          "alt": "male-scientist"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83d\udd2c": {
+          "src": s1f4681f3fe200d1f52c,
+          "alt": "male-scientist"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83d\udd2c": {
+          "src": s1f4681f3ff200d1f52c,
+          "alt": "male-scientist"
+        }
+      }
     },
-    "\u1F468\u200D\u1F680": {
+    "\ud83d\udc68\u200d\ud83d\ude80": {
       "src": s1f468200d1f680,
-      "alt": "male-astronaut"
+      "alt": "male-astronaut",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83d\ude80": {
+          "src": s1f468200d1f680,
+          "alt": "male-astronaut"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83d\ude80": {
+          "src": s1f4681f3fb200d1f680,
+          "alt": "male-astronaut"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83d\ude80": {
+          "src": s1f4681f3fc200d1f680,
+          "alt": "male-astronaut"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83d\ude80": {
+          "src": s1f4681f3fd200d1f680,
+          "alt": "male-astronaut"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83d\ude80": {
+          "src": s1f4681f3fe200d1f680,
+          "alt": "male-astronaut"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83d\ude80": {
+          "src": s1f4681f3ff200d1f680,
+          "alt": "male-astronaut"
+        }
+      }
     },
-    "\u1F468\u200D\u1F692": {
+    "\ud83d\udc68\u200d\ud83d\ude92": {
       "src": s1f468200d1f692,
-      "alt": "male-firefighter"
+      "alt": "male-firefighter",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83d\ude92": {
+          "src": s1f468200d1f692,
+          "alt": "male-firefighter"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83d\ude92": {
+          "src": s1f4681f3fb200d1f692,
+          "alt": "male-firefighter"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83d\ude92": {
+          "src": s1f4681f3fc200d1f692,
+          "alt": "male-firefighter"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83d\ude92": {
+          "src": s1f4681f3fd200d1f692,
+          "alt": "male-firefighter"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83d\ude92": {
+          "src": s1f4681f3fe200d1f692,
+          "alt": "male-firefighter"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83d\ude92": {
+          "src": s1f4681f3ff200d1f692,
+          "alt": "male-firefighter"
+        }
+      }
     },
-    "\u1F468\u200D\u1F9AF": {
+    "\ud83d\udc68\u200d\ud83e\uddaf": {
       "src": s1f468200d1f9af,
-      "alt": "man_with_probing_cane"
+      "alt": "man_with_probing_cane",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83e\uddaf": {
+          "src": s1f468200d1f9af,
+          "alt": "man_with_probing_cane"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\uddaf": {
+          "src": s1f4681f3fb200d1f9af,
+          "alt": "man_with_probing_cane"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\uddaf": {
+          "src": s1f4681f3fc200d1f9af,
+          "alt": "man_with_probing_cane"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\uddaf": {
+          "src": s1f4681f3fd200d1f9af,
+          "alt": "man_with_probing_cane"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\uddaf": {
+          "src": s1f4681f3fe200d1f9af,
+          "alt": "man_with_probing_cane"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\uddaf": {
+          "src": s1f4681f3ff200d1f9af,
+          "alt": "man_with_probing_cane"
+        }
+      }
     },
-    "\u1F468\u200D\u1F9B0": {
+    "\ud83d\udc68\u200d\ud83e\uddb0": {
       "src": s1f468200d1f9b0,
-      "alt": "red_haired_man"
+      "alt": "red_haired_man",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83e\uddb0": {
+          "src": s1f468200d1f9b0,
+          "alt": "red_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\uddb0": {
+          "src": s1f4681f3fb200d1f9b0,
+          "alt": "red_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\uddb0": {
+          "src": s1f4681f3fc200d1f9b0,
+          "alt": "red_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\uddb0": {
+          "src": s1f4681f3fd200d1f9b0,
+          "alt": "red_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\uddb0": {
+          "src": s1f4681f3fe200d1f9b0,
+          "alt": "red_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\uddb0": {
+          "src": s1f4681f3ff200d1f9b0,
+          "alt": "red_haired_man"
+        }
+      }
     },
-    "\u1F468\u200D\u1F9B1": {
+    "\ud83d\udc68\u200d\ud83e\uddb1": {
       "src": s1f468200d1f9b1,
-      "alt": "curly_haired_man"
+      "alt": "curly_haired_man",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83e\uddb1": {
+          "src": s1f468200d1f9b1,
+          "alt": "curly_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\uddb1": {
+          "src": s1f4681f3fb200d1f9b1,
+          "alt": "curly_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\uddb1": {
+          "src": s1f4681f3fc200d1f9b1,
+          "alt": "curly_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\uddb1": {
+          "src": s1f4681f3fd200d1f9b1,
+          "alt": "curly_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\uddb1": {
+          "src": s1f4681f3fe200d1f9b1,
+          "alt": "curly_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\uddb1": {
+          "src": s1f4681f3ff200d1f9b1,
+          "alt": "curly_haired_man"
+        }
+      }
     },
-    "\u1F468\u200D\u1F9B2": {
+    "\ud83d\udc68\u200d\ud83e\uddb2": {
       "src": s1f468200d1f9b2,
-      "alt": "bald_man"
+      "alt": "bald_man",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83e\uddb2": {
+          "src": s1f468200d1f9b2,
+          "alt": "bald_man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\uddb2": {
+          "src": s1f4681f3fb200d1f9b2,
+          "alt": "bald_man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\uddb2": {
+          "src": s1f4681f3fc200d1f9b2,
+          "alt": "bald_man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\uddb2": {
+          "src": s1f4681f3fd200d1f9b2,
+          "alt": "bald_man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\uddb2": {
+          "src": s1f4681f3fe200d1f9b2,
+          "alt": "bald_man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\uddb2": {
+          "src": s1f4681f3ff200d1f9b2,
+          "alt": "bald_man"
+        }
+      }
     },
-    "\u1F468\u200D\u1F9B3": {
+    "\ud83d\udc68\u200d\ud83e\uddb3": {
       "src": s1f468200d1f9b3,
-      "alt": "white_haired_man"
+      "alt": "white_haired_man",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83e\uddb3": {
+          "src": s1f468200d1f9b3,
+          "alt": "white_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\uddb3": {
+          "src": s1f4681f3fb200d1f9b3,
+          "alt": "white_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\uddb3": {
+          "src": s1f4681f3fc200d1f9b3,
+          "alt": "white_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\uddb3": {
+          "src": s1f4681f3fd200d1f9b3,
+          "alt": "white_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\uddb3": {
+          "src": s1f4681f3fe200d1f9b3,
+          "alt": "white_haired_man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\uddb3": {
+          "src": s1f4681f3ff200d1f9b3,
+          "alt": "white_haired_man"
+        }
+      }
     },
-    "\u1F468\u200D\u1F9BC": {
+    "\ud83d\udc68\u200d\ud83e\uddbc": {
       "src": s1f468200d1f9bc,
-      "alt": "man_in_motorized_wheelchair"
+      "alt": "man_in_motorized_wheelchair",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83e\uddbc": {
+          "src": s1f468200d1f9bc,
+          "alt": "man_in_motorized_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\uddbc": {
+          "src": s1f4681f3fb200d1f9bc,
+          "alt": "man_in_motorized_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\uddbc": {
+          "src": s1f4681f3fc200d1f9bc,
+          "alt": "man_in_motorized_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\uddbc": {
+          "src": s1f4681f3fd200d1f9bc,
+          "alt": "man_in_motorized_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\uddbc": {
+          "src": s1f4681f3fe200d1f9bc,
+          "alt": "man_in_motorized_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\uddbc": {
+          "src": s1f4681f3ff200d1f9bc,
+          "alt": "man_in_motorized_wheelchair"
+        }
+      }
     },
-    "\u1F468\u200D\u1F9BD": {
+    "\ud83d\udc68\u200d\ud83e\uddbd": {
       "src": s1f468200d1f9bd,
-      "alt": "man_in_manual_wheelchair"
+      "alt": "man_in_manual_wheelchair",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\ud83e\uddbd": {
+          "src": s1f468200d1f9bd,
+          "alt": "man_in_manual_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\uddbd": {
+          "src": s1f4681f3fb200d1f9bd,
+          "alt": "man_in_manual_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\uddbd": {
+          "src": s1f4681f3fc200d1f9bd,
+          "alt": "man_in_manual_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\uddbd": {
+          "src": s1f4681f3fd200d1f9bd,
+          "alt": "man_in_manual_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\uddbd": {
+          "src": s1f4681f3fe200d1f9bd,
+          "alt": "man_in_manual_wheelchair"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\uddbd": {
+          "src": s1f4681f3ff200d1f9bd,
+          "alt": "man_in_manual_wheelchair"
+        }
+      }
     },
-    "\u1F468\u200D\u2695\uFE0F": {
+    "\ud83d\udc68\u200d\u2695\ufe0f": {
       "src": s1f468200d2695fe0f,
-      "alt": "male-doctor"
+      "alt": "male-doctor",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\u2695\ufe0f": {
+          "src": s1f468200d2695fe0f,
+          "alt": "male-doctor"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2695\ufe0f": {
+          "src": s1f4681f3fb200d2695fe0f,
+          "alt": "male-doctor"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2695\ufe0f": {
+          "src": s1f4681f3fc200d2695fe0f,
+          "alt": "male-doctor"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2695\ufe0f": {
+          "src": s1f4681f3fd200d2695fe0f,
+          "alt": "male-doctor"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2695\ufe0f": {
+          "src": s1f4681f3fe200d2695fe0f,
+          "alt": "male-doctor"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2695\ufe0f": {
+          "src": s1f4681f3ff200d2695fe0f,
+          "alt": "male-doctor"
+        }
+      }
     },
-    "\u1F468\u200D\u2696\uFE0F": {
+    "\ud83d\udc68\u200d\u2696\ufe0f": {
       "src": s1f468200d2696fe0f,
-      "alt": "male-judge"
+      "alt": "male-judge",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\u2696\ufe0f": {
+          "src": s1f468200d2696fe0f,
+          "alt": "male-judge"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2696\ufe0f": {
+          "src": s1f4681f3fb200d2696fe0f,
+          "alt": "male-judge"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2696\ufe0f": {
+          "src": s1f4681f3fc200d2696fe0f,
+          "alt": "male-judge"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2696\ufe0f": {
+          "src": s1f4681f3fd200d2696fe0f,
+          "alt": "male-judge"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2696\ufe0f": {
+          "src": s1f4681f3fe200d2696fe0f,
+          "alt": "male-judge"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2696\ufe0f": {
+          "src": s1f4681f3ff200d2696fe0f,
+          "alt": "male-judge"
+        }
+      }
     },
-    "\u1F468\u200D\u2708\uFE0F": {
+    "\ud83d\udc68\u200d\u2708\ufe0f": {
       "src": s1f468200d2708fe0f,
-      "alt": "male-pilot"
+      "alt": "male-pilot",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\u2708\ufe0f": {
+          "src": s1f468200d2708fe0f,
+          "alt": "male-pilot"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2708\ufe0f": {
+          "src": s1f4681f3fb200d2708fe0f,
+          "alt": "male-pilot"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2708\ufe0f": {
+          "src": s1f4681f3fc200d2708fe0f,
+          "alt": "male-pilot"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2708\ufe0f": {
+          "src": s1f4681f3fd200d2708fe0f,
+          "alt": "male-pilot"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2708\ufe0f": {
+          "src": s1f4681f3fe200d2708fe0f,
+          "alt": "male-pilot"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2708\ufe0f": {
+          "src": s1f4681f3ff200d2708fe0f,
+          "alt": "male-pilot"
+        }
+      }
     },
-    "\u1F468\u200D\u2764\uFE0F\u200D\u1F468": {
+    "\ud83d\udc68\u200d\u2764\ufe0f\u200d\ud83d\udc68": {
       "src": s1f468200d2764fe0f200d1f468,
-      "alt": "man-heart-man"
+      "alt": "man-heart-man",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\u2764\ufe0f\u200d\ud83d\udc68": {
+          "src": s1f468200d2764fe0f200d1f468,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fb200d2764fe0f200d1f4681f3fb,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fb200d2764fe0f200d1f4681f3fc,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fb200d2764fe0f200d1f4681f3fd,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fb200d2764fe0f200d1f4681f3fe,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fb200d2764fe0f200d1f4681f3ff,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fc200d2764fe0f200d1f4681f3fb,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fc200d2764fe0f200d1f4681f3fc,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fc200d2764fe0f200d1f4681f3fd,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fc200d2764fe0f200d1f4681f3fe,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fc200d2764fe0f200d1f4681f3ff,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fd200d2764fe0f200d1f4681f3fb,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fd200d2764fe0f200d1f4681f3fc,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fd200d2764fe0f200d1f4681f3fd,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fd200d2764fe0f200d1f4681f3fe,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fd200d2764fe0f200d1f4681f3ff,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fe200d2764fe0f200d1f4681f3fb,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fe200d2764fe0f200d1f4681f3fc,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fe200d2764fe0f200d1f4681f3fd,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fe200d2764fe0f200d1f4681f3fe,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fe200d2764fe0f200d1f4681f3ff,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3ff200d2764fe0f200d1f4681f3fb,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3ff200d2764fe0f200d1f4681f3fc,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3ff200d2764fe0f200d1f4681f3fd,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3ff200d2764fe0f200d1f4681f3fe,
+          "alt": "man-heart-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3ff200d2764fe0f200d1f4681f3ff,
+          "alt": "man-heart-man"
+        }
+      }
     },
-    "\u1F468\u200D\u2764\uFE0F\u200D\u1F48B\u200D\u1F468": {
+    "\ud83d\udc68\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68": {
       "src": s1f468200d2764fe0f200d1f48b200d1f468,
-      "alt": "man-kiss-man"
+      "alt": "man-kiss-man",
+      "skinVariations": {
+        "\ud83d\udc68\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68": {
+          "src": s1f468200d2764fe0f200d1f48b200d1f468,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fb200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fc200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fd200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fe200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "man-kiss-man"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3ff200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "man-kiss-man"
+        }
+      }
     },
-    "\u1F468": {
+    "\ud83d\udc68": {
       "src": s1f468,
-      "alt": "man"
+      "alt": "man",
+      "skinVariations": {
+        "\ud83d\udc68": {
+          "src": s1f468,
+          "alt": "man"
+        },
+        "\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fb,
+          "alt": "man"
+        },
+        "\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fc,
+          "alt": "man"
+        },
+        "\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fd,
+          "alt": "man"
+        },
+        "\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fe,
+          "alt": "man"
+        },
+        "\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3ff,
+          "alt": "man"
+        }
+      }
     },
-    "\u1F469\u200D\u1F33E": {
+    "\ud83d\udc69\u200d\ud83c\udf3e": {
       "src": s1f469200d1f33e,
-      "alt": "female-farmer"
+      "alt": "female-farmer",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udf3e": {
+          "src": s1f469200d1f33e,
+          "alt": "female-farmer"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udf3e": {
+          "src": s1f4691f3fb200d1f33e,
+          "alt": "female-farmer"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udf3e": {
+          "src": s1f4691f3fc200d1f33e,
+          "alt": "female-farmer"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udf3e": {
+          "src": s1f4691f3fd200d1f33e,
+          "alt": "female-farmer"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udf3e": {
+          "src": s1f4691f3fe200d1f33e,
+          "alt": "female-farmer"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udf3e": {
+          "src": s1f4691f3ff200d1f33e,
+          "alt": "female-farmer"
+        }
+      }
     },
-    "\u1F469\u200D\u1F373": {
+    "\ud83d\udc69\u200d\ud83c\udf73": {
       "src": s1f469200d1f373,
-      "alt": "female-cook"
+      "alt": "female-cook",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udf73": {
+          "src": s1f469200d1f373,
+          "alt": "female-cook"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udf73": {
+          "src": s1f4691f3fb200d1f373,
+          "alt": "female-cook"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udf73": {
+          "src": s1f4691f3fc200d1f373,
+          "alt": "female-cook"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udf73": {
+          "src": s1f4691f3fd200d1f373,
+          "alt": "female-cook"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udf73": {
+          "src": s1f4691f3fe200d1f373,
+          "alt": "female-cook"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udf73": {
+          "src": s1f4691f3ff200d1f373,
+          "alt": "female-cook"
+        }
+      }
     },
-    "\u1F469\u200D\u1F37C": {
+    "\ud83d\udc69\u200d\ud83c\udf7c": {
       "src": s1f469200d1f37c,
-      "alt": "woman_feeding_baby"
+      "alt": "woman_feeding_baby",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udf7c": {
+          "src": s1f469200d1f37c,
+          "alt": "woman_feeding_baby"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udf7c": {
+          "src": s1f4691f3fb200d1f37c,
+          "alt": "woman_feeding_baby"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udf7c": {
+          "src": s1f4691f3fc200d1f37c,
+          "alt": "woman_feeding_baby"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udf7c": {
+          "src": s1f4691f3fd200d1f37c,
+          "alt": "woman_feeding_baby"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udf7c": {
+          "src": s1f4691f3fe200d1f37c,
+          "alt": "woman_feeding_baby"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udf7c": {
+          "src": s1f4691f3ff200d1f37c,
+          "alt": "woman_feeding_baby"
+        }
+      }
     },
-    "\u1F469\u200D\u1F393": {
+    "\ud83d\udc69\u200d\ud83c\udf93": {
       "src": s1f469200d1f393,
-      "alt": "female-student"
+      "alt": "female-student",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udf93": {
+          "src": s1f469200d1f393,
+          "alt": "female-student"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udf93": {
+          "src": s1f4691f3fb200d1f393,
+          "alt": "female-student"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udf93": {
+          "src": s1f4691f3fc200d1f393,
+          "alt": "female-student"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udf93": {
+          "src": s1f4691f3fd200d1f393,
+          "alt": "female-student"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udf93": {
+          "src": s1f4691f3fe200d1f393,
+          "alt": "female-student"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udf93": {
+          "src": s1f4691f3ff200d1f393,
+          "alt": "female-student"
+        }
+      }
     },
-    "\u1F469\u200D\u1F3A4": {
+    "\ud83d\udc69\u200d\ud83c\udfa4": {
       "src": s1f469200d1f3a4,
-      "alt": "female-singer"
+      "alt": "female-singer",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udfa4": {
+          "src": s1f469200d1f3a4,
+          "alt": "female-singer"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udfa4": {
+          "src": s1f4691f3fb200d1f3a4,
+          "alt": "female-singer"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udfa4": {
+          "src": s1f4691f3fc200d1f3a4,
+          "alt": "female-singer"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udfa4": {
+          "src": s1f4691f3fd200d1f3a4,
+          "alt": "female-singer"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udfa4": {
+          "src": s1f4691f3fe200d1f3a4,
+          "alt": "female-singer"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udfa4": {
+          "src": s1f4691f3ff200d1f3a4,
+          "alt": "female-singer"
+        }
+      }
     },
-    "\u1F469\u200D\u1F3A8": {
+    "\ud83d\udc69\u200d\ud83c\udfa8": {
       "src": s1f469200d1f3a8,
-      "alt": "female-artist"
+      "alt": "female-artist",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udfa8": {
+          "src": s1f469200d1f3a8,
+          "alt": "female-artist"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udfa8": {
+          "src": s1f4691f3fb200d1f3a8,
+          "alt": "female-artist"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udfa8": {
+          "src": s1f4691f3fc200d1f3a8,
+          "alt": "female-artist"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udfa8": {
+          "src": s1f4691f3fd200d1f3a8,
+          "alt": "female-artist"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udfa8": {
+          "src": s1f4691f3fe200d1f3a8,
+          "alt": "female-artist"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udfa8": {
+          "src": s1f4691f3ff200d1f3a8,
+          "alt": "female-artist"
+        }
+      }
     },
-    "\u1F469\u200D\u1F3EB": {
+    "\ud83d\udc69\u200d\ud83c\udfeb": {
       "src": s1f469200d1f3eb,
-      "alt": "female-teacher"
+      "alt": "female-teacher",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udfeb": {
+          "src": s1f469200d1f3eb,
+          "alt": "female-teacher"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udfeb": {
+          "src": s1f4691f3fb200d1f3eb,
+          "alt": "female-teacher"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udfeb": {
+          "src": s1f4691f3fc200d1f3eb,
+          "alt": "female-teacher"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udfeb": {
+          "src": s1f4691f3fd200d1f3eb,
+          "alt": "female-teacher"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udfeb": {
+          "src": s1f4691f3fe200d1f3eb,
+          "alt": "female-teacher"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udfeb": {
+          "src": s1f4691f3ff200d1f3eb,
+          "alt": "female-teacher"
+        }
+      }
     },
-    "\u1F469\u200D\u1F3ED": {
+    "\ud83d\udc69\u200d\ud83c\udfed": {
       "src": s1f469200d1f3ed,
-      "alt": "female-factory-worker"
+      "alt": "female-factory-worker",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83c\udfed": {
+          "src": s1f469200d1f3ed,
+          "alt": "female-factory-worker"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83c\udfed": {
+          "src": s1f4691f3fb200d1f3ed,
+          "alt": "female-factory-worker"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83c\udfed": {
+          "src": s1f4691f3fc200d1f3ed,
+          "alt": "female-factory-worker"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83c\udfed": {
+          "src": s1f4691f3fd200d1f3ed,
+          "alt": "female-factory-worker"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83c\udfed": {
+          "src": s1f4691f3fe200d1f3ed,
+          "alt": "female-factory-worker"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83c\udfed": {
+          "src": s1f4691f3ff200d1f3ed,
+          "alt": "female-factory-worker"
+        }
+      }
     },
-    "\u1F469\u200D\u1F466\u200D\u1F466": {
+    "\ud83d\udc69\u200d\ud83d\udc66\u200d\ud83d\udc66": {
       "src": s1f469200d1f466200d1f466,
       "alt": "woman-boy-boy"
     },
-    "\u1F469\u200D\u1F466": {
+    "\ud83d\udc69\u200d\ud83d\udc66": {
       "src": s1f469200d1f466,
       "alt": "woman-boy"
     },
-    "\u1F469\u200D\u1F467\u200D\u1F466": {
+    "\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66": {
       "src": s1f469200d1f467200d1f466,
       "alt": "woman-girl-boy"
     },
-    "\u1F469\u200D\u1F467\u200D\u1F467": {
+    "\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc67": {
       "src": s1f469200d1f467200d1f467,
       "alt": "woman-girl-girl"
     },
-    "\u1F469\u200D\u1F467": {
+    "\ud83d\udc69\u200d\ud83d\udc67": {
       "src": s1f469200d1f467,
       "alt": "woman-girl"
     },
-    "\u1F469\u200D\u1F469\u200D\u1F466": {
+    "\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc66": {
       "src": s1f469200d1f469200d1f466,
       "alt": "woman-woman-boy"
     },
-    "\u1F469\u200D\u1F469\u200D\u1F466\u200D\u1F466": {
+    "\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc66\u200d\ud83d\udc66": {
       "src": s1f469200d1f469200d1f466200d1f466,
       "alt": "woman-woman-boy-boy"
     },
-    "\u1F469\u200D\u1F469\u200D\u1F467": {
+    "\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc67": {
       "src": s1f469200d1f469200d1f467,
       "alt": "woman-woman-girl"
     },
-    "\u1F469\u200D\u1F469\u200D\u1F467\u200D\u1F466": {
+    "\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc66": {
       "src": s1f469200d1f469200d1f467200d1f466,
       "alt": "woman-woman-girl-boy"
     },
-    "\u1F469\u200D\u1F469\u200D\u1F467\u200D\u1F467": {
+    "\ud83d\udc69\u200d\ud83d\udc69\u200d\ud83d\udc67\u200d\ud83d\udc67": {
       "src": s1f469200d1f469200d1f467200d1f467,
       "alt": "woman-woman-girl-girl"
     },
-    "\u1F469\u200D\u1F4BB": {
+    "\ud83d\udc69\u200d\ud83d\udcbb": {
       "src": s1f469200d1f4bb,
-      "alt": "female-technologist"
+      "alt": "female-technologist",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83d\udcbb": {
+          "src": s1f469200d1f4bb,
+          "alt": "female-technologist"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83d\udcbb": {
+          "src": s1f4691f3fb200d1f4bb,
+          "alt": "female-technologist"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83d\udcbb": {
+          "src": s1f4691f3fc200d1f4bb,
+          "alt": "female-technologist"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83d\udcbb": {
+          "src": s1f4691f3fd200d1f4bb,
+          "alt": "female-technologist"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83d\udcbb": {
+          "src": s1f4691f3fe200d1f4bb,
+          "alt": "female-technologist"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83d\udcbb": {
+          "src": s1f4691f3ff200d1f4bb,
+          "alt": "female-technologist"
+        }
+      }
     },
-    "\u1F469\u200D\u1F4BC": {
+    "\ud83d\udc69\u200d\ud83d\udcbc": {
       "src": s1f469200d1f4bc,
-      "alt": "female-office-worker"
+      "alt": "female-office-worker",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83d\udcbc": {
+          "src": s1f469200d1f4bc,
+          "alt": "female-office-worker"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83d\udcbc": {
+          "src": s1f4691f3fb200d1f4bc,
+          "alt": "female-office-worker"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83d\udcbc": {
+          "src": s1f4691f3fc200d1f4bc,
+          "alt": "female-office-worker"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83d\udcbc": {
+          "src": s1f4691f3fd200d1f4bc,
+          "alt": "female-office-worker"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83d\udcbc": {
+          "src": s1f4691f3fe200d1f4bc,
+          "alt": "female-office-worker"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83d\udcbc": {
+          "src": s1f4691f3ff200d1f4bc,
+          "alt": "female-office-worker"
+        }
+      }
     },
-    "\u1F469\u200D\u1F527": {
+    "\ud83d\udc69\u200d\ud83d\udd27": {
       "src": s1f469200d1f527,
-      "alt": "female-mechanic"
+      "alt": "female-mechanic",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83d\udd27": {
+          "src": s1f469200d1f527,
+          "alt": "female-mechanic"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83d\udd27": {
+          "src": s1f4691f3fb200d1f527,
+          "alt": "female-mechanic"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83d\udd27": {
+          "src": s1f4691f3fc200d1f527,
+          "alt": "female-mechanic"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83d\udd27": {
+          "src": s1f4691f3fd200d1f527,
+          "alt": "female-mechanic"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83d\udd27": {
+          "src": s1f4691f3fe200d1f527,
+          "alt": "female-mechanic"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83d\udd27": {
+          "src": s1f4691f3ff200d1f527,
+          "alt": "female-mechanic"
+        }
+      }
     },
-    "\u1F469\u200D\u1F52C": {
+    "\ud83d\udc69\u200d\ud83d\udd2c": {
       "src": s1f469200d1f52c,
-      "alt": "female-scientist"
+      "alt": "female-scientist",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83d\udd2c": {
+          "src": s1f469200d1f52c,
+          "alt": "female-scientist"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83d\udd2c": {
+          "src": s1f4691f3fb200d1f52c,
+          "alt": "female-scientist"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83d\udd2c": {
+          "src": s1f4691f3fc200d1f52c,
+          "alt": "female-scientist"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83d\udd2c": {
+          "src": s1f4691f3fd200d1f52c,
+          "alt": "female-scientist"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83d\udd2c": {
+          "src": s1f4691f3fe200d1f52c,
+          "alt": "female-scientist"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83d\udd2c": {
+          "src": s1f4691f3ff200d1f52c,
+          "alt": "female-scientist"
+        }
+      }
     },
-    "\u1F469\u200D\u1F680": {
+    "\ud83d\udc69\u200d\ud83d\ude80": {
       "src": s1f469200d1f680,
-      "alt": "female-astronaut"
+      "alt": "female-astronaut",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83d\ude80": {
+          "src": s1f469200d1f680,
+          "alt": "female-astronaut"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83d\ude80": {
+          "src": s1f4691f3fb200d1f680,
+          "alt": "female-astronaut"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83d\ude80": {
+          "src": s1f4691f3fc200d1f680,
+          "alt": "female-astronaut"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude80": {
+          "src": s1f4691f3fd200d1f680,
+          "alt": "female-astronaut"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83d\ude80": {
+          "src": s1f4691f3fe200d1f680,
+          "alt": "female-astronaut"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83d\ude80": {
+          "src": s1f4691f3ff200d1f680,
+          "alt": "female-astronaut"
+        }
+      }
     },
-    "\u1F469\u200D\u1F692": {
+    "\ud83d\udc69\u200d\ud83d\ude92": {
       "src": s1f469200d1f692,
-      "alt": "female-firefighter"
+      "alt": "female-firefighter",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83d\ude92": {
+          "src": s1f469200d1f692,
+          "alt": "female-firefighter"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83d\ude92": {
+          "src": s1f4691f3fb200d1f692,
+          "alt": "female-firefighter"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83d\ude92": {
+          "src": s1f4691f3fc200d1f692,
+          "alt": "female-firefighter"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83d\ude92": {
+          "src": s1f4691f3fd200d1f692,
+          "alt": "female-firefighter"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83d\ude92": {
+          "src": s1f4691f3fe200d1f692,
+          "alt": "female-firefighter"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83d\ude92": {
+          "src": s1f4691f3ff200d1f692,
+          "alt": "female-firefighter"
+        }
+      }
     },
-    "\u1F469\u200D\u1F9AF": {
+    "\ud83d\udc69\u200d\ud83e\uddaf": {
       "src": s1f469200d1f9af,
-      "alt": "woman_with_probing_cane"
+      "alt": "woman_with_probing_cane",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83e\uddaf": {
+          "src": s1f469200d1f9af,
+          "alt": "woman_with_probing_cane"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\uddaf": {
+          "src": s1f4691f3fb200d1f9af,
+          "alt": "woman_with_probing_cane"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\uddaf": {
+          "src": s1f4691f3fc200d1f9af,
+          "alt": "woman_with_probing_cane"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\uddaf": {
+          "src": s1f4691f3fd200d1f9af,
+          "alt": "woman_with_probing_cane"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\uddaf": {
+          "src": s1f4691f3fe200d1f9af,
+          "alt": "woman_with_probing_cane"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\uddaf": {
+          "src": s1f4691f3ff200d1f9af,
+          "alt": "woman_with_probing_cane"
+        }
+      }
     },
-    "\u1F469\u200D\u1F9B0": {
+    "\ud83d\udc69\u200d\ud83e\uddb0": {
       "src": s1f469200d1f9b0,
-      "alt": "red_haired_woman"
+      "alt": "red_haired_woman",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83e\uddb0": {
+          "src": s1f469200d1f9b0,
+          "alt": "red_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\uddb0": {
+          "src": s1f4691f3fb200d1f9b0,
+          "alt": "red_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\uddb0": {
+          "src": s1f4691f3fc200d1f9b0,
+          "alt": "red_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\uddb0": {
+          "src": s1f4691f3fd200d1f9b0,
+          "alt": "red_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\uddb0": {
+          "src": s1f4691f3fe200d1f9b0,
+          "alt": "red_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\uddb0": {
+          "src": s1f4691f3ff200d1f9b0,
+          "alt": "red_haired_woman"
+        }
+      }
     },
-    "\u1F469\u200D\u1F9B1": {
+    "\ud83d\udc69\u200d\ud83e\uddb1": {
       "src": s1f469200d1f9b1,
-      "alt": "curly_haired_woman"
+      "alt": "curly_haired_woman",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83e\uddb1": {
+          "src": s1f469200d1f9b1,
+          "alt": "curly_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\uddb1": {
+          "src": s1f4691f3fb200d1f9b1,
+          "alt": "curly_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\uddb1": {
+          "src": s1f4691f3fc200d1f9b1,
+          "alt": "curly_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\uddb1": {
+          "src": s1f4691f3fd200d1f9b1,
+          "alt": "curly_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\uddb1": {
+          "src": s1f4691f3fe200d1f9b1,
+          "alt": "curly_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\uddb1": {
+          "src": s1f4691f3ff200d1f9b1,
+          "alt": "curly_haired_woman"
+        }
+      }
     },
-    "\u1F469\u200D\u1F9B2": {
+    "\ud83d\udc69\u200d\ud83e\uddb2": {
       "src": s1f469200d1f9b2,
-      "alt": "bald_woman"
+      "alt": "bald_woman",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83e\uddb2": {
+          "src": s1f469200d1f9b2,
+          "alt": "bald_woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\uddb2": {
+          "src": s1f4691f3fb200d1f9b2,
+          "alt": "bald_woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\uddb2": {
+          "src": s1f4691f3fc200d1f9b2,
+          "alt": "bald_woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\uddb2": {
+          "src": s1f4691f3fd200d1f9b2,
+          "alt": "bald_woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\uddb2": {
+          "src": s1f4691f3fe200d1f9b2,
+          "alt": "bald_woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\uddb2": {
+          "src": s1f4691f3ff200d1f9b2,
+          "alt": "bald_woman"
+        }
+      }
     },
-    "\u1F469\u200D\u1F9B3": {
+    "\ud83d\udc69\u200d\ud83e\uddb3": {
       "src": s1f469200d1f9b3,
-      "alt": "white_haired_woman"
+      "alt": "white_haired_woman",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83e\uddb3": {
+          "src": s1f469200d1f9b3,
+          "alt": "white_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\uddb3": {
+          "src": s1f4691f3fb200d1f9b3,
+          "alt": "white_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\uddb3": {
+          "src": s1f4691f3fc200d1f9b3,
+          "alt": "white_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\uddb3": {
+          "src": s1f4691f3fd200d1f9b3,
+          "alt": "white_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\uddb3": {
+          "src": s1f4691f3fe200d1f9b3,
+          "alt": "white_haired_woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\uddb3": {
+          "src": s1f4691f3ff200d1f9b3,
+          "alt": "white_haired_woman"
+        }
+      }
     },
-    "\u1F469\u200D\u1F9BC": {
+    "\ud83d\udc69\u200d\ud83e\uddbc": {
       "src": s1f469200d1f9bc,
-      "alt": "woman_in_motorized_wheelchair"
+      "alt": "woman_in_motorized_wheelchair",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83e\uddbc": {
+          "src": s1f469200d1f9bc,
+          "alt": "woman_in_motorized_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\uddbc": {
+          "src": s1f4691f3fb200d1f9bc,
+          "alt": "woman_in_motorized_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\uddbc": {
+          "src": s1f4691f3fc200d1f9bc,
+          "alt": "woman_in_motorized_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\uddbc": {
+          "src": s1f4691f3fd200d1f9bc,
+          "alt": "woman_in_motorized_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\uddbc": {
+          "src": s1f4691f3fe200d1f9bc,
+          "alt": "woman_in_motorized_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\uddbc": {
+          "src": s1f4691f3ff200d1f9bc,
+          "alt": "woman_in_motorized_wheelchair"
+        }
+      }
     },
-    "\u1F469\u200D\u1F9BD": {
+    "\ud83d\udc69\u200d\ud83e\uddbd": {
       "src": s1f469200d1f9bd,
-      "alt": "woman_in_manual_wheelchair"
+      "alt": "woman_in_manual_wheelchair",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\ud83e\uddbd": {
+          "src": s1f469200d1f9bd,
+          "alt": "woman_in_manual_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\uddbd": {
+          "src": s1f4691f3fb200d1f9bd,
+          "alt": "woman_in_manual_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\uddbd": {
+          "src": s1f4691f3fc200d1f9bd,
+          "alt": "woman_in_manual_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\uddbd": {
+          "src": s1f4691f3fd200d1f9bd,
+          "alt": "woman_in_manual_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\uddbd": {
+          "src": s1f4691f3fe200d1f9bd,
+          "alt": "woman_in_manual_wheelchair"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\uddbd": {
+          "src": s1f4691f3ff200d1f9bd,
+          "alt": "woman_in_manual_wheelchair"
+        }
+      }
     },
-    "\u1F469\u200D\u2695\uFE0F": {
+    "\ud83d\udc69\u200d\u2695\ufe0f": {
       "src": s1f469200d2695fe0f,
-      "alt": "female-doctor"
+      "alt": "female-doctor",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\u2695\ufe0f": {
+          "src": s1f469200d2695fe0f,
+          "alt": "female-doctor"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2695\ufe0f": {
+          "src": s1f4691f3fb200d2695fe0f,
+          "alt": "female-doctor"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2695\ufe0f": {
+          "src": s1f4691f3fc200d2695fe0f,
+          "alt": "female-doctor"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2695\ufe0f": {
+          "src": s1f4691f3fd200d2695fe0f,
+          "alt": "female-doctor"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2695\ufe0f": {
+          "src": s1f4691f3fe200d2695fe0f,
+          "alt": "female-doctor"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2695\ufe0f": {
+          "src": s1f4691f3ff200d2695fe0f,
+          "alt": "female-doctor"
+        }
+      }
     },
-    "\u1F469\u200D\u2696\uFE0F": {
+    "\ud83d\udc69\u200d\u2696\ufe0f": {
       "src": s1f469200d2696fe0f,
-      "alt": "female-judge"
+      "alt": "female-judge",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\u2696\ufe0f": {
+          "src": s1f469200d2696fe0f,
+          "alt": "female-judge"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2696\ufe0f": {
+          "src": s1f4691f3fb200d2696fe0f,
+          "alt": "female-judge"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2696\ufe0f": {
+          "src": s1f4691f3fc200d2696fe0f,
+          "alt": "female-judge"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2696\ufe0f": {
+          "src": s1f4691f3fd200d2696fe0f,
+          "alt": "female-judge"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2696\ufe0f": {
+          "src": s1f4691f3fe200d2696fe0f,
+          "alt": "female-judge"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2696\ufe0f": {
+          "src": s1f4691f3ff200d2696fe0f,
+          "alt": "female-judge"
+        }
+      }
     },
-    "\u1F469\u200D\u2708\uFE0F": {
+    "\ud83d\udc69\u200d\u2708\ufe0f": {
       "src": s1f469200d2708fe0f,
-      "alt": "female-pilot"
+      "alt": "female-pilot",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\u2708\ufe0f": {
+          "src": s1f469200d2708fe0f,
+          "alt": "female-pilot"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2708\ufe0f": {
+          "src": s1f4691f3fb200d2708fe0f,
+          "alt": "female-pilot"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2708\ufe0f": {
+          "src": s1f4691f3fc200d2708fe0f,
+          "alt": "female-pilot"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2708\ufe0f": {
+          "src": s1f4691f3fd200d2708fe0f,
+          "alt": "female-pilot"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2708\ufe0f": {
+          "src": s1f4691f3fe200d2708fe0f,
+          "alt": "female-pilot"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2708\ufe0f": {
+          "src": s1f4691f3ff200d2708fe0f,
+          "alt": "female-pilot"
+        }
+      }
     },
-    "\u1F469\u200D\u2764\uFE0F\u200D\u1F468": {
+    "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc68": {
       "src": s1f469200d2764fe0f200d1f468,
-      "alt": "woman-heart-man"
+      "alt": "woman-heart-man",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc68": {
+          "src": s1f469200d2764fe0f200d1f468,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4681f3fb,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4681f3fc,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4681f3fd,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4681f3fe,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4681f3ff,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4681f3fb,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4681f3fc,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4681f3fd,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4681f3fe,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4681f3ff,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4681f3fb,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4681f3fc,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4681f3fd,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4681f3fe,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4681f3ff,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4681f3fb,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4681f3fc,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4681f3fd,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4681f3fe,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4681f3ff,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4681f3fb,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4681f3fc,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4681f3fd,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4681f3fe,
+          "alt": "woman-heart-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4681f3ff,
+          "alt": "woman-heart-man"
+        }
+      }
     },
-    "\u1F469\u200D\u2764\uFE0F\u200D\u1F469": {
+    "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc69": {
       "src": s1f469200d2764fe0f200d1f469,
-      "alt": "woman-heart-woman"
+      "alt": "woman-heart-woman",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc69": {
+          "src": s1f469200d2764fe0f200d1f469,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4691f3fb,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4691f3fc,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4691f3fd,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4691f3fe,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fb200d2764fe0f200d1f4691f3ff,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4691f3fb,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4691f3fc,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4691f3fd,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4691f3fe,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fc200d2764fe0f200d1f4691f3ff,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4691f3fb,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4691f3fc,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4691f3fd,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4691f3fe,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fd200d2764fe0f200d1f4691f3ff,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4691f3fb,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4691f3fc,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4691f3fd,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4691f3fe,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fe200d2764fe0f200d1f4691f3ff,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4691f3fb,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4691f3fc,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4691f3fd,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4691f3fe,
+          "alt": "woman-heart-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3ff200d2764fe0f200d1f4691f3ff,
+          "alt": "woman-heart-woman"
+        }
+      }
     },
-    "\u1F469\u200D\u2764\uFE0F\u200D\u1F48B\u200D\u1F468": {
+    "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68": {
       "src": s1f469200d2764fe0f200d1f48b200d1f468,
-      "alt": "woman-kiss-man"
+      "alt": "woman-kiss-man",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68": {
+          "src": s1f469200d2764fe0f200d1f48b200d1f468,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fb,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fc,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fd,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3fe,
+          "alt": "woman-kiss-man"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4681f3ff,
+          "alt": "woman-kiss-man"
+        }
+      }
     },
-    "\u1F469\u200D\u2764\uFE0F\u200D\u1F48B\u200D\u1F469": {
+    "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69": {
       "src": s1f469200d2764fe0f200d1f48b200d1f469,
-      "alt": "woman-kiss-woman"
+      "alt": "woman-kiss-woman",
+      "skinVariations": {
+        "\ud83d\udc69\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69": {
+          "src": s1f469200d2764fe0f200d1f48b200d1f469,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fb,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fc,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fd,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3fe,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fb200d2764fe0f200d1f48b200d1f4691f3ff,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fb,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fc,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fd,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3fe,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fc200d2764fe0f200d1f48b200d1f4691f3ff,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fb,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fc,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fd,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3fe,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fd200d2764fe0f200d1f48b200d1f4691f3ff,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fb,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fc,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fd,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3fe,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fe200d2764fe0f200d1f48b200d1f4691f3ff,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fb,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fc,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fd,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3fe,
+          "alt": "woman-kiss-woman"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3ff200d2764fe0f200d1f48b200d1f4691f3ff,
+          "alt": "woman-kiss-woman"
+        }
+      }
     },
-    "\u1F469": {
+    "\ud83d\udc69": {
       "src": s1f469,
-      "alt": "woman"
+      "alt": "woman",
+      "skinVariations": {
+        "\ud83d\udc69": {
+          "src": s1f469,
+          "alt": "woman"
+        },
+        "\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fb,
+          "alt": "woman"
+        },
+        "\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fc,
+          "alt": "woman"
+        },
+        "\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fd,
+          "alt": "woman"
+        },
+        "\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fe,
+          "alt": "woman"
+        },
+        "\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3ff,
+          "alt": "woman"
+        }
+      }
     },
-    "\u1F46A": {
+    "\ud83d\udc6a": {
       "src": s1f46a,
       "alt": "family"
     },
-    "\u1F46B": {
+    "\ud83d\udc6b": {
       "src": s1f46b,
-      "alt": "man_and_woman_holding_hands"
+      "alt": "man_and_woman_holding_hands",
+      "skinVariations": {
+        "\ud83d\udc6b": {
+          "src": s1f46b,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc6b\ud83c\udffb": {
+          "src": s1f46b1f3fb,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc6b\ud83c\udffc": {
+          "src": s1f46b1f3fc,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc6b\ud83c\udffd": {
+          "src": s1f46b1f3fd,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc6b\ud83c\udffe": {
+          "src": s1f46b1f3fe,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc6b\ud83c\udfff": {
+          "src": s1f46b1f3ff,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fb200d1f91d200d1f4681f3fc,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fb200d1f91d200d1f4681f3fd,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fb200d1f91d200d1f4681f3fe,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fb200d1f91d200d1f4681f3ff,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fc200d1f91d200d1f4681f3fb,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fc200d1f91d200d1f4681f3fd,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fc200d1f91d200d1f4681f3fe,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fc200d1f91d200d1f4681f3ff,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fd200d1f91d200d1f4681f3fb,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fd200d1f91d200d1f4681f3fc,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3fd200d1f91d200d1f4681f3fe,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fd200d1f91d200d1f4681f3ff,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3fe200d1f91d200d1f4681f3fb,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3fe200d1f91d200d1f4681f3fc,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3fe200d1f91d200d1f4681f3fd,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4691f3fe200d1f91d200d1f4681f3ff,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4691f3ff200d1f91d200d1f4681f3fb,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4691f3ff200d1f91d200d1f4681f3fc,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4691f3ff200d1f91d200d1f4681f3fd,
+          "alt": "man_and_woman_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4691f3ff200d1f91d200d1f4681f3fe,
+          "alt": "man_and_woman_holding_hands"
+        }
+      }
     },
-    "\u1F46C": {
+    "\ud83d\udc6c": {
       "src": s1f46c,
-      "alt": "two_men_holding_hands"
+      "alt": "two_men_holding_hands",
+      "skinVariations": {
+        "\ud83d\udc6c": {
+          "src": s1f46c,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc6c\ud83c\udffb": {
+          "src": s1f46c1f3fb,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc6c\ud83c\udffc": {
+          "src": s1f46c1f3fc,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc6c\ud83c\udffd": {
+          "src": s1f46c1f3fd,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc6c\ud83c\udffe": {
+          "src": s1f46c1f3fe,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc6c\ud83c\udfff": {
+          "src": s1f46c1f3ff,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fb200d1f91d200d1f4681f3fc,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fb200d1f91d200d1f4681f3fd,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fb200d1f91d200d1f4681f3fe,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fb200d1f91d200d1f4681f3ff,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fc200d1f91d200d1f4681f3fb,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fc200d1f91d200d1f4681f3fd,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fc200d1f91d200d1f4681f3fe,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fc200d1f91d200d1f4681f3ff,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fd200d1f91d200d1f4681f3fb,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fd200d1f91d200d1f4681f3fc,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3fd200d1f91d200d1f4681f3fe,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fd200d1f91d200d1f4681f3ff,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3fe200d1f91d200d1f4681f3fb,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3fe200d1f91d200d1f4681f3fc,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3fe200d1f91d200d1f4681f3fd,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udfff": {
+          "src": s1f4681f3fe200d1f91d200d1f4681f3ff,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffb": {
+          "src": s1f4681f3ff200d1f91d200d1f4681f3fb,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffc": {
+          "src": s1f4681f3ff200d1f91d200d1f4681f3fc,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffd": {
+          "src": s1f4681f3ff200d1f91d200d1f4681f3fd,
+          "alt": "two_men_holding_hands"
+        },
+        "\ud83d\udc68\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc68\ud83c\udffe": {
+          "src": s1f4681f3ff200d1f91d200d1f4681f3fe,
+          "alt": "two_men_holding_hands"
+        }
+      }
     },
-    "\u1F46D": {
+    "\ud83d\udc6d": {
       "src": s1f46d,
-      "alt": "two_women_holding_hands"
+      "alt": "two_women_holding_hands",
+      "skinVariations": {
+        "\ud83d\udc6d": {
+          "src": s1f46d,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc6d\ud83c\udffb": {
+          "src": s1f46d1f3fb,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc6d\ud83c\udffc": {
+          "src": s1f46d1f3fc,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc6d\ud83c\udffd": {
+          "src": s1f46d1f3fd,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc6d\ud83c\udffe": {
+          "src": s1f46d1f3fe,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc6d\ud83c\udfff": {
+          "src": s1f46d1f3ff,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fb200d1f91d200d1f4691f3fc,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fb200d1f91d200d1f4691f3fd,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fb200d1f91d200d1f4691f3fe,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fb200d1f91d200d1f4691f3ff,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fc200d1f91d200d1f4691f3fb,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fc200d1f91d200d1f4691f3fd,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fc200d1f91d200d1f4691f3fe,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fc200d1f91d200d1f4691f3ff,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fd200d1f91d200d1f4691f3fb,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fd200d1f91d200d1f4691f3fc,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3fd200d1f91d200d1f4691f3fe,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fd200d1f91d200d1f4691f3ff,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3fe200d1f91d200d1f4691f3fb,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3fe200d1f91d200d1f4691f3fc,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3fe200d1f91d200d1f4691f3fd,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udfff": {
+          "src": s1f4691f3fe200d1f91d200d1f4691f3ff,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffb": {
+          "src": s1f4691f3ff200d1f91d200d1f4691f3fb,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffc": {
+          "src": s1f4691f3ff200d1f91d200d1f4691f3fc,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffd": {
+          "src": s1f4691f3ff200d1f91d200d1f4691f3fd,
+          "alt": "two_women_holding_hands"
+        },
+        "\ud83d\udc69\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83d\udc69\ud83c\udffe": {
+          "src": s1f4691f3ff200d1f91d200d1f4691f3fe,
+          "alt": "two_women_holding_hands"
+        }
+      }
     },
-    "\u1F46E\u200D\u2640\uFE0F": {
+    "\ud83d\udc6e\u200d\u2640\ufe0f": {
       "src": s1f46e200d2640fe0f,
-      "alt": "female-police-officer"
+      "alt": "female-police-officer",
+      "skinVariations": {
+        "\ud83d\udc6e\u200d\u2640\ufe0f": {
+          "src": s1f46e200d2640fe0f,
+          "alt": "female-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f46e1f3fb200d2640fe0f,
+          "alt": "female-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f46e1f3fc200d2640fe0f,
+          "alt": "female-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f46e1f3fd200d2640fe0f,
+          "alt": "female-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f46e1f3fe200d2640fe0f,
+          "alt": "female-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f46e1f3ff200d2640fe0f,
+          "alt": "female-police-officer"
+        }
+      }
     },
-    "\u1F46E\u200D\u2642\uFE0F": {
+    "\ud83d\udc6e\u200d\u2642\ufe0f": {
       "src": s1f46e200d2642fe0f,
-      "alt": "male-police-officer"
+      "alt": "male-police-officer",
+      "skinVariations": {
+        "\ud83d\udc6e\u200d\u2642\ufe0f": {
+          "src": s1f46e200d2642fe0f,
+          "alt": "male-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f46e1f3fb200d2642fe0f,
+          "alt": "male-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f46e1f3fc200d2642fe0f,
+          "alt": "male-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f46e1f3fd200d2642fe0f,
+          "alt": "male-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f46e1f3fe200d2642fe0f,
+          "alt": "male-police-officer"
+        },
+        "\ud83d\udc6e\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f46e1f3ff200d2642fe0f,
+          "alt": "male-police-officer"
+        }
+      }
     },
-    "\u1F46E": {
+    "\ud83d\udc6e": {
       "src": s1f46e,
-      "alt": "cop"
+      "alt": "cop",
+      "skinVariations": {
+        "\ud83d\udc6e": {
+          "src": s1f46e,
+          "alt": "cop"
+        },
+        "\ud83d\udc6e\ud83c\udffb": {
+          "src": s1f46e1f3fb,
+          "alt": "cop"
+        },
+        "\ud83d\udc6e\ud83c\udffc": {
+          "src": s1f46e1f3fc,
+          "alt": "cop"
+        },
+        "\ud83d\udc6e\ud83c\udffd": {
+          "src": s1f46e1f3fd,
+          "alt": "cop"
+        },
+        "\ud83d\udc6e\ud83c\udffe": {
+          "src": s1f46e1f3fe,
+          "alt": "cop"
+        },
+        "\ud83d\udc6e\ud83c\udfff": {
+          "src": s1f46e1f3ff,
+          "alt": "cop"
+        }
+      }
     },
-    "\u1F46F\u200D\u2640\uFE0F": {
+    "\ud83d\udc6f\u200d\u2640\ufe0f": {
       "src": s1f46f200d2640fe0f,
       "alt": "women-with-bunny-ears-partying"
     },
-    "\u1F46F\u200D\u2642\uFE0F": {
+    "\ud83d\udc6f\u200d\u2642\ufe0f": {
       "src": s1f46f200d2642fe0f,
       "alt": "men-with-bunny-ears-partying"
     },
-    "\u1F46F": {
+    "\ud83d\udc6f": {
       "src": s1f46f,
       "alt": "dancers"
     },
-    "\u1F470\u200D\u2640\uFE0F": {
+    "\ud83d\udc70\u200d\u2640\ufe0f": {
       "src": s1f470200d2640fe0f,
-      "alt": "woman_with_veil"
+      "alt": "woman_with_veil",
+      "skinVariations": {
+        "\ud83d\udc70\u200d\u2640\ufe0f": {
+          "src": s1f470200d2640fe0f,
+          "alt": "woman_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4701f3fb200d2640fe0f,
+          "alt": "woman_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4701f3fc200d2640fe0f,
+          "alt": "woman_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4701f3fd200d2640fe0f,
+          "alt": "woman_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4701f3fe200d2640fe0f,
+          "alt": "woman_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4701f3ff200d2640fe0f,
+          "alt": "woman_with_veil"
+        }
+      }
     },
-    "\u1F470\u200D\u2642\uFE0F": {
+    "\ud83d\udc70\u200d\u2642\ufe0f": {
       "src": s1f470200d2642fe0f,
-      "alt": "man_with_veil"
+      "alt": "man_with_veil",
+      "skinVariations": {
+        "\ud83d\udc70\u200d\u2642\ufe0f": {
+          "src": s1f470200d2642fe0f,
+          "alt": "man_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4701f3fb200d2642fe0f,
+          "alt": "man_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4701f3fc200d2642fe0f,
+          "alt": "man_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4701f3fd200d2642fe0f,
+          "alt": "man_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4701f3fe200d2642fe0f,
+          "alt": "man_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4701f3ff200d2642fe0f,
+          "alt": "man_with_veil"
+        }
+      }
     },
-    "\u1F470": {
+    "\ud83d\udc70": {
       "src": s1f470,
-      "alt": "bride_with_veil"
+      "alt": "bride_with_veil",
+      "skinVariations": {
+        "\ud83d\udc70": {
+          "src": s1f470,
+          "alt": "bride_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffb": {
+          "src": s1f4701f3fb,
+          "alt": "bride_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffc": {
+          "src": s1f4701f3fc,
+          "alt": "bride_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffd": {
+          "src": s1f4701f3fd,
+          "alt": "bride_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udffe": {
+          "src": s1f4701f3fe,
+          "alt": "bride_with_veil"
+        },
+        "\ud83d\udc70\ud83c\udfff": {
+          "src": s1f4701f3ff,
+          "alt": "bride_with_veil"
+        }
+      }
     },
-    "\u1F471\u200D\u2640\uFE0F": {
+    "\ud83d\udc71\u200d\u2640\ufe0f": {
       "src": s1f471200d2640fe0f,
-      "alt": "blond-haired-woman"
+      "alt": "blond-haired-woman",
+      "skinVariations": {
+        "\ud83d\udc71\u200d\u2640\ufe0f": {
+          "src": s1f471200d2640fe0f,
+          "alt": "blond-haired-woman"
+        },
+        "\ud83d\udc71\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4711f3fb200d2640fe0f,
+          "alt": "blond-haired-woman"
+        },
+        "\ud83d\udc71\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4711f3fc200d2640fe0f,
+          "alt": "blond-haired-woman"
+        },
+        "\ud83d\udc71\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4711f3fd200d2640fe0f,
+          "alt": "blond-haired-woman"
+        },
+        "\ud83d\udc71\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4711f3fe200d2640fe0f,
+          "alt": "blond-haired-woman"
+        },
+        "\ud83d\udc71\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4711f3ff200d2640fe0f,
+          "alt": "blond-haired-woman"
+        }
+      }
     },
-    "\u1F471\u200D\u2642\uFE0F": {
+    "\ud83d\udc71\u200d\u2642\ufe0f": {
       "src": s1f471200d2642fe0f,
-      "alt": "blond-haired-man"
+      "alt": "blond-haired-man",
+      "skinVariations": {
+        "\ud83d\udc71\u200d\u2642\ufe0f": {
+          "src": s1f471200d2642fe0f,
+          "alt": "blond-haired-man"
+        },
+        "\ud83d\udc71\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4711f3fb200d2642fe0f,
+          "alt": "blond-haired-man"
+        },
+        "\ud83d\udc71\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4711f3fc200d2642fe0f,
+          "alt": "blond-haired-man"
+        },
+        "\ud83d\udc71\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4711f3fd200d2642fe0f,
+          "alt": "blond-haired-man"
+        },
+        "\ud83d\udc71\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4711f3fe200d2642fe0f,
+          "alt": "blond-haired-man"
+        },
+        "\ud83d\udc71\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4711f3ff200d2642fe0f,
+          "alt": "blond-haired-man"
+        }
+      }
     },
-    "\u1F471": {
+    "\ud83d\udc71": {
       "src": s1f471,
-      "alt": "person_with_blond_hair"
+      "alt": "person_with_blond_hair",
+      "skinVariations": {
+        "\ud83d\udc71": {
+          "src": s1f471,
+          "alt": "person_with_blond_hair"
+        },
+        "\ud83d\udc71\ud83c\udffb": {
+          "src": s1f4711f3fb,
+          "alt": "person_with_blond_hair"
+        },
+        "\ud83d\udc71\ud83c\udffc": {
+          "src": s1f4711f3fc,
+          "alt": "person_with_blond_hair"
+        },
+        "\ud83d\udc71\ud83c\udffd": {
+          "src": s1f4711f3fd,
+          "alt": "person_with_blond_hair"
+        },
+        "\ud83d\udc71\ud83c\udffe": {
+          "src": s1f4711f3fe,
+          "alt": "person_with_blond_hair"
+        },
+        "\ud83d\udc71\ud83c\udfff": {
+          "src": s1f4711f3ff,
+          "alt": "person_with_blond_hair"
+        }
+      }
     },
-    "\u1F472": {
+    "\ud83d\udc72": {
       "src": s1f472,
-      "alt": "man_with_gua_pi_mao"
+      "alt": "man_with_gua_pi_mao",
+      "skinVariations": {
+        "\ud83d\udc72": {
+          "src": s1f472,
+          "alt": "man_with_gua_pi_mao"
+        },
+        "\ud83d\udc72\ud83c\udffb": {
+          "src": s1f4721f3fb,
+          "alt": "man_with_gua_pi_mao"
+        },
+        "\ud83d\udc72\ud83c\udffc": {
+          "src": s1f4721f3fc,
+          "alt": "man_with_gua_pi_mao"
+        },
+        "\ud83d\udc72\ud83c\udffd": {
+          "src": s1f4721f3fd,
+          "alt": "man_with_gua_pi_mao"
+        },
+        "\ud83d\udc72\ud83c\udffe": {
+          "src": s1f4721f3fe,
+          "alt": "man_with_gua_pi_mao"
+        },
+        "\ud83d\udc72\ud83c\udfff": {
+          "src": s1f4721f3ff,
+          "alt": "man_with_gua_pi_mao"
+        }
+      }
     },
-    "\u1F473\u200D\u2640\uFE0F": {
+    "\ud83d\udc73\u200d\u2640\ufe0f": {
       "src": s1f473200d2640fe0f,
-      "alt": "woman-wearing-turban"
+      "alt": "woman-wearing-turban",
+      "skinVariations": {
+        "\ud83d\udc73\u200d\u2640\ufe0f": {
+          "src": s1f473200d2640fe0f,
+          "alt": "woman-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4731f3fb200d2640fe0f,
+          "alt": "woman-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4731f3fc200d2640fe0f,
+          "alt": "woman-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4731f3fd200d2640fe0f,
+          "alt": "woman-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4731f3fe200d2640fe0f,
+          "alt": "woman-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4731f3ff200d2640fe0f,
+          "alt": "woman-wearing-turban"
+        }
+      }
     },
-    "\u1F473\u200D\u2642\uFE0F": {
+    "\ud83d\udc73\u200d\u2642\ufe0f": {
       "src": s1f473200d2642fe0f,
-      "alt": "man-wearing-turban"
+      "alt": "man-wearing-turban",
+      "skinVariations": {
+        "\ud83d\udc73\u200d\u2642\ufe0f": {
+          "src": s1f473200d2642fe0f,
+          "alt": "man-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4731f3fb200d2642fe0f,
+          "alt": "man-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4731f3fc200d2642fe0f,
+          "alt": "man-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4731f3fd200d2642fe0f,
+          "alt": "man-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4731f3fe200d2642fe0f,
+          "alt": "man-wearing-turban"
+        },
+        "\ud83d\udc73\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4731f3ff200d2642fe0f,
+          "alt": "man-wearing-turban"
+        }
+      }
     },
-    "\u1F473": {
+    "\ud83d\udc73": {
       "src": s1f473,
-      "alt": "man_with_turban"
+      "alt": "man_with_turban",
+      "skinVariations": {
+        "\ud83d\udc73": {
+          "src": s1f473,
+          "alt": "man_with_turban"
+        },
+        "\ud83d\udc73\ud83c\udffb": {
+          "src": s1f4731f3fb,
+          "alt": "man_with_turban"
+        },
+        "\ud83d\udc73\ud83c\udffc": {
+          "src": s1f4731f3fc,
+          "alt": "man_with_turban"
+        },
+        "\ud83d\udc73\ud83c\udffd": {
+          "src": s1f4731f3fd,
+          "alt": "man_with_turban"
+        },
+        "\ud83d\udc73\ud83c\udffe": {
+          "src": s1f4731f3fe,
+          "alt": "man_with_turban"
+        },
+        "\ud83d\udc73\ud83c\udfff": {
+          "src": s1f4731f3ff,
+          "alt": "man_with_turban"
+        }
+      }
     },
-    "\u1F474": {
+    "\ud83d\udc74": {
       "src": s1f474,
-      "alt": "older_man"
+      "alt": "older_man",
+      "skinVariations": {
+        "\ud83d\udc74": {
+          "src": s1f474,
+          "alt": "older_man"
+        },
+        "\ud83d\udc74\ud83c\udffb": {
+          "src": s1f4741f3fb,
+          "alt": "older_man"
+        },
+        "\ud83d\udc74\ud83c\udffc": {
+          "src": s1f4741f3fc,
+          "alt": "older_man"
+        },
+        "\ud83d\udc74\ud83c\udffd": {
+          "src": s1f4741f3fd,
+          "alt": "older_man"
+        },
+        "\ud83d\udc74\ud83c\udffe": {
+          "src": s1f4741f3fe,
+          "alt": "older_man"
+        },
+        "\ud83d\udc74\ud83c\udfff": {
+          "src": s1f4741f3ff,
+          "alt": "older_man"
+        }
+      }
     },
-    "\u1F475": {
+    "\ud83d\udc75": {
       "src": s1f475,
-      "alt": "older_woman"
+      "alt": "older_woman",
+      "skinVariations": {
+        "\ud83d\udc75": {
+          "src": s1f475,
+          "alt": "older_woman"
+        },
+        "\ud83d\udc75\ud83c\udffb": {
+          "src": s1f4751f3fb,
+          "alt": "older_woman"
+        },
+        "\ud83d\udc75\ud83c\udffc": {
+          "src": s1f4751f3fc,
+          "alt": "older_woman"
+        },
+        "\ud83d\udc75\ud83c\udffd": {
+          "src": s1f4751f3fd,
+          "alt": "older_woman"
+        },
+        "\ud83d\udc75\ud83c\udffe": {
+          "src": s1f4751f3fe,
+          "alt": "older_woman"
+        },
+        "\ud83d\udc75\ud83c\udfff": {
+          "src": s1f4751f3ff,
+          "alt": "older_woman"
+        }
+      }
     },
-    "\u1F476": {
+    "\ud83d\udc76": {
       "src": s1f476,
-      "alt": "baby"
+      "alt": "baby",
+      "skinVariations": {
+        "\ud83d\udc76": {
+          "src": s1f476,
+          "alt": "baby"
+        },
+        "\ud83d\udc76\ud83c\udffb": {
+          "src": s1f4761f3fb,
+          "alt": "baby"
+        },
+        "\ud83d\udc76\ud83c\udffc": {
+          "src": s1f4761f3fc,
+          "alt": "baby"
+        },
+        "\ud83d\udc76\ud83c\udffd": {
+          "src": s1f4761f3fd,
+          "alt": "baby"
+        },
+        "\ud83d\udc76\ud83c\udffe": {
+          "src": s1f4761f3fe,
+          "alt": "baby"
+        },
+        "\ud83d\udc76\ud83c\udfff": {
+          "src": s1f4761f3ff,
+          "alt": "baby"
+        }
+      }
     },
-    "\u1F477\u200D\u2640\uFE0F": {
+    "\ud83d\udc77\u200d\u2640\ufe0f": {
       "src": s1f477200d2640fe0f,
-      "alt": "female-construction-worker"
+      "alt": "female-construction-worker",
+      "skinVariations": {
+        "\ud83d\udc77\u200d\u2640\ufe0f": {
+          "src": s1f477200d2640fe0f,
+          "alt": "female-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4771f3fb200d2640fe0f,
+          "alt": "female-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4771f3fc200d2640fe0f,
+          "alt": "female-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4771f3fd200d2640fe0f,
+          "alt": "female-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4771f3fe200d2640fe0f,
+          "alt": "female-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4771f3ff200d2640fe0f,
+          "alt": "female-construction-worker"
+        }
+      }
     },
-    "\u1F477\u200D\u2642\uFE0F": {
+    "\ud83d\udc77\u200d\u2642\ufe0f": {
       "src": s1f477200d2642fe0f,
-      "alt": "male-construction-worker"
+      "alt": "male-construction-worker",
+      "skinVariations": {
+        "\ud83d\udc77\u200d\u2642\ufe0f": {
+          "src": s1f477200d2642fe0f,
+          "alt": "male-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4771f3fb200d2642fe0f,
+          "alt": "male-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4771f3fc200d2642fe0f,
+          "alt": "male-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4771f3fd200d2642fe0f,
+          "alt": "male-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4771f3fe200d2642fe0f,
+          "alt": "male-construction-worker"
+        },
+        "\ud83d\udc77\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4771f3ff200d2642fe0f,
+          "alt": "male-construction-worker"
+        }
+      }
     },
-    "\u1F477": {
+    "\ud83d\udc77": {
       "src": s1f477,
-      "alt": "construction_worker"
+      "alt": "construction_worker",
+      "skinVariations": {
+        "\ud83d\udc77": {
+          "src": s1f477,
+          "alt": "construction_worker"
+        },
+        "\ud83d\udc77\ud83c\udffb": {
+          "src": s1f4771f3fb,
+          "alt": "construction_worker"
+        },
+        "\ud83d\udc77\ud83c\udffc": {
+          "src": s1f4771f3fc,
+          "alt": "construction_worker"
+        },
+        "\ud83d\udc77\ud83c\udffd": {
+          "src": s1f4771f3fd,
+          "alt": "construction_worker"
+        },
+        "\ud83d\udc77\ud83c\udffe": {
+          "src": s1f4771f3fe,
+          "alt": "construction_worker"
+        },
+        "\ud83d\udc77\ud83c\udfff": {
+          "src": s1f4771f3ff,
+          "alt": "construction_worker"
+        }
+      }
     },
-    "\u1F478": {
+    "\ud83d\udc78": {
       "src": s1f478,
-      "alt": "princess"
+      "alt": "princess",
+      "skinVariations": {
+        "\ud83d\udc78": {
+          "src": s1f478,
+          "alt": "princess"
+        },
+        "\ud83d\udc78\ud83c\udffb": {
+          "src": s1f4781f3fb,
+          "alt": "princess"
+        },
+        "\ud83d\udc78\ud83c\udffc": {
+          "src": s1f4781f3fc,
+          "alt": "princess"
+        },
+        "\ud83d\udc78\ud83c\udffd": {
+          "src": s1f4781f3fd,
+          "alt": "princess"
+        },
+        "\ud83d\udc78\ud83c\udffe": {
+          "src": s1f4781f3fe,
+          "alt": "princess"
+        },
+        "\ud83d\udc78\ud83c\udfff": {
+          "src": s1f4781f3ff,
+          "alt": "princess"
+        }
+      }
     },
-    "\u1F47C": {
+    "\ud83d\udc7c": {
       "src": s1f47c,
-      "alt": "angel"
+      "alt": "angel",
+      "skinVariations": {
+        "\ud83d\udc7c": {
+          "src": s1f47c,
+          "alt": "angel"
+        },
+        "\ud83d\udc7c\ud83c\udffb": {
+          "src": s1f47c1f3fb,
+          "alt": "angel"
+        },
+        "\ud83d\udc7c\ud83c\udffc": {
+          "src": s1f47c1f3fc,
+          "alt": "angel"
+        },
+        "\ud83d\udc7c\ud83c\udffd": {
+          "src": s1f47c1f3fd,
+          "alt": "angel"
+        },
+        "\ud83d\udc7c\ud83c\udffe": {
+          "src": s1f47c1f3fe,
+          "alt": "angel"
+        },
+        "\ud83d\udc7c\ud83c\udfff": {
+          "src": s1f47c1f3ff,
+          "alt": "angel"
+        }
+      }
     },
-    "\u1F481\u200D\u2640\uFE0F": {
+    "\ud83d\udc81\u200d\u2640\ufe0f": {
       "src": s1f481200d2640fe0f,
-      "alt": "woman-tipping-hand"
+      "alt": "woman-tipping-hand",
+      "skinVariations": {
+        "\ud83d\udc81\u200d\u2640\ufe0f": {
+          "src": s1f481200d2640fe0f,
+          "alt": "woman-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4811f3fb200d2640fe0f,
+          "alt": "woman-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4811f3fc200d2640fe0f,
+          "alt": "woman-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4811f3fd200d2640fe0f,
+          "alt": "woman-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4811f3fe200d2640fe0f,
+          "alt": "woman-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4811f3ff200d2640fe0f,
+          "alt": "woman-tipping-hand"
+        }
+      }
     },
-    "\u1F481\u200D\u2642\uFE0F": {
+    "\ud83d\udc81\u200d\u2642\ufe0f": {
       "src": s1f481200d2642fe0f,
-      "alt": "man-tipping-hand"
+      "alt": "man-tipping-hand",
+      "skinVariations": {
+        "\ud83d\udc81\u200d\u2642\ufe0f": {
+          "src": s1f481200d2642fe0f,
+          "alt": "man-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4811f3fb200d2642fe0f,
+          "alt": "man-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4811f3fc200d2642fe0f,
+          "alt": "man-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4811f3fd200d2642fe0f,
+          "alt": "man-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4811f3fe200d2642fe0f,
+          "alt": "man-tipping-hand"
+        },
+        "\ud83d\udc81\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4811f3ff200d2642fe0f,
+          "alt": "man-tipping-hand"
+        }
+      }
     },
-    "\u1F481": {
+    "\ud83d\udc81": {
       "src": s1f481,
-      "alt": "information_desk_person"
+      "alt": "information_desk_person",
+      "skinVariations": {
+        "\ud83d\udc81": {
+          "src": s1f481,
+          "alt": "information_desk_person"
+        },
+        "\ud83d\udc81\ud83c\udffb": {
+          "src": s1f4811f3fb,
+          "alt": "information_desk_person"
+        },
+        "\ud83d\udc81\ud83c\udffc": {
+          "src": s1f4811f3fc,
+          "alt": "information_desk_person"
+        },
+        "\ud83d\udc81\ud83c\udffd": {
+          "src": s1f4811f3fd,
+          "alt": "information_desk_person"
+        },
+        "\ud83d\udc81\ud83c\udffe": {
+          "src": s1f4811f3fe,
+          "alt": "information_desk_person"
+        },
+        "\ud83d\udc81\ud83c\udfff": {
+          "src": s1f4811f3ff,
+          "alt": "information_desk_person"
+        }
+      }
     },
-    "\u1F482\u200D\u2640\uFE0F": {
+    "\ud83d\udc82\u200d\u2640\ufe0f": {
       "src": s1f482200d2640fe0f,
-      "alt": "female-guard"
+      "alt": "female-guard",
+      "skinVariations": {
+        "\ud83d\udc82\u200d\u2640\ufe0f": {
+          "src": s1f482200d2640fe0f,
+          "alt": "female-guard"
+        },
+        "\ud83d\udc82\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4821f3fb200d2640fe0f,
+          "alt": "female-guard"
+        },
+        "\ud83d\udc82\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4821f3fc200d2640fe0f,
+          "alt": "female-guard"
+        },
+        "\ud83d\udc82\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4821f3fd200d2640fe0f,
+          "alt": "female-guard"
+        },
+        "\ud83d\udc82\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4821f3fe200d2640fe0f,
+          "alt": "female-guard"
+        },
+        "\ud83d\udc82\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4821f3ff200d2640fe0f,
+          "alt": "female-guard"
+        }
+      }
     },
-    "\u1F482\u200D\u2642\uFE0F": {
+    "\ud83d\udc82\u200d\u2642\ufe0f": {
       "src": s1f482200d2642fe0f,
-      "alt": "male-guard"
+      "alt": "male-guard",
+      "skinVariations": {
+        "\ud83d\udc82\u200d\u2642\ufe0f": {
+          "src": s1f482200d2642fe0f,
+          "alt": "male-guard"
+        },
+        "\ud83d\udc82\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4821f3fb200d2642fe0f,
+          "alt": "male-guard"
+        },
+        "\ud83d\udc82\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4821f3fc200d2642fe0f,
+          "alt": "male-guard"
+        },
+        "\ud83d\udc82\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4821f3fd200d2642fe0f,
+          "alt": "male-guard"
+        },
+        "\ud83d\udc82\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4821f3fe200d2642fe0f,
+          "alt": "male-guard"
+        },
+        "\ud83d\udc82\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4821f3ff200d2642fe0f,
+          "alt": "male-guard"
+        }
+      }
     },
-    "\u1F482": {
+    "\ud83d\udc82": {
       "src": s1f482,
-      "alt": "guardsman"
+      "alt": "guardsman",
+      "skinVariations": {
+        "\ud83d\udc82": {
+          "src": s1f482,
+          "alt": "guardsman"
+        },
+        "\ud83d\udc82\ud83c\udffb": {
+          "src": s1f4821f3fb,
+          "alt": "guardsman"
+        },
+        "\ud83d\udc82\ud83c\udffc": {
+          "src": s1f4821f3fc,
+          "alt": "guardsman"
+        },
+        "\ud83d\udc82\ud83c\udffd": {
+          "src": s1f4821f3fd,
+          "alt": "guardsman"
+        },
+        "\ud83d\udc82\ud83c\udffe": {
+          "src": s1f4821f3fe,
+          "alt": "guardsman"
+        },
+        "\ud83d\udc82\ud83c\udfff": {
+          "src": s1f4821f3ff,
+          "alt": "guardsman"
+        }
+      }
     },
-    "\u1F483": {
+    "\ud83d\udc83": {
       "src": s1f483,
-      "alt": "dancer"
+      "alt": "dancer",
+      "skinVariations": {
+        "\ud83d\udc83": {
+          "src": s1f483,
+          "alt": "dancer"
+        },
+        "\ud83d\udc83\ud83c\udffb": {
+          "src": s1f4831f3fb,
+          "alt": "dancer"
+        },
+        "\ud83d\udc83\ud83c\udffc": {
+          "src": s1f4831f3fc,
+          "alt": "dancer"
+        },
+        "\ud83d\udc83\ud83c\udffd": {
+          "src": s1f4831f3fd,
+          "alt": "dancer"
+        },
+        "\ud83d\udc83\ud83c\udffe": {
+          "src": s1f4831f3fe,
+          "alt": "dancer"
+        },
+        "\ud83d\udc83\ud83c\udfff": {
+          "src": s1f4831f3ff,
+          "alt": "dancer"
+        }
+      }
     },
-    "\u1F485": {
+    "\ud83d\udc85": {
       "src": s1f485,
-      "alt": "nail_care"
+      "alt": "nail_care",
+      "skinVariations": {
+        "\ud83d\udc85": {
+          "src": s1f485,
+          "alt": "nail_care"
+        },
+        "\ud83d\udc85\ud83c\udffb": {
+          "src": s1f4851f3fb,
+          "alt": "nail_care"
+        },
+        "\ud83d\udc85\ud83c\udffc": {
+          "src": s1f4851f3fc,
+          "alt": "nail_care"
+        },
+        "\ud83d\udc85\ud83c\udffd": {
+          "src": s1f4851f3fd,
+          "alt": "nail_care"
+        },
+        "\ud83d\udc85\ud83c\udffe": {
+          "src": s1f4851f3fe,
+          "alt": "nail_care"
+        },
+        "\ud83d\udc85\ud83c\udfff": {
+          "src": s1f4851f3ff,
+          "alt": "nail_care"
+        }
+      }
     },
-    "\u1F486\u200D\u2640\uFE0F": {
+    "\ud83d\udc86\u200d\u2640\ufe0f": {
       "src": s1f486200d2640fe0f,
-      "alt": "woman-getting-massage"
+      "alt": "woman-getting-massage",
+      "skinVariations": {
+        "\ud83d\udc86\u200d\u2640\ufe0f": {
+          "src": s1f486200d2640fe0f,
+          "alt": "woman-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4861f3fb200d2640fe0f,
+          "alt": "woman-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4861f3fc200d2640fe0f,
+          "alt": "woman-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4861f3fd200d2640fe0f,
+          "alt": "woman-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4861f3fe200d2640fe0f,
+          "alt": "woman-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4861f3ff200d2640fe0f,
+          "alt": "woman-getting-massage"
+        }
+      }
     },
-    "\u1F486\u200D\u2642\uFE0F": {
+    "\ud83d\udc86\u200d\u2642\ufe0f": {
       "src": s1f486200d2642fe0f,
-      "alt": "man-getting-massage"
+      "alt": "man-getting-massage",
+      "skinVariations": {
+        "\ud83d\udc86\u200d\u2642\ufe0f": {
+          "src": s1f486200d2642fe0f,
+          "alt": "man-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4861f3fb200d2642fe0f,
+          "alt": "man-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4861f3fc200d2642fe0f,
+          "alt": "man-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4861f3fd200d2642fe0f,
+          "alt": "man-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4861f3fe200d2642fe0f,
+          "alt": "man-getting-massage"
+        },
+        "\ud83d\udc86\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4861f3ff200d2642fe0f,
+          "alt": "man-getting-massage"
+        }
+      }
     },
-    "\u1F486": {
+    "\ud83d\udc86": {
       "src": s1f486,
-      "alt": "massage"
+      "alt": "massage",
+      "skinVariations": {
+        "\ud83d\udc86": {
+          "src": s1f486,
+          "alt": "massage"
+        },
+        "\ud83d\udc86\ud83c\udffb": {
+          "src": s1f4861f3fb,
+          "alt": "massage"
+        },
+        "\ud83d\udc86\ud83c\udffc": {
+          "src": s1f4861f3fc,
+          "alt": "massage"
+        },
+        "\ud83d\udc86\ud83c\udffd": {
+          "src": s1f4861f3fd,
+          "alt": "massage"
+        },
+        "\ud83d\udc86\ud83c\udffe": {
+          "src": s1f4861f3fe,
+          "alt": "massage"
+        },
+        "\ud83d\udc86\ud83c\udfff": {
+          "src": s1f4861f3ff,
+          "alt": "massage"
+        }
+      }
     },
-    "\u1F487\u200D\u2640\uFE0F": {
+    "\ud83d\udc87\u200d\u2640\ufe0f": {
       "src": s1f487200d2640fe0f,
-      "alt": "woman-getting-haircut"
+      "alt": "woman-getting-haircut",
+      "skinVariations": {
+        "\ud83d\udc87\u200d\u2640\ufe0f": {
+          "src": s1f487200d2640fe0f,
+          "alt": "woman-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f4871f3fb200d2640fe0f,
+          "alt": "woman-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f4871f3fc200d2640fe0f,
+          "alt": "woman-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f4871f3fd200d2640fe0f,
+          "alt": "woman-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f4871f3fe200d2640fe0f,
+          "alt": "woman-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f4871f3ff200d2640fe0f,
+          "alt": "woman-getting-haircut"
+        }
+      }
     },
-    "\u1F487\u200D\u2642\uFE0F": {
+    "\ud83d\udc87\u200d\u2642\ufe0f": {
       "src": s1f487200d2642fe0f,
-      "alt": "man-getting-haircut"
+      "alt": "man-getting-haircut",
+      "skinVariations": {
+        "\ud83d\udc87\u200d\u2642\ufe0f": {
+          "src": s1f487200d2642fe0f,
+          "alt": "man-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f4871f3fb200d2642fe0f,
+          "alt": "man-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f4871f3fc200d2642fe0f,
+          "alt": "man-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f4871f3fd200d2642fe0f,
+          "alt": "man-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f4871f3fe200d2642fe0f,
+          "alt": "man-getting-haircut"
+        },
+        "\ud83d\udc87\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f4871f3ff200d2642fe0f,
+          "alt": "man-getting-haircut"
+        }
+      }
     },
-    "\u1F487": {
+    "\ud83d\udc87": {
       "src": s1f487,
-      "alt": "haircut"
+      "alt": "haircut",
+      "skinVariations": {
+        "\ud83d\udc87": {
+          "src": s1f487,
+          "alt": "haircut"
+        },
+        "\ud83d\udc87\ud83c\udffb": {
+          "src": s1f4871f3fb,
+          "alt": "haircut"
+        },
+        "\ud83d\udc87\ud83c\udffc": {
+          "src": s1f4871f3fc,
+          "alt": "haircut"
+        },
+        "\ud83d\udc87\ud83c\udffd": {
+          "src": s1f4871f3fd,
+          "alt": "haircut"
+        },
+        "\ud83d\udc87\ud83c\udffe": {
+          "src": s1f4871f3fe,
+          "alt": "haircut"
+        },
+        "\ud83d\udc87\ud83c\udfff": {
+          "src": s1f4871f3ff,
+          "alt": "haircut"
+        }
+      }
     },
-    "\u1F48F": {
+    "\ud83d\udc8f": {
       "src": s1f48f,
-      "alt": "couplekiss"
+      "alt": "couplekiss",
+      "skinVariations": {
+        "\ud83d\udc8f": {
+          "src": s1f48f,
+          "alt": "couplekiss"
+        },
+        "\ud83d\udc8f\ud83c\udffb": {
+          "src": s1f48f1f3fb,
+          "alt": "couplekiss"
+        },
+        "\ud83d\udc8f\ud83c\udffc": {
+          "src": s1f48f1f3fc,
+          "alt": "couplekiss"
+        },
+        "\ud83d\udc8f\ud83c\udffd": {
+          "src": s1f48f1f3fd,
+          "alt": "couplekiss"
+        },
+        "\ud83d\udc8f\ud83c\udffe": {
+          "src": s1f48f1f3fe,
+          "alt": "couplekiss"
+        },
+        "\ud83d\udc8f\ud83c\udfff": {
+          "src": s1f48f1f3ff,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3fc,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3fd,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3fe,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f48b200d1f9d11f3ff,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3fb,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3fd,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3fe,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f48b200d1f9d11f3ff,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3fb,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3fc,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3fe,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f48b200d1f9d11f3ff,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3fb,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3fc,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3fd,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f48b200d1f9d11f3ff,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fb,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fc,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fd,
+          "alt": "couplekiss"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83d\udc8b\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f48b200d1f9d11f3fe,
+          "alt": "couplekiss"
+        }
+      }
     },
-    "\u1F491": {
+    "\ud83d\udc91": {
       "src": s1f491,
-      "alt": "couple_with_heart"
+      "alt": "couple_with_heart",
+      "skinVariations": {
+        "\ud83d\udc91": {
+          "src": s1f491,
+          "alt": "couple_with_heart"
+        },
+        "\ud83d\udc91\ud83c\udffb": {
+          "src": s1f4911f3fb,
+          "alt": "couple_with_heart"
+        },
+        "\ud83d\udc91\ud83c\udffc": {
+          "src": s1f4911f3fc,
+          "alt": "couple_with_heart"
+        },
+        "\ud83d\udc91\ud83c\udffd": {
+          "src": s1f4911f3fd,
+          "alt": "couple_with_heart"
+        },
+        "\ud83d\udc91\ud83c\udffe": {
+          "src": s1f4911f3fe,
+          "alt": "couple_with_heart"
+        },
+        "\ud83d\udc91\ud83c\udfff": {
+          "src": s1f4911f3ff,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f9d11f3fc,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f9d11f3fd,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f9d11f3fe,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fb200d2764fe0f200d1f9d11f3ff,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f9d11f3fb,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f9d11f3fd,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f9d11f3fe,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fc200d2764fe0f200d1f9d11f3ff,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f9d11f3fb,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f9d11f3fc,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f9d11f3fe,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fd200d2764fe0f200d1f9d11f3ff,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f9d11f3fb,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f9d11f3fc,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f9d11f3fd,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fe200d2764fe0f200d1f9d11f3ff,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f9d11f3fb,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f9d11f3fc,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f9d11f3fd,
+          "alt": "couple_with_heart"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2764\ufe0f\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3ff200d2764fe0f200d1f9d11f3fe,
+          "alt": "couple_with_heart"
+        }
+      }
     },
-    "\u1F4AA": {
+    "\ud83d\udcaa": {
       "src": s1f4aa,
-      "alt": "muscle"
+      "alt": "muscle",
+      "skinVariations": {
+        "\ud83d\udcaa": {
+          "src": s1f4aa,
+          "alt": "muscle"
+        },
+        "\ud83d\udcaa\ud83c\udffb": {
+          "src": s1f4aa1f3fb,
+          "alt": "muscle"
+        },
+        "\ud83d\udcaa\ud83c\udffc": {
+          "src": s1f4aa1f3fc,
+          "alt": "muscle"
+        },
+        "\ud83d\udcaa\ud83c\udffd": {
+          "src": s1f4aa1f3fd,
+          "alt": "muscle"
+        },
+        "\ud83d\udcaa\ud83c\udffe": {
+          "src": s1f4aa1f3fe,
+          "alt": "muscle"
+        },
+        "\ud83d\udcaa\ud83c\udfff": {
+          "src": s1f4aa1f3ff,
+          "alt": "muscle"
+        }
+      }
     },
-    "\u1F574\uFE0F": {
+    "\ud83d\udd74\ufe0f": {
       "src": s1f574fe0f,
-      "alt": "man_in_business_suit_levitating"
+      "alt": "man_in_business_suit_levitating",
+      "skinVariations": {
+        "\ud83d\udd74\ufe0f": {
+          "src": s1f574fe0f,
+          "alt": "man_in_business_suit_levitating"
+        },
+        "\ud83d\udd74\ud83c\udffb": {
+          "src": s1f5741f3fb,
+          "alt": "man_in_business_suit_levitating"
+        },
+        "\ud83d\udd74\ud83c\udffc": {
+          "src": s1f5741f3fc,
+          "alt": "man_in_business_suit_levitating"
+        },
+        "\ud83d\udd74\ud83c\udffd": {
+          "src": s1f5741f3fd,
+          "alt": "man_in_business_suit_levitating"
+        },
+        "\ud83d\udd74\ud83c\udffe": {
+          "src": s1f5741f3fe,
+          "alt": "man_in_business_suit_levitating"
+        },
+        "\ud83d\udd74\ud83c\udfff": {
+          "src": s1f5741f3ff,
+          "alt": "man_in_business_suit_levitating"
+        }
+      }
     },
-    "\u1F575\uFE0F\u200D\u2640\uFE0F": {
+    "\ud83d\udd75\ufe0f\u200d\u2640\ufe0f": {
       "src": s1f575fe0f200d2640fe0f,
-      "alt": "female-detective"
+      "alt": "female-detective",
+      "skinVariations": {
+        "\ud83d\udd75\ufe0f\u200d\u2640\ufe0f": {
+          "src": s1f575fe0f200d2640fe0f,
+          "alt": "female-detective"
+        },
+        "\ud83d\udd75\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f5751f3fb200d2640fe0f,
+          "alt": "female-detective"
+        },
+        "\ud83d\udd75\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f5751f3fc200d2640fe0f,
+          "alt": "female-detective"
+        },
+        "\ud83d\udd75\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f5751f3fd200d2640fe0f,
+          "alt": "female-detective"
+        },
+        "\ud83d\udd75\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f5751f3fe200d2640fe0f,
+          "alt": "female-detective"
+        },
+        "\ud83d\udd75\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f5751f3ff200d2640fe0f,
+          "alt": "female-detective"
+        }
+      }
     },
-    "\u1F575\uFE0F\u200D\u2642\uFE0F": {
+    "\ud83d\udd75\ufe0f\u200d\u2642\ufe0f": {
       "src": s1f575fe0f200d2642fe0f,
-      "alt": "male-detective"
+      "alt": "male-detective",
+      "skinVariations": {
+        "\ud83d\udd75\ufe0f\u200d\u2642\ufe0f": {
+          "src": s1f575fe0f200d2642fe0f,
+          "alt": "male-detective"
+        },
+        "\ud83d\udd75\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f5751f3fb200d2642fe0f,
+          "alt": "male-detective"
+        },
+        "\ud83d\udd75\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f5751f3fc200d2642fe0f,
+          "alt": "male-detective"
+        },
+        "\ud83d\udd75\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f5751f3fd200d2642fe0f,
+          "alt": "male-detective"
+        },
+        "\ud83d\udd75\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f5751f3fe200d2642fe0f,
+          "alt": "male-detective"
+        },
+        "\ud83d\udd75\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f5751f3ff200d2642fe0f,
+          "alt": "male-detective"
+        }
+      }
     },
-    "\u1F575\uFE0F": {
+    "\ud83d\udd75\ufe0f": {
       "src": s1f575fe0f,
-      "alt": "sleuth_or_spy"
+      "alt": "sleuth_or_spy",
+      "skinVariations": {
+        "\ud83d\udd75\ufe0f": {
+          "src": s1f575fe0f,
+          "alt": "sleuth_or_spy"
+        },
+        "\ud83d\udd75\ud83c\udffb": {
+          "src": s1f5751f3fb,
+          "alt": "sleuth_or_spy"
+        },
+        "\ud83d\udd75\ud83c\udffc": {
+          "src": s1f5751f3fc,
+          "alt": "sleuth_or_spy"
+        },
+        "\ud83d\udd75\ud83c\udffd": {
+          "src": s1f5751f3fd,
+          "alt": "sleuth_or_spy"
+        },
+        "\ud83d\udd75\ud83c\udffe": {
+          "src": s1f5751f3fe,
+          "alt": "sleuth_or_spy"
+        },
+        "\ud83d\udd75\ud83c\udfff": {
+          "src": s1f5751f3ff,
+          "alt": "sleuth_or_spy"
+        }
+      }
     },
-    "\u1F57A": {
+    "\ud83d\udd7a": {
       "src": s1f57a,
-      "alt": "man_dancing"
+      "alt": "man_dancing",
+      "skinVariations": {
+        "\ud83d\udd7a": {
+          "src": s1f57a,
+          "alt": "man_dancing"
+        },
+        "\ud83d\udd7a\ud83c\udffb": {
+          "src": s1f57a1f3fb,
+          "alt": "man_dancing"
+        },
+        "\ud83d\udd7a\ud83c\udffc": {
+          "src": s1f57a1f3fc,
+          "alt": "man_dancing"
+        },
+        "\ud83d\udd7a\ud83c\udffd": {
+          "src": s1f57a1f3fd,
+          "alt": "man_dancing"
+        },
+        "\ud83d\udd7a\ud83c\udffe": {
+          "src": s1f57a1f3fe,
+          "alt": "man_dancing"
+        },
+        "\ud83d\udd7a\ud83c\udfff": {
+          "src": s1f57a1f3ff,
+          "alt": "man_dancing"
+        }
+      }
     },
-    "\u1F590\uFE0F": {
+    "\ud83d\udd90\ufe0f": {
       "src": s1f590fe0f,
-      "alt": "raised_hand_with_fingers_splayed"
+      "alt": "raised_hand_with_fingers_splayed",
+      "skinVariations": {
+        "\ud83d\udd90\ufe0f": {
+          "src": s1f590fe0f,
+          "alt": "raised_hand_with_fingers_splayed"
+        },
+        "\ud83d\udd90\ud83c\udffb": {
+          "src": s1f5901f3fb,
+          "alt": "raised_hand_with_fingers_splayed"
+        },
+        "\ud83d\udd90\ud83c\udffc": {
+          "src": s1f5901f3fc,
+          "alt": "raised_hand_with_fingers_splayed"
+        },
+        "\ud83d\udd90\ud83c\udffd": {
+          "src": s1f5901f3fd,
+          "alt": "raised_hand_with_fingers_splayed"
+        },
+        "\ud83d\udd90\ud83c\udffe": {
+          "src": s1f5901f3fe,
+          "alt": "raised_hand_with_fingers_splayed"
+        },
+        "\ud83d\udd90\ud83c\udfff": {
+          "src": s1f5901f3ff,
+          "alt": "raised_hand_with_fingers_splayed"
+        }
+      }
     },
-    "\u1F595": {
+    "\ud83d\udd95": {
       "src": s1f595,
-      "alt": "middle_finger"
+      "alt": "middle_finger",
+      "skinVariations": {
+        "\ud83d\udd95": {
+          "src": s1f595,
+          "alt": "middle_finger"
+        },
+        "\ud83d\udd95\ud83c\udffb": {
+          "src": s1f5951f3fb,
+          "alt": "middle_finger"
+        },
+        "\ud83d\udd95\ud83c\udffc": {
+          "src": s1f5951f3fc,
+          "alt": "middle_finger"
+        },
+        "\ud83d\udd95\ud83c\udffd": {
+          "src": s1f5951f3fd,
+          "alt": "middle_finger"
+        },
+        "\ud83d\udd95\ud83c\udffe": {
+          "src": s1f5951f3fe,
+          "alt": "middle_finger"
+        },
+        "\ud83d\udd95\ud83c\udfff": {
+          "src": s1f5951f3ff,
+          "alt": "middle_finger"
+        }
+      }
     },
-    "\u1F596": {
+    "\ud83d\udd96": {
       "src": s1f596,
-      "alt": "spock-hand"
+      "alt": "spock-hand",
+      "skinVariations": {
+        "\ud83d\udd96": {
+          "src": s1f596,
+          "alt": "spock-hand"
+        },
+        "\ud83d\udd96\ud83c\udffb": {
+          "src": s1f5961f3fb,
+          "alt": "spock-hand"
+        },
+        "\ud83d\udd96\ud83c\udffc": {
+          "src": s1f5961f3fc,
+          "alt": "spock-hand"
+        },
+        "\ud83d\udd96\ud83c\udffd": {
+          "src": s1f5961f3fd,
+          "alt": "spock-hand"
+        },
+        "\ud83d\udd96\ud83c\udffe": {
+          "src": s1f5961f3fe,
+          "alt": "spock-hand"
+        },
+        "\ud83d\udd96\ud83c\udfff": {
+          "src": s1f5961f3ff,
+          "alt": "spock-hand"
+        }
+      }
     },
-    "\u1F5E3\uFE0F": {
+    "\ud83d\udde3\ufe0f": {
       "src": s1f5e3fe0f,
       "alt": "speaking_head_in_silhouette"
     },
-    "\u1F645\u200D\u2640\uFE0F": {
+    "\ud83d\ude45\u200d\u2640\ufe0f": {
       "src": s1f645200d2640fe0f,
-      "alt": "woman-gesturing-no"
+      "alt": "woman-gesturing-no",
+      "skinVariations": {
+        "\ud83d\ude45\u200d\u2640\ufe0f": {
+          "src": s1f645200d2640fe0f,
+          "alt": "woman-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f6451f3fb200d2640fe0f,
+          "alt": "woman-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f6451f3fc200d2640fe0f,
+          "alt": "woman-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f6451f3fd200d2640fe0f,
+          "alt": "woman-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f6451f3fe200d2640fe0f,
+          "alt": "woman-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f6451f3ff200d2640fe0f,
+          "alt": "woman-gesturing-no"
+        }
+      }
     },
-    "\u1F645\u200D\u2642\uFE0F": {
+    "\ud83d\ude45\u200d\u2642\ufe0f": {
       "src": s1f645200d2642fe0f,
-      "alt": "man-gesturing-no"
+      "alt": "man-gesturing-no",
+      "skinVariations": {
+        "\ud83d\ude45\u200d\u2642\ufe0f": {
+          "src": s1f645200d2642fe0f,
+          "alt": "man-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f6451f3fb200d2642fe0f,
+          "alt": "man-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f6451f3fc200d2642fe0f,
+          "alt": "man-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f6451f3fd200d2642fe0f,
+          "alt": "man-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f6451f3fe200d2642fe0f,
+          "alt": "man-gesturing-no"
+        },
+        "\ud83d\ude45\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f6451f3ff200d2642fe0f,
+          "alt": "man-gesturing-no"
+        }
+      }
     },
-    "\u1F645": {
+    "\ud83d\ude45": {
       "src": s1f645,
-      "alt": "no_good"
+      "alt": "no_good",
+      "skinVariations": {
+        "\ud83d\ude45": {
+          "src": s1f645,
+          "alt": "no_good"
+        },
+        "\ud83d\ude45\ud83c\udffb": {
+          "src": s1f6451f3fb,
+          "alt": "no_good"
+        },
+        "\ud83d\ude45\ud83c\udffc": {
+          "src": s1f6451f3fc,
+          "alt": "no_good"
+        },
+        "\ud83d\ude45\ud83c\udffd": {
+          "src": s1f6451f3fd,
+          "alt": "no_good"
+        },
+        "\ud83d\ude45\ud83c\udffe": {
+          "src": s1f6451f3fe,
+          "alt": "no_good"
+        },
+        "\ud83d\ude45\ud83c\udfff": {
+          "src": s1f6451f3ff,
+          "alt": "no_good"
+        }
+      }
     },
-    "\u1F646\u200D\u2640\uFE0F": {
+    "\ud83d\ude46\u200d\u2640\ufe0f": {
       "src": s1f646200d2640fe0f,
-      "alt": "woman-gesturing-ok"
+      "alt": "woman-gesturing-ok",
+      "skinVariations": {
+        "\ud83d\ude46\u200d\u2640\ufe0f": {
+          "src": s1f646200d2640fe0f,
+          "alt": "woman-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f6461f3fb200d2640fe0f,
+          "alt": "woman-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f6461f3fc200d2640fe0f,
+          "alt": "woman-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f6461f3fd200d2640fe0f,
+          "alt": "woman-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f6461f3fe200d2640fe0f,
+          "alt": "woman-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f6461f3ff200d2640fe0f,
+          "alt": "woman-gesturing-ok"
+        }
+      }
     },
-    "\u1F646\u200D\u2642\uFE0F": {
+    "\ud83d\ude46\u200d\u2642\ufe0f": {
       "src": s1f646200d2642fe0f,
-      "alt": "man-gesturing-ok"
+      "alt": "man-gesturing-ok",
+      "skinVariations": {
+        "\ud83d\ude46\u200d\u2642\ufe0f": {
+          "src": s1f646200d2642fe0f,
+          "alt": "man-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f6461f3fb200d2642fe0f,
+          "alt": "man-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f6461f3fc200d2642fe0f,
+          "alt": "man-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f6461f3fd200d2642fe0f,
+          "alt": "man-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f6461f3fe200d2642fe0f,
+          "alt": "man-gesturing-ok"
+        },
+        "\ud83d\ude46\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f6461f3ff200d2642fe0f,
+          "alt": "man-gesturing-ok"
+        }
+      }
     },
-    "\u1F646": {
+    "\ud83d\ude46": {
       "src": s1f646,
-      "alt": "ok_woman"
+      "alt": "ok_woman",
+      "skinVariations": {
+        "\ud83d\ude46": {
+          "src": s1f646,
+          "alt": "ok_woman"
+        },
+        "\ud83d\ude46\ud83c\udffb": {
+          "src": s1f6461f3fb,
+          "alt": "ok_woman"
+        },
+        "\ud83d\ude46\ud83c\udffc": {
+          "src": s1f6461f3fc,
+          "alt": "ok_woman"
+        },
+        "\ud83d\ude46\ud83c\udffd": {
+          "src": s1f6461f3fd,
+          "alt": "ok_woman"
+        },
+        "\ud83d\ude46\ud83c\udffe": {
+          "src": s1f6461f3fe,
+          "alt": "ok_woman"
+        },
+        "\ud83d\ude46\ud83c\udfff": {
+          "src": s1f6461f3ff,
+          "alt": "ok_woman"
+        }
+      }
     },
-    "\u1F647\u200D\u2640\uFE0F": {
+    "\ud83d\ude47\u200d\u2640\ufe0f": {
       "src": s1f647200d2640fe0f,
-      "alt": "woman-bowing"
+      "alt": "woman-bowing",
+      "skinVariations": {
+        "\ud83d\ude47\u200d\u2640\ufe0f": {
+          "src": s1f647200d2640fe0f,
+          "alt": "woman-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f6471f3fb200d2640fe0f,
+          "alt": "woman-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f6471f3fc200d2640fe0f,
+          "alt": "woman-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f6471f3fd200d2640fe0f,
+          "alt": "woman-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f6471f3fe200d2640fe0f,
+          "alt": "woman-bowing"
+        },
+        "\ud83d\ude47\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f6471f3ff200d2640fe0f,
+          "alt": "woman-bowing"
+        }
+      }
     },
-    "\u1F647\u200D\u2642\uFE0F": {
+    "\ud83d\ude47\u200d\u2642\ufe0f": {
       "src": s1f647200d2642fe0f,
-      "alt": "man-bowing"
+      "alt": "man-bowing",
+      "skinVariations": {
+        "\ud83d\ude47\u200d\u2642\ufe0f": {
+          "src": s1f647200d2642fe0f,
+          "alt": "man-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f6471f3fb200d2642fe0f,
+          "alt": "man-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f6471f3fc200d2642fe0f,
+          "alt": "man-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f6471f3fd200d2642fe0f,
+          "alt": "man-bowing"
+        },
+        "\ud83d\ude47\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f6471f3fe200d2642fe0f,
+          "alt": "man-bowing"
+        },
+        "\ud83d\ude47\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f6471f3ff200d2642fe0f,
+          "alt": "man-bowing"
+        }
+      }
     },
-    "\u1F647": {
+    "\ud83d\ude47": {
       "src": s1f647,
-      "alt": "bow"
+      "alt": "bow",
+      "skinVariations": {
+        "\ud83d\ude47": {
+          "src": s1f647,
+          "alt": "bow"
+        },
+        "\ud83d\ude47\ud83c\udffb": {
+          "src": s1f6471f3fb,
+          "alt": "bow"
+        },
+        "\ud83d\ude47\ud83c\udffc": {
+          "src": s1f6471f3fc,
+          "alt": "bow"
+        },
+        "\ud83d\ude47\ud83c\udffd": {
+          "src": s1f6471f3fd,
+          "alt": "bow"
+        },
+        "\ud83d\ude47\ud83c\udffe": {
+          "src": s1f6471f3fe,
+          "alt": "bow"
+        },
+        "\ud83d\ude47\ud83c\udfff": {
+          "src": s1f6471f3ff,
+          "alt": "bow"
+        }
+      }
     },
-    "\u1F64B\u200D\u2640\uFE0F": {
+    "\ud83d\ude4b\u200d\u2640\ufe0f": {
       "src": s1f64b200d2640fe0f,
-      "alt": "woman-raising-hand"
+      "alt": "woman-raising-hand",
+      "skinVariations": {
+        "\ud83d\ude4b\u200d\u2640\ufe0f": {
+          "src": s1f64b200d2640fe0f,
+          "alt": "woman-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f64b1f3fb200d2640fe0f,
+          "alt": "woman-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f64b1f3fc200d2640fe0f,
+          "alt": "woman-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f64b1f3fd200d2640fe0f,
+          "alt": "woman-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f64b1f3fe200d2640fe0f,
+          "alt": "woman-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f64b1f3ff200d2640fe0f,
+          "alt": "woman-raising-hand"
+        }
+      }
     },
-    "\u1F64B\u200D\u2642\uFE0F": {
+    "\ud83d\ude4b\u200d\u2642\ufe0f": {
       "src": s1f64b200d2642fe0f,
-      "alt": "man-raising-hand"
+      "alt": "man-raising-hand",
+      "skinVariations": {
+        "\ud83d\ude4b\u200d\u2642\ufe0f": {
+          "src": s1f64b200d2642fe0f,
+          "alt": "man-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f64b1f3fb200d2642fe0f,
+          "alt": "man-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f64b1f3fc200d2642fe0f,
+          "alt": "man-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f64b1f3fd200d2642fe0f,
+          "alt": "man-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f64b1f3fe200d2642fe0f,
+          "alt": "man-raising-hand"
+        },
+        "\ud83d\ude4b\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f64b1f3ff200d2642fe0f,
+          "alt": "man-raising-hand"
+        }
+      }
     },
-    "\u1F64B": {
+    "\ud83d\ude4b": {
       "src": s1f64b,
-      "alt": "raising_hand"
+      "alt": "raising_hand",
+      "skinVariations": {
+        "\ud83d\ude4b": {
+          "src": s1f64b,
+          "alt": "raising_hand"
+        },
+        "\ud83d\ude4b\ud83c\udffb": {
+          "src": s1f64b1f3fb,
+          "alt": "raising_hand"
+        },
+        "\ud83d\ude4b\ud83c\udffc": {
+          "src": s1f64b1f3fc,
+          "alt": "raising_hand"
+        },
+        "\ud83d\ude4b\ud83c\udffd": {
+          "src": s1f64b1f3fd,
+          "alt": "raising_hand"
+        },
+        "\ud83d\ude4b\ud83c\udffe": {
+          "src": s1f64b1f3fe,
+          "alt": "raising_hand"
+        },
+        "\ud83d\ude4b\ud83c\udfff": {
+          "src": s1f64b1f3ff,
+          "alt": "raising_hand"
+        }
+      }
     },
-    "\u1F64C": {
+    "\ud83d\ude4c": {
       "src": s1f64c,
-      "alt": "raised_hands"
+      "alt": "raised_hands",
+      "skinVariations": {
+        "\ud83d\ude4c": {
+          "src": s1f64c,
+          "alt": "raised_hands"
+        },
+        "\ud83d\ude4c\ud83c\udffb": {
+          "src": s1f64c1f3fb,
+          "alt": "raised_hands"
+        },
+        "\ud83d\ude4c\ud83c\udffc": {
+          "src": s1f64c1f3fc,
+          "alt": "raised_hands"
+        },
+        "\ud83d\ude4c\ud83c\udffd": {
+          "src": s1f64c1f3fd,
+          "alt": "raised_hands"
+        },
+        "\ud83d\ude4c\ud83c\udffe": {
+          "src": s1f64c1f3fe,
+          "alt": "raised_hands"
+        },
+        "\ud83d\ude4c\ud83c\udfff": {
+          "src": s1f64c1f3ff,
+          "alt": "raised_hands"
+        }
+      }
     },
-    "\u1F64D\u200D\u2640\uFE0F": {
+    "\ud83d\ude4d\u200d\u2640\ufe0f": {
       "src": s1f64d200d2640fe0f,
-      "alt": "woman-frowning"
+      "alt": "woman-frowning",
+      "skinVariations": {
+        "\ud83d\ude4d\u200d\u2640\ufe0f": {
+          "src": s1f64d200d2640fe0f,
+          "alt": "woman-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f64d1f3fb200d2640fe0f,
+          "alt": "woman-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f64d1f3fc200d2640fe0f,
+          "alt": "woman-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f64d1f3fd200d2640fe0f,
+          "alt": "woman-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f64d1f3fe200d2640fe0f,
+          "alt": "woman-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f64d1f3ff200d2640fe0f,
+          "alt": "woman-frowning"
+        }
+      }
     },
-    "\u1F64D\u200D\u2642\uFE0F": {
+    "\ud83d\ude4d\u200d\u2642\ufe0f": {
       "src": s1f64d200d2642fe0f,
-      "alt": "man-frowning"
+      "alt": "man-frowning",
+      "skinVariations": {
+        "\ud83d\ude4d\u200d\u2642\ufe0f": {
+          "src": s1f64d200d2642fe0f,
+          "alt": "man-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f64d1f3fb200d2642fe0f,
+          "alt": "man-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f64d1f3fc200d2642fe0f,
+          "alt": "man-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f64d1f3fd200d2642fe0f,
+          "alt": "man-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f64d1f3fe200d2642fe0f,
+          "alt": "man-frowning"
+        },
+        "\ud83d\ude4d\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f64d1f3ff200d2642fe0f,
+          "alt": "man-frowning"
+        }
+      }
     },
-    "\u1F64D": {
+    "\ud83d\ude4d": {
       "src": s1f64d,
-      "alt": "person_frowning"
+      "alt": "person_frowning",
+      "skinVariations": {
+        "\ud83d\ude4d": {
+          "src": s1f64d,
+          "alt": "person_frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffb": {
+          "src": s1f64d1f3fb,
+          "alt": "person_frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffc": {
+          "src": s1f64d1f3fc,
+          "alt": "person_frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffd": {
+          "src": s1f64d1f3fd,
+          "alt": "person_frowning"
+        },
+        "\ud83d\ude4d\ud83c\udffe": {
+          "src": s1f64d1f3fe,
+          "alt": "person_frowning"
+        },
+        "\ud83d\ude4d\ud83c\udfff": {
+          "src": s1f64d1f3ff,
+          "alt": "person_frowning"
+        }
+      }
     },
-    "\u1F64E\u200D\u2640\uFE0F": {
+    "\ud83d\ude4e\u200d\u2640\ufe0f": {
       "src": s1f64e200d2640fe0f,
-      "alt": "woman-pouting"
+      "alt": "woman-pouting",
+      "skinVariations": {
+        "\ud83d\ude4e\u200d\u2640\ufe0f": {
+          "src": s1f64e200d2640fe0f,
+          "alt": "woman-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f64e1f3fb200d2640fe0f,
+          "alt": "woman-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f64e1f3fc200d2640fe0f,
+          "alt": "woman-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f64e1f3fd200d2640fe0f,
+          "alt": "woman-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f64e1f3fe200d2640fe0f,
+          "alt": "woman-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f64e1f3ff200d2640fe0f,
+          "alt": "woman-pouting"
+        }
+      }
     },
-    "\u1F64E\u200D\u2642\uFE0F": {
+    "\ud83d\ude4e\u200d\u2642\ufe0f": {
       "src": s1f64e200d2642fe0f,
-      "alt": "man-pouting"
+      "alt": "man-pouting",
+      "skinVariations": {
+        "\ud83d\ude4e\u200d\u2642\ufe0f": {
+          "src": s1f64e200d2642fe0f,
+          "alt": "man-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f64e1f3fb200d2642fe0f,
+          "alt": "man-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f64e1f3fc200d2642fe0f,
+          "alt": "man-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f64e1f3fd200d2642fe0f,
+          "alt": "man-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f64e1f3fe200d2642fe0f,
+          "alt": "man-pouting"
+        },
+        "\ud83d\ude4e\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f64e1f3ff200d2642fe0f,
+          "alt": "man-pouting"
+        }
+      }
     },
-    "\u1F64E": {
+    "\ud83d\ude4e": {
       "src": s1f64e,
-      "alt": "person_with_pouting_face"
+      "alt": "person_with_pouting_face",
+      "skinVariations": {
+        "\ud83d\ude4e": {
+          "src": s1f64e,
+          "alt": "person_with_pouting_face"
+        },
+        "\ud83d\ude4e\ud83c\udffb": {
+          "src": s1f64e1f3fb,
+          "alt": "person_with_pouting_face"
+        },
+        "\ud83d\ude4e\ud83c\udffc": {
+          "src": s1f64e1f3fc,
+          "alt": "person_with_pouting_face"
+        },
+        "\ud83d\ude4e\ud83c\udffd": {
+          "src": s1f64e1f3fd,
+          "alt": "person_with_pouting_face"
+        },
+        "\ud83d\ude4e\ud83c\udffe": {
+          "src": s1f64e1f3fe,
+          "alt": "person_with_pouting_face"
+        },
+        "\ud83d\ude4e\ud83c\udfff": {
+          "src": s1f64e1f3ff,
+          "alt": "person_with_pouting_face"
+        }
+      }
     },
-    "\u1F64F": {
+    "\ud83d\ude4f": {
       "src": s1f64f,
-      "alt": "pray"
+      "alt": "pray",
+      "skinVariations": {
+        "\ud83d\ude4f": {
+          "src": s1f64f,
+          "alt": "pray"
+        },
+        "\ud83d\ude4f\ud83c\udffb": {
+          "src": s1f64f1f3fb,
+          "alt": "pray"
+        },
+        "\ud83d\ude4f\ud83c\udffc": {
+          "src": s1f64f1f3fc,
+          "alt": "pray"
+        },
+        "\ud83d\ude4f\ud83c\udffd": {
+          "src": s1f64f1f3fd,
+          "alt": "pray"
+        },
+        "\ud83d\ude4f\ud83c\udffe": {
+          "src": s1f64f1f3fe,
+          "alt": "pray"
+        },
+        "\ud83d\ude4f\ud83c\udfff": {
+          "src": s1f64f1f3ff,
+          "alt": "pray"
+        }
+      }
     },
-    "\u1F6A3\u200D\u2640\uFE0F": {
+    "\ud83d\udea3\u200d\u2640\ufe0f": {
       "src": s1f6a3200d2640fe0f,
-      "alt": "woman-rowing-boat"
+      "alt": "woman-rowing-boat",
+      "skinVariations": {
+        "\ud83d\udea3\u200d\u2640\ufe0f": {
+          "src": s1f6a3200d2640fe0f,
+          "alt": "woman-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f6a31f3fb200d2640fe0f,
+          "alt": "woman-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f6a31f3fc200d2640fe0f,
+          "alt": "woman-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f6a31f3fd200d2640fe0f,
+          "alt": "woman-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f6a31f3fe200d2640fe0f,
+          "alt": "woman-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f6a31f3ff200d2640fe0f,
+          "alt": "woman-rowing-boat"
+        }
+      }
     },
-    "\u1F6A3\u200D\u2642\uFE0F": {
+    "\ud83d\udea3\u200d\u2642\ufe0f": {
       "src": s1f6a3200d2642fe0f,
-      "alt": "man-rowing-boat"
+      "alt": "man-rowing-boat",
+      "skinVariations": {
+        "\ud83d\udea3\u200d\u2642\ufe0f": {
+          "src": s1f6a3200d2642fe0f,
+          "alt": "man-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f6a31f3fb200d2642fe0f,
+          "alt": "man-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f6a31f3fc200d2642fe0f,
+          "alt": "man-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f6a31f3fd200d2642fe0f,
+          "alt": "man-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f6a31f3fe200d2642fe0f,
+          "alt": "man-rowing-boat"
+        },
+        "\ud83d\udea3\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f6a31f3ff200d2642fe0f,
+          "alt": "man-rowing-boat"
+        }
+      }
     },
-    "\u1F6A3": {
+    "\ud83d\udea3": {
       "src": s1f6a3,
-      "alt": "rowboat"
+      "alt": "rowboat",
+      "skinVariations": {
+        "\ud83d\udea3": {
+          "src": s1f6a3,
+          "alt": "rowboat"
+        },
+        "\ud83d\udea3\ud83c\udffb": {
+          "src": s1f6a31f3fb,
+          "alt": "rowboat"
+        },
+        "\ud83d\udea3\ud83c\udffc": {
+          "src": s1f6a31f3fc,
+          "alt": "rowboat"
+        },
+        "\ud83d\udea3\ud83c\udffd": {
+          "src": s1f6a31f3fd,
+          "alt": "rowboat"
+        },
+        "\ud83d\udea3\ud83c\udffe": {
+          "src": s1f6a31f3fe,
+          "alt": "rowboat"
+        },
+        "\ud83d\udea3\ud83c\udfff": {
+          "src": s1f6a31f3ff,
+          "alt": "rowboat"
+        }
+      }
     },
-    "\u1F6B4\u200D\u2640\uFE0F": {
+    "\ud83d\udeb4\u200d\u2640\ufe0f": {
       "src": s1f6b4200d2640fe0f,
-      "alt": "woman-biking"
+      "alt": "woman-biking",
+      "skinVariations": {
+        "\ud83d\udeb4\u200d\u2640\ufe0f": {
+          "src": s1f6b4200d2640fe0f,
+          "alt": "woman-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f6b41f3fb200d2640fe0f,
+          "alt": "woman-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f6b41f3fc200d2640fe0f,
+          "alt": "woman-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f6b41f3fd200d2640fe0f,
+          "alt": "woman-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f6b41f3fe200d2640fe0f,
+          "alt": "woman-biking"
+        },
+        "\ud83d\udeb4\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f6b41f3ff200d2640fe0f,
+          "alt": "woman-biking"
+        }
+      }
     },
-    "\u1F6B4\u200D\u2642\uFE0F": {
+    "\ud83d\udeb4\u200d\u2642\ufe0f": {
       "src": s1f6b4200d2642fe0f,
-      "alt": "man-biking"
+      "alt": "man-biking",
+      "skinVariations": {
+        "\ud83d\udeb4\u200d\u2642\ufe0f": {
+          "src": s1f6b4200d2642fe0f,
+          "alt": "man-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f6b41f3fb200d2642fe0f,
+          "alt": "man-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f6b41f3fc200d2642fe0f,
+          "alt": "man-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f6b41f3fd200d2642fe0f,
+          "alt": "man-biking"
+        },
+        "\ud83d\udeb4\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f6b41f3fe200d2642fe0f,
+          "alt": "man-biking"
+        },
+        "\ud83d\udeb4\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f6b41f3ff200d2642fe0f,
+          "alt": "man-biking"
+        }
+      }
     },
-    "\u1F6B4": {
+    "\ud83d\udeb4": {
       "src": s1f6b4,
-      "alt": "bicyclist"
+      "alt": "bicyclist",
+      "skinVariations": {
+        "\ud83d\udeb4": {
+          "src": s1f6b4,
+          "alt": "bicyclist"
+        },
+        "\ud83d\udeb4\ud83c\udffb": {
+          "src": s1f6b41f3fb,
+          "alt": "bicyclist"
+        },
+        "\ud83d\udeb4\ud83c\udffc": {
+          "src": s1f6b41f3fc,
+          "alt": "bicyclist"
+        },
+        "\ud83d\udeb4\ud83c\udffd": {
+          "src": s1f6b41f3fd,
+          "alt": "bicyclist"
+        },
+        "\ud83d\udeb4\ud83c\udffe": {
+          "src": s1f6b41f3fe,
+          "alt": "bicyclist"
+        },
+        "\ud83d\udeb4\ud83c\udfff": {
+          "src": s1f6b41f3ff,
+          "alt": "bicyclist"
+        }
+      }
     },
-    "\u1F6B5\u200D\u2640\uFE0F": {
+    "\ud83d\udeb5\u200d\u2640\ufe0f": {
       "src": s1f6b5200d2640fe0f,
-      "alt": "woman-mountain-biking"
+      "alt": "woman-mountain-biking",
+      "skinVariations": {
+        "\ud83d\udeb5\u200d\u2640\ufe0f": {
+          "src": s1f6b5200d2640fe0f,
+          "alt": "woman-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f6b51f3fb200d2640fe0f,
+          "alt": "woman-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f6b51f3fc200d2640fe0f,
+          "alt": "woman-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f6b51f3fd200d2640fe0f,
+          "alt": "woman-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f6b51f3fe200d2640fe0f,
+          "alt": "woman-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f6b51f3ff200d2640fe0f,
+          "alt": "woman-mountain-biking"
+        }
+      }
     },
-    "\u1F6B5\u200D\u2642\uFE0F": {
+    "\ud83d\udeb5\u200d\u2642\ufe0f": {
       "src": s1f6b5200d2642fe0f,
-      "alt": "man-mountain-biking"
+      "alt": "man-mountain-biking",
+      "skinVariations": {
+        "\ud83d\udeb5\u200d\u2642\ufe0f": {
+          "src": s1f6b5200d2642fe0f,
+          "alt": "man-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f6b51f3fb200d2642fe0f,
+          "alt": "man-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f6b51f3fc200d2642fe0f,
+          "alt": "man-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f6b51f3fd200d2642fe0f,
+          "alt": "man-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f6b51f3fe200d2642fe0f,
+          "alt": "man-mountain-biking"
+        },
+        "\ud83d\udeb5\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f6b51f3ff200d2642fe0f,
+          "alt": "man-mountain-biking"
+        }
+      }
     },
-    "\u1F6B5": {
+    "\ud83d\udeb5": {
       "src": s1f6b5,
-      "alt": "mountain_bicyclist"
+      "alt": "mountain_bicyclist",
+      "skinVariations": {
+        "\ud83d\udeb5": {
+          "src": s1f6b5,
+          "alt": "mountain_bicyclist"
+        },
+        "\ud83d\udeb5\ud83c\udffb": {
+          "src": s1f6b51f3fb,
+          "alt": "mountain_bicyclist"
+        },
+        "\ud83d\udeb5\ud83c\udffc": {
+          "src": s1f6b51f3fc,
+          "alt": "mountain_bicyclist"
+        },
+        "\ud83d\udeb5\ud83c\udffd": {
+          "src": s1f6b51f3fd,
+          "alt": "mountain_bicyclist"
+        },
+        "\ud83d\udeb5\ud83c\udffe": {
+          "src": s1f6b51f3fe,
+          "alt": "mountain_bicyclist"
+        },
+        "\ud83d\udeb5\ud83c\udfff": {
+          "src": s1f6b51f3ff,
+          "alt": "mountain_bicyclist"
+        }
+      }
     },
-    "\u1F6B6\u200D\u2640\uFE0F": {
+    "\ud83d\udeb6\u200d\u2640\ufe0f": {
       "src": s1f6b6200d2640fe0f,
-      "alt": "woman-walking"
+      "alt": "woman-walking",
+      "skinVariations": {
+        "\ud83d\udeb6\u200d\u2640\ufe0f": {
+          "src": s1f6b6200d2640fe0f,
+          "alt": "woman-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f6b61f3fb200d2640fe0f,
+          "alt": "woman-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f6b61f3fc200d2640fe0f,
+          "alt": "woman-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f6b61f3fd200d2640fe0f,
+          "alt": "woman-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f6b61f3fe200d2640fe0f,
+          "alt": "woman-walking"
+        },
+        "\ud83d\udeb6\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f6b61f3ff200d2640fe0f,
+          "alt": "woman-walking"
+        }
+      }
     },
-    "\u1F6B6\u200D\u2642\uFE0F": {
+    "\ud83d\udeb6\u200d\u2642\ufe0f": {
       "src": s1f6b6200d2642fe0f,
-      "alt": "man-walking"
+      "alt": "man-walking",
+      "skinVariations": {
+        "\ud83d\udeb6\u200d\u2642\ufe0f": {
+          "src": s1f6b6200d2642fe0f,
+          "alt": "man-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f6b61f3fb200d2642fe0f,
+          "alt": "man-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f6b61f3fc200d2642fe0f,
+          "alt": "man-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f6b61f3fd200d2642fe0f,
+          "alt": "man-walking"
+        },
+        "\ud83d\udeb6\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f6b61f3fe200d2642fe0f,
+          "alt": "man-walking"
+        },
+        "\ud83d\udeb6\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f6b61f3ff200d2642fe0f,
+          "alt": "man-walking"
+        }
+      }
     },
-    "\u1F6B6": {
+    "\ud83d\udeb6": {
       "src": s1f6b6,
-      "alt": "walking"
+      "alt": "walking",
+      "skinVariations": {
+        "\ud83d\udeb6": {
+          "src": s1f6b6,
+          "alt": "walking"
+        },
+        "\ud83d\udeb6\ud83c\udffb": {
+          "src": s1f6b61f3fb,
+          "alt": "walking"
+        },
+        "\ud83d\udeb6\ud83c\udffc": {
+          "src": s1f6b61f3fc,
+          "alt": "walking"
+        },
+        "\ud83d\udeb6\ud83c\udffd": {
+          "src": s1f6b61f3fd,
+          "alt": "walking"
+        },
+        "\ud83d\udeb6\ud83c\udffe": {
+          "src": s1f6b61f3fe,
+          "alt": "walking"
+        },
+        "\ud83d\udeb6\ud83c\udfff": {
+          "src": s1f6b61f3ff,
+          "alt": "walking"
+        }
+      }
     },
-    "\u1F6C0": {
+    "\ud83d\udec0": {
       "src": s1f6c0,
-      "alt": "bath"
+      "alt": "bath",
+      "skinVariations": {
+        "\ud83d\udec0": {
+          "src": s1f6c0,
+          "alt": "bath"
+        },
+        "\ud83d\udec0\ud83c\udffb": {
+          "src": s1f6c01f3fb,
+          "alt": "bath"
+        },
+        "\ud83d\udec0\ud83c\udffc": {
+          "src": s1f6c01f3fc,
+          "alt": "bath"
+        },
+        "\ud83d\udec0\ud83c\udffd": {
+          "src": s1f6c01f3fd,
+          "alt": "bath"
+        },
+        "\ud83d\udec0\ud83c\udffe": {
+          "src": s1f6c01f3fe,
+          "alt": "bath"
+        },
+        "\ud83d\udec0\ud83c\udfff": {
+          "src": s1f6c01f3ff,
+          "alt": "bath"
+        }
+      }
     },
-    "\u1F6CC": {
+    "\ud83d\udecc": {
       "src": s1f6cc,
-      "alt": "sleeping_accommodation"
+      "alt": "sleeping_accommodation",
+      "skinVariations": {
+        "\ud83d\udecc": {
+          "src": s1f6cc,
+          "alt": "sleeping_accommodation"
+        },
+        "\ud83d\udecc\ud83c\udffb": {
+          "src": s1f6cc1f3fb,
+          "alt": "sleeping_accommodation"
+        },
+        "\ud83d\udecc\ud83c\udffc": {
+          "src": s1f6cc1f3fc,
+          "alt": "sleeping_accommodation"
+        },
+        "\ud83d\udecc\ud83c\udffd": {
+          "src": s1f6cc1f3fd,
+          "alt": "sleeping_accommodation"
+        },
+        "\ud83d\udecc\ud83c\udffe": {
+          "src": s1f6cc1f3fe,
+          "alt": "sleeping_accommodation"
+        },
+        "\ud83d\udecc\ud83c\udfff": {
+          "src": s1f6cc1f3ff,
+          "alt": "sleeping_accommodation"
+        }
+      }
     },
-    "\u1F90C": {
+    "\ud83e\udd0c": {
       "src": s1f90c,
-      "alt": "pinched_fingers"
+      "alt": "pinched_fingers",
+      "skinVariations": {
+        "\ud83e\udd0c": {
+          "src": s1f90c,
+          "alt": "pinched_fingers"
+        },
+        "\ud83e\udd0c\ud83c\udffb": {
+          "src": s1f90c1f3fb,
+          "alt": "pinched_fingers"
+        },
+        "\ud83e\udd0c\ud83c\udffc": {
+          "src": s1f90c1f3fc,
+          "alt": "pinched_fingers"
+        },
+        "\ud83e\udd0c\ud83c\udffd": {
+          "src": s1f90c1f3fd,
+          "alt": "pinched_fingers"
+        },
+        "\ud83e\udd0c\ud83c\udffe": {
+          "src": s1f90c1f3fe,
+          "alt": "pinched_fingers"
+        },
+        "\ud83e\udd0c\ud83c\udfff": {
+          "src": s1f90c1f3ff,
+          "alt": "pinched_fingers"
+        }
+      }
     },
-    "\u1F90F": {
+    "\ud83e\udd0f": {
       "src": s1f90f,
-      "alt": "pinching_hand"
+      "alt": "pinching_hand",
+      "skinVariations": {
+        "\ud83e\udd0f": {
+          "src": s1f90f,
+          "alt": "pinching_hand"
+        },
+        "\ud83e\udd0f\ud83c\udffb": {
+          "src": s1f90f1f3fb,
+          "alt": "pinching_hand"
+        },
+        "\ud83e\udd0f\ud83c\udffc": {
+          "src": s1f90f1f3fc,
+          "alt": "pinching_hand"
+        },
+        "\ud83e\udd0f\ud83c\udffd": {
+          "src": s1f90f1f3fd,
+          "alt": "pinching_hand"
+        },
+        "\ud83e\udd0f\ud83c\udffe": {
+          "src": s1f90f1f3fe,
+          "alt": "pinching_hand"
+        },
+        "\ud83e\udd0f\ud83c\udfff": {
+          "src": s1f90f1f3ff,
+          "alt": "pinching_hand"
+        }
+      }
     },
-    "\u1F918": {
+    "\ud83e\udd18": {
       "src": s1f918,
-      "alt": "the_horns"
+      "alt": "the_horns",
+      "skinVariations": {
+        "\ud83e\udd18": {
+          "src": s1f918,
+          "alt": "the_horns"
+        },
+        "\ud83e\udd18\ud83c\udffb": {
+          "src": s1f9181f3fb,
+          "alt": "the_horns"
+        },
+        "\ud83e\udd18\ud83c\udffc": {
+          "src": s1f9181f3fc,
+          "alt": "the_horns"
+        },
+        "\ud83e\udd18\ud83c\udffd": {
+          "src": s1f9181f3fd,
+          "alt": "the_horns"
+        },
+        "\ud83e\udd18\ud83c\udffe": {
+          "src": s1f9181f3fe,
+          "alt": "the_horns"
+        },
+        "\ud83e\udd18\ud83c\udfff": {
+          "src": s1f9181f3ff,
+          "alt": "the_horns"
+        }
+      }
     },
-    "\u1F919": {
+    "\ud83e\udd19": {
       "src": s1f919,
-      "alt": "call_me_hand"
+      "alt": "call_me_hand",
+      "skinVariations": {
+        "\ud83e\udd19": {
+          "src": s1f919,
+          "alt": "call_me_hand"
+        },
+        "\ud83e\udd19\ud83c\udffb": {
+          "src": s1f9191f3fb,
+          "alt": "call_me_hand"
+        },
+        "\ud83e\udd19\ud83c\udffc": {
+          "src": s1f9191f3fc,
+          "alt": "call_me_hand"
+        },
+        "\ud83e\udd19\ud83c\udffd": {
+          "src": s1f9191f3fd,
+          "alt": "call_me_hand"
+        },
+        "\ud83e\udd19\ud83c\udffe": {
+          "src": s1f9191f3fe,
+          "alt": "call_me_hand"
+        },
+        "\ud83e\udd19\ud83c\udfff": {
+          "src": s1f9191f3ff,
+          "alt": "call_me_hand"
+        }
+      }
     },
-    "\u1F91A": {
+    "\ud83e\udd1a": {
       "src": s1f91a,
-      "alt": "raised_back_of_hand"
+      "alt": "raised_back_of_hand",
+      "skinVariations": {
+        "\ud83e\udd1a": {
+          "src": s1f91a,
+          "alt": "raised_back_of_hand"
+        },
+        "\ud83e\udd1a\ud83c\udffb": {
+          "src": s1f91a1f3fb,
+          "alt": "raised_back_of_hand"
+        },
+        "\ud83e\udd1a\ud83c\udffc": {
+          "src": s1f91a1f3fc,
+          "alt": "raised_back_of_hand"
+        },
+        "\ud83e\udd1a\ud83c\udffd": {
+          "src": s1f91a1f3fd,
+          "alt": "raised_back_of_hand"
+        },
+        "\ud83e\udd1a\ud83c\udffe": {
+          "src": s1f91a1f3fe,
+          "alt": "raised_back_of_hand"
+        },
+        "\ud83e\udd1a\ud83c\udfff": {
+          "src": s1f91a1f3ff,
+          "alt": "raised_back_of_hand"
+        }
+      }
     },
-    "\u1F91B": {
+    "\ud83e\udd1b": {
       "src": s1f91b,
-      "alt": "left-facing_fist"
+      "alt": "left-facing_fist",
+      "skinVariations": {
+        "\ud83e\udd1b": {
+          "src": s1f91b,
+          "alt": "left-facing_fist"
+        },
+        "\ud83e\udd1b\ud83c\udffb": {
+          "src": s1f91b1f3fb,
+          "alt": "left-facing_fist"
+        },
+        "\ud83e\udd1b\ud83c\udffc": {
+          "src": s1f91b1f3fc,
+          "alt": "left-facing_fist"
+        },
+        "\ud83e\udd1b\ud83c\udffd": {
+          "src": s1f91b1f3fd,
+          "alt": "left-facing_fist"
+        },
+        "\ud83e\udd1b\ud83c\udffe": {
+          "src": s1f91b1f3fe,
+          "alt": "left-facing_fist"
+        },
+        "\ud83e\udd1b\ud83c\udfff": {
+          "src": s1f91b1f3ff,
+          "alt": "left-facing_fist"
+        }
+      }
     },
-    "\u1F91C": {
+    "\ud83e\udd1c": {
       "src": s1f91c,
-      "alt": "right-facing_fist"
+      "alt": "right-facing_fist",
+      "skinVariations": {
+        "\ud83e\udd1c": {
+          "src": s1f91c,
+          "alt": "right-facing_fist"
+        },
+        "\ud83e\udd1c\ud83c\udffb": {
+          "src": s1f91c1f3fb,
+          "alt": "right-facing_fist"
+        },
+        "\ud83e\udd1c\ud83c\udffc": {
+          "src": s1f91c1f3fc,
+          "alt": "right-facing_fist"
+        },
+        "\ud83e\udd1c\ud83c\udffd": {
+          "src": s1f91c1f3fd,
+          "alt": "right-facing_fist"
+        },
+        "\ud83e\udd1c\ud83c\udffe": {
+          "src": s1f91c1f3fe,
+          "alt": "right-facing_fist"
+        },
+        "\ud83e\udd1c\ud83c\udfff": {
+          "src": s1f91c1f3ff,
+          "alt": "right-facing_fist"
+        }
+      }
     },
-    "\u1F91D": {
+    "\ud83e\udd1d": {
       "src": s1f91d,
       "alt": "handshake"
     },
-    "\u1F91E": {
+    "\ud83e\udd1e": {
       "src": s1f91e,
-      "alt": "crossed_fingers"
+      "alt": "crossed_fingers",
+      "skinVariations": {
+        "\ud83e\udd1e": {
+          "src": s1f91e,
+          "alt": "crossed_fingers"
+        },
+        "\ud83e\udd1e\ud83c\udffb": {
+          "src": s1f91e1f3fb,
+          "alt": "crossed_fingers"
+        },
+        "\ud83e\udd1e\ud83c\udffc": {
+          "src": s1f91e1f3fc,
+          "alt": "crossed_fingers"
+        },
+        "\ud83e\udd1e\ud83c\udffd": {
+          "src": s1f91e1f3fd,
+          "alt": "crossed_fingers"
+        },
+        "\ud83e\udd1e\ud83c\udffe": {
+          "src": s1f91e1f3fe,
+          "alt": "crossed_fingers"
+        },
+        "\ud83e\udd1e\ud83c\udfff": {
+          "src": s1f91e1f3ff,
+          "alt": "crossed_fingers"
+        }
+      }
     },
-    "\u1F91F": {
+    "\ud83e\udd1f": {
       "src": s1f91f,
-      "alt": "i_love_you_hand_sign"
+      "alt": "i_love_you_hand_sign",
+      "skinVariations": {
+        "\ud83e\udd1f": {
+          "src": s1f91f,
+          "alt": "i_love_you_hand_sign"
+        },
+        "\ud83e\udd1f\ud83c\udffb": {
+          "src": s1f91f1f3fb,
+          "alt": "i_love_you_hand_sign"
+        },
+        "\ud83e\udd1f\ud83c\udffc": {
+          "src": s1f91f1f3fc,
+          "alt": "i_love_you_hand_sign"
+        },
+        "\ud83e\udd1f\ud83c\udffd": {
+          "src": s1f91f1f3fd,
+          "alt": "i_love_you_hand_sign"
+        },
+        "\ud83e\udd1f\ud83c\udffe": {
+          "src": s1f91f1f3fe,
+          "alt": "i_love_you_hand_sign"
+        },
+        "\ud83e\udd1f\ud83c\udfff": {
+          "src": s1f91f1f3ff,
+          "alt": "i_love_you_hand_sign"
+        }
+      }
     },
-    "\u1F926\u200D\u2640\uFE0F": {
+    "\ud83e\udd26\u200d\u2640\ufe0f": {
       "src": s1f926200d2640fe0f,
-      "alt": "woman-facepalming"
+      "alt": "woman-facepalming",
+      "skinVariations": {
+        "\ud83e\udd26\u200d\u2640\ufe0f": {
+          "src": s1f926200d2640fe0f,
+          "alt": "woman-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9261f3fb200d2640fe0f,
+          "alt": "woman-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9261f3fc200d2640fe0f,
+          "alt": "woman-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9261f3fd200d2640fe0f,
+          "alt": "woman-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9261f3fe200d2640fe0f,
+          "alt": "woman-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9261f3ff200d2640fe0f,
+          "alt": "woman-facepalming"
+        }
+      }
     },
-    "\u1F926\u200D\u2642\uFE0F": {
+    "\ud83e\udd26\u200d\u2642\ufe0f": {
       "src": s1f926200d2642fe0f,
-      "alt": "man-facepalming"
+      "alt": "man-facepalming",
+      "skinVariations": {
+        "\ud83e\udd26\u200d\u2642\ufe0f": {
+          "src": s1f926200d2642fe0f,
+          "alt": "man-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9261f3fb200d2642fe0f,
+          "alt": "man-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9261f3fc200d2642fe0f,
+          "alt": "man-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9261f3fd200d2642fe0f,
+          "alt": "man-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9261f3fe200d2642fe0f,
+          "alt": "man-facepalming"
+        },
+        "\ud83e\udd26\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9261f3ff200d2642fe0f,
+          "alt": "man-facepalming"
+        }
+      }
     },
-    "\u1F926": {
+    "\ud83e\udd26": {
       "src": s1f926,
-      "alt": "face_palm"
+      "alt": "face_palm",
+      "skinVariations": {
+        "\ud83e\udd26": {
+          "src": s1f926,
+          "alt": "face_palm"
+        },
+        "\ud83e\udd26\ud83c\udffb": {
+          "src": s1f9261f3fb,
+          "alt": "face_palm"
+        },
+        "\ud83e\udd26\ud83c\udffc": {
+          "src": s1f9261f3fc,
+          "alt": "face_palm"
+        },
+        "\ud83e\udd26\ud83c\udffd": {
+          "src": s1f9261f3fd,
+          "alt": "face_palm"
+        },
+        "\ud83e\udd26\ud83c\udffe": {
+          "src": s1f9261f3fe,
+          "alt": "face_palm"
+        },
+        "\ud83e\udd26\ud83c\udfff": {
+          "src": s1f9261f3ff,
+          "alt": "face_palm"
+        }
+      }
     },
-    "\u1F930": {
+    "\ud83e\udd30": {
       "src": s1f930,
-      "alt": "pregnant_woman"
+      "alt": "pregnant_woman",
+      "skinVariations": {
+        "\ud83e\udd30": {
+          "src": s1f930,
+          "alt": "pregnant_woman"
+        },
+        "\ud83e\udd30\ud83c\udffb": {
+          "src": s1f9301f3fb,
+          "alt": "pregnant_woman"
+        },
+        "\ud83e\udd30\ud83c\udffc": {
+          "src": s1f9301f3fc,
+          "alt": "pregnant_woman"
+        },
+        "\ud83e\udd30\ud83c\udffd": {
+          "src": s1f9301f3fd,
+          "alt": "pregnant_woman"
+        },
+        "\ud83e\udd30\ud83c\udffe": {
+          "src": s1f9301f3fe,
+          "alt": "pregnant_woman"
+        },
+        "\ud83e\udd30\ud83c\udfff": {
+          "src": s1f9301f3ff,
+          "alt": "pregnant_woman"
+        }
+      }
     },
-    "\u1F931": {
+    "\ud83e\udd31": {
       "src": s1f931,
-      "alt": "breast-feeding"
+      "alt": "breast-feeding",
+      "skinVariations": {
+        "\ud83e\udd31": {
+          "src": s1f931,
+          "alt": "breast-feeding"
+        },
+        "\ud83e\udd31\ud83c\udffb": {
+          "src": s1f9311f3fb,
+          "alt": "breast-feeding"
+        },
+        "\ud83e\udd31\ud83c\udffc": {
+          "src": s1f9311f3fc,
+          "alt": "breast-feeding"
+        },
+        "\ud83e\udd31\ud83c\udffd": {
+          "src": s1f9311f3fd,
+          "alt": "breast-feeding"
+        },
+        "\ud83e\udd31\ud83c\udffe": {
+          "src": s1f9311f3fe,
+          "alt": "breast-feeding"
+        },
+        "\ud83e\udd31\ud83c\udfff": {
+          "src": s1f9311f3ff,
+          "alt": "breast-feeding"
+        }
+      }
     },
-    "\u1F932": {
+    "\ud83e\udd32": {
       "src": s1f932,
-      "alt": "palms_up_together"
+      "alt": "palms_up_together",
+      "skinVariations": {
+        "\ud83e\udd32": {
+          "src": s1f932,
+          "alt": "palms_up_together"
+        },
+        "\ud83e\udd32\ud83c\udffb": {
+          "src": s1f9321f3fb,
+          "alt": "palms_up_together"
+        },
+        "\ud83e\udd32\ud83c\udffc": {
+          "src": s1f9321f3fc,
+          "alt": "palms_up_together"
+        },
+        "\ud83e\udd32\ud83c\udffd": {
+          "src": s1f9321f3fd,
+          "alt": "palms_up_together"
+        },
+        "\ud83e\udd32\ud83c\udffe": {
+          "src": s1f9321f3fe,
+          "alt": "palms_up_together"
+        },
+        "\ud83e\udd32\ud83c\udfff": {
+          "src": s1f9321f3ff,
+          "alt": "palms_up_together"
+        }
+      }
     },
-    "\u1F933": {
+    "\ud83e\udd33": {
       "src": s1f933,
-      "alt": "selfie"
+      "alt": "selfie",
+      "skinVariations": {
+        "\ud83e\udd33": {
+          "src": s1f933,
+          "alt": "selfie"
+        },
+        "\ud83e\udd33\ud83c\udffb": {
+          "src": s1f9331f3fb,
+          "alt": "selfie"
+        },
+        "\ud83e\udd33\ud83c\udffc": {
+          "src": s1f9331f3fc,
+          "alt": "selfie"
+        },
+        "\ud83e\udd33\ud83c\udffd": {
+          "src": s1f9331f3fd,
+          "alt": "selfie"
+        },
+        "\ud83e\udd33\ud83c\udffe": {
+          "src": s1f9331f3fe,
+          "alt": "selfie"
+        },
+        "\ud83e\udd33\ud83c\udfff": {
+          "src": s1f9331f3ff,
+          "alt": "selfie"
+        }
+      }
     },
-    "\u1F934": {
+    "\ud83e\udd34": {
       "src": s1f934,
-      "alt": "prince"
+      "alt": "prince",
+      "skinVariations": {
+        "\ud83e\udd34": {
+          "src": s1f934,
+          "alt": "prince"
+        },
+        "\ud83e\udd34\ud83c\udffb": {
+          "src": s1f9341f3fb,
+          "alt": "prince"
+        },
+        "\ud83e\udd34\ud83c\udffc": {
+          "src": s1f9341f3fc,
+          "alt": "prince"
+        },
+        "\ud83e\udd34\ud83c\udffd": {
+          "src": s1f9341f3fd,
+          "alt": "prince"
+        },
+        "\ud83e\udd34\ud83c\udffe": {
+          "src": s1f9341f3fe,
+          "alt": "prince"
+        },
+        "\ud83e\udd34\ud83c\udfff": {
+          "src": s1f9341f3ff,
+          "alt": "prince"
+        }
+      }
     },
-    "\u1F935\u200D\u2640\uFE0F": {
+    "\ud83e\udd35\u200d\u2640\ufe0f": {
       "src": s1f935200d2640fe0f,
-      "alt": "woman_in_tuxedo"
+      "alt": "woman_in_tuxedo",
+      "skinVariations": {
+        "\ud83e\udd35\u200d\u2640\ufe0f": {
+          "src": s1f935200d2640fe0f,
+          "alt": "woman_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9351f3fb200d2640fe0f,
+          "alt": "woman_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9351f3fc200d2640fe0f,
+          "alt": "woman_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9351f3fd200d2640fe0f,
+          "alt": "woman_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9351f3fe200d2640fe0f,
+          "alt": "woman_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9351f3ff200d2640fe0f,
+          "alt": "woman_in_tuxedo"
+        }
+      }
     },
-    "\u1F935\u200D\u2642\uFE0F": {
+    "\ud83e\udd35\u200d\u2642\ufe0f": {
       "src": s1f935200d2642fe0f,
-      "alt": "man_in_tuxedo"
+      "alt": "man_in_tuxedo",
+      "skinVariations": {
+        "\ud83e\udd35\u200d\u2642\ufe0f": {
+          "src": s1f935200d2642fe0f,
+          "alt": "man_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9351f3fb200d2642fe0f,
+          "alt": "man_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9351f3fc200d2642fe0f,
+          "alt": "man_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9351f3fd200d2642fe0f,
+          "alt": "man_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9351f3fe200d2642fe0f,
+          "alt": "man_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9351f3ff200d2642fe0f,
+          "alt": "man_in_tuxedo"
+        }
+      }
     },
-    "\u1F935": {
+    "\ud83e\udd35": {
       "src": s1f935,
-      "alt": "person_in_tuxedo"
+      "alt": "person_in_tuxedo",
+      "skinVariations": {
+        "\ud83e\udd35": {
+          "src": s1f935,
+          "alt": "person_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffb": {
+          "src": s1f9351f3fb,
+          "alt": "person_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffc": {
+          "src": s1f9351f3fc,
+          "alt": "person_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffd": {
+          "src": s1f9351f3fd,
+          "alt": "person_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udffe": {
+          "src": s1f9351f3fe,
+          "alt": "person_in_tuxedo"
+        },
+        "\ud83e\udd35\ud83c\udfff": {
+          "src": s1f9351f3ff,
+          "alt": "person_in_tuxedo"
+        }
+      }
     },
-    "\u1F936": {
+    "\ud83e\udd36": {
       "src": s1f936,
-      "alt": "mrs_claus"
+      "alt": "mrs_claus",
+      "skinVariations": {
+        "\ud83e\udd36": {
+          "src": s1f936,
+          "alt": "mrs_claus"
+        },
+        "\ud83e\udd36\ud83c\udffb": {
+          "src": s1f9361f3fb,
+          "alt": "mrs_claus"
+        },
+        "\ud83e\udd36\ud83c\udffc": {
+          "src": s1f9361f3fc,
+          "alt": "mrs_claus"
+        },
+        "\ud83e\udd36\ud83c\udffd": {
+          "src": s1f9361f3fd,
+          "alt": "mrs_claus"
+        },
+        "\ud83e\udd36\ud83c\udffe": {
+          "src": s1f9361f3fe,
+          "alt": "mrs_claus"
+        },
+        "\ud83e\udd36\ud83c\udfff": {
+          "src": s1f9361f3ff,
+          "alt": "mrs_claus"
+        }
+      }
     },
-    "\u1F937\u200D\u2640\uFE0F": {
+    "\ud83e\udd37\u200d\u2640\ufe0f": {
       "src": s1f937200d2640fe0f,
-      "alt": "woman-shrugging"
+      "alt": "woman-shrugging",
+      "skinVariations": {
+        "\ud83e\udd37\u200d\u2640\ufe0f": {
+          "src": s1f937200d2640fe0f,
+          "alt": "woman-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9371f3fb200d2640fe0f,
+          "alt": "woman-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9371f3fc200d2640fe0f,
+          "alt": "woman-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9371f3fd200d2640fe0f,
+          "alt": "woman-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9371f3fe200d2640fe0f,
+          "alt": "woman-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9371f3ff200d2640fe0f,
+          "alt": "woman-shrugging"
+        }
+      }
     },
-    "\u1F937\u200D\u2642\uFE0F": {
+    "\ud83e\udd37\u200d\u2642\ufe0f": {
       "src": s1f937200d2642fe0f,
-      "alt": "man-shrugging"
+      "alt": "man-shrugging",
+      "skinVariations": {
+        "\ud83e\udd37\u200d\u2642\ufe0f": {
+          "src": s1f937200d2642fe0f,
+          "alt": "man-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9371f3fb200d2642fe0f,
+          "alt": "man-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9371f3fc200d2642fe0f,
+          "alt": "man-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9371f3fd200d2642fe0f,
+          "alt": "man-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9371f3fe200d2642fe0f,
+          "alt": "man-shrugging"
+        },
+        "\ud83e\udd37\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9371f3ff200d2642fe0f,
+          "alt": "man-shrugging"
+        }
+      }
     },
-    "\u1F937": {
+    "\ud83e\udd37": {
       "src": s1f937,
-      "alt": "shrug"
+      "alt": "shrug",
+      "skinVariations": {
+        "\ud83e\udd37": {
+          "src": s1f937,
+          "alt": "shrug"
+        },
+        "\ud83e\udd37\ud83c\udffb": {
+          "src": s1f9371f3fb,
+          "alt": "shrug"
+        },
+        "\ud83e\udd37\ud83c\udffc": {
+          "src": s1f9371f3fc,
+          "alt": "shrug"
+        },
+        "\ud83e\udd37\ud83c\udffd": {
+          "src": s1f9371f3fd,
+          "alt": "shrug"
+        },
+        "\ud83e\udd37\ud83c\udffe": {
+          "src": s1f9371f3fe,
+          "alt": "shrug"
+        },
+        "\ud83e\udd37\ud83c\udfff": {
+          "src": s1f9371f3ff,
+          "alt": "shrug"
+        }
+      }
     },
-    "\u1F938\u200D\u2640\uFE0F": {
+    "\ud83e\udd38\u200d\u2640\ufe0f": {
       "src": s1f938200d2640fe0f,
-      "alt": "woman-cartwheeling"
+      "alt": "woman-cartwheeling",
+      "skinVariations": {
+        "\ud83e\udd38\u200d\u2640\ufe0f": {
+          "src": s1f938200d2640fe0f,
+          "alt": "woman-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9381f3fb200d2640fe0f,
+          "alt": "woman-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9381f3fc200d2640fe0f,
+          "alt": "woman-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9381f3fd200d2640fe0f,
+          "alt": "woman-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9381f3fe200d2640fe0f,
+          "alt": "woman-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9381f3ff200d2640fe0f,
+          "alt": "woman-cartwheeling"
+        }
+      }
     },
-    "\u1F938\u200D\u2642\uFE0F": {
+    "\ud83e\udd38\u200d\u2642\ufe0f": {
       "src": s1f938200d2642fe0f,
-      "alt": "man-cartwheeling"
+      "alt": "man-cartwheeling",
+      "skinVariations": {
+        "\ud83e\udd38\u200d\u2642\ufe0f": {
+          "src": s1f938200d2642fe0f,
+          "alt": "man-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9381f3fb200d2642fe0f,
+          "alt": "man-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9381f3fc200d2642fe0f,
+          "alt": "man-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9381f3fd200d2642fe0f,
+          "alt": "man-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9381f3fe200d2642fe0f,
+          "alt": "man-cartwheeling"
+        },
+        "\ud83e\udd38\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9381f3ff200d2642fe0f,
+          "alt": "man-cartwheeling"
+        }
+      }
     },
-    "\u1F938": {
+    "\ud83e\udd38": {
       "src": s1f938,
-      "alt": "person_doing_cartwheel"
+      "alt": "person_doing_cartwheel",
+      "skinVariations": {
+        "\ud83e\udd38": {
+          "src": s1f938,
+          "alt": "person_doing_cartwheel"
+        },
+        "\ud83e\udd38\ud83c\udffb": {
+          "src": s1f9381f3fb,
+          "alt": "person_doing_cartwheel"
+        },
+        "\ud83e\udd38\ud83c\udffc": {
+          "src": s1f9381f3fc,
+          "alt": "person_doing_cartwheel"
+        },
+        "\ud83e\udd38\ud83c\udffd": {
+          "src": s1f9381f3fd,
+          "alt": "person_doing_cartwheel"
+        },
+        "\ud83e\udd38\ud83c\udffe": {
+          "src": s1f9381f3fe,
+          "alt": "person_doing_cartwheel"
+        },
+        "\ud83e\udd38\ud83c\udfff": {
+          "src": s1f9381f3ff,
+          "alt": "person_doing_cartwheel"
+        }
+      }
     },
-    "\u1F939\u200D\u2640\uFE0F": {
+    "\ud83e\udd39\u200d\u2640\ufe0f": {
       "src": s1f939200d2640fe0f,
-      "alt": "woman-juggling"
+      "alt": "woman-juggling",
+      "skinVariations": {
+        "\ud83e\udd39\u200d\u2640\ufe0f": {
+          "src": s1f939200d2640fe0f,
+          "alt": "woman-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9391f3fb200d2640fe0f,
+          "alt": "woman-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9391f3fc200d2640fe0f,
+          "alt": "woman-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9391f3fd200d2640fe0f,
+          "alt": "woman-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9391f3fe200d2640fe0f,
+          "alt": "woman-juggling"
+        },
+        "\ud83e\udd39\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9391f3ff200d2640fe0f,
+          "alt": "woman-juggling"
+        }
+      }
     },
-    "\u1F939\u200D\u2642\uFE0F": {
+    "\ud83e\udd39\u200d\u2642\ufe0f": {
       "src": s1f939200d2642fe0f,
-      "alt": "man-juggling"
+      "alt": "man-juggling",
+      "skinVariations": {
+        "\ud83e\udd39\u200d\u2642\ufe0f": {
+          "src": s1f939200d2642fe0f,
+          "alt": "man-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9391f3fb200d2642fe0f,
+          "alt": "man-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9391f3fc200d2642fe0f,
+          "alt": "man-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9391f3fd200d2642fe0f,
+          "alt": "man-juggling"
+        },
+        "\ud83e\udd39\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9391f3fe200d2642fe0f,
+          "alt": "man-juggling"
+        },
+        "\ud83e\udd39\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9391f3ff200d2642fe0f,
+          "alt": "man-juggling"
+        }
+      }
     },
-    "\u1F939": {
+    "\ud83e\udd39": {
       "src": s1f939,
-      "alt": "juggling"
+      "alt": "juggling",
+      "skinVariations": {
+        "\ud83e\udd39": {
+          "src": s1f939,
+          "alt": "juggling"
+        },
+        "\ud83e\udd39\ud83c\udffb": {
+          "src": s1f9391f3fb,
+          "alt": "juggling"
+        },
+        "\ud83e\udd39\ud83c\udffc": {
+          "src": s1f9391f3fc,
+          "alt": "juggling"
+        },
+        "\ud83e\udd39\ud83c\udffd": {
+          "src": s1f9391f3fd,
+          "alt": "juggling"
+        },
+        "\ud83e\udd39\ud83c\udffe": {
+          "src": s1f9391f3fe,
+          "alt": "juggling"
+        },
+        "\ud83e\udd39\ud83c\udfff": {
+          "src": s1f9391f3ff,
+          "alt": "juggling"
+        }
+      }
     },
-    "\u1F93A": {
+    "\ud83e\udd3a": {
       "src": s1f93a,
       "alt": "fencer"
     },
-    "\u1F93C\u200D\u2640\uFE0F": {
+    "\ud83e\udd3c\u200d\u2640\ufe0f": {
       "src": s1f93c200d2640fe0f,
       "alt": "woman-wrestling"
     },
-    "\u1F93C\u200D\u2642\uFE0F": {
+    "\ud83e\udd3c\u200d\u2642\ufe0f": {
       "src": s1f93c200d2642fe0f,
       "alt": "man-wrestling"
     },
-    "\u1F93C": {
+    "\ud83e\udd3c": {
       "src": s1f93c,
       "alt": "wrestlers"
     },
-    "\u1F93D\u200D\u2640\uFE0F": {
+    "\ud83e\udd3d\u200d\u2640\ufe0f": {
       "src": s1f93d200d2640fe0f,
-      "alt": "woman-playing-water-polo"
+      "alt": "woman-playing-water-polo",
+      "skinVariations": {
+        "\ud83e\udd3d\u200d\u2640\ufe0f": {
+          "src": s1f93d200d2640fe0f,
+          "alt": "woman-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f93d1f3fb200d2640fe0f,
+          "alt": "woman-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f93d1f3fc200d2640fe0f,
+          "alt": "woman-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f93d1f3fd200d2640fe0f,
+          "alt": "woman-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f93d1f3fe200d2640fe0f,
+          "alt": "woman-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f93d1f3ff200d2640fe0f,
+          "alt": "woman-playing-water-polo"
+        }
+      }
     },
-    "\u1F93D\u200D\u2642\uFE0F": {
+    "\ud83e\udd3d\u200d\u2642\ufe0f": {
       "src": s1f93d200d2642fe0f,
-      "alt": "man-playing-water-polo"
+      "alt": "man-playing-water-polo",
+      "skinVariations": {
+        "\ud83e\udd3d\u200d\u2642\ufe0f": {
+          "src": s1f93d200d2642fe0f,
+          "alt": "man-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f93d1f3fb200d2642fe0f,
+          "alt": "man-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f93d1f3fc200d2642fe0f,
+          "alt": "man-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f93d1f3fd200d2642fe0f,
+          "alt": "man-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f93d1f3fe200d2642fe0f,
+          "alt": "man-playing-water-polo"
+        },
+        "\ud83e\udd3d\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f93d1f3ff200d2642fe0f,
+          "alt": "man-playing-water-polo"
+        }
+      }
     },
-    "\u1F93D": {
+    "\ud83e\udd3d": {
       "src": s1f93d,
-      "alt": "water_polo"
+      "alt": "water_polo",
+      "skinVariations": {
+        "\ud83e\udd3d": {
+          "src": s1f93d,
+          "alt": "water_polo"
+        },
+        "\ud83e\udd3d\ud83c\udffb": {
+          "src": s1f93d1f3fb,
+          "alt": "water_polo"
+        },
+        "\ud83e\udd3d\ud83c\udffc": {
+          "src": s1f93d1f3fc,
+          "alt": "water_polo"
+        },
+        "\ud83e\udd3d\ud83c\udffd": {
+          "src": s1f93d1f3fd,
+          "alt": "water_polo"
+        },
+        "\ud83e\udd3d\ud83c\udffe": {
+          "src": s1f93d1f3fe,
+          "alt": "water_polo"
+        },
+        "\ud83e\udd3d\ud83c\udfff": {
+          "src": s1f93d1f3ff,
+          "alt": "water_polo"
+        }
+      }
     },
-    "\u1F93E\u200D\u2640\uFE0F": {
+    "\ud83e\udd3e\u200d\u2640\ufe0f": {
       "src": s1f93e200d2640fe0f,
-      "alt": "woman-playing-handball"
+      "alt": "woman-playing-handball",
+      "skinVariations": {
+        "\ud83e\udd3e\u200d\u2640\ufe0f": {
+          "src": s1f93e200d2640fe0f,
+          "alt": "woman-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f93e1f3fb200d2640fe0f,
+          "alt": "woman-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f93e1f3fc200d2640fe0f,
+          "alt": "woman-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f93e1f3fd200d2640fe0f,
+          "alt": "woman-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f93e1f3fe200d2640fe0f,
+          "alt": "woman-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f93e1f3ff200d2640fe0f,
+          "alt": "woman-playing-handball"
+        }
+      }
     },
-    "\u1F93E\u200D\u2642\uFE0F": {
+    "\ud83e\udd3e\u200d\u2642\ufe0f": {
       "src": s1f93e200d2642fe0f,
-      "alt": "man-playing-handball"
+      "alt": "man-playing-handball",
+      "skinVariations": {
+        "\ud83e\udd3e\u200d\u2642\ufe0f": {
+          "src": s1f93e200d2642fe0f,
+          "alt": "man-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f93e1f3fb200d2642fe0f,
+          "alt": "man-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f93e1f3fc200d2642fe0f,
+          "alt": "man-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f93e1f3fd200d2642fe0f,
+          "alt": "man-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f93e1f3fe200d2642fe0f,
+          "alt": "man-playing-handball"
+        },
+        "\ud83e\udd3e\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f93e1f3ff200d2642fe0f,
+          "alt": "man-playing-handball"
+        }
+      }
     },
-    "\u1F93E": {
+    "\ud83e\udd3e": {
       "src": s1f93e,
-      "alt": "handball"
+      "alt": "handball",
+      "skinVariations": {
+        "\ud83e\udd3e": {
+          "src": s1f93e,
+          "alt": "handball"
+        },
+        "\ud83e\udd3e\ud83c\udffb": {
+          "src": s1f93e1f3fb,
+          "alt": "handball"
+        },
+        "\ud83e\udd3e\ud83c\udffc": {
+          "src": s1f93e1f3fc,
+          "alt": "handball"
+        },
+        "\ud83e\udd3e\ud83c\udffd": {
+          "src": s1f93e1f3fd,
+          "alt": "handball"
+        },
+        "\ud83e\udd3e\ud83c\udffe": {
+          "src": s1f93e1f3fe,
+          "alt": "handball"
+        },
+        "\ud83e\udd3e\ud83c\udfff": {
+          "src": s1f93e1f3ff,
+          "alt": "handball"
+        }
+      }
     },
-    "\u1F977": {
+    "\ud83e\udd77": {
       "src": s1f977,
-      "alt": "ninja"
+      "alt": "ninja",
+      "skinVariations": {
+        "\ud83e\udd77": {
+          "src": s1f977,
+          "alt": "ninja"
+        },
+        "\ud83e\udd77\ud83c\udffb": {
+          "src": s1f9771f3fb,
+          "alt": "ninja"
+        },
+        "\ud83e\udd77\ud83c\udffc": {
+          "src": s1f9771f3fc,
+          "alt": "ninja"
+        },
+        "\ud83e\udd77\ud83c\udffd": {
+          "src": s1f9771f3fd,
+          "alt": "ninja"
+        },
+        "\ud83e\udd77\ud83c\udffe": {
+          "src": s1f9771f3fe,
+          "alt": "ninja"
+        },
+        "\ud83e\udd77\ud83c\udfff": {
+          "src": s1f9771f3ff,
+          "alt": "ninja"
+        }
+      }
     },
-    "\u1F9B4": {
+    "\ud83e\uddb4": {
       "src": s1f9b4,
       "alt": "bone"
     },
-    "\u1F9B5": {
+    "\ud83e\uddb5": {
       "src": s1f9b5,
-      "alt": "leg"
+      "alt": "leg",
+      "skinVariations": {
+        "\ud83e\uddb5": {
+          "src": s1f9b5,
+          "alt": "leg"
+        },
+        "\ud83e\uddb5\ud83c\udffb": {
+          "src": s1f9b51f3fb,
+          "alt": "leg"
+        },
+        "\ud83e\uddb5\ud83c\udffc": {
+          "src": s1f9b51f3fc,
+          "alt": "leg"
+        },
+        "\ud83e\uddb5\ud83c\udffd": {
+          "src": s1f9b51f3fd,
+          "alt": "leg"
+        },
+        "\ud83e\uddb5\ud83c\udffe": {
+          "src": s1f9b51f3fe,
+          "alt": "leg"
+        },
+        "\ud83e\uddb5\ud83c\udfff": {
+          "src": s1f9b51f3ff,
+          "alt": "leg"
+        }
+      }
     },
-    "\u1F9B6": {
+    "\ud83e\uddb6": {
       "src": s1f9b6,
-      "alt": "foot"
+      "alt": "foot",
+      "skinVariations": {
+        "\ud83e\uddb6": {
+          "src": s1f9b6,
+          "alt": "foot"
+        },
+        "\ud83e\uddb6\ud83c\udffb": {
+          "src": s1f9b61f3fb,
+          "alt": "foot"
+        },
+        "\ud83e\uddb6\ud83c\udffc": {
+          "src": s1f9b61f3fc,
+          "alt": "foot"
+        },
+        "\ud83e\uddb6\ud83c\udffd": {
+          "src": s1f9b61f3fd,
+          "alt": "foot"
+        },
+        "\ud83e\uddb6\ud83c\udffe": {
+          "src": s1f9b61f3fe,
+          "alt": "foot"
+        },
+        "\ud83e\uddb6\ud83c\udfff": {
+          "src": s1f9b61f3ff,
+          "alt": "foot"
+        }
+      }
     },
-    "\u1F9B7": {
+    "\ud83e\uddb7": {
       "src": s1f9b7,
       "alt": "tooth"
     },
-    "\u1F9B8\u200D\u2640\uFE0F": {
+    "\ud83e\uddb8\u200d\u2640\ufe0f": {
       "src": s1f9b8200d2640fe0f,
-      "alt": "female_superhero"
+      "alt": "female_superhero",
+      "skinVariations": {
+        "\ud83e\uddb8\u200d\u2640\ufe0f": {
+          "src": s1f9b8200d2640fe0f,
+          "alt": "female_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9b81f3fb200d2640fe0f,
+          "alt": "female_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9b81f3fc200d2640fe0f,
+          "alt": "female_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9b81f3fd200d2640fe0f,
+          "alt": "female_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9b81f3fe200d2640fe0f,
+          "alt": "female_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9b81f3ff200d2640fe0f,
+          "alt": "female_superhero"
+        }
+      }
     },
-    "\u1F9B8\u200D\u2642\uFE0F": {
+    "\ud83e\uddb8\u200d\u2642\ufe0f": {
       "src": s1f9b8200d2642fe0f,
-      "alt": "male_superhero"
+      "alt": "male_superhero",
+      "skinVariations": {
+        "\ud83e\uddb8\u200d\u2642\ufe0f": {
+          "src": s1f9b8200d2642fe0f,
+          "alt": "male_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9b81f3fb200d2642fe0f,
+          "alt": "male_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9b81f3fc200d2642fe0f,
+          "alt": "male_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9b81f3fd200d2642fe0f,
+          "alt": "male_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9b81f3fe200d2642fe0f,
+          "alt": "male_superhero"
+        },
+        "\ud83e\uddb8\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9b81f3ff200d2642fe0f,
+          "alt": "male_superhero"
+        }
+      }
     },
-    "\u1F9B8": {
+    "\ud83e\uddb8": {
       "src": s1f9b8,
-      "alt": "superhero"
+      "alt": "superhero",
+      "skinVariations": {
+        "\ud83e\uddb8": {
+          "src": s1f9b8,
+          "alt": "superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffb": {
+          "src": s1f9b81f3fb,
+          "alt": "superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffc": {
+          "src": s1f9b81f3fc,
+          "alt": "superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffd": {
+          "src": s1f9b81f3fd,
+          "alt": "superhero"
+        },
+        "\ud83e\uddb8\ud83c\udffe": {
+          "src": s1f9b81f3fe,
+          "alt": "superhero"
+        },
+        "\ud83e\uddb8\ud83c\udfff": {
+          "src": s1f9b81f3ff,
+          "alt": "superhero"
+        }
+      }
     },
-    "\u1F9B9\u200D\u2640\uFE0F": {
+    "\ud83e\uddb9\u200d\u2640\ufe0f": {
       "src": s1f9b9200d2640fe0f,
-      "alt": "female_supervillain"
+      "alt": "female_supervillain",
+      "skinVariations": {
+        "\ud83e\uddb9\u200d\u2640\ufe0f": {
+          "src": s1f9b9200d2640fe0f,
+          "alt": "female_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9b91f3fb200d2640fe0f,
+          "alt": "female_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9b91f3fc200d2640fe0f,
+          "alt": "female_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9b91f3fd200d2640fe0f,
+          "alt": "female_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9b91f3fe200d2640fe0f,
+          "alt": "female_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9b91f3ff200d2640fe0f,
+          "alt": "female_supervillain"
+        }
+      }
     },
-    "\u1F9B9\u200D\u2642\uFE0F": {
+    "\ud83e\uddb9\u200d\u2642\ufe0f": {
       "src": s1f9b9200d2642fe0f,
-      "alt": "male_supervillain"
+      "alt": "male_supervillain",
+      "skinVariations": {
+        "\ud83e\uddb9\u200d\u2642\ufe0f": {
+          "src": s1f9b9200d2642fe0f,
+          "alt": "male_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9b91f3fb200d2642fe0f,
+          "alt": "male_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9b91f3fc200d2642fe0f,
+          "alt": "male_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9b91f3fd200d2642fe0f,
+          "alt": "male_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9b91f3fe200d2642fe0f,
+          "alt": "male_supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9b91f3ff200d2642fe0f,
+          "alt": "male_supervillain"
+        }
+      }
     },
-    "\u1F9B9": {
+    "\ud83e\uddb9": {
       "src": s1f9b9,
-      "alt": "supervillain"
+      "alt": "supervillain",
+      "skinVariations": {
+        "\ud83e\uddb9": {
+          "src": s1f9b9,
+          "alt": "supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffb": {
+          "src": s1f9b91f3fb,
+          "alt": "supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffc": {
+          "src": s1f9b91f3fc,
+          "alt": "supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffd": {
+          "src": s1f9b91f3fd,
+          "alt": "supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udffe": {
+          "src": s1f9b91f3fe,
+          "alt": "supervillain"
+        },
+        "\ud83e\uddb9\ud83c\udfff": {
+          "src": s1f9b91f3ff,
+          "alt": "supervillain"
+        }
+      }
     },
-    "\u1F9BB": {
+    "\ud83e\uddbb": {
       "src": s1f9bb,
-      "alt": "ear_with_hearing_aid"
+      "alt": "ear_with_hearing_aid",
+      "skinVariations": {
+        "\ud83e\uddbb": {
+          "src": s1f9bb,
+          "alt": "ear_with_hearing_aid"
+        },
+        "\ud83e\uddbb\ud83c\udffb": {
+          "src": s1f9bb1f3fb,
+          "alt": "ear_with_hearing_aid"
+        },
+        "\ud83e\uddbb\ud83c\udffc": {
+          "src": s1f9bb1f3fc,
+          "alt": "ear_with_hearing_aid"
+        },
+        "\ud83e\uddbb\ud83c\udffd": {
+          "src": s1f9bb1f3fd,
+          "alt": "ear_with_hearing_aid"
+        },
+        "\ud83e\uddbb\ud83c\udffe": {
+          "src": s1f9bb1f3fe,
+          "alt": "ear_with_hearing_aid"
+        },
+        "\ud83e\uddbb\ud83c\udfff": {
+          "src": s1f9bb1f3ff,
+          "alt": "ear_with_hearing_aid"
+        }
+      }
     },
-    "\u1F9BE": {
+    "\ud83e\uddbe": {
       "src": s1f9be,
       "alt": "mechanical_arm"
     },
-    "\u1F9BF": {
+    "\ud83e\uddbf": {
       "src": s1f9bf,
       "alt": "mechanical_leg"
     },
-    "\u1F9CD\u200D\u2640\uFE0F": {
+    "\ud83e\uddcd\u200d\u2640\ufe0f": {
       "src": s1f9cd200d2640fe0f,
-      "alt": "woman_standing"
+      "alt": "woman_standing",
+      "skinVariations": {
+        "\ud83e\uddcd\u200d\u2640\ufe0f": {
+          "src": s1f9cd200d2640fe0f,
+          "alt": "woman_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9cd1f3fb200d2640fe0f,
+          "alt": "woman_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9cd1f3fc200d2640fe0f,
+          "alt": "woman_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9cd1f3fd200d2640fe0f,
+          "alt": "woman_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9cd1f3fe200d2640fe0f,
+          "alt": "woman_standing"
+        },
+        "\ud83e\uddcd\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9cd1f3ff200d2640fe0f,
+          "alt": "woman_standing"
+        }
+      }
     },
-    "\u1F9CD\u200D\u2642\uFE0F": {
+    "\ud83e\uddcd\u200d\u2642\ufe0f": {
       "src": s1f9cd200d2642fe0f,
-      "alt": "man_standing"
+      "alt": "man_standing",
+      "skinVariations": {
+        "\ud83e\uddcd\u200d\u2642\ufe0f": {
+          "src": s1f9cd200d2642fe0f,
+          "alt": "man_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9cd1f3fb200d2642fe0f,
+          "alt": "man_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9cd1f3fc200d2642fe0f,
+          "alt": "man_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9cd1f3fd200d2642fe0f,
+          "alt": "man_standing"
+        },
+        "\ud83e\uddcd\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9cd1f3fe200d2642fe0f,
+          "alt": "man_standing"
+        },
+        "\ud83e\uddcd\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9cd1f3ff200d2642fe0f,
+          "alt": "man_standing"
+        }
+      }
     },
-    "\u1F9CD": {
+    "\ud83e\uddcd": {
       "src": s1f9cd,
-      "alt": "standing_person"
+      "alt": "standing_person",
+      "skinVariations": {
+        "\ud83e\uddcd": {
+          "src": s1f9cd,
+          "alt": "standing_person"
+        },
+        "\ud83e\uddcd\ud83c\udffb": {
+          "src": s1f9cd1f3fb,
+          "alt": "standing_person"
+        },
+        "\ud83e\uddcd\ud83c\udffc": {
+          "src": s1f9cd1f3fc,
+          "alt": "standing_person"
+        },
+        "\ud83e\uddcd\ud83c\udffd": {
+          "src": s1f9cd1f3fd,
+          "alt": "standing_person"
+        },
+        "\ud83e\uddcd\ud83c\udffe": {
+          "src": s1f9cd1f3fe,
+          "alt": "standing_person"
+        },
+        "\ud83e\uddcd\ud83c\udfff": {
+          "src": s1f9cd1f3ff,
+          "alt": "standing_person"
+        }
+      }
     },
-    "\u1F9CE\u200D\u2640\uFE0F": {
+    "\ud83e\uddce\u200d\u2640\ufe0f": {
       "src": s1f9ce200d2640fe0f,
-      "alt": "woman_kneeling"
+      "alt": "woman_kneeling",
+      "skinVariations": {
+        "\ud83e\uddce\u200d\u2640\ufe0f": {
+          "src": s1f9ce200d2640fe0f,
+          "alt": "woman_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9ce1f3fb200d2640fe0f,
+          "alt": "woman_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9ce1f3fc200d2640fe0f,
+          "alt": "woman_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9ce1f3fd200d2640fe0f,
+          "alt": "woman_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9ce1f3fe200d2640fe0f,
+          "alt": "woman_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9ce1f3ff200d2640fe0f,
+          "alt": "woman_kneeling"
+        }
+      }
     },
-    "\u1F9CE\u200D\u2642\uFE0F": {
+    "\ud83e\uddce\u200d\u2642\ufe0f": {
       "src": s1f9ce200d2642fe0f,
-      "alt": "man_kneeling"
+      "alt": "man_kneeling",
+      "skinVariations": {
+        "\ud83e\uddce\u200d\u2642\ufe0f": {
+          "src": s1f9ce200d2642fe0f,
+          "alt": "man_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9ce1f3fb200d2642fe0f,
+          "alt": "man_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9ce1f3fc200d2642fe0f,
+          "alt": "man_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9ce1f3fd200d2642fe0f,
+          "alt": "man_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9ce1f3fe200d2642fe0f,
+          "alt": "man_kneeling"
+        },
+        "\ud83e\uddce\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9ce1f3ff200d2642fe0f,
+          "alt": "man_kneeling"
+        }
+      }
     },
-    "\u1F9CE": {
+    "\ud83e\uddce": {
       "src": s1f9ce,
-      "alt": "kneeling_person"
+      "alt": "kneeling_person",
+      "skinVariations": {
+        "\ud83e\uddce": {
+          "src": s1f9ce,
+          "alt": "kneeling_person"
+        },
+        "\ud83e\uddce\ud83c\udffb": {
+          "src": s1f9ce1f3fb,
+          "alt": "kneeling_person"
+        },
+        "\ud83e\uddce\ud83c\udffc": {
+          "src": s1f9ce1f3fc,
+          "alt": "kneeling_person"
+        },
+        "\ud83e\uddce\ud83c\udffd": {
+          "src": s1f9ce1f3fd,
+          "alt": "kneeling_person"
+        },
+        "\ud83e\uddce\ud83c\udffe": {
+          "src": s1f9ce1f3fe,
+          "alt": "kneeling_person"
+        },
+        "\ud83e\uddce\ud83c\udfff": {
+          "src": s1f9ce1f3ff,
+          "alt": "kneeling_person"
+        }
+      }
     },
-    "\u1F9CF\u200D\u2640\uFE0F": {
+    "\ud83e\uddcf\u200d\u2640\ufe0f": {
       "src": s1f9cf200d2640fe0f,
-      "alt": "deaf_woman"
+      "alt": "deaf_woman",
+      "skinVariations": {
+        "\ud83e\uddcf\u200d\u2640\ufe0f": {
+          "src": s1f9cf200d2640fe0f,
+          "alt": "deaf_woman"
+        },
+        "\ud83e\uddcf\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9cf1f3fb200d2640fe0f,
+          "alt": "deaf_woman"
+        },
+        "\ud83e\uddcf\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9cf1f3fc200d2640fe0f,
+          "alt": "deaf_woman"
+        },
+        "\ud83e\uddcf\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9cf1f3fd200d2640fe0f,
+          "alt": "deaf_woman"
+        },
+        "\ud83e\uddcf\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9cf1f3fe200d2640fe0f,
+          "alt": "deaf_woman"
+        },
+        "\ud83e\uddcf\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9cf1f3ff200d2640fe0f,
+          "alt": "deaf_woman"
+        }
+      }
     },
-    "\u1F9CF\u200D\u2642\uFE0F": {
+    "\ud83e\uddcf\u200d\u2642\ufe0f": {
       "src": s1f9cf200d2642fe0f,
-      "alt": "deaf_man"
+      "alt": "deaf_man",
+      "skinVariations": {
+        "\ud83e\uddcf\u200d\u2642\ufe0f": {
+          "src": s1f9cf200d2642fe0f,
+          "alt": "deaf_man"
+        },
+        "\ud83e\uddcf\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9cf1f3fb200d2642fe0f,
+          "alt": "deaf_man"
+        },
+        "\ud83e\uddcf\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9cf1f3fc200d2642fe0f,
+          "alt": "deaf_man"
+        },
+        "\ud83e\uddcf\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9cf1f3fd200d2642fe0f,
+          "alt": "deaf_man"
+        },
+        "\ud83e\uddcf\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9cf1f3fe200d2642fe0f,
+          "alt": "deaf_man"
+        },
+        "\ud83e\uddcf\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9cf1f3ff200d2642fe0f,
+          "alt": "deaf_man"
+        }
+      }
     },
-    "\u1F9CF": {
+    "\ud83e\uddcf": {
       "src": s1f9cf,
-      "alt": "deaf_person"
+      "alt": "deaf_person",
+      "skinVariations": {
+        "\ud83e\uddcf": {
+          "src": s1f9cf,
+          "alt": "deaf_person"
+        },
+        "\ud83e\uddcf\ud83c\udffb": {
+          "src": s1f9cf1f3fb,
+          "alt": "deaf_person"
+        },
+        "\ud83e\uddcf\ud83c\udffc": {
+          "src": s1f9cf1f3fc,
+          "alt": "deaf_person"
+        },
+        "\ud83e\uddcf\ud83c\udffd": {
+          "src": s1f9cf1f3fd,
+          "alt": "deaf_person"
+        },
+        "\ud83e\uddcf\ud83c\udffe": {
+          "src": s1f9cf1f3fe,
+          "alt": "deaf_person"
+        },
+        "\ud83e\uddcf\ud83c\udfff": {
+          "src": s1f9cf1f3ff,
+          "alt": "deaf_person"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F33E": {
+    "\ud83e\uddd1\u200d\ud83c\udf3e": {
       "src": s1f9d1200d1f33e,
-      "alt": "farmer"
+      "alt": "farmer",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udf3e": {
+          "src": s1f9d1200d1f33e,
+          "alt": "farmer"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udf3e": {
+          "src": s1f9d11f3fb200d1f33e,
+          "alt": "farmer"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udf3e": {
+          "src": s1f9d11f3fc200d1f33e,
+          "alt": "farmer"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udf3e": {
+          "src": s1f9d11f3fd200d1f33e,
+          "alt": "farmer"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udf3e": {
+          "src": s1f9d11f3fe200d1f33e,
+          "alt": "farmer"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udf3e": {
+          "src": s1f9d11f3ff200d1f33e,
+          "alt": "farmer"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F373": {
+    "\ud83e\uddd1\u200d\ud83c\udf73": {
       "src": s1f9d1200d1f373,
-      "alt": "cook"
+      "alt": "cook",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udf73": {
+          "src": s1f9d1200d1f373,
+          "alt": "cook"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udf73": {
+          "src": s1f9d11f3fb200d1f373,
+          "alt": "cook"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udf73": {
+          "src": s1f9d11f3fc200d1f373,
+          "alt": "cook"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udf73": {
+          "src": s1f9d11f3fd200d1f373,
+          "alt": "cook"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udf73": {
+          "src": s1f9d11f3fe200d1f373,
+          "alt": "cook"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udf73": {
+          "src": s1f9d11f3ff200d1f373,
+          "alt": "cook"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F37C": {
+    "\ud83e\uddd1\u200d\ud83c\udf7c": {
       "src": s1f9d1200d1f37c,
-      "alt": "person_feeding_baby"
+      "alt": "person_feeding_baby",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udf7c": {
+          "src": s1f9d1200d1f37c,
+          "alt": "person_feeding_baby"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udf7c": {
+          "src": s1f9d11f3fb200d1f37c,
+          "alt": "person_feeding_baby"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udf7c": {
+          "src": s1f9d11f3fc200d1f37c,
+          "alt": "person_feeding_baby"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udf7c": {
+          "src": s1f9d11f3fd200d1f37c,
+          "alt": "person_feeding_baby"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udf7c": {
+          "src": s1f9d11f3fe200d1f37c,
+          "alt": "person_feeding_baby"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udf7c": {
+          "src": s1f9d11f3ff200d1f37c,
+          "alt": "person_feeding_baby"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F384": {
+    "\ud83e\uddd1\u200d\ud83c\udf84": {
       "src": s1f9d1200d1f384,
-      "alt": "mx_claus"
+      "alt": "mx_claus",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udf84": {
+          "src": s1f9d1200d1f384,
+          "alt": "mx_claus"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udf84": {
+          "src": s1f9d11f3fb200d1f384,
+          "alt": "mx_claus"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udf84": {
+          "src": s1f9d11f3fc200d1f384,
+          "alt": "mx_claus"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udf84": {
+          "src": s1f9d11f3fd200d1f384,
+          "alt": "mx_claus"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udf84": {
+          "src": s1f9d11f3fe200d1f384,
+          "alt": "mx_claus"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udf84": {
+          "src": s1f9d11f3ff200d1f384,
+          "alt": "mx_claus"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F393": {
+    "\ud83e\uddd1\u200d\ud83c\udf93": {
       "src": s1f9d1200d1f393,
-      "alt": "student"
+      "alt": "student",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udf93": {
+          "src": s1f9d1200d1f393,
+          "alt": "student"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udf93": {
+          "src": s1f9d11f3fb200d1f393,
+          "alt": "student"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udf93": {
+          "src": s1f9d11f3fc200d1f393,
+          "alt": "student"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udf93": {
+          "src": s1f9d11f3fd200d1f393,
+          "alt": "student"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udf93": {
+          "src": s1f9d11f3fe200d1f393,
+          "alt": "student"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udf93": {
+          "src": s1f9d11f3ff200d1f393,
+          "alt": "student"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F3A4": {
+    "\ud83e\uddd1\u200d\ud83c\udfa4": {
       "src": s1f9d1200d1f3a4,
-      "alt": "singer"
+      "alt": "singer",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udfa4": {
+          "src": s1f9d1200d1f3a4,
+          "alt": "singer"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udfa4": {
+          "src": s1f9d11f3fb200d1f3a4,
+          "alt": "singer"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udfa4": {
+          "src": s1f9d11f3fc200d1f3a4,
+          "alt": "singer"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udfa4": {
+          "src": s1f9d11f3fd200d1f3a4,
+          "alt": "singer"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udfa4": {
+          "src": s1f9d11f3fe200d1f3a4,
+          "alt": "singer"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udfa4": {
+          "src": s1f9d11f3ff200d1f3a4,
+          "alt": "singer"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F3A8": {
+    "\ud83e\uddd1\u200d\ud83c\udfa8": {
       "src": s1f9d1200d1f3a8,
-      "alt": "artist"
+      "alt": "artist",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udfa8": {
+          "src": s1f9d1200d1f3a8,
+          "alt": "artist"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udfa8": {
+          "src": s1f9d11f3fb200d1f3a8,
+          "alt": "artist"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udfa8": {
+          "src": s1f9d11f3fc200d1f3a8,
+          "alt": "artist"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udfa8": {
+          "src": s1f9d11f3fd200d1f3a8,
+          "alt": "artist"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udfa8": {
+          "src": s1f9d11f3fe200d1f3a8,
+          "alt": "artist"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udfa8": {
+          "src": s1f9d11f3ff200d1f3a8,
+          "alt": "artist"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F3EB": {
+    "\ud83e\uddd1\u200d\ud83c\udfeb": {
       "src": s1f9d1200d1f3eb,
-      "alt": "teacher"
+      "alt": "teacher",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udfeb": {
+          "src": s1f9d1200d1f3eb,
+          "alt": "teacher"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udfeb": {
+          "src": s1f9d11f3fb200d1f3eb,
+          "alt": "teacher"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udfeb": {
+          "src": s1f9d11f3fc200d1f3eb,
+          "alt": "teacher"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udfeb": {
+          "src": s1f9d11f3fd200d1f3eb,
+          "alt": "teacher"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udfeb": {
+          "src": s1f9d11f3fe200d1f3eb,
+          "alt": "teacher"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udfeb": {
+          "src": s1f9d11f3ff200d1f3eb,
+          "alt": "teacher"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F3ED": {
+    "\ud83e\uddd1\u200d\ud83c\udfed": {
       "src": s1f9d1200d1f3ed,
-      "alt": "factory_worker"
+      "alt": "factory_worker",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83c\udfed": {
+          "src": s1f9d1200d1f3ed,
+          "alt": "factory_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83c\udfed": {
+          "src": s1f9d11f3fb200d1f3ed,
+          "alt": "factory_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83c\udfed": {
+          "src": s1f9d11f3fc200d1f3ed,
+          "alt": "factory_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83c\udfed": {
+          "src": s1f9d11f3fd200d1f3ed,
+          "alt": "factory_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83c\udfed": {
+          "src": s1f9d11f3fe200d1f3ed,
+          "alt": "factory_worker"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83c\udfed": {
+          "src": s1f9d11f3ff200d1f3ed,
+          "alt": "factory_worker"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F4BB": {
+    "\ud83e\uddd1\u200d\ud83d\udcbb": {
       "src": s1f9d1200d1f4bb,
-      "alt": "technologist"
+      "alt": "technologist",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83d\udcbb": {
+          "src": s1f9d1200d1f4bb,
+          "alt": "technologist"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83d\udcbb": {
+          "src": s1f9d11f3fb200d1f4bb,
+          "alt": "technologist"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83d\udcbb": {
+          "src": s1f9d11f3fc200d1f4bb,
+          "alt": "technologist"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbb": {
+          "src": s1f9d11f3fd200d1f4bb,
+          "alt": "technologist"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83d\udcbb": {
+          "src": s1f9d11f3fe200d1f4bb,
+          "alt": "technologist"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83d\udcbb": {
+          "src": s1f9d11f3ff200d1f4bb,
+          "alt": "technologist"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F4BC": {
+    "\ud83e\uddd1\u200d\ud83d\udcbc": {
       "src": s1f9d1200d1f4bc,
-      "alt": "office_worker"
+      "alt": "office_worker",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83d\udcbc": {
+          "src": s1f9d1200d1f4bc,
+          "alt": "office_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83d\udcbc": {
+          "src": s1f9d11f3fb200d1f4bc,
+          "alt": "office_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83d\udcbc": {
+          "src": s1f9d11f3fc200d1f4bc,
+          "alt": "office_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udcbc": {
+          "src": s1f9d11f3fd200d1f4bc,
+          "alt": "office_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83d\udcbc": {
+          "src": s1f9d11f3fe200d1f4bc,
+          "alt": "office_worker"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83d\udcbc": {
+          "src": s1f9d11f3ff200d1f4bc,
+          "alt": "office_worker"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F527": {
+    "\ud83e\uddd1\u200d\ud83d\udd27": {
       "src": s1f9d1200d1f527,
-      "alt": "mechanic"
+      "alt": "mechanic",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83d\udd27": {
+          "src": s1f9d1200d1f527,
+          "alt": "mechanic"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83d\udd27": {
+          "src": s1f9d11f3fb200d1f527,
+          "alt": "mechanic"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83d\udd27": {
+          "src": s1f9d11f3fc200d1f527,
+          "alt": "mechanic"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udd27": {
+          "src": s1f9d11f3fd200d1f527,
+          "alt": "mechanic"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83d\udd27": {
+          "src": s1f9d11f3fe200d1f527,
+          "alt": "mechanic"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83d\udd27": {
+          "src": s1f9d11f3ff200d1f527,
+          "alt": "mechanic"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F52C": {
+    "\ud83e\uddd1\u200d\ud83d\udd2c": {
       "src": s1f9d1200d1f52c,
-      "alt": "scientist"
+      "alt": "scientist",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83d\udd2c": {
+          "src": s1f9d1200d1f52c,
+          "alt": "scientist"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83d\udd2c": {
+          "src": s1f9d11f3fb200d1f52c,
+          "alt": "scientist"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83d\udd2c": {
+          "src": s1f9d11f3fc200d1f52c,
+          "alt": "scientist"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83d\udd2c": {
+          "src": s1f9d11f3fd200d1f52c,
+          "alt": "scientist"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83d\udd2c": {
+          "src": s1f9d11f3fe200d1f52c,
+          "alt": "scientist"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83d\udd2c": {
+          "src": s1f9d11f3ff200d1f52c,
+          "alt": "scientist"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F680": {
+    "\ud83e\uddd1\u200d\ud83d\ude80": {
       "src": s1f9d1200d1f680,
-      "alt": "astronaut"
+      "alt": "astronaut",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83d\ude80": {
+          "src": s1f9d1200d1f680,
+          "alt": "astronaut"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83d\ude80": {
+          "src": s1f9d11f3fb200d1f680,
+          "alt": "astronaut"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83d\ude80": {
+          "src": s1f9d11f3fc200d1f680,
+          "alt": "astronaut"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83d\ude80": {
+          "src": s1f9d11f3fd200d1f680,
+          "alt": "astronaut"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83d\ude80": {
+          "src": s1f9d11f3fe200d1f680,
+          "alt": "astronaut"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83d\ude80": {
+          "src": s1f9d11f3ff200d1f680,
+          "alt": "astronaut"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F692": {
+    "\ud83e\uddd1\u200d\ud83d\ude92": {
       "src": s1f9d1200d1f692,
-      "alt": "firefighter"
+      "alt": "firefighter",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83d\ude92": {
+          "src": s1f9d1200d1f692,
+          "alt": "firefighter"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83d\ude92": {
+          "src": s1f9d11f3fb200d1f692,
+          "alt": "firefighter"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83d\ude92": {
+          "src": s1f9d11f3fc200d1f692,
+          "alt": "firefighter"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83d\ude92": {
+          "src": s1f9d11f3fd200d1f692,
+          "alt": "firefighter"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83d\ude92": {
+          "src": s1f9d11f3fe200d1f692,
+          "alt": "firefighter"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83d\ude92": {
+          "src": s1f9d11f3ff200d1f692,
+          "alt": "firefighter"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F91D\u200D\u1F9D1": {
+    "\ud83e\uddd1\u200d\ud83e\udd1d\u200d\ud83e\uddd1": {
       "src": s1f9d1200d1f91d200d1f9d1,
-      "alt": "people_holding_hands"
+      "alt": "people_holding_hands",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\udd1d\u200d\ud83e\uddd1": {
+          "src": s1f9d1200d1f91d200d1f9d1,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fb200d1f91d200d1f9d11f3fb,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fb200d1f91d200d1f9d11f3fc,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fb200d1f91d200d1f9d11f3fd,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fb200d1f91d200d1f9d11f3fe,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fb200d1f91d200d1f9d11f3ff,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fc200d1f91d200d1f9d11f3fb,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fc200d1f91d200d1f9d11f3fc,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fc200d1f91d200d1f9d11f3fd,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fc200d1f91d200d1f9d11f3fe,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fc200d1f91d200d1f9d11f3ff,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fd200d1f91d200d1f9d11f3fb,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fd200d1f91d200d1f9d11f3fc,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fd200d1f91d200d1f9d11f3fd,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fd200d1f91d200d1f9d11f3fe,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fd200d1f91d200d1f9d11f3ff,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fe200d1f91d200d1f9d11f3fb,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fe200d1f91d200d1f9d11f3fc,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fe200d1f91d200d1f9d11f3fd,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fe200d1f91d200d1f9d11f3fe,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3fe200d1f91d200d1f9d11f3ff,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3ff200d1f91d200d1f9d11f3fb,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3ff200d1f91d200d1f9d11f3fc,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3ff200d1f91d200d1f9d11f3fd,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3ff200d1f91d200d1f9d11f3fe,
+          "alt": "people_holding_hands"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\udd1d\u200d\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3ff200d1f91d200d1f9d11f3ff,
+          "alt": "people_holding_hands"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F9AF": {
+    "\ud83e\uddd1\u200d\ud83e\uddaf": {
       "src": s1f9d1200d1f9af,
-      "alt": "person_with_probing_cane"
+      "alt": "person_with_probing_cane",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\uddaf": {
+          "src": s1f9d1200d1f9af,
+          "alt": "person_with_probing_cane"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\uddaf": {
+          "src": s1f9d11f3fb200d1f9af,
+          "alt": "person_with_probing_cane"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\uddaf": {
+          "src": s1f9d11f3fc200d1f9af,
+          "alt": "person_with_probing_cane"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\uddaf": {
+          "src": s1f9d11f3fd200d1f9af,
+          "alt": "person_with_probing_cane"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\uddaf": {
+          "src": s1f9d11f3fe200d1f9af,
+          "alt": "person_with_probing_cane"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\uddaf": {
+          "src": s1f9d11f3ff200d1f9af,
+          "alt": "person_with_probing_cane"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F9B0": {
+    "\ud83e\uddd1\u200d\ud83e\uddb0": {
       "src": s1f9d1200d1f9b0,
-      "alt": "red_haired_person"
+      "alt": "red_haired_person",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\uddb0": {
+          "src": s1f9d1200d1f9b0,
+          "alt": "red_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\uddb0": {
+          "src": s1f9d11f3fb200d1f9b0,
+          "alt": "red_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\uddb0": {
+          "src": s1f9d11f3fc200d1f9b0,
+          "alt": "red_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\uddb0": {
+          "src": s1f9d11f3fd200d1f9b0,
+          "alt": "red_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\uddb0": {
+          "src": s1f9d11f3fe200d1f9b0,
+          "alt": "red_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\uddb0": {
+          "src": s1f9d11f3ff200d1f9b0,
+          "alt": "red_haired_person"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F9B1": {
+    "\ud83e\uddd1\u200d\ud83e\uddb1": {
       "src": s1f9d1200d1f9b1,
-      "alt": "curly_haired_person"
+      "alt": "curly_haired_person",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\uddb1": {
+          "src": s1f9d1200d1f9b1,
+          "alt": "curly_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\uddb1": {
+          "src": s1f9d11f3fb200d1f9b1,
+          "alt": "curly_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\uddb1": {
+          "src": s1f9d11f3fc200d1f9b1,
+          "alt": "curly_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\uddb1": {
+          "src": s1f9d11f3fd200d1f9b1,
+          "alt": "curly_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\uddb1": {
+          "src": s1f9d11f3fe200d1f9b1,
+          "alt": "curly_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\uddb1": {
+          "src": s1f9d11f3ff200d1f9b1,
+          "alt": "curly_haired_person"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F9B2": {
+    "\ud83e\uddd1\u200d\ud83e\uddb2": {
       "src": s1f9d1200d1f9b2,
-      "alt": "bald_person"
+      "alt": "bald_person",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\uddb2": {
+          "src": s1f9d1200d1f9b2,
+          "alt": "bald_person"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\uddb2": {
+          "src": s1f9d11f3fb200d1f9b2,
+          "alt": "bald_person"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\uddb2": {
+          "src": s1f9d11f3fc200d1f9b2,
+          "alt": "bald_person"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\uddb2": {
+          "src": s1f9d11f3fd200d1f9b2,
+          "alt": "bald_person"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\uddb2": {
+          "src": s1f9d11f3fe200d1f9b2,
+          "alt": "bald_person"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\uddb2": {
+          "src": s1f9d11f3ff200d1f9b2,
+          "alt": "bald_person"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F9B3": {
+    "\ud83e\uddd1\u200d\ud83e\uddb3": {
       "src": s1f9d1200d1f9b3,
-      "alt": "white_haired_person"
+      "alt": "white_haired_person",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\uddb3": {
+          "src": s1f9d1200d1f9b3,
+          "alt": "white_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\uddb3": {
+          "src": s1f9d11f3fb200d1f9b3,
+          "alt": "white_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\uddb3": {
+          "src": s1f9d11f3fc200d1f9b3,
+          "alt": "white_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\uddb3": {
+          "src": s1f9d11f3fd200d1f9b3,
+          "alt": "white_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\uddb3": {
+          "src": s1f9d11f3fe200d1f9b3,
+          "alt": "white_haired_person"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\uddb3": {
+          "src": s1f9d11f3ff200d1f9b3,
+          "alt": "white_haired_person"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F9BC": {
+    "\ud83e\uddd1\u200d\ud83e\uddbc": {
       "src": s1f9d1200d1f9bc,
-      "alt": "person_in_motorized_wheelchair"
+      "alt": "person_in_motorized_wheelchair",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\uddbc": {
+          "src": s1f9d1200d1f9bc,
+          "alt": "person_in_motorized_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\uddbc": {
+          "src": s1f9d11f3fb200d1f9bc,
+          "alt": "person_in_motorized_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\uddbc": {
+          "src": s1f9d11f3fc200d1f9bc,
+          "alt": "person_in_motorized_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\uddbc": {
+          "src": s1f9d11f3fd200d1f9bc,
+          "alt": "person_in_motorized_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\uddbc": {
+          "src": s1f9d11f3fe200d1f9bc,
+          "alt": "person_in_motorized_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\uddbc": {
+          "src": s1f9d11f3ff200d1f9bc,
+          "alt": "person_in_motorized_wheelchair"
+        }
+      }
     },
-    "\u1F9D1\u200D\u1F9BD": {
+    "\ud83e\uddd1\u200d\ud83e\uddbd": {
       "src": s1f9d1200d1f9bd,
-      "alt": "person_in_manual_wheelchair"
+      "alt": "person_in_manual_wheelchair",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\ud83e\uddbd": {
+          "src": s1f9d1200d1f9bd,
+          "alt": "person_in_manual_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\ud83e\uddbd": {
+          "src": s1f9d11f3fb200d1f9bd,
+          "alt": "person_in_manual_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\ud83e\uddbd": {
+          "src": s1f9d11f3fc200d1f9bd,
+          "alt": "person_in_manual_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\ud83e\uddbd": {
+          "src": s1f9d11f3fd200d1f9bd,
+          "alt": "person_in_manual_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\ud83e\uddbd": {
+          "src": s1f9d11f3fe200d1f9bd,
+          "alt": "person_in_manual_wheelchair"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\ud83e\uddbd": {
+          "src": s1f9d11f3ff200d1f9bd,
+          "alt": "person_in_manual_wheelchair"
+        }
+      }
     },
-    "\u1F9D1\u200D\u2695\uFE0F": {
+    "\ud83e\uddd1\u200d\u2695\ufe0f": {
       "src": s1f9d1200d2695fe0f,
-      "alt": "health_worker"
+      "alt": "health_worker",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\u2695\ufe0f": {
+          "src": s1f9d1200d2695fe0f,
+          "alt": "health_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2695\ufe0f": {
+          "src": s1f9d11f3fb200d2695fe0f,
+          "alt": "health_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2695\ufe0f": {
+          "src": s1f9d11f3fc200d2695fe0f,
+          "alt": "health_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2695\ufe0f": {
+          "src": s1f9d11f3fd200d2695fe0f,
+          "alt": "health_worker"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2695\ufe0f": {
+          "src": s1f9d11f3fe200d2695fe0f,
+          "alt": "health_worker"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2695\ufe0f": {
+          "src": s1f9d11f3ff200d2695fe0f,
+          "alt": "health_worker"
+        }
+      }
     },
-    "\u1F9D1\u200D\u2696\uFE0F": {
+    "\ud83e\uddd1\u200d\u2696\ufe0f": {
       "src": s1f9d1200d2696fe0f,
-      "alt": "judge"
+      "alt": "judge",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\u2696\ufe0f": {
+          "src": s1f9d1200d2696fe0f,
+          "alt": "judge"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2696\ufe0f": {
+          "src": s1f9d11f3fb200d2696fe0f,
+          "alt": "judge"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2696\ufe0f": {
+          "src": s1f9d11f3fc200d2696fe0f,
+          "alt": "judge"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2696\ufe0f": {
+          "src": s1f9d11f3fd200d2696fe0f,
+          "alt": "judge"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2696\ufe0f": {
+          "src": s1f9d11f3fe200d2696fe0f,
+          "alt": "judge"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2696\ufe0f": {
+          "src": s1f9d11f3ff200d2696fe0f,
+          "alt": "judge"
+        }
+      }
     },
-    "\u1F9D1\u200D\u2708\uFE0F": {
+    "\ud83e\uddd1\u200d\u2708\ufe0f": {
       "src": s1f9d1200d2708fe0f,
-      "alt": "pilot"
+      "alt": "pilot",
+      "skinVariations": {
+        "\ud83e\uddd1\u200d\u2708\ufe0f": {
+          "src": s1f9d1200d2708fe0f,
+          "alt": "pilot"
+        },
+        "\ud83e\uddd1\ud83c\udffb\u200d\u2708\ufe0f": {
+          "src": s1f9d11f3fb200d2708fe0f,
+          "alt": "pilot"
+        },
+        "\ud83e\uddd1\ud83c\udffc\u200d\u2708\ufe0f": {
+          "src": s1f9d11f3fc200d2708fe0f,
+          "alt": "pilot"
+        },
+        "\ud83e\uddd1\ud83c\udffd\u200d\u2708\ufe0f": {
+          "src": s1f9d11f3fd200d2708fe0f,
+          "alt": "pilot"
+        },
+        "\ud83e\uddd1\ud83c\udffe\u200d\u2708\ufe0f": {
+          "src": s1f9d11f3fe200d2708fe0f,
+          "alt": "pilot"
+        },
+        "\ud83e\uddd1\ud83c\udfff\u200d\u2708\ufe0f": {
+          "src": s1f9d11f3ff200d2708fe0f,
+          "alt": "pilot"
+        }
+      }
     },
-    "\u1F9D1": {
+    "\ud83e\uddd1": {
       "src": s1f9d1,
-      "alt": "adult"
+      "alt": "adult",
+      "skinVariations": {
+        "\ud83e\uddd1": {
+          "src": s1f9d1,
+          "alt": "adult"
+        },
+        "\ud83e\uddd1\ud83c\udffb": {
+          "src": s1f9d11f3fb,
+          "alt": "adult"
+        },
+        "\ud83e\uddd1\ud83c\udffc": {
+          "src": s1f9d11f3fc,
+          "alt": "adult"
+        },
+        "\ud83e\uddd1\ud83c\udffd": {
+          "src": s1f9d11f3fd,
+          "alt": "adult"
+        },
+        "\ud83e\uddd1\ud83c\udffe": {
+          "src": s1f9d11f3fe,
+          "alt": "adult"
+        },
+        "\ud83e\uddd1\ud83c\udfff": {
+          "src": s1f9d11f3ff,
+          "alt": "adult"
+        }
+      }
     },
-    "\u1F9D2": {
+    "\ud83e\uddd2": {
       "src": s1f9d2,
-      "alt": "child"
+      "alt": "child",
+      "skinVariations": {
+        "\ud83e\uddd2": {
+          "src": s1f9d2,
+          "alt": "child"
+        },
+        "\ud83e\uddd2\ud83c\udffb": {
+          "src": s1f9d21f3fb,
+          "alt": "child"
+        },
+        "\ud83e\uddd2\ud83c\udffc": {
+          "src": s1f9d21f3fc,
+          "alt": "child"
+        },
+        "\ud83e\uddd2\ud83c\udffd": {
+          "src": s1f9d21f3fd,
+          "alt": "child"
+        },
+        "\ud83e\uddd2\ud83c\udffe": {
+          "src": s1f9d21f3fe,
+          "alt": "child"
+        },
+        "\ud83e\uddd2\ud83c\udfff": {
+          "src": s1f9d21f3ff,
+          "alt": "child"
+        }
+      }
     },
-    "\u1F9D3": {
+    "\ud83e\uddd3": {
       "src": s1f9d3,
-      "alt": "older_adult"
+      "alt": "older_adult",
+      "skinVariations": {
+        "\ud83e\uddd3": {
+          "src": s1f9d3,
+          "alt": "older_adult"
+        },
+        "\ud83e\uddd3\ud83c\udffb": {
+          "src": s1f9d31f3fb,
+          "alt": "older_adult"
+        },
+        "\ud83e\uddd3\ud83c\udffc": {
+          "src": s1f9d31f3fc,
+          "alt": "older_adult"
+        },
+        "\ud83e\uddd3\ud83c\udffd": {
+          "src": s1f9d31f3fd,
+          "alt": "older_adult"
+        },
+        "\ud83e\uddd3\ud83c\udffe": {
+          "src": s1f9d31f3fe,
+          "alt": "older_adult"
+        },
+        "\ud83e\uddd3\ud83c\udfff": {
+          "src": s1f9d31f3ff,
+          "alt": "older_adult"
+        }
+      }
     },
-    "\u1F9D4\u200D\u2640\uFE0F": {
+    "\ud83e\uddd4\u200d\u2640\ufe0f": {
       "src": s1f9d4200d2640fe0f,
-      "alt": "woman_with_beard"
+      "alt": "woman_with_beard",
+      "skinVariations": {
+        "\ud83e\uddd4\u200d\u2640\ufe0f": {
+          "src": s1f9d4200d2640fe0f,
+          "alt": "woman_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9d41f3fb200d2640fe0f,
+          "alt": "woman_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9d41f3fc200d2640fe0f,
+          "alt": "woman_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9d41f3fd200d2640fe0f,
+          "alt": "woman_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9d41f3fe200d2640fe0f,
+          "alt": "woman_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9d41f3ff200d2640fe0f,
+          "alt": "woman_with_beard"
+        }
+      }
     },
-    "\u1F9D4\u200D\u2642\uFE0F": {
+    "\ud83e\uddd4\u200d\u2642\ufe0f": {
       "src": s1f9d4200d2642fe0f,
-      "alt": "man_with_beard"
+      "alt": "man_with_beard",
+      "skinVariations": {
+        "\ud83e\uddd4\u200d\u2642\ufe0f": {
+          "src": s1f9d4200d2642fe0f,
+          "alt": "man_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9d41f3fb200d2642fe0f,
+          "alt": "man_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9d41f3fc200d2642fe0f,
+          "alt": "man_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9d41f3fd200d2642fe0f,
+          "alt": "man_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9d41f3fe200d2642fe0f,
+          "alt": "man_with_beard"
+        },
+        "\ud83e\uddd4\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9d41f3ff200d2642fe0f,
+          "alt": "man_with_beard"
+        }
+      }
     },
-    "\u1F9D4": {
+    "\ud83e\uddd4": {
       "src": s1f9d4,
-      "alt": "bearded_person"
+      "alt": "bearded_person",
+      "skinVariations": {
+        "\ud83e\uddd4": {
+          "src": s1f9d4,
+          "alt": "bearded_person"
+        },
+        "\ud83e\uddd4\ud83c\udffb": {
+          "src": s1f9d41f3fb,
+          "alt": "bearded_person"
+        },
+        "\ud83e\uddd4\ud83c\udffc": {
+          "src": s1f9d41f3fc,
+          "alt": "bearded_person"
+        },
+        "\ud83e\uddd4\ud83c\udffd": {
+          "src": s1f9d41f3fd,
+          "alt": "bearded_person"
+        },
+        "\ud83e\uddd4\ud83c\udffe": {
+          "src": s1f9d41f3fe,
+          "alt": "bearded_person"
+        },
+        "\ud83e\uddd4\ud83c\udfff": {
+          "src": s1f9d41f3ff,
+          "alt": "bearded_person"
+        }
+      }
     },
-    "\u1F9D5": {
+    "\ud83e\uddd5": {
       "src": s1f9d5,
-      "alt": "person_with_headscarf"
+      "alt": "person_with_headscarf",
+      "skinVariations": {
+        "\ud83e\uddd5": {
+          "src": s1f9d5,
+          "alt": "person_with_headscarf"
+        },
+        "\ud83e\uddd5\ud83c\udffb": {
+          "src": s1f9d51f3fb,
+          "alt": "person_with_headscarf"
+        },
+        "\ud83e\uddd5\ud83c\udffc": {
+          "src": s1f9d51f3fc,
+          "alt": "person_with_headscarf"
+        },
+        "\ud83e\uddd5\ud83c\udffd": {
+          "src": s1f9d51f3fd,
+          "alt": "person_with_headscarf"
+        },
+        "\ud83e\uddd5\ud83c\udffe": {
+          "src": s1f9d51f3fe,
+          "alt": "person_with_headscarf"
+        },
+        "\ud83e\uddd5\ud83c\udfff": {
+          "src": s1f9d51f3ff,
+          "alt": "person_with_headscarf"
+        }
+      }
     },
-    "\u1F9D6\u200D\u2640\uFE0F": {
+    "\ud83e\uddd6\u200d\u2640\ufe0f": {
       "src": s1f9d6200d2640fe0f,
-      "alt": "woman_in_steamy_room"
+      "alt": "woman_in_steamy_room",
+      "skinVariations": {
+        "\ud83e\uddd6\u200d\u2640\ufe0f": {
+          "src": s1f9d6200d2640fe0f,
+          "alt": "woman_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9d61f3fb200d2640fe0f,
+          "alt": "woman_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9d61f3fc200d2640fe0f,
+          "alt": "woman_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9d61f3fd200d2640fe0f,
+          "alt": "woman_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9d61f3fe200d2640fe0f,
+          "alt": "woman_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9d61f3ff200d2640fe0f,
+          "alt": "woman_in_steamy_room"
+        }
+      }
     },
-    "\u1F9D6\u200D\u2642\uFE0F": {
+    "\ud83e\uddd6\u200d\u2642\ufe0f": {
       "src": s1f9d6200d2642fe0f,
-      "alt": "man_in_steamy_room"
+      "alt": "man_in_steamy_room",
+      "skinVariations": {
+        "\ud83e\uddd6\u200d\u2642\ufe0f": {
+          "src": s1f9d6200d2642fe0f,
+          "alt": "man_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9d61f3fb200d2642fe0f,
+          "alt": "man_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9d61f3fc200d2642fe0f,
+          "alt": "man_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9d61f3fd200d2642fe0f,
+          "alt": "man_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9d61f3fe200d2642fe0f,
+          "alt": "man_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9d61f3ff200d2642fe0f,
+          "alt": "man_in_steamy_room"
+        }
+      }
     },
-    "\u1F9D6": {
+    "\ud83e\uddd6": {
       "src": s1f9d6,
-      "alt": "person_in_steamy_room"
+      "alt": "person_in_steamy_room",
+      "skinVariations": {
+        "\ud83e\uddd6": {
+          "src": s1f9d6,
+          "alt": "person_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffb": {
+          "src": s1f9d61f3fb,
+          "alt": "person_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffc": {
+          "src": s1f9d61f3fc,
+          "alt": "person_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffd": {
+          "src": s1f9d61f3fd,
+          "alt": "person_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udffe": {
+          "src": s1f9d61f3fe,
+          "alt": "person_in_steamy_room"
+        },
+        "\ud83e\uddd6\ud83c\udfff": {
+          "src": s1f9d61f3ff,
+          "alt": "person_in_steamy_room"
+        }
+      }
     },
-    "\u1F9D7\u200D\u2640\uFE0F": {
+    "\ud83e\uddd7\u200d\u2640\ufe0f": {
       "src": s1f9d7200d2640fe0f,
-      "alt": "woman_climbing"
+      "alt": "woman_climbing",
+      "skinVariations": {
+        "\ud83e\uddd7\u200d\u2640\ufe0f": {
+          "src": s1f9d7200d2640fe0f,
+          "alt": "woman_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9d71f3fb200d2640fe0f,
+          "alt": "woman_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9d71f3fc200d2640fe0f,
+          "alt": "woman_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9d71f3fd200d2640fe0f,
+          "alt": "woman_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9d71f3fe200d2640fe0f,
+          "alt": "woman_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9d71f3ff200d2640fe0f,
+          "alt": "woman_climbing"
+        }
+      }
     },
-    "\u1F9D7\u200D\u2642\uFE0F": {
+    "\ud83e\uddd7\u200d\u2642\ufe0f": {
       "src": s1f9d7200d2642fe0f,
-      "alt": "man_climbing"
+      "alt": "man_climbing",
+      "skinVariations": {
+        "\ud83e\uddd7\u200d\u2642\ufe0f": {
+          "src": s1f9d7200d2642fe0f,
+          "alt": "man_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9d71f3fb200d2642fe0f,
+          "alt": "man_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9d71f3fc200d2642fe0f,
+          "alt": "man_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9d71f3fd200d2642fe0f,
+          "alt": "man_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9d71f3fe200d2642fe0f,
+          "alt": "man_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9d71f3ff200d2642fe0f,
+          "alt": "man_climbing"
+        }
+      }
     },
-    "\u1F9D7": {
+    "\ud83e\uddd7": {
       "src": s1f9d7,
-      "alt": "person_climbing"
+      "alt": "person_climbing",
+      "skinVariations": {
+        "\ud83e\uddd7": {
+          "src": s1f9d7,
+          "alt": "person_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffb": {
+          "src": s1f9d71f3fb,
+          "alt": "person_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffc": {
+          "src": s1f9d71f3fc,
+          "alt": "person_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffd": {
+          "src": s1f9d71f3fd,
+          "alt": "person_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udffe": {
+          "src": s1f9d71f3fe,
+          "alt": "person_climbing"
+        },
+        "\ud83e\uddd7\ud83c\udfff": {
+          "src": s1f9d71f3ff,
+          "alt": "person_climbing"
+        }
+      }
     },
-    "\u1F9D8\u200D\u2640\uFE0F": {
+    "\ud83e\uddd8\u200d\u2640\ufe0f": {
       "src": s1f9d8200d2640fe0f,
-      "alt": "woman_in_lotus_position"
+      "alt": "woman_in_lotus_position",
+      "skinVariations": {
+        "\ud83e\uddd8\u200d\u2640\ufe0f": {
+          "src": s1f9d8200d2640fe0f,
+          "alt": "woman_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9d81f3fb200d2640fe0f,
+          "alt": "woman_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9d81f3fc200d2640fe0f,
+          "alt": "woman_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9d81f3fd200d2640fe0f,
+          "alt": "woman_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9d81f3fe200d2640fe0f,
+          "alt": "woman_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9d81f3ff200d2640fe0f,
+          "alt": "woman_in_lotus_position"
+        }
+      }
     },
-    "\u1F9D8\u200D\u2642\uFE0F": {
+    "\ud83e\uddd8\u200d\u2642\ufe0f": {
       "src": s1f9d8200d2642fe0f,
-      "alt": "man_in_lotus_position"
+      "alt": "man_in_lotus_position",
+      "skinVariations": {
+        "\ud83e\uddd8\u200d\u2642\ufe0f": {
+          "src": s1f9d8200d2642fe0f,
+          "alt": "man_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9d81f3fb200d2642fe0f,
+          "alt": "man_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9d81f3fc200d2642fe0f,
+          "alt": "man_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9d81f3fd200d2642fe0f,
+          "alt": "man_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9d81f3fe200d2642fe0f,
+          "alt": "man_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9d81f3ff200d2642fe0f,
+          "alt": "man_in_lotus_position"
+        }
+      }
     },
-    "\u1F9D8": {
+    "\ud83e\uddd8": {
       "src": s1f9d8,
-      "alt": "person_in_lotus_position"
+      "alt": "person_in_lotus_position",
+      "skinVariations": {
+        "\ud83e\uddd8": {
+          "src": s1f9d8,
+          "alt": "person_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffb": {
+          "src": s1f9d81f3fb,
+          "alt": "person_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffc": {
+          "src": s1f9d81f3fc,
+          "alt": "person_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffd": {
+          "src": s1f9d81f3fd,
+          "alt": "person_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udffe": {
+          "src": s1f9d81f3fe,
+          "alt": "person_in_lotus_position"
+        },
+        "\ud83e\uddd8\ud83c\udfff": {
+          "src": s1f9d81f3ff,
+          "alt": "person_in_lotus_position"
+        }
+      }
     },
-    "\u1F9D9\u200D\u2640\uFE0F": {
+    "\ud83e\uddd9\u200d\u2640\ufe0f": {
       "src": s1f9d9200d2640fe0f,
-      "alt": "female_mage"
+      "alt": "female_mage",
+      "skinVariations": {
+        "\ud83e\uddd9\u200d\u2640\ufe0f": {
+          "src": s1f9d9200d2640fe0f,
+          "alt": "female_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9d91f3fb200d2640fe0f,
+          "alt": "female_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9d91f3fc200d2640fe0f,
+          "alt": "female_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9d91f3fd200d2640fe0f,
+          "alt": "female_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9d91f3fe200d2640fe0f,
+          "alt": "female_mage"
+        },
+        "\ud83e\uddd9\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9d91f3ff200d2640fe0f,
+          "alt": "female_mage"
+        }
+      }
     },
-    "\u1F9D9\u200D\u2642\uFE0F": {
+    "\ud83e\uddd9\u200d\u2642\ufe0f": {
       "src": s1f9d9200d2642fe0f,
-      "alt": "male_mage"
+      "alt": "male_mage",
+      "skinVariations": {
+        "\ud83e\uddd9\u200d\u2642\ufe0f": {
+          "src": s1f9d9200d2642fe0f,
+          "alt": "male_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9d91f3fb200d2642fe0f,
+          "alt": "male_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9d91f3fc200d2642fe0f,
+          "alt": "male_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9d91f3fd200d2642fe0f,
+          "alt": "male_mage"
+        },
+        "\ud83e\uddd9\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9d91f3fe200d2642fe0f,
+          "alt": "male_mage"
+        },
+        "\ud83e\uddd9\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9d91f3ff200d2642fe0f,
+          "alt": "male_mage"
+        }
+      }
     },
-    "\u1F9D9": {
+    "\ud83e\uddd9": {
       "src": s1f9d9,
-      "alt": "mage"
+      "alt": "mage",
+      "skinVariations": {
+        "\ud83e\uddd9": {
+          "src": s1f9d9,
+          "alt": "mage"
+        },
+        "\ud83e\uddd9\ud83c\udffb": {
+          "src": s1f9d91f3fb,
+          "alt": "mage"
+        },
+        "\ud83e\uddd9\ud83c\udffc": {
+          "src": s1f9d91f3fc,
+          "alt": "mage"
+        },
+        "\ud83e\uddd9\ud83c\udffd": {
+          "src": s1f9d91f3fd,
+          "alt": "mage"
+        },
+        "\ud83e\uddd9\ud83c\udffe": {
+          "src": s1f9d91f3fe,
+          "alt": "mage"
+        },
+        "\ud83e\uddd9\ud83c\udfff": {
+          "src": s1f9d91f3ff,
+          "alt": "mage"
+        }
+      }
     },
-    "\u1F9DA\u200D\u2640\uFE0F": {
+    "\ud83e\uddda\u200d\u2640\ufe0f": {
       "src": s1f9da200d2640fe0f,
-      "alt": "female_fairy"
+      "alt": "female_fairy",
+      "skinVariations": {
+        "\ud83e\uddda\u200d\u2640\ufe0f": {
+          "src": s1f9da200d2640fe0f,
+          "alt": "female_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9da1f3fb200d2640fe0f,
+          "alt": "female_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9da1f3fc200d2640fe0f,
+          "alt": "female_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9da1f3fd200d2640fe0f,
+          "alt": "female_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9da1f3fe200d2640fe0f,
+          "alt": "female_fairy"
+        },
+        "\ud83e\uddda\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9da1f3ff200d2640fe0f,
+          "alt": "female_fairy"
+        }
+      }
     },
-    "\u1F9DA\u200D\u2642\uFE0F": {
+    "\ud83e\uddda\u200d\u2642\ufe0f": {
       "src": s1f9da200d2642fe0f,
-      "alt": "male_fairy"
+      "alt": "male_fairy",
+      "skinVariations": {
+        "\ud83e\uddda\u200d\u2642\ufe0f": {
+          "src": s1f9da200d2642fe0f,
+          "alt": "male_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9da1f3fb200d2642fe0f,
+          "alt": "male_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9da1f3fc200d2642fe0f,
+          "alt": "male_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9da1f3fd200d2642fe0f,
+          "alt": "male_fairy"
+        },
+        "\ud83e\uddda\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9da1f3fe200d2642fe0f,
+          "alt": "male_fairy"
+        },
+        "\ud83e\uddda\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9da1f3ff200d2642fe0f,
+          "alt": "male_fairy"
+        }
+      }
     },
-    "\u1F9DA": {
+    "\ud83e\uddda": {
       "src": s1f9da,
-      "alt": "fairy"
+      "alt": "fairy",
+      "skinVariations": {
+        "\ud83e\uddda": {
+          "src": s1f9da,
+          "alt": "fairy"
+        },
+        "\ud83e\uddda\ud83c\udffb": {
+          "src": s1f9da1f3fb,
+          "alt": "fairy"
+        },
+        "\ud83e\uddda\ud83c\udffc": {
+          "src": s1f9da1f3fc,
+          "alt": "fairy"
+        },
+        "\ud83e\uddda\ud83c\udffd": {
+          "src": s1f9da1f3fd,
+          "alt": "fairy"
+        },
+        "\ud83e\uddda\ud83c\udffe": {
+          "src": s1f9da1f3fe,
+          "alt": "fairy"
+        },
+        "\ud83e\uddda\ud83c\udfff": {
+          "src": s1f9da1f3ff,
+          "alt": "fairy"
+        }
+      }
     },
-    "\u1F9DB\u200D\u2640\uFE0F": {
+    "\ud83e\udddb\u200d\u2640\ufe0f": {
       "src": s1f9db200d2640fe0f,
-      "alt": "female_vampire"
+      "alt": "female_vampire",
+      "skinVariations": {
+        "\ud83e\udddb\u200d\u2640\ufe0f": {
+          "src": s1f9db200d2640fe0f,
+          "alt": "female_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9db1f3fb200d2640fe0f,
+          "alt": "female_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9db1f3fc200d2640fe0f,
+          "alt": "female_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9db1f3fd200d2640fe0f,
+          "alt": "female_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9db1f3fe200d2640fe0f,
+          "alt": "female_vampire"
+        },
+        "\ud83e\udddb\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9db1f3ff200d2640fe0f,
+          "alt": "female_vampire"
+        }
+      }
     },
-    "\u1F9DB\u200D\u2642\uFE0F": {
+    "\ud83e\udddb\u200d\u2642\ufe0f": {
       "src": s1f9db200d2642fe0f,
-      "alt": "male_vampire"
+      "alt": "male_vampire",
+      "skinVariations": {
+        "\ud83e\udddb\u200d\u2642\ufe0f": {
+          "src": s1f9db200d2642fe0f,
+          "alt": "male_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9db1f3fb200d2642fe0f,
+          "alt": "male_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9db1f3fc200d2642fe0f,
+          "alt": "male_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9db1f3fd200d2642fe0f,
+          "alt": "male_vampire"
+        },
+        "\ud83e\udddb\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9db1f3fe200d2642fe0f,
+          "alt": "male_vampire"
+        },
+        "\ud83e\udddb\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9db1f3ff200d2642fe0f,
+          "alt": "male_vampire"
+        }
+      }
     },
-    "\u1F9DB": {
+    "\ud83e\udddb": {
       "src": s1f9db,
-      "alt": "vampire"
+      "alt": "vampire",
+      "skinVariations": {
+        "\ud83e\udddb": {
+          "src": s1f9db,
+          "alt": "vampire"
+        },
+        "\ud83e\udddb\ud83c\udffb": {
+          "src": s1f9db1f3fb,
+          "alt": "vampire"
+        },
+        "\ud83e\udddb\ud83c\udffc": {
+          "src": s1f9db1f3fc,
+          "alt": "vampire"
+        },
+        "\ud83e\udddb\ud83c\udffd": {
+          "src": s1f9db1f3fd,
+          "alt": "vampire"
+        },
+        "\ud83e\udddb\ud83c\udffe": {
+          "src": s1f9db1f3fe,
+          "alt": "vampire"
+        },
+        "\ud83e\udddb\ud83c\udfff": {
+          "src": s1f9db1f3ff,
+          "alt": "vampire"
+        }
+      }
     },
-    "\u1F9DC\u200D\u2640\uFE0F": {
+    "\ud83e\udddc\u200d\u2640\ufe0f": {
       "src": s1f9dc200d2640fe0f,
-      "alt": "mermaid"
+      "alt": "mermaid",
+      "skinVariations": {
+        "\ud83e\udddc\u200d\u2640\ufe0f": {
+          "src": s1f9dc200d2640fe0f,
+          "alt": "mermaid"
+        },
+        "\ud83e\udddc\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9dc1f3fb200d2640fe0f,
+          "alt": "mermaid"
+        },
+        "\ud83e\udddc\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9dc1f3fc200d2640fe0f,
+          "alt": "mermaid"
+        },
+        "\ud83e\udddc\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9dc1f3fd200d2640fe0f,
+          "alt": "mermaid"
+        },
+        "\ud83e\udddc\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9dc1f3fe200d2640fe0f,
+          "alt": "mermaid"
+        },
+        "\ud83e\udddc\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9dc1f3ff200d2640fe0f,
+          "alt": "mermaid"
+        }
+      }
     },
-    "\u1F9DC\u200D\u2642\uFE0F": {
+    "\ud83e\udddc\u200d\u2642\ufe0f": {
       "src": s1f9dc200d2642fe0f,
-      "alt": "merman"
+      "alt": "merman",
+      "skinVariations": {
+        "\ud83e\udddc\u200d\u2642\ufe0f": {
+          "src": s1f9dc200d2642fe0f,
+          "alt": "merman"
+        },
+        "\ud83e\udddc\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9dc1f3fb200d2642fe0f,
+          "alt": "merman"
+        },
+        "\ud83e\udddc\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9dc1f3fc200d2642fe0f,
+          "alt": "merman"
+        },
+        "\ud83e\udddc\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9dc1f3fd200d2642fe0f,
+          "alt": "merman"
+        },
+        "\ud83e\udddc\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9dc1f3fe200d2642fe0f,
+          "alt": "merman"
+        },
+        "\ud83e\udddc\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9dc1f3ff200d2642fe0f,
+          "alt": "merman"
+        }
+      }
     },
-    "\u1F9DC": {
+    "\ud83e\udddc": {
       "src": s1f9dc,
-      "alt": "merperson"
+      "alt": "merperson",
+      "skinVariations": {
+        "\ud83e\udddc": {
+          "src": s1f9dc,
+          "alt": "merperson"
+        },
+        "\ud83e\udddc\ud83c\udffb": {
+          "src": s1f9dc1f3fb,
+          "alt": "merperson"
+        },
+        "\ud83e\udddc\ud83c\udffc": {
+          "src": s1f9dc1f3fc,
+          "alt": "merperson"
+        },
+        "\ud83e\udddc\ud83c\udffd": {
+          "src": s1f9dc1f3fd,
+          "alt": "merperson"
+        },
+        "\ud83e\udddc\ud83c\udffe": {
+          "src": s1f9dc1f3fe,
+          "alt": "merperson"
+        },
+        "\ud83e\udddc\ud83c\udfff": {
+          "src": s1f9dc1f3ff,
+          "alt": "merperson"
+        }
+      }
     },
-    "\u1F9DD\u200D\u2640\uFE0F": {
+    "\ud83e\udddd\u200d\u2640\ufe0f": {
       "src": s1f9dd200d2640fe0f,
-      "alt": "female_elf"
+      "alt": "female_elf",
+      "skinVariations": {
+        "\ud83e\udddd\u200d\u2640\ufe0f": {
+          "src": s1f9dd200d2640fe0f,
+          "alt": "female_elf"
+        },
+        "\ud83e\udddd\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s1f9dd1f3fb200d2640fe0f,
+          "alt": "female_elf"
+        },
+        "\ud83e\udddd\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s1f9dd1f3fc200d2640fe0f,
+          "alt": "female_elf"
+        },
+        "\ud83e\udddd\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s1f9dd1f3fd200d2640fe0f,
+          "alt": "female_elf"
+        },
+        "\ud83e\udddd\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s1f9dd1f3fe200d2640fe0f,
+          "alt": "female_elf"
+        },
+        "\ud83e\udddd\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s1f9dd1f3ff200d2640fe0f,
+          "alt": "female_elf"
+        }
+      }
     },
-    "\u1F9DD\u200D\u2642\uFE0F": {
+    "\ud83e\udddd\u200d\u2642\ufe0f": {
       "src": s1f9dd200d2642fe0f,
-      "alt": "male_elf"
+      "alt": "male_elf",
+      "skinVariations": {
+        "\ud83e\udddd\u200d\u2642\ufe0f": {
+          "src": s1f9dd200d2642fe0f,
+          "alt": "male_elf"
+        },
+        "\ud83e\udddd\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s1f9dd1f3fb200d2642fe0f,
+          "alt": "male_elf"
+        },
+        "\ud83e\udddd\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s1f9dd1f3fc200d2642fe0f,
+          "alt": "male_elf"
+        },
+        "\ud83e\udddd\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s1f9dd1f3fd200d2642fe0f,
+          "alt": "male_elf"
+        },
+        "\ud83e\udddd\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s1f9dd1f3fe200d2642fe0f,
+          "alt": "male_elf"
+        },
+        "\ud83e\udddd\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s1f9dd1f3ff200d2642fe0f,
+          "alt": "male_elf"
+        }
+      }
     },
-    "\u1F9DD": {
+    "\ud83e\udddd": {
       "src": s1f9dd,
-      "alt": "elf"
+      "alt": "elf",
+      "skinVariations": {
+        "\ud83e\udddd": {
+          "src": s1f9dd,
+          "alt": "elf"
+        },
+        "\ud83e\udddd\ud83c\udffb": {
+          "src": s1f9dd1f3fb,
+          "alt": "elf"
+        },
+        "\ud83e\udddd\ud83c\udffc": {
+          "src": s1f9dd1f3fc,
+          "alt": "elf"
+        },
+        "\ud83e\udddd\ud83c\udffd": {
+          "src": s1f9dd1f3fd,
+          "alt": "elf"
+        },
+        "\ud83e\udddd\ud83c\udffe": {
+          "src": s1f9dd1f3fe,
+          "alt": "elf"
+        },
+        "\ud83e\udddd\ud83c\udfff": {
+          "src": s1f9dd1f3ff,
+          "alt": "elf"
+        }
+      }
     },
-    "\u1F9DE\u200D\u2640\uFE0F": {
+    "\ud83e\uddde\u200d\u2640\ufe0f": {
       "src": s1f9de200d2640fe0f,
       "alt": "female_genie"
     },
-    "\u1F9DE\u200D\u2642\uFE0F": {
+    "\ud83e\uddde\u200d\u2642\ufe0f": {
       "src": s1f9de200d2642fe0f,
       "alt": "male_genie"
     },
-    "\u1F9DE": {
+    "\ud83e\uddde": {
       "src": s1f9de,
       "alt": "genie"
     },
-    "\u1F9DF\u200D\u2640\uFE0F": {
+    "\ud83e\udddf\u200d\u2640\ufe0f": {
       "src": s1f9df200d2640fe0f,
       "alt": "female_zombie"
     },
-    "\u1F9DF\u200D\u2642\uFE0F": {
+    "\ud83e\udddf\u200d\u2642\ufe0f": {
       "src": s1f9df200d2642fe0f,
       "alt": "male_zombie"
     },
-    "\u1F9DF": {
+    "\ud83e\udddf": {
       "src": s1f9df,
       "alt": "zombie"
     },
-    "\u1F9E0": {
+    "\ud83e\udde0": {
       "src": s1f9e0,
       "alt": "brain"
     },
-    "\u1FAC0": {
+    "\ud83e\udec0": {
       "src": s1fac0,
       "alt": "anatomical_heart"
     },
-    "\u1FAC1": {
+    "\ud83e\udec1": {
       "src": s1fac1,
       "alt": "lungs"
     },
-    "\u1FAC2": {
+    "\ud83e\udec2": {
       "src": s1fac2,
       "alt": "people_hugging"
     },
-    "\u261D\uFE0F": {
+    "\u261d\ufe0f": {
       "src": s261dfe0f,
-      "alt": "point_up"
+      "alt": "point_up",
+      "skinVariations": {
+        "\u261d\ufe0f": {
+          "src": s261dfe0f,
+          "alt": "point_up"
+        },
+        "\u261d\ud83c\udffb": {
+          "src": s261d1f3fb,
+          "alt": "point_up"
+        },
+        "\u261d\ud83c\udffc": {
+          "src": s261d1f3fc,
+          "alt": "point_up"
+        },
+        "\u261d\ud83c\udffd": {
+          "src": s261d1f3fd,
+          "alt": "point_up"
+        },
+        "\u261d\ud83c\udffe": {
+          "src": s261d1f3fe,
+          "alt": "point_up"
+        },
+        "\u261d\ud83c\udfff": {
+          "src": s261d1f3ff,
+          "alt": "point_up"
+        }
+      }
     },
-    "\u26F7\uFE0F": {
+    "\u26f7\ufe0f": {
       "src": s26f7fe0f,
       "alt": "skier"
     },
-    "\u26F9\uFE0F\u200D\u2640\uFE0F": {
+    "\u26f9\ufe0f\u200d\u2640\ufe0f": {
       "src": s26f9fe0f200d2640fe0f,
-      "alt": "woman-bouncing-ball"
+      "alt": "woman-bouncing-ball",
+      "skinVariations": {
+        "\u26f9\ufe0f\u200d\u2640\ufe0f": {
+          "src": s26f9fe0f200d2640fe0f,
+          "alt": "woman-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffb\u200d\u2640\ufe0f": {
+          "src": s26f91f3fb200d2640fe0f,
+          "alt": "woman-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffc\u200d\u2640\ufe0f": {
+          "src": s26f91f3fc200d2640fe0f,
+          "alt": "woman-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffd\u200d\u2640\ufe0f": {
+          "src": s26f91f3fd200d2640fe0f,
+          "alt": "woman-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffe\u200d\u2640\ufe0f": {
+          "src": s26f91f3fe200d2640fe0f,
+          "alt": "woman-bouncing-ball"
+        },
+        "\u26f9\ud83c\udfff\u200d\u2640\ufe0f": {
+          "src": s26f91f3ff200d2640fe0f,
+          "alt": "woman-bouncing-ball"
+        }
+      }
     },
-    "\u26F9\uFE0F\u200D\u2642\uFE0F": {
+    "\u26f9\ufe0f\u200d\u2642\ufe0f": {
       "src": s26f9fe0f200d2642fe0f,
-      "alt": "man-bouncing-ball"
+      "alt": "man-bouncing-ball",
+      "skinVariations": {
+        "\u26f9\ufe0f\u200d\u2642\ufe0f": {
+          "src": s26f9fe0f200d2642fe0f,
+          "alt": "man-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffb\u200d\u2642\ufe0f": {
+          "src": s26f91f3fb200d2642fe0f,
+          "alt": "man-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffc\u200d\u2642\ufe0f": {
+          "src": s26f91f3fc200d2642fe0f,
+          "alt": "man-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffd\u200d\u2642\ufe0f": {
+          "src": s26f91f3fd200d2642fe0f,
+          "alt": "man-bouncing-ball"
+        },
+        "\u26f9\ud83c\udffe\u200d\u2642\ufe0f": {
+          "src": s26f91f3fe200d2642fe0f,
+          "alt": "man-bouncing-ball"
+        },
+        "\u26f9\ud83c\udfff\u200d\u2642\ufe0f": {
+          "src": s26f91f3ff200d2642fe0f,
+          "alt": "man-bouncing-ball"
+        }
+      }
     },
-    "\u26F9\uFE0F": {
+    "\u26f9\ufe0f": {
       "src": s26f9fe0f,
-      "alt": "person_with_ball"
+      "alt": "person_with_ball",
+      "skinVariations": {
+        "\u26f9\ufe0f": {
+          "src": s26f9fe0f,
+          "alt": "person_with_ball"
+        },
+        "\u26f9\ud83c\udffb": {
+          "src": s26f91f3fb,
+          "alt": "person_with_ball"
+        },
+        "\u26f9\ud83c\udffc": {
+          "src": s26f91f3fc,
+          "alt": "person_with_ball"
+        },
+        "\u26f9\ud83c\udffd": {
+          "src": s26f91f3fd,
+          "alt": "person_with_ball"
+        },
+        "\u26f9\ud83c\udffe": {
+          "src": s26f91f3fe,
+          "alt": "person_with_ball"
+        },
+        "\u26f9\ud83c\udfff": {
+          "src": s26f91f3ff,
+          "alt": "person_with_ball"
+        }
+      }
     },
-    "\u270A": {
+    "\u270a": {
       "src": s270a,
-      "alt": "fist"
+      "alt": "fist",
+      "skinVariations": {
+        "\u270a": {
+          "src": s270a,
+          "alt": "fist"
+        },
+        "\u270a\ud83c\udffb": {
+          "src": s270a1f3fb,
+          "alt": "fist"
+        },
+        "\u270a\ud83c\udffc": {
+          "src": s270a1f3fc,
+          "alt": "fist"
+        },
+        "\u270a\ud83c\udffd": {
+          "src": s270a1f3fd,
+          "alt": "fist"
+        },
+        "\u270a\ud83c\udffe": {
+          "src": s270a1f3fe,
+          "alt": "fist"
+        },
+        "\u270a\ud83c\udfff": {
+          "src": s270a1f3ff,
+          "alt": "fist"
+        }
+      }
     },
-    "\u270B": {
+    "\u270b": {
       "src": s270b,
-      "alt": "hand"
+      "alt": "hand",
+      "skinVariations": {
+        "\u270b": {
+          "src": s270b,
+          "alt": "hand"
+        },
+        "\u270b\ud83c\udffb": {
+          "src": s270b1f3fb,
+          "alt": "hand"
+        },
+        "\u270b\ud83c\udffc": {
+          "src": s270b1f3fc,
+          "alt": "hand"
+        },
+        "\u270b\ud83c\udffd": {
+          "src": s270b1f3fd,
+          "alt": "hand"
+        },
+        "\u270b\ud83c\udffe": {
+          "src": s270b1f3fe,
+          "alt": "hand"
+        },
+        "\u270b\ud83c\udfff": {
+          "src": s270b1f3ff,
+          "alt": "hand"
+        }
+      }
     },
-    "\u270C\uFE0F": {
+    "\u270c\ufe0f": {
       "src": s270cfe0f,
-      "alt": "v"
+      "alt": "v",
+      "skinVariations": {
+        "\u270c\ufe0f": {
+          "src": s270cfe0f,
+          "alt": "v"
+        },
+        "\u270c\ud83c\udffb": {
+          "src": s270c1f3fb,
+          "alt": "v"
+        },
+        "\u270c\ud83c\udffc": {
+          "src": s270c1f3fc,
+          "alt": "v"
+        },
+        "\u270c\ud83c\udffd": {
+          "src": s270c1f3fd,
+          "alt": "v"
+        },
+        "\u270c\ud83c\udffe": {
+          "src": s270c1f3fe,
+          "alt": "v"
+        },
+        "\u270c\ud83c\udfff": {
+          "src": s270c1f3ff,
+          "alt": "v"
+        }
+      }
     },
-    "\u270D\uFE0F": {
+    "\u270d\ufe0f": {
       "src": s270dfe0f,
-      "alt": "writing_hand"
+      "alt": "writing_hand",
+      "skinVariations": {
+        "\u270d\ufe0f": {
+          "src": s270dfe0f,
+          "alt": "writing_hand"
+        },
+        "\u270d\ud83c\udffb": {
+          "src": s270d1f3fb,
+          "alt": "writing_hand"
+        },
+        "\u270d\ud83c\udffc": {
+          "src": s270d1f3fc,
+          "alt": "writing_hand"
+        },
+        "\u270d\ud83c\udffd": {
+          "src": s270d1f3fd,
+          "alt": "writing_hand"
+        },
+        "\u270d\ud83c\udffe": {
+          "src": s270d1f3fe,
+          "alt": "writing_hand"
+        },
+        "\u270d\ud83c\udfff": {
+          "src": s270d1f3ff,
+          "alt": "writing_hand"
+        }
+      }
     }
   },
   "Nature": {
-    "\u1F331": {
+    "\ud83c\udf31": {
       "src": s1f331,
       "alt": "seedling"
     },
-    "\u1F332": {
+    "\ud83c\udf32": {
       "src": s1f332,
       "alt": "evergreen_tree"
     },
-    "\u1F333": {
+    "\ud83c\udf33": {
       "src": s1f333,
       "alt": "deciduous_tree"
     },
-    "\u1F334": {
+    "\ud83c\udf34": {
       "src": s1f334,
       "alt": "palm_tree"
     },
-    "\u1F335": {
+    "\ud83c\udf35": {
       "src": s1f335,
       "alt": "cactus"
     },
-    "\u1F337": {
+    "\ud83c\udf37": {
       "src": s1f337,
       "alt": "tulip"
     },
-    "\u1F338": {
+    "\ud83c\udf38": {
       "src": s1f338,
       "alt": "cherry_blossom"
     },
-    "\u1F339": {
+    "\ud83c\udf39": {
       "src": s1f339,
       "alt": "rose"
     },
-    "\u1F33A": {
+    "\ud83c\udf3a": {
       "src": s1f33a,
       "alt": "hibiscus"
     },
-    "\u1F33B": {
+    "\ud83c\udf3b": {
       "src": s1f33b,
       "alt": "sunflower"
     },
-    "\u1F33C": {
+    "\ud83c\udf3c": {
       "src": s1f33c,
       "alt": "blossom"
     },
-    "\u1F33E": {
+    "\ud83c\udf3e": {
       "src": s1f33e,
       "alt": "ear_of_rice"
     },
-    "\u1F33F": {
+    "\ud83c\udf3f": {
       "src": s1f33f,
       "alt": "herb"
     },
-    "\u1F340": {
+    "\ud83c\udf40": {
       "src": s1f340,
       "alt": "four_leaf_clover"
     },
-    "\u1F341": {
+    "\ud83c\udf41": {
       "src": s1f341,
       "alt": "maple_leaf"
     },
-    "\u1F342": {
+    "\ud83c\udf42": {
       "src": s1f342,
       "alt": "fallen_leaf"
     },
-    "\u1F343": {
+    "\ud83c\udf43": {
       "src": s1f343,
       "alt": "leaves"
     },
-    "\u1F3F5\uFE0F": {
+    "\ud83c\udff5\ufe0f": {
       "src": s1f3f5fe0f,
       "alt": "rosette"
     },
-    "\u1F400": {
+    "\ud83d\udc00": {
       "src": s1f400,
       "alt": "rat"
     },
-    "\u1F401": {
+    "\ud83d\udc01": {
       "src": s1f401,
       "alt": "mouse2"
     },
-    "\u1F402": {
+    "\ud83d\udc02": {
       "src": s1f402,
       "alt": "ox"
     },
-    "\u1F403": {
+    "\ud83d\udc03": {
       "src": s1f403,
       "alt": "water_buffalo"
     },
-    "\u1F404": {
+    "\ud83d\udc04": {
       "src": s1f404,
       "alt": "cow2"
     },
-    "\u1F405": {
+    "\ud83d\udc05": {
       "src": s1f405,
       "alt": "tiger2"
     },
-    "\u1F406": {
+    "\ud83d\udc06": {
       "src": s1f406,
       "alt": "leopard"
     },
-    "\u1F407": {
+    "\ud83d\udc07": {
       "src": s1f407,
       "alt": "rabbit2"
     },
-    "\u1F408\u200D\u2B1B": {
+    "\ud83d\udc08\u200d\u2b1b": {
       "src": s1f408200d2b1b,
       "alt": "black_cat"
     },
-    "\u1F408": {
+    "\ud83d\udc08": {
       "src": s1f408,
       "alt": "cat2"
     },
-    "\u1F409": {
+    "\ud83d\udc09": {
       "src": s1f409,
       "alt": "dragon"
     },
-    "\u1F40A": {
+    "\ud83d\udc0a": {
       "src": s1f40a,
       "alt": "crocodile"
     },
-    "\u1F40B": {
+    "\ud83d\udc0b": {
       "src": s1f40b,
       "alt": "whale2"
     },
-    "\u1F40C": {
+    "\ud83d\udc0c": {
       "src": s1f40c,
       "alt": "snail"
     },
-    "\u1F40D": {
+    "\ud83d\udc0d": {
       "src": s1f40d,
       "alt": "snake"
     },
-    "\u1F40E": {
+    "\ud83d\udc0e": {
       "src": s1f40e,
       "alt": "racehorse"
     },
-    "\u1F40F": {
+    "\ud83d\udc0f": {
       "src": s1f40f,
       "alt": "ram"
     },
-    "\u1F410": {
+    "\ud83d\udc10": {
       "src": s1f410,
       "alt": "goat"
     },
-    "\u1F411": {
+    "\ud83d\udc11": {
       "src": s1f411,
       "alt": "sheep"
     },
-    "\u1F412": {
+    "\ud83d\udc12": {
       "src": s1f412,
       "alt": "monkey"
     },
-    "\u1F413": {
+    "\ud83d\udc13": {
       "src": s1f413,
       "alt": "rooster"
     },
-    "\u1F414": {
+    "\ud83d\udc14": {
       "src": s1f414,
       "alt": "chicken"
     },
-    "\u1F415\u200D\u1F9BA": {
+    "\ud83d\udc15\u200d\ud83e\uddba": {
       "src": s1f415200d1f9ba,
       "alt": "service_dog"
     },
-    "\u1F415": {
+    "\ud83d\udc15": {
       "src": s1f415,
       "alt": "dog2"
     },
-    "\u1F416": {
+    "\ud83d\udc16": {
       "src": s1f416,
       "alt": "pig2"
     },
-    "\u1F417": {
+    "\ud83d\udc17": {
       "src": s1f417,
       "alt": "boar"
     },
-    "\u1F418": {
+    "\ud83d\udc18": {
       "src": s1f418,
       "alt": "elephant"
     },
-    "\u1F419": {
+    "\ud83d\udc19": {
       "src": s1f419,
       "alt": "octopus"
     },
-    "\u1F41A": {
+    "\ud83d\udc1a": {
       "src": s1f41a,
       "alt": "shell"
     },
-    "\u1F41B": {
+    "\ud83d\udc1b": {
       "src": s1f41b,
       "alt": "bug"
     },
-    "\u1F41C": {
+    "\ud83d\udc1c": {
       "src": s1f41c,
       "alt": "ant"
     },
-    "\u1F41D": {
+    "\ud83d\udc1d": {
       "src": s1f41d,
       "alt": "bee"
     },
-    "\u1F41E": {
+    "\ud83d\udc1e": {
       "src": s1f41e,
       "alt": "ladybug"
     },
-    "\u1F41F": {
+    "\ud83d\udc1f": {
       "src": s1f41f,
       "alt": "fish"
     },
-    "\u1F420": {
+    "\ud83d\udc20": {
       "src": s1f420,
       "alt": "tropical_fish"
     },
-    "\u1F421": {
+    "\ud83d\udc21": {
       "src": s1f421,
       "alt": "blowfish"
     },
-    "\u1F422": {
+    "\ud83d\udc22": {
       "src": s1f422,
       "alt": "turtle"
     },
-    "\u1F423": {
+    "\ud83d\udc23": {
       "src": s1f423,
       "alt": "hatching_chick"
     },
-    "\u1F424": {
+    "\ud83d\udc24": {
       "src": s1f424,
       "alt": "baby_chick"
     },
-    "\u1F425": {
+    "\ud83d\udc25": {
       "src": s1f425,
       "alt": "hatched_chick"
     },
-    "\u1F426": {
+    "\ud83d\udc26": {
       "src": s1f426,
       "alt": "bird"
     },
-    "\u1F427": {
+    "\ud83d\udc27": {
       "src": s1f427,
       "alt": "penguin"
     },
-    "\u1F428": {
+    "\ud83d\udc28": {
       "src": s1f428,
       "alt": "koala"
     },
-    "\u1F429": {
+    "\ud83d\udc29": {
       "src": s1f429,
       "alt": "poodle"
     },
-    "\u1F42A": {
+    "\ud83d\udc2a": {
       "src": s1f42a,
       "alt": "dromedary_camel"
     },
-    "\u1F42B": {
+    "\ud83d\udc2b": {
       "src": s1f42b,
       "alt": "camel"
     },
-    "\u1F42C": {
+    "\ud83d\udc2c": {
       "src": s1f42c,
       "alt": "dolphin"
     },
-    "\u1F42D": {
+    "\ud83d\udc2d": {
       "src": s1f42d,
       "alt": "mouse"
     },
-    "\u1F42E": {
+    "\ud83d\udc2e": {
       "src": s1f42e,
       "alt": "cow"
     },
-    "\u1F42F": {
+    "\ud83d\udc2f": {
       "src": s1f42f,
       "alt": "tiger"
     },
-    "\u1F430": {
+    "\ud83d\udc30": {
       "src": s1f430,
       "alt": "rabbit"
     },
-    "\u1F431": {
+    "\ud83d\udc31": {
       "src": s1f431,
       "alt": "cat"
     },
-    "\u1F432": {
+    "\ud83d\udc32": {
       "src": s1f432,
       "alt": "dragon_face"
     },
-    "\u1F433": {
+    "\ud83d\udc33": {
       "src": s1f433,
       "alt": "whale"
     },
-    "\u1F434": {
+    "\ud83d\udc34": {
       "src": s1f434,
       "alt": "horse"
     },
-    "\u1F435": {
+    "\ud83d\udc35": {
       "src": s1f435,
       "alt": "monkey_face"
     },
-    "\u1F436": {
+    "\ud83d\udc36": {
       "src": s1f436,
       "alt": "dog"
     },
-    "\u1F437": {
+    "\ud83d\udc37": {
       "src": s1f437,
       "alt": "pig"
     },
-    "\u1F438": {
+    "\ud83d\udc38": {
       "src": s1f438,
       "alt": "frog"
     },
-    "\u1F439": {
+    "\ud83d\udc39": {
       "src": s1f439,
       "alt": "hamster"
     },
-    "\u1F43A": {
+    "\ud83d\udc3a": {
       "src": s1f43a,
       "alt": "wolf"
     },
-    "\u1F43B\u200D\u2744\uFE0F": {
+    "\ud83d\udc3b\u200d\u2744\ufe0f": {
       "src": s1f43b200d2744fe0f,
       "alt": "polar_bear"
     },
-    "\u1F43B": {
+    "\ud83d\udc3b": {
       "src": s1f43b,
       "alt": "bear"
     },
-    "\u1F43C": {
+    "\ud83d\udc3c": {
       "src": s1f43c,
       "alt": "panda_face"
     },
-    "\u1F43D": {
+    "\ud83d\udc3d": {
       "src": s1f43d,
       "alt": "pig_nose"
     },
-    "\u1F43E": {
+    "\ud83d\udc3e": {
       "src": s1f43e,
       "alt": "feet"
     },
-    "\u1F43F\uFE0F": {
+    "\ud83d\udc3f\ufe0f": {
       "src": s1f43ffe0f,
       "alt": "chipmunk"
     },
-    "\u1F490": {
+    "\ud83d\udc90": {
       "src": s1f490,
       "alt": "bouquet"
     },
-    "\u1F4AE": {
+    "\ud83d\udcae": {
       "src": s1f4ae,
       "alt": "white_flower"
     },
-    "\u1F54A\uFE0F": {
+    "\ud83d\udd4a\ufe0f": {
       "src": s1f54afe0f,
       "alt": "dove_of_peace"
     },
-    "\u1F577\uFE0F": {
+    "\ud83d\udd77\ufe0f": {
       "src": s1f577fe0f,
       "alt": "spider"
     },
-    "\u1F578\uFE0F": {
+    "\ud83d\udd78\ufe0f": {
       "src": s1f578fe0f,
       "alt": "spider_web"
     },
-    "\u1F940": {
+    "\ud83e\udd40": {
       "src": s1f940,
       "alt": "wilted_flower"
     },
-    "\u1F981": {
+    "\ud83e\udd81": {
       "src": s1f981,
       "alt": "lion_face"
     },
-    "\u1F982": {
+    "\ud83e\udd82": {
       "src": s1f982,
       "alt": "scorpion"
     },
-    "\u1F983": {
+    "\ud83e\udd83": {
       "src": s1f983,
       "alt": "turkey"
     },
-    "\u1F984": {
+    "\ud83e\udd84": {
       "src": s1f984,
       "alt": "unicorn_face"
     },
-    "\u1F985": {
+    "\ud83e\udd85": {
       "src": s1f985,
       "alt": "eagle"
     },
-    "\u1F986": {
+    "\ud83e\udd86": {
       "src": s1f986,
       "alt": "duck"
     },
-    "\u1F987": {
+    "\ud83e\udd87": {
       "src": s1f987,
       "alt": "bat"
     },
-    "\u1F988": {
+    "\ud83e\udd88": {
       "src": s1f988,
       "alt": "shark"
     },
-    "\u1F989": {
+    "\ud83e\udd89": {
       "src": s1f989,
       "alt": "owl"
     },
-    "\u1F98A": {
+    "\ud83e\udd8a": {
       "src": s1f98a,
       "alt": "fox_face"
     },
-    "\u1F98B": {
+    "\ud83e\udd8b": {
       "src": s1f98b,
       "alt": "butterfly"
     },
-    "\u1F98C": {
+    "\ud83e\udd8c": {
       "src": s1f98c,
       "alt": "deer"
     },
-    "\u1F98D": {
+    "\ud83e\udd8d": {
       "src": s1f98d,
       "alt": "gorilla"
     },
-    "\u1F98E": {
+    "\ud83e\udd8e": {
       "src": s1f98e,
       "alt": "lizard"
     },
-    "\u1F98F": {
+    "\ud83e\udd8f": {
       "src": s1f98f,
       "alt": "rhinoceros"
     },
-    "\u1F992": {
+    "\ud83e\udd92": {
       "src": s1f992,
       "alt": "giraffe_face"
     },
-    "\u1F993": {
+    "\ud83e\udd93": {
       "src": s1f993,
       "alt": "zebra_face"
     },
-    "\u1F994": {
+    "\ud83e\udd94": {
       "src": s1f994,
       "alt": "hedgehog"
     },
-    "\u1F995": {
+    "\ud83e\udd95": {
       "src": s1f995,
       "alt": "sauropod"
     },
-    "\u1F996": {
+    "\ud83e\udd96": {
       "src": s1f996,
       "alt": "t-rex"
     },
-    "\u1F997": {
+    "\ud83e\udd97": {
       "src": s1f997,
       "alt": "cricket"
     },
-    "\u1F998": {
+    "\ud83e\udd98": {
       "src": s1f998,
       "alt": "kangaroo"
     },
-    "\u1F999": {
+    "\ud83e\udd99": {
       "src": s1f999,
       "alt": "llama"
     },
-    "\u1F99A": {
+    "\ud83e\udd9a": {
       "src": s1f99a,
       "alt": "peacock"
     },
-    "\u1F99B": {
+    "\ud83e\udd9b": {
       "src": s1f99b,
       "alt": "hippopotamus"
     },
-    "\u1F99C": {
+    "\ud83e\udd9c": {
       "src": s1f99c,
       "alt": "parrot"
     },
-    "\u1F99D": {
+    "\ud83e\udd9d": {
       "src": s1f99d,
       "alt": "raccoon"
     },
-    "\u1F99F": {
+    "\ud83e\udd9f": {
       "src": s1f99f,
       "alt": "mosquito"
     },
-    "\u1F9A0": {
+    "\ud83e\udda0": {
       "src": s1f9a0,
       "alt": "microbe"
     },
-    "\u1F9A1": {
+    "\ud83e\udda1": {
       "src": s1f9a1,
       "alt": "badger"
     },
-    "\u1F9A2": {
+    "\ud83e\udda2": {
       "src": s1f9a2,
       "alt": "swan"
     },
-    "\u1F9A3": {
+    "\ud83e\udda3": {
       "src": s1f9a3,
       "alt": "mammoth"
     },
-    "\u1F9A4": {
+    "\ud83e\udda4": {
       "src": s1f9a4,
       "alt": "dodo"
     },
-    "\u1F9A5": {
+    "\ud83e\udda5": {
       "src": s1f9a5,
       "alt": "sloth"
     },
-    "\u1F9A6": {
+    "\ud83e\udda6": {
       "src": s1f9a6,
       "alt": "otter"
     },
-    "\u1F9A7": {
+    "\ud83e\udda7": {
       "src": s1f9a7,
       "alt": "orangutan"
     },
-    "\u1F9A8": {
+    "\ud83e\udda8": {
       "src": s1f9a8,
       "alt": "skunk"
     },
-    "\u1F9A9": {
+    "\ud83e\udda9": {
       "src": s1f9a9,
       "alt": "flamingo"
     },
-    "\u1F9AB": {
+    "\ud83e\uddab": {
       "src": s1f9ab,
       "alt": "beaver"
     },
-    "\u1F9AC": {
+    "\ud83e\uddac": {
       "src": s1f9ac,
       "alt": "bison"
     },
-    "\u1F9AD": {
+    "\ud83e\uddad": {
       "src": s1f9ad,
       "alt": "seal"
     },
-    "\u1F9AE": {
+    "\ud83e\uddae": {
       "src": s1f9ae,
       "alt": "guide_dog"
     },
-    "\u1FAB0": {
+    "\ud83e\udeb0": {
       "src": s1fab0,
       "alt": "fly"
     },
-    "\u1FAB1": {
+    "\ud83e\udeb1": {
       "src": s1fab1,
       "alt": "worm"
     },
-    "\u1FAB2": {
+    "\ud83e\udeb2": {
       "src": s1fab2,
       "alt": "beetle"
     },
-    "\u1FAB3": {
+    "\ud83e\udeb3": {
       "src": s1fab3,
       "alt": "cockroach"
     },
-    "\u1FAB4": {
+    "\ud83e\udeb4": {
       "src": s1fab4,
       "alt": "potted_plant"
     },
-    "\u1FAB6": {
+    "\ud83e\udeb6": {
       "src": s1fab6,
       "alt": "feather"
     },
-    "\u2618\uFE0F": {
+    "\u2618\ufe0f": {
       "src": s2618fe0f,
       "alt": "shamrock"
     }
   },
   "Activity": {
-    "\u1F004": {
+    "\ud83c\udc04": {
       "src": s1f004,
       "alt": "mahjong"
     },
-    "\u1F0CF": {
+    "\ud83c\udccf": {
       "src": s1f0cf,
       "alt": "black_joker"
     },
-    "\u1F380": {
+    "\ud83c\udf80": {
       "src": s1f380,
       "alt": "ribbon"
     },
-    "\u1F381": {
+    "\ud83c\udf81": {
       "src": s1f381,
       "alt": "gift"
     },
-    "\u1F383": {
+    "\ud83c\udf83": {
       "src": s1f383,
       "alt": "jack_o_lantern"
     },
-    "\u1F384": {
+    "\ud83c\udf84": {
       "src": s1f384,
       "alt": "christmas_tree"
     },
-    "\u1F386": {
+    "\ud83c\udf86": {
       "src": s1f386,
       "alt": "fireworks"
     },
-    "\u1F387": {
+    "\ud83c\udf87": {
       "src": s1f387,
       "alt": "sparkler"
     },
-    "\u1F388": {
+    "\ud83c\udf88": {
       "src": s1f388,
       "alt": "balloon"
     },
-    "\u1F389": {
+    "\ud83c\udf89": {
       "src": s1f389,
       "alt": "tada"
     },
-    "\u1F38A": {
+    "\ud83c\udf8a": {
       "src": s1f38a,
       "alt": "confetti_ball"
     },
-    "\u1F38B": {
+    "\ud83c\udf8b": {
       "src": s1f38b,
       "alt": "tanabata_tree"
     },
-    "\u1F38D": {
+    "\ud83c\udf8d": {
       "src": s1f38d,
       "alt": "bamboo"
     },
-    "\u1F38E": {
+    "\ud83c\udf8e": {
       "src": s1f38e,
       "alt": "dolls"
     },
-    "\u1F38F": {
+    "\ud83c\udf8f": {
       "src": s1f38f,
       "alt": "flags"
     },
-    "\u1F390": {
+    "\ud83c\udf90": {
       "src": s1f390,
       "alt": "wind_chime"
     },
-    "\u1F391": {
+    "\ud83c\udf91": {
       "src": s1f391,
       "alt": "rice_scene"
     },
-    "\u1F396\uFE0F": {
+    "\ud83c\udf96\ufe0f": {
       "src": s1f396fe0f,
       "alt": "medal"
     },
-    "\u1F397\uFE0F": {
+    "\ud83c\udf97\ufe0f": {
       "src": s1f397fe0f,
       "alt": "reminder_ribbon"
     },
-    "\u1F39F\uFE0F": {
+    "\ud83c\udf9f\ufe0f": {
       "src": s1f39ffe0f,
       "alt": "admission_tickets"
     },
-    "\u1F3A3": {
+    "\ud83c\udfa3": {
       "src": s1f3a3,
       "alt": "fishing_pole_and_fish"
     },
-    "\u1F3A8": {
+    "\ud83c\udfa8": {
       "src": s1f3a8,
       "alt": "art"
     },
-    "\u1F3AB": {
+    "\ud83c\udfab": {
       "src": s1f3ab,
       "alt": "ticket"
     },
-    "\u1F3AD": {
+    "\ud83c\udfad": {
       "src": s1f3ad,
       "alt": "performing_arts"
     },
-    "\u1F3AE": {
+    "\ud83c\udfae": {
       "src": s1f3ae,
       "alt": "video_game"
     },
-    "\u1F3AF": {
+    "\ud83c\udfaf": {
       "src": s1f3af,
       "alt": "dart"
     },
-    "\u1F3B0": {
+    "\ud83c\udfb0": {
       "src": s1f3b0,
       "alt": "slot_machine"
     },
-    "\u1F3B1": {
+    "\ud83c\udfb1": {
       "src": s1f3b1,
       "alt": "8ball"
     },
-    "\u1F3B2": {
+    "\ud83c\udfb2": {
       "src": s1f3b2,
       "alt": "game_die"
     },
-    "\u1F3B3": {
+    "\ud83c\udfb3": {
       "src": s1f3b3,
       "alt": "bowling"
     },
-    "\u1F3B4": {
+    "\ud83c\udfb4": {
       "src": s1f3b4,
       "alt": "flower_playing_cards"
     },
-    "\u1F3BD": {
+    "\ud83c\udfbd": {
       "src": s1f3bd,
       "alt": "running_shirt_with_sash"
     },
-    "\u1F3BE": {
+    "\ud83c\udfbe": {
       "src": s1f3be,
       "alt": "tennis"
     },
-    "\u1F3BF": {
+    "\ud83c\udfbf": {
       "src": s1f3bf,
       "alt": "ski"
     },
-    "\u1F3C0": {
+    "\ud83c\udfc0": {
       "src": s1f3c0,
       "alt": "basketball"
     },
-    "\u1F3C5": {
+    "\ud83c\udfc5": {
       "src": s1f3c5,
       "alt": "sports_medal"
     },
-    "\u1F3C6": {
+    "\ud83c\udfc6": {
       "src": s1f3c6,
       "alt": "trophy"
     },
-    "\u1F3C8": {
+    "\ud83c\udfc8": {
       "src": s1f3c8,
       "alt": "football"
     },
-    "\u1F3C9": {
+    "\ud83c\udfc9": {
       "src": s1f3c9,
       "alt": "rugby_football"
     },
-    "\u1F3CF": {
+    "\ud83c\udfcf": {
       "src": s1f3cf,
       "alt": "cricket_bat_and_ball"
     },
-    "\u1F3D0": {
+    "\ud83c\udfd0": {
       "src": s1f3d0,
       "alt": "volleyball"
     },
-    "\u1F3D1": {
+    "\ud83c\udfd1": {
       "src": s1f3d1,
       "alt": "field_hockey_stick_and_ball"
     },
-    "\u1F3D2": {
+    "\ud83c\udfd2": {
       "src": s1f3d2,
       "alt": "ice_hockey_stick_and_puck"
     },
-    "\u1F3D3": {
+    "\ud83c\udfd3": {
       "src": s1f3d3,
       "alt": "table_tennis_paddle_and_ball"
     },
-    "\u1F3F8": {
+    "\ud83c\udff8": {
       "src": s1f3f8,
       "alt": "badminton_racquet_and_shuttlecock"
     },
-    "\u1F52E": {
+    "\ud83d\udd2e": {
       "src": s1f52e,
       "alt": "crystal_ball"
     },
-    "\u1F579\uFE0F": {
+    "\ud83d\udd79\ufe0f": {
       "src": s1f579fe0f,
       "alt": "joystick"
     },
-    "\u1F5BC\uFE0F": {
+    "\ud83d\uddbc\ufe0f": {
       "src": s1f5bcfe0f,
       "alt": "frame_with_picture"
     },
-    "\u1F6F7": {
+    "\ud83d\udef7": {
       "src": s1f6f7,
       "alt": "sled"
     },
-    "\u1F93F": {
+    "\ud83e\udd3f": {
       "src": s1f93f,
       "alt": "diving_mask"
     },
-    "\u1F945": {
+    "\ud83e\udd45": {
       "src": s1f945,
       "alt": "goal_net"
     },
-    "\u1F947": {
+    "\ud83e\udd47": {
       "src": s1f947,
       "alt": "first_place_medal"
     },
-    "\u1F948": {
+    "\ud83e\udd48": {
       "src": s1f948,
       "alt": "second_place_medal"
     },
-    "\u1F949": {
+    "\ud83e\udd49": {
       "src": s1f949,
       "alt": "third_place_medal"
     },
-    "\u1F94A": {
+    "\ud83e\udd4a": {
       "src": s1f94a,
       "alt": "boxing_glove"
     },
-    "\u1F94B": {
+    "\ud83e\udd4b": {
       "src": s1f94b,
       "alt": "martial_arts_uniform"
     },
-    "\u1F94C": {
+    "\ud83e\udd4c": {
       "src": s1f94c,
       "alt": "curling_stone"
     },
-    "\u1F94D": {
+    "\ud83e\udd4d": {
       "src": s1f94d,
       "alt": "lacrosse"
     },
-    "\u1F94E": {
+    "\ud83e\udd4e": {
       "src": s1f94e,
       "alt": "softball"
     },
-    "\u1F94F": {
+    "\ud83e\udd4f": {
       "src": s1f94f,
       "alt": "flying_disc"
     },
-    "\u1F9E7": {
+    "\ud83e\udde7": {
       "src": s1f9e7,
       "alt": "red_envelope"
     },
-    "\u1F9E8": {
+    "\ud83e\udde8": {
       "src": s1f9e8,
       "alt": "firecracker"
     },
-    "\u1F9E9": {
+    "\ud83e\udde9": {
       "src": s1f9e9,
       "alt": "jigsaw"
     },
-    "\u1F9F5": {
+    "\ud83e\uddf5": {
       "src": s1f9f5,
       "alt": "thread"
     },
-    "\u1F9F6": {
+    "\ud83e\uddf6": {
       "src": s1f9f6,
       "alt": "yarn"
     },
-    "\u1F9F8": {
+    "\ud83e\uddf8": {
       "src": s1f9f8,
       "alt": "teddy_bear"
     },
-    "\u1F9FF": {
+    "\ud83e\uddff": {
       "src": s1f9ff,
       "alt": "nazar_amulet"
     },
-    "\u1FA80": {
+    "\ud83e\ude80": {
       "src": s1fa80,
       "alt": "yo-yo"
     },
-    "\u1FA81": {
+    "\ud83e\ude81": {
       "src": s1fa81,
       "alt": "kite"
     },
-    "\u1FA84": {
+    "\ud83e\ude84": {
       "src": s1fa84,
       "alt": "magic_wand"
     },
-    "\u1FA85": {
+    "\ud83e\ude85": {
       "src": s1fa85,
       "alt": "pinata"
     },
-    "\u1FA86": {
+    "\ud83e\ude86": {
       "src": s1fa86,
       "alt": "nesting_dolls"
     },
-    "\u1FAA1": {
+    "\ud83e\udea1": {
       "src": s1faa1,
       "alt": "sewing_needle"
     },
-    "\u1FAA2": {
+    "\ud83e\udea2": {
       "src": s1faa2,
       "alt": "knot"
     },
-    "\u265F\uFE0F": {
+    "\u265f\ufe0f": {
       "src": s265ffe0f,
       "alt": "chess_pawn"
     },
-    "\u2660\uFE0F": {
+    "\u2660\ufe0f": {
       "src": s2660fe0f,
       "alt": "spades"
     },
-    "\u2663\uFE0F": {
+    "\u2663\ufe0f": {
       "src": s2663fe0f,
       "alt": "clubs"
     },
-    "\u2665\uFE0F": {
+    "\u2665\ufe0f": {
       "src": s2665fe0f,
       "alt": "hearts"
     },
-    "\u2666\uFE0F": {
+    "\u2666\ufe0f": {
       "src": s2666fe0f,
       "alt": "diamonds"
     },
-    "\u26BD": {
+    "\u26bd": {
       "src": s26bd,
       "alt": "soccer"
     },
-    "\u26BE": {
+    "\u26be": {
       "src": s26be,
       "alt": "baseball"
     },
-    "\u26F3": {
+    "\u26f3": {
       "src": s26f3,
       "alt": "golf"
     },
-    "\u26F8\uFE0F": {
+    "\u26f8\ufe0f": {
       "src": s26f8fe0f,
       "alt": "ice_skate"
     },
@@ -4746,787 +15002,787 @@ export const smileys: SmileysStructure = {
     }
   },
   "Travel & Places": {
-    "\u1F300": {
+    "\ud83c\udf00": {
       "src": s1f300,
       "alt": "cyclone"
     },
-    "\u1F301": {
+    "\ud83c\udf01": {
       "src": s1f301,
       "alt": "foggy"
     },
-    "\u1F302": {
+    "\ud83c\udf02": {
       "src": s1f302,
       "alt": "closed_umbrella"
     },
-    "\u1F303": {
+    "\ud83c\udf03": {
       "src": s1f303,
       "alt": "night_with_stars"
     },
-    "\u1F304": {
+    "\ud83c\udf04": {
       "src": s1f304,
       "alt": "sunrise_over_mountains"
     },
-    "\u1F305": {
+    "\ud83c\udf05": {
       "src": s1f305,
       "alt": "sunrise"
     },
-    "\u1F306": {
+    "\ud83c\udf06": {
       "src": s1f306,
       "alt": "city_sunset"
     },
-    "\u1F307": {
+    "\ud83c\udf07": {
       "src": s1f307,
       "alt": "city_sunrise"
     },
-    "\u1F308": {
+    "\ud83c\udf08": {
       "src": s1f308,
       "alt": "rainbow"
     },
-    "\u1F309": {
+    "\ud83c\udf09": {
       "src": s1f309,
       "alt": "bridge_at_night"
     },
-    "\u1F30A": {
+    "\ud83c\udf0a": {
       "src": s1f30a,
       "alt": "ocean"
     },
-    "\u1F30B": {
+    "\ud83c\udf0b": {
       "src": s1f30b,
       "alt": "volcano"
     },
-    "\u1F30C": {
+    "\ud83c\udf0c": {
       "src": s1f30c,
       "alt": "milky_way"
     },
-    "\u1F30D": {
+    "\ud83c\udf0d": {
       "src": s1f30d,
       "alt": "earth_africa"
     },
-    "\u1F30E": {
+    "\ud83c\udf0e": {
       "src": s1f30e,
       "alt": "earth_americas"
     },
-    "\u1F30F": {
+    "\ud83c\udf0f": {
       "src": s1f30f,
       "alt": "earth_asia"
     },
-    "\u1F310": {
+    "\ud83c\udf10": {
       "src": s1f310,
       "alt": "globe_with_meridians"
     },
-    "\u1F311": {
+    "\ud83c\udf11": {
       "src": s1f311,
       "alt": "new_moon"
     },
-    "\u1F312": {
+    "\ud83c\udf12": {
       "src": s1f312,
       "alt": "waxing_crescent_moon"
     },
-    "\u1F313": {
+    "\ud83c\udf13": {
       "src": s1f313,
       "alt": "first_quarter_moon"
     },
-    "\u1F314": {
+    "\ud83c\udf14": {
       "src": s1f314,
       "alt": "moon"
     },
-    "\u1F315": {
+    "\ud83c\udf15": {
       "src": s1f315,
       "alt": "full_moon"
     },
-    "\u1F316": {
+    "\ud83c\udf16": {
       "src": s1f316,
       "alt": "waning_gibbous_moon"
     },
-    "\u1F317": {
+    "\ud83c\udf17": {
       "src": s1f317,
       "alt": "last_quarter_moon"
     },
-    "\u1F318": {
+    "\ud83c\udf18": {
       "src": s1f318,
       "alt": "waning_crescent_moon"
     },
-    "\u1F319": {
+    "\ud83c\udf19": {
       "src": s1f319,
       "alt": "crescent_moon"
     },
-    "\u1F31A": {
+    "\ud83c\udf1a": {
       "src": s1f31a,
       "alt": "new_moon_with_face"
     },
-    "\u1F31B": {
+    "\ud83c\udf1b": {
       "src": s1f31b,
       "alt": "first_quarter_moon_with_face"
     },
-    "\u1F31C": {
+    "\ud83c\udf1c": {
       "src": s1f31c,
       "alt": "last_quarter_moon_with_face"
     },
-    "\u1F31D": {
+    "\ud83c\udf1d": {
       "src": s1f31d,
       "alt": "full_moon_with_face"
     },
-    "\u1F31E": {
+    "\ud83c\udf1e": {
       "src": s1f31e,
       "alt": "sun_with_face"
     },
-    "\u1F31F": {
+    "\ud83c\udf1f": {
       "src": s1f31f,
       "alt": "star2"
     },
-    "\u1F320": {
+    "\ud83c\udf20": {
       "src": s1f320,
       "alt": "stars"
     },
-    "\u1F321\uFE0F": {
+    "\ud83c\udf21\ufe0f": {
       "src": s1f321fe0f,
       "alt": "thermometer"
     },
-    "\u1F324\uFE0F": {
+    "\ud83c\udf24\ufe0f": {
       "src": s1f324fe0f,
       "alt": "mostly_sunny"
     },
-    "\u1F325\uFE0F": {
+    "\ud83c\udf25\ufe0f": {
       "src": s1f325fe0f,
       "alt": "barely_sunny"
     },
-    "\u1F326\uFE0F": {
+    "\ud83c\udf26\ufe0f": {
       "src": s1f326fe0f,
       "alt": "partly_sunny_rain"
     },
-    "\u1F327\uFE0F": {
+    "\ud83c\udf27\ufe0f": {
       "src": s1f327fe0f,
       "alt": "rain_cloud"
     },
-    "\u1F328\uFE0F": {
+    "\ud83c\udf28\ufe0f": {
       "src": s1f328fe0f,
       "alt": "snow_cloud"
     },
-    "\u1F329\uFE0F": {
+    "\ud83c\udf29\ufe0f": {
       "src": s1f329fe0f,
       "alt": "lightning"
     },
-    "\u1F32A\uFE0F": {
+    "\ud83c\udf2a\ufe0f": {
       "src": s1f32afe0f,
       "alt": "tornado"
     },
-    "\u1F32B\uFE0F": {
+    "\ud83c\udf2b\ufe0f": {
       "src": s1f32bfe0f,
       "alt": "fog"
     },
-    "\u1F32C\uFE0F": {
+    "\ud83c\udf2c\ufe0f": {
       "src": s1f32cfe0f,
       "alt": "wind_blowing_face"
     },
-    "\u1F3A0": {
+    "\ud83c\udfa0": {
       "src": s1f3a0,
       "alt": "carousel_horse"
     },
-    "\u1F3A1": {
+    "\ud83c\udfa1": {
       "src": s1f3a1,
       "alt": "ferris_wheel"
     },
-    "\u1F3A2": {
+    "\ud83c\udfa2": {
       "src": s1f3a2,
       "alt": "roller_coaster"
     },
-    "\u1F3AA": {
+    "\ud83c\udfaa": {
       "src": s1f3aa,
       "alt": "circus_tent"
     },
-    "\u1F3CD\uFE0F": {
+    "\ud83c\udfcd\ufe0f": {
       "src": s1f3cdfe0f,
       "alt": "racing_motorcycle"
     },
-    "\u1F3CE\uFE0F": {
+    "\ud83c\udfce\ufe0f": {
       "src": s1f3cefe0f,
       "alt": "racing_car"
     },
-    "\u1F3D4\uFE0F": {
+    "\ud83c\udfd4\ufe0f": {
       "src": s1f3d4fe0f,
       "alt": "snow_capped_mountain"
     },
-    "\u1F3D5\uFE0F": {
+    "\ud83c\udfd5\ufe0f": {
       "src": s1f3d5fe0f,
       "alt": "camping"
     },
-    "\u1F3D6\uFE0F": {
+    "\ud83c\udfd6\ufe0f": {
       "src": s1f3d6fe0f,
       "alt": "beach_with_umbrella"
     },
-    "\u1F3D7\uFE0F": {
+    "\ud83c\udfd7\ufe0f": {
       "src": s1f3d7fe0f,
       "alt": "building_construction"
     },
-    "\u1F3D8\uFE0F": {
+    "\ud83c\udfd8\ufe0f": {
       "src": s1f3d8fe0f,
       "alt": "house_buildings"
     },
-    "\u1F3D9\uFE0F": {
+    "\ud83c\udfd9\ufe0f": {
       "src": s1f3d9fe0f,
       "alt": "cityscape"
     },
-    "\u1F3DA\uFE0F": {
+    "\ud83c\udfda\ufe0f": {
       "src": s1f3dafe0f,
       "alt": "derelict_house_building"
     },
-    "\u1F3DB\uFE0F": {
+    "\ud83c\udfdb\ufe0f": {
       "src": s1f3dbfe0f,
       "alt": "classical_building"
     },
-    "\u1F3DC\uFE0F": {
+    "\ud83c\udfdc\ufe0f": {
       "src": s1f3dcfe0f,
       "alt": "desert"
     },
-    "\u1F3DD\uFE0F": {
+    "\ud83c\udfdd\ufe0f": {
       "src": s1f3ddfe0f,
       "alt": "desert_island"
     },
-    "\u1F3DE\uFE0F": {
+    "\ud83c\udfde\ufe0f": {
       "src": s1f3defe0f,
       "alt": "national_park"
     },
-    "\u1F3DF\uFE0F": {
+    "\ud83c\udfdf\ufe0f": {
       "src": s1f3dffe0f,
       "alt": "stadium"
     },
-    "\u1F3E0": {
+    "\ud83c\udfe0": {
       "src": s1f3e0,
       "alt": "house"
     },
-    "\u1F3E1": {
+    "\ud83c\udfe1": {
       "src": s1f3e1,
       "alt": "house_with_garden"
     },
-    "\u1F3E2": {
+    "\ud83c\udfe2": {
       "src": s1f3e2,
       "alt": "office"
     },
-    "\u1F3E3": {
+    "\ud83c\udfe3": {
       "src": s1f3e3,
       "alt": "post_office"
     },
-    "\u1F3E4": {
+    "\ud83c\udfe4": {
       "src": s1f3e4,
       "alt": "european_post_office"
     },
-    "\u1F3E5": {
+    "\ud83c\udfe5": {
       "src": s1f3e5,
       "alt": "hospital"
     },
-    "\u1F3E6": {
+    "\ud83c\udfe6": {
       "src": s1f3e6,
       "alt": "bank"
     },
-    "\u1F3E8": {
+    "\ud83c\udfe8": {
       "src": s1f3e8,
       "alt": "hotel"
     },
-    "\u1F3E9": {
+    "\ud83c\udfe9": {
       "src": s1f3e9,
       "alt": "love_hotel"
     },
-    "\u1F3EA": {
+    "\ud83c\udfea": {
       "src": s1f3ea,
       "alt": "convenience_store"
     },
-    "\u1F3EB": {
+    "\ud83c\udfeb": {
       "src": s1f3eb,
       "alt": "school"
     },
-    "\u1F3EC": {
+    "\ud83c\udfec": {
       "src": s1f3ec,
       "alt": "department_store"
     },
-    "\u1F3ED": {
+    "\ud83c\udfed": {
       "src": s1f3ed,
       "alt": "factory"
     },
-    "\u1F3EF": {
+    "\ud83c\udfef": {
       "src": s1f3ef,
       "alt": "japanese_castle"
     },
-    "\u1F3F0": {
+    "\ud83c\udff0": {
       "src": s1f3f0,
       "alt": "european_castle"
     },
-    "\u1F488": {
+    "\ud83d\udc88": {
       "src": s1f488,
       "alt": "barber"
     },
-    "\u1F492": {
+    "\ud83d\udc92": {
       "src": s1f492,
       "alt": "wedding"
     },
-    "\u1F4A7": {
+    "\ud83d\udca7": {
       "src": s1f4a7,
       "alt": "droplet"
     },
-    "\u1F4BA": {
+    "\ud83d\udcba": {
       "src": s1f4ba,
       "alt": "seat"
     },
-    "\u1F525": {
+    "\ud83d\udd25": {
       "src": s1f525,
       "alt": "fire"
     },
-    "\u1F54B": {
+    "\ud83d\udd4b": {
       "src": s1f54b,
       "alt": "kaaba"
     },
-    "\u1F54C": {
+    "\ud83d\udd4c": {
       "src": s1f54c,
       "alt": "mosque"
     },
-    "\u1F54D": {
+    "\ud83d\udd4d": {
       "src": s1f54d,
       "alt": "synagogue"
     },
-    "\u1F550": {
+    "\ud83d\udd50": {
       "src": s1f550,
       "alt": "clock1"
     },
-    "\u1F551": {
+    "\ud83d\udd51": {
       "src": s1f551,
       "alt": "clock2"
     },
-    "\u1F552": {
+    "\ud83d\udd52": {
       "src": s1f552,
       "alt": "clock3"
     },
-    "\u1F553": {
+    "\ud83d\udd53": {
       "src": s1f553,
       "alt": "clock4"
     },
-    "\u1F554": {
+    "\ud83d\udd54": {
       "src": s1f554,
       "alt": "clock5"
     },
-    "\u1F555": {
+    "\ud83d\udd55": {
       "src": s1f555,
       "alt": "clock6"
     },
-    "\u1F556": {
+    "\ud83d\udd56": {
       "src": s1f556,
       "alt": "clock7"
     },
-    "\u1F557": {
+    "\ud83d\udd57": {
       "src": s1f557,
       "alt": "clock8"
     },
-    "\u1F558": {
+    "\ud83d\udd58": {
       "src": s1f558,
       "alt": "clock9"
     },
-    "\u1F559": {
+    "\ud83d\udd59": {
       "src": s1f559,
       "alt": "clock10"
     },
-    "\u1F55A": {
+    "\ud83d\udd5a": {
       "src": s1f55a,
       "alt": "clock11"
     },
-    "\u1F55B": {
+    "\ud83d\udd5b": {
       "src": s1f55b,
       "alt": "clock12"
     },
-    "\u1F55C": {
+    "\ud83d\udd5c": {
       "src": s1f55c,
       "alt": "clock130"
     },
-    "\u1F55D": {
+    "\ud83d\udd5d": {
       "src": s1f55d,
       "alt": "clock230"
     },
-    "\u1F55E": {
+    "\ud83d\udd5e": {
       "src": s1f55e,
       "alt": "clock330"
     },
-    "\u1F55F": {
+    "\ud83d\udd5f": {
       "src": s1f55f,
       "alt": "clock430"
     },
-    "\u1F560": {
+    "\ud83d\udd60": {
       "src": s1f560,
       "alt": "clock530"
     },
-    "\u1F561": {
+    "\ud83d\udd61": {
       "src": s1f561,
       "alt": "clock630"
     },
-    "\u1F562": {
+    "\ud83d\udd62": {
       "src": s1f562,
       "alt": "clock730"
     },
-    "\u1F563": {
+    "\ud83d\udd63": {
       "src": s1f563,
       "alt": "clock830"
     },
-    "\u1F564": {
+    "\ud83d\udd64": {
       "src": s1f564,
       "alt": "clock930"
     },
-    "\u1F565": {
+    "\ud83d\udd65": {
       "src": s1f565,
       "alt": "clock1030"
     },
-    "\u1F566": {
+    "\ud83d\udd66": {
       "src": s1f566,
       "alt": "clock1130"
     },
-    "\u1F567": {
+    "\ud83d\udd67": {
       "src": s1f567,
       "alt": "clock1230"
     },
-    "\u1F570\uFE0F": {
+    "\ud83d\udd70\ufe0f": {
       "src": s1f570fe0f,
       "alt": "mantelpiece_clock"
     },
-    "\u1F5FA\uFE0F": {
+    "\ud83d\uddfa\ufe0f": {
       "src": s1f5fafe0f,
       "alt": "world_map"
     },
-    "\u1F5FB": {
+    "\ud83d\uddfb": {
       "src": s1f5fb,
       "alt": "mount_fuji"
     },
-    "\u1F5FC": {
+    "\ud83d\uddfc": {
       "src": s1f5fc,
       "alt": "tokyo_tower"
     },
-    "\u1F5FD": {
+    "\ud83d\uddfd": {
       "src": s1f5fd,
       "alt": "statue_of_liberty"
     },
-    "\u1F5FE": {
+    "\ud83d\uddfe": {
       "src": s1f5fe,
       "alt": "japan"
     },
-    "\u1F680": {
+    "\ud83d\ude80": {
       "src": s1f680,
       "alt": "rocket"
     },
-    "\u1F681": {
+    "\ud83d\ude81": {
       "src": s1f681,
       "alt": "helicopter"
     },
-    "\u1F682": {
+    "\ud83d\ude82": {
       "src": s1f682,
       "alt": "steam_locomotive"
     },
-    "\u1F683": {
+    "\ud83d\ude83": {
       "src": s1f683,
       "alt": "railway_car"
     },
-    "\u1F684": {
+    "\ud83d\ude84": {
       "src": s1f684,
       "alt": "bullettrain_side"
     },
-    "\u1F685": {
+    "\ud83d\ude85": {
       "src": s1f685,
       "alt": "bullettrain_front"
     },
-    "\u1F686": {
+    "\ud83d\ude86": {
       "src": s1f686,
       "alt": "train2"
     },
-    "\u1F687": {
+    "\ud83d\ude87": {
       "src": s1f687,
       "alt": "metro"
     },
-    "\u1F688": {
+    "\ud83d\ude88": {
       "src": s1f688,
       "alt": "light_rail"
     },
-    "\u1F689": {
+    "\ud83d\ude89": {
       "src": s1f689,
       "alt": "station"
     },
-    "\u1F68A": {
+    "\ud83d\ude8a": {
       "src": s1f68a,
       "alt": "tram"
     },
-    "\u1F68B": {
+    "\ud83d\ude8b": {
       "src": s1f68b,
       "alt": "train"
     },
-    "\u1F68C": {
+    "\ud83d\ude8c": {
       "src": s1f68c,
       "alt": "bus"
     },
-    "\u1F68D": {
+    "\ud83d\ude8d": {
       "src": s1f68d,
       "alt": "oncoming_bus"
     },
-    "\u1F68E": {
+    "\ud83d\ude8e": {
       "src": s1f68e,
       "alt": "trolleybus"
     },
-    "\u1F68F": {
+    "\ud83d\ude8f": {
       "src": s1f68f,
       "alt": "busstop"
     },
-    "\u1F690": {
+    "\ud83d\ude90": {
       "src": s1f690,
       "alt": "minibus"
     },
-    "\u1F691": {
+    "\ud83d\ude91": {
       "src": s1f691,
       "alt": "ambulance"
     },
-    "\u1F692": {
+    "\ud83d\ude92": {
       "src": s1f692,
       "alt": "fire_engine"
     },
-    "\u1F693": {
+    "\ud83d\ude93": {
       "src": s1f693,
       "alt": "police_car"
     },
-    "\u1F694": {
+    "\ud83d\ude94": {
       "src": s1f694,
       "alt": "oncoming_police_car"
     },
-    "\u1F695": {
+    "\ud83d\ude95": {
       "src": s1f695,
       "alt": "taxi"
     },
-    "\u1F696": {
+    "\ud83d\ude96": {
       "src": s1f696,
       "alt": "oncoming_taxi"
     },
-    "\u1F697": {
+    "\ud83d\ude97": {
       "src": s1f697,
       "alt": "car"
     },
-    "\u1F698": {
+    "\ud83d\ude98": {
       "src": s1f698,
       "alt": "oncoming_automobile"
     },
-    "\u1F699": {
+    "\ud83d\ude99": {
       "src": s1f699,
       "alt": "blue_car"
     },
-    "\u1F69A": {
+    "\ud83d\ude9a": {
       "src": s1f69a,
       "alt": "truck"
     },
-    "\u1F69B": {
+    "\ud83d\ude9b": {
       "src": s1f69b,
       "alt": "articulated_lorry"
     },
-    "\u1F69C": {
+    "\ud83d\ude9c": {
       "src": s1f69c,
       "alt": "tractor"
     },
-    "\u1F69D": {
+    "\ud83d\ude9d": {
       "src": s1f69d,
       "alt": "monorail"
     },
-    "\u1F69E": {
+    "\ud83d\ude9e": {
       "src": s1f69e,
       "alt": "mountain_railway"
     },
-    "\u1F69F": {
+    "\ud83d\ude9f": {
       "src": s1f69f,
       "alt": "suspension_railway"
     },
-    "\u1F6A0": {
+    "\ud83d\udea0": {
       "src": s1f6a0,
       "alt": "mountain_cableway"
     },
-    "\u1F6A1": {
+    "\ud83d\udea1": {
       "src": s1f6a1,
       "alt": "aerial_tramway"
     },
-    "\u1F6A2": {
+    "\ud83d\udea2": {
       "src": s1f6a2,
       "alt": "ship"
     },
-    "\u1F6A4": {
+    "\ud83d\udea4": {
       "src": s1f6a4,
       "alt": "speedboat"
     },
-    "\u1F6A5": {
+    "\ud83d\udea5": {
       "src": s1f6a5,
       "alt": "traffic_light"
     },
-    "\u1F6A6": {
+    "\ud83d\udea6": {
       "src": s1f6a6,
       "alt": "vertical_traffic_light"
     },
-    "\u1F6A7": {
+    "\ud83d\udea7": {
       "src": s1f6a7,
       "alt": "construction"
     },
-    "\u1F6A8": {
+    "\ud83d\udea8": {
       "src": s1f6a8,
       "alt": "rotating_light"
     },
-    "\u1F6B2": {
+    "\ud83d\udeb2": {
       "src": s1f6b2,
       "alt": "bike"
     },
-    "\u1F6CE\uFE0F": {
+    "\ud83d\udece\ufe0f": {
       "src": s1f6cefe0f,
       "alt": "bellhop_bell"
     },
-    "\u1F6D1": {
+    "\ud83d\uded1": {
       "src": s1f6d1,
       "alt": "octagonal_sign"
     },
-    "\u1F6D5": {
+    "\ud83d\uded5": {
       "src": s1f6d5,
       "alt": "hindu_temple"
     },
-    "\u1F6D6": {
+    "\ud83d\uded6": {
       "src": s1f6d6,
       "alt": "hut"
     },
-    "\u1F6E2\uFE0F": {
+    "\ud83d\udee2\ufe0f": {
       "src": s1f6e2fe0f,
       "alt": "oil_drum"
     },
-    "\u1F6E3\uFE0F": {
+    "\ud83d\udee3\ufe0f": {
       "src": s1f6e3fe0f,
       "alt": "motorway"
     },
-    "\u1F6E4\uFE0F": {
+    "\ud83d\udee4\ufe0f": {
       "src": s1f6e4fe0f,
       "alt": "railway_track"
     },
-    "\u1F6E5\uFE0F": {
+    "\ud83d\udee5\ufe0f": {
       "src": s1f6e5fe0f,
       "alt": "motor_boat"
     },
-    "\u1F6E9\uFE0F": {
+    "\ud83d\udee9\ufe0f": {
       "src": s1f6e9fe0f,
       "alt": "small_airplane"
     },
-    "\u1F6EB": {
+    "\ud83d\udeeb": {
       "src": s1f6eb,
       "alt": "airplane_departure"
     },
-    "\u1F6EC": {
+    "\ud83d\udeec": {
       "src": s1f6ec,
       "alt": "airplane_arriving"
     },
-    "\u1F6F0\uFE0F": {
+    "\ud83d\udef0\ufe0f": {
       "src": s1f6f0fe0f,
       "alt": "satellite"
     },
-    "\u1F6F3\uFE0F": {
+    "\ud83d\udef3\ufe0f": {
       "src": s1f6f3fe0f,
       "alt": "passenger_ship"
     },
-    "\u1F6F4": {
+    "\ud83d\udef4": {
       "src": s1f6f4,
       "alt": "scooter"
     },
-    "\u1F6F5": {
+    "\ud83d\udef5": {
       "src": s1f6f5,
       "alt": "motor_scooter"
     },
-    "\u1F6F6": {
+    "\ud83d\udef6": {
       "src": s1f6f6,
       "alt": "canoe"
     },
-    "\u1F6F8": {
+    "\ud83d\udef8": {
       "src": s1f6f8,
       "alt": "flying_saucer"
     },
-    "\u1F6F9": {
+    "\ud83d\udef9": {
       "src": s1f6f9,
       "alt": "skateboard"
     },
-    "\u1F6FA": {
+    "\ud83d\udefa": {
       "src": s1f6fa,
       "alt": "auto_rickshaw"
     },
-    "\u1F6FB": {
+    "\ud83d\udefb": {
       "src": s1f6fb,
       "alt": "pickup_truck"
     },
-    "\u1F6FC": {
+    "\ud83d\udefc": {
       "src": s1f6fc,
       "alt": "roller_skate"
     },
-    "\u1F9BC": {
+    "\ud83e\uddbc": {
       "src": s1f9bc,
       "alt": "motorized_wheelchair"
     },
-    "\u1F9BD": {
+    "\ud83e\uddbd": {
       "src": s1f9bd,
       "alt": "manual_wheelchair"
     },
-    "\u1F9ED": {
+    "\ud83e\udded": {
       "src": s1f9ed,
       "alt": "compass"
     },
-    "\u1F9F1": {
+    "\ud83e\uddf1": {
       "src": s1f9f1,
       "alt": "bricks"
     },
-    "\u1F9F3": {
+    "\ud83e\uddf3": {
       "src": s1f9f3,
       "alt": "luggage"
     },
-    "\u1FA82": {
+    "\ud83e\ude82": {
       "src": s1fa82,
       "alt": "parachute"
     },
-    "\u1FA90": {
+    "\ud83e\ude90": {
       "src": s1fa90,
       "alt": "ringed_planet"
     },
-    "\u1FAA8": {
+    "\ud83e\udea8": {
       "src": s1faa8,
       "alt": "rock"
     },
-    "\u1FAB5": {
+    "\ud83e\udeb5": {
       "src": s1fab5,
       "alt": "wood"
     },
-    "\u231A": {
+    "\u231a": {
       "src": s231a,
       "alt": "watch"
     },
-    "\u231B": {
+    "\u231b": {
       "src": s231b,
       "alt": "hourglass"
     },
-    "\u23F0": {
+    "\u23f0": {
       "src": s23f0,
       "alt": "alarm_clock"
     },
-    "\u23F1\uFE0F": {
+    "\u23f1\ufe0f": {
       "src": s23f1fe0f,
       "alt": "stopwatch"
     },
-    "\u23F2\uFE0F": {
+    "\u23f2\ufe0f": {
       "src": s23f2fe0f,
       "alt": "timer_clock"
     },
-    "\u23F3": {
+    "\u23f3": {
       "src": s23f3,
       "alt": "hourglass_flowing_sand"
     },
-    "\u2600\uFE0F": {
+    "\u2600\ufe0f": {
       "src": s2600fe0f,
       "alt": "sunny"
     },
-    "\u2601\uFE0F": {
+    "\u2601\ufe0f": {
       "src": s2601fe0f,
       "alt": "cloud"
     },
-    "\u2602\uFE0F": {
+    "\u2602\ufe0f": {
       "src": s2602fe0f,
       "alt": "umbrella"
     },
-    "\u2603\uFE0F": {
+    "\u2603\ufe0f": {
       "src": s2603fe0f,
       "alt": "snowman"
     },
-    "\u2604\uFE0F": {
+    "\u2604\ufe0f": {
       "src": s2604fe0f,
       "alt": "comet"
     },
@@ -5534,7 +15790,7 @@ export const smileys: SmileysStructure = {
       "src": s2614,
       "alt": "umbrella_with_rain_drops"
     },
-    "\u2668\uFE0F": {
+    "\u2668\ufe0f": {
       "src": s2668fe0f,
       "alt": "hotsprings"
     },
@@ -5542,2797 +15798,2797 @@ export const smileys: SmileysStructure = {
       "src": s2693,
       "alt": "anchor"
     },
-    "\u26A1": {
+    "\u26a1": {
       "src": s26a1,
       "alt": "zap"
     },
-    "\u26C4": {
+    "\u26c4": {
       "src": s26c4,
       "alt": "snowman_without_snow"
     },
-    "\u26C5": {
+    "\u26c5": {
       "src": s26c5,
       "alt": "partly_sunny"
     },
-    "\u26C8\uFE0F": {
+    "\u26c8\ufe0f": {
       "src": s26c8fe0f,
       "alt": "thunder_cloud_and_rain"
     },
-    "\u26E9\uFE0F": {
+    "\u26e9\ufe0f": {
       "src": s26e9fe0f,
       "alt": "shinto_shrine"
     },
-    "\u26EA": {
+    "\u26ea": {
       "src": s26ea,
       "alt": "church"
     },
-    "\u26F0\uFE0F": {
+    "\u26f0\ufe0f": {
       "src": s26f0fe0f,
       "alt": "mountain"
     },
-    "\u26F1\uFE0F": {
+    "\u26f1\ufe0f": {
       "src": s26f1fe0f,
       "alt": "umbrella_on_ground"
     },
-    "\u26F2": {
+    "\u26f2": {
       "src": s26f2,
       "alt": "fountain"
     },
-    "\u26F4\uFE0F": {
+    "\u26f4\ufe0f": {
       "src": s26f4fe0f,
       "alt": "ferry"
     },
-    "\u26F5": {
+    "\u26f5": {
       "src": s26f5,
       "alt": "boat"
     },
-    "\u26FA": {
+    "\u26fa": {
       "src": s26fa,
       "alt": "tent"
     },
-    "\u26FD": {
+    "\u26fd": {
       "src": s26fd,
       "alt": "fuelpump"
     },
-    "\u2708\uFE0F": {
+    "\u2708\ufe0f": {
       "src": s2708fe0f,
       "alt": "airplane"
     },
-    "\u2744\uFE0F": {
+    "\u2744\ufe0f": {
       "src": s2744fe0f,
       "alt": "snowflake"
     },
-    "\u2B50": {
+    "\u2b50": {
       "src": s2b50,
       "alt": "star"
     }
   },
   "Objects": {
-    "\u1F392": {
+    "\ud83c\udf92": {
       "src": s1f392,
       "alt": "school_satchel"
     },
-    "\u1F393": {
+    "\ud83c\udf93": {
       "src": s1f393,
       "alt": "mortar_board"
     },
-    "\u1F399\uFE0F": {
+    "\ud83c\udf99\ufe0f": {
       "src": s1f399fe0f,
       "alt": "studio_microphone"
     },
-    "\u1F39A\uFE0F": {
+    "\ud83c\udf9a\ufe0f": {
       "src": s1f39afe0f,
       "alt": "level_slider"
     },
-    "\u1F39B\uFE0F": {
+    "\ud83c\udf9b\ufe0f": {
       "src": s1f39bfe0f,
       "alt": "control_knobs"
     },
-    "\u1F39E\uFE0F": {
+    "\ud83c\udf9e\ufe0f": {
       "src": s1f39efe0f,
       "alt": "film_frames"
     },
-    "\u1F3A4": {
+    "\ud83c\udfa4": {
       "src": s1f3a4,
       "alt": "microphone"
     },
-    "\u1F3A5": {
+    "\ud83c\udfa5": {
       "src": s1f3a5,
       "alt": "movie_camera"
     },
-    "\u1F3A7": {
+    "\ud83c\udfa7": {
       "src": s1f3a7,
       "alt": "headphones"
     },
-    "\u1F3A9": {
+    "\ud83c\udfa9": {
       "src": s1f3a9,
       "alt": "tophat"
     },
-    "\u1F3AC": {
+    "\ud83c\udfac": {
       "src": s1f3ac,
       "alt": "clapper"
     },
-    "\u1F3B5": {
+    "\ud83c\udfb5": {
       "src": s1f3b5,
       "alt": "musical_note"
     },
-    "\u1F3B6": {
+    "\ud83c\udfb6": {
       "src": s1f3b6,
       "alt": "notes"
     },
-    "\u1F3B7": {
+    "\ud83c\udfb7": {
       "src": s1f3b7,
       "alt": "saxophone"
     },
-    "\u1F3B8": {
+    "\ud83c\udfb8": {
       "src": s1f3b8,
       "alt": "guitar"
     },
-    "\u1F3B9": {
+    "\ud83c\udfb9": {
       "src": s1f3b9,
       "alt": "musical_keyboard"
     },
-    "\u1F3BA": {
+    "\ud83c\udfba": {
       "src": s1f3ba,
       "alt": "trumpet"
     },
-    "\u1F3BB": {
+    "\ud83c\udfbb": {
       "src": s1f3bb,
       "alt": "violin"
     },
-    "\u1F3BC": {
+    "\ud83c\udfbc": {
       "src": s1f3bc,
       "alt": "musical_score"
     },
-    "\u1F3EE": {
+    "\ud83c\udfee": {
       "src": s1f3ee,
       "alt": "izakaya_lantern"
     },
-    "\u1F3F7\uFE0F": {
+    "\ud83c\udff7\ufe0f": {
       "src": s1f3f7fe0f,
       "alt": "label"
     },
-    "\u1F3F9": {
+    "\ud83c\udff9": {
       "src": s1f3f9,
       "alt": "bow_and_arrow"
     },
-    "\u1F451": {
+    "\ud83d\udc51": {
       "src": s1f451,
       "alt": "crown"
     },
-    "\u1F452": {
+    "\ud83d\udc52": {
       "src": s1f452,
       "alt": "womans_hat"
     },
-    "\u1F453": {
+    "\ud83d\udc53": {
       "src": s1f453,
       "alt": "eyeglasses"
     },
-    "\u1F454": {
+    "\ud83d\udc54": {
       "src": s1f454,
       "alt": "necktie"
     },
-    "\u1F455": {
+    "\ud83d\udc55": {
       "src": s1f455,
       "alt": "shirt"
     },
-    "\u1F456": {
+    "\ud83d\udc56": {
       "src": s1f456,
       "alt": "jeans"
     },
-    "\u1F457": {
+    "\ud83d\udc57": {
       "src": s1f457,
       "alt": "dress"
     },
-    "\u1F458": {
+    "\ud83d\udc58": {
       "src": s1f458,
       "alt": "kimono"
     },
-    "\u1F459": {
+    "\ud83d\udc59": {
       "src": s1f459,
       "alt": "bikini"
     },
-    "\u1F45A": {
+    "\ud83d\udc5a": {
       "src": s1f45a,
       "alt": "womans_clothes"
     },
-    "\u1F45B": {
+    "\ud83d\udc5b": {
       "src": s1f45b,
       "alt": "purse"
     },
-    "\u1F45C": {
+    "\ud83d\udc5c": {
       "src": s1f45c,
       "alt": "handbag"
     },
-    "\u1F45D": {
+    "\ud83d\udc5d": {
       "src": s1f45d,
       "alt": "pouch"
     },
-    "\u1F45E": {
+    "\ud83d\udc5e": {
       "src": s1f45e,
       "alt": "mans_shoe"
     },
-    "\u1F45F": {
+    "\ud83d\udc5f": {
       "src": s1f45f,
       "alt": "athletic_shoe"
     },
-    "\u1F460": {
+    "\ud83d\udc60": {
       "src": s1f460,
       "alt": "high_heel"
     },
-    "\u1F461": {
+    "\ud83d\udc61": {
       "src": s1f461,
       "alt": "sandal"
     },
-    "\u1F462": {
+    "\ud83d\udc62": {
       "src": s1f462,
       "alt": "boot"
     },
-    "\u1F484": {
+    "\ud83d\udc84": {
       "src": s1f484,
       "alt": "lipstick"
     },
-    "\u1F489": {
+    "\ud83d\udc89": {
       "src": s1f489,
       "alt": "syringe"
     },
-    "\u1F48A": {
+    "\ud83d\udc8a": {
       "src": s1f48a,
       "alt": "pill"
     },
-    "\u1F48D": {
+    "\ud83d\udc8d": {
       "src": s1f48d,
       "alt": "ring"
     },
-    "\u1F48E": {
+    "\ud83d\udc8e": {
       "src": s1f48e,
       "alt": "gem"
     },
-    "\u1F4A1": {
+    "\ud83d\udca1": {
       "src": s1f4a1,
       "alt": "bulb"
     },
-    "\u1F4B0": {
+    "\ud83d\udcb0": {
       "src": s1f4b0,
       "alt": "moneybag"
     },
-    "\u1F4B3": {
+    "\ud83d\udcb3": {
       "src": s1f4b3,
       "alt": "credit_card"
     },
-    "\u1F4B4": {
+    "\ud83d\udcb4": {
       "src": s1f4b4,
       "alt": "yen"
     },
-    "\u1F4B5": {
+    "\ud83d\udcb5": {
       "src": s1f4b5,
       "alt": "dollar"
     },
-    "\u1F4B6": {
+    "\ud83d\udcb6": {
       "src": s1f4b6,
       "alt": "euro"
     },
-    "\u1F4B7": {
+    "\ud83d\udcb7": {
       "src": s1f4b7,
       "alt": "pound"
     },
-    "\u1F4B8": {
+    "\ud83d\udcb8": {
       "src": s1f4b8,
       "alt": "money_with_wings"
     },
-    "\u1F4B9": {
+    "\ud83d\udcb9": {
       "src": s1f4b9,
       "alt": "chart"
     },
-    "\u1F4BB": {
+    "\ud83d\udcbb": {
       "src": s1f4bb,
       "alt": "computer"
     },
-    "\u1F4BC": {
+    "\ud83d\udcbc": {
       "src": s1f4bc,
       "alt": "briefcase"
     },
-    "\u1F4BD": {
+    "\ud83d\udcbd": {
       "src": s1f4bd,
       "alt": "minidisc"
     },
-    "\u1F4BE": {
+    "\ud83d\udcbe": {
       "src": s1f4be,
       "alt": "floppy_disk"
     },
-    "\u1F4BF": {
+    "\ud83d\udcbf": {
       "src": s1f4bf,
       "alt": "cd"
     },
-    "\u1F4C0": {
+    "\ud83d\udcc0": {
       "src": s1f4c0,
       "alt": "dvd"
     },
-    "\u1F4C1": {
+    "\ud83d\udcc1": {
       "src": s1f4c1,
       "alt": "file_folder"
     },
-    "\u1F4C2": {
+    "\ud83d\udcc2": {
       "src": s1f4c2,
       "alt": "open_file_folder"
     },
-    "\u1F4C3": {
+    "\ud83d\udcc3": {
       "src": s1f4c3,
       "alt": "page_with_curl"
     },
-    "\u1F4C4": {
+    "\ud83d\udcc4": {
       "src": s1f4c4,
       "alt": "page_facing_up"
     },
-    "\u1F4C5": {
+    "\ud83d\udcc5": {
       "src": s1f4c5,
       "alt": "date"
     },
-    "\u1F4C6": {
+    "\ud83d\udcc6": {
       "src": s1f4c6,
       "alt": "calendar"
     },
-    "\u1F4C7": {
+    "\ud83d\udcc7": {
       "src": s1f4c7,
       "alt": "card_index"
     },
-    "\u1F4C8": {
+    "\ud83d\udcc8": {
       "src": s1f4c8,
       "alt": "chart_with_upwards_trend"
     },
-    "\u1F4C9": {
+    "\ud83d\udcc9": {
       "src": s1f4c9,
       "alt": "chart_with_downwards_trend"
     },
-    "\u1F4CA": {
+    "\ud83d\udcca": {
       "src": s1f4ca,
       "alt": "bar_chart"
     },
-    "\u1F4CB": {
+    "\ud83d\udccb": {
       "src": s1f4cb,
       "alt": "clipboard"
     },
-    "\u1F4CC": {
+    "\ud83d\udccc": {
       "src": s1f4cc,
       "alt": "pushpin"
     },
-    "\u1F4CD": {
+    "\ud83d\udccd": {
       "src": s1f4cd,
       "alt": "round_pushpin"
     },
-    "\u1F4CE": {
+    "\ud83d\udcce": {
       "src": s1f4ce,
       "alt": "paperclip"
     },
-    "\u1F4CF": {
+    "\ud83d\udccf": {
       "src": s1f4cf,
       "alt": "straight_ruler"
     },
-    "\u1F4D0": {
+    "\ud83d\udcd0": {
       "src": s1f4d0,
       "alt": "triangular_ruler"
     },
-    "\u1F4D1": {
+    "\ud83d\udcd1": {
       "src": s1f4d1,
       "alt": "bookmark_tabs"
     },
-    "\u1F4D2": {
+    "\ud83d\udcd2": {
       "src": s1f4d2,
       "alt": "ledger"
     },
-    "\u1F4D3": {
+    "\ud83d\udcd3": {
       "src": s1f4d3,
       "alt": "notebook"
     },
-    "\u1F4D4": {
+    "\ud83d\udcd4": {
       "src": s1f4d4,
       "alt": "notebook_with_decorative_cover"
     },
-    "\u1F4D5": {
+    "\ud83d\udcd5": {
       "src": s1f4d5,
       "alt": "closed_book"
     },
-    "\u1F4D6": {
+    "\ud83d\udcd6": {
       "src": s1f4d6,
       "alt": "book"
     },
-    "\u1F4D7": {
+    "\ud83d\udcd7": {
       "src": s1f4d7,
       "alt": "green_book"
     },
-    "\u1F4D8": {
+    "\ud83d\udcd8": {
       "src": s1f4d8,
       "alt": "blue_book"
     },
-    "\u1F4D9": {
+    "\ud83d\udcd9": {
       "src": s1f4d9,
       "alt": "orange_book"
     },
-    "\u1F4DA": {
+    "\ud83d\udcda": {
       "src": s1f4da,
       "alt": "books"
     },
-    "\u1F4DC": {
+    "\ud83d\udcdc": {
       "src": s1f4dc,
       "alt": "scroll"
     },
-    "\u1F4DD": {
+    "\ud83d\udcdd": {
       "src": s1f4dd,
       "alt": "memo"
     },
-    "\u1F4DE": {
+    "\ud83d\udcde": {
       "src": s1f4de,
       "alt": "telephone_receiver"
     },
-    "\u1F4DF": {
+    "\ud83d\udcdf": {
       "src": s1f4df,
       "alt": "pager"
     },
-    "\u1F4E0": {
+    "\ud83d\udce0": {
       "src": s1f4e0,
       "alt": "fax"
     },
-    "\u1F4E1": {
+    "\ud83d\udce1": {
       "src": s1f4e1,
       "alt": "satellite_antenna"
     },
-    "\u1F4E2": {
+    "\ud83d\udce2": {
       "src": s1f4e2,
       "alt": "loudspeaker"
     },
-    "\u1F4E3": {
+    "\ud83d\udce3": {
       "src": s1f4e3,
       "alt": "mega"
     },
-    "\u1F4E4": {
+    "\ud83d\udce4": {
       "src": s1f4e4,
       "alt": "outbox_tray"
     },
-    "\u1F4E5": {
+    "\ud83d\udce5": {
       "src": s1f4e5,
       "alt": "inbox_tray"
     },
-    "\u1F4E6": {
+    "\ud83d\udce6": {
       "src": s1f4e6,
       "alt": "package"
     },
-    "\u1F4E7": {
+    "\ud83d\udce7": {
       "src": s1f4e7,
       "alt": "e-mail"
     },
-    "\u1F4E8": {
+    "\ud83d\udce8": {
       "src": s1f4e8,
       "alt": "incoming_envelope"
     },
-    "\u1F4E9": {
+    "\ud83d\udce9": {
       "src": s1f4e9,
       "alt": "envelope_with_arrow"
     },
-    "\u1F4EA": {
+    "\ud83d\udcea": {
       "src": s1f4ea,
       "alt": "mailbox_closed"
     },
-    "\u1F4EB": {
+    "\ud83d\udceb": {
       "src": s1f4eb,
       "alt": "mailbox"
     },
-    "\u1F4EC": {
+    "\ud83d\udcec": {
       "src": s1f4ec,
       "alt": "mailbox_with_mail"
     },
-    "\u1F4ED": {
+    "\ud83d\udced": {
       "src": s1f4ed,
       "alt": "mailbox_with_no_mail"
     },
-    "\u1F4EE": {
+    "\ud83d\udcee": {
       "src": s1f4ee,
       "alt": "postbox"
     },
-    "\u1F4EF": {
+    "\ud83d\udcef": {
       "src": s1f4ef,
       "alt": "postal_horn"
     },
-    "\u1F4F0": {
+    "\ud83d\udcf0": {
       "src": s1f4f0,
       "alt": "newspaper"
     },
-    "\u1F4F1": {
+    "\ud83d\udcf1": {
       "src": s1f4f1,
       "alt": "iphone"
     },
-    "\u1F4F2": {
+    "\ud83d\udcf2": {
       "src": s1f4f2,
       "alt": "calling"
     },
-    "\u1F4F7": {
+    "\ud83d\udcf7": {
       "src": s1f4f7,
       "alt": "camera"
     },
-    "\u1F4F8": {
+    "\ud83d\udcf8": {
       "src": s1f4f8,
       "alt": "camera_with_flash"
     },
-    "\u1F4F9": {
+    "\ud83d\udcf9": {
       "src": s1f4f9,
       "alt": "video_camera"
     },
-    "\u1F4FA": {
+    "\ud83d\udcfa": {
       "src": s1f4fa,
       "alt": "tv"
     },
-    "\u1F4FB": {
+    "\ud83d\udcfb": {
       "src": s1f4fb,
       "alt": "radio"
     },
-    "\u1F4FC": {
+    "\ud83d\udcfc": {
       "src": s1f4fc,
       "alt": "vhs"
     },
-    "\u1F4FD\uFE0F": {
+    "\ud83d\udcfd\ufe0f": {
       "src": s1f4fdfe0f,
       "alt": "film_projector"
     },
-    "\u1F4FF": {
+    "\ud83d\udcff": {
       "src": s1f4ff,
       "alt": "prayer_beads"
     },
-    "\u1F507": {
+    "\ud83d\udd07": {
       "src": s1f507,
       "alt": "mute"
     },
-    "\u1F508": {
+    "\ud83d\udd08": {
       "src": s1f508,
       "alt": "speaker"
     },
-    "\u1F509": {
+    "\ud83d\udd09": {
       "src": s1f509,
       "alt": "sound"
     },
-    "\u1F50A": {
+    "\ud83d\udd0a": {
       "src": s1f50a,
       "alt": "loud_sound"
     },
-    "\u1F50B": {
+    "\ud83d\udd0b": {
       "src": s1f50b,
       "alt": "battery"
     },
-    "\u1F50C": {
+    "\ud83d\udd0c": {
       "src": s1f50c,
       "alt": "electric_plug"
     },
-    "\u1F50D": {
+    "\ud83d\udd0d": {
       "src": s1f50d,
       "alt": "mag"
     },
-    "\u1F50E": {
+    "\ud83d\udd0e": {
       "src": s1f50e,
       "alt": "mag_right"
     },
-    "\u1F50F": {
+    "\ud83d\udd0f": {
       "src": s1f50f,
       "alt": "lock_with_ink_pen"
     },
-    "\u1F510": {
+    "\ud83d\udd10": {
       "src": s1f510,
       "alt": "closed_lock_with_key"
     },
-    "\u1F511": {
+    "\ud83d\udd11": {
       "src": s1f511,
       "alt": "key"
     },
-    "\u1F512": {
+    "\ud83d\udd12": {
       "src": s1f512,
       "alt": "lock"
     },
-    "\u1F513": {
+    "\ud83d\udd13": {
       "src": s1f513,
       "alt": "unlock"
     },
-    "\u1F514": {
+    "\ud83d\udd14": {
       "src": s1f514,
       "alt": "bell"
     },
-    "\u1F515": {
+    "\ud83d\udd15": {
       "src": s1f515,
       "alt": "no_bell"
     },
-    "\u1F516": {
+    "\ud83d\udd16": {
       "src": s1f516,
       "alt": "bookmark"
     },
-    "\u1F517": {
+    "\ud83d\udd17": {
       "src": s1f517,
       "alt": "link"
     },
-    "\u1F526": {
+    "\ud83d\udd26": {
       "src": s1f526,
       "alt": "flashlight"
     },
-    "\u1F527": {
+    "\ud83d\udd27": {
       "src": s1f527,
       "alt": "wrench"
     },
-    "\u1F528": {
+    "\ud83d\udd28": {
       "src": s1f528,
       "alt": "hammer"
     },
-    "\u1F529": {
+    "\ud83d\udd29": {
       "src": s1f529,
       "alt": "nut_and_bolt"
     },
-    "\u1F52B": {
+    "\ud83d\udd2b": {
       "src": s1f52b,
       "alt": "gun"
     },
-    "\u1F52C": {
+    "\ud83d\udd2c": {
       "src": s1f52c,
       "alt": "microscope"
     },
-    "\u1F52D": {
+    "\ud83d\udd2d": {
       "src": s1f52d,
       "alt": "telescope"
     },
-    "\u1F56F\uFE0F": {
+    "\ud83d\udd6f\ufe0f": {
       "src": s1f56ffe0f,
       "alt": "candle"
     },
-    "\u1F576\uFE0F": {
+    "\ud83d\udd76\ufe0f": {
       "src": s1f576fe0f,
       "alt": "dark_sunglasses"
     },
-    "\u1F587\uFE0F": {
+    "\ud83d\udd87\ufe0f": {
       "src": s1f587fe0f,
       "alt": "linked_paperclips"
     },
-    "\u1F58A\uFE0F": {
+    "\ud83d\udd8a\ufe0f": {
       "src": s1f58afe0f,
       "alt": "lower_left_ballpoint_pen"
     },
-    "\u1F58B\uFE0F": {
+    "\ud83d\udd8b\ufe0f": {
       "src": s1f58bfe0f,
       "alt": "lower_left_fountain_pen"
     },
-    "\u1F58C\uFE0F": {
+    "\ud83d\udd8c\ufe0f": {
       "src": s1f58cfe0f,
       "alt": "lower_left_paintbrush"
     },
-    "\u1F58D\uFE0F": {
+    "\ud83d\udd8d\ufe0f": {
       "src": s1f58dfe0f,
       "alt": "lower_left_crayon"
     },
-    "\u1F5A5\uFE0F": {
+    "\ud83d\udda5\ufe0f": {
       "src": s1f5a5fe0f,
       "alt": "desktop_computer"
     },
-    "\u1F5A8\uFE0F": {
+    "\ud83d\udda8\ufe0f": {
       "src": s1f5a8fe0f,
       "alt": "printer"
     },
-    "\u1F5B1\uFE0F": {
+    "\ud83d\uddb1\ufe0f": {
       "src": s1f5b1fe0f,
       "alt": "three_button_mouse"
     },
-    "\u1F5B2\uFE0F": {
+    "\ud83d\uddb2\ufe0f": {
       "src": s1f5b2fe0f,
       "alt": "trackball"
     },
-    "\u1F5C2\uFE0F": {
+    "\ud83d\uddc2\ufe0f": {
       "src": s1f5c2fe0f,
       "alt": "card_index_dividers"
     },
-    "\u1F5C3\uFE0F": {
+    "\ud83d\uddc3\ufe0f": {
       "src": s1f5c3fe0f,
       "alt": "card_file_box"
     },
-    "\u1F5C4\uFE0F": {
+    "\ud83d\uddc4\ufe0f": {
       "src": s1f5c4fe0f,
       "alt": "file_cabinet"
     },
-    "\u1F5D1\uFE0F": {
+    "\ud83d\uddd1\ufe0f": {
       "src": s1f5d1fe0f,
       "alt": "wastebasket"
     },
-    "\u1F5D2\uFE0F": {
+    "\ud83d\uddd2\ufe0f": {
       "src": s1f5d2fe0f,
       "alt": "spiral_note_pad"
     },
-    "\u1F5D3\uFE0F": {
+    "\ud83d\uddd3\ufe0f": {
       "src": s1f5d3fe0f,
       "alt": "spiral_calendar_pad"
     },
-    "\u1F5DC\uFE0F": {
+    "\ud83d\udddc\ufe0f": {
       "src": s1f5dcfe0f,
       "alt": "compression"
     },
-    "\u1F5DD\uFE0F": {
+    "\ud83d\udddd\ufe0f": {
       "src": s1f5ddfe0f,
       "alt": "old_key"
     },
-    "\u1F5DE\uFE0F": {
+    "\ud83d\uddde\ufe0f": {
       "src": s1f5defe0f,
       "alt": "rolled_up_newspaper"
     },
-    "\u1F5E1\uFE0F": {
+    "\ud83d\udde1\ufe0f": {
       "src": s1f5e1fe0f,
       "alt": "dagger_knife"
     },
-    "\u1F5F3\uFE0F": {
+    "\ud83d\uddf3\ufe0f": {
       "src": s1f5f3fe0f,
       "alt": "ballot_box_with_ballot"
     },
-    "\u1F5FF": {
+    "\ud83d\uddff": {
       "src": s1f5ff,
       "alt": "moyai"
     },
-    "\u1F6AA": {
+    "\ud83d\udeaa": {
       "src": s1f6aa,
       "alt": "door"
     },
-    "\u1F6AC": {
+    "\ud83d\udeac": {
       "src": s1f6ac,
       "alt": "smoking"
     },
-    "\u1F6BD": {
+    "\ud83d\udebd": {
       "src": s1f6bd,
       "alt": "toilet"
     },
-    "\u1F6BF": {
+    "\ud83d\udebf": {
       "src": s1f6bf,
       "alt": "shower"
     },
-    "\u1F6C1": {
+    "\ud83d\udec1": {
       "src": s1f6c1,
       "alt": "bathtub"
     },
-    "\u1F6CB\uFE0F": {
+    "\ud83d\udecb\ufe0f": {
       "src": s1f6cbfe0f,
       "alt": "couch_and_lamp"
     },
-    "\u1F6CD\uFE0F": {
+    "\ud83d\udecd\ufe0f": {
       "src": s1f6cdfe0f,
       "alt": "shopping_bags"
     },
-    "\u1F6CF\uFE0F": {
+    "\ud83d\udecf\ufe0f": {
       "src": s1f6cffe0f,
       "alt": "bed"
     },
-    "\u1F6D2": {
+    "\ud83d\uded2": {
       "src": s1f6d2,
       "alt": "shopping_trolley"
     },
-    "\u1F6D7": {
+    "\ud83d\uded7": {
       "src": s1f6d7,
       "alt": "elevator"
     },
-    "\u1F6E0\uFE0F": {
+    "\ud83d\udee0\ufe0f": {
       "src": s1f6e0fe0f,
       "alt": "hammer_and_wrench"
     },
-    "\u1F6E1\uFE0F": {
+    "\ud83d\udee1\ufe0f": {
       "src": s1f6e1fe0f,
       "alt": "shield"
     },
-    "\u1F941": {
+    "\ud83e\udd41": {
       "src": s1f941,
       "alt": "drum_with_drumsticks"
     },
-    "\u1F97B": {
+    "\ud83e\udd7b": {
       "src": s1f97b,
       "alt": "sari"
     },
-    "\u1F97C": {
+    "\ud83e\udd7c": {
       "src": s1f97c,
       "alt": "lab_coat"
     },
-    "\u1F97D": {
+    "\ud83e\udd7d": {
       "src": s1f97d,
       "alt": "goggles"
     },
-    "\u1F97E": {
+    "\ud83e\udd7e": {
       "src": s1f97e,
       "alt": "hiking_boot"
     },
-    "\u1F97F": {
+    "\ud83e\udd7f": {
       "src": s1f97f,
       "alt": "womans_flat_shoe"
     },
-    "\u1F9AF": {
+    "\ud83e\uddaf": {
       "src": s1f9af,
       "alt": "probing_cane"
     },
-    "\u1F9BA": {
+    "\ud83e\uddba": {
       "src": s1f9ba,
       "alt": "safety_vest"
     },
-    "\u1F9E2": {
+    "\ud83e\udde2": {
       "src": s1f9e2,
       "alt": "billed_cap"
     },
-    "\u1F9E3": {
+    "\ud83e\udde3": {
       "src": s1f9e3,
       "alt": "scarf"
     },
-    "\u1F9E4": {
+    "\ud83e\udde4": {
       "src": s1f9e4,
       "alt": "gloves"
     },
-    "\u1F9E5": {
+    "\ud83e\udde5": {
       "src": s1f9e5,
       "alt": "coat"
     },
-    "\u1F9E6": {
+    "\ud83e\udde6": {
       "src": s1f9e6,
       "alt": "socks"
     },
-    "\u1F9EA": {
+    "\ud83e\uddea": {
       "src": s1f9ea,
       "alt": "test_tube"
     },
-    "\u1F9EB": {
+    "\ud83e\uddeb": {
       "src": s1f9eb,
       "alt": "petri_dish"
     },
-    "\u1F9EC": {
+    "\ud83e\uddec": {
       "src": s1f9ec,
       "alt": "dna"
     },
-    "\u1F9EE": {
+    "\ud83e\uddee": {
       "src": s1f9ee,
       "alt": "abacus"
     },
-    "\u1F9EF": {
+    "\ud83e\uddef": {
       "src": s1f9ef,
       "alt": "fire_extinguisher"
     },
-    "\u1F9F0": {
+    "\ud83e\uddf0": {
       "src": s1f9f0,
       "alt": "toolbox"
     },
-    "\u1F9F2": {
+    "\ud83e\uddf2": {
       "src": s1f9f2,
       "alt": "magnet"
     },
-    "\u1F9F4": {
+    "\ud83e\uddf4": {
       "src": s1f9f4,
       "alt": "lotion_bottle"
     },
-    "\u1F9F7": {
+    "\ud83e\uddf7": {
       "src": s1f9f7,
       "alt": "safety_pin"
     },
-    "\u1F9F9": {
+    "\ud83e\uddf9": {
       "src": s1f9f9,
       "alt": "broom"
     },
-    "\u1F9FA": {
+    "\ud83e\uddfa": {
       "src": s1f9fa,
       "alt": "basket"
     },
-    "\u1F9FB": {
+    "\ud83e\uddfb": {
       "src": s1f9fb,
       "alt": "roll_of_paper"
     },
-    "\u1F9FC": {
+    "\ud83e\uddfc": {
       "src": s1f9fc,
       "alt": "soap"
     },
-    "\u1F9FD": {
+    "\ud83e\uddfd": {
       "src": s1f9fd,
       "alt": "sponge"
     },
-    "\u1F9FE": {
+    "\ud83e\uddfe": {
       "src": s1f9fe,
       "alt": "receipt"
     },
-    "\u1FA70": {
+    "\ud83e\ude70": {
       "src": s1fa70,
       "alt": "ballet_shoes"
     },
-    "\u1FA71": {
+    "\ud83e\ude71": {
       "src": s1fa71,
       "alt": "one-piece_swimsuit"
     },
-    "\u1FA72": {
+    "\ud83e\ude72": {
       "src": s1fa72,
       "alt": "briefs"
     },
-    "\u1FA73": {
+    "\ud83e\ude73": {
       "src": s1fa73,
       "alt": "shorts"
     },
-    "\u1FA74": {
+    "\ud83e\ude74": {
       "src": s1fa74,
       "alt": "thong_sandal"
     },
-    "\u1FA78": {
+    "\ud83e\ude78": {
       "src": s1fa78,
       "alt": "drop_of_blood"
     },
-    "\u1FA79": {
+    "\ud83e\ude79": {
       "src": s1fa79,
       "alt": "adhesive_bandage"
     },
-    "\u1FA7A": {
+    "\ud83e\ude7a": {
       "src": s1fa7a,
       "alt": "stethoscope"
     },
-    "\u1FA83": {
+    "\ud83e\ude83": {
       "src": s1fa83,
       "alt": "boomerang"
     },
-    "\u1FA91": {
+    "\ud83e\ude91": {
       "src": s1fa91,
       "alt": "chair"
     },
-    "\u1FA92": {
+    "\ud83e\ude92": {
       "src": s1fa92,
       "alt": "razor"
     },
-    "\u1FA93": {
+    "\ud83e\ude93": {
       "src": s1fa93,
       "alt": "axe"
     },
-    "\u1FA94": {
+    "\ud83e\ude94": {
       "src": s1fa94,
       "alt": "diya_lamp"
     },
-    "\u1FA95": {
+    "\ud83e\ude95": {
       "src": s1fa95,
       "alt": "banjo"
     },
-    "\u1FA96": {
+    "\ud83e\ude96": {
       "src": s1fa96,
       "alt": "military_helmet"
     },
-    "\u1FA97": {
+    "\ud83e\ude97": {
       "src": s1fa97,
       "alt": "accordion"
     },
-    "\u1FA98": {
+    "\ud83e\ude98": {
       "src": s1fa98,
       "alt": "long_drum"
     },
-    "\u1FA99": {
+    "\ud83e\ude99": {
       "src": s1fa99,
       "alt": "coin"
     },
-    "\u1FA9A": {
+    "\ud83e\ude9a": {
       "src": s1fa9a,
       "alt": "carpentry_saw"
     },
-    "\u1FA9B": {
+    "\ud83e\ude9b": {
       "src": s1fa9b,
       "alt": "screwdriver"
     },
-    "\u1FA9C": {
+    "\ud83e\ude9c": {
       "src": s1fa9c,
       "alt": "ladder"
     },
-    "\u1FA9D": {
+    "\ud83e\ude9d": {
       "src": s1fa9d,
       "alt": "hook"
     },
-    "\u1FA9E": {
+    "\ud83e\ude9e": {
       "src": s1fa9e,
       "alt": "mirror"
     },
-    "\u1FA9F": {
+    "\ud83e\ude9f": {
       "src": s1fa9f,
       "alt": "window"
     },
-    "\u1FAA0": {
+    "\ud83e\udea0": {
       "src": s1faa0,
       "alt": "plunger"
     },
-    "\u1FAA3": {
+    "\ud83e\udea3": {
       "src": s1faa3,
       "alt": "bucket"
     },
-    "\u1FAA4": {
+    "\ud83e\udea4": {
       "src": s1faa4,
       "alt": "mouse_trap"
     },
-    "\u1FAA5": {
+    "\ud83e\udea5": {
       "src": s1faa5,
       "alt": "toothbrush"
     },
-    "\u1FAA6": {
+    "\ud83e\udea6": {
       "src": s1faa6,
       "alt": "headstone"
     },
-    "\u1FAA7": {
+    "\ud83e\udea7": {
       "src": s1faa7,
       "alt": "placard"
     },
-    "\u2328\uFE0F": {
+    "\u2328\ufe0f": {
       "src": s2328fe0f,
       "alt": "keyboard"
     },
-    "\u260E\uFE0F": {
+    "\u260e\ufe0f": {
       "src": s260efe0f,
       "alt": "phone"
     },
-    "\u2692\uFE0F": {
+    "\u2692\ufe0f": {
       "src": s2692fe0f,
       "alt": "hammer_and_pick"
     },
-    "\u2694\uFE0F": {
+    "\u2694\ufe0f": {
       "src": s2694fe0f,
       "alt": "crossed_swords"
     },
-    "\u2696\uFE0F": {
+    "\u2696\ufe0f": {
       "src": s2696fe0f,
       "alt": "scales"
     },
-    "\u2697\uFE0F": {
+    "\u2697\ufe0f": {
       "src": s2697fe0f,
       "alt": "alembic"
     },
-    "\u2699\uFE0F": {
+    "\u2699\ufe0f": {
       "src": s2699fe0f,
       "alt": "gear"
     },
-    "\u26B0\uFE0F": {
+    "\u26b0\ufe0f": {
       "src": s26b0fe0f,
       "alt": "coffin"
     },
-    "\u26B1\uFE0F": {
+    "\u26b1\ufe0f": {
       "src": s26b1fe0f,
       "alt": "funeral_urn"
     },
-    "\u26CF\uFE0F": {
+    "\u26cf\ufe0f": {
       "src": s26cffe0f,
       "alt": "pick"
     },
-    "\u26D1\uFE0F": {
+    "\u26d1\ufe0f": {
       "src": s26d1fe0f,
       "alt": "helmet_with_white_cross"
     },
-    "\u26D3\uFE0F": {
+    "\u26d3\ufe0f": {
       "src": s26d3fe0f,
       "alt": "chains"
     },
-    "\u2702\uFE0F": {
+    "\u2702\ufe0f": {
       "src": s2702fe0f,
       "alt": "scissors"
     },
-    "\u2709\uFE0F": {
+    "\u2709\ufe0f": {
       "src": s2709fe0f,
       "alt": "email"
     },
-    "\u270F\uFE0F": {
+    "\u270f\ufe0f": {
       "src": s270ffe0f,
       "alt": "pencil2"
     },
-    "\u2712\uFE0F": {
+    "\u2712\ufe0f": {
       "src": s2712fe0f,
       "alt": "black_nib"
     }
   },
   "Flags": {
-    "\u1F1E6\u1F1E8": {
+    "\ud83c\udde6\ud83c\udde8": {
       "src": s1f1e61f1e8,
       "alt": "flag-ac"
     },
-    "\u1F1E6\u1F1E9": {
+    "\ud83c\udde6\ud83c\udde9": {
       "src": s1f1e61f1e9,
       "alt": "flag-ad"
     },
-    "\u1F1E6\u1F1EA": {
+    "\ud83c\udde6\ud83c\uddea": {
       "src": s1f1e61f1ea,
       "alt": "flag-ae"
     },
-    "\u1F1E6\u1F1EB": {
+    "\ud83c\udde6\ud83c\uddeb": {
       "src": s1f1e61f1eb,
       "alt": "flag-af"
     },
-    "\u1F1E6\u1F1EC": {
+    "\ud83c\udde6\ud83c\uddec": {
       "src": s1f1e61f1ec,
       "alt": "flag-ag"
     },
-    "\u1F1E6\u1F1EE": {
+    "\ud83c\udde6\ud83c\uddee": {
       "src": s1f1e61f1ee,
       "alt": "flag-ai"
     },
-    "\u1F1E6\u1F1F1": {
+    "\ud83c\udde6\ud83c\uddf1": {
       "src": s1f1e61f1f1,
       "alt": "flag-al"
     },
-    "\u1F1E6\u1F1F2": {
+    "\ud83c\udde6\ud83c\uddf2": {
       "src": s1f1e61f1f2,
       "alt": "flag-am"
     },
-    "\u1F1E6\u1F1F4": {
+    "\ud83c\udde6\ud83c\uddf4": {
       "src": s1f1e61f1f4,
       "alt": "flag-ao"
     },
-    "\u1F1E6\u1F1F6": {
+    "\ud83c\udde6\ud83c\uddf6": {
       "src": s1f1e61f1f6,
       "alt": "flag-aq"
     },
-    "\u1F1E6\u1F1F7": {
+    "\ud83c\udde6\ud83c\uddf7": {
       "src": s1f1e61f1f7,
       "alt": "flag-ar"
     },
-    "\u1F1E6\u1F1F8": {
+    "\ud83c\udde6\ud83c\uddf8": {
       "src": s1f1e61f1f8,
       "alt": "flag-as"
     },
-    "\u1F1E6\u1F1F9": {
+    "\ud83c\udde6\ud83c\uddf9": {
       "src": s1f1e61f1f9,
       "alt": "flag-at"
     },
-    "\u1F1E6\u1F1FA": {
+    "\ud83c\udde6\ud83c\uddfa": {
       "src": s1f1e61f1fa,
       "alt": "flag-au"
     },
-    "\u1F1E6\u1F1FC": {
+    "\ud83c\udde6\ud83c\uddfc": {
       "src": s1f1e61f1fc,
       "alt": "flag-aw"
     },
-    "\u1F1E6\u1F1FD": {
+    "\ud83c\udde6\ud83c\uddfd": {
       "src": s1f1e61f1fd,
       "alt": "flag-ax"
     },
-    "\u1F1E6\u1F1FF": {
+    "\ud83c\udde6\ud83c\uddff": {
       "src": s1f1e61f1ff,
       "alt": "flag-az"
     },
-    "\u1F1E7\u1F1E6": {
+    "\ud83c\udde7\ud83c\udde6": {
       "src": s1f1e71f1e6,
       "alt": "flag-ba"
     },
-    "\u1F1E7\u1F1E7": {
+    "\ud83c\udde7\ud83c\udde7": {
       "src": s1f1e71f1e7,
       "alt": "flag-bb"
     },
-    "\u1F1E7\u1F1E9": {
+    "\ud83c\udde7\ud83c\udde9": {
       "src": s1f1e71f1e9,
       "alt": "flag-bd"
     },
-    "\u1F1E7\u1F1EA": {
+    "\ud83c\udde7\ud83c\uddea": {
       "src": s1f1e71f1ea,
       "alt": "flag-be"
     },
-    "\u1F1E7\u1F1EB": {
+    "\ud83c\udde7\ud83c\uddeb": {
       "src": s1f1e71f1eb,
       "alt": "flag-bf"
     },
-    "\u1F1E7\u1F1EC": {
+    "\ud83c\udde7\ud83c\uddec": {
       "src": s1f1e71f1ec,
       "alt": "flag-bg"
     },
-    "\u1F1E7\u1F1ED": {
+    "\ud83c\udde7\ud83c\udded": {
       "src": s1f1e71f1ed,
       "alt": "flag-bh"
     },
-    "\u1F1E7\u1F1EE": {
+    "\ud83c\udde7\ud83c\uddee": {
       "src": s1f1e71f1ee,
       "alt": "flag-bi"
     },
-    "\u1F1E7\u1F1EF": {
+    "\ud83c\udde7\ud83c\uddef": {
       "src": s1f1e71f1ef,
       "alt": "flag-bj"
     },
-    "\u1F1E7\u1F1F1": {
+    "\ud83c\udde7\ud83c\uddf1": {
       "src": s1f1e71f1f1,
       "alt": "flag-bl"
     },
-    "\u1F1E7\u1F1F2": {
+    "\ud83c\udde7\ud83c\uddf2": {
       "src": s1f1e71f1f2,
       "alt": "flag-bm"
     },
-    "\u1F1E7\u1F1F3": {
+    "\ud83c\udde7\ud83c\uddf3": {
       "src": s1f1e71f1f3,
       "alt": "flag-bn"
     },
-    "\u1F1E7\u1F1F4": {
+    "\ud83c\udde7\ud83c\uddf4": {
       "src": s1f1e71f1f4,
       "alt": "flag-bo"
     },
-    "\u1F1E7\u1F1F6": {
+    "\ud83c\udde7\ud83c\uddf6": {
       "src": s1f1e71f1f6,
       "alt": "flag-bq"
     },
-    "\u1F1E7\u1F1F7": {
+    "\ud83c\udde7\ud83c\uddf7": {
       "src": s1f1e71f1f7,
       "alt": "flag-br"
     },
-    "\u1F1E7\u1F1F8": {
+    "\ud83c\udde7\ud83c\uddf8": {
       "src": s1f1e71f1f8,
       "alt": "flag-bs"
     },
-    "\u1F1E7\u1F1F9": {
+    "\ud83c\udde7\ud83c\uddf9": {
       "src": s1f1e71f1f9,
       "alt": "flag-bt"
     },
-    "\u1F1E7\u1F1FB": {
+    "\ud83c\udde7\ud83c\uddfb": {
       "src": s1f1e71f1fb,
       "alt": "flag-bv"
     },
-    "\u1F1E7\u1F1FC": {
+    "\ud83c\udde7\ud83c\uddfc": {
       "src": s1f1e71f1fc,
       "alt": "flag-bw"
     },
-    "\u1F1E7\u1F1FE": {
+    "\ud83c\udde7\ud83c\uddfe": {
       "src": s1f1e71f1fe,
       "alt": "flag-by"
     },
-    "\u1F1E7\u1F1FF": {
+    "\ud83c\udde7\ud83c\uddff": {
       "src": s1f1e71f1ff,
       "alt": "flag-bz"
     },
-    "\u1F1E8\u1F1E6": {
+    "\ud83c\udde8\ud83c\udde6": {
       "src": s1f1e81f1e6,
       "alt": "flag-ca"
     },
-    "\u1F1E8\u1F1E8": {
+    "\ud83c\udde8\ud83c\udde8": {
       "src": s1f1e81f1e8,
       "alt": "flag-cc"
     },
-    "\u1F1E8\u1F1E9": {
+    "\ud83c\udde8\ud83c\udde9": {
       "src": s1f1e81f1e9,
       "alt": "flag-cd"
     },
-    "\u1F1E8\u1F1EB": {
+    "\ud83c\udde8\ud83c\uddeb": {
       "src": s1f1e81f1eb,
       "alt": "flag-cf"
     },
-    "\u1F1E8\u1F1EC": {
+    "\ud83c\udde8\ud83c\uddec": {
       "src": s1f1e81f1ec,
       "alt": "flag-cg"
     },
-    "\u1F1E8\u1F1ED": {
+    "\ud83c\udde8\ud83c\udded": {
       "src": s1f1e81f1ed,
       "alt": "flag-ch"
     },
-    "\u1F1E8\u1F1EE": {
+    "\ud83c\udde8\ud83c\uddee": {
       "src": s1f1e81f1ee,
       "alt": "flag-ci"
     },
-    "\u1F1E8\u1F1F0": {
+    "\ud83c\udde8\ud83c\uddf0": {
       "src": s1f1e81f1f0,
       "alt": "flag-ck"
     },
-    "\u1F1E8\u1F1F1": {
+    "\ud83c\udde8\ud83c\uddf1": {
       "src": s1f1e81f1f1,
       "alt": "flag-cl"
     },
-    "\u1F1E8\u1F1F2": {
+    "\ud83c\udde8\ud83c\uddf2": {
       "src": s1f1e81f1f2,
       "alt": "flag-cm"
     },
-    "\u1F1E8\u1F1F3": {
+    "\ud83c\udde8\ud83c\uddf3": {
       "src": s1f1e81f1f3,
       "alt": "cn"
     },
-    "\u1F1E8\u1F1F4": {
+    "\ud83c\udde8\ud83c\uddf4": {
       "src": s1f1e81f1f4,
       "alt": "flag-co"
     },
-    "\u1F1E8\u1F1F5": {
+    "\ud83c\udde8\ud83c\uddf5": {
       "src": s1f1e81f1f5,
       "alt": "flag-cp"
     },
-    "\u1F1E8\u1F1F7": {
+    "\ud83c\udde8\ud83c\uddf7": {
       "src": s1f1e81f1f7,
       "alt": "flag-cr"
     },
-    "\u1F1E8\u1F1FA": {
+    "\ud83c\udde8\ud83c\uddfa": {
       "src": s1f1e81f1fa,
       "alt": "flag-cu"
     },
-    "\u1F1E8\u1F1FB": {
+    "\ud83c\udde8\ud83c\uddfb": {
       "src": s1f1e81f1fb,
       "alt": "flag-cv"
     },
-    "\u1F1E8\u1F1FC": {
+    "\ud83c\udde8\ud83c\uddfc": {
       "src": s1f1e81f1fc,
       "alt": "flag-cw"
     },
-    "\u1F1E8\u1F1FD": {
+    "\ud83c\udde8\ud83c\uddfd": {
       "src": s1f1e81f1fd,
       "alt": "flag-cx"
     },
-    "\u1F1E8\u1F1FE": {
+    "\ud83c\udde8\ud83c\uddfe": {
       "src": s1f1e81f1fe,
       "alt": "flag-cy"
     },
-    "\u1F1E8\u1F1FF": {
+    "\ud83c\udde8\ud83c\uddff": {
       "src": s1f1e81f1ff,
       "alt": "flag-cz"
     },
-    "\u1F1E9\u1F1EA": {
+    "\ud83c\udde9\ud83c\uddea": {
       "src": s1f1e91f1ea,
       "alt": "de"
     },
-    "\u1F1E9\u1F1EC": {
+    "\ud83c\udde9\ud83c\uddec": {
       "src": s1f1e91f1ec,
       "alt": "flag-dg"
     },
-    "\u1F1E9\u1F1EF": {
+    "\ud83c\udde9\ud83c\uddef": {
       "src": s1f1e91f1ef,
       "alt": "flag-dj"
     },
-    "\u1F1E9\u1F1F0": {
+    "\ud83c\udde9\ud83c\uddf0": {
       "src": s1f1e91f1f0,
       "alt": "flag-dk"
     },
-    "\u1F1E9\u1F1F2": {
+    "\ud83c\udde9\ud83c\uddf2": {
       "src": s1f1e91f1f2,
       "alt": "flag-dm"
     },
-    "\u1F1E9\u1F1F4": {
+    "\ud83c\udde9\ud83c\uddf4": {
       "src": s1f1e91f1f4,
       "alt": "flag-do"
     },
-    "\u1F1E9\u1F1FF": {
+    "\ud83c\udde9\ud83c\uddff": {
       "src": s1f1e91f1ff,
       "alt": "flag-dz"
     },
-    "\u1F1EA\u1F1E6": {
+    "\ud83c\uddea\ud83c\udde6": {
       "src": s1f1ea1f1e6,
       "alt": "flag-ea"
     },
-    "\u1F1EA\u1F1E8": {
+    "\ud83c\uddea\ud83c\udde8": {
       "src": s1f1ea1f1e8,
       "alt": "flag-ec"
     },
-    "\u1F1EA\u1F1EA": {
+    "\ud83c\uddea\ud83c\uddea": {
       "src": s1f1ea1f1ea,
       "alt": "flag-ee"
     },
-    "\u1F1EA\u1F1EC": {
+    "\ud83c\uddea\ud83c\uddec": {
       "src": s1f1ea1f1ec,
       "alt": "flag-eg"
     },
-    "\u1F1EA\u1F1ED": {
+    "\ud83c\uddea\ud83c\udded": {
       "src": s1f1ea1f1ed,
       "alt": "flag-eh"
     },
-    "\u1F1EA\u1F1F7": {
+    "\ud83c\uddea\ud83c\uddf7": {
       "src": s1f1ea1f1f7,
       "alt": "flag-er"
     },
-    "\u1F1EA\u1F1F8": {
+    "\ud83c\uddea\ud83c\uddf8": {
       "src": s1f1ea1f1f8,
       "alt": "es"
     },
-    "\u1F1EA\u1F1F9": {
+    "\ud83c\uddea\ud83c\uddf9": {
       "src": s1f1ea1f1f9,
       "alt": "flag-et"
     },
-    "\u1F1EA\u1F1FA": {
+    "\ud83c\uddea\ud83c\uddfa": {
       "src": s1f1ea1f1fa,
       "alt": "flag-eu"
     },
-    "\u1F1EB\u1F1EE": {
+    "\ud83c\uddeb\ud83c\uddee": {
       "src": s1f1eb1f1ee,
       "alt": "flag-fi"
     },
-    "\u1F1EB\u1F1EF": {
+    "\ud83c\uddeb\ud83c\uddef": {
       "src": s1f1eb1f1ef,
       "alt": "flag-fj"
     },
-    "\u1F1EB\u1F1F0": {
+    "\ud83c\uddeb\ud83c\uddf0": {
       "src": s1f1eb1f1f0,
       "alt": "flag-fk"
     },
-    "\u1F1EB\u1F1F2": {
+    "\ud83c\uddeb\ud83c\uddf2": {
       "src": s1f1eb1f1f2,
       "alt": "flag-fm"
     },
-    "\u1F1EB\u1F1F4": {
+    "\ud83c\uddeb\ud83c\uddf4": {
       "src": s1f1eb1f1f4,
       "alt": "flag-fo"
     },
-    "\u1F1EB\u1F1F7": {
+    "\ud83c\uddeb\ud83c\uddf7": {
       "src": s1f1eb1f1f7,
       "alt": "fr"
     },
-    "\u1F1EC\u1F1E6": {
+    "\ud83c\uddec\ud83c\udde6": {
       "src": s1f1ec1f1e6,
       "alt": "flag-ga"
     },
-    "\u1F1EC\u1F1E7": {
+    "\ud83c\uddec\ud83c\udde7": {
       "src": s1f1ec1f1e7,
       "alt": "gb"
     },
-    "\u1F1EC\u1F1E9": {
+    "\ud83c\uddec\ud83c\udde9": {
       "src": s1f1ec1f1e9,
       "alt": "flag-gd"
     },
-    "\u1F1EC\u1F1EA": {
+    "\ud83c\uddec\ud83c\uddea": {
       "src": s1f1ec1f1ea,
       "alt": "flag-ge"
     },
-    "\u1F1EC\u1F1EB": {
+    "\ud83c\uddec\ud83c\uddeb": {
       "src": s1f1ec1f1eb,
       "alt": "flag-gf"
     },
-    "\u1F1EC\u1F1EC": {
+    "\ud83c\uddec\ud83c\uddec": {
       "src": s1f1ec1f1ec,
       "alt": "flag-gg"
     },
-    "\u1F1EC\u1F1ED": {
+    "\ud83c\uddec\ud83c\udded": {
       "src": s1f1ec1f1ed,
       "alt": "flag-gh"
     },
-    "\u1F1EC\u1F1EE": {
+    "\ud83c\uddec\ud83c\uddee": {
       "src": s1f1ec1f1ee,
       "alt": "flag-gi"
     },
-    "\u1F1EC\u1F1F1": {
+    "\ud83c\uddec\ud83c\uddf1": {
       "src": s1f1ec1f1f1,
       "alt": "flag-gl"
     },
-    "\u1F1EC\u1F1F2": {
+    "\ud83c\uddec\ud83c\uddf2": {
       "src": s1f1ec1f1f2,
       "alt": "flag-gm"
     },
-    "\u1F1EC\u1F1F3": {
+    "\ud83c\uddec\ud83c\uddf3": {
       "src": s1f1ec1f1f3,
       "alt": "flag-gn"
     },
-    "\u1F1EC\u1F1F5": {
+    "\ud83c\uddec\ud83c\uddf5": {
       "src": s1f1ec1f1f5,
       "alt": "flag-gp"
     },
-    "\u1F1EC\u1F1F6": {
+    "\ud83c\uddec\ud83c\uddf6": {
       "src": s1f1ec1f1f6,
       "alt": "flag-gq"
     },
-    "\u1F1EC\u1F1F7": {
+    "\ud83c\uddec\ud83c\uddf7": {
       "src": s1f1ec1f1f7,
       "alt": "flag-gr"
     },
-    "\u1F1EC\u1F1F8": {
+    "\ud83c\uddec\ud83c\uddf8": {
       "src": s1f1ec1f1f8,
       "alt": "flag-gs"
     },
-    "\u1F1EC\u1F1F9": {
+    "\ud83c\uddec\ud83c\uddf9": {
       "src": s1f1ec1f1f9,
       "alt": "flag-gt"
     },
-    "\u1F1EC\u1F1FA": {
+    "\ud83c\uddec\ud83c\uddfa": {
       "src": s1f1ec1f1fa,
       "alt": "flag-gu"
     },
-    "\u1F1EC\u1F1FC": {
+    "\ud83c\uddec\ud83c\uddfc": {
       "src": s1f1ec1f1fc,
       "alt": "flag-gw"
     },
-    "\u1F1EC\u1F1FE": {
+    "\ud83c\uddec\ud83c\uddfe": {
       "src": s1f1ec1f1fe,
       "alt": "flag-gy"
     },
-    "\u1F1ED\u1F1F0": {
+    "\ud83c\udded\ud83c\uddf0": {
       "src": s1f1ed1f1f0,
       "alt": "flag-hk"
     },
-    "\u1F1ED\u1F1F2": {
+    "\ud83c\udded\ud83c\uddf2": {
       "src": s1f1ed1f1f2,
       "alt": "flag-hm"
     },
-    "\u1F1ED\u1F1F3": {
+    "\ud83c\udded\ud83c\uddf3": {
       "src": s1f1ed1f1f3,
       "alt": "flag-hn"
     },
-    "\u1F1ED\u1F1F7": {
+    "\ud83c\udded\ud83c\uddf7": {
       "src": s1f1ed1f1f7,
       "alt": "flag-hr"
     },
-    "\u1F1ED\u1F1F9": {
+    "\ud83c\udded\ud83c\uddf9": {
       "src": s1f1ed1f1f9,
       "alt": "flag-ht"
     },
-    "\u1F1ED\u1F1FA": {
+    "\ud83c\udded\ud83c\uddfa": {
       "src": s1f1ed1f1fa,
       "alt": "flag-hu"
     },
-    "\u1F1EE\u1F1E8": {
+    "\ud83c\uddee\ud83c\udde8": {
       "src": s1f1ee1f1e8,
       "alt": "flag-ic"
     },
-    "\u1F1EE\u1F1E9": {
+    "\ud83c\uddee\ud83c\udde9": {
       "src": s1f1ee1f1e9,
       "alt": "flag-id"
     },
-    "\u1F1EE\u1F1EA": {
+    "\ud83c\uddee\ud83c\uddea": {
       "src": s1f1ee1f1ea,
       "alt": "flag-ie"
     },
-    "\u1F1EE\u1F1F1": {
+    "\ud83c\uddee\ud83c\uddf1": {
       "src": s1f1ee1f1f1,
       "alt": "flag-il"
     },
-    "\u1F1EE\u1F1F2": {
+    "\ud83c\uddee\ud83c\uddf2": {
       "src": s1f1ee1f1f2,
       "alt": "flag-im"
     },
-    "\u1F1EE\u1F1F3": {
+    "\ud83c\uddee\ud83c\uddf3": {
       "src": s1f1ee1f1f3,
       "alt": "flag-in"
     },
-    "\u1F1EE\u1F1F4": {
+    "\ud83c\uddee\ud83c\uddf4": {
       "src": s1f1ee1f1f4,
       "alt": "flag-io"
     },
-    "\u1F1EE\u1F1F6": {
+    "\ud83c\uddee\ud83c\uddf6": {
       "src": s1f1ee1f1f6,
       "alt": "flag-iq"
     },
-    "\u1F1EE\u1F1F7": {
+    "\ud83c\uddee\ud83c\uddf7": {
       "src": s1f1ee1f1f7,
       "alt": "flag-ir"
     },
-    "\u1F1EE\u1F1F8": {
+    "\ud83c\uddee\ud83c\uddf8": {
       "src": s1f1ee1f1f8,
       "alt": "flag-is"
     },
-    "\u1F1EE\u1F1F9": {
+    "\ud83c\uddee\ud83c\uddf9": {
       "src": s1f1ee1f1f9,
       "alt": "it"
     },
-    "\u1F1EF\u1F1EA": {
+    "\ud83c\uddef\ud83c\uddea": {
       "src": s1f1ef1f1ea,
       "alt": "flag-je"
     },
-    "\u1F1EF\u1F1F2": {
+    "\ud83c\uddef\ud83c\uddf2": {
       "src": s1f1ef1f1f2,
       "alt": "flag-jm"
     },
-    "\u1F1EF\u1F1F4": {
+    "\ud83c\uddef\ud83c\uddf4": {
       "src": s1f1ef1f1f4,
       "alt": "flag-jo"
     },
-    "\u1F1EF\u1F1F5": {
+    "\ud83c\uddef\ud83c\uddf5": {
       "src": s1f1ef1f1f5,
       "alt": "jp"
     },
-    "\u1F1F0\u1F1EA": {
+    "\ud83c\uddf0\ud83c\uddea": {
       "src": s1f1f01f1ea,
       "alt": "flag-ke"
     },
-    "\u1F1F0\u1F1EC": {
+    "\ud83c\uddf0\ud83c\uddec": {
       "src": s1f1f01f1ec,
       "alt": "flag-kg"
     },
-    "\u1F1F0\u1F1ED": {
+    "\ud83c\uddf0\ud83c\udded": {
       "src": s1f1f01f1ed,
       "alt": "flag-kh"
     },
-    "\u1F1F0\u1F1EE": {
+    "\ud83c\uddf0\ud83c\uddee": {
       "src": s1f1f01f1ee,
       "alt": "flag-ki"
     },
-    "\u1F1F0\u1F1F2": {
+    "\ud83c\uddf0\ud83c\uddf2": {
       "src": s1f1f01f1f2,
       "alt": "flag-km"
     },
-    "\u1F1F0\u1F1F3": {
+    "\ud83c\uddf0\ud83c\uddf3": {
       "src": s1f1f01f1f3,
       "alt": "flag-kn"
     },
-    "\u1F1F0\u1F1F5": {
+    "\ud83c\uddf0\ud83c\uddf5": {
       "src": s1f1f01f1f5,
       "alt": "flag-kp"
     },
-    "\u1F1F0\u1F1F7": {
+    "\ud83c\uddf0\ud83c\uddf7": {
       "src": s1f1f01f1f7,
       "alt": "kr"
     },
-    "\u1F1F0\u1F1FC": {
+    "\ud83c\uddf0\ud83c\uddfc": {
       "src": s1f1f01f1fc,
       "alt": "flag-kw"
     },
-    "\u1F1F0\u1F1FE": {
+    "\ud83c\uddf0\ud83c\uddfe": {
       "src": s1f1f01f1fe,
       "alt": "flag-ky"
     },
-    "\u1F1F0\u1F1FF": {
+    "\ud83c\uddf0\ud83c\uddff": {
       "src": s1f1f01f1ff,
       "alt": "flag-kz"
     },
-    "\u1F1F1\u1F1E6": {
+    "\ud83c\uddf1\ud83c\udde6": {
       "src": s1f1f11f1e6,
       "alt": "flag-la"
     },
-    "\u1F1F1\u1F1E7": {
+    "\ud83c\uddf1\ud83c\udde7": {
       "src": s1f1f11f1e7,
       "alt": "flag-lb"
     },
-    "\u1F1F1\u1F1E8": {
+    "\ud83c\uddf1\ud83c\udde8": {
       "src": s1f1f11f1e8,
       "alt": "flag-lc"
     },
-    "\u1F1F1\u1F1EE": {
+    "\ud83c\uddf1\ud83c\uddee": {
       "src": s1f1f11f1ee,
       "alt": "flag-li"
     },
-    "\u1F1F1\u1F1F0": {
+    "\ud83c\uddf1\ud83c\uddf0": {
       "src": s1f1f11f1f0,
       "alt": "flag-lk"
     },
-    "\u1F1F1\u1F1F7": {
+    "\ud83c\uddf1\ud83c\uddf7": {
       "src": s1f1f11f1f7,
       "alt": "flag-lr"
     },
-    "\u1F1F1\u1F1F8": {
+    "\ud83c\uddf1\ud83c\uddf8": {
       "src": s1f1f11f1f8,
       "alt": "flag-ls"
     },
-    "\u1F1F1\u1F1F9": {
+    "\ud83c\uddf1\ud83c\uddf9": {
       "src": s1f1f11f1f9,
       "alt": "flag-lt"
     },
-    "\u1F1F1\u1F1FA": {
+    "\ud83c\uddf1\ud83c\uddfa": {
       "src": s1f1f11f1fa,
       "alt": "flag-lu"
     },
-    "\u1F1F1\u1F1FB": {
+    "\ud83c\uddf1\ud83c\uddfb": {
       "src": s1f1f11f1fb,
       "alt": "flag-lv"
     },
-    "\u1F1F1\u1F1FE": {
+    "\ud83c\uddf1\ud83c\uddfe": {
       "src": s1f1f11f1fe,
       "alt": "flag-ly"
     },
-    "\u1F1F2\u1F1E6": {
+    "\ud83c\uddf2\ud83c\udde6": {
       "src": s1f1f21f1e6,
       "alt": "flag-ma"
     },
-    "\u1F1F2\u1F1E8": {
+    "\ud83c\uddf2\ud83c\udde8": {
       "src": s1f1f21f1e8,
       "alt": "flag-mc"
     },
-    "\u1F1F2\u1F1E9": {
+    "\ud83c\uddf2\ud83c\udde9": {
       "src": s1f1f21f1e9,
       "alt": "flag-md"
     },
-    "\u1F1F2\u1F1EA": {
+    "\ud83c\uddf2\ud83c\uddea": {
       "src": s1f1f21f1ea,
       "alt": "flag-me"
     },
-    "\u1F1F2\u1F1EB": {
+    "\ud83c\uddf2\ud83c\uddeb": {
       "src": s1f1f21f1eb,
       "alt": "flag-mf"
     },
-    "\u1F1F2\u1F1EC": {
+    "\ud83c\uddf2\ud83c\uddec": {
       "src": s1f1f21f1ec,
       "alt": "flag-mg"
     },
-    "\u1F1F2\u1F1ED": {
+    "\ud83c\uddf2\ud83c\udded": {
       "src": s1f1f21f1ed,
       "alt": "flag-mh"
     },
-    "\u1F1F2\u1F1F0": {
+    "\ud83c\uddf2\ud83c\uddf0": {
       "src": s1f1f21f1f0,
       "alt": "flag-mk"
     },
-    "\u1F1F2\u1F1F1": {
+    "\ud83c\uddf2\ud83c\uddf1": {
       "src": s1f1f21f1f1,
       "alt": "flag-ml"
     },
-    "\u1F1F2\u1F1F2": {
+    "\ud83c\uddf2\ud83c\uddf2": {
       "src": s1f1f21f1f2,
       "alt": "flag-mm"
     },
-    "\u1F1F2\u1F1F3": {
+    "\ud83c\uddf2\ud83c\uddf3": {
       "src": s1f1f21f1f3,
       "alt": "flag-mn"
     },
-    "\u1F1F2\u1F1F4": {
+    "\ud83c\uddf2\ud83c\uddf4": {
       "src": s1f1f21f1f4,
       "alt": "flag-mo"
     },
-    "\u1F1F2\u1F1F5": {
+    "\ud83c\uddf2\ud83c\uddf5": {
       "src": s1f1f21f1f5,
       "alt": "flag-mp"
     },
-    "\u1F1F2\u1F1F6": {
+    "\ud83c\uddf2\ud83c\uddf6": {
       "src": s1f1f21f1f6,
       "alt": "flag-mq"
     },
-    "\u1F1F2\u1F1F7": {
+    "\ud83c\uddf2\ud83c\uddf7": {
       "src": s1f1f21f1f7,
       "alt": "flag-mr"
     },
-    "\u1F1F2\u1F1F8": {
+    "\ud83c\uddf2\ud83c\uddf8": {
       "src": s1f1f21f1f8,
       "alt": "flag-ms"
     },
-    "\u1F1F2\u1F1F9": {
+    "\ud83c\uddf2\ud83c\uddf9": {
       "src": s1f1f21f1f9,
       "alt": "flag-mt"
     },
-    "\u1F1F2\u1F1FA": {
+    "\ud83c\uddf2\ud83c\uddfa": {
       "src": s1f1f21f1fa,
       "alt": "flag-mu"
     },
-    "\u1F1F2\u1F1FB": {
+    "\ud83c\uddf2\ud83c\uddfb": {
       "src": s1f1f21f1fb,
       "alt": "flag-mv"
     },
-    "\u1F1F2\u1F1FC": {
+    "\ud83c\uddf2\ud83c\uddfc": {
       "src": s1f1f21f1fc,
       "alt": "flag-mw"
     },
-    "\u1F1F2\u1F1FD": {
+    "\ud83c\uddf2\ud83c\uddfd": {
       "src": s1f1f21f1fd,
       "alt": "flag-mx"
     },
-    "\u1F1F2\u1F1FE": {
+    "\ud83c\uddf2\ud83c\uddfe": {
       "src": s1f1f21f1fe,
       "alt": "flag-my"
     },
-    "\u1F1F2\u1F1FF": {
+    "\ud83c\uddf2\ud83c\uddff": {
       "src": s1f1f21f1ff,
       "alt": "flag-mz"
     },
-    "\u1F1F3\u1F1E6": {
+    "\ud83c\uddf3\ud83c\udde6": {
       "src": s1f1f31f1e6,
       "alt": "flag-na"
     },
-    "\u1F1F3\u1F1E8": {
+    "\ud83c\uddf3\ud83c\udde8": {
       "src": s1f1f31f1e8,
       "alt": "flag-nc"
     },
-    "\u1F1F3\u1F1EA": {
+    "\ud83c\uddf3\ud83c\uddea": {
       "src": s1f1f31f1ea,
       "alt": "flag-ne"
     },
-    "\u1F1F3\u1F1EB": {
+    "\ud83c\uddf3\ud83c\uddeb": {
       "src": s1f1f31f1eb,
       "alt": "flag-nf"
     },
-    "\u1F1F3\u1F1EC": {
+    "\ud83c\uddf3\ud83c\uddec": {
       "src": s1f1f31f1ec,
       "alt": "flag-ng"
     },
-    "\u1F1F3\u1F1EE": {
+    "\ud83c\uddf3\ud83c\uddee": {
       "src": s1f1f31f1ee,
       "alt": "flag-ni"
     },
-    "\u1F1F3\u1F1F1": {
+    "\ud83c\uddf3\ud83c\uddf1": {
       "src": s1f1f31f1f1,
       "alt": "flag-nl"
     },
-    "\u1F1F3\u1F1F4": {
+    "\ud83c\uddf3\ud83c\uddf4": {
       "src": s1f1f31f1f4,
       "alt": "flag-no"
     },
-    "\u1F1F3\u1F1F5": {
+    "\ud83c\uddf3\ud83c\uddf5": {
       "src": s1f1f31f1f5,
       "alt": "flag-np"
     },
-    "\u1F1F3\u1F1F7": {
+    "\ud83c\uddf3\ud83c\uddf7": {
       "src": s1f1f31f1f7,
       "alt": "flag-nr"
     },
-    "\u1F1F3\u1F1FA": {
+    "\ud83c\uddf3\ud83c\uddfa": {
       "src": s1f1f31f1fa,
       "alt": "flag-nu"
     },
-    "\u1F1F3\u1F1FF": {
+    "\ud83c\uddf3\ud83c\uddff": {
       "src": s1f1f31f1ff,
       "alt": "flag-nz"
     },
-    "\u1F1F4\u1F1F2": {
+    "\ud83c\uddf4\ud83c\uddf2": {
       "src": s1f1f41f1f2,
       "alt": "flag-om"
     },
-    "\u1F1F5\u1F1E6": {
+    "\ud83c\uddf5\ud83c\udde6": {
       "src": s1f1f51f1e6,
       "alt": "flag-pa"
     },
-    "\u1F1F5\u1F1EA": {
+    "\ud83c\uddf5\ud83c\uddea": {
       "src": s1f1f51f1ea,
       "alt": "flag-pe"
     },
-    "\u1F1F5\u1F1EB": {
+    "\ud83c\uddf5\ud83c\uddeb": {
       "src": s1f1f51f1eb,
       "alt": "flag-pf"
     },
-    "\u1F1F5\u1F1EC": {
+    "\ud83c\uddf5\ud83c\uddec": {
       "src": s1f1f51f1ec,
       "alt": "flag-pg"
     },
-    "\u1F1F5\u1F1ED": {
+    "\ud83c\uddf5\ud83c\udded": {
       "src": s1f1f51f1ed,
       "alt": "flag-ph"
     },
-    "\u1F1F5\u1F1F0": {
+    "\ud83c\uddf5\ud83c\uddf0": {
       "src": s1f1f51f1f0,
       "alt": "flag-pk"
     },
-    "\u1F1F5\u1F1F1": {
+    "\ud83c\uddf5\ud83c\uddf1": {
       "src": s1f1f51f1f1,
       "alt": "flag-pl"
     },
-    "\u1F1F5\u1F1F2": {
+    "\ud83c\uddf5\ud83c\uddf2": {
       "src": s1f1f51f1f2,
       "alt": "flag-pm"
     },
-    "\u1F1F5\u1F1F3": {
+    "\ud83c\uddf5\ud83c\uddf3": {
       "src": s1f1f51f1f3,
       "alt": "flag-pn"
     },
-    "\u1F1F5\u1F1F7": {
+    "\ud83c\uddf5\ud83c\uddf7": {
       "src": s1f1f51f1f7,
       "alt": "flag-pr"
     },
-    "\u1F1F5\u1F1F8": {
+    "\ud83c\uddf5\ud83c\uddf8": {
       "src": s1f1f51f1f8,
       "alt": "flag-ps"
     },
-    "\u1F1F5\u1F1F9": {
+    "\ud83c\uddf5\ud83c\uddf9": {
       "src": s1f1f51f1f9,
       "alt": "flag-pt"
     },
-    "\u1F1F5\u1F1FC": {
+    "\ud83c\uddf5\ud83c\uddfc": {
       "src": s1f1f51f1fc,
       "alt": "flag-pw"
     },
-    "\u1F1F5\u1F1FE": {
+    "\ud83c\uddf5\ud83c\uddfe": {
       "src": s1f1f51f1fe,
       "alt": "flag-py"
     },
-    "\u1F1F6\u1F1E6": {
+    "\ud83c\uddf6\ud83c\udde6": {
       "src": s1f1f61f1e6,
       "alt": "flag-qa"
     },
-    "\u1F1F7\u1F1EA": {
+    "\ud83c\uddf7\ud83c\uddea": {
       "src": s1f1f71f1ea,
       "alt": "flag-re"
     },
-    "\u1F1F7\u1F1F4": {
+    "\ud83c\uddf7\ud83c\uddf4": {
       "src": s1f1f71f1f4,
       "alt": "flag-ro"
     },
-    "\u1F1F7\u1F1F8": {
+    "\ud83c\uddf7\ud83c\uddf8": {
       "src": s1f1f71f1f8,
       "alt": "flag-rs"
     },
-    "\u1F1F7\u1F1FA": {
+    "\ud83c\uddf7\ud83c\uddfa": {
       "src": s1f1f71f1fa,
       "alt": "ru"
     },
-    "\u1F1F7\u1F1FC": {
+    "\ud83c\uddf7\ud83c\uddfc": {
       "src": s1f1f71f1fc,
       "alt": "flag-rw"
     },
-    "\u1F1F8\u1F1E6": {
+    "\ud83c\uddf8\ud83c\udde6": {
       "src": s1f1f81f1e6,
       "alt": "flag-sa"
     },
-    "\u1F1F8\u1F1E7": {
+    "\ud83c\uddf8\ud83c\udde7": {
       "src": s1f1f81f1e7,
       "alt": "flag-sb"
     },
-    "\u1F1F8\u1F1E8": {
+    "\ud83c\uddf8\ud83c\udde8": {
       "src": s1f1f81f1e8,
       "alt": "flag-sc"
     },
-    "\u1F1F8\u1F1E9": {
+    "\ud83c\uddf8\ud83c\udde9": {
       "src": s1f1f81f1e9,
       "alt": "flag-sd"
     },
-    "\u1F1F8\u1F1EA": {
+    "\ud83c\uddf8\ud83c\uddea": {
       "src": s1f1f81f1ea,
       "alt": "flag-se"
     },
-    "\u1F1F8\u1F1EC": {
+    "\ud83c\uddf8\ud83c\uddec": {
       "src": s1f1f81f1ec,
       "alt": "flag-sg"
     },
-    "\u1F1F8\u1F1ED": {
+    "\ud83c\uddf8\ud83c\udded": {
       "src": s1f1f81f1ed,
       "alt": "flag-sh"
     },
-    "\u1F1F8\u1F1EE": {
+    "\ud83c\uddf8\ud83c\uddee": {
       "src": s1f1f81f1ee,
       "alt": "flag-si"
     },
-    "\u1F1F8\u1F1EF": {
+    "\ud83c\uddf8\ud83c\uddef": {
       "src": s1f1f81f1ef,
       "alt": "flag-sj"
     },
-    "\u1F1F8\u1F1F0": {
+    "\ud83c\uddf8\ud83c\uddf0": {
       "src": s1f1f81f1f0,
       "alt": "flag-sk"
     },
-    "\u1F1F8\u1F1F1": {
+    "\ud83c\uddf8\ud83c\uddf1": {
       "src": s1f1f81f1f1,
       "alt": "flag-sl"
     },
-    "\u1F1F8\u1F1F2": {
+    "\ud83c\uddf8\ud83c\uddf2": {
       "src": s1f1f81f1f2,
       "alt": "flag-sm"
     },
-    "\u1F1F8\u1F1F3": {
+    "\ud83c\uddf8\ud83c\uddf3": {
       "src": s1f1f81f1f3,
       "alt": "flag-sn"
     },
-    "\u1F1F8\u1F1F4": {
+    "\ud83c\uddf8\ud83c\uddf4": {
       "src": s1f1f81f1f4,
       "alt": "flag-so"
     },
-    "\u1F1F8\u1F1F7": {
+    "\ud83c\uddf8\ud83c\uddf7": {
       "src": s1f1f81f1f7,
       "alt": "flag-sr"
     },
-    "\u1F1F8\u1F1F8": {
+    "\ud83c\uddf8\ud83c\uddf8": {
       "src": s1f1f81f1f8,
       "alt": "flag-ss"
     },
-    "\u1F1F8\u1F1F9": {
+    "\ud83c\uddf8\ud83c\uddf9": {
       "src": s1f1f81f1f9,
       "alt": "flag-st"
     },
-    "\u1F1F8\u1F1FB": {
+    "\ud83c\uddf8\ud83c\uddfb": {
       "src": s1f1f81f1fb,
       "alt": "flag-sv"
     },
-    "\u1F1F8\u1F1FD": {
+    "\ud83c\uddf8\ud83c\uddfd": {
       "src": s1f1f81f1fd,
       "alt": "flag-sx"
     },
-    "\u1F1F8\u1F1FE": {
+    "\ud83c\uddf8\ud83c\uddfe": {
       "src": s1f1f81f1fe,
       "alt": "flag-sy"
     },
-    "\u1F1F8\u1F1FF": {
+    "\ud83c\uddf8\ud83c\uddff": {
       "src": s1f1f81f1ff,
       "alt": "flag-sz"
     },
-    "\u1F1F9\u1F1E6": {
+    "\ud83c\uddf9\ud83c\udde6": {
       "src": s1f1f91f1e6,
       "alt": "flag-ta"
     },
-    "\u1F1F9\u1F1E8": {
+    "\ud83c\uddf9\ud83c\udde8": {
       "src": s1f1f91f1e8,
       "alt": "flag-tc"
     },
-    "\u1F1F9\u1F1E9": {
+    "\ud83c\uddf9\ud83c\udde9": {
       "src": s1f1f91f1e9,
       "alt": "flag-td"
     },
-    "\u1F1F9\u1F1EB": {
+    "\ud83c\uddf9\ud83c\uddeb": {
       "src": s1f1f91f1eb,
       "alt": "flag-tf"
     },
-    "\u1F1F9\u1F1EC": {
+    "\ud83c\uddf9\ud83c\uddec": {
       "src": s1f1f91f1ec,
       "alt": "flag-tg"
     },
-    "\u1F1F9\u1F1ED": {
+    "\ud83c\uddf9\ud83c\udded": {
       "src": s1f1f91f1ed,
       "alt": "flag-th"
     },
-    "\u1F1F9\u1F1EF": {
+    "\ud83c\uddf9\ud83c\uddef": {
       "src": s1f1f91f1ef,
       "alt": "flag-tj"
     },
-    "\u1F1F9\u1F1F0": {
+    "\ud83c\uddf9\ud83c\uddf0": {
       "src": s1f1f91f1f0,
       "alt": "flag-tk"
     },
-    "\u1F1F9\u1F1F1": {
+    "\ud83c\uddf9\ud83c\uddf1": {
       "src": s1f1f91f1f1,
       "alt": "flag-tl"
     },
-    "\u1F1F9\u1F1F2": {
+    "\ud83c\uddf9\ud83c\uddf2": {
       "src": s1f1f91f1f2,
       "alt": "flag-tm"
     },
-    "\u1F1F9\u1F1F3": {
+    "\ud83c\uddf9\ud83c\uddf3": {
       "src": s1f1f91f1f3,
       "alt": "flag-tn"
     },
-    "\u1F1F9\u1F1F4": {
+    "\ud83c\uddf9\ud83c\uddf4": {
       "src": s1f1f91f1f4,
       "alt": "flag-to"
     },
-    "\u1F1F9\u1F1F7": {
+    "\ud83c\uddf9\ud83c\uddf7": {
       "src": s1f1f91f1f7,
       "alt": "flag-tr"
     },
-    "\u1F1F9\u1F1F9": {
+    "\ud83c\uddf9\ud83c\uddf9": {
       "src": s1f1f91f1f9,
       "alt": "flag-tt"
     },
-    "\u1F1F9\u1F1FB": {
+    "\ud83c\uddf9\ud83c\uddfb": {
       "src": s1f1f91f1fb,
       "alt": "flag-tv"
     },
-    "\u1F1F9\u1F1FC": {
+    "\ud83c\uddf9\ud83c\uddfc": {
       "src": s1f1f91f1fc,
       "alt": "flag-tw"
     },
-    "\u1F1F9\u1F1FF": {
+    "\ud83c\uddf9\ud83c\uddff": {
       "src": s1f1f91f1ff,
       "alt": "flag-tz"
     },
-    "\u1F1FA\u1F1E6": {
+    "\ud83c\uddfa\ud83c\udde6": {
       "src": s1f1fa1f1e6,
       "alt": "flag-ua"
     },
-    "\u1F1FA\u1F1EC": {
+    "\ud83c\uddfa\ud83c\uddec": {
       "src": s1f1fa1f1ec,
       "alt": "flag-ug"
     },
-    "\u1F1FA\u1F1F2": {
+    "\ud83c\uddfa\ud83c\uddf2": {
       "src": s1f1fa1f1f2,
       "alt": "flag-um"
     },
-    "\u1F1FA\u1F1F3": {
+    "\ud83c\uddfa\ud83c\uddf3": {
       "src": s1f1fa1f1f3,
       "alt": "flag-un"
     },
-    "\u1F1FA\u1F1F8": {
+    "\ud83c\uddfa\ud83c\uddf8": {
       "src": s1f1fa1f1f8,
       "alt": "us"
     },
-    "\u1F1FA\u1F1FE": {
+    "\ud83c\uddfa\ud83c\uddfe": {
       "src": s1f1fa1f1fe,
       "alt": "flag-uy"
     },
-    "\u1F1FA\u1F1FF": {
+    "\ud83c\uddfa\ud83c\uddff": {
       "src": s1f1fa1f1ff,
       "alt": "flag-uz"
     },
-    "\u1F1FB\u1F1E6": {
+    "\ud83c\uddfb\ud83c\udde6": {
       "src": s1f1fb1f1e6,
       "alt": "flag-va"
     },
-    "\u1F1FB\u1F1E8": {
+    "\ud83c\uddfb\ud83c\udde8": {
       "src": s1f1fb1f1e8,
       "alt": "flag-vc"
     },
-    "\u1F1FB\u1F1EA": {
+    "\ud83c\uddfb\ud83c\uddea": {
       "src": s1f1fb1f1ea,
       "alt": "flag-ve"
     },
-    "\u1F1FB\u1F1EC": {
+    "\ud83c\uddfb\ud83c\uddec": {
       "src": s1f1fb1f1ec,
       "alt": "flag-vg"
     },
-    "\u1F1FB\u1F1EE": {
+    "\ud83c\uddfb\ud83c\uddee": {
       "src": s1f1fb1f1ee,
       "alt": "flag-vi"
     },
-    "\u1F1FB\u1F1F3": {
+    "\ud83c\uddfb\ud83c\uddf3": {
       "src": s1f1fb1f1f3,
       "alt": "flag-vn"
     },
-    "\u1F1FB\u1F1FA": {
+    "\ud83c\uddfb\ud83c\uddfa": {
       "src": s1f1fb1f1fa,
       "alt": "flag-vu"
     },
-    "\u1F1FC\u1F1EB": {
+    "\ud83c\uddfc\ud83c\uddeb": {
       "src": s1f1fc1f1eb,
       "alt": "flag-wf"
     },
-    "\u1F1FC\u1F1F8": {
+    "\ud83c\uddfc\ud83c\uddf8": {
       "src": s1f1fc1f1f8,
       "alt": "flag-ws"
     },
-    "\u1F1FD\u1F1F0": {
+    "\ud83c\uddfd\ud83c\uddf0": {
       "src": s1f1fd1f1f0,
       "alt": "flag-xk"
     },
-    "\u1F1FE\u1F1EA": {
+    "\ud83c\uddfe\ud83c\uddea": {
       "src": s1f1fe1f1ea,
       "alt": "flag-ye"
     },
-    "\u1F1FE\u1F1F9": {
+    "\ud83c\uddfe\ud83c\uddf9": {
       "src": s1f1fe1f1f9,
       "alt": "flag-yt"
     },
-    "\u1F1FF\u1F1E6": {
+    "\ud83c\uddff\ud83c\udde6": {
       "src": s1f1ff1f1e6,
       "alt": "flag-za"
     },
-    "\u1F1FF\u1F1F2": {
+    "\ud83c\uddff\ud83c\uddf2": {
       "src": s1f1ff1f1f2,
       "alt": "flag-zm"
     },
-    "\u1F1FF\u1F1FC": {
+    "\ud83c\uddff\ud83c\uddfc": {
       "src": s1f1ff1f1fc,
       "alt": "flag-zw"
     },
-    "\u1F38C": {
+    "\ud83c\udf8c": {
       "src": s1f38c,
       "alt": "crossed_flags"
     },
-    "\u1F3C1": {
+    "\ud83c\udfc1": {
       "src": s1f3c1,
       "alt": "checkered_flag"
     },
-    "\u1F3F3\uFE0F\u200D\u1F308": {
+    "\ud83c\udff3\ufe0f\u200d\ud83c\udf08": {
       "src": s1f3f3fe0f200d1f308,
       "alt": "rainbow-flag"
     },
-    "\u1F3F3\uFE0F\u200D\u26A7\uFE0F": {
+    "\ud83c\udff3\ufe0f\u200d\u26a7\ufe0f": {
       "src": s1f3f3fe0f200d26a7fe0f,
       "alt": "transgender_flag"
     },
-    "\u1F3F3\uFE0F": {
+    "\ud83c\udff3\ufe0f": {
       "src": s1f3f3fe0f,
       "alt": "waving_white_flag"
     },
-    "\u1F3F4\u200D\u2620\uFE0F": {
+    "\ud83c\udff4\u200d\u2620\ufe0f": {
       "src": s1f3f4200d2620fe0f,
       "alt": "pirate_flag"
     },
-    "\u1F3F4\uE0067\uE0062\uE0065\uE006E\uE0067\uE007F": {
+    "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc65\udb40\udc6e\udb40\udc67\udb40\udc7f": {
       "src": s1f3f4e0067e0062e0065e006ee0067e007f,
       "alt": "flag-england"
     },
-    "\u1F3F4\uE0067\uE0062\uE0073\uE0063\uE0074\uE007F": {
+    "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc73\udb40\udc63\udb40\udc74\udb40\udc7f": {
       "src": s1f3f4e0067e0062e0073e0063e0074e007f,
       "alt": "flag-scotland"
     },
-    "\u1F3F4\uE0067\uE0062\uE0077\uE006C\uE0073\uE007F": {
+    "\ud83c\udff4\udb40\udc67\udb40\udc62\udb40\udc77\udb40\udc6c\udb40\udc73\udb40\udc7f": {
       "src": s1f3f4e0067e0062e0077e006ce0073e007f,
       "alt": "flag-wales"
     },
-    "\u1F3F4": {
+    "\ud83c\udff4": {
       "src": s1f3f4,
       "alt": "waving_black_flag"
     },
-    "\u1F6A9": {
+    "\ud83d\udea9": {
       "src": s1f6a9,
       "alt": "triangular_flag_on_post"
     }
   },
   "Symbols": {
-    "\u0023\uFE0F\u20E3": {
+    "\u0023\ufe0f\u20e3": {
       "src": s0023fe0f20e3,
       "alt": "hash"
     },
-    "\u002A\uFE0F\u20E3": {
+    "\u002a\ufe0f\u20e3": {
       "src": s002afe0f20e3,
       "alt": "keycap_star"
     },
-    "\u0030\uFE0F\u20E3": {
+    "\u0030\ufe0f\u20e3": {
       "src": s0030fe0f20e3,
       "alt": "zero"
     },
-    "\u0031\uFE0F\u20E3": {
+    "\u0031\ufe0f\u20e3": {
       "src": s0031fe0f20e3,
       "alt": "one"
     },
-    "\u0032\uFE0F\u20E3": {
+    "\u0032\ufe0f\u20e3": {
       "src": s0032fe0f20e3,
       "alt": "two"
     },
-    "\u0033\uFE0F\u20E3": {
+    "\u0033\ufe0f\u20e3": {
       "src": s0033fe0f20e3,
       "alt": "three"
     },
-    "\u0034\uFE0F\u20E3": {
+    "\u0034\ufe0f\u20e3": {
       "src": s0034fe0f20e3,
       "alt": "four"
     },
-    "\u0035\uFE0F\u20E3": {
+    "\u0035\ufe0f\u20e3": {
       "src": s0035fe0f20e3,
       "alt": "five"
     },
-    "\u0036\uFE0F\u20E3": {
+    "\u0036\ufe0f\u20e3": {
       "src": s0036fe0f20e3,
       "alt": "six"
     },
-    "\u0037\uFE0F\u20E3": {
+    "\u0037\ufe0f\u20e3": {
       "src": s0037fe0f20e3,
       "alt": "seven"
     },
-    "\u0038\uFE0F\u20E3": {
+    "\u0038\ufe0f\u20e3": {
       "src": s0038fe0f20e3,
       "alt": "eight"
     },
-    "\u0039\uFE0F\u20E3": {
+    "\u0039\ufe0f\u20e3": {
       "src": s0039fe0f20e3,
       "alt": "nine"
     },
-    "\u00A9\uFE0F": {
+    "\u00a9\ufe0f": {
       "src": s00a9fe0f,
       "alt": "copyright"
     },
-    "\u00AE\uFE0F": {
+    "\u00ae\ufe0f": {
       "src": s00aefe0f,
       "alt": "registered"
     },
-    "\u1F170\uFE0F": {
+    "\ud83c\udd70\ufe0f": {
       "src": s1f170fe0f,
       "alt": "a"
     },
-    "\u1F171\uFE0F": {
+    "\ud83c\udd71\ufe0f": {
       "src": s1f171fe0f,
       "alt": "b"
     },
-    "\u1F17E\uFE0F": {
+    "\ud83c\udd7e\ufe0f": {
       "src": s1f17efe0f,
       "alt": "o2"
     },
-    "\u1F17F\uFE0F": {
+    "\ud83c\udd7f\ufe0f": {
       "src": s1f17ffe0f,
       "alt": "parking"
     },
-    "\u1F18E": {
+    "\ud83c\udd8e": {
       "src": s1f18e,
       "alt": "ab"
     },
-    "\u1F191": {
+    "\ud83c\udd91": {
       "src": s1f191,
       "alt": "cl"
     },
-    "\u1F192": {
+    "\ud83c\udd92": {
       "src": s1f192,
       "alt": "cool"
     },
-    "\u1F193": {
+    "\ud83c\udd93": {
       "src": s1f193,
       "alt": "free"
     },
-    "\u1F194": {
+    "\ud83c\udd94": {
       "src": s1f194,
       "alt": "id"
     },
-    "\u1F195": {
+    "\ud83c\udd95": {
       "src": s1f195,
       "alt": "new"
     },
-    "\u1F196": {
+    "\ud83c\udd96": {
       "src": s1f196,
       "alt": "ng"
     },
-    "\u1F197": {
+    "\ud83c\udd97": {
       "src": s1f197,
       "alt": "ok"
     },
-    "\u1F198": {
+    "\ud83c\udd98": {
       "src": s1f198,
       "alt": "sos"
     },
-    "\u1F199": {
+    "\ud83c\udd99": {
       "src": s1f199,
       "alt": "up"
     },
-    "\u1F19A": {
+    "\ud83c\udd9a": {
       "src": s1f19a,
       "alt": "vs"
     },
-    "\u1F201": {
+    "\ud83c\ude01": {
       "src": s1f201,
       "alt": "koko"
     },
-    "\u1F202\uFE0F": {
+    "\ud83c\ude02\ufe0f": {
       "src": s1f202fe0f,
       "alt": "sa"
     },
-    "\u1F21A": {
+    "\ud83c\ude1a": {
       "src": s1f21a,
       "alt": "u7121"
     },
-    "\u1F22F": {
+    "\ud83c\ude2f": {
       "src": s1f22f,
       "alt": "u6307"
     },
-    "\u1F232": {
+    "\ud83c\ude32": {
       "src": s1f232,
       "alt": "u7981"
     },
-    "\u1F233": {
+    "\ud83c\ude33": {
       "src": s1f233,
       "alt": "u7a7a"
     },
-    "\u1F234": {
+    "\ud83c\ude34": {
       "src": s1f234,
       "alt": "u5408"
     },
-    "\u1F235": {
+    "\ud83c\ude35": {
       "src": s1f235,
       "alt": "u6e80"
     },
-    "\u1F236": {
+    "\ud83c\ude36": {
       "src": s1f236,
       "alt": "u6709"
     },
-    "\u1F237\uFE0F": {
+    "\ud83c\ude37\ufe0f": {
       "src": s1f237fe0f,
       "alt": "u6708"
     },
-    "\u1F238": {
+    "\ud83c\ude38": {
       "src": s1f238,
       "alt": "u7533"
     },
-    "\u1F239": {
+    "\ud83c\ude39": {
       "src": s1f239,
       "alt": "u5272"
     },
-    "\u1F23A": {
+    "\ud83c\ude3a": {
       "src": s1f23a,
       "alt": "u55b6"
     },
-    "\u1F250": {
+    "\ud83c\ude50": {
       "src": s1f250,
       "alt": "ideograph_advantage"
     },
-    "\u1F251": {
+    "\ud83c\ude51": {
       "src": s1f251,
       "alt": "accept"
     },
-    "\u1F3A6": {
+    "\ud83c\udfa6": {
       "src": s1f3a6,
       "alt": "cinema"
     },
-    "\u1F3E7": {
+    "\ud83c\udfe7": {
       "src": s1f3e7,
       "alt": "atm"
     },
-    "\u1F4A0": {
+    "\ud83d\udca0": {
       "src": s1f4a0,
       "alt": "diamond_shape_with_a_dot_inside"
     },
-    "\u1F4B1": {
+    "\ud83d\udcb1": {
       "src": s1f4b1,
       "alt": "currency_exchange"
     },
-    "\u1F4B2": {
+    "\ud83d\udcb2": {
       "src": s1f4b2,
       "alt": "heavy_dollar_sign"
     },
-    "\u1F4DB": {
+    "\ud83d\udcdb": {
       "src": s1f4db,
       "alt": "name_badge"
     },
-    "\u1F4F3": {
+    "\ud83d\udcf3": {
       "src": s1f4f3,
       "alt": "vibration_mode"
     },
-    "\u1F4F4": {
+    "\ud83d\udcf4": {
       "src": s1f4f4,
       "alt": "mobile_phone_off"
     },
-    "\u1F4F5": {
+    "\ud83d\udcf5": {
       "src": s1f4f5,
       "alt": "no_mobile_phones"
     },
-    "\u1F4F6": {
+    "\ud83d\udcf6": {
       "src": s1f4f6,
       "alt": "signal_strength"
     },
-    "\u1F500": {
+    "\ud83d\udd00": {
       "src": s1f500,
       "alt": "twisted_rightwards_arrows"
     },
-    "\u1F501": {
+    "\ud83d\udd01": {
       "src": s1f501,
       "alt": "repeat"
     },
-    "\u1F502": {
+    "\ud83d\udd02": {
       "src": s1f502,
       "alt": "repeat_one"
     },
-    "\u1F503": {
+    "\ud83d\udd03": {
       "src": s1f503,
       "alt": "arrows_clockwise"
     },
-    "\u1F504": {
+    "\ud83d\udd04": {
       "src": s1f504,
       "alt": "arrows_counterclockwise"
     },
-    "\u1F505": {
+    "\ud83d\udd05": {
       "src": s1f505,
       "alt": "low_brightness"
     },
-    "\u1F506": {
+    "\ud83d\udd06": {
       "src": s1f506,
       "alt": "high_brightness"
     },
-    "\u1F518": {
+    "\ud83d\udd18": {
       "src": s1f518,
       "alt": "radio_button"
     },
-    "\u1F519": {
+    "\ud83d\udd19": {
       "src": s1f519,
       "alt": "back"
     },
-    "\u1F51A": {
+    "\ud83d\udd1a": {
       "src": s1f51a,
       "alt": "end"
     },
-    "\u1F51B": {
+    "\ud83d\udd1b": {
       "src": s1f51b,
       "alt": "on"
     },
-    "\u1F51C": {
+    "\ud83d\udd1c": {
       "src": s1f51c,
       "alt": "soon"
     },
-    "\u1F51D": {
+    "\ud83d\udd1d": {
       "src": s1f51d,
       "alt": "top"
     },
-    "\u1F51E": {
+    "\ud83d\udd1e": {
       "src": s1f51e,
       "alt": "underage"
     },
-    "\u1F51F": {
+    "\ud83d\udd1f": {
       "src": s1f51f,
       "alt": "keycap_ten"
     },
-    "\u1F520": {
+    "\ud83d\udd20": {
       "src": s1f520,
       "alt": "capital_abcd"
     },
-    "\u1F521": {
+    "\ud83d\udd21": {
       "src": s1f521,
       "alt": "abcd"
     },
-    "\u1F522": {
+    "\ud83d\udd22": {
       "src": s1f522,
       "alt": "1234"
     },
-    "\u1F523": {
+    "\ud83d\udd23": {
       "src": s1f523,
       "alt": "symbols"
     },
-    "\u1F524": {
+    "\ud83d\udd24": {
       "src": s1f524,
       "alt": "abc"
     },
-    "\u1F52F": {
+    "\ud83d\udd2f": {
       "src": s1f52f,
       "alt": "six_pointed_star"
     },
-    "\u1F530": {
+    "\ud83d\udd30": {
       "src": s1f530,
       "alt": "beginner"
     },
-    "\u1F531": {
+    "\ud83d\udd31": {
       "src": s1f531,
       "alt": "trident"
     },
-    "\u1F532": {
+    "\ud83d\udd32": {
       "src": s1f532,
       "alt": "black_square_button"
     },
-    "\u1F533": {
+    "\ud83d\udd33": {
       "src": s1f533,
       "alt": "white_square_button"
     },
-    "\u1F534": {
+    "\ud83d\udd34": {
       "src": s1f534,
       "alt": "red_circle"
     },
-    "\u1F535": {
+    "\ud83d\udd35": {
       "src": s1f535,
       "alt": "large_blue_circle"
     },
-    "\u1F536": {
+    "\ud83d\udd36": {
       "src": s1f536,
       "alt": "large_orange_diamond"
     },
-    "\u1F537": {
+    "\ud83d\udd37": {
       "src": s1f537,
       "alt": "large_blue_diamond"
     },
-    "\u1F538": {
+    "\ud83d\udd38": {
       "src": s1f538,
       "alt": "small_orange_diamond"
     },
-    "\u1F539": {
+    "\ud83d\udd39": {
       "src": s1f539,
       "alt": "small_blue_diamond"
     },
-    "\u1F53A": {
+    "\ud83d\udd3a": {
       "src": s1f53a,
       "alt": "small_red_triangle"
     },
-    "\u1F53B": {
+    "\ud83d\udd3b": {
       "src": s1f53b,
       "alt": "small_red_triangle_down"
     },
-    "\u1F53C": {
+    "\ud83d\udd3c": {
       "src": s1f53c,
       "alt": "arrow_up_small"
     },
-    "\u1F53D": {
+    "\ud83d\udd3d": {
       "src": s1f53d,
       "alt": "arrow_down_small"
     },
-    "\u1F549\uFE0F": {
+    "\ud83d\udd49\ufe0f": {
       "src": s1f549fe0f,
       "alt": "om_symbol"
     },
-    "\u1F54E": {
+    "\ud83d\udd4e": {
       "src": s1f54e,
       "alt": "menorah_with_nine_branches"
     },
-    "\u1F6AB": {
+    "\ud83d\udeab": {
       "src": s1f6ab,
       "alt": "no_entry_sign"
     },
-    "\u1F6AD": {
+    "\ud83d\udead": {
       "src": s1f6ad,
       "alt": "no_smoking"
     },
-    "\u1F6AE": {
+    "\ud83d\udeae": {
       "src": s1f6ae,
       "alt": "put_litter_in_its_place"
     },
-    "\u1F6AF": {
+    "\ud83d\udeaf": {
       "src": s1f6af,
       "alt": "do_not_litter"
     },
-    "\u1F6B0": {
+    "\ud83d\udeb0": {
       "src": s1f6b0,
       "alt": "potable_water"
     },
-    "\u1F6B1": {
+    "\ud83d\udeb1": {
       "src": s1f6b1,
       "alt": "non-potable_water"
     },
-    "\u1F6B3": {
+    "\ud83d\udeb3": {
       "src": s1f6b3,
       "alt": "no_bicycles"
     },
-    "\u1F6B7": {
+    "\ud83d\udeb7": {
       "src": s1f6b7,
       "alt": "no_pedestrians"
     },
-    "\u1F6B8": {
+    "\ud83d\udeb8": {
       "src": s1f6b8,
       "alt": "children_crossing"
     },
-    "\u1F6B9": {
+    "\ud83d\udeb9": {
       "src": s1f6b9,
       "alt": "mens"
     },
-    "\u1F6BA": {
+    "\ud83d\udeba": {
       "src": s1f6ba,
       "alt": "womens"
     },
-    "\u1F6BB": {
+    "\ud83d\udebb": {
       "src": s1f6bb,
       "alt": "restroom"
     },
-    "\u1F6BC": {
+    "\ud83d\udebc": {
       "src": s1f6bc,
       "alt": "baby_symbol"
     },
-    "\u1F6BE": {
+    "\ud83d\udebe": {
       "src": s1f6be,
       "alt": "wc"
     },
-    "\u1F6C2": {
+    "\ud83d\udec2": {
       "src": s1f6c2,
       "alt": "passport_control"
     },
-    "\u1F6C3": {
+    "\ud83d\udec3": {
       "src": s1f6c3,
       "alt": "customs"
     },
-    "\u1F6C4": {
+    "\ud83d\udec4": {
       "src": s1f6c4,
       "alt": "baggage_claim"
     },
-    "\u1F6C5": {
+    "\ud83d\udec5": {
       "src": s1f6c5,
       "alt": "left_luggage"
     },
-    "\u1F6D0": {
+    "\ud83d\uded0": {
       "src": s1f6d0,
       "alt": "place_of_worship"
     },
-    "\u1F7E0": {
+    "\ud83d\udfe0": {
       "src": s1f7e0,
       "alt": "large_orange_circle"
     },
-    "\u1F7E1": {
+    "\ud83d\udfe1": {
       "src": s1f7e1,
       "alt": "large_yellow_circle"
     },
-    "\u1F7E2": {
+    "\ud83d\udfe2": {
       "src": s1f7e2,
       "alt": "large_green_circle"
     },
-    "\u1F7E3": {
+    "\ud83d\udfe3": {
       "src": s1f7e3,
       "alt": "large_purple_circle"
     },
-    "\u1F7E4": {
+    "\ud83d\udfe4": {
       "src": s1f7e4,
       "alt": "large_brown_circle"
     },
-    "\u1F7E5": {
+    "\ud83d\udfe5": {
       "src": s1f7e5,
       "alt": "large_red_square"
     },
-    "\u1F7E6": {
+    "\ud83d\udfe6": {
       "src": s1f7e6,
       "alt": "large_blue_square"
     },
-    "\u1F7E7": {
+    "\ud83d\udfe7": {
       "src": s1f7e7,
       "alt": "large_orange_square"
     },
-    "\u1F7E8": {
+    "\ud83d\udfe8": {
       "src": s1f7e8,
       "alt": "large_yellow_square"
     },
-    "\u1F7E9": {
+    "\ud83d\udfe9": {
       "src": s1f7e9,
       "alt": "large_green_square"
     },
-    "\u1F7EA": {
+    "\ud83d\udfea": {
       "src": s1f7ea,
       "alt": "large_purple_square"
     },
-    "\u1F7EB": {
+    "\ud83d\udfeb": {
       "src": s1f7eb,
       "alt": "large_brown_square"
     },
-    "\u203C\uFE0F": {
+    "\u203c\ufe0f": {
       "src": s203cfe0f,
       "alt": "bangbang"
     },
-    "\u2049\uFE0F": {
+    "\u2049\ufe0f": {
       "src": s2049fe0f,
       "alt": "interrobang"
     },
-    "\u2122\uFE0F": {
+    "\u2122\ufe0f": {
       "src": s2122fe0f,
       "alt": "tm"
     },
-    "\u2139\uFE0F": {
+    "\u2139\ufe0f": {
       "src": s2139fe0f,
       "alt": "information_source"
     },
-    "\u2194\uFE0F": {
+    "\u2194\ufe0f": {
       "src": s2194fe0f,
       "alt": "left_right_arrow"
     },
-    "\u2195\uFE0F": {
+    "\u2195\ufe0f": {
       "src": s2195fe0f,
       "alt": "arrow_up_down"
     },
-    "\u2196\uFE0F": {
+    "\u2196\ufe0f": {
       "src": s2196fe0f,
       "alt": "arrow_upper_left"
     },
-    "\u2197\uFE0F": {
+    "\u2197\ufe0f": {
       "src": s2197fe0f,
       "alt": "arrow_upper_right"
     },
-    "\u2198\uFE0F": {
+    "\u2198\ufe0f": {
       "src": s2198fe0f,
       "alt": "arrow_lower_right"
     },
-    "\u2199\uFE0F": {
+    "\u2199\ufe0f": {
       "src": s2199fe0f,
       "alt": "arrow_lower_left"
     },
-    "\u21A9\uFE0F": {
+    "\u21a9\ufe0f": {
       "src": s21a9fe0f,
       "alt": "leftwards_arrow_with_hook"
     },
-    "\u21AA\uFE0F": {
+    "\u21aa\ufe0f": {
       "src": s21aafe0f,
       "alt": "arrow_right_hook"
     },
-    "\u23CF\uFE0F": {
+    "\u23cf\ufe0f": {
       "src": s23cffe0f,
       "alt": "eject"
     },
-    "\u23E9": {
+    "\u23e9": {
       "src": s23e9,
       "alt": "fast_forward"
     },
-    "\u23EA": {
+    "\u23ea": {
       "src": s23ea,
       "alt": "rewind"
     },
-    "\u23EB": {
+    "\u23eb": {
       "src": s23eb,
       "alt": "arrow_double_up"
     },
-    "\u23EC": {
+    "\u23ec": {
       "src": s23ec,
       "alt": "arrow_double_down"
     },
-    "\u23ED\uFE0F": {
+    "\u23ed\ufe0f": {
       "src": s23edfe0f,
       "alt": "black_right_pointing_double_triangle_with_vertical_bar"
     },
-    "\u23EE\uFE0F": {
+    "\u23ee\ufe0f": {
       "src": s23eefe0f,
       "alt": "black_left_pointing_double_triangle_with_vertical_bar"
     },
-    "\u23EF\uFE0F": {
+    "\u23ef\ufe0f": {
       "src": s23effe0f,
       "alt": "black_right_pointing_triangle_with_double_vertical_bar"
     },
-    "\u23F8\uFE0F": {
+    "\u23f8\ufe0f": {
       "src": s23f8fe0f,
       "alt": "double_vertical_bar"
     },
-    "\u23F9\uFE0F": {
+    "\u23f9\ufe0f": {
       "src": s23f9fe0f,
       "alt": "black_square_for_stop"
     },
-    "\u23FA\uFE0F": {
+    "\u23fa\ufe0f": {
       "src": s23fafe0f,
       "alt": "black_circle_for_record"
     },
-    "\u24C2\uFE0F": {
+    "\u24c2\ufe0f": {
       "src": s24c2fe0f,
       "alt": "m"
     },
-    "\u25AA\uFE0F": {
+    "\u25aa\ufe0f": {
       "src": s25aafe0f,
       "alt": "black_small_square"
     },
-    "\u25AB\uFE0F": {
+    "\u25ab\ufe0f": {
       "src": s25abfe0f,
       "alt": "white_small_square"
     },
-    "\u25B6\uFE0F": {
+    "\u25b6\ufe0f": {
       "src": s25b6fe0f,
       "alt": "arrow_forward"
     },
-    "\u25C0\uFE0F": {
+    "\u25c0\ufe0f": {
       "src": s25c0fe0f,
       "alt": "arrow_backward"
     },
-    "\u25FB\uFE0F": {
+    "\u25fb\ufe0f": {
       "src": s25fbfe0f,
       "alt": "white_medium_square"
     },
-    "\u25FC\uFE0F": {
+    "\u25fc\ufe0f": {
       "src": s25fcfe0f,
       "alt": "black_medium_square"
     },
-    "\u25FD": {
+    "\u25fd": {
       "src": s25fd,
       "alt": "white_medium_small_square"
     },
-    "\u25FE": {
+    "\u25fe": {
       "src": s25fe,
       "alt": "black_medium_small_square"
     },
-    "\u2611\uFE0F": {
+    "\u2611\ufe0f": {
       "src": s2611fe0f,
       "alt": "ballot_box_with_check"
     },
-    "\u2622\uFE0F": {
+    "\u2622\ufe0f": {
       "src": s2622fe0f,
       "alt": "radioactive_sign"
     },
-    "\u2623\uFE0F": {
+    "\u2623\ufe0f": {
       "src": s2623fe0f,
       "alt": "biohazard_sign"
     },
-    "\u2626\uFE0F": {
+    "\u2626\ufe0f": {
       "src": s2626fe0f,
       "alt": "orthodox_cross"
     },
-    "\u262A\uFE0F": {
+    "\u262a\ufe0f": {
       "src": s262afe0f,
       "alt": "star_and_crescent"
     },
-    "\u262E\uFE0F": {
+    "\u262e\ufe0f": {
       "src": s262efe0f,
       "alt": "peace_symbol"
     },
-    "\u262F\uFE0F": {
+    "\u262f\ufe0f": {
       "src": s262ffe0f,
       "alt": "yin_yang"
     },
-    "\u2638\uFE0F": {
+    "\u2638\ufe0f": {
       "src": s2638fe0f,
       "alt": "wheel_of_dharma"
     },
@@ -8344,27 +18600,27 @@ export const smileys: SmileysStructure = {
       "src": s2649,
       "alt": "taurus"
     },
-    "\u264A": {
+    "\u264a": {
       "src": s264a,
       "alt": "gemini"
     },
-    "\u264B": {
+    "\u264b": {
       "src": s264b,
       "alt": "cancer"
     },
-    "\u264C": {
+    "\u264c": {
       "src": s264c,
       "alt": "leo"
     },
-    "\u264D": {
+    "\u264d": {
       "src": s264d,
       "alt": "virgo"
     },
-    "\u264E": {
+    "\u264e": {
       "src": s264e,
       "alt": "libra"
     },
-    "\u264F": {
+    "\u264f": {
       "src": s264f,
       "alt": "scorpius"
     },
@@ -8384,47 +18640,47 @@ export const smileys: SmileysStructure = {
       "src": s2653,
       "alt": "pisces"
     },
-    "\u267B\uFE0F": {
+    "\u267b\ufe0f": {
       "src": s267bfe0f,
       "alt": "recycle"
     },
-    "\u267E\uFE0F": {
+    "\u267e\ufe0f": {
       "src": s267efe0f,
       "alt": "infinity"
     },
-    "\u267F": {
+    "\u267f": {
       "src": s267f,
       "alt": "wheelchair"
     },
-    "\u269B\uFE0F": {
+    "\u269b\ufe0f": {
       "src": s269bfe0f,
       "alt": "atom_symbol"
     },
-    "\u269C\uFE0F": {
+    "\u269c\ufe0f": {
       "src": s269cfe0f,
       "alt": "fleur_de_lis"
     },
-    "\u26A0\uFE0F": {
+    "\u26a0\ufe0f": {
       "src": s26a0fe0f,
       "alt": "warning"
     },
-    "\u26A7\uFE0F": {
+    "\u26a7\ufe0f": {
       "src": s26a7fe0f,
       "alt": "transgender_symbol"
     },
-    "\u26AA": {
+    "\u26aa": {
       "src": s26aa,
       "alt": "white_circle"
     },
-    "\u26AB": {
+    "\u26ab": {
       "src": s26ab,
       "alt": "black_circle"
     },
-    "\u26CE": {
+    "\u26ce": {
       "src": s26ce,
       "alt": "ophiuchus"
     },
-    "\u26D4": {
+    "\u26d4": {
       "src": s26d4,
       "alt": "no_entry"
     },
@@ -8432,39 +18688,39 @@ export const smileys: SmileysStructure = {
       "src": s2705,
       "alt": "white_check_mark"
     },
-    "\u2714\uFE0F": {
+    "\u2714\ufe0f": {
       "src": s2714fe0f,
       "alt": "heavy_check_mark"
     },
-    "\u2716\uFE0F": {
+    "\u2716\ufe0f": {
       "src": s2716fe0f,
       "alt": "heavy_multiplication_x"
     },
-    "\u271D\uFE0F": {
+    "\u271d\ufe0f": {
       "src": s271dfe0f,
       "alt": "latin_cross"
     },
-    "\u2721\uFE0F": {
+    "\u2721\ufe0f": {
       "src": s2721fe0f,
       "alt": "star_of_david"
     },
-    "\u2733\uFE0F": {
+    "\u2733\ufe0f": {
       "src": s2733fe0f,
       "alt": "eight_spoked_asterisk"
     },
-    "\u2734\uFE0F": {
+    "\u2734\ufe0f": {
       "src": s2734fe0f,
       "alt": "eight_pointed_black_star"
     },
-    "\u2747\uFE0F": {
+    "\u2747\ufe0f": {
       "src": s2747fe0f,
       "alt": "sparkle"
     },
-    "\u274C": {
+    "\u274c": {
       "src": s274c,
       "alt": "x"
     },
-    "\u274E": {
+    "\u274e": {
       "src": s274e,
       "alt": "negative_squared_cross_mark"
     },
@@ -8496,63 +18752,63 @@ export const smileys: SmileysStructure = {
       "src": s2797,
       "alt": "heavy_division_sign"
     },
-    "\u27A1\uFE0F": {
+    "\u27a1\ufe0f": {
       "src": s27a1fe0f,
       "alt": "arrow_right"
     },
-    "\u27B0": {
+    "\u27b0": {
       "src": s27b0,
       "alt": "curly_loop"
     },
-    "\u27BF": {
+    "\u27bf": {
       "src": s27bf,
       "alt": "loop"
     },
-    "\u2934\uFE0F": {
+    "\u2934\ufe0f": {
       "src": s2934fe0f,
       "alt": "arrow_heading_up"
     },
-    "\u2935\uFE0F": {
+    "\u2935\ufe0f": {
       "src": s2935fe0f,
       "alt": "arrow_heading_down"
     },
-    "\u2B05\uFE0F": {
+    "\u2b05\ufe0f": {
       "src": s2b05fe0f,
       "alt": "arrow_left"
     },
-    "\u2B06\uFE0F": {
+    "\u2b06\ufe0f": {
       "src": s2b06fe0f,
       "alt": "arrow_up"
     },
-    "\u2B07\uFE0F": {
+    "\u2b07\ufe0f": {
       "src": s2b07fe0f,
       "alt": "arrow_down"
     },
-    "\u2B1B": {
+    "\u2b1b": {
       "src": s2b1b,
       "alt": "black_large_square"
     },
-    "\u2B1C": {
+    "\u2b1c": {
       "src": s2b1c,
       "alt": "white_large_square"
     },
-    "\u2B55": {
+    "\u2b55": {
       "src": s2b55,
       "alt": "o"
     },
-    "\u3030\uFE0F": {
+    "\u3030\ufe0f": {
       "src": s3030fe0f,
       "alt": "wavy_dash"
     },
-    "\u303D\uFE0F": {
+    "\u303d\ufe0f": {
       "src": s303dfe0f,
       "alt": "part_alternation_mark"
     },
-    "\u3297\uFE0F": {
+    "\u3297\ufe0f": {
       "src": s3297fe0f,
       "alt": "congratulations"
     },
-    "\u3299\uFE0F": {
+    "\u3299\ufe0f": {
       "src": s3299fe0f,
       "alt": "secret"
     }

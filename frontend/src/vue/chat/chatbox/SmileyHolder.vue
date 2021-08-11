@@ -5,17 +5,31 @@
         v-for="(_, tabName) in smileys"
         :key="tabName"
         :class="{'activeTab': activeTab === tabName}"
-        @mousedown.prevent="activeTab = tabName"
+        @mousedown.prevent="setTabName(tabName)"
       >
         {{ tabName }}
       </li>
+<!--      <li>-->
+<!--        <input type="text" class="input" tabindex="1"/>-->
+<!--      </li>-->
       <li class="holder-icon-cancel">
         <i class="icon-cancel-circled-outline" @click="close"/>
       </li>
     </ul>
+    <div v-if="showSkinVariations">
+      <img
+        class="emoji"
+        v-for="(smiley, code) in skinVariations"
+        :key="code"
+        :src="smiley.src"
+        :alt="smiley.alt"
+        :code="code"
+        @click="addSmileyClick(code)"
+      />
+    </div>
     <template v-for="(allSmileys, tabName) in smileys">
       <div
-        v-show="activeTab === tabName"
+        v-show="activeTab === tabName && !showSkinVariations"
         :key="tabName"
       >
         <img
@@ -25,8 +39,8 @@
           :src="smiley.src"
           :alt="smiley.alt"
           :code="code"
-          @click="addSmiley(code)"
-        >
+          @click="addSmileyClick(code)"
+        />
       </div>
     </template>
   </div>
@@ -37,7 +51,11 @@ import {
   Vue,
   Emit
 } from 'vue-property-decorator';
-import { smileys } from '@/ts/utils/smileys';
+import {
+  SmileVariation,
+  smileys
+} from '@/ts/utils/smileys';
+import { allSmileysKeys } from '@/ts/utils/htmlApi';
 
 import { State } from '@/ts/instances/storeInstance';
 
@@ -46,14 +64,40 @@ import { State } from '@/ts/instances/storeInstance';
 
   public smileys = smileys;
   public activeTab: string = Object.keys(smileys)[0];
+  public skinVariations: Record<string, SmileVariation> = {};
 
-  @Emit()
-  addSmiley(code: string) {
-    return code;
+
+  get showSkinVariations() {
+    return Object.keys(this.skinVariations).length > 0;
+  }
+
+  setTabName(tabName: string) {
+    this.skinVariations = {};
+    this.activeTab = tabName;
+  }
+
+  addSmileyClick(code: string) {
+    if (this.showSkinVariations) {
+      this.skinVariations = {}
+    } else {
+      let b = allSmileysKeys[code];
+      if (b.skinVariations) {
+        this.skinVariations = b.skinVariations;
+        return
+      }
+    }
+    this.addSmiley(code);
   }
 
   @Emit()
-  close() {}
+  addSmiley(code: string) {
+    return code
+  }
+
+  @Emit()
+  close() {
+    this.skinVariations = {};
+  }
 
 }
 </script>
