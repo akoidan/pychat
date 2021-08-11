@@ -163,6 +163,11 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
       } else {
         this.scrollBottom = false;
       }
+      this.$logger.debug(`Settings scroll element to ${this.scrollBottom}`)()
+    }
+
+    updated() {
+      this.onEmitScroll(); // this seems to be more reliable than created and mounted
     }
 
 
@@ -211,6 +216,8 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
             } else if (this.chatbox) {
               this.$logger.debug("Scrolling chatbox to bottom")();
               this.chatbox.scrollTop = this.chatbox.scrollHeight;
+            } else {
+              this.$logger.warn(`No chatbox to scroll`)()
             }
           }
         });

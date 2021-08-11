@@ -916,7 +916,7 @@ export class DefaultStore extends VuexModule {
     this.allUsersDict = {};
     this.onlineDict = {};
     this.activeRoomId = null;
-    localStorage.clear(); // remove LAST_SYNC, serviceWorkerUrl, sessionId and other trash
+    localStorage.clear(); // remove LAST_SYNC, serviceWorkerUrl, sessionId, smileyRecent and other trash
     this.storage.clearStorage();
   }
 

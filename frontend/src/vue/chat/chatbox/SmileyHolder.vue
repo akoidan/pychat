@@ -78,12 +78,23 @@ import { State } from '@/ts/instances/storeInstance';
 @Component({name: 'SmileyHolder'})
  export default class SmileyHolder extends Vue {
 
-  public smileys = smileys;
   public activeTab: string = Object.keys(smileys)[0];
   public skinVariations: Record<string, SmileVariation> = {};
   public searchResults: Record<string, SmileVariation> = {};
+  public recentSmileysCodes: string[] = [];
   public searchSmile: string = '';
 
+  mounted() {
+    this.recentSmileysCodes = JSON.parse(localStorage.getItem('recentSmileys') || '[]');
+  }
+
+  get smileys() {
+    if (this.recentSmileysCodes.length > 0) {
+      return {'Recent': this.recentSmileys, ...smileys}
+    } else {
+      return smileys;
+    }
+  }
 
   get filterSmiley() {
     if (Object.keys(this.skinVariations).length > 0) {
@@ -95,14 +106,15 @@ import { State } from '@/ts/instances/storeInstance';
     return {};
   }
 
-  get showFilterSmiley() {
-    return Object.keys(this.skinVariations).length > 0 || Object.keys(this.searchResults).length > 0 || this.searchSmile;
+  get recentSmileys(): Record<string, SmileVariation> {
+    return this.recentSmileysCodes.slice(0, 15).reduce((obj, key) => {
+      obj[key] = allSmileysKeys[key];
+      return obj;
+    }, {} as  Record<string, Smile>);
   }
 
-  mouseDownMain(e: MouseEvent) {
-    if ((e.target as HTMLElement)?.tagName !== 'INPUT') {
-      e.preventDefault();
-    }
+  get showFilterSmiley() {
+    return Object.keys(this.skinVariations).length > 0 || Object.keys(this.searchResults).length > 0 || this.searchSmile;
   }
 
   @Watch('searchSmile')
@@ -120,6 +132,12 @@ import { State } from '@/ts/instances/storeInstance';
         }, {} as  Record<string, Smile>);
   }
 
+  mouseDownMain(e: MouseEvent) {
+    if ((e.target as HTMLElement)?.tagName !== 'INPUT') {
+      e.preventDefault();
+    }
+  }
+
   setTabName(tabName: string) {
     this.skinVariations = {};
     this.activeTab = tabName;
@@ -133,6 +151,12 @@ import { State } from '@/ts/instances/storeInstance';
       this.skinVariations = b.skinVariations;
       return
     }
+    this.recentSmileysCodes = JSON.parse(localStorage.getItem('recentSmileys') || '[]');
+    if (this.recentSmileysCodes.includes(code)) {
+      this.recentSmileysCodes.splice(this.recentSmileysCodes.indexOf(code), 1)
+    }
+    this.recentSmileysCodes.unshift(code);
+    localStorage.setItem('recentSmileys', JSON.stringify(this.recentSmileysCodes));
     this.addSmiley(code);
   }
 

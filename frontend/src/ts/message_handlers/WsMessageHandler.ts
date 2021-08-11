@@ -29,7 +29,6 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 
 import {
   InternetAppearMessage,
-  LogoutMessage
 } from '@/ts/types/messages/innerMessages';
 import {
   HandlerName,

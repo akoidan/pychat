@@ -100,7 +100,6 @@ export const allSmileysKeys : Record<string, Smile> = (function() {
 
 export const smileUnicodeRegex = (function() {
   let allSmileyRegexarray = Object.keys(allSmileysKeys).map(hexEncode);
-  debugger
   return new RegExp(allSmileyRegexarray.join('|'), 'g');
 })();
 
