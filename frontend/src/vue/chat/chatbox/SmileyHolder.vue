@@ -168,7 +168,7 @@ import { State } from '@/ts/instances/storeInstance';
   .smile-parent-holder
     padding: 10px
     max-height: calc(100vh - 220px)
-    overflow:
+    overflow: scroll
     input[type=search]
       width: 100px
 
