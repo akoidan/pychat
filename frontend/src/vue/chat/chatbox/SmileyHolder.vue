@@ -1,5 +1,8 @@
 <template>
-  <div class="smile-parent-holder" @mousedown.prevent>
+  <div
+    class="smile-parent-holder"
+    @mousedown="mouseDownMain"
+  >
     <ul class="tabNames">
       <li
         v-for="(_, tabName) in smileys"
@@ -9,38 +12,46 @@
       >
         {{ tabName }}
       </li>
-<!--      <li>-->
-<!--        <input type="text" class="input" tabindex="1"/>-->
-<!--      </li>-->
+      <li>
+        <input
+          v-model="searchSmile"
+          type="search"
+          class="input"
+          placeholder="search smile"
+        >
+      </li>
       <li class="holder-icon-cancel">
-        <i class="icon-cancel-circled-outline" @click="close"/>
+        <i
+          class="icon-cancel-circled-outline"
+          @click="close"
+        />
       </li>
     </ul>
-    <div v-if="showSkinVariations">
+    <div v-if="showFilterSmiley">
       <img
-        class="emoji"
-        v-for="(smiley, code) in skinVariations"
+        v-for="(smiley, code) in filterSmiley"
         :key="code"
+        class="emoji"
         :src="smiley.src"
         :alt="smiley.alt"
         :code="code"
         @click="addSmileyClick(code)"
-      />
+      >
     </div>
     <template v-for="(allSmileys, tabName) in smileys">
       <div
-        v-show="activeTab === tabName && !showSkinVariations"
+        v-show="activeTab === tabName && !showFilterSmiley"
         :key="tabName"
       >
         <img
-          class="emoji"
           v-for="(smiley, code) in allSmileys"
           :key="code"
+          class="emoji"
           :src="smiley.src"
           :alt="smiley.alt"
           :code="code"
           @click="addSmileyClick(code)"
-        />
+        >
       </div>
     </template>
   </div>
@@ -49,13 +60,18 @@
 import {
   Component,
   Vue,
-  Emit
+  Emit,
+  Watch
 } from 'vue-property-decorator';
 import {
+  Smile,
   SmileVariation,
   smileys
 } from '@/ts/utils/smileys';
-import { allSmileysKeys } from '@/ts/utils/htmlApi';
+import {
+  allSmileysKeys,
+  allSmileysKeysNoVariations
+} from '@/ts/utils/htmlApi';
 
 import { State } from '@/ts/instances/storeInstance';
 
@@ -65,10 +81,43 @@ import { State } from '@/ts/instances/storeInstance';
   public smileys = smileys;
   public activeTab: string = Object.keys(smileys)[0];
   public skinVariations: Record<string, SmileVariation> = {};
+  public searchResults: Record<string, SmileVariation> = {};
+  public searchSmile: string = '';
 
 
-  get showSkinVariations() {
-    return Object.keys(this.skinVariations).length > 0;
+  get filterSmiley() {
+    if (Object.keys(this.skinVariations).length > 0) {
+      return this.skinVariations;
+    }
+    if (Object.keys(this.searchResults).length > 0) {
+      return this.searchResults;
+    }
+    return {};
+  }
+
+  get showFilterSmiley() {
+    return Object.keys(this.skinVariations).length > 0 || Object.keys(this.searchResults).length > 0 || this.searchSmile;
+  }
+
+  mouseDownMain(e: MouseEvent) {
+    if ((e.target as HTMLElement)?.tagName !== 'INPUT') {
+      e.preventDefault();
+    }
+  }
+
+  @Watch('searchSmile')
+  searchSmileChange() {
+    if (!this.searchSmile) {
+      this.searchResults = {};
+      return;
+    }
+    this.searchResults = Object.entries(allSmileysKeysNoVariations)
+        .filter(([key, value]) => value.alt.includes(this.searchSmile))
+        .slice(0, 30)
+        .reduce((obj, [key, value]) => {
+          obj[key] = value;
+          return obj;
+        }, {} as  Record<string, Smile>);
   }
 
   setTabName(tabName: string) {
@@ -77,14 +126,12 @@ import { State } from '@/ts/instances/storeInstance';
   }
 
   addSmileyClick(code: string) {
-    if (this.showSkinVariations) {
-      this.skinVariations = {}
-    } else {
-      let b = allSmileysKeys[code];
-      if (b.skinVariations) {
-        this.skinVariations = b.skinVariations;
-        return
-      }
+    this.searchSmile = '';
+    this.skinVariations = {}
+    let b = allSmileysKeys[code];
+    if (b.skinVariations) {
+      this.skinVariations = b.skinVariations;
+      return
     }
     this.addSmiley(code);
   }
@@ -121,7 +168,9 @@ import { State } from '@/ts/instances/storeInstance';
   .smile-parent-holder
     padding: 10px
     max-height: calc(100vh - 220px)
-    overflow: scroll
+    overflow:
+    input[type=search]
+      width: 100px
 
   .tabNames
     margin: 0

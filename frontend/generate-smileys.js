@@ -54,6 +54,7 @@ function hexDecode(v){
        return encodedString.split('').map((a, i) => a.charCodeAt(0).toString(16).padStart(4, '0')).join('---');
     }).join('---');
 }
+
 const preparedJson = {
    'Smileys': resultingJson['Smileys & Emotion'],
    'People': resultingJson['People & Body'],

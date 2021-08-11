@@ -55,6 +55,20 @@ export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a
   }
 }
 
+export const allSmileysKeysNoVariations : Record<string, Smile> = (function() {
+  const result: Record<string, Smile>= {};
+  Object.entries(smileys).forEach(([tabName, tabSmileys]) => {
+    Object.entries(tabSmileys).forEach(([smileyCode, smileyValue]) => {
+      result[smileyCode] = {
+        alt: smileyValue.alt,
+        src: smileyValue.src,
+        skinVariations: smileyValue.skinVariations,
+      }
+    });
+  })
+  return result;
+})()
+
 export const allSmileysKeys : Record<string, Smile> = (function() {
   const result: Record<string, Smile>= {};
   Object.entries(smileys).forEach(([tabName, tabSmileys]) => {
