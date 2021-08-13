@@ -508,12 +508,11 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
-* when opening progessive app on mobile phone it's not scrolled to bottom
 * loading messages is too slow, when a lot of messages is printed to local database. It's better to load 20 last messages to chat instead of 100000, probably vuex getter but it's better to think what we should do on scroll.
 * pin messages feature, like telegram
 * webpack [ext] doesn't work for chunks. 
 * Serviceworkerplugin doesn't support hashmaps
-* Room should have image
+* Room should have an image
 * pasting from painterpage doesn't work
 * lastTimeOnline
 * /giphy should work exactly like mention with drop above

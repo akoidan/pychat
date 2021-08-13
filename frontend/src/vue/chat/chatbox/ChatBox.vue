@@ -154,9 +154,13 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
     @Ref()
     private readonly chatboxSearch!: HTMLElement;
 
-    scrollBottom: boolean = false;
+    scrollBottom: boolean = true; // scroll to bottom on load
 
     beforeUpdate() {
+      // third party api calls emit('scroll')
+      // this triggers vue beforeUpdate event
+      // check if scroll was on bottom (or botom + 100px) before component updated, if yes save scrollToBottom = true
+      // html rerenders and update lifecycle hooks is called which checks scrollToBottom and scroll if it's true
       let el = this.room.search.searchActive ? this.chatboxSearch : this.chatbox;
       if (el) { // checked, el could be missing
         this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
@@ -166,7 +170,7 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
       this.$logger.debug(`Settings scroll element to ${this.scrollBottom}`)()
     }
 
-    updated() {
+    mounted() {
       this.onEmitScroll(); // this seems to be more reliable than created and mounted
     }
 
