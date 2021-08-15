@@ -135,8 +135,6 @@ class MessagesCreator(object):
 			res[VarNames.FILES] = files
 		if message.symbol:
 			res[VarNames.SYMBOL] = message.symbol
-		if message.giphy:
-			res[VarNames.GIPHY] = message.giphy
 		return res
 
 	def create_send_message(self, message, event, files, tags_users):
@@ -192,7 +190,7 @@ class MessagesCreator(object):
 		"""
 		if files:
 			return {x.symbol: {
-				VarNames.FILE_URL: x.img.url,
+				VarNames.FILE_URL: x.img.url if x.img else x.absolute_url,
 				VarNames.FILE_TYPE: x.type,
 				VarNames.PREVIEW: x.preview.url if x.preview else None,
 				VarNames.IMAGE_ID: x.id

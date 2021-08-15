@@ -24,6 +24,7 @@ export const {
   ELECTRON_IGNORE_SSL,
   CAPTCHA_IFRAME,
   WEBRTC_CONFIG,
+  GIPHY_API_KEY,
 } = allConsts;
 
 export const PING_CLOSE_JS_DELAY = 5000;
@@ -35,6 +36,8 @@ export const ALL_ROOM_ID = 1;
 export const CHROME_EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn';
 export const CHROME_EXTENSION_URL = `https://chrome.google.com/webstore/detail/pychat-screensharing-exte/${CHROME_EXTENSION_ID}`;
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
+export const PASTED_GIPHY_CLASS = 'giphy-img';
+export const GIPHY_URL = 'https://api.giphy.com/v1';
 export const MESSAGES_PER_SEARCH = 10;
 export const CONNECTION_ERROR = `Connection error`;
 export const LAST_SYNCED = 'lastSynced';

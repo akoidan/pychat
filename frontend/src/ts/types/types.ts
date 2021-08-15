@@ -207,7 +207,7 @@ export interface IStorage {
   markMessageAsSent(messagesId: number[]): void;
 }
 
-export interface  PostData<T> {
+export interface PostData {
   url: string;
   params?: {[id: string]: string|Blob|null|number|boolean};
   formData?: FormData;
@@ -215,6 +215,15 @@ export interface  PostData<T> {
   isJsonDecoded?: boolean;
   checkOkString?: boolean;
   errorDescription?: string;
+  process?(R: XMLHttpRequest): void;
+}
+
+export interface GetData {
+  url: string;
+  isJsonDecoded?: boolean;
+  checkOkString?: boolean;
+  baseUrl?: string;
+  skipAuth?: boolean;
   process?(R: XMLHttpRequest): void;
 }
 

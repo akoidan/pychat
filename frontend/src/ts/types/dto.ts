@@ -126,7 +126,6 @@ export interface MessageModelDto {
   status: MessageStatus;
   symbol?: string;
   deleted?: boolean;
-  giphy?: string;
   threadMessagesCount: number;
   edited: number;
   roomId: number;

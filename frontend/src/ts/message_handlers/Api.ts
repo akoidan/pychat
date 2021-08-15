@@ -1,6 +1,8 @@
 import {
   CONNECTION_ERROR,
-  RESPONSE_SUCCESS
+  GIPHY_URL,
+  RESPONSE_SUCCESS,
+  GIPHY_API_KEY
 } from '@/ts/utils/consts';
 import {
   UploadFile
@@ -24,17 +26,20 @@ import {
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { InternetAppearMessage } from '@/ts/types/messages/innerMessages';
 import { FileModel } from '@/ts/types/model';
-
+import {
+  GIFObject,
+  MultiResponse
+} from 'giphy-api';
 
 export default class Api extends MessageHandler {
-  protected readonly handlers:  HandlerTypes<keyof Api, 'any'> = {
+  protected readonly handlers: HandlerTypes<keyof Api, 'any'> = {
     internetAppear: <HandlerType<'internetAppear', 'any'>>this.internetAppear
   };
 
   protected readonly logger: Logger;
-  private readonly  xhr: Http;
+  private readonly xhr: Http;
 
-  private retryFcb: Function|null = null;
+  private retryFcb: Function | null = null;
 
   constructor(xhr: Http) {
     super();
@@ -67,7 +72,7 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async logout(registration_id: string |null= null): Promise<void> {
+  public async logout(registration_id: string | null = null): Promise<void> {
     await this.xhr.doPost({
       url: '/logout',
       params: {registration_id},
@@ -99,8 +104,39 @@ export default class Api extends MessageHandler {
     });
   }
 
+  public async searchGiphys(text: string, offset: number, process?: (R: XMLHttpRequest) => void): Promise<MultiResponse> {
+    let response!: MultiResponse;
+    if (text.match(/^\s*$/)) {
+      response = await this.xhr.doGet<MultiResponse>({
+        isJsonDecoded: true,
+        skipAuth: true,
+        // https://developers.giphy.com/docs/api/endpoint#trending
+        url: `/gifs/trending?api_key=${GIPHY_API_KEY}&limit=12&offset=${offset}`,
+        baseUrl: GIPHY_URL,
+        process
+      });
+    } else {
+      response = await this.xhr.doGet<MultiResponse>({
+        isJsonDecoded: true,
+        skipAuth: true,
+        // https://developers.giphy.com/docs/api/endpoint#search
+        url: `/gifs/search?api_key=${GIPHY_API_KEY}&limit=12&q=${encodeURIComponent(text)}&offset=${offset}`,
+        baseUrl: GIPHY_URL,
+        process
+      });
+    }
+
+    if (response?.meta?.msg === 'OK') {
+      return response;
+    }
+    throw Error(`Invalid giphy response ${response?.meta?.msg}`);
+  }
+
   public async getOauthStatus(): Promise<OauthStatus> {
-    return this.xhr.doGet<OauthStatus>('/oauth_status', true);
+    return this.xhr.doGet<OauthStatus>({
+      url: '/oauth_status',
+      isJsonDecoded: true
+    });
   }
 
   public async setGoogleOauth(token: string): Promise<void> {
@@ -130,7 +166,7 @@ export default class Api extends MessageHandler {
   }
 
   public async facebookAuth(token: string): Promise<OauthSessionResponse> {
-    return  this.xhr.doPost<OauthSessionResponse>({
+    return this.xhr.doPost<OauthSessionResponse>({
       url: '/facebook_auth',
       isJsonDecoded: true,
       params: {
@@ -138,6 +174,7 @@ export default class Api extends MessageHandler {
       }
     });
   }
+
   public async loadGoogle(): Promise<void> {
     await this.xhr.loadJs('https://apis.google.com/js/platform.js');
   }
@@ -195,11 +232,16 @@ export default class Api extends MessageHandler {
   }
 
   public async showProfile(id: number): Promise<ViewUserProfileDto> {
-    return this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, true);
+    return this.xhr.doGet<ViewUserProfileDto>({
+      url: `/profile?id=${id}`,
+      isJsonDecoded: true
+    });
   }
 
   public async changeEmail(token: string): Promise<string> {
-    return this.xhr.doGet<string>(`/change_email?token=${token}`, false);
+    return this.xhr.doGet<string>({
+      url: `/change_email?token=${token}`
+    });
   }
 
   public async changeEmailLogin(email: string, password: string): Promise<void> {
@@ -211,7 +253,10 @@ export default class Api extends MessageHandler {
   }
 
   public async confirmEmail(token: string): Promise<string> {
-    return this.xhr.doGet<string>(`/confirm_email?token=${token}`, false, true);
+    return this.xhr.doGet<string>({
+      url: `/confirm_email?token=${token}`,
+      checkOkString: true
+    });
   }
 
   public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void, setXhr: (e: XMLHttpRequest) => void): Promise<SaveFileResponse> {
@@ -239,7 +284,7 @@ export default class Api extends MessageHandler {
   }
 
   public async verifyToken(token: string): Promise<string> {
-    const value: { message: string; restoreUser: string } = await this.xhr.doPost<{ message: string; restoreUser: string}>({
+    const value: { message: string; restoreUser: string } = await this.xhr.doPost<{ message: string; restoreUser: string }>({
       url: '/verify_token',
       isJsonDecoded: true,
       params: {token}

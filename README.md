@@ -486,6 +486,7 @@ development.json and production.json have the following format:
   "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash",
   "ISSUES": "if true navigation bar will display link to reporting a issue page",
   "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
+  "GIPHY_API_KEY": "Api keys that is used to fetch gifs from https://giphy.com/. Be aware, this key is gonna be exposed to frontend. So anyone can steal it. To get those sign up in https://developers.giphy.com/, create a new app and replaced with its key.",
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
   "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",
   "WEBRTC_CONFIG": "This variable defines the first argument of RtcPeerConnection constructor. Sometimes webrtc stun server doesn't work in establishing a connection. Especially for this you can use turn server instead of it. Docker prod docker image already comes with a turn server, example of configuration for it  `{iceServers:[{urls:['turn:YOUR_DOMAIN'],username:'pychat',credential:'pypass'}]}`. replace YOUR_DOMAIN with your real domain name/public ip. You other scenarios use your server like coturn (https://github.com/coturn/coturn). See more info of this variable at docs: https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/RTCPeerConnection#RTCConfiguration_dictionary"
@@ -508,6 +509,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* Grep for "this algorythim doesn not work, since symbol is updated to a new one on top of stack" in code and remove it. This is for giphy while editing 
 * loading messages is too slow, when a lot of messages is printed to local database. It's better to load 20 last messages to chat instead of 100000, probably vuex getter but it's better to think what we should do on scroll.
 * pin messages feature, like telegram
 * webpack [ext] doesn't work for chunks. 

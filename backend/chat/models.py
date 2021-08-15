@@ -249,7 +249,6 @@ class MessageHistory(Model):
 	time = BigIntegerField(default=get_milliseconds)
 	message = ForeignKey('Message', CASCADE, null=False)
 	content = TextField(null=True, blank=True)
-	giphy = URLField(null=True, blank=True)
 
 
 class Message(Model):
@@ -291,7 +290,6 @@ class Message(Model):
 	message_status = CharField(max_length=1, null=False, default=MessageStatus.on_server.value)
 	thread_messages_count = IntegerField(default=0, null=False)
 	parent_message = ForeignKey('self', CASCADE, null=True, blank=True)
-	giphy = URLField(null=True, blank=True)
 	updated_at = BigIntegerField(default=get_milliseconds, null=False)
 
 	@property
@@ -364,11 +362,13 @@ class Image(Model):
 	class MediaTypeChoices(Enum):
 		video = 'v'
 		image = 'i'
+		giphy = 'g'
 
 	# character in Message.content that will be replaced with this image
 	symbol = CharField(null=False, max_length=1)
 	message = ForeignKey(Message, CASCADE, null=False)
 	img = FileField(upload_to=get_random_path, null=True)
+	absolute_url = CharField(null=True, max_length=256, blank=True)
 	preview = FileField(upload_to=get_random_path, null=True)
 	type = CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
 

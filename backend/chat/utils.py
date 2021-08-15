@@ -16,7 +16,6 @@ from chat.log_filters import id_generator
 from chat.models import Image, UploadedFile, MessageMention
 from chat.models import IpAddress
 from chat.models import User
-from chat.py2_3 import dict_values_to_list
 FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 
@@ -50,7 +49,8 @@ def with_history_q(q_objects, room_id, h, f):
 
 
 def evaluate(query_set):
-	len(query_set)
+	if (query_set):
+		len(query_set)
 	return query_set
 
 
@@ -137,12 +137,10 @@ def create_id(user_id=0, random=None):
 	return "{:04d}:{}".format(user_id if user_id else 0, random), random
 
 
-def max_from_2(a, b):
-	if a is None:
-		return b
-	if b is None:
-		return a
-	return a if a > b else b
+def max_from_2(array_numbers):
+	if all(v is None for v in array_numbers):
+		return None
+	return max([i for i in array_numbers if i is not None])
 
 
 def get_max_symbol(symbol_holder):
@@ -165,7 +163,7 @@ def get_max_symbol_dict(symbol_holder):
 	return max
 
 
-def update_symbols(files, tags, message):
+def update_symbols(files, tags,giphies,  message):
 	# TODO refactor this crap
 	if message.symbol:
 		order = ord(message.symbol)
@@ -185,12 +183,24 @@ def update_symbols(files, tags, message):
 					tags[new_symb] = tags[up]
 					del tags[up]
 					up.symbol = new_symb
+		if giphies:
+			for symbol, value_url in list(giphies.items()):
+				if ord(symbol) <= order:
+					order += 1
+					new_symb = chr(order)
+					message.content = message.content.replace(symbol, new_symb)
+					giphies[new_symb] = giphies[symbol]
+					del giphies[symbol]
 	if files:
 		new_file_symbol = get_max_symbol(files)
 		if message.symbol is None or new_file_symbol > message.symbol:
 			message.symbol = new_file_symbol
 	if tags:
 		new_tag_symbol = get_max_symbol_dict(tags)
+		if message.symbol is None or new_tag_symbol > message.symbol:
+			message.symbol = new_tag_symbol
+	if giphies:
+		new_tag_symbol = get_max_symbol_dict(giphies)
 		if message.symbol is None or new_tag_symbol > message.symbol:
 			message.symbol = new_tag_symbol
 
@@ -232,16 +242,35 @@ def get_message_tags(messages):
 	return mentions
 
 
-def up_files_to_img(files, message_id):
+def up_files_to_img(files, giphies, message_id, recheck_old):
 	blk_video = {}
-	for f in files:
-		stored_file = blk_video.setdefault(f.symbol, Image(symbol=f.symbol))
-		if f.type_enum == UploadedFile.UploadedFileChoices.preview:
-			stored_file.preview = f.file
+	if files:
+		for f in files:
+			stored_file = blk_video.setdefault(f.symbol, Image(symbol=f.symbol))
+			if f.type_enum == UploadedFile.UploadedFileChoices.preview:
+				stored_file.preview = f.file # TODO do we need message id???
+			else:
+				stored_file.message_id = message_id
+				stored_file.img = f.file
+				stored_file.type = f.type
+		files.delete()
+	if giphies:
+		# TODO this algorythim doesn not work, since symbol is updated to a new one on top of stack
+		if recheck_old:
+			iterate_giphies_to_save = []
+			old_images = Image.objects.filter(message_id=message_id, absolute_url__in=giphies.values())
+			for (k,v) in giphies.items():
+				# if old image exist, no need to create a new one
+				if not filter(lambda x: x.absolute_url == v and x.symbol == k, old_images):
+					iterate_giphies_to_save.append((k,v))
 		else:
-			stored_file.message_id = message_id
-			stored_file.img = f.file
-			stored_file.type = f.type
-	images = Image.objects.bulk_create(dict_values_to_list(blk_video))
-	files.delete()
+			iterate_giphies_to_save = giphies.items()
+		for symb, url_value in iterate_giphies_to_save:
+			blk_video.setdefault(symb, Image(
+				symbol=symb,
+				message_id=message_id,
+				absolute_url=url_value,
+				type=Image.MediaTypeChoices.giphy.value
+			))
+	images = Image.objects.bulk_create(list(blk_video.values()))
 	return images

@@ -18,7 +18,6 @@ from tornado.httpclient import HTTPRequest
 from chat import settings
 from chat.global_redis import sync_redis
 from chat.models import get_random_path
-from chat.py2_3 import str_type
 import mimetypes
 from chat.utils import http_client, create_id
 
@@ -204,7 +203,7 @@ def json_response(function):
 	"""
 	def wrap_function(self, *args, **kwargs):
 		result = function(self, *args, **kwargs)
-		if not isinstance(result, str_type):
+		if not isinstance(result, str):
 			result = json.dumps(result)
 		self.finish(result)
 

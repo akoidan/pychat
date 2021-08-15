@@ -1,4 +1,5 @@
 import {
+  GetData,
   PostData,
   SessionHolder
 } from '@/ts/types/types';
@@ -22,29 +23,25 @@ export default class Xhr extends Http {
     super(sessionHolder);
   }
 
-  public getApiUrl(url: string) {
-    return `${XHR_API_URL}${url}`;
-  }
-
   /**
    * Loads file from server on runtime */
-  public async doGet<T>(fileUrl: string, isJsonDecoded: boolean = false, checkOk: boolean = false): Promise<T> {
+  public async doGet<T>(d: GetData): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      fileUrl = this.getApiUrl(fileUrl);
+      const fileUrl = `${d.baseUrl ?? XHR_API_URL}${d.url}`;
       this.httpLogger.log('GET out {}', fileUrl)();
-      const regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
-      const fileType = regexRes != undefined && regexRes.length === 3 ? regexRes[1] : null;
       const xobj = new XMLHttpRequest();
       // special for IE
       if (xobj.overrideMimeType) {
         xobj.overrideMimeType('application/json');
       }
       xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
-      xobj.setRequestHeader('session_id', this.sessionHolder.session!);
+      if (!d.skipAuth) {
+        xobj.setRequestHeader('session_id', this.sessionHolder.session!);
+      }
       xobj.onreadystatechange = this.getOnreadystatechange(
           xobj,
-          isJsonDecoded || false,
-          checkOk,
+          d.isJsonDecoded || false,
+          d.checkOkString || false,
           fileUrl,
           undefined,
           reject,
@@ -54,7 +51,7 @@ export default class Xhr extends Http {
     });
   }
 
-  public async doPost<T>(d: PostData<T>): Promise<T> {
+  public async doPost<T>(d: PostData): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const r: XMLHttpRequest = new XMLHttpRequest();
       r.onreadystatechange = this.getOnreadystatechange<T>(
@@ -67,7 +64,7 @@ export default class Xhr extends Http {
           resolve
       );
 
-      const url = this.getApiUrl(d.url);
+      const url = `${XHR_API_URL}${d.url}`;
       r.open('POST', url, true);
       let data;
       let logOut: String = '';

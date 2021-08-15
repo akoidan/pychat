@@ -14,6 +14,7 @@
     />
     <smiley-holder v-if="showSmileys" @close="showSmileys = false" @add-smiley="onEmitAddSmile"/>
     <chat-tagging :name="taggingName" :user-ids="room.users" @emit-name="addTagInfo" ref="chatTagging"/>
+    <giphy-search v-if="showGiphy" @close="showGiphy = false" @add-gihpy="onEmitGiphy"/>
     <media-recorder
       ref="mediaRecorder"
       :is-video="isRecordingVideo"
@@ -30,12 +31,12 @@
       <i
         class="icon-attach-outline"
         title="Add attachment"
-        @mousedown.prevent="showAttachments = !showAttachments"
+        @mousedown.prevent="invertAttachments"
       />
       <i
         class="icon-smile"
         title="Add a smile :)"
-        @mousedown.prevent="showSmileys = !showSmileys"
+        @mousedown.prevent="invertSmileys"
       />
       <div
         ref="userMessage"
@@ -62,6 +63,7 @@ import {
   encodeHTML,
   encodeP,
   getCurrentWordInHtml,
+  getGiphyHtml,
   getMessageData,
   getSmileyHtml,
   pasteBlobAudioToTextArea,
@@ -100,12 +102,8 @@ import {
   showAllowEditing
 } from '@/ts/utils/pureFunctions';
 import MediaRecorder from '@/vue/chat/textarea/MediaRecorder.vue';
-import {
-  RawLocation,
-  Route
-} from "vue-router";
 import ChatAttachments from '@/vue/chat/textarea/ChatAttachments.vue';
-import SmileyHolder from '@/vue/chat/chatbox/SmileyHolder.vue';
+import SmileyHolder from '@/vue/chat/textarea/SmileyHolder.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
 import {
   SHOW_I_TYPING_INTERVAL,
@@ -113,6 +111,7 @@ import {
 } from '@/ts/utils/consts';
 import ChatTagging from '@/vue/chat/textarea/ChatTagging.vue';
 import {Throttle} from '@/ts/classes/Throttle';
+import GiphySearch from '@/vue/chat/textarea/GiphySearch.vue';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -121,6 +120,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     components: {
       ChatTagging,
       SmileyHolder,
+      GiphySearch,
       ChatAttachments,
       MediaRecorder
   }})
@@ -167,6 +167,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
     private showAttachments: boolean = false;
     private showSmileys: boolean = false;
+    private showGiphy: boolean = false;
     private taggingName: string = '';
     private isRecordingVideo: boolean = true;
     private showIType!: Throttle;
@@ -222,6 +223,13 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       const tag = createTag(user);
       replaceCurrentWord(this.userMessage, tag);
       this.taggingName = '';
+    }
+
+
+    onEmitGiphy(url: string) {
+      this.showGiphy = false;
+      this.$logger.log('Adding giphy {}', url)();
+      pasteHtmlAtCaret(getGiphyHtml(url), this.userMessage);
     }
 
     onEmitAddSmile(code:string) {
@@ -396,11 +404,22 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
+    private invertAttachments() {
+      this.showSmileys = false;
+      this.showGiphy = false;
+      this.showAttachments = !this.showAttachments;
+    }
+
+    private invertSmileys() {
+      this.showSmileys = !this.showSmileys;
+      this.showGiphy = false;
+      this.showAttachments = false;
+    }
+
     private addGiphy() {
-      this.userMessage.innerHTML = `/giphy ${this.userMessage.innerHTML}`;
-      this.userMessage.focus();
-      this.$store.growlInfo("Type animation name. e.g. /giphy lol")
-      placeCaretAtEnd(this.userMessage);
+      this.showGiphy = true;
+      this.showSmileys = false;
+      this.showAttachments = false;
     }
 
     private addVideo() {
@@ -518,9 +537,10 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     overflow-y: auto
     white-space: pre-wrap
 
-    /deep/ .B4j2ContentEditableImg
+    /deep/ .B4j2ContentEditableImg, /deep/ .giphy-img
       max-height: 200px
       max-width: 400px
+
       &.failed
         min-width: 200px
         min-height: 100px

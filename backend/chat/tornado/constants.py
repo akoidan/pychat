@@ -98,7 +98,7 @@ class VarNames(object):
 	IS_ROOM_PRIVATE = 'private'
 	CONNECTION_ID = 'connId'
 	HANDLER_NAME = 'handler'
-	GIPHY = 'giphy'
+	GIPHIES = 'giphies'
 	SYMBOL = 'symbol'
 	ONLINE = 'online'
 	TIME_DIFF = 'timeDiff'

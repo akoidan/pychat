@@ -123,7 +123,6 @@ export function editMessageWs(
     status: shouldBeSynced ? 'sending' : 'on_server',
     content: messageContent,
     symbol: symbol,
-    giphy: null,
     edited,
     files,
     userId: store.userInfo?.userId!

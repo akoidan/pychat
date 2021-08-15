@@ -192,7 +192,6 @@ export function messageModelToP2p(m: MessageModel): MessageP2pDto {
     deleted: m.deleted,
     edited: m.edited,
     files: {},
-    giphy: m.giphy,
     id: m.id,
     status: m.status,
     parentMessage: m.parentMessage,
@@ -240,7 +239,6 @@ export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessa
     tags: {...message.tags}, // prevent modifying original object by vuex
     parentMessage: message.parentMessage,
     status: message.status,
-    giphy: message.giphy || null,
     deleted: message.deleted || false
   };
 }
@@ -257,7 +255,6 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     parentMessage: m.parentMessage,
     files: {},
     tags: {}, // TODO
-    giphy: m.giphy,
     threadMessagesCount: 0, // TODO
     isThreadOpened: false,
     isEditingActive: false,

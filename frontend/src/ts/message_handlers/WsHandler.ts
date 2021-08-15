@@ -206,12 +206,19 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public sendEditMessage(content: string|null, id: number, files: number[] | null, tags: Record<string, number>) {
+  public sendEditMessage(
+      content: string|null,
+      id: number,
+      files: number[] | null,
+      tags: Record<string, number>,
+      giphies: Record<string, string>|null
+  ) {
     const newVar = {
       id,
       action: 'editMessage',
       files,
       tags,
+      giphies,
       content
     };
     this.sendToServer(newVar, true);
@@ -224,7 +231,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       id: number,
       timeDiff: number,
       parentMessage: number|null,
-      tags: Record<string, number>
+      tags: Record<string, number>,
+      giphies: Record<string, string>|null,
   ): Promise<PrintMessage> {
     const newVar = {
       files,
@@ -234,7 +242,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       content,
       tags,
       parentMessage,
-      roomId
+      roomId,
+      giphies
     };
     return this.messageProc.sendToServerAndAwait(newVar);
   }

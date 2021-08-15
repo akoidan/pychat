@@ -358,6 +358,11 @@
   resolved "https://registry.yarnpkg.com/@types/filewriter/-/filewriter-0.0.28.tgz#c054e8af4d9dd75db4e63abc76f885168714d4b3"
   integrity sha1-wFTor02d11205jq8dviFFocU1LM=
 
+"@types/giphy-api@^2.0.3":
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/@types/giphy-api/-/giphy-api-2.0.3.tgz#cdb689040bb61fbb8d3de094238cec16ca8c4e86"
+  integrity sha512-nqwYMwWwa6uwnj4RbiexCj9yPTQS8etUD5LyA4T7GwqyX5WDowJ+8c5J5N4QHJOvHXF1wzt/fQ0UIAkDJtg+ig==
+
 "@types/glob@^7.1.1":
   version "7.1.1"
   resolved "https://registry.yarnpkg.com/@types/glob/-/glob-7.1.1.tgz#aa59a1c6e3fbc421e07ccd31a944c30eba521575"

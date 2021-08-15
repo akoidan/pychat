@@ -11,7 +11,6 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile, Channel, get_milliseconds, \
 	IpAddress
-from chat.py2_3 import str_type
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
 from chat.tornado.message_creator import MessagesCreator, WebRtcMessageCreator
@@ -255,7 +254,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		try:
 			if isinstance(message, dict):
 				message = json.dumps(message)
-			if not isinstance(message, str_type):
+			if not isinstance(message, str):
 				raise ValueError('Wrong message type : %s' % str(message))
 			self.logger.debug(">> %.1000s", message)
 			self.write_message(message)

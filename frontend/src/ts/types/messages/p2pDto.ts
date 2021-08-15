@@ -9,7 +9,6 @@ export interface MessageP2pDto {
   status: MessageStatus;
   parentMessage: number|null;
   deleted: boolean;
-  giphy: string|null;
   edited: number;
   userId: number;
 }

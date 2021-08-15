@@ -1,8 +1,6 @@
 import json
 import time
-
-from chat.py2_3 import urlopen
-
+from urllib.request import urlopen
 from chat import settings
 from chat.models import IpAddress
 from django.db.models import Q

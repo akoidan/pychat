@@ -113,6 +113,7 @@
   },
   "dependencies": {
     "@types/cordova": "^0.0.34",
+    "@types/giphy-api": "^2.0.3",
     "@types/serviceworker-webpack-plugin": "^1.0.1",
     "@types/vue-cropperjs": "^4.1.1",
     "cordova": "10.0.0",

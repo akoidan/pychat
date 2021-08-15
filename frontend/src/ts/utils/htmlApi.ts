@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import {
   IS_DEBUG,
-  PASTED_IMG_CLASS, USERNAME_REGEX
+  PASTED_IMG_CLASS,
+  USERNAME_REGEX,
+  PASTED_GIPHY_CLASS
 } from '@/ts/utils/consts';
 import {
   MessageDataEncode,
@@ -185,6 +187,10 @@ export function getSmileyHtml(symbol: string) {
   return `<img src="${smile.src}" symbol="${symbol}" class="emoji" alt="${smile.alt}">`;
 }
 
+export function getGiphyHtml(url: string) {
+  return `<img src="${url}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" />`;
+}
+
 export const isDateMissing = (function () {
   const input = document.createElement('input');
   input.setAttribute('type', 'date');
@@ -235,28 +241,24 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
 
 export function encodeMessage(data: MessageModel, store: DefaultStore) {
   logger.debug('Encoding message {}: {}', data.id, data)();
-  if (data.giphy) {
-    return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
-  } else {
-    if (!data.content) {
-      throw Error(`Message ${data.id} doesn't have content`);
-    }
-    let html = encodeHTML(data.content);
-    const replaceElements: unknown[] = [];
-    patterns.forEach((pattern) => {
-      const res = html.replace(pattern.search, pattern.replace);
-      if (res !== html) {
-        replaceElements.push(pattern.name);
-        html = res;
-      }
-    });
-    if (replaceElements.length) {
-      logger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
-    }
-    html = encodeFiles(html, data.files);
-    html = encodeTags(html,  data.tags, store);
-    return encodeSmileys(html);
+  if (!data.content) {
+    throw Error(`Message ${data.id} doesn't have content`);
   }
+  let html = encodeHTML(data.content);
+  const replaceElements: unknown[] = [];
+  patterns.forEach((pattern) => {
+    const res = html.replace(pattern.search, pattern.replace);
+    if (res !== html) {
+      replaceElements.push(pattern.name);
+      html = res;
+    }
+  });
+  if (replaceElements.length) {
+    logger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
+  }
+  html = encodeFiles(html, data.files);
+  html = encodeTags(html,  data.tags, store);
+  return encodeSmileys(html);
 }
 
 function encodePTags(html: string,   tags: { [id: string]: number } | null, store: DefaultStore) {
@@ -290,7 +292,7 @@ function encodeTags(html: string,   tags: { [id: string]: number } | null, store
 
 
 function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
-
+  console.warn('r2d2')
   if (files && Object.keys(files).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];
@@ -305,7 +307,9 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
           return `<img src='${recordIcon}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else if (v.type === 'f') {
           return `<a href="${resolveMediaUrl(v.url!)}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
-        } else {
+        } else if (v.type === 'g') {
+          return `<img src='${v.url}' symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
+        }  else {
           logger.error('Invalid type {}', v.type)();
         }
       }
@@ -650,6 +654,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     const assVideo = img.getAttribute('associatedVideo') ?? null;
     const assAudio = img.getAttribute('associatedAudio')  ?? null;
     const assFile = img.getAttribute('associatedFile')  ?? null;
+    const asGiphy = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('src') : null;
     const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
 
     let elSymbol = oldSymbol;
@@ -675,6 +680,8 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
       type = 'a'
     } else if (assFile) {
       type = 'f'
+    } else if (asGiphy) {
+      type = 'g'
     } else {
       type = 'i'
     }
@@ -686,6 +693,8 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
       url = assFile;
     } else if (assVideo) {
       url = assVideo;
+    } else if (asGiphy) {
+      url = asGiphy;
     } else {
       url = src!;
     }
@@ -694,7 +703,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
       type,
       preview: assVideo ? src : assVideo,
       url,
-      sending: true,
+      sending: !asGiphy, // if it's not giphy, we need to transfer it to backend. giphy as absolute url already
       fileId: null,
       previewFileId: null,
     }

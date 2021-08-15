@@ -16,9 +16,7 @@ from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
 	UploadedFile, Image, get_milliseconds, UserProfile, Channel, User, MessageMention, IpAddress
-from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, REDIS_PORT, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
-	REDIS_DB
+from chat.settings import ALL_ROOM_ID, REDIS_PORT,REDIS_HOST, REDIS_DB
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
 	UserSettingsVarNames, UserProfileVarNames, IpVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
@@ -38,7 +36,6 @@ base_logger = logging.LoggerAdapter(parent_logger, {
 # max_connections=500,
 # wait_for_available=True)
 
-GIPHY_API_KEY = getattr(settings, "GIPHY_API_KEY", None)
 FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 
 
@@ -209,7 +206,7 @@ class MessagesHandler():
 		:return:
 		"""
 		data = message.body
-		if isinstance(data, str_type):  # not subscribe event
+		if isinstance(data, str):  # not subscribe event
 			prefixless_str = remove_parsable_prefix(data)
 			if prefixless_str:
 				dict_message = json.loads(prefixless_str)
@@ -221,19 +218,6 @@ class MessagesHandler():
 
 	def ws_write(self, message):
 		raise NotImplementedError('WebSocketHandler implements')
-
-	def search_giphy(self, message, query, cb):
-		self.logger.debug("!! Asking giphy for: %s", query)
-		def on_giphy_reply(response):
-			try:
-				self.logger.debug("!! Got giphy response: " + str(response.body))
-				res =  json.loads(response.body)
-				giphy = res['data'][0]['images']['downsized_medium']['url']
-			except:
-				giphy = None
-			cb(message, giphy)
-		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
-		http_client.fetch(url, callback=on_giphy_reply)
 
 	def notify_offline(self, channel, message):
 		if FIREBASE_API_KEY is None:
@@ -275,69 +259,55 @@ class MessagesHandler():
 			VarNames.JS_MESSAGE_ID: data[VarNames.JS_MESSAGE_ID],
 			VarNames.HANDLER_NAME: HandlerNames.NULL
 		})
-		
-
-	def isGiphy(self, content):
-		if GIPHY_API_KEY is not None and content is not None:
-			giphy_match = re.search(GIPHY_REGEX, content)
-			return giphy_match.group(1) if giphy_match is not None else None
 
 	def process_send_message(self, message):
 		"""
 		:type message: dict
 		"""
-		content = message.get(VarNames.CONTENT)
-		giphy_match = self.isGiphy(content)
+		if message[VarNames.TIME_DIFF] < 0:
+			self.logger.warning("Invalid time %d, resetting to 0", message[VarNames.TIME_DIFF])
+			message[VarNames.TIME_DIFF] = 0
+		tags_users = message[VarNames.MESSAGE_TAGS]
+		giphies = message[VarNames.GIPHIES]
+		files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
+		symbol = max_from_2([get_max_symbol(files), get_max_symbol_dict(tags_users), get_max_symbol_dict(giphies)])
+		channel = message[VarNames.ROOM_ID]
+		js_id = message[VarNames.JS_MESSAGE_ID]
+		parent_message_id = message[VarNames.PARENT_MESSAGE]
+		if parent_message_id:
+			parent_room_id = Message.objects.get(id=parent_message_id).room_id
+			if parent_room_id not in self.channels:
+				raise ValidationError("You don't have access to this room message")
+		message_db = Message(
+			sender_id=self.user_id,
+			content=message[VarNames.CONTENT],
+			symbol=symbol,
+			parent_message_id=parent_message_id,
+			room_id=channel
+		)
+		message_db.time -= message[VarNames.TIME_DIFF]
+		res_files = []
+		message_db.save()
 
-		# @transaction.atomic mysql has gone away
-		def send_message(message, giphy=None):
-			if message[VarNames.TIME_DIFF] < 0:
-				raise ValidationError("Back to the future?")
-			tags_users = message[VarNames.MESSAGE_TAGS]
-			files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
-			symbol = max_from_2(get_max_symbol(files), get_max_symbol_dict(tags_users))
-			channel = message[VarNames.ROOM_ID]
-			js_id = message[VarNames.JS_MESSAGE_ID]
-			parent_message_id = message[VarNames.PARENT_MESSAGE]
-			if parent_message_id:
-				parent_room_id = Message.objects.get(id=parent_message_id).room_id
-				if parent_room_id not in self.channels:
-					raise ValidationError("You don't have access to this room message")
-			message_db = Message(
-				sender_id=self.user_id,
-				content=message[VarNames.CONTENT],
-				symbol=symbol,
-				parent_message_id=parent_message_id,
-				giphy=giphy,
-				room_id=channel
-			)
-			message_db.time -= message[VarNames.TIME_DIFF]
-			res_files = []
-			message_db.save()
-
-			if tags_users:
-				mes_ment = [MessageMention(
-					user_id=userId,
-					message_id=message_db.id,
-					symbol=symb,
-				) for symb, userId in tags_users.items()]
-				MessageMention.objects.bulk_create(mes_ment)
-			if files:
-				images = up_files_to_img(files, message_db.id)
-				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
-			prepared_message = self.message_creator.create_send_message(
-				message_db,
-				Actions.PRINT_MESSAGE,
-				res_files,
-				tags_users
-			)
-			prepared_message[VarNames.JS_MESSAGE_ID] = js_id
-			self.publish(prepared_message, channel)
-			self.notify_offline(channel, message_db)
-		if giphy_match is not None:
-			self.search_giphy(message, giphy_match, send_message)
-		else:
-			send_message(message)
+		if tags_users:
+			mes_ment = [MessageMention(
+				user_id=userId,
+				message_id=message_db.id,
+				symbol=symb,
+			) for symb, userId in tags_users.items()]
+			MessageMention.objects.bulk_create(mes_ment)
+		if files or giphies:
+			images = up_files_to_img(files, giphies, message_db.id, False)
+			res_files = MessagesCreator.prepare_img_video(images, message_db.id)
+		prepared_message = self.message_creator.create_send_message(
+			message_db,
+			Actions.PRINT_MESSAGE,
+			res_files,
+			tags_users
+		)
+		prepared_message[VarNames.JS_MESSAGE_ID] = js_id
+		self.publish(prepared_message, channel)
+		self.notify_offline(channel, message_db)
 
 	def save_channels_settings(self, message):
 		channel_id = message[VarNames.CHANNEL_ID]
@@ -803,9 +773,8 @@ class MessagesHandler():
 		message = Message.objects.get(id=data[VarNames.MESSAGE_ID])
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
-		MessageHistory(message=message, content=message.content, giphy=message.giphy).save()
+		MessageHistory(message=message, content=message.content).save()
 
-		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
 			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(
 				deleted=True,
@@ -813,31 +782,17 @@ class MessagesHandler():
 				content=None
 			)
 			self.publish(self.message_creator.create_send_message(message, Actions.DELETE_MESSAGE, None, {}), message.room_id)
-		elif giphy_match is not None:
-			self.edit_message_giphy(giphy_match, message)
 		else:
 			self.edit_message_edit(data, message)
 
-	def edit_message_giphy(self, giphy_match, message):
-		def edit_glyphy(message, giphy):
-			Message.objects.filter(id=message.id).update(
-				content=message.content,
-				symbol=message.symbol,
-				giphy=giphy,
-				updated_at=get_milliseconds()
-			)
-			message.giphy = giphy
-			self.publish(self.message_creator.create_send_message(message, Actions.EDIT_MESSAGE, None, {}), message.room_id)
-
-		self.search_giphy(message, giphy_match, edit_glyphy)
 
 	def edit_message_edit(self, data, message):
 		action = Actions.EDIT_MESSAGE
-		message.giphy = None
 		tags = data[VarNames.MESSAGE_TAGS]
+		giphies = data[VarNames.GIPHIES]
 		files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
-		if files or tags:
-			update_symbols(files, tags, message)
+		if files or tags or giphies:
+			update_symbols(files, tags, giphies, message)
 		if tags:
 			db_tags = MessageMention.objects.filter(message_id=message.id)
 			update_or_create = []
@@ -855,14 +810,15 @@ class MessagesHandler():
 			if create_tags:
 				MessageMention.objects.bulk_create(create_tags)
 
-		if files:
-			up_files_to_img(files, message.id)
+		if files or giphies:
+			# TODO this algorythim doesn not work, since symbol is updated to a new one on top of stack
+			up_files_to_img(files, giphies, message.id, False)
 		if message.symbol:  # fetch all, including that we just store
 			db_images = Image.objects.filter(message_id=message.id)
 			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
 		else:
 			prep_files = None
-		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, updated_at=get_milliseconds())
+		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, updated_at=get_milliseconds())
 		self.publish(self.message_creator.create_send_message(message, action, prep_files, tags), message.room_id)
 
 	def send_client_new_channel(self, message):

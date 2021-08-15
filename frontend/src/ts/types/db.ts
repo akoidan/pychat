@@ -50,7 +50,6 @@ export interface MessageDB {
   parent_message_id: number|null;
   thread_messages_count: number;
   deleted: BooleanDB;
-  giphy: string;
   edited: number;
   room_id: number;
   user_id: number;

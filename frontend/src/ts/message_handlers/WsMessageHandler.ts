@@ -184,16 +184,18 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
     await this.uploadFilesForMessages(storeMessage);
     storeMessage = this.store.roomsDict[roomId].messages[messageId];
-    let fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
+    const fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
+    const giphies: Record<string, string>|null = this.getGiphiesFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
-      let a: PrintMessage = await this.ws.sendPrintMessage(
+      const a: PrintMessage = await this.ws.sendPrintMessage(
           storeMessage.content,
           roomId,
           fileIds,
           storeMessage.id,
           Date.now() - storeMessage.time,
           storeMessage.parentMessage,
-          {...storeMessage.tags}
+          {...storeMessage.tags},
+          giphies,
       );
       const rmMes: RoomMessageIds = {
         messageId: storeMessage.id,
@@ -202,7 +204,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       };
       this.store.deleteMessage(rmMes);
     } else if (storeMessage.id > 0) {
-      this.ws.sendEditMessage(storeMessage.content, storeMessage.id, fileIds, storeMessage.tags);
+      this.ws.sendEditMessage(storeMessage.content, storeMessage.id, fileIds, storeMessage.tags, giphies);
     } else if (!storeMessage.content && storeMessage.id < 0) {
       throw Error("Should not be here"); // this messages should be removed
     }
@@ -298,7 +300,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         roomId: message.roomId,
         userId: message.userId,
         transfer: null,
-        giphy: message.giphy || null,
         deleted: true
       };
       this.logger.debug('Adding message to storage {}', message)();
@@ -351,6 +352,21 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     });
   }
 
+  private getGiphiesFromMessage(storeMessage: MessageModel): Record<string, string>|null {
+    if (storeMessage.files) {
+      const giphiesArray =  Object
+          .entries(storeMessage.files)
+          .filter(([k,v]) => v.type === 'g');
+      if (giphiesArray.length > 0) {
+        return giphiesArray.reduce((p, [k,v]) => {
+          p[k] = v.url!;
+          return p;
+        }, {} as Record<string, string>)
+      }
+    }
+    return null;
+  }
+
   private getFileIdsFromMessage(storeMessage: MessageModel): number[] {
     let files: number[] = []
     if (storeMessage.files) {
@@ -358,7 +374,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       if (fileValues.find(f => !f.fileId && f.sending)) {
         throw Error('New files were added during upload') // TODO
       }
-      fileValues.forEach(fv => {
+      fileValues.filter(fv => fv.type !== 'g').forEach(fv => {
         files.push(fv.fileId!)
         if (fv.previewFileId) {
           files.push(fv.previewFileId)

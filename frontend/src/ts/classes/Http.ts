@@ -1,5 +1,6 @@
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
+  GetData,
   PostData,
   SessionHolder
 } from '@/ts/types/types';
@@ -15,9 +16,9 @@ export default abstract class Http {
     this.httpLogger = loggerFactory.getLogger('http');
   }
 
-  public abstract async doGet<T>(fileUrl: string, isJsonDecoded: boolean, checkOk?: boolean): Promise<T>;
+  public abstract async doGet<T>(d: GetData): Promise<T>;
 
-  public abstract async doPost<T>(d: PostData<T>): Promise<T>;
+  public abstract async doPost<T>(d: PostData): Promise<T>;
 
   public async loadJs(fullFileUrlWithProtocol: string): Promise<Event> {
     return new Promise((resolve, reject) => {

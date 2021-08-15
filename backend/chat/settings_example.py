@@ -79,12 +79,6 @@
 # FIREBASE_API_KEY = '***********:********************************************************************************************************************************************'
 
 
-#### If you want to use giphy images that appears if user types "/giphy example".
-### To get those -sign up in https://developers.giphy.com/, create a new app and replaced with its key.
-### you can use mine, so w/e
-GIPHY_API_KEY = 'thZMTtWsaBQAPDIAY461GzYTctuYIeIj'
-
-
 ### If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain, type is web captcha
 ### If you set RECAPTCHA_PRIVATE_KEY you should set RECAPTCHA_PUBLIC_KEY in frontend/development.json and frontend/production.json
 # RECAPTCHA_PRIVATE_KEY = '****************************************' # Secret key

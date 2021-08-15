@@ -12,7 +12,7 @@ from tornado.httputil import url_concat
 from chat import settings
 from chat.log_filters import id_generator
 from chat.models import UserProfile, get_random_path, RoomUsers
-from chat.py2_3 import urlopen
+from urllib.request import urlopen
 from chat.utils import check_user
 
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)

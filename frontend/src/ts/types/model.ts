@@ -79,7 +79,14 @@ export interface Location {
   countryCode: string|null;
   region: string|null;
 }
-export type BlobType = 'v' | 'm' | 'a' | 'i' | 'f';
+
+// f - file
+// g - giphy
+// i - image
+// v - video
+// a - audio
+// m - media (same as video, but you need to click on image, in order to load video)
+export type BlobType = 'v' | 'm' | 'a' | 'i' | 'f' | 'g';
 
 export interface FileModel {
   url: string|null;
@@ -117,7 +124,6 @@ export interface MessageModel {
   threadMessagesCount: number;
   deleted: boolean;
   status: MessageStatus;
-  giphy: string|null;
   edited: number;
   roomId: number;
   userId: number;
