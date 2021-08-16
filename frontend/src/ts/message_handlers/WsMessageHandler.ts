@@ -361,7 +361,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
     return Object
       .entries(storeMessage.files)
-      .filter(([k,v]) => v.type === 'g')
+      .filter(([k,v]) => v.type === 'g' && !v.serverId)
       .map(([k, v]) => ({
         url: v.url!,
         symbol: k,

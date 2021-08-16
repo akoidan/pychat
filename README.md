@@ -509,9 +509,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
-* loading history on mobile doesn't work, because there's no wheel
-* sometimes my messages are mark as read when I join the chat. (only 3rd persons messages should be marked as read). This is when syncing history. It was from callback loading messages from server right after appearing online and then marking them as read, not checking if they were mine or not
-* Grep for "this algorythim doesn not work, since symbol is updated to a new one on top of stack" in code and remove it. This is for giphy while editing 
+
 * loading messages is too slow, when a lot of messages is printed to local database. It's better to load 20 last messages to chat instead of 100000, probably vuex getter but it's better to think what we should do on scroll.
 * pin messages feature, like telegram
 * webpack [ext] doesn't work for chunks. 

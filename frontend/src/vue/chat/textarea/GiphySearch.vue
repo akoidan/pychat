@@ -30,6 +30,7 @@
         class="img-wrapper"
         :src="webpSupported ? gif.images.fixed_height_small.webp: gif.images.fixed_height_small.url"
       />
+      <input type="button" class="lor-btn" v-if="!request" value="Load more" @click="fetchGiphies"/>
     </div>
   </div>
 </template>
@@ -91,16 +92,20 @@ export default class GiphySearch extends Vue {
     this.images = response.data;
   }
 
-  @ApplyGrowlErr({message: "Unable to load more giphies", runningProp: 'moreLoading', preventStacking: true})
   async loadMore() {
     const {scrollHeight, scrollTop, clientHeight } =  this.giphyContent;
     if (scrollHeight - scrollTop  < clientHeight + 100) {
-      // w/0 +1, it returns duplicate id
-      // the weird thing docs say, that pagination start with 0, but it seems like with 1
-      let response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, r => this.request = r);
-      console.warn({old: this.images, new: response})
-      this.images.push(...response.data.filter(n => !this.images.find(o => o.id === n.id)));
+      await this.fetchGiphies();
     }
+  }
+
+  @ApplyGrowlErr({message: "Unable to load more giphies", runningProp: 'moreLoading', preventStacking: true})
+  async fetchGiphies() {
+    // w/0 +1, it returns duplicate id
+    // the weird thing docs say, that pagination start with 0, but it seems like with 1
+    let response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, r => this.request = r);
+    console.warn({old: this.images, new: response})
+    this.images.push(...response.data.filter(n => !this.images.find(o => o.id === n.id)));
   }
 
   @Emit()
@@ -124,6 +129,8 @@ export default class GiphySearch extends Vue {
     padding: 5px
     @extend %modal-window
 
+  input[type=button]
+    width: 100%
   .giphy-content
     overflow: scroll
     max-height: 800px

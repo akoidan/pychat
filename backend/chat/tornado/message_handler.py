@@ -301,7 +301,8 @@ class MessagesHandler():
 			) for symb, userId in tags_users.items()]
 			MessageMention.objects.bulk_create(mes_ment)
 		if files or giphies:
-			images = up_files_to_img(files, giphies, message_db.id, False)
+			up_files_to_img(files, giphies, message_db.id)
+			images = Image.objects.filter(message_id=message_db.id)
 			res_files = MessagesCreator.prepare_img_video(images, message_db.id)
 		prepared_message = self.message_creator.create_send_message(
 			message_db,
@@ -789,7 +790,6 @@ class MessagesHandler():
 		else:
 			self.edit_message_edit(data, message)
 
-
 	def edit_message_edit(self, data, message):
 		action = Actions.EDIT_MESSAGE
 		tags = data[VarNames.MESSAGE_TAGS]
@@ -815,8 +815,7 @@ class MessagesHandler():
 				MessageMention.objects.bulk_create(create_tags)
 
 		if files or giphies:
-			# TODO this algorythim doesn not work, since symbol is updated to a new one on top of stack
-			up_files_to_img(files, giphies, message.id, False)
+			up_files_to_img(files, giphies, message.id)
 		if message.symbol:  # fetch all, including that we just store
 			db_images = Image.objects.filter(message_id=message.id)
 			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)

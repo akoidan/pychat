@@ -91,6 +91,7 @@ export type BlobType = 'v' | 'm' | 'a' | 'i' | 'f' | 'g';
 export interface FileModel {
   url: string|null;
   type: BlobType;
+  serverId: number|null;
   previewFileId: number|null;
   fileId: number|null;
   preview: string|null;

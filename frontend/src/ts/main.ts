@@ -156,7 +156,7 @@ async function init() {
     if (!window.openDatabase) {
       throw Error("Not supported")
     }
-    const db = window.openDatabase('v154', '', 'Messages database', 10 * 1024 * 1024);
+    const db = window.openDatabase('v156', '', 'Messages database', 10 * 1024 * 1024);
     storage = new DatabaseWrapper(mainWindow, db);
   } catch (e) {
     logger.error("Unable to init websql, because {}. Falling back to localstorage", e)();

@@ -301,17 +301,17 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
       const v = files[s];
       if (v) {
         if (v.type === 'i') {
-          return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
+          return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}' serverId="${v.serverId}"/>`;
         } else if (v.type === 'v' || v.type === 'm') {
           const className = v.type === 'v' ? 'video-player' : 'video-player video-record';
 
-          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+          return `<div class='${className}' serverId="${v.serverId}" associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-          return `<img src='${recordIcon}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+          return `<img src='${recordIcon}' serverId="${v.serverId}" symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else if (v.type === 'f') {
-          return `<a href="${resolveMediaUrl(v.url!)}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
+          return `<a href="${resolveMediaUrl(v.url!)}" serverId="${v.serverId}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
         } else if (v.type === 'g') {
-          return `<img src='${webpSupported && v.preview? v.preview : v.url}' webp="${v.preview}" url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
+          return `<img serverId="${v.serverId}" src='${webpSupported && v.preview? v.preview : v.url}' webp="${v.preview}" url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
         }  else {
           logger.error('Invalid type {}', v.type)();
         }
@@ -657,6 +657,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     const assVideo = img.getAttribute('associatedVideo') ?? null;
     const assAudio = img.getAttribute('associatedAudio')  ?? null;
     const assFile = img.getAttribute('associatedFile')  ?? null;
+    const serverId = parseInt(img.getAttribute('serverId')!);
     const asGiphy = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('url') : null;
     const asGiphyPreview = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('webp') : null;
     const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
@@ -715,6 +716,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
       type,
       preview,
       url,
+      serverId: serverId || null,
       sending: !asGiphy, // if it's not giphy, we need to transfer it to backend. giphy as absolute url already
       fileId: null,
       previewFileId: null,

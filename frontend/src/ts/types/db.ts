@@ -60,6 +60,7 @@ export interface FileDB {
   id: number;
   preview_file_id: number; //  so this is UploadFile.id for "preview" File
   file_id: number;  // so this is UploadFile.id for "url" File
+  server_id: number;  // if we saved this file on backend, it would have its id
   symbol: string;
   sending: BooleanDB;
   url: string;

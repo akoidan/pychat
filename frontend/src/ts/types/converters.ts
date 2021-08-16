@@ -208,6 +208,7 @@ export function convertFiles(dtos: {[id: number]: FileModelDto}): {[id: number]:
     let dto = dtos[k];
     res[k] = {
       fileId: null,
+      serverId: dto.id,
       sending: false,
       previewFileId: null,
       preview: dto.preview,

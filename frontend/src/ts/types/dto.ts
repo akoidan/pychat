@@ -118,6 +118,7 @@ export interface OauthStatus {
 }
 export interface FileModelDto {
   url: string;
+  id: number;
   type: BlobType;
   preview: string;
 }

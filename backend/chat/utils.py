@@ -251,7 +251,7 @@ def get_message_tags(messages):
 	return mentions
 
 
-def up_files_to_img(files, giphies, message_id, recheck_old):
+def up_files_to_img(files, giphies, message_id):
 	blk_video = {}
 	if files:
 		for f in files:
@@ -264,17 +264,7 @@ def up_files_to_img(files, giphies, message_id, recheck_old):
 				stored_file.type = f.type
 		files.delete()
 	if giphies:
-		# TODO this algorythim doesn not work, since symbol is updated to a new one on top of stack
-		if recheck_old:
-			iterate_giphies_to_save = []
-			old_images = Image.objects.filter(message_id=message_id, absolute_url__in=map(lambda x : x.url, giphies))
-			for giphy in giphies:
-				# if old image exist, no need to create a new one
-				if not filter(lambda x: x.absolute_url == giphy['url'] and x.symbol == giphy['symbol'], old_images):
-					iterate_giphies_to_save.append(giphy)
-		else:
-			iterate_giphies_to_save = giphies
-		for giphy in iterate_giphies_to_save:
+		for giphy in giphies:
 			blk_video.setdefault(giphy['symbol'], Image(
 				symbol=giphy['symbol'],
 				message_id=message_id,
@@ -282,5 +272,7 @@ def up_files_to_img(files, giphies, message_id, recheck_old):
 				webp_absolute_url=giphy['webp'],
 				type=Image.MediaTypeChoices.giphy.value
 			))
-	images = Image.objects.bulk_create(list(blk_video.values()))
-	return images
+	img_to_create = list(blk_video.values())
+	if img_to_create:
+		Image.objects.bulk_create(img_to_create)
+

@@ -11,7 +11,8 @@
       :class="{'hidden': !room.search.searchActive}"
       tabindex="1"
       @keydown="keyDownSearchLoadUp"
-      @mousewheel="onSearchScroll"
+      @mousewheel="onSearchMouseWheel"
+      @scroll.passive="onSearchScroll"
     >
       <template
         v-for="message in searchMessages">
@@ -29,6 +30,7 @@
       :class="{'hidden': room.search.searchActive || (room.callInfo.callContainer && room.callInfo.sharePaint)}"
       tabindex="1"
       @keydown="keyDownLoadUp"
+      @mousewheel="onMouseWheel"
       @scroll.passive="onScroll"
     >
       <div v-if="messageLoading" class="spinner"/>
@@ -123,6 +125,7 @@ import ChatThread from '@/vue/chat/message/ChatThread.vue';
 import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
 
+
   @Component({
     name: 'ChatBox' ,
     components: {
@@ -166,6 +169,7 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
     private readonly chatboxSearch!: HTMLElement;
 
     scrollBottom: boolean = true; // scroll to bottom on load
+    lastScrollTop: number = 0;
 
     beforeUpdate() {
       // third party api calls emit('scroll')
@@ -311,15 +315,27 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
       await this.messageSender.loadUpMessages(this.room.id, n);
     }
 
-    onSearchScroll(e: WheelEvent) {
+    onSearchScroll() {
+      const st = this.chatbox.scrollTop;
+      if (st < this.lastScrollTop) {
+        this.loadUpSearchHistory(10);
+      }
+      this.lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+    }
+
+    onSearchMouseWheel(e: WheelEvent) {
       // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
       if (e.detail < 0 || e.deltaY < 0) {
         this.loadUpSearchHistory(10);
       }
     }
 
-    onScroll() {
-      this.loadUpHistory(10);
+    onScroll(e: Event) {
+      const st = this.chatbox.scrollTop;
+      if (st < this.lastScrollTop) {
+        this.loadUpHistory(10);
+      }
+      this.lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
     }
     onMouseWheel(e: WheelEvent) {
       // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
