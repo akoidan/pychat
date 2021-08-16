@@ -2,10 +2,12 @@ import {
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
   IS_DEBUG,
-  FLAGS
+  FLAGS,
+  LOG_LEVEL_LS
 } from '@/ts/utils/consts';
 import {
   Logger,
+  LogLevel,
 } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
@@ -591,9 +593,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   private setUserSettings(userInfo: UserSettingsDto) {
     const um: UserSettingsDto = userSettingsDtoToModel(userInfo);
-    if (!IS_DEBUG) {
-      loggerFactory.setLogWarnings(userInfo.logs ?? 'debug');
-    }
+    const logLevel: LogLevel =  userInfo.logs || (IS_DEBUG ? 'trace' : 'error');
+    localStorage.setItem(LOG_LEVEL_LS, logLevel);
+    loggerFactory.setLogWarnings(logLevel);
     this.store.setUserSettings(um);
   }
 

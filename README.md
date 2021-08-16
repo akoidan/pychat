@@ -509,6 +509,8 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* loading history on mobile doesn't work, because there's no wheel
+* sometimes my messaages are mard as read when I join the chat
 * Grep for "this algorythim doesn not work, since symbol is updated to a new one on top of stack" in code and remove it. This is for giphy while editing 
 * loading messages is too slow, when a lot of messages is printed to local database. It's better to load 20 last messages to chat instead of 100000, probably vuex getter but it's better to think what we should do on scroll.
 * pin messages feature, like telegram

@@ -292,7 +292,6 @@ function encodeTags(html: string,   tags: { [id: string]: number } | null, store
 
 
 function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
-  console.warn('r2d2')
   if (files && Object.keys(files).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];

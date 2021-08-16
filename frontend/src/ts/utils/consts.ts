@@ -31,6 +31,7 @@ export const PING_CLOSE_JS_DELAY = 5000;
 export const CONNECTION_RETRY_TIME = 5000;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;
 export const RESPONSE_SUCCESS = 'ok';
+export const LOG_LEVEL_LS = 'logLevel';
 export const ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO = 24 * 60 * 60 * 1000; // 1 day
 export const ALL_ROOM_ID = 1;
 export const CHROME_EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn';
