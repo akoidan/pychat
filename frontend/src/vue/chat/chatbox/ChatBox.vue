@@ -29,8 +29,19 @@
       :class="{'hidden': room.search.searchActive || (room.callInfo.callContainer && room.callInfo.sharePaint)}"
       tabindex="1"
       @keydown="keyDownLoadUp"
-      @mousewheel="onScroll"
+      @scroll.passive="onScroll"
     >
+      <div v-if="messageLoading" class="spinner"/>
+      <input
+        v-else-if="!room.allLoaded"
+        type="button"
+        value="Load more messages"
+        class="lor-btn load-more-msg-btn"
+        @click="loadUpHistory(10)"
+      />
+      <div v-else class="start-history">
+        This is the start of the history
+      </div>
       <template v-for="message in messages">
         <chat-user-action-message
           v-if="message.isUserAction"
@@ -294,7 +305,7 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
 
     @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})
     private async loadUpHistory(n: number) {
-      if (this.chatbox.scrollTop !== 0) {
+      if (this.chatbox.scrollTop > 100) {
         return; // we're just scrolling up
       }
       await this.messageSender.loadUpMessages(this.room.id, n);
@@ -307,7 +318,10 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
       }
     }
 
-    onScroll(e: WheelEvent) {
+    onScroll() {
+      this.loadUpHistory(10);
+    }
+    onMouseWheel(e: WheelEvent) {
       // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
       if (e.detail < 0 || e.deltaY < 0) {
         this.loadUpHistory(10);
@@ -381,7 +395,15 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
     .message-system .message-header
       color: #84B7C0
 
-
-
+  .load-more-msg-btn
+    display: block
+    margin: 5px auto
+    padding: 4px 10px
+  .start-history
+    text-align: center
+    font-size: 12px
+  .spinner
+    margin: 5px auto auto
+    @include spinner(3px, white)
 
 </style>

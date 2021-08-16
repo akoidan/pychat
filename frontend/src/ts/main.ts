@@ -99,7 +99,7 @@ function declareDirectives() {
     },
     unbind: function (el, binding, vnode: MyVNode) {
       getEventName('start').forEach(eventName => el.removeEventListener(eventName, vnode.switcherStart!))
-      getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
+       getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
     }
   });
 }

@@ -112,6 +112,7 @@ import {
 import ChatTagging from '@/vue/chat/textarea/ChatTagging.vue';
 import {Throttle} from '@/ts/classes/Throttle';
 import GiphySearch from '@/vue/chat/textarea/GiphySearch.vue';
+import { GIFObject } from 'giphy-api';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -226,10 +227,10 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     }
 
 
-    onEmitGiphy(url: string) {
+    onEmitGiphy(gif: GIFObject) {
       this.showGiphy = false;
-      this.$logger.log('Adding giphy {}', url)();
-      pasteHtmlAtCaret(getGiphyHtml(url), this.userMessage);
+      this.$logger.log('Adding giphy {}', gif)();
+      pasteHtmlAtCaret(getGiphyHtml(gif), this.userMessage);
     }
 
     onEmitAddSmile(code:string) {

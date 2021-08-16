@@ -86,7 +86,7 @@ export default class ChatTextMessage extends Vue {
   }
 
   private seEvents() {
-    this.$logger.debug('Setting events')();
+    //this.$logger.debug('Setting events')();
     if (this.userSettings.highlightCode) {
       highlightCode(this.content);
     }

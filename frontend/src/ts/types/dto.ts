@@ -106,6 +106,12 @@ export interface UserProfileDto extends UserProfileDtoWoImage {
   userImage: string;
 }
 
+export interface GiphyDto {
+  webp: string;
+  url: string;
+  symbol: string;
+}
+
 export interface OauthStatus {
   google: boolean;
   facebook: boolean;

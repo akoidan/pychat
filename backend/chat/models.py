@@ -369,6 +369,7 @@ class Image(Model):
 	message = ForeignKey(Message, CASCADE, null=False)
 	img = FileField(upload_to=get_random_path, null=True)
 	absolute_url = CharField(null=True, max_length=256, blank=True)
+	webp_absolute_url = CharField(null=True, max_length=256, blank=True)
 	preview = FileField(upload_to=get_random_path, null=True)
 	type = CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
 

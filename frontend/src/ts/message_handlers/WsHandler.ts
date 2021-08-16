@@ -30,6 +30,7 @@ import {
   userSettingsDtoToModel
 } from '@/ts/types/converters';
 import {
+  GiphyDto,
   MessageModelDto,
   RoomNoUsersDto,
   UserProfileDto,
@@ -213,7 +214,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       id: number,
       files: number[] | null,
       tags: Record<string, number>,
-      giphies: Record<string, string>|null
+      giphies: GiphyDto[]
   ) {
     const newVar = {
       id,
@@ -234,7 +235,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       timeDiff: number,
       parentMessage: number|null,
       tags: Record<string, number>,
-      giphies: Record<string, string>|null,
+      giphies: GiphyDto[],
   ): Promise<PrintMessage> {
     const newVar = {
       files,

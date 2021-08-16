@@ -163,6 +163,16 @@ def get_max_symbol_dict(symbol_holder):
 	return max
 
 
+def get_max_symbol_array(symbol_holder, key_extractor=lambda x: x):
+	result = None
+	evaluate(symbol_holder)
+	if symbol_holder:
+		for f in symbol_holder:
+			if result is None or key_extractor(f) > result:
+				result = key_extractor(f)
+	return result
+
+
 def update_symbols(files, tags,giphies,  message):
 	# TODO refactor this crap
 	if message.symbol:
@@ -184,13 +194,12 @@ def update_symbols(files, tags,giphies,  message):
 					del tags[up]
 					up.symbol = new_symb
 		if giphies:
-			for symbol, value_url in list(giphies.items()):
-				if ord(symbol) <= order:
+			for giphy in giphies:
+				if ord(giphy['symbol']) <= order:
 					order += 1
 					new_symb = chr(order)
-					message.content = message.content.replace(symbol, new_symb)
-					giphies[new_symb] = giphies[symbol]
-					del giphies[symbol]
+					message.content = message.content.replace(giphy['symbol'], new_symb)
+					giphy['symbol'] = new_symb
 	if files:
 		new_file_symbol = get_max_symbol(files)
 		if message.symbol is None or new_file_symbol > message.symbol:
@@ -200,7 +209,7 @@ def update_symbols(files, tags,giphies,  message):
 		if message.symbol is None or new_tag_symbol > message.symbol:
 			message.symbol = new_tag_symbol
 	if giphies:
-		new_tag_symbol = get_max_symbol_dict(giphies)
+		new_tag_symbol = get_max_symbol_array(giphies, lambda x: x['symbol'])
 		if message.symbol is None or new_tag_symbol > message.symbol:
 			message.symbol = new_tag_symbol
 
@@ -258,18 +267,19 @@ def up_files_to_img(files, giphies, message_id, recheck_old):
 		# TODO this algorythim doesn not work, since symbol is updated to a new one on top of stack
 		if recheck_old:
 			iterate_giphies_to_save = []
-			old_images = Image.objects.filter(message_id=message_id, absolute_url__in=giphies.values())
-			for (k,v) in giphies.items():
+			old_images = Image.objects.filter(message_id=message_id, absolute_url__in=map(lambda x : x.url, giphies))
+			for giphy in giphies:
 				# if old image exist, no need to create a new one
-				if not filter(lambda x: x.absolute_url == v and x.symbol == k, old_images):
-					iterate_giphies_to_save.append((k,v))
+				if not filter(lambda x: x.absolute_url == giphy['url'] and x.symbol == giphy['symbol'], old_images):
+					iterate_giphies_to_save.append(giphy)
 		else:
-			iterate_giphies_to_save = giphies.items()
-		for symb, url_value in iterate_giphies_to_save:
-			blk_video.setdefault(symb, Image(
-				symbol=symb,
+			iterate_giphies_to_save = giphies
+		for giphy in iterate_giphies_to_save:
+			blk_video.setdefault(giphy['symbol'], Image(
+				symbol=giphy['symbol'],
 				message_id=message_id,
-				absolute_url=url_value,
+				absolute_url=giphy['url'],
+				webp_absolute_url=giphy['webp'],
 				type=Image.MediaTypeChoices.giphy.value
 			))
 	images = Image.objects.bulk_create(list(blk_video.values()))

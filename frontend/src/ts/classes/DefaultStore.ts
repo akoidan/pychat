@@ -734,6 +734,7 @@ export class DefaultStore extends VuexModule {
   public clearMessages() {
     for (const m in this.roomsDict) {
       this.roomsDict[m].messages = {};
+      this.roomsDict[m].allLoaded = false;
     }
     this.storage.clearMessages();
   }

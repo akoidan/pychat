@@ -24,9 +24,13 @@ import {
 } from '@/ts/utils/smileys';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
-import { MEDIA_API_URL } from '@/ts/utils/runtimeConsts';
+import {
+  MEDIA_API_URL,
+  webpSupported
+} from '@/ts/utils/runtimeConsts';
 import {DefaultStore} from '@/ts/classes/DefaultStore';
 import { hexEncode } from '@/ts/utils/pureFunctions';
+import { GIFObject } from 'giphy-api';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -187,8 +191,8 @@ export function getSmileyHtml(symbol: string) {
   return `<img src="${smile.src}" symbol="${symbol}" class="emoji" alt="${smile.alt}">`;
 }
 
-export function getGiphyHtml(url: string) {
-  return `<img src="${url}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" />`;
+export function getGiphyHtml(gif: GIFObject) {
+  return `<img src="${webpSupported ? gif.images.fixed_height_small.webp : gif.images.fixed_height_small.url}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" webp="${gif.images.original.webp}" url="${gif.images.original.url}" />`;
 }
 
 export const isDateMissing = (function () {
@@ -240,7 +244,7 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
 }
 
 export function encodeMessage(data: MessageModel, store: DefaultStore) {
-  logger.debug('Encoding message {}: {}', data.id, data)();
+  //logger.debug('Encoding message {}: {}', data.id, data)();
   if (!data.content) {
     throw Error(`Message ${data.id} doesn't have content`);
   }
@@ -307,7 +311,7 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
         } else if (v.type === 'f') {
           return `<a href="${resolveMediaUrl(v.url!)}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
         } else if (v.type === 'g') {
-          return `<img src='${v.url}' symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
+          return `<img src='${webpSupported && v.preview? v.preview : v.url}' webp="${v.preview}" url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
         }  else {
           logger.error('Invalid type {}', v.type)();
         }
@@ -653,7 +657,8 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     const assVideo = img.getAttribute('associatedVideo') ?? null;
     const assAudio = img.getAttribute('associatedAudio')  ?? null;
     const assFile = img.getAttribute('associatedFile')  ?? null;
-    const asGiphy = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('src') : null;
+    const asGiphy = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('url') : null;
+    const asGiphyPreview = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('webp') : null;
     const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
 
     let elSymbol = oldSymbol;
@@ -697,10 +702,18 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     } else {
       url = src!;
     }
+    let preview: string|null;
+    if (assVideo) {
+      preview = src;
+    } else if (asGiphyPreview) {
+      preview = asGiphyPreview;
+    } else {
+      preview = assVideo;
+    }
 
     files[elSymbol] = {
       type,
-      preview: assVideo ? src : assVideo,
+      preview,
       url,
       sending: !asGiphy, // if it's not giphy, we need to transfer it to backend. giphy as absolute url already
       fileId: null,

@@ -21,7 +21,7 @@ from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix,
 	UserSettingsVarNames, UserProfileVarNames, IpVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_symbol, validate_edit_message, update_symbols, up_files_to_img, evaluate, check_user, \
-	http_client, get_max_symbol_dict, max_from_2
+	http_client, get_max_symbol_dict, max_from_2, get_max_symbol_array
 
 # from pywebpush import webpush
 
@@ -270,7 +270,11 @@ class MessagesHandler():
 		tags_users = message[VarNames.MESSAGE_TAGS]
 		giphies = message[VarNames.GIPHIES]
 		files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
-		symbol = max_from_2([get_max_symbol(files), get_max_symbol_dict(tags_users), get_max_symbol_dict(giphies)])
+		symbol = max_from_2([
+			get_max_symbol(files),
+			get_max_symbol_dict(tags_users),
+			get_max_symbol_array(giphies, lambda x: x['symbol'])
+		])
 		channel = message[VarNames.ROOM_ID]
 		js_id = message[VarNames.JS_MESSAGE_ID]
 		parent_message_id = message[VarNames.PARENT_MESSAGE]

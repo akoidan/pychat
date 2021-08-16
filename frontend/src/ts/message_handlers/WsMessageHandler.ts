@@ -20,6 +20,7 @@ import { Logger } from 'lines-logger';
 
 import {
   FileModelDto,
+  GiphyDto,
   MessageModelDto,
   SaveFileResponse
 } from '@/ts/types/dto';
@@ -173,6 +174,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       } else {
         this.store.setAllLoaded(roomId);
       }
+    } else {
+      this.logger.debug(`No more loading for room '${room.name}' #${room.id}`)()
     }
   }
 
@@ -185,7 +188,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     await this.uploadFilesForMessages(storeMessage);
     storeMessage = this.store.roomsDict[roomId].messages[messageId];
     const fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
-    const giphies: Record<string, string>|null = this.getGiphiesFromMessage(storeMessage);
+    const giphies: GiphyDto[] = this.getGiphiesFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
       const a: PrintMessage = await this.ws.sendPrintMessage(
           storeMessage.content,
@@ -352,19 +355,18 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     });
   }
 
-  private getGiphiesFromMessage(storeMessage: MessageModel): Record<string, string>|null {
-    if (storeMessage.files) {
-      const giphiesArray =  Object
-          .entries(storeMessage.files)
-          .filter(([k,v]) => v.type === 'g');
-      if (giphiesArray.length > 0) {
-        return giphiesArray.reduce((p, [k,v]) => {
-          p[k] = v.url!;
-          return p;
-        }, {} as Record<string, string>)
-      }
+  private getGiphiesFromMessage(storeMessage: MessageModel): GiphyDto[] {
+    if (!storeMessage.files) {
+      return []
     }
-    return null;
+    return Object
+      .entries(storeMessage.files)
+      .filter(([k,v]) => v.type === 'g')
+      .map(([k, v]) => ({
+        url: v.url!,
+        symbol: k,
+        webp: v.preview!
+      }))
   }
 
   private getFileIdsFromMessage(storeMessage: MessageModel): number[] {
@@ -447,6 +449,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
     let joined: any = localStorage.getItem(LAST_SYNCED);
     if (!joined) {
+      this.logger.debug(`Syncing messsages won't happen, because LAST_SYNCED is '${LAST_SYNCED}'`)();
       localStorage.setItem(LAST_SYNCED, Date.now().toString())
       return ;
     }

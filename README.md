@@ -509,7 +509,6 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
-* BUG, chance to reproduce 50%. Open 2 browsers (lets say chrome, + chrome annon). Clear history on 2nd one. Type  `window.ws.ws.close()` on 2nd one. Clicly switch to first one and send message in less than 5 seconds (reconnect time). Open 2nd one and when internet appears the message might not appear while you were offline
 * loading history on mobile doesn't work, because there's no wheel
 * sometimes my messages are mark as read when I join the chat. (only 3rd persons messages should be marked as read). This is when syncing history. It was from callback loading messages from server right after appearing online and then marking them as read, not checking if they were mine or not
 * Grep for "this algorythim doesn not work, since symbol is updated to a new one on top of stack" in code and remove it. This is for giphy while editing 

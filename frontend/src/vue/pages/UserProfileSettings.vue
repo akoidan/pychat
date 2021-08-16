@@ -179,7 +179,15 @@ export default class UserProfileSettings extends Vue {
       return
     }
 
-    localStorage.removeItem(LAST_SYNCED);
+    // do not remove lastSynced, instead set it to now
+    // because if we go offline after clearing cache
+    // message that are printing after it, won't appear while offline
+    // to reproduce: chance to reproduce 50%.
+    // Open 2 browsers (lets say chrome, + chrome annon).
+    // Clear history on 2nd one. Type  `window.ws.ws.close()` on 2nd one.
+    // Clicly switch to first one and send message in less than 5 seconds (reconnect time).
+    // Open 2nd one and when internet appears the message might not appear while you were offline
+    localStorage.setItem(LAST_SYNCED, Date.now().toString())
     if (typeof self !== 'undefined') {
       let cacheNames = await self.caches.keys()
       await Promise.all(cacheNames.map(cn => {

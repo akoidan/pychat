@@ -18,7 +18,7 @@
     <div
       ref="giphyContent"
       class="giphy-content"
-      @scroll="loadMore"
+      @scroll.passive="loadMore"
     >
       <div v-if="images.length === 0 && search && !request">
         Nothing found
@@ -28,7 +28,7 @@
         :key="gif.id"
         @click.native="addGihpy(gif)"
         class="img-wrapper"
-        :src="gif.images.downsized_medium.url"
+        :src="webpSupported ? gif.images.fixed_height_small.webp: gif.images.fixed_height_small.url"
       />
     </div>
   </div>
@@ -46,6 +46,7 @@ import {
 import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import AppSuspense from '@/vue/ui/AppSuspense.vue';
+import {webpSupported} from '@/ts/utils/runtimeConsts';
 import {
   GIFObject,
   MultiResponse
@@ -63,6 +64,7 @@ export default class GiphySearch extends Vue {
   private readonly giphyContent!: HTMLDivElement;
 
   private search: string = '';
+  private webpSupported: boolean = webpSupported;
   public moreLoading: boolean = false;
   private images: GIFObject[] = [];
 
@@ -74,7 +76,7 @@ export default class GiphySearch extends Vue {
 
   @Emit()
   addGihpy(img: GIFObject) {
-    return img.images.downsized_medium.url;
+    return img;
   }
 
   @Watch('search')

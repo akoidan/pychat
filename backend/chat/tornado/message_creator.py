@@ -190,9 +190,9 @@ class MessagesCreator(object):
 		"""
 		if files:
 			return {x.symbol: {
-				VarNames.FILE_URL: x.img.url if x.img else x.absolute_url,
+				VarNames.FILE_URL: x.absolute_url if x.type == 'g' else x.img.url ,
 				VarNames.FILE_TYPE: x.type,
-				VarNames.PREVIEW: x.preview.url if x.preview else None,
+				VarNames.PREVIEW: x.webp_absolute_url if x.type == 'g' else x.preview.url if x.preview else None,
 				VarNames.IMAGE_ID: x.id
 			} for x in files if x.message_id == message_id}
 
