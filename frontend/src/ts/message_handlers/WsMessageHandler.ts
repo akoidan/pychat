@@ -432,6 +432,10 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     let messagesIds: number[] = [];
     let receivedMessageIds: number[] = [];
     let onServerMessageIds: number[] = [];
+
+    // readMessageIds and receivedMessageIds - can be my messages from another device
+    // so I don't need to mark them as read, but rather filter first
+
     let roomIds: number[] = this.store.roomsArray.map(r => {
       let roomMessage = Object.values(r.messages).filter(m => m.id > 0)
       messagesIds.push(...roomMessage.map(m => m.id));
@@ -495,7 +499,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private updateMessagesStatusIfRequired(roomId: number, inMessages: MessageModelDto[]) {
     if (roomId === this.store.activeRoomId) {
       let ids: number[] = inMessages
-          .filter(m => m.status === 'received' || m.status === 'on_server')
+          // if we received a message from the server from our second device
+          // we still don't need to mark those messages as received
+          .filter(m => m.userId !== this.store.myId && (m.status === 'received' || m.status === 'on_server'))
           .map(m => m.id);
       if (ids.length > 0) {
         this.ws.setMessageStatus(
