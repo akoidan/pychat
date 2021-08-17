@@ -28,9 +28,15 @@
         :key="gif.id"
         @click.native="addGihpy(gif)"
         class="img-wrapper"
-        :src="webpSupported ? gif.images.fixed_height_small.webp: gif.images.fixed_height_small.url"
+        :src="getImageSrc(gif)"
       />
-      <input type="button" class="lor-btn" v-if="!request" value="Load more" @click="fetchGiphies"/>
+      <input
+        type="button"
+        class="lor-btn"
+        v-if="showLoadMoreBtn"
+        :value="`Load ${pagination.total_count - pagination.offset} more`"
+        @click="fetchGiphies"
+      />
     </div>
   </div>
 </template>
@@ -53,6 +59,8 @@ import {
   MultiResponse
 } from 'giphy-api';
 import AppLoadingImage from '@/vue/ui/AppLoadingImage.vue';
+import { LOAD_GIPHIES_PER_REQUEST } from '@/ts/utils/consts';
+
 @Component({
   components: {AppLoadingImage, AppSuspense, AppSubmit}
 })
@@ -65,14 +73,33 @@ export default class GiphySearch extends Vue {
   private readonly giphyContent!: HTMLDivElement;
 
   private search: string = '';
+  private pagination: MultiResponse['pagination'] = {
+    count: 0,
+    offset: 0,
+    total_count: 0,
+  };
   private webpSupported: boolean = webpSupported;
   public moreLoading: boolean = false;
   private images: GIFObject[] = [];
 
   private request: XMLHttpRequest|null = null;
 
+  get showLoadMoreBtn() {
+    return !this.request && this.images.length > 0 && this.pagination.count === LOAD_GIPHIES_PER_REQUEST;
+  }
+
   async mounted() {
     await this.onSearchChange();
+  }
+
+  getImageSrc(gif: GIFObject) {
+    if (gif.images.fixed_height_small) {
+      return webpSupported && gif.images.fixed_height_small.webp ? gif.images.fixed_height_small.webp : gif.images.fixed_height_small.url;
+    }
+    if (gif.images.fixed_height) {
+      return webpSupported && gif.images.fixed_height.webp ? gif.images.fixed_height.webp : gif.images.fixed_height.url;
+    }
+    throw Error(`Invalid image ${JSON.stringify(gif)}`);
   }
 
   @Emit()
@@ -87,7 +114,8 @@ export default class GiphySearch extends Vue {
       this.request.abort();
       this.request = null;
     }
-    const response = await this.$api.searchGiphys(this.search, 0, r => this.request = r);
+    const response = await this.$api.searchGiphys(this.search, 0, LOAD_GIPHIES_PER_REQUEST,r => this.request = r);
+    this.pagination = response.pagination;
     this.request = null;
     this.images = response.data;
   }
@@ -103,8 +131,8 @@ export default class GiphySearch extends Vue {
   async fetchGiphies() {
     // w/0 +1, it returns duplicate id
     // the weird thing docs say, that pagination start with 0, but it seems like with 1
-    let response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, r => this.request = r);
-    console.warn({old: this.images, new: response})
+    let response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, LOAD_GIPHIES_PER_REQUEST, r => this.request = r);
+    this.pagination = response.pagination;
     this.images.push(...response.data.filter(n => !this.images.find(o => o.id === n.id)));
   }
 
@@ -136,27 +164,13 @@ export default class GiphySearch extends Vue {
     max-height: 800px
     height: calc(100vh - 300px)
     min-height: 100px
+    display: flex
+    flex-direction: row
+    flex-wrap: wrap
     .img-wrapper
       padding: 5px
-      display: inline-block
-      max-height: 100%
-      width: calc(50% - 10px)
+      margin: auto
       cursor: pointer
-      // if right bar is hidden
-      @media screen and (max-width: $collapse-width /2)
-        width: calc(100% - 10px)
-      @media screen and (min-width: $collapse-width / 2) and (max-width: $collapse-width)
-        width: calc(50% - 10px)
-      // if right bar is present
-      @media screen and (min-width: $collapse-width) and (max-width: $collapse-width * 3 / 2)
-        width: calc(50% - 10px)
-      @media screen and (min-width: $collapse-width * 3 / 2) and (max-width: $collapse-width * 2)
-        width: calc(33% - 10px)
-      @media screen and (min-width: $collapse-width * 2) and (max-width: $collapse-width * 4)
-        width: calc(25% - 10px)
-      @media screen and (min-width: $collapse-width * 4)
-          width: auto
       /deep/ img
-        max-width: 100%
-        max-height: 100%
+        max-width: 100% // some images can be fixed hight but really wide, search 'fsg' for e.g
 </style>

@@ -192,7 +192,16 @@ export function getSmileyHtml(symbol: string) {
 }
 
 export function getGiphyHtml(gif: GIFObject) {
-  return `<img src="${webpSupported ? gif.images.fixed_height_small.webp : gif.images.fixed_height_small.url}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" webp="${gif.images.original.webp}" url="${gif.images.original.url}" />`;
+  let src;
+  if (gif.images.fixed_height_small) {
+    src =  webpSupported && gif.images.fixed_height_small.webp ? gif.images.fixed_height_small.webp : gif.images.fixed_height_small.url;
+  } else if (gif.images.fixed_height) {
+    src = webpSupported && gif.images.fixed_height.webp ? gif.images.fixed_height.webp : gif.images.fixed_height.url;
+  } else {
+    throw Error(`Invalid image ${JSON.stringify(gif)}`)
+  }
+  const webp = gif.images.original.webp ? `webp="${gif.images.original.webp}"` : ``;
+  return `<img src="${src}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" ${webp} url="${gif.images.original.url}" />`;
 }
 
 export const isDateMissing = (function () {
@@ -311,7 +320,8 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
         } else if (v.type === 'f') {
           return `<a href="${resolveMediaUrl(v.url!)}" serverId="${v.serverId}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
         } else if (v.type === 'g') {
-          return `<img serverId="${v.serverId}" src='${webpSupported && v.preview? v.preview : v.url}' webp="${v.preview}" url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
+          // giphy api sometimes doesn't contain webp, so it can be null
+          return `<img serverId="${v.serverId}" src='${webpSupported && v.preview? v.preview : v.url}' ${v.preview ? `webp="${v.preview}"`: ''} url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
         }  else {
           logger.error('Invalid type {}', v.type)();
         }

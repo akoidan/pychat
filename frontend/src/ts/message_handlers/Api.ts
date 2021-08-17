@@ -104,14 +104,19 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async searchGiphys(text: string, offset: number, process?: (R: XMLHttpRequest) => void): Promise<MultiResponse> {
+  public async searchGiphys(
+    text: string,
+    offset: number,
+    limit: number,
+    process?: (R: XMLHttpRequest) => void
+  ): Promise<MultiResponse> {
     let response!: MultiResponse;
     if (text.match(/^\s*$/)) {
       response = await this.xhr.doGet<MultiResponse>({
         isJsonDecoded: true,
         skipAuth: true,
         // https://developers.giphy.com/docs/api/endpoint#trending
-        url: `/gifs/trending?api_key=${GIPHY_API_KEY}&limit=12&offset=${offset}`,
+        url: `/gifs/trending?api_key=${GIPHY_API_KEY}&limit=${limit}&offset=${offset}`,
         baseUrl: GIPHY_URL,
         process
       });
