@@ -1,13 +1,20 @@
-import {Logger} from 'lines-logger';
-import loggerFactory from '@/ts/instances/loggerFactory';
+import {
+  Logger,
+  LoggerFactory
+} from 'lines-logger';
+
 import {
   BACKEND_ADDRESS,
   GIT_HASH,
-  PUBLIC_PATH
+  PUBLIC_PATH,
+  IS_DEBUG
 } from '@/ts/utils/consts';
 
 declare var clients: any;
-declare var serviceWorkerOption: {assets: string[]};
+declare var serviceWorkerOption: { assets: string[] };
+
+// don't use loggerFactory.ts since, we don't have localStorage on serviceWorker
+const loggerFactory =  new LoggerFactory(IS_DEBUG ? 'trace' : 'error');
 const logger: Logger = loggerFactory.getLogger(`SW_${GIT_HASH}`);
 
 logger.debug('Evaluating...')();
