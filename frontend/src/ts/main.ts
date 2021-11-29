@@ -227,26 +227,6 @@ async function init() {
     logger.log('Constants {}', constants)();
   }
 
-  const data: SetStateFromStorage | null = await storage.connect();
-  const session = sessionHolder.session;
-  logger.log('restored state from db {}, userId: {}, session {}', data, store.myId, session)();
-  if (data) {
-    if (!store.userInfo && session) {
-      store.setStateFromStorage(data);
-    } else {
-      store.roomsArray.forEach((storeRoom: RoomModel) => {
-        if (data.roomsDict[storeRoom.id]) {
-          const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
-          for (const dbMessagesKey in dbMessages) {
-            if (!storeRoom.messages[dbMessagesKey]) {
-              store.addMessageWoDB(dbMessages[dbMessagesKey]);
-            }
-          }
-        }
-      });
-      logger.debug('Skipping settings state {}', data)();
-    }
-  }
   // sync is not required here, I tested every time this code branch is executed messages sync even if we don't use it here.
   // weird ha? they could be not in the storage ...
   // if (ws.isWsOpen()) {

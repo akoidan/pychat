@@ -39,11 +39,8 @@ import {
   TagDB,
   UserDB
 } from '@/ts/types/db';
-import {browserVersion} from '@/ts/utils/runtimeConsts';
 import {SetStateFromStorage} from '@/ts/types/dto';
 import {MainWindow} from '@/ts/classes/MainWindow';
-import sessionHolder from '@/ts/instances/sessionInstance';
-import {store} from '@/ts/instances/storeInstance';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];

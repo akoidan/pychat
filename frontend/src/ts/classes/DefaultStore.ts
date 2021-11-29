@@ -29,6 +29,7 @@ import {
   UserModel
 } from '@/ts/types/model';
 import {
+  AddMessagesDTO,
   AddSendingFileTransfer,
   BooleanIdentifier,
   IStorage,
@@ -139,6 +140,10 @@ export class DefaultStore extends VuexModule {
   public mediaObjects: { [id: string]: MediaStream } = {};
   public isCurrentWindowActive: boolean = true;
   public currentChatPage: 'rooms' | 'chat' = 'chat';
+
+  public get getStorage() { // not reactive state is not available outside
+    return this.storage;
+  }
 
   get userName(): (id: number) => string {
     return (id: number): string => this.allUsersDict[id].user;
@@ -405,7 +410,7 @@ export class DefaultStore extends VuexModule {
       }
     }
     if (!key) {
-    // TODO do we need to fire watch if track added but stream hasn't changed?
+      // TODO do we need to fire watch if track added but stream hasn't changed?
       let key = mediaLinkIdGetter();
       this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
       Vue.set(this.mediaObjects, key, payload.anchor);
@@ -462,7 +467,7 @@ export class DefaultStore extends VuexModule {
       ci.shareScreen = payload.state;
     } else if (payload.type === 'webcam') {
       ci.showVideo = payload.state;
-    }  else if (payload.type === 'paint') {
+    } else if (payload.type === 'paint') {
       ci.sharePaint = payload.state;
     }
   }
@@ -562,7 +567,7 @@ export class DefaultStore extends VuexModule {
         .map(m => {
           m.status = status;
           return m.id;
-    });
+        });
     if (ids.length) {
       this.storage.setMessagesStatus(ids, status);
     }
@@ -600,6 +605,15 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public addMessage(m: MessageModel) {
     const om: { [id: number]: MessageModel } = this.roomsDict[m.roomId].messages;
+    // if this message is in thread
+    // and parent message already loaded (so its threadMessageId is not actualanymore)
+    // and this message is a new one (not syncing current message)
+    if (m.parentMessage && om[m.parentMessage] && !om[m.id]
+        // and this message is not from us (otherwise we already increased message count when sending it and storing in store)
+        && !(m.userId === this.userInfo?.userId && m.id > 0)) {
+      om[m.parentMessage].threadMessagesCount++;
+      this.storage.setThreadMessageCount(m.parentMessage, om[m.parentMessage].threadMessagesCount);
+    }
     Vue.set(om, String(m.id), m);
     this.storage.saveMessage(m);
   }
@@ -609,6 +623,8 @@ export class DefaultStore extends VuexModule {
   // and one in mutation, but storage is not available in actions
   @Mutation
   public addMessageWoDB(m: MessageModel) {
+    // calling mutation from another mutation is not allowed in vuex
+    // https://github.com/championswimmer/vuex-module-decorators/issues/363
     const om: { [id: number]: MessageModel } = this.roomsDict[m.roomId].messages;
     Vue.set(om, String(m.id), m);
   }
@@ -655,15 +671,22 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public increaseThreadMessageCount({roomId, messageId}: {roomId: number; messageId: number}) {
-    let message = this.roomsDict[roomId].messages[messageId];
-    message.threadMessagesCount++;
-    this.storage.setThreadMessageCount(messageId, message.threadMessagesCount);
-  }
-
-  @Mutation
-  public addMessages(ml: MessagesLocation) {
+  public addMessages(ml: AddMessagesDTO) {
     const om: { [id: number]: MessageModel } = this.roomsDict[ml.roomId].messages;
+    if (ml.syncingThreadMessageRequired) {
+      const messageWithParent: Record<string, number> = {};
+      ml.messages.filter(m => m.parentMessage && !om[m.id] && om[m.parentMessage]).forEach(m => {
+        if (!messageWithParent[m.parentMessage!]) {
+          messageWithParent[m.parentMessage!] = 0;
+        }
+        messageWithParent[m.parentMessage!]++;
+      })
+      Object.entries(messageWithParent).forEach(([parentRoomId, amountNewmessages]) => {
+        const roomId = parseInt(parentRoomId);
+        om[roomId].threadMessagesCount += amountNewmessages;
+        this.storage.setThreadMessageCount(roomId, om[roomId].threadMessagesCount);
+      })
+    }
     ml.messages.forEach(m => {
       Vue.set(om, String(m.id), m);
     });

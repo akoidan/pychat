@@ -270,6 +270,10 @@ export interface MessagesLocation {
   messages: MessageModel[];
 }
 
+export interface AddMessagesDTO extends MessagesLocation {
+  syncingThreadMessageRequired?: true;
+}
+
 export interface LiveConnectionLocation {
   roomId: number;
   connection: string;

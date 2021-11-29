@@ -264,12 +264,12 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
 
   }
-  public addMessages(roomId: number, inMessages: MessageModelDto[]) {
+  public addMessages(roomId: number, inMessages: MessageModelDto[], syncingThreadMessageRequired?: true) {
     this.updateMessagesStatusIfRequired(roomId, inMessages);
     const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].messages;
     const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]); // TODO this is no longer required, probably
     const messages: MessageModel[] = newMesages.map(nm => convertMessageModelDtoToModel(nm, null, time => this.ws.convertServerTimeToPC(time)));
-    this.store.addMessages({messages, roomId: roomId});
+    this.store.addMessages({messages, roomId: roomId, syncingThreadMessageRequired});
   }
 
   public addSearchMessages(roomId: number, inMessages: MessageModelDto[]) {
@@ -337,8 +337,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
     if (checkIfIdIsMissing(message, this.store)) {
       await this.loadMessages(message.roomId, [message.parentMessage!]);
-    } else if (inMessage.parentMessage) {
-      this.store.increaseThreadMessageCount({roomId: inMessage.roomId, messageId: message.parentMessage!})
     }
   }
 
@@ -467,8 +465,16 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.setAllMessagesStatus(result.readMessageIds, 'read');
     this.setAllMessagesStatus(result.receivedMessageIds, 'received');
 
-    // Persist loaded messages into storage
-    this.addRandomMessagesToStorage(result.content);
+    Object.entries(this.groupMessagesIdsByStatus(result.content, () => true))
+      .forEach(([k,messagesInGroup]) => {
+        let roomId = parseInt(k);
+        this.addMessages(roomId, messagesInGroup, true);
+        let missingIds = getMissingIds(roomId, this.store);
+        if (missingIds.length) {
+          // when we load new messages, they can be from thread we don't have
+          this.loadMessages(roomId, missingIds)
+        }
+    });
 
     localStorage.setItem(LAST_SYNCED, Date.now().toString())
   }
@@ -484,19 +490,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       }
       return rv;
     }, {} as Record<number, MessageModelDto[]>);
-  }
-
-  private addRandomMessagesToStorage(messages: MessageModelDto[]) {
-    Object.entries(this.groupMessagesIdsByStatus(messages, () => true))
-        .forEach(([k,messagesInGroup]) => {
-          let roomId = parseInt(k);
-          this.addMessages(roomId, messagesInGroup);
-          let missingIds = getMissingIds(roomId, this.store);
-          if (missingIds.length) {
-            // when we load new messages, they can be from thread we don't have
-            this.loadMessages(roomId, missingIds)
-          }
-        });
   }
 
   private updateMessagesStatusIfRequired(roomId: number, inMessages: MessageModelDto[]) {
