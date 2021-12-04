@@ -167,6 +167,10 @@ export default class ChatTextMessage extends Vue {
     /deep/ .video-player
       @extend %img-play-chat
       @extend %img-play
+      img:not([src])
+        margin: 0
+        min-width: 200px
+        min-height: 100px
 
     /deep/ .tag-user
       color: #729fcf

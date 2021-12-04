@@ -18,6 +18,7 @@ import {
 import recordIcon from '@/assets/img/audio.svg';
 import fileIcon from '@/assets/img/file.svg';
 import { getFlag } from '@/ts/utils/flags';
+import videoIcon from '@/assets/img/icon-play-red.svg';
 import {
   Smile,
   smileys,
@@ -314,7 +315,7 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
         } else if (v.type === 'v' || v.type === 'm') {
           const className = v.type === 'v' ? 'video-player' : 'video-player video-record';
 
-          return `<div class='${className}' serverId="${v.serverId}" associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+          return `<div class='${className}' serverId="${v.serverId}" associatedVideo='${v.url}'><div><img ${v.preview? `src="${resolveMediaUrl(v.preview)}"`: ""} symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
           return `<img src='${recordIcon}' serverId="${v.serverId}" symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else if (v.type === 'f') {
@@ -574,20 +575,20 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
       tmpCanvasContext.drawImage(video, 0, 0);
       tmpCanvasContext.canvas.toBlob(
         function (blob) {
-          if (!blob) {
-            errCb(`Blob for file ${file.name} is not null`);
-
-            return;
-          }
-          const url = URL.createObjectURL(blob);
           const img = document.createElement('img');
+          if (!blob) {
+             logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
+             img.src = videoIcon as string;
+          } else {
+            const url = URL.createObjectURL(blob);
+            savedFiles[url] = blob;
+            blob.name = '.jpg';
+            img.src = url;
+          }
           img.className = PASTED_IMG_CLASS;
-          img.src = url;
           img.setAttribute('videoType', videoType);
-          blob.name = '.jpg';
           img.setAttribute('associatedVideo', src);
           savedFiles[src] = file;
-          savedFiles[url] = blob;
           pasteNodeAtCaret(img, textArea);
         },
         'image/jpeg',
@@ -713,12 +714,12 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     } else {
       url = src!;
     }
-    let preview: string|null;
-    if (assVideo) {
+    let preview: string|null = null;
+    if (assVideo && src !== videoIcon) {
       preview = src;
     } else if (asGiphyPreview) {
       preview = asGiphyPreview;
-    } else {
+    } else if (src !== videoIcon) {
       preview = assVideo;
     }
 
