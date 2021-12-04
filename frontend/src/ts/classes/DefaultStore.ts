@@ -68,6 +68,7 @@ import {
 } from '@/ts/types/dto';
 import {encodeHTML} from '@/ts/utils/htmlApi';
 import {
+  ACTIVE_ROOM_ID_LS_NAME,
   ALL_ROOM_ID,
   SHOW_I_TYPING_INTERVAL
 } from '@/ts/utils/consts';
@@ -795,6 +796,7 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setActiveRoomId(id: number) {
     this.activeRoomId = id;
+    localStorage.setItem(ACTIVE_ROOM_ID_LS_NAME, String(id));
     if (this.roomsDict[id]) {
       this.roomsDict[id].newMessagesCount = 0;
     }

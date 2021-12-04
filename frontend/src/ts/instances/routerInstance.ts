@@ -20,6 +20,7 @@ import ViewProfilePage from '@/vue/pages/ViewProfilePage.vue';
 import RoomSettings from '@/vue/pages/RoomSettings.vue';
 import ApplyResetPassword from '@/vue/singup/ApplyResetPassword.vue';
 import {
+  ACTIVE_ROOM_ID_LS_NAME,
   ALL_ROOM_ID
 } from '@/ts/utils/consts';
 import ConfirmMail from '@/vue/pages/ConfirmMail.vue';
@@ -63,7 +64,16 @@ export const router = new VueRouter({
       children: [
         {
           path: '',
-          redirect: `/chat/${ALL_ROOM_ID}`
+          meta: {
+            beforeEnter: (to: Route, from: Route, next: Function) => {
+              const prevActiveRoomId = localStorage.getItem(ACTIVE_ROOM_ID_LS_NAME);
+              if (prevActiveRoomId) {
+                next(`/chat/${prevActiveRoomId}`);
+              } else {
+                next(`/chat/${ALL_ROOM_ID}`);
+              }
+            }
+          }
         },
         {
           component: ChannelsPage,
@@ -184,10 +194,10 @@ export const router = new VueRouter({
       path: '*',
       redirect: `/chat/${ALL_ROOM_ID}`
     }
-    ]
+  ]
 });
 router.beforeEach((to, from, next) => {
-  if (to.matched[0] && to.matched[0].meta && to.matched[0].meta.loginRequired && !sessionHolder.session) {
+  if (to.matched[0]?.meta?.loginRequired && !sessionHolder.session) {
     next('/auth/login');
   } else {
     if (to.meta && to.meta.beforeEnter) {

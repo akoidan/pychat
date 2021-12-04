@@ -46,6 +46,7 @@ export const LAST_SYNCED = 'lastSynced';
 export const SEND_CHUNK_SIZE = 16384;
 export const READ_CHUNK_SIZE = SEND_CHUNK_SIZE * 64;
 export const MAX_BUFFER_SIZE = 256;
+export const ACTIVE_ROOM_ID_LS_NAME = 'activeRoomId';
 export const SERVICE_WORKER_VERSION_LS_NAME = 'serviceWorkerVersion';
 export const USERNAME_REGEX = '[a-zA-Z-_0-9]{1,16}';
 export const SHOW_I_TYPING_INTERVAL = 5_000;
