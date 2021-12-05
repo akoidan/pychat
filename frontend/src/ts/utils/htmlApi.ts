@@ -11,6 +11,7 @@ import {
 } from '@/ts/types/types';
 import {
   BlobType,
+  CurrentUserSettingsModel,
   FileModel,
   MessageModel,
   UserModel
@@ -24,7 +25,10 @@ import {
   smileys,
 } from '@/ts/utils/smileys';
 import loggerFactory from '@/ts/instances/loggerFactory';
-import { Logger } from 'lines-logger';
+import {
+  Logger,
+  LogLevel
+} from 'lines-logger';
 import {
   MEDIA_API_URL,
   webpSupported
@@ -119,12 +123,12 @@ const patterns = [
   }, {
     search: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/g,
     replace: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
-    name: 'youtube'
+    name: 'embeddedYoutube'
   },
   {
     search: /```(.+?)(?=```)```/g,
     replace: '<pre>$1</pre>',
-    name: 'code'
+    name: 'highlightCode'
   },
   {
     search: new RegExp(`(^\(\d\d:\d\d:\d\d\)\s${USERNAME_REGEX}:)(.*)&gt;&gt;&gt;<br>`),
@@ -261,6 +265,11 @@ export function encodeMessage(data: MessageModel, store: DefaultStore) {
   let html = encodeHTML(data.content);
   const replaceElements: unknown[] = [];
   patterns.forEach((pattern) => {
+    if (store.userSettings
+        && store.userSettings[pattern.name as keyof CurrentUserSettingsModel] === false) {
+      debugger
+      return;
+    }
     const res = html.replace(pattern.search, pattern.replace);
     if (res !== html) {
       replaceElements.push(pattern.name);
