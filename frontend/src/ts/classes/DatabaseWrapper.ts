@@ -52,9 +52,12 @@ export default class DatabaseWrapper implements IStorage {
   private mainWindow: MainWindow;
   private skipSqlCache: Record<string, boolean> = {}
 
-  constructor(mainWindow: MainWindow, db: Database) {
+  constructor(mainWindow: MainWindow) {
     this.mainWindow = mainWindow;
-    this.db = db;
+    if (!window.openDatabase) {
+      throw Error("DatabaseWrapper not supported")
+    }
+    this.db = window.openDatabase('v157', '', 'Messages database', 10 * 1024 * 1024);
     this.logger = loggerFactory.getLoggerColor(`db`, '#753e01');
   }
 
