@@ -64,9 +64,6 @@ export class MessageHelper {
         message.isHighlighted = true;
       }
     }
-    if (activeRoomId !== message.roomId) {
-      this.store.incNewMessagesCount(message.roomId);
-    }
 
     if (this.store.userSettings!.messageSound) {
       this.audioPlayer.checkAndPlay(incoming, room.volume);

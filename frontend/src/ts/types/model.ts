@@ -259,7 +259,6 @@ export interface RoomModel extends RoomSettingsModel {
   messages: Record<number, MessageModel>;
   allLoaded: boolean;
   search: SearchModel;
-  newMessagesCount: number;
   usersTyping: Record<number, number>;
   roomLog: RoomLog[];
   changeName: ChangeRoomName[];

@@ -266,8 +266,7 @@ export function encodeMessage(data: MessageModel, store: DefaultStore) {
   const replaceElements: unknown[] = [];
   patterns.forEach((pattern) => {
     if (store.userSettings
-        && store.userSettings[pattern.name as keyof CurrentUserSettingsModel] === false) {
-      debugger
+        && store.userSettings[pattern.name as keyof CurrentUserSettingsModel] === false) { // can be undefined as well
       return;
     }
     const res = html.replace(pattern.search, pattern.replace);

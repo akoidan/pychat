@@ -465,7 +465,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.setAllMessagesStatus(result.readMessageIds, 'read');
     this.setAllMessagesStatus(result.receivedMessageIds, 'received');
 
-    Object.entries(this.groupMessagesIdsByStatus(result.content, () => true))
+    const messagesByStatus = this.groupMessagesIdsByStatus(result.content, () => true);
+    Object.entries(messagesByStatus)
       .forEach(([k,messagesInGroup]) => {
         let roomId = parseInt(k);
         this.addMessages(roomId, messagesInGroup, true);
@@ -493,30 +494,27 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   }
 
   private updateMessagesStatusIfRequired(roomId: number, inMessages: MessageModelDto[]) {
+    let ids: number[];
+    let messageStatus: MessageStatus;
     if (roomId === this.store.activeRoomId) {
-      let ids: number[] = inMessages
+      ids = inMessages
           // if we received a message from the server from our second device
           // we still don't need to mark those messages as received
           .filter(m => m.userId !== this.store.myId && (m.status === 'received' || m.status === 'on_server'))
           .map(m => m.id);
-      if (ids.length > 0) {
-        this.ws.setMessageStatus(
-            ids,
-            this.store.activeRoomId!,
-            'read'
-        );
-      }
+      messageStatus = 'read';
     } else {
-      let ids: number[] = inMessages
+      ids = inMessages
           .filter(m => m.status === 'on_server')
           .map(m => m.id);
-      if (ids.length > 0) {
-        this.ws.setMessageStatus(
-            ids,
-            this.store.activeRoomId!,
-            'received'
-        );
-      }
+      messageStatus = 'received';
+    }
+    if (ids.length > 0) {
+      this.ws.setMessageStatus(
+          ids,
+          roomId,
+          messageStatus
+      );
     }
   }
 

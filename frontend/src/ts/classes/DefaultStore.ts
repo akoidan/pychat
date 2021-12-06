@@ -212,7 +212,7 @@ export class DefaultStore extends VuexModule {
           if (messageDict[receivingFile.threadId]) {
             messageDict[receivingFile.threadId].messages.push(receivingFile);
           } else {
-            logger.warn(`Receiving file {} won't be dispayed as thread ${receivingFile.threadId} is not loaded yet`)();
+            logger.warn(`Receiving file {} won't be displayed as thread ${receivingFile.threadId} is not loaded yet`)();
           }
         } else {
           newArray.push(receivingFile);
@@ -547,11 +547,6 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public incNewMessagesCount(roomId: number) {
-    this.roomsDict[roomId].newMessagesCount++;
-  }
-
-  @Mutation
   public setMessagesStatus(
       {
         roomId,
@@ -797,9 +792,6 @@ export class DefaultStore extends VuexModule {
   public setActiveRoomId(id: number) {
     this.activeRoomId = id;
     localStorage.setItem(ACTIVE_ROOM_ID_LS_NAME, String(id));
-    if (this.roomsDict[id]) {
-      this.roomsDict[id].newMessagesCount = 0;
-    }
   }
 
   @Mutation

@@ -1,11 +1,11 @@
 <template>
   <div>
     <span
-      v-if="room.newMessagesCount"
+      v-if="newMessagesCount > 0"
       class="newMessagesCount"
-      :title="`You have ${room.newMessagesCount} new messages in this room`"
+      :title="`You have ${newMessagesCount} new messages in this room`"
     >
-      {{ room.newMessagesCount }}
+      {{ newMessagesCount }}
     </span>
     <span
       v-else-if="room.callInfo.callActive"
@@ -31,12 +31,22 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { RoomModel } from '@/ts/types/model';
+import { MessageModel, RoomModel } from '@/ts/types/model';
 
 @Component({name: 'RoomRightIcon'})
  export default class RoomRightIcon extends Vue {
 
     @Prop() public room!: RoomModel;
+
+    get newMessagesCount(): number {
+      return this.$store.calculatedMessagesForRoom(this.room.id)
+          .filter((m: MessageModel) =>
+              // on_server is not really required, since all received messages are gonna be 'received'
+              // but it's an additional failsafe check, in case of a bug in another place
+              (m.status === 'received' || m.status === 'on_server')
+              && m.userId !== this.$store.myId
+          ).length;
+    }
 
   }
 </script>
