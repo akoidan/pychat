@@ -2,6 +2,7 @@
   <div class="chatBoxHolder">
     <template v-for="room in roomsArray">
       <chat-box
+        v-if="roomInited[room.id]"
         v-show="activeRoomId === room.id"
         :key="room.id"
         :room="room"
@@ -39,6 +40,18 @@ export default class ChatBoxes extends Vue {
 
   @State
   public readonly roomsArray!: RoomModel[];
+
+  // do not render all messages in all rooms, this is too slow
+  private roomInited: Record<string, boolean> = {};
+
+  created() {
+    Vue.set(this.roomInited, this.activeRoomId, true);
+  }
+
+  @Watch('activeRoomId')
+  public onActiveRoomIdChange(newValue: number) {
+    Vue.set(this.roomInited, newValue, true);
+  }
 
   get ALL_ROOM_ID(): number {
     return ALL_ROOM_ID;

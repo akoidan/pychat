@@ -124,6 +124,7 @@ import AppSeparator from '@/vue/ui/AppSeparator.vue';
 import ChatThread from '@/vue/chat/message/ChatThread.vue';
 import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
+import { isMobile } from '@/ts/utils/runtimeConsts';
 
 
   @Component({
@@ -186,6 +187,7 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
     }
 
     mounted() {
+      this.$logger.log(`Rendering messages for room #${this.room.id}`)()
       this.onEmitScroll(); // this seems to be more reliable than created and mounted
     }
 
@@ -210,10 +212,14 @@ import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
     @Watch('activeRoomId')
     public onActivate() {
       if (this.activeRoomId === this.room.id) {
+        this.scrollBottom = true;
+        this.onEmitScroll()
         this.markMessagesInCurrentRoomAsRead();
-        this.$nextTick(() => {
-          this.textarea.userMessage.focus();
-        })
+          if (!isMobile) { // do not trigger virtual keyboard on mobile, since it occupies all of space
+            this.$nextTick(() => {
+              this.textarea.userMessage.focus();
+          })
+        }
       }
     }
 
