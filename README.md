@@ -35,7 +35,7 @@
 - [TODO](#todo)
 
 # About
-Pychat is an opensource absolutely free communcation tool targeted for a copmany use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
+Pychat is an opensource absolutely free communcation tool targeted for a company use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
 
 # When should I use pychat
 |                        | Pychat | Slack | Skype | Telegram | Viber | Discord |
