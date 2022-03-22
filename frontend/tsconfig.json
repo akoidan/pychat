@@ -10,7 +10,7 @@
       { "name": "typescript-tslint-plugin"}
     ],
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "esnext",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -28,8 +28,10 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "pretty": true,
-    "strict": true
+    "strict": true,
+    "composite": true,
   },
+ "include": ["vite.config.ts"],
   "exclude": [
     "node_modules"
   ]
