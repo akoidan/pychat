@@ -354,7 +354,8 @@ const getConfig = async () => {
       extensions: ['.ts', '.js', '.vue'],
       alias: {
         'vue': 'vue/dist/vue.js',
-        '@': path.resolve(__dirname, 'src')
+        '@': path.resolve(__dirname, 'src'),
+        '~/': path.resolve(__dirname, 'node_modules')
       }
     },
     mode: options.IS_PROD ? 'production' : 'development',
@@ -464,7 +465,8 @@ function getSimpleConfig(mainFile, dist, entry, target) {
     resolve: {
       extensions: ['.ts', '.vue', '.json', ".js", '.png', ".sass"],
       alias: {
-        '@': path.resolve(__dirname, 'src')
+        '@': path.resolve(__dirname, 'src'),
+        '~/': path.resolve(__dirname, 'node_modules')
       },
     },
     watch: !options.IS_PROD,
