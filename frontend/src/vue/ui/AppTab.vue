@@ -24,7 +24,7 @@
 >
   @import "~@/assets/sass/partials/variables"
   @import "~@/assets/sass/partials/abstract_classes"
-  .links /deep/
+  .links ::v-deep
     display: flex
     margin-top: 10px
     padding: 8px
@@ -46,7 +46,7 @@
       a
         text-align: center
         padding: 4px
-  .color-white .links /deep/ a
+  .color-white .links ::v-deep a
     color: #c3fffd
     &.router-link-active
       color: #e8e156

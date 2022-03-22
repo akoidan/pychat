@@ -202,27 +202,29 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 
 ### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
  1. Install [python](https://www.python.org/downloads/) with pip. only **Python 3.6**+ is **required**
- 2. Add **pip** and **python** to `PATH` variable.
- 3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
- 5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector.
- 6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
- 7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
+ 1. Add **pip** and **python** to `PATH` variable.
+ 1. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
+ 1. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector.
+ 1. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
+ 1. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
  1. Install [nvm](https://github.com/coreybutler/nvm-windows). 
+ 1. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv .venv`. Activate python virtual environment: `source .venv/bin/activate`
 
 ### [Ubuntu](http://www.ubuntu.com/):
  1. Install required packages: `apt-get install python pip mysql-server libmysqlclient-dev` (python should be 3.6-3.8) If pip is missing check `python-pip`. For old versions of Ubuntu you can use this ppa: `sudo add-apt-repository ppa:deadsnakes/ppa; sudo apt-get update; sudo apt-get install python3.8 python3.8-dev python3.8-venv python3.8-apt; curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; python3.8 get-pip.py` 
  1. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
- 1. Install mysqlclient `pip install mysqlclient==1.3.13`
  1. Install [nvm](https://qiita.com/shaching/items/6e398140432d4133c866)
+ 1. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv .venv`. Activate python virtual environment: `source .venv/bin/activate`
 
 ### [Archlinux](https://www.archlinux.org/):
- 1. Install system packages:  `pacman -S unzip python python-pip redis yarn mariadb python-mysqlclient`. nvm is located in [aur](https://aur.archlinux.org/packages/nvm/) so `yay -S nvm` (or use another aur package)
- 2. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
+ 1. Install system packages:  `pacman -S unzip python python-pip redis yarn mariadb python-mysqlclient`. nvm and pyenv is located in [aur](https://aur.archlinux.org/packages/nvm/) so `yay -S nvm pyenv-virtualenv` (or use another aur package)
+ 1. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
+ 1. `cd backend; pyenv virtualenv 3.8-dev pychat`. Activate it `source ~/.pyenv/versions/pychat/bin/activate`
  
 ### [MacOS](https://en.wikipedia.org/wiki/MacOS)
  1. Install packages: `brew install mysql redis python3` 
  1. Start services `brew services run mysql redis`
- 1. Install mysqlclient `pip install mysqlclient`
+ 1. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv .venv`. Activate it: `source .venv/bin/activate`
 
 ## Ssl
 Since we're using self singed certificate your OS doesn't know about for development. We need to do some tricks for browser to make it work. If you have valid certificates for your domain you can skip this step.
@@ -253,11 +255,10 @@ Remember that Service Worker will work only if certificate is trusted. So flags 
 
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
- 2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
- 3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv`. For ubuntu you can omit `--system-site-packages `. Activate it: `source .venv/bin/activate`
- 4. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
- 5. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
- 6. Fill database with tables: `bash ../download_content.sh create_django_tables`. (Remember you're still in `backend` dir)
+ 1. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.**
+ 1. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
+ 1. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 1. Fill database with tables: `bash ../download_content.sh create_django_tables`. (Remember you're still in `backend` dir)
 
 ## Build frontend
 Change to frontend directory `cd frontend` I would recommend to use node version specified in nvm, so  `nvm install; nvm use`.
@@ -275,7 +276,7 @@ Change to frontend directory `cd frontend` I would recommend to use node version
  1. Django support should be enabled by default when you open this project. If it doesn't happen go to Settings -> Languages and Framework -> Django -> Enable django support. 
    - Django project root: `backend`
    - Put `Settings:` to `chat/settings.py`
- 1. If pycharm didn't configure virtualenv itself. Go to `Settings` -> `Project backend` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
+ 1. If pycharm didn't configure virtualenv itself. Go to `Settings` -> `Project backend` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python` (or on Archlinux `.pyenv/versions/pychat/bin/python`). Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
  1. `Settings` -> `Project backend` -> `Project structure`
   - You might want to exclude: `.idea`
   - mark `templates` directory as `Template Folder`

@@ -258,7 +258,7 @@ export default class VideoContainer extends Vue {
     background: #555
     margin-bottom: 4px
 
-  .micVideoHolder /deep/
+  .micVideoHolder ::v-deep
     @mixin selectIfHasAmountOfChild($child) // renders style depending on amount of children
       $realChild: $child +1
       // select first element, and nth element from the end

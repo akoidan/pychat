@@ -57,6 +57,6 @@ export default class PrivateRoomRow extends Vue {
 
   .online, .offline
     padding-left: 0
-  .online /deep/ .online-marker
+  .online ::v-deep .online-marker
     display: block
 </style>

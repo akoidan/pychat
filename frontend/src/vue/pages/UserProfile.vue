@@ -49,7 +49,7 @@ export default class UserProfile extends Vue {
   .tab
     max-width: 680px
 
-  .profileInner /deep/
+  .profileInner ::v-deep
     button
       width: 100%
     padding-top: 10px
