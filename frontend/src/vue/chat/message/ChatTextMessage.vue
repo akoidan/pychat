@@ -158,13 +158,13 @@ export default class ChatTextMessage extends Vue {
   .message-text-style
     min-width: 0
 
-    /deep/ .emoji
+    ::v-deep .emoji
       width: $emoji-width
 
-    /deep/ .youtube-player
+    ::v-deep .youtube-player
       @extend %img-play-chat
       @extend %img-play
-    /deep/ .video-player
+    ::v-deep .video-player
       @extend %img-play-chat
       @extend %img-play
       img:not([src])
@@ -172,39 +172,39 @@ export default class ChatTextMessage extends Vue {
         min-width: 200px
         min-height: 100px
 
-    /deep/ .tag-user
+    ::v-deep .tag-user
       color: #729fcf
 
-    /deep/ :visited
+    ::v-deep :visited
       color: #7572CF
-    /deep/ :link
+    ::v-deep :link
       color: $link-color
-    /deep/ a
+    ::v-deep a
       &:hover
         text-decoration: underline
 
-    /deep/ img[alt] // smile
+    ::v-deep img[alt] // smile
       @extend %img-code
 
-    /deep/ .quote
+    ::v-deep .quote
       border-left: 5px solid #4d4d4d
       padding-left: 5px
       margin: 5px
       span
         font-weight: bold
-    /deep/ pre
+    ::v-deep pre
       margin: 10px
       max-width: calc(100% - 15px)
       overflow-x: auto
 
-    /deep/ .video-player-ready
+    ::v-deep .video-player-ready
       border: none
       @include margin-img-def
       width: 500px
       height: 350px
       @include margin-img
 
-    /deep/ .giphy
+    ::v-deep .giphy
       position: relative
       img
         @include margin-img-def
@@ -218,7 +218,7 @@ export default class ChatTextMessage extends Vue {
         width: 100px
         height: 36px
 
-    /deep/ .B4j2ContentEditableImg
+    ::v-deep .B4j2ContentEditableImg
       @include margin-img-def
       @include margin-img
       &.failed
@@ -227,25 +227,25 @@ export default class ChatTextMessage extends Vue {
         + div.icon-youtube-play
           width: 50px
           margin-right: -30px
-    /deep/ .video-record
+    ::v-deep .video-record
       img
         border-radius: 50%
       div
         background-color: transparent
-    /deep/ .audio-record
+    ::v-deep .audio-record
       vertical-align: middle
       height: 50px
       cursor: pointer
-    /deep/ .uploading-file
+    ::v-deep .uploading-file
       vertical-align: middle
       height: 50px
       cursor: pointer
-    /deep/ .audio-player-ready
+    ::v-deep .audio-player-ready
       vertical-align: middle
 
-  .color-lor p /deep/, .color-reg p /deep/
+  .color-lor p ::v-deep, .color-reg p ::v-deep
     @import "../../../../node_modules/highlightjs/styles/railscasts.css"
-  .color-white p /deep/
+  .color-white p ::v-deep
     @import "../../../../node_modules/highlightjs/styles/default.css"
     .message-others
       background-color: white

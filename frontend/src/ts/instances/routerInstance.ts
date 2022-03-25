@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import sessionHolder from '@/ts/instances/sessionInstance';
 import { store } from '@/ts/instances/storeInstance';
 import MainPage from '@/vue/pages/MainPage.vue';
@@ -25,8 +25,6 @@ import {
 } from '@/ts/utils/consts';
 import ConfirmMail from '@/vue/pages/ConfirmMail.vue';
 import UserProfileChangeEmail from '@/vue/pages/UserProfileChangeEmail.vue';
-import { Route } from 'vue-router/types';
-import CreateRoomChannel from '@/vue/pages/CreateRoomChannel.vue';
 import CreateChannel from '@/vue/pages/CreateChannel.vue';
 import ChannelSettings from '@/vue/pages/ChannelSettings.vue';
 import { sub } from '@/ts/instances/subInstance';
@@ -44,16 +42,13 @@ import {
 } from '@/ts/types/messages/innerMessages';
 import UserProfileOauthSettings from '@/vue/pages/UserProfileOauthSettings.vue';
 import PainterPage from '@/vue/pages/PainterPage.vue';
-import ChatRightSection from '@/vue/chat/right/ChatRightSection.vue';
-import ChatRightSectionPage from '@/vue/pages/ChatRightSectionPage.vue';
 import RoomUsersListPage from '@/vue/pages/RoomUsersListPage.vue';
 import ChannelAddRoom from '@/vue/pages/ChannelAddRoom.vue';
 
-Vue.use(VueRouter);
-
 const logger: Logger = loggerFactory.getLogger('router');
 
-export const router = new VueRouter({
+export const router = createRouter({
+  history: createWebHistory(),
   routes: [
     {
       path: '',
@@ -64,26 +59,23 @@ export const router = new VueRouter({
       children: [
         {
           path: '',
-          meta: {
-            beforeEnter: (to: Route, from: Route, next: Function) => {
-              const prevActiveRoomId = localStorage.getItem(ACTIVE_ROOM_ID_LS_NAME);
-              if (prevActiveRoomId) {
-                next(`/chat/${prevActiveRoomId}`);
-              } else {
-                next(`/chat/${ALL_ROOM_ID}`);
-              }
+          redirect: to => {
+           const prevActiveRoomId = localStorage.getItem(ACTIVE_ROOM_ID_LS_NAME);
+           if (prevActiveRoomId) {
+              return `/chat/${prevActiveRoomId}`
+            } else {
+              return `/chat/${ALL_ROOM_ID}`;
             }
-          }
+          },
         },
         {
           component: ChannelsPage,
           meta: {
             hasOwnNavBar: true,
-            beforeEnter: (to: Route, from: Route, next: Function) => {
+          },
+          beforeEnter: (to, from) => {
               logger.debug('setActiveRoomId {}', to.params.id)();
               store.setActiveRoomId(parseInt(to.params.id));
-              next();
-            }
           },
           name: 'chat',
           path: '/chat/:id'
@@ -200,9 +192,6 @@ router.beforeEach((to, from, next) => {
   if (to.matched[0]?.meta?.loginRequired && !sessionHolder.session) {
     next('/auth/login');
   } else {
-    if (to.meta && to.meta.beforeEnter) {
-      to.meta.beforeEnter(to, from, next);
-    }
     next();
   }
 });

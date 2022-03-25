@@ -38,11 +38,8 @@
         @click="addSmileyClick(code)"
       >
     </div>
-    <template v-for="(allSmileys, tabName) in smileys">
-      <div
-        v-show="activeTab === tabName && !showFilterSmiley"
-        :key="tabName"
-      >
+    <template v-for="(allSmileys, tabName) in smileys" :key="tabName">
+      <div v-show="activeTab === tabName && !showFilterSmiley">
         <img
           v-for="(smiley, code) in allSmileys"
           :key="code"
@@ -51,7 +48,7 @@
           :alt="smiley.alt"
           :code="code"
           @click="addSmileyClick(code)"
-        >
+        />
       </div>
     </template>
   </div>

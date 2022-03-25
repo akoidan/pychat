@@ -169,7 +169,7 @@ function getUniqueId() {
       background-color: $after-color
 
     &::-webkit-slider-thumb
-      margin-top: ($track-h - $thumb-d) / 2
+      margin-top: calc(($track-h - $thumb-d) / 2)
       +thumb-base
 
     &::-moz-range-thumb

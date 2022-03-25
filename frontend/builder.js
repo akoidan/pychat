@@ -8,7 +8,7 @@
 const WebpackDevServer = require('webpack-dev-server');
 const fs = require('fs');
 const path = require('path');
-const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const { VueLoaderPlugin } = require("vue-loader");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
@@ -31,6 +31,7 @@ const sassOptionsGlobal = {
   options: {
     sassOptions: {
       indentedSyntax: true,
+      implementation: require("sass"),
       includePaths: [path.resolve(__dirname, 'src/assets/sass')]
     }
   }
@@ -307,20 +308,20 @@ const getConfig = async () => {
       sassOptionsGlobal
     ];
   }
-  plugins.push(new webpack.ProgressPlugin(function (percentage, msg, current, active, modulepath) {
-      if (process.stdout.isTTY && percentage < 1) {
-        process.stdout.cursorTo(0);
-        modulepath = modulepath ? ' …' + modulepath.substr(modulepath.length - process.stdout.columns + 45) : '';
-        current = current ? ' ' + current : '';
-        active = active ? ' ' + active : '';
-        process.stdout.write((percentage * 100).toFixed(0) + '% ' + msg + current + active + modulepath + ' ');
-        process.stdout.clearLine(1)
-      } else if (process.stdout.isTTY && percentage === 1) {
-        process.stdout.cursorTo(0);
-        process.stdout.clearLine(1);
-      }
-    })
-  );
+  // plugins.push(new webpack.ProgressPlugin(function (percentage, msg, current, active, modulepath) {
+  //     if (process.stdout.isTTY && percentage < 1) {
+  //       process.stdout.cursorTo(0);
+  //       modulepath = modulepath ? ' …' + modulepath.substr(modulepath.length - process.stdout.columns + 45) : '';
+  //       current = current ? ' ' + current : '';
+  //       active = active ? ' ' + active : '';
+  //       process.stdout.write((percentage * 100).toFixed(0) + '% ' + msg + current + active + modulepath + ' ');
+  //       process.stdout.clearLine(1)
+  //     } else if (process.stdout.isTTY && percentage === 1) {
+  //       process.stdout.cursorTo(0);
+  //       process.stdout.clearLine(1);
+  //     }
+  //   })
+  // );
 
   let tsConfig = function () {
     const res =  [

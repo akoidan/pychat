@@ -234,7 +234,7 @@ export default class ChatCall extends Vue {
   @import "~@/assets/sass/partials/mixins.sass"
 
 
-  .callContainer /deep/
+  .callContainer ::v-deep
     border-right: 7.5px solid #1a1a1a
     display: inline-block
     max-width: 100%
@@ -256,7 +256,7 @@ export default class ChatCall extends Vue {
       @include hover-click(#2a8f9c)
 
 
-  .fullscreen /deep/
+  .fullscreen ::v-deep
     .videoContainer
       background-color: black
 
@@ -280,17 +280,17 @@ export default class ChatCall extends Vue {
     padding: 10px
     min-height: 0
     @media screen and (max-height: 850px)
-      /deep/ .painterTools
+      ::v-deep .painterTools
         width: 60px !important
         flex-direction: row !important
         flex-wrap: wrap
     @media screen and (max-height: 650px)
-        /deep/ .painterTools
+        ::v-deep .painterTools
           width: 80px !important
           flex-direction: row !important
           flex-wrap: wrap
 
-    /deep/
+    ::v-deep
       .active-icon
         color: red
       > div

@@ -1,7 +1,7 @@
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import Api from '@/ts/message_handlers/Api';
 import { Logger } from 'lines-logger';
-import VueRouter, { Route } from 'vue-router';
+import  { RouteComponent } from 'vue-router';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   GoogleCaptcha,
@@ -15,15 +15,15 @@ import {
 import WebRtcApi from '@/ts/webrtc/WebRtcApi';
 import Subscription from '@/ts/classes/Subscription';
 import Http from '@/ts/classes/Http';
-import Vue, { Component } from 'vue';
+import  { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
 import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 import { RoomHandler } from '@/ts/message_handlers/RomHandler';
-
+import type {App as VueApp} from '@vue/runtime-core'
 declare global {
   interface Window {
     GIT_VERSION: string|undefined;
-    vue: Vue;
+    vue: VueApp;
     router: VueRouter;
     api: Api;
     deferredPrompt: BeforeInstallPromptEvent;
@@ -71,7 +71,7 @@ declare module 'vue/types/vue' {
     $store: DefaultStore; // if $store conflicts with node_modules/vuex/types/vue.d.ts if
     $logger: Logger;
     $router: VueRouter;
-    $route: Route;
+    $route: RouteComponent;
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;
     $messageBus: Vue;

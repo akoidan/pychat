@@ -217,7 +217,7 @@ export default class UserProfileSettings extends Vue {
   .lor-btn
     width: 100%
 
-  .settings-page /deep/
+  .settings-page ::v-deep
     button
       width: 100%
     padding-top: 10px

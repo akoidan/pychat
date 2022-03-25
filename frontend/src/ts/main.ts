@@ -11,17 +11,17 @@ import {
 } from '@/ts/utils/runtimeConsts';
 import App from '@/vue/App.vue'; // should be after initStore
 import {sub} from '@/ts/instances/subInstance';
-import Vue, {ComponentOptions} from 'vue';
+import {ComponentOptions, createApp} from 'vue';
 import {store} from '@/ts/instances/storeInstance';
 import {Logger} from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import sessionHolder from '@/ts/instances/sessionInstance';
+import type {App as VueApp} from '@vue/runtime-core'
 import {
   MessageModel,
   PlatformUtil,
   RoomModel
 } from '@/ts/types/model';
-import {VNode} from 'vue/types/vnode';
 import Xhr from '@/ts/classes/Xhr';
 import '@/assets/icon.png';
 import WsHandler from '@/ts/message_handlers/WsHandler';
@@ -41,18 +41,19 @@ import {SetStateFromStorage} from '@/ts/types/dto';
 import {MessageHelper} from '@/ts/message_handlers/MessageHelper';
 import {RoomHandler} from '@/ts/message_handlers/RomHandler';
 import {mainWindow} from '@/ts/instances/mainWindow';
+import mitt, { Emitter } from 'mitt';
 
 
-function declareDirectives() {
-  Vue.directive('validity', function (el: HTMLElement, binding) {
+function declareDirectives(app: VueApp) {
+  app.directive('validity', function (el: HTMLElement, binding) {
     (<HTMLInputElement>el).setCustomValidity(binding.value);
   });
-
-  interface MyVNode extends VNode {
-    switcherTimeout?: number;
-    switcherStart?: () => Promise<void>;
-    switcherFinish?: () => Promise<void>;
-  }
+  // TODO
+  // interface MyVNode extends VNode {
+  //   switcherTimeout?: number;
+  //   switcherStart?: () => Promise<void>;
+  //   switcherFinish?: () => Promise<void>;
+  // }
 
   function getEventName(eventType: 'start' | 'end'): string[] {
     if (constants.IS_ANDROID || isMobile) {
@@ -68,9 +69,9 @@ function declareDirectives() {
   // if user mouse down and keeps it down for HOLD_TIMEOUT, start event would be fired
   // otherwise switch event woould be fired
   //  v-switcher="{start: mousedownevent, stop: releaseRecord, switch: clickevent}"
-  Vue.directive('switcher', {
+  app.directive('switcher', {
 
-    bind: function (el, binding, vnode: MyVNode) {
+    created: function (el, binding, vnode: any) {
 
       vnode.switcherTimeout = 0;
       vnode.switcherStart = async function () {
@@ -97,38 +98,41 @@ function declareDirectives() {
       }
       getEventName('start').forEach(eventName => el.addEventListener(eventName, vnode.switcherStart!))
     },
-    unbind: function (el, binding, vnode: MyVNode) {
+    unmounted: function (el, binding, vnode: any) {
       getEventName('start').forEach(eventName => el.removeEventListener(eventName, vnode.switcherStart!))
        getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
     }
   });
 }
 
+declare module '@vue/runtime-core' {
 
-declare module 'vue/types/vue' {
-
-  interface Vue {
+  interface App {
     __logger: Logger;
     id?: number | string;
   }
 }
 
 
-function declareMixins() {
-  const mixin = {
+function getMixins() {
+  const loggerMixin = {
     computed: {
-      $logger(this: Vue): Logger {
-        if (!this.__logger && this.$options._componentTag !== 'router-link') {
-          let name = this.$options._componentTag || 'vue-comp';
-          if (!this.$options._componentTag) {
-            // oops :(
-          }
-          if (this.id) {
-            name += `:${this.id}`;
-          }
-          this.__logger = loggerFactory.getLoggerColor(name, '#35495e');
-        }
+      $logger(this: VueApp): Logger {
+        //TODO vue3
+        // if (!this.__logger && this.$options._componentTag !== 'router-link') {
+        //   let name = this.$options._componentTag || 'vue-comp';
+        //   if (!this.$options._componentTag) {
+        //     // oops :(
+        //   }
+        //   if (this.id) {
+        //     name += `:${this.id}`;
+        //   }
+        //   this.__logger = loggerFactory.getLoggerColor(name, '#35495e');
+        // }
 
+        if (!this.__logger) {
+          this.__logger = loggerFactory.getLoggerColor('tTODO', '#35495e');
+        }
         return this.__logger;
       }
     },
@@ -139,15 +143,12 @@ function declareMixins() {
       // this.$logger && this.$logger.debug('Created')();
     }
   };
-  Vue.mixin(<ComponentOptions<Vue>><unknown>mixin);
+  return [loggerMixin]
 }
 const logger: Logger = loggerFactory.getLoggerColor(`main`, '#007a70');
 logger.log(`Evaluating main script ${constants.GIT_HASH}`)();
 
 async function init() {
-  declareMixins();
-  declareDirectives();
-
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
@@ -163,7 +164,7 @@ async function init() {
   store.setStorage(storage);
   const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow);
-  const messageBus = new Vue();
+  const messageBus: Emitter<any> = mitt();
   const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
   const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
   const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
@@ -171,19 +172,35 @@ async function init() {
   const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
 
-  Vue.prototype.$api = api;
-  Vue.prototype.$ws = ws;
-  Vue.prototype.$store = store;
-  Vue.prototype.$messageBus = messageBus;
-  Vue.prototype.$webrtcApi = webrtcApi;
-  Vue.prototype.$platformUtil = platformUtil;
-  Vue.prototype.$messageSenderProxy = messageSenderProxy;
 
 
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
-  const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
-  vue.$mount('#app');
+  const vue: VueApp = createApp(App, {
+    store,
+    mixins: getMixins(),
+  });
+  vue.use(router);
+  vue.config.globalProperties.$messageBus = messageBus;
+  vue.config.globalProperties.$api = api;
+  vue.config.globalProperties.$ws = ws;
+  vue.config.globalProperties.$store = store;
+  vue.config.globalProperties.$webrtcApi = webrtcApi;
+  vue.config.globalProperties.$platformUtil = platformUtil;
+  vue.config.globalProperties.$messageSenderProxy = messageSenderProxy;
+
+  declareDirectives(vue);
+  vue.config.errorHandler = (err, vm, info) => {
+    const message = `Error occurred in ${err}:${vm}\n${info}`;
+    if (store?.userSettings?.sendLogs && api) {
+      api.sendLogs(`${vm}:${err}:${info}`, browserVersion, constants.GIT_HASH);
+    }
+    store.growlError(message);
+    logger.error("Error occured in vue component err: '{}', vm '{}', info '{}'", err, vm, info)()
+    return false;
+  };
+
+  vue.mount('#app');
 
   window.onerror = function (msg, url, linenumber, column, errorObj) {
     const message = `Error occurred in ${url}:${linenumber}\n${msg}`;
@@ -195,16 +212,7 @@ async function init() {
     return false;
   };
 
-  Vue.config.errorHandler = (err, vm, info) => {
-    const message = `Error occurred in ${err}:${vm}\n${info}`;
-    if (store?.userSettings?.sendLogs && api) {
-      api.sendLogs(`${vm}:${err}:${info}`, browserVersion, constants.GIT_HASH);
-    }
-    store.growlError(message);
-    logger.error("Error occured in vue component err: '{}', vm '{}', info '{}'", err, vm, info)()
-    return false;
 
-  };
 
   window.GIT_VERSION = constants.GIT_HASH;
   if (constants.IS_DEBUG) {
