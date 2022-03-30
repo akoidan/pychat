@@ -90,7 +90,7 @@ export default class PickUser extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
   .spann
     @extend %hovered-user-room
 

@@ -26,7 +26,7 @@ export default class App extends Vue {
 
   @Watch('mainClass')
   public onMainClassChange(value: string) {
-    document.body.parenzzz tElement!.className = value;
+    document.body.parentElement!.className = value;
   }
 
 }

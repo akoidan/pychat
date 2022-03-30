@@ -143,7 +143,7 @@ export default class GiphySearch extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .giphy-header
     display: flex

@@ -94,8 +94,8 @@ import { ViewUserProfileDto } from "@/ts/types/dto";
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/variables"
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/mixins"
 
   th
     text-align: right

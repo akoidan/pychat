@@ -116,7 +116,7 @@
     private showVideo: boolean = false;
     private isStopped: boolean = true;
 
-    private created() {
+    public created() {
       this.srcImg = this.initialImage;
     }
 
@@ -197,7 +197,7 @@
         // "image/webp" works in Chrome.
         // Other browsers will fall back to image/png.
         canvasContext.canvas.toBlob((blob) => {
-          this.srcImg = URL.createObjectURL(blob);
+          this.srcImg = URL.createObjectURL(blob); //TODO
           blob!.name = '.jpg';
           this.blob = blob;
         },                          'image/jpeg', 0.95);
@@ -239,11 +239,11 @@
 <!-- eslint-disable -->
 <style lang="sass">
   $cropper-image-path: '~cropperjs/src/images' !default
-  @import '~cropperjs/src/index.scss'
+  @import "~cropperjs/src/index.scss"
 </style>
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   video
     position: absolute

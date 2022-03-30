@@ -29,7 +29,7 @@ import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
 </script>
 <style lang="sass" scoped>
 
-    @import "~@/assets/sass/partials/mixins"
+    @import "@/assets/sass/partials/mixins"
 
     .spinner
         @include lds-30-spinner-vertical('Changing email...')

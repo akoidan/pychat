@@ -29,8 +29,8 @@ import { GrowlModel } from '@/ts/types/model';
 </script>
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .growl-leave-active
     @include transition(0.5s opacity)

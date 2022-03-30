@@ -110,7 +110,7 @@ import { CallsInfoModel } from '@/ts/types/model';
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/mixins.sass"
+  @import "@/assets/sass/partials/mixins.sass"
 
   .call-is-active
     font-size: 10px

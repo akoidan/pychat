@@ -60,7 +60,7 @@ export default class ChatSendingFile extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/variables"
 
   .message-self
     display: flex

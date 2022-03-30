@@ -151,7 +151,7 @@ export default class CreateRoom extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   input[type="text"]
     max-width: calc(100vw - 140px)

@@ -61,7 +61,7 @@ function getUniqueId() {
 </script>
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .container
     height: calc(100% - 55px)

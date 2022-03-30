@@ -116,7 +116,7 @@ export default class GoogleAuth extends Vue {
       right: 0
       // expand to width
       position: absolute
-      background: url('~@/assets/img/g-icon.svg') no-repeat
+      background: url('@/assets/img/g-icon.svg') no-repeat
       top: -8px
       left: -5px
 

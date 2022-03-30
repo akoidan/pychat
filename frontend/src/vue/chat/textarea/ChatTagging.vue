@@ -89,7 +89,7 @@ import {State} from '@/ts/instances/storeInstance';
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .chat-tagging
     @extend %modal-window

@@ -66,7 +66,7 @@ export default class RoomUsersListPage extends Vue {
 
 
   get roomId(): number {
-    return parseInt(this.$route.params.id);
+    return parseInt(this.$route.params.id as string);
   }
 
   get room() {
@@ -104,9 +104,9 @@ export default class RoomUsersListPage extends Vue {
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/room_users_table.sass"
+  @import "@/assets/sass/partials/room_users_table.sass"
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .current-room-users-table-header
     font-size: 20px

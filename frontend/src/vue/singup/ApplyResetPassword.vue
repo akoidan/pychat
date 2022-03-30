@@ -81,7 +81,7 @@
 
   $restPassMargin: 20px
 
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/mixins"
 
   .spinner
     @include lds-30-spinner-vertical('Checking token...')

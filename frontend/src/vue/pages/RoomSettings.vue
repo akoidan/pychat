@@ -274,7 +274,7 @@ export default class RoomSettings extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .holder
     overflow-y: auto

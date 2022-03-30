@@ -32,7 +32,7 @@ const sassOptionsGlobal = {
     sassOptions: {
       indentedSyntax: true,
       implementation: require("sass"),
-      includePaths: [path.resolve(__dirname, 'src/assets/sass')]
+      includePaths: [path.resolve(__dirname, 'src')]
     }
   }
 }

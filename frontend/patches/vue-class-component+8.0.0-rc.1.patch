@@ -1,0 +1,22 @@
+diff --git a/node_modules/vue-class-component/package.json b/node_modules/vue-class-component/package.json
+index 128055fa..8501604b 100644
+--- a/node_modules/vue-class-component/package.json
++++ b/node_modules/vue-class-component/package.json
+@@ -2,14 +2,10 @@
+   "name": "vue-class-component",
+   "version": "8.0.0-rc.1",
+   "description": "ES201X/TypeScript class decorator for Vue components",
+-  "main": "dist/vue-class-component.cjs.js",
+-  "module": "dist/vue-class-component.esm-bundler.js",
+-  "unpkg": "dist/vue-class-component.global.js",
+-  "jsdelivr": "dist/vue-class-component.global.js",
+-  "types": "dist/vue-class-component.d.ts",
++  "main": "src",
+   "sideEffects": false,
+   "files": [
+-    "dist"
++    "src"
+   ],
+   "scripts": {
+     "build": "yarn build:ts && yarn build:main && yarn build:dts",
+

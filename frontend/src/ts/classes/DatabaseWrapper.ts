@@ -88,7 +88,7 @@ export default class DatabaseWrapper implements IStorage {
   private async getAllTree(): Promise<SetStateFromStorage|null> {
     const t: SQLTransaction  = await new Promise((resolve, reject) => this.db.transaction(resolve, reject));
 
-    const f: unknown[][] = await Promise.all<unknown[]>([
+    const f: unknown[] = await Promise.all<unknown[]>([
       'select * from file',
       'select * from profile',
       'select * from room where deleted = 0',

@@ -65,7 +65,7 @@ import PickUser from '@/vue/parts/PickUser.vue';
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   input[type="text"]
     width: 100%

@@ -66,7 +66,7 @@
   lang="sass"
   scoped
 >
-  @import "~@/assets/sass/partials/room_users_table.sass"
+  @import "@/assets/sass/partials/room_users_table.sass"
   .router-link-active.active-room
     color: $active-color
   .icon-cog

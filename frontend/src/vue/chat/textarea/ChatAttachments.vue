@@ -215,7 +215,7 @@ import {buildQueryParams} from '@/ts/utils/pureFunctions';
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .icon-cancel-circled-outline
     margin-left: auto

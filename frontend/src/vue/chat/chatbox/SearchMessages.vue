@@ -150,7 +150,7 @@ function getUniqueId() {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/mixins"
 
   .icon-cancel-circled-outline
     @include hover-click(red)

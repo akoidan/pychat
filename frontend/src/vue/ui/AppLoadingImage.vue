@@ -22,7 +22,7 @@ export default class AppLoadingImage extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-@import "~@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
 .spinner
   margin: auto

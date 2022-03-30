@@ -22,8 +22,8 @@
   lang="sass"
   scoped
 >
-  @import "~@/assets/sass/partials/variables"
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/abstract_classes"
   .links ::v-deep
     display: flex
     margin-top: 10px

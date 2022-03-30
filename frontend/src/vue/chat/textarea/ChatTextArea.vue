@@ -482,9 +482,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 <style lang="sass" scoped>
 
 
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/variables"
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .userMessageWrapper
     padding: 8px
