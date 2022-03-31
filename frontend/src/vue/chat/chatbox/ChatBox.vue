@@ -101,8 +101,8 @@ import {
   Vue
 } from "vue-property-decorator";
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import ChatTextMessage from '@/vue/chat/message/ChatTextMessage.vue';
-import SearchMessages from '@/vue/chat/chatbox/SearchMessages.vue';
+import ChatTextMessage from '@/vue/chat/message/ChatTextMessage';
+import SearchMessages from '@/vue/chat/chatbox/SearchMessages';
 import {
   MessageModel,
   ReceivingFile,
@@ -113,17 +113,17 @@ import {
 import { MessageModelDto } from '@/ts/types/dto';
 
 import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage.vue';
-import ChatUserActionMessage from '@/vue/chat/message/ChatUserActionMessage.vue';
-import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
-import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
-import ChatCall from '@/vue/chat/call/ChatCall.vue';
-import ChatChangeNameMessage from '@/vue/chat/message/ChatChangeNameMessage.vue';
-import AppSeparator from '@/vue/ui/AppSeparator.vue';
-import ChatThread from '@/vue/chat/message/ChatThread.vue';
-import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
-import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
+import AppProgressBar from '@/vue/ui/AppProgressBar';
+import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage';
+import ChatUserActionMessage from '@/vue/chat/message/ChatUserActionMessage';
+import ChatSendingFile from '@/vue/chat/message/ChatSendingFile';
+import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile';
+import ChatCall from '@/vue/chat/call/ChatCall';
+import ChatChangeNameMessage from '@/vue/chat/message/ChatChangeNameMessage';
+import AppSeparator from '@/vue/ui/AppSeparator';
+import ChatThread from '@/vue/chat/message/ChatThread';
+import ChatTextArea from '@/vue/chat/textarea/ChatTextArea';
+import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping';
 import { isMobile } from '@/ts/utils/runtimeConsts';
 
 

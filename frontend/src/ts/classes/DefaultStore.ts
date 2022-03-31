@@ -81,7 +81,6 @@ import {
 
 const logger = loggerFactory.getLogger('store');
 
-Vue.use(Vuex);
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -390,9 +389,11 @@ export class DefaultStore extends VuexModule {
   @Validate
   public setCallOpponent(payload: SetCallOpponent) {
     if (payload.callInfoModel) {
-      Vue.set(this.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId, payload.callInfoModel);
+      // Vue.set
+      this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId] = payload.callInfoModel;
     } else {
-      Vue.delete(this.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId);
+      // Vue.delete
+      delete this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId];
     }
   }
 
@@ -414,13 +415,15 @@ export class DefaultStore extends VuexModule {
       // TODO do we need to fire watch if track added but stream hasn't changed?
       let key = mediaLinkIdGetter();
       this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
-      Vue.set(this.mediaObjects, key, payload.anchor);
+      // Vue.set
+      this.mediaObjects[key] = payload.anchor;
     }
   }
 
   @Mutation
   public addSendingFile(payload: SendingFile) {
-    Vue.set(this.roomsDict[payload.roomId].sendingFiles, payload.connId, payload);
+    // Vue.set
+    this.roomsDict[payload.roomId].sendingFiles[payload.connId] = payload;
   }
 
   @Mutation
@@ -497,19 +500,22 @@ export class DefaultStore extends VuexModule {
   @Validate
   public setLocalStreamSrc(payload: MediaIdentifier) {
     const key: string = mediaLinkIdGetter();
-    Vue.set(this.mediaObjects, key, payload.media);
+    // Vue.set
+    this.mediaObjects[key] = payload.media!;
     this.roomsDict[payload.id].callInfo.mediaStreamLink = key;
   }
 
   @Mutation
   public addReceivingFile(payload: ReceivingFile) {
-    Vue.set(this.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
+    // Vue.set
+    this.roomsDict[payload.roomId].receivingFiles[payload.connId] = payload;
   }
 
   @Mutation
   @Validate
   public addSendingFileTransfer(payload: AddSendingFileTransfer) {
-    Vue.set(this.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers, payload.transferId, payload.transfer);
+    // Vue.set
+    this.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transferId]= payload.transfer;
   }
 
   @Mutation
@@ -610,7 +616,8 @@ export class DefaultStore extends VuexModule {
       om[m.parentMessage].threadMessagesCount++;
       this.storage.setThreadMessageCount(m.parentMessage, om[m.parentMessage].threadMessagesCount);
     }
-    Vue.set(om, String(m.id), m);
+    //Vue.set(
+    om[m.id] = m;
     this.storage.saveMessage(m);
   }
 
@@ -622,7 +629,8 @@ export class DefaultStore extends VuexModule {
     // calling mutation from another mutation is not allowed in vuex
     // https://github.com/championswimmer/vuex-module-decorators/issues/363
     const om: { [id: number]: MessageModel } = this.roomsDict[m.roomId].messages;
-    Vue.set(om, String(m.id), m);
+    //Vue.set(
+    om[m.id] =m;
   }
 
   @Mutation
@@ -659,7 +667,8 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public deleteMessage(rm: RoomMessageIds) {
     let messages = this.roomsDict[rm.roomId].messages;
-    Vue.delete(messages, String(rm.messageId));
+    // Vue.delete(messages, String(rm.messageId));
+    delete messages[rm.messageId]
     Object.values(messages)
         .filter(m => m.parentMessage === rm.messageId)
         .forEach(a => a.parentMessage = rm.newMessageId);
@@ -684,7 +693,8 @@ export class DefaultStore extends VuexModule {
       })
     }
     ml.messages.forEach(m => {
-      Vue.set(om, String(m.id), m);
+      // VUe.set
+      om[m.id] = m;
     });
     this.storage.saveMessages(ml.messages);
   }
@@ -693,7 +703,8 @@ export class DefaultStore extends VuexModule {
   public addSearchMessages(ml: MessagesLocation) {
     const om: Record<number, MessageModel> = this.roomsDict[ml.roomId].search.messages;
     ml.messages.forEach(m => {
-      Vue.set(om, String(m.id), m);
+      // vue.set
+      om[m.id] = m;
     });
   }
 
@@ -760,7 +771,8 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public deleteRoom(roomId: number) {
-    Vue.delete(this.roomsDict, String(roomId));
+    // Vue.delete(this.roomsDict, String(roomId));
+    delete this.roomsDict[roomId];
     this.storage.deleteRoom(roomId);
   }
 
@@ -801,7 +813,8 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public addUser(u: UserModel) {
-    Vue.set(this.allUsersDict, String(u.id), u);
+    // Vue.set
+    this.allUsersDict[u.id] = u;
     this.storage.saveUser(u);
   }
 
@@ -896,28 +909,33 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public addRoom(room: RoomModel) {
-    Vue.set(this.roomsDict, String(room.id), room);
+    this.roomsDict[room.id] = room;
+    // Vue.set(, String(room.id), room);
     this.storage.saveRoom(room);
   }
 
   @Mutation
   public addChannel(channel: ChannelModel) {
-    Vue.set(this.channelsDict, String(channel.id), channel);
+    // Vue.set(, String(), channel);
+    this.channelsDict[channel.id] = channel
     this.storage.saveChannel(channel);
   }
 
   @Mutation
   public deleteChannel(channelId: number) {
-    Vue.delete(this.channelsDict, String(channelId));
+    // Vue.delete(this.channelsDict, String(channelId));
+    delete this.channelsDict[channelId];
     this.storage.deleteChannel(channelId);
   }
 
   @Mutation
   public setShowITypingUser({userId, roomId, date}: {userId: number; roomId: number; date: number}) {
     if (date === 0) {
-      Vue.delete(this.roomsDict[roomId].usersTyping, userId);
+      // Vue.delete(, userId);
+      delete this.roomsDict[roomId].usersTyping[userId];
     } else {
-      Vue.set(this.roomsDict[roomId].usersTyping, userId, date);
+      // Vue.set(, userId, date);
+      this.roomsDict[roomId].usersTyping[userId] = date;
     }
   }
 

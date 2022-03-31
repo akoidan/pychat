@@ -13,7 +13,7 @@ import {
 import { UserDictModel } from '@/ts/types/model';
 import { timeToString } from '@/ts/utils/htmlApi';
 
-import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
+import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon';
 @Component({
   name: 'ChatMessageHeader' ,
   components: {UserImageIcon}

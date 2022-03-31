@@ -34,7 +34,7 @@
     Prop,
     Vue
   } from 'vue-property-decorator';
-  import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
+  import AppNavWrapper from '@/vue/ui/AppNavWrapper';
   import {State} from '@/ts/instances/storeInstance';
   import {
     ChannelsDictUIModel,
@@ -42,10 +42,10 @@
     UserDictModel,
     UserModel
   } from '@/ts/types/model';
-  import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon.vue';
+  import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon';
   import {PrivateRoomsIds} from '@/ts/types/types';
-  import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
-  import UserNavInfo from '@/vue/chat/right/UserNavInfo.vue';
+  import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon';
+  import UserNavInfo from '@/vue/chat/right/UserNavInfo';
 
   @Component({
     name: 'ChatNavBar' ,

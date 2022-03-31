@@ -28,8 +28,8 @@
   import {State} from '@/ts/instances/storeInstance';
   import {ChannelUIModel} from '@/ts/types/model';
   import ChatRightCollapsedSection
-    from '@/vue/chat/right/ChatRightCollapsedSection.vue';
-  import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper.vue';
+    from '@/vue/chat/right/ChatRightCollapsedSection';
+  import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper';
 
   @Component({
     name: 'ChannelTable',

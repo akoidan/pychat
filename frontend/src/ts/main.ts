@@ -1,5 +1,5 @@
 import '@/ts/utils/classComponentHooks.ts';
-import '@/assets/sass/common.sass';
+import '@/assets/sass/common';
 import * as constants from '@/ts/utils/consts';
 
 import * as runtimeConsts from '@/ts/utils/runtimeConsts';
@@ -9,7 +9,7 @@ import {
   isMobile,
   WS_API_URL
 } from '@/ts/utils/runtimeConsts';
-import App from '@/vue/App.vue'; // should be after initStore
+import App from '@/vue/App'; // should be after initStore
 import {sub} from '@/ts/instances/subInstance';
 import {ComponentOptions, createApp} from 'vue';
 import {store} from '@/ts/instances/storeInstance';

@@ -114,14 +114,14 @@
 <script lang="ts">
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import AppSubmit from '@/vue/ui/AppSubmit';
 import {CurrentUserInfoModel, SexModelString} from '@/ts/types/model';
 import {
   UserProfileDto,
   UserProfileDtoWoImage
 } from '@/ts/types/dto';
 import {currentUserInfoModelToDto} from '@/ts/types/converters';
-import AppInputDate from '@/vue/ui/AppInputDate.vue';
+import AppInputDate from '@/vue/ui/AppInputDate';
 import { SetUserProfileMessage } from '@/ts/types/messages/wsInMessages';
 import {LogoutMessage} from '@/ts/types/messages/innerMessages';
 import {sub} from '@/ts/instances/subInstance';

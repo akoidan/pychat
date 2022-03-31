@@ -9,7 +9,7 @@
     Component,
     Vue
   } from 'vue-property-decorator';
-  import CreateRoom from '@/vue/parts/CreateRoom.vue';
+  import CreateRoom from '@/vue/parts/CreateRoom';
   import {State} from '@/ts/instances/storeInstance';
   import {PrivateRoomsIds} from '@/ts/types/types';
 

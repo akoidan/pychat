@@ -12,7 +12,7 @@ import {
 
 
 import loggerFactory from '@/ts/instances/loggerFactory';
-import AppInputRange from '@/vue/ui/AppInputRange.vue';
+import AppInputRange from '@/vue/ui/AppInputRange';
 import {savedFiles} from '@/ts/utils/htmlApi';
 
 let uniqueId = 1;

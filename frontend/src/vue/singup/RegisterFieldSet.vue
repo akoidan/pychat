@@ -11,8 +11,7 @@
   </div>
 </template>
 <script lang="ts">
-import Vue from 'vue';
-import {Prop, Component} from 'vue-property-decorator';
+import {Prop, Component, Vue} from 'vue-property-decorator';
 import {IconColor} from '@/ts/types/types';
 
 @Component({name: 'FieldSet'})

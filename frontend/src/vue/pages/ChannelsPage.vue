@@ -19,18 +19,18 @@
 <script lang='ts'>
 import {Component, Vue, Watch, Ref} from 'vue-property-decorator';
 
-import ChatRightSection from '@/vue/chat/right/ChatRightSection.vue';
-// import NavEditMessage from '@/vue/chat/NavEditMessage.vue';
-import ChatBoxes from '@/vue/chat/chatbox/ChatBoxes.vue';
-import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
+import ChatRightSection from '@/vue/chat/right/ChatRightSection';
+// import NavEditMessage from '@/vue/chat/NavEditMessage';
+import ChatBoxes from '@/vue/chat/chatbox/ChatBoxes';
+import AppNavWrapper from '@/vue/ui/AppNavWrapper';
 import {isMobile} from '@/ts/utils/runtimeConsts';
-import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon.vue';
+import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon';
 import {State} from '@/ts/instances/storeInstance';
-import ChatPopupMenu from '@/vue/chat/chatbox/ChatPopupMenu.vue';
-import AppMenuBar from '@/vue/ui/AppMenuBar.vue';
+import ChatPopupMenu from '@/vue/chat/chatbox/ChatPopupMenu';
+import AppMenuBar from '@/vue/ui/AppMenuBar';
 import {RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
 import {PrivateRoomsIds} from '@/ts/types/types';
-import ChatNavBar from '@/vue/chat/chatbox/ChatNavBar.vue';
+import ChatNavBar from '@/vue/chat/chatbox/ChatNavBar';
 
 
 @Component({

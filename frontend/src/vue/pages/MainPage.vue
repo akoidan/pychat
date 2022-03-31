@@ -29,9 +29,9 @@ import {
   IncomingCallModel
 } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
-import IncomingCall from '@/vue/chat/call/IncomingCall.vue';
-import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
-import ChatBackIcon from '@/vue/chat/chatbox/ChatBackIcon.vue';
+import IncomingCall from '@/vue/chat/call/IncomingCall';
+import AppNavWrapper from '@/vue/ui/AppNavWrapper';
+import ChatBackIcon from '@/vue/chat/chatbox/ChatBackIcon';
 import { SetStateFromStorage } from '@/ts/types/dto';
 
 @Component({

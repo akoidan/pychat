@@ -304,7 +304,7 @@ const getConfig = async () => {
     //   }
     // }))
     sasscPlugins = [
-      "style-loader", 'css-loader?sourceMap',
+      "style-loader", 'css-loader?sourceMap&url=false', // TODO vue3 replace all url=false
       sassOptionsGlobal
     ];
   }
@@ -352,9 +352,8 @@ const getConfig = async () => {
     }: 'minimal', // TODO DOESN WORK
     profile: !!options.IS_PROFILE,
     resolve: {
-      extensions: ['.ts', '.js', '.vue'],
+      extensions: ['.ts', '.js', '.vue', '.sass', '.scss'],
       alias: {
-        'vue': 'vue/dist/vue.js',
         '@': path.resolve(__dirname, 'src')
       }
     },
@@ -371,7 +370,7 @@ const getConfig = async () => {
       rules: [
         {
           test: /\.ts$/,
-          exclude: /node_modules/,
+          exclude: /node_modules\/(?!vue-class-component)/,
           use: tsConfig(),
         },
         {

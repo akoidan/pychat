@@ -128,14 +128,14 @@ import {
   Watch
 } from "vue-property-decorator";
 import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
-import AppSubmit from '@/vue/ui/AppSubmit.vue'
-import RegisterFieldSet from '@/vue/singup/RegisterFieldSet.vue'
+import AppSubmit from '@/vue/ui/AppSubmit'
+import RegisterFieldSet from '@/vue/singup/RegisterFieldSet'
 import debounce from 'lodash.debounce';
 import { IconColor } from '@/ts/types/types';
 import { SexModelString } from '@/ts/types/model';
 import { sub } from '@/ts/instances/subInstance'
 import { LoginMessage } from '@/ts/types/messages/innerMessages';
-import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
+import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp';
 import {USERNAME_REGEX} from '@/ts/utils/consts';
 
 @Component({

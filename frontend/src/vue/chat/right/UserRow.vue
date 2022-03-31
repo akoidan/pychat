@@ -22,7 +22,7 @@ import {
 } from '@/ts/types/model';
 import { getFlagPath, } from '@/ts/utils/htmlApi';
 import { FLAGS } from '@/ts/utils/consts';
-import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
+import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon';
 
 
 @Component({

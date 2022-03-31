@@ -38,8 +38,8 @@ import {
   setYoutubeEvent
 } from '@/ts/utils/htmlApi';
 
-import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
-import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader';
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper';
 
 @Component({
   name: 'ChatTextMessage' ,

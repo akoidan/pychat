@@ -35,10 +35,10 @@ import {
 } from 'vue-property-decorator';
 import { SendingFile } from '@/ts/types/model';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingFileTransfer from '@/vue/chat/message/ChatSendingFileTransfer.vue';
-import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
-import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+import AppProgressBar from '@/vue/ui/AppProgressBar';
+import ChatSendingFileTransfer from '@/vue/chat/message/ChatSendingFileTransfer';
+import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader';
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper';
 
 @Component({
   name: 'ChatSendingFile' ,

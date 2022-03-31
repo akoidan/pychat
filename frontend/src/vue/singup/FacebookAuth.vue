@@ -17,7 +17,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import AppSubmit from '@/vue/ui/AppSubmit';
 import { FACEBOOK_APP_ID } from '@/ts/utils/consts';
 
 declare const FB: any;

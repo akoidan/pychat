@@ -16,7 +16,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import AppSubmit from '@/vue/ui/AppSubmit';
 import { GOOGLE_OAUTH_2_CLIENT_ID } from '@/ts/utils/consts';
 
 declare const gapi: any;

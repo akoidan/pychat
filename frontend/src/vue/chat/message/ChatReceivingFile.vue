@@ -45,10 +45,10 @@ import {
   FileTransferStatus,
   ReceivingFile
 } from '@/ts/types/model';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
-import ReceivingFileInfo from '@/vue/chat/message/ReceivingFileInfo.vue';
-import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+import AppProgressBar from '@/vue/ui/AppProgressBar';
+import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader';
+import ReceivingFileInfo from '@/vue/chat/message/ReceivingFileInfo';
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper';
 
 
 @Component({

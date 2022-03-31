@@ -12,8 +12,8 @@ import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import RoomDirectUsersTable from '@/vue/chat/right/RoomDirectUsersTable.vue';
-import ChannelTable from '@/vue/chat/right/ChannelTable.vue';
+import RoomDirectUsersTable from '@/vue/chat/right/RoomDirectUsersTable';
+import ChannelTable from '@/vue/chat/right/ChannelTable';
 import {ChannelUIModel} from '@/ts/types/model';
 import {State} from '@/ts/instances/storeInstance';
 

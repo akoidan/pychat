@@ -129,8 +129,8 @@
     ApplyGrowlErr,
     State
   } from '@/ts/instances/storeInstance';
-  import AppSubmit from '@/vue/ui/AppSubmit.vue';
-  import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
+  import AppSubmit from '@/vue/ui/AppSubmit';
+  import AppCheckbox from '@/vue/ui/AppCheckbox';
   import {CurrentUserSettingsModel} from '@/ts/types/model';
   import {userSettingsDtoToModel} from '@/ts/types/converters';
   import {UserSettingsDto} from '@/ts/types/dto';

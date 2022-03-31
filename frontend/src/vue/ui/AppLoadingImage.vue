@@ -9,7 +9,7 @@
 import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
 import { CallsInfoModel } from '@/ts/types/model';
 
-@Component
+@Component({})
 export default class AppLoadingImage extends Vue {
   @Prop() public src!: string;
   private loaded: boolean = false;

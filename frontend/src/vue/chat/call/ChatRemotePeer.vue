@@ -27,8 +27,8 @@ import {
   Watch
 } from 'vue-property-decorator';
 import { CallInfoModel } from '@/ts/types/model';
-import AppInputRange from '@/vue/ui/AppInputRange.vue';
-import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
+import AppInputRange from '@/vue/ui/AppInputRange';
+import VideoObject from '@/vue/chat/chatbox/VideoObject';
 
 @Component({
   name: 'ChatRemotePeer' ,

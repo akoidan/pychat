@@ -104,13 +104,13 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {ChannelsDictUIModel, ChannelUIModel, CurrentUserInfoModel, UserModel} from '@/ts/types/model';
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import PickUser from '@/vue/parts/PickUser.vue';
+import AppSubmit from '@/vue/ui/AppSubmit';
+import PickUser from '@/vue/parts/PickUser';
 import {RouterNavigateMessage} from '@/ts/types/messages/innerMessages';
 import {sub} from '@/ts/instances/subInstance';
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
-import AppInputRange from '@/vue/ui/AppInputRange.vue';
-import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
+import AppInputRange from '@/vue/ui/AppInputRange';
+import AppCheckbox from '@/vue/ui/AppCheckbox';
 
 @Component({
   name: 'ChannelSettings',

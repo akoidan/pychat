@@ -26,7 +26,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
+import AppProgressBar from '@/vue/ui/AppProgressBar';
 import {
   FileTransferStatus,
   SendingFileTransfer,

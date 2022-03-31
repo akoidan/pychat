@@ -17,7 +17,7 @@
   } from 'vue-property-decorator';
   import {GrowlModel} from '@/ts/types/model';
   import {State} from '@/ts/instances/storeInstance';
-  import AppGrowl from '@/vue/ui/AppGrowl.vue';
+  import AppGrowl from '@/vue/ui/AppGrowl';
   @Component({
     components: {AppGrowl}
   })

@@ -51,14 +51,14 @@ import {
   Emit
 } from "vue-property-decorator";
 import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import AppSuspense from '@/vue/ui/AppSuspense.vue';
+import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSuspense from '@/vue/ui/AppSuspense';
 import {webpSupported} from '@/ts/utils/runtimeConsts';
 import {
   GIFObject,
   MultiResponse
 } from 'giphy-api';
-import AppLoadingImage from '@/vue/ui/AppLoadingImage.vue';
+import AppLoadingImage from '@/vue/ui/AppLoadingImage';
 import { LOAD_GIPHIES_PER_REQUEST } from '@/ts/utils/consts';
 
 @Component({

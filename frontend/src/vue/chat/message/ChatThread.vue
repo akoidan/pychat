@@ -35,12 +35,12 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {MessageModel, ReceivingFile, SendingFile} from '@/ts/types/model';
-import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage.vue';
+import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage';
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
-import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
-import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
-import AppSeparator from '@/vue/ui/AppSeparator.vue';
+import ChatTextArea from '@/vue/chat/textarea/ChatTextArea';
+import ChatSendingFile from '@/vue/chat/message/ChatSendingFile';
+import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile';
+import AppSeparator from '@/vue/ui/AppSeparator';
 @Component({
   name: 'ChatThread' ,
   components: {

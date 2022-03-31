@@ -37,7 +37,7 @@ import {
 } from 'vue-property-decorator';
 import { UserModel } from '@/ts/types/model';
 import { State } from '@/ts/instances/storeInstance';
-import UserRow from '@/vue/chat/right/UserRow.vue';
+import UserRow from '@/vue/chat/right/UserRow';
 @Component({
   name: 'PickUser' ,
   components: {UserRow}

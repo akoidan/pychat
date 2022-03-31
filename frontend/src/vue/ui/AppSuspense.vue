@@ -15,7 +15,7 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
 
-@Component
+@Component({})
 export default class AppSuspense extends Vue {
 
   private currentRequest: XMLHttpRequest|null = null;

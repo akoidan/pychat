@@ -15,7 +15,7 @@
     Watch,
     Ref
   } from 'vue-property-decorator';
-  import UserRow from '@/vue/chat/right/UserRow.vue';
+  import UserRow from '@/vue/chat/right/UserRow';
   import {
     RoomModel,
     UserModel

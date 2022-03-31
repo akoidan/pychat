@@ -47,7 +47,7 @@
 <script lang="ts">
 import {State} from '@/ts/instances/storeInstance';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import AppSubmit from '@/vue/ui/AppSubmit';
 import {CurrentUserInfoModel} from '@/ts/types/model';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 @Component({
