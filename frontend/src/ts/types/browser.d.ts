@@ -9,7 +9,7 @@ declare interface Document {
 }
 
 declare interface RTCPeerConnection {
-  onaddstream(event: MediaStreamEvent): void;
+  onaddstream(event: any): void;
   // obsolete (deprecated) TODO
   addStream(a: MediaStream): void;
   removeStream(a: MediaStream): void;
@@ -60,7 +60,7 @@ declare interface BeforeInstallPromptEvent extends Event {
 
 declare interface MediaDevices {
   getDisplayMedia(constraints: MediaStreamConstraints): Promise<MediaStream>;
-  getUserMedia(constraints: MediaStreamConstraints, successCallback: NavigatorUserMediaSuccessCallback, errorCallback: NavigatorUserMediaErrorCallback): void;
+  getUserMedia(constraints: MediaStreamConstraints, successCallback: any, errorCallback: any): void;
 }
 
 // declare class MediaRecorder {

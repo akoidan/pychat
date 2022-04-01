@@ -4,7 +4,7 @@ import { extractError } from '@/ts/utils/pureFunctions';
 import Api from '@/ts/message_handlers/Api';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import webpackServiceWorker from 'serviceworker-webpack-plugin/lib/runtime';
+// import webpackServiceWorker from 'serviceworker-webpack-plugin/lib/runtime';
 import {
   IS_DEBUG,
   MANIFEST,
@@ -201,11 +201,12 @@ export default class NotifierHandler extends MessageHandler {
     let version = localStorage.getItem(SERVICE_WORKER_VERSION_LS_NAME) || '';
     if (version !== GIT_HASH || !r) {
       this.logger.log(`Updating sw {} version ${version} to ${GIT_HASH}`, r)();
-      r = await webpackServiceWorker.register( {scope: '/'}) as ServiceWorkerRegistration;
-      this.logger.log(`Registered SW ${GIT_HASH} {}`, r)();
-      if (r) {
-        localStorage.setItem(SERVICE_WORKER_VERSION_LS_NAME, `${GIT_HASH}`);
-      }
+      // TODO vue3
+      // r = await webpackServiceWorker.register( {scope: '/'}) as ServiceWorkerRegistration;
+      // this.logger.log(`Registered SW ${GIT_HASH} {}`, r)();
+      // if (r) {
+      //   localStorage.setItem(SERVICE_WORKER_VERSION_LS_NAME, `${GIT_HASH}`);
+      // }
     } else {
       this.logger.log(`SW is up to date, v=${version} {}, skipping the update`, r)();
     }

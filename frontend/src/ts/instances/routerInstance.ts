@@ -182,7 +182,7 @@ export const router = createRouter({
       path: '/confirm_email',
       component: ConfirmMail
     }, {
-      path: '*',
+      path: '/:catchAll(.*)',
       redirect: `/chat/${ALL_ROOM_ID}`
     }
   ]

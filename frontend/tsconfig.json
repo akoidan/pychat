@@ -1,33 +1,22 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
-    "module": "esnext",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
+    "target": "esnext",
+    "useDefineForClassFields": true,
+    "module": "esnext",
     "moduleResolution": "node",
-    "target": "es5",
+    "strict": true,
+    "jsx": "preserve",
     "sourceMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "types": [
-      "websql", "webrtc", "chrome", "wicg-native-file-system"
-    ],
-    "resolveJsonModule": true,
-    "declaration": false,
-    "noImplicitAny": true,
-    "allowUnreachableCode": false,
-    "allowUnusedLabels": false,
-    "forceConsistentCasingInFileNames": true,
-    "noEmitOnError": false,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "pretty": true,
-    "strict": true
   },
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "references": [{ "path": "./tsconfig.node.json" }]
 }

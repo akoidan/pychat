@@ -1,5 +1,5 @@
 import '@/ts/utils/classComponentHooks.ts';
-import '@/assets/sass/common';
+import '@/assets/sass/common.sass';
 import * as constants from '@/ts/utils/consts';
 
 import * as runtimeConsts from '@/ts/utils/runtimeConsts';
@@ -10,13 +10,16 @@ import {
   WS_API_URL
 } from '@/ts/utils/runtimeConsts';
 import App from '@/vue/App.vue'; // should be after initStore
-import {sub} from '@/ts/instances/subInstance';
-import {ComponentOptions, createApp} from 'vue';
-import {store} from '@/ts/instances/storeInstance';
-import {Logger} from 'lines-logger';
+import { sub } from '@/ts/instances/subInstance';
+import {
+  ComponentOptions,
+  createApp
+} from 'vue';
+import { store } from '@/ts/instances/storeInstance';
+import { Logger } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import sessionHolder from '@/ts/instances/sessionInstance';
-import type {App as VueApp} from '@vue/runtime-core'
+import type { App as VueApp } from '@vue/runtime-core'
 import {
   MessageModel,
   PlatformUtil,
@@ -32,16 +35,19 @@ import Api from '@/ts/message_handlers/Api';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import Http from '@/ts/classes/Http';
 import WebRtcApi from '@/ts/webrtc/WebRtcApi';
-import {router} from '@/ts/instances/routerInstance';
-import {AudioPlayer} from '@/ts/classes/AudioPlayer';
-import {AndroidPlatformUtil} from '@/ts/devices/AndroidPlatformUtils';
-import {WebPlatformUtils} from '@/ts/devices/WebPlatformUtils';
-import {MessageSenderProxy} from '@/ts/message_handlers/MessageSenderProxy';
-import {SetStateFromStorage} from '@/ts/types/dto';
-import {MessageHelper} from '@/ts/message_handlers/MessageHelper';
-import {RoomHandler} from '@/ts/message_handlers/RomHandler';
-import {mainWindow} from '@/ts/instances/mainWindow';
+import { router } from '@/ts/instances/routerInstance';
+import { AudioPlayer } from '@/ts/classes/AudioPlayer';
+import { AndroidPlatformUtil } from '@/ts/devices/AndroidPlatformUtils';
+import { WebPlatformUtils } from '@/ts/devices/WebPlatformUtils';
+import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
+import { SetStateFromStorage } from '@/ts/types/dto';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import { RoomHandler } from '@/ts/message_handlers/RomHandler';
+import { mainWindow } from '@/ts/instances/mainWindow';
 import mitt, { Emitter } from 'mitt';
+import { ComponentOptionsMixin } from '@vue/runtime-core';
+import { vueStore } from '@/ts/classes/DefaultStore';
+import { loggerMixin } from '@/ts/utils/mixins';
 
 
 function declareDirectives(app: VueApp) {
@@ -100,7 +106,7 @@ function declareDirectives(app: VueApp) {
     },
     unmounted: function (el, binding, vnode: any) {
       getEventName('start').forEach(eventName => el.removeEventListener(eventName, vnode.switcherStart!))
-       getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
+      getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
     }
   });
 }
@@ -114,41 +120,12 @@ declare module '@vue/runtime-core' {
 }
 
 
-function getMixins() {
-  const loggerMixin = {
-    computed: {
-      $logger(this: VueApp): Logger {
-        //TODO vue3
-        // if (!this.__logger && this.$options._componentTag !== 'router-link') {
-        //   let name = this.$options._componentTag || 'vue-comp';
-        //   if (!this.$options._componentTag) {
-        //     // oops :(
-        //   }
-        //   if (this.id) {
-        //     name += `:${this.id}`;
-        //   }
-        //   this.__logger = loggerFactory.getLoggerColor(name, '#35495e');
-        // }
 
-        if (!this.__logger) {
-          this.__logger = loggerFactory.getLoggerColor('tTODO', '#35495e');
-        }
-        return this.__logger;
-      }
-    },
-    updated: function (this: Vue): void {
-      // this.$logger && this.$logger.debug('Updated')();
-    },
-    created: function (this: Vue) {
-      // this.$logger && this.$logger.debug('Created')();
-    }
-  };
-  return [loggerMixin]
-}
 const logger: Logger = loggerFactory.getLoggerColor(`main`, '#007a70');
 logger.log(`Evaluating main script ${constants.GIT_HASH}`)();
 
 async function init() {
+
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
@@ -157,7 +134,7 @@ async function init() {
     storage = new DatabaseWrapper(mainWindow);
   } catch (e) {
     logger.error("Unable to init websql, because {}. Falling back to localstorage", e)();
-    storage =  new LocalStorage();
+    storage = new LocalStorage();
   }
 
   const audioPlayer: AudioPlayer = new AudioPlayer(mainWindow);
@@ -173,13 +150,12 @@ async function init() {
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
 
 
-
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
-  const vue: VueApp = createApp(App, {
-    store,
-    mixins: getMixins(),
+  const vue: VueApp = createApp(App,  {
+    store: vueStore,
   });
+  vue.mixin(loggerMixin);
   vue.use(router);
   vue.config.globalProperties.$messageBus = messageBus;
   vue.config.globalProperties.$api = api;
@@ -190,15 +166,15 @@ async function init() {
   vue.config.globalProperties.$messageSenderProxy = messageSenderProxy;
 
   declareDirectives(vue);
-  vue.config.errorHandler = (err, vm, info) => {
-    const message = `Error occurred in ${err}:${vm}\n${info}`;
-    if (store?.userSettings?.sendLogs && api) {
-      api.sendLogs(`${vm}:${err}:${info}`, browserVersion, constants.GIT_HASH);
-    }
-    store.growlError(message);
-    logger.error("Error occured in vue component err: '{}', vm '{}', info '{}'", err, vm, info)()
-    return false;
-  };
+  // vue.config.errorHandler = (err, vm, info) => {
+  //   const message = `Error occurred in ${err}:${vm}\n${info}`;
+  //   if (store?.userSettings?.sendLogs && api) {
+  //     api.sendLogs(`${vm}:${err}:${info}`, browserVersion, constants.GIT_HASH);
+  //   }
+  //   store.growlError(message);
+  //   logger.error("Error occured in vue component err: '{}', vm '{}', info '{}'", err, vm, info)()
+  //   return false;
+  // };
 
   vue.mount('#app');
 
@@ -211,7 +187,6 @@ async function init() {
 
     return false;
   };
-
 
 
   window.GIT_VERSION = constants.GIT_HASH;

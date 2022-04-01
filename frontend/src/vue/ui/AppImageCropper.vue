@@ -238,8 +238,8 @@
 </script>
 <!-- eslint-disable -->
 <style lang="sass">
-  $cropper-image-path: '~cropperjs/src/images' !default
-  @import "~cropperjs/src/index.scss"
+  $cropper-image-path: 'cropperjs/src/images' !default
+  @import "cropperjs/src/index.scss"
 </style>
 <style lang="sass" scoped>
 

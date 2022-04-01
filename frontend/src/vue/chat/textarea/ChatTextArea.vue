@@ -112,7 +112,7 @@ import {
 import ChatTagging from '@/vue/chat/textarea/ChatTagging.vue';
 import {Throttle} from '@/ts/classes/Throttle';
 import GiphySearch from '@/vue/chat/textarea/GiphySearch.vue';
-import { GIFObject } from 'giphy-api';
+import type { GIFObject } from 'giphy-api';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
