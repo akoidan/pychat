@@ -8,11 +8,10 @@
       :call="incomingCall"
     />
     <router-view v-if="inited" v-slot="{ Component, route }">
-      <keep-alive>
+      <keep-alive include="PainterPage,ChannelsPage">
         <component
           :is="Component"
           class="body"
-          :key="route.meta.usePathKey ? route.path : undefined"
         />
       </keep-alive>
     </router-view>

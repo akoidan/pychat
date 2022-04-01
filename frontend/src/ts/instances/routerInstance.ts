@@ -72,6 +72,12 @@ export const router = createRouter({
         {
           component: ChannelsPage,
           meta: {
+            // this should be in meta, if it's in the same lvl as component, it won't be executed when route.params.id change
+            beforeEnter: (to: any, from: any) => {
+              // This should be set before instance is creeated, otherwise activeRoomId could be null and lots of componentfail
+              logger.debug('setActiveRoomId {}', to.params.id)();
+              store.setActiveRoomId(parseInt(to.params.id as string));
+            },
             hasOwnNavBar: true,
           },
           name: 'chat',
@@ -183,6 +189,16 @@ export const router = createRouter({
   ]
 });
 
+router.beforeEach((to, from, next) => {
+  if (to.matched[0]?.meta?.loginRequired && !sessionHolder.session) {
+    next('/auth/login');
+  } else {
+    if (to?.meta?.beforeEnter) {
+      (to.meta.beforeEnter as any)(to, from, next);
+    }
+    next();
+  }
+});
 
 sub.subscribe('router', new class RouterProcessor extends MessageHandler {
 

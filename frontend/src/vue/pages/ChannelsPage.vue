@@ -1,6 +1,7 @@
 <template>
   <div class="holder">
-    <app-menu-bar v-show="showAppMenuBar" v-model="showAppMenuBar" @click.native="showAppMenuBar = false"/>
+    <!--    app-menu and popup menu requires to have activeRoomId not null, and painterPage dont have it. so use v-if-->
+    <app-menu-bar v-if="showAppMenuBar" v-model="showAppMenuBar" @click.native="showAppMenuBar = false"/>
     <chat-nav-bar
       :low-width="lowWidth"
       :current-page="currentChatPage"
@@ -8,7 +9,7 @@
       @show-menu="showAppMenuBar = true"
       @show-popup-toggle="showPopup = true"
     />
-    <chat-popup-menu v-show="showPopup" @click.native="showPopup = false" />
+    <chat-popup-menu v-if="showPopup" @click.native="showPopup = false" />
     <div class="wrapper">
       <chat-right-section v-show="!lowWidth || currentChatPage === 'rooms'" />
       <chat-boxes v-show="!lowWidth || currentChatPage === 'chat'"/>
@@ -56,13 +57,14 @@ export default class ChannelsPage extends Vue {
   private showAppMenuBar = false;
 
   @State
+  public readonly activeRoomId!: number;
+
+  @State
   public readonly currentChatPage!: 'rooms' | 'chat';
   private showPopup = false;
 
-  @Watch('$route.params.id')
-  onIdChange() {
-    this.$logger.debug('setActiveRoomId {}', this.$route.params.id)();
-    this.$store.setActiveRoomId(parseInt(this.$route.params.id as string));
+  @Watch('activeRoomId')
+  public activeRoomIdChange() {
     if (this.lowWidth) {
       this.$store.setCurrentChatPage('chat');
     }
