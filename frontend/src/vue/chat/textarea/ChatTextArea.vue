@@ -101,17 +101,17 @@ import {
   editMessageWs,
   showAllowEditing
 } from '@/ts/utils/pureFunctions';
-import MediaRecorder from '@/vue/chat/textarea/MediaRecorder';
-import ChatAttachments from '@/vue/chat/textarea/ChatAttachments';
-import SmileyHolder from '@/vue/chat/textarea/SmileyHolder';
+import MediaRecorder from '@/vue/chat/textarea/MediaRecorder.vue';
+import ChatAttachments from '@/vue/chat/textarea/ChatAttachments.vue';
+import SmileyHolder from '@/vue/chat/textarea/SmileyHolder.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
 import {
   SHOW_I_TYPING_INTERVAL,
   USERNAME_REGEX
 } from '@/ts/utils/consts';
-import ChatTagging from '@/vue/chat/textarea/ChatTagging';
+import ChatTagging from '@/vue/chat/textarea/ChatTagging.vue';
 import {Throttle} from '@/ts/classes/Throttle';
-import GiphySearch from '@/vue/chat/textarea/GiphySearch';
+import GiphySearch from '@/vue/chat/textarea/GiphySearch.vue';
 import { GIFObject } from 'giphy-api';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;

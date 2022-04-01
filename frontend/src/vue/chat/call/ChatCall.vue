@@ -60,13 +60,13 @@ import {
   VideoType
 } from '@/ts/types/types';
 
-import ChatRemotePeer from '@/vue/chat/call/ChatRemotePeer';
+import ChatRemotePeer from '@/vue/chat/call/ChatRemotePeer.vue';
 import { file } from '@/ts/utils/audio';
-import VideoObject from '@/vue/chat/chatbox/VideoObject';
-import InputDevicesSettings from '@/vue/chat/call/InputDevicesSettings';
-import VideoContainer from '@/vue/chat/chatbox/VideoContainer';
-import CallContainerIcons from '@/vue/chat/call/CallContainerIcons';
-import Painter from '@/vue/chat/textarea/Painter';
+import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
+import InputDevicesSettings from '@/vue/chat/call/InputDevicesSettings.vue';
+import VideoContainer from '@/vue/chat/chatbox/VideoContainer.vue';
+import CallContainerIcons from '@/vue/chat/call/CallContainerIcons.vue';
+import Painter from '@/vue/chat/textarea/Painter.vue';
 
 @Component({
   name: 'ChatCall' ,

@@ -33,10 +33,10 @@
 </template>
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
-import PickUser from '@/vue/parts/PickUser';
+import PickUser from '@/vue/parts/PickUser.vue';
 
 @Component({
   name: 'CreateChannel' ,

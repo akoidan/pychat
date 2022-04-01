@@ -16,9 +16,9 @@ import {
   UserModel
 } from '@/ts/types/model';
 import { PrivateRoomsIds } from '@/ts/types/types';
-import RoomRightIcon from '@/vue/chat/right/RoomRightIcon';
-import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper';
-import UserRow from '@/vue/chat/right/UserRow';
+import RoomRightIcon from '@/vue/chat/right/RoomRightIcon.vue';
+import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper.vue';
+import UserRow from '@/vue/chat/right/UserRow.vue';
 
 @Component({
   name: 'PrivateRoomRow' ,

@@ -16,7 +16,7 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { timeToString } from '@/ts/utils/htmlApi';
-import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper';
+import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
 @Component({
   name: 'ChatChangeNameMessage' ,
   components: {ChatMessageWrapper}

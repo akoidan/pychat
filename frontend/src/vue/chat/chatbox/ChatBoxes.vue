@@ -24,7 +24,7 @@ import {
   Vue,
   Watch
 } from 'vue-property-decorator';
-import ChatBox from '@/vue/chat/chatbox/ChatBox';
+import ChatBox from '@/vue/chat/chatbox/ChatBox.vue';
 import { State } from '@/ts/instances/storeInstance';
 
 import { ALL_ROOM_ID } from '@/ts/utils/consts';

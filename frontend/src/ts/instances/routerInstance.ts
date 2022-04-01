@@ -75,7 +75,7 @@ export const router = createRouter({
           },
           beforeEnter: (to, from) => {
               logger.debug('setActiveRoomId {}', to.params.id)();
-              store.setActiveRoomId(parseInt(to.params.id));
+              store.setActiveRoomId(parseInt(to.params.id as string));
           },
           name: 'chat',
           path: '/chat/:id'
@@ -212,7 +212,8 @@ sub.subscribe('router', new class RouterProcessor extends MessageHandler {
   }
 
   navigate(a: RouterNavigateMessage) {
-    if (router.currentRoute.path !== a.to) {
+    // TODO vue3 .value.path ?
+    if (router.currentRoute.value.path !== a.to) {
       router.replace(a.to);
     }
   }

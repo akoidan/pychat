@@ -10,7 +10,7 @@ import {
     Component,
     Vue
 } from 'vue-property-decorator';
-import CreateRoom from '@/vue/parts/CreateRoom';
+import CreateRoom from '@/vue/parts/CreateRoom.vue';
 import {State} from '@/ts/instances/storeInstance';
 import {
   ChannelsDictUIModel,

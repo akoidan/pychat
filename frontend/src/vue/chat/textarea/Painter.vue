@@ -10,7 +10,7 @@ import {
 } from 'vue-property-decorator';
 
 import loggerFactory from '@/ts/instances/loggerFactory';
-import AppInputRange from '@/vue/ui/AppInputRange';
+import AppInputRange from '@/vue/ui/AppInputRange.vue';
 
 
 let uniqueId = 1;

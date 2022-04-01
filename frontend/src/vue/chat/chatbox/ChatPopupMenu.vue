@@ -32,7 +32,7 @@
   import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
   import {State} from '@/ts/instances/storeInstance';
   import {RoomModel} from '@/ts/types/model';
-  import AppModal from '@/vue/ui/AppModal';
+  import AppModal from '@/vue/ui/AppModal.vue';
 
   @Component({
     name: 'ChatPopupMenu' ,

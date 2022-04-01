@@ -17,11 +17,11 @@ import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import PrivateRoomRow from '@/vue/chat/right/PrivateRoomRow';
+import PrivateRoomRow from '@/vue/chat/right/PrivateRoomRow.vue';
 import {State} from '@/ts/instances/storeInstance';
 import {RoomModel} from '@/ts/types/model';
 import ChatRightCollapsedSection
-  from '@/vue/chat/right/ChatRightCollapsedSection';
+  from '@/vue/chat/right/ChatRightCollapsedSection.vue';
 
 @Component({
   name: 'RoomDirectUsersTable' ,

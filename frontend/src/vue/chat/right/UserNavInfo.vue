@@ -17,7 +17,7 @@
     Ref
   } from 'vue-property-decorator';
   import {State} from '@/ts/instances/storeInstance';
-  import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon';
+  import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
   import {UserModel} from '@/ts/types/model';
   @Component({
     name: 'UserNavInfo' ,

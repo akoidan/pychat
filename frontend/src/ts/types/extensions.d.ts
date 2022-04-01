@@ -1,6 +1,14 @@
+import { DefineComponent } from 'vue';
 declare module '*.vue' {
-  import Vue from 'vue';
-  export default Vue;
+  import type { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
+declare module '*.vue.ts' {
+  import type { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
 }
 
 declare module '*.json' {
@@ -8,20 +16,9 @@ declare module '*.json' {
   export default value;
 }
 
-declare module '*.ico' {
-}
-
-declare module '*.wav' {
-}
-
-declare module '*.mp3' {
-}
-
-declare module '*.gif' {
-}
-
-declare module '*.svg' {
-}
-
-declare module '*.png' {
-}
+declare module '*.ico';
+declare module '*.wav';
+declare module '*.mp3';
+declare module '*.gif';
+declare module '*.svg';
+declare module '*.png';

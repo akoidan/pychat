@@ -135,7 +135,7 @@ import { IconColor } from '@/ts/types/types';
 import { SexModelString } from '@/ts/types/model';
 import { sub } from '@/ts/instances/subInstance'
 import { LoginMessage } from '@/ts/types/messages/innerMessages';
-import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp';
+import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
 import {USERNAME_REGEX} from '@/ts/utils/consts';
 
 @Component({

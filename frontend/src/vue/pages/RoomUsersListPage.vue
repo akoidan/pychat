@@ -42,9 +42,9 @@
     RoomDictModel,
     UserDictModel
   } from '@/ts/types/model';
-  import AppSubmit from '@/vue/ui/AppSubmit';
-  import PickUser from '@/vue/parts/PickUser';
-  import UserFlagRow from '@/vue/chat/right/UserFlagRow';
+  import AppSubmit from '@/vue/ui/AppSubmit.vue';
+  import PickUser from '@/vue/parts/PickUser.vue';
+  import UserFlagRow from '@/vue/chat/right/UserFlagRow.vue';
 
   @Component({
   components: {UserFlagRow,  AppSubmit, PickUser}

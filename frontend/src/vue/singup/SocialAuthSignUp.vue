@@ -12,8 +12,8 @@ import {
 } from "vue-property-decorator";
 import { LoginMessage } from '@/ts/types/messages/innerMessages';
 import { sub } from '@/ts/instances/subInstance';
-import FacebookAuth from '@/vue/singup/FacebookAuth';
-import GoogleAuth from '@/vue/singup/GoogleAuth';
+import FacebookAuth from '@/vue/singup/FacebookAuth.vue';
+import GoogleAuth from '@/vue/singup/GoogleAuth.vue';
 import { GOOGLE_OAUTH_2_CLIENT_ID, FACEBOOK_APP_ID } from "@/ts/utils/consts";
 import { OauthSessionResponse } from '@/ts/types/dto';
 

@@ -29,9 +29,9 @@
 
 <script lang='ts'>
 import {Vue, Component, Prop, Ref} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {State} from '@/ts/instances/storeInstance';
-import CaptchaComponent from '@/vue/singup/CaptchaComponent';
+import CaptchaComponent from '@/vue/singup/CaptchaComponent.vue';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 
 @Component({

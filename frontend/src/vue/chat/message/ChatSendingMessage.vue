@@ -40,8 +40,8 @@ import {
   Emit,
   Vue
 } from 'vue-property-decorator';
-import ChatTextMessage from '@/vue/chat/message/ChatTextMessage';
-import AppProgressBar from '@/vue/ui/AppProgressBar';
+import ChatTextMessage from '@/vue/chat/message/ChatTextMessage.vue';
+import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
 import {
@@ -50,8 +50,8 @@ import {
   MessageModel,
   RoomDictModel
 } from '@/ts/types/model';
-import ChatMessageToolTip from '@/vue/chat/message/ChatMessageToolTip';
-import ChatTextArea from '@/vue/chat/textarea/ChatTextArea';
+import ChatMessageToolTip from '@/vue/chat/message/ChatMessageToolTip.vue';
+import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
 
 @Component({
   name: 'ChatSendingMessage' ,

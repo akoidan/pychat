@@ -49,7 +49,7 @@
   import {GITHUB_LINK, ISSUES} from '@/ts/utils/consts';
   import {State} from '@/ts/instances/storeInstance';
   import {CurrentUserInfoModel} from '@/ts/types/model';
-  import AppModal from '@/vue/ui/AppModal';
+  import AppModal from '@/vue/ui/AppModal.vue';
   import {resolveMediaUrl} from '@/ts/utils/htmlApi';
 
   @Component({

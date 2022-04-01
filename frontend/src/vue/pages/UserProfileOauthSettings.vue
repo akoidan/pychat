@@ -13,9 +13,9 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { OauthStatus } from '@/ts/types/dto';
-import AppSubmit from '@/vue/ui/AppSubmit';
-import FacebookAuth from '@/vue/singup/FacebookAuth';
-import GoogleAuth from '@/vue/singup/GoogleAuth';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import FacebookAuth from '@/vue/singup/FacebookAuth.vue';
+import GoogleAuth from '@/vue/singup/GoogleAuth.vue';
 
 @Component({
   name: 'UserProfileOauthSettings' ,

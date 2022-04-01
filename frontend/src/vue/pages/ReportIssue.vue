@@ -52,7 +52,7 @@
 <script lang="ts">
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {GIT_HASH} from '@/ts/utils/consts';
 import {browserVersion} from '@/ts/utils/runtimeConsts';
 
