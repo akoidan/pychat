@@ -129,7 +129,7 @@ export class DefaultStore extends VuexModule {
   public microphones: { [id: string]: string } = {};
   public speakers: { [id: string]: string } = {};
   public webcams: { [id: string]: string } = {};
-  public activeRoomId: number | null = null;
+  public activeRoomId: number | null = ALL_ROOM_ID;
   public userInfo: CurrentUserInfoModel | null = null;
   public userSettings: CurrentUserSettingsModel | null = null;
   public allUsersDict: UserDictModel = {};

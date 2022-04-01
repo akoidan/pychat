@@ -50,9 +50,6 @@ import ChatNavBar from '@/vue/chat/chatbox/ChatNavBar.vue';
 })
 export default class ChannelsPage extends Vue {
 
-  @State
-  public readonly activeRoomId!: number;
-
   private listener!: Function;
   private mediaQuery!: MediaQueryList;
   private lowWidth = false;
@@ -66,10 +63,6 @@ export default class ChannelsPage extends Vue {
   onIdChange() {
     this.$logger.debug('setActiveRoomId {}', this.$route.params.id)();
     this.$store.setActiveRoomId(parseInt(this.$route.params.id as string));
-  }
-
-  @Watch('activeRoomId')
-  public activeRoomIdChange() {
     if (this.lowWidth) {
       this.$store.setCurrentChatPage('chat');
     }
@@ -78,7 +71,6 @@ export default class ChannelsPage extends Vue {
   goBack() {
     this.$store.setCurrentChatPage('rooms');
   }
-
 
   created() {
     this.$store.setActiveRoomId(parseInt(this.$route.params.id as string));

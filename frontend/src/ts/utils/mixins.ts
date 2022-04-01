@@ -1,5 +1,6 @@
 import type { Logger } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
+import type {VueBase} from 'vue-class-component';
 import type { ComponentOptions } from 'vue';
 
 export const loggerMixin = {
@@ -8,7 +9,7 @@ export const loggerMixin = {
       if (!this.__logger && this.$options._componentTag !== 'router-link') {
         let name = this.$options.name;
         if (['RouterView', 'RouterLink'].includes(name)) {
-          return null;
+          return null as any;
         }
         const fileName = this.$options.__file;
         if (!name) {
@@ -25,10 +26,13 @@ export const loggerMixin = {
       return this.__logger;
     }
   },
-  updated: function (this: Vue): void {
+  updated: function (this: VueBase): void {
     this.$logger && this.$logger.debug('Updated')();
   },
-  created: function (this: Vue) {
+  unmounted(this: VueBase) {
+    this.$logger && this.$logger.debug('unmounted')();
+  },
+  created: function (this: VueBase) {
     this.$logger && this.$logger.debug('Created')();
   }
 };

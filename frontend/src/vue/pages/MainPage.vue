@@ -7,16 +7,16 @@
       v-if="incomingCall"
       :call="incomingCall"
     />
-    <keep-alive
-      v-if="inited"
-      :include="['ChannelsPage', 'Painter']"
-    >
-      <router-view class="body" />
-    </keep-alive>
-    <div
-      v-else
-      class="spinner"
-    />
+    <router-view v-if="inited" v-slot="{ Component, route }">
+      <keep-alive>
+        <component
+          :is="Component"
+          class="body"
+          :key="route.meta.usePathKey ? route.path : undefined"
+        />
+      </keep-alive>
+    </router-view>
+    <div v-else class="spinner"></div>
   </div>
 </template>
 <script lang="ts">

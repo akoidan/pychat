@@ -18,9 +18,15 @@
       </router-link>
     </app-tab>
     <div class="container">
-      <keep-alive>
-        <router-view class="profileInner" />
-      </keep-alive>
+      <router-view v-slot="{ Component, route }">
+        <keep-alive>
+          <component
+            :is="Component"
+            class="profileInner"
+            :key="route.meta.usePathKey ? route.path : undefined"
+          />
+        </keep-alive>
+      </router-view>
     </div>
   </div>
 </template>
