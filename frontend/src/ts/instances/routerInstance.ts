@@ -215,7 +215,6 @@ sub.subscribe('router', new class RouterProcessor extends MessageHandler {
   }
 
   navigate(a: RouterNavigateMessage) {
-    // TODO vue3 .value.path ?
     if (router.currentRoute.value.path !== a.to) {
       router.replace(a.to);
     }
