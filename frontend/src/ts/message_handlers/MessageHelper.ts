@@ -81,7 +81,7 @@ export class MessageHelper {
   }
 
   public processAnyMessage() {
-    this.messageBus.$emit('scroll');
+    this.messageBus.emit('scroll');
   }
 
 }

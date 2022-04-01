@@ -145,7 +145,7 @@ export default class RoomSettings extends Vue {
   public admin: number[] = [];
 
   get roomId(): number {
-    const id = this.$route.params.id;
+    const id = this.$route.params.id as string;
     this.$logger.log('Rending room settings for {}', id)();
 
     return parseInt(id);

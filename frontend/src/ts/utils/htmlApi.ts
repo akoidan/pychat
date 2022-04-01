@@ -36,6 +36,7 @@ import {
 import {DefaultStore} from '@/ts/classes/DefaultStore';
 import { hexEncode } from '@/ts/utils/pureFunctions';
 import { GIFObject } from 'giphy-api';
+import { Emitter } from 'mitt';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -476,7 +477,7 @@ export function setAudioEvent(e: HTMLElement) {
   });
 }
 
-export function setImageFailEvents(e: HTMLElement, bus: Vue) {
+export function setImageFailEvents(e: HTMLElement, bus: Emitter<any>) {
   const r = e.querySelectorAll('img');
   for (let i = 0; i < r.length; i++) {
     (function (img) {
@@ -484,7 +485,7 @@ export function setImageFailEvents(e: HTMLElement, bus: Vue) {
         this.className += ' failed';
       };
       img.onload = function () {
-        bus.$emit('scroll');
+        bus.emit('scroll');
       };
     })(r[i]);
   }

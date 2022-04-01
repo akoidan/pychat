@@ -45,12 +45,14 @@ export default class ChatBoxes extends Vue {
   private roomInited: Record<string, boolean> = {};
 
   created() {
-    Vue.set(this.roomInited, this.activeRoomId, true);
+    // vue.set
+    this.roomInited[this.activeRoomId] =  true;
   }
 
   @Watch('activeRoomId')
   public onActiveRoomIdChange(newValue: number) {
-    Vue.set(this.roomInited, newValue, true);
+    // Vue.set
+    this.roomInited[newValue] = true;
   }
 
   get ALL_ROOM_ID(): number {

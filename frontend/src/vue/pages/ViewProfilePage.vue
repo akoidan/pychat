@@ -67,7 +67,7 @@ import { ViewUserProfileDto } from "@/ts/types/dto";
  export default class ViewProfilePage extends Vue {
 
   get id(): number {
-    return parseInt(this.$route.params.id);
+    return parseInt(this.$route.params.id as string);
   }
 
   get username(): string {

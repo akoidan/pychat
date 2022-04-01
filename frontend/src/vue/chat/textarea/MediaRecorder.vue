@@ -57,7 +57,7 @@ import {
       let src: MediaStream = (await this.navigatorRecord.record())!;
       this.video.srcObject = src;
       this.recordState = 'running';
-    } catch (error) {
+    } catch (error: any) {
       this.recordState = 'pause';
       if (String(error.message).includes("Permission denied")) {
         if (isChrome && !isMobile) {

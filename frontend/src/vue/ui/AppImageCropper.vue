@@ -196,7 +196,7 @@
         canvasContext.drawImage(this.changeProfileVideo, 0, 0);
         // "image/webp" works in Chrome.
         // Other browsers will fall back to image/png.
-        canvasContext.canvas.toBlob((blob) => {
+        canvasContext.canvas.toBlob((blob: any) => {
           this.srcImg = URL.createObjectURL(blob); //TODO
           blob!.name = '.jpg';
           this.blob = blob;
@@ -224,7 +224,7 @@
         this.srcVideo = await navigator.mediaDevices.getUserMedia({audio: true, video: true});
         this.showVideo = true;
         this.isStopped = false;
-      } catch (e) {
+      } catch (e: any) {
         this.$logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
         this.$store.growlError(`Unable to use your webcam because ${e.message || e.name}`);
       }

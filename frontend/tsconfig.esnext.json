@@ -30,11 +30,6 @@
     "pretty": true,
     "strict": true
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue",
-    "node_modules/vue-class-component/src"
-  ],
   "exclude": [
     "node_modules"
   ]

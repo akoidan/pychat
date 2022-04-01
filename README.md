@@ -509,6 +509,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
 * user1 writes a message, user1 goes offline, user 2 opens a chat from 1st devices and goes offline, user 2 opens a chat from 2nd devices and responds in its thread and goes offline, user2 opens first deviecs and thread messages count = 0
 * loading messages is too slow, when a lot of messages is printed to local database. It's better to load 20 last messages to chat instead of 100000, probably vuex getter but it's better to think what we should do on scroll.
 * pin messages feature, like telegram

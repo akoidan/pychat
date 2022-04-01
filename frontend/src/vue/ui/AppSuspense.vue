@@ -34,7 +34,7 @@ export default class AppSuspense extends Vue {
       this.currentRequest = null;
       return result;
     } catch (errors) {
-      this.error = errors.message;
+      this.error = (errors as any).message;
       this.currentRequest = null;
     }
   }

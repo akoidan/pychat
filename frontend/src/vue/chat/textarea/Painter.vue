@@ -11,6 +11,7 @@ import {
 
 import loggerFactory from '@/ts/instances/loggerFactory';
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
+import { createApp } from 'vue';
 
 
 let uniqueId = 1;
@@ -33,11 +34,10 @@ function getUniqueId() {
       buttonClass: 'lor-btn',
       logger: loggerFactory.getLogger('painter'),
       rangeFactory: (): HTMLInputElement => {
-        let ComponentClass = Vue.extend(AppInputRange);
-        let instance = new ComponentClass();
-        instance.$mount();
-
-        return instance.$el as HTMLInputElement;
+        // TODO vue3 vue.extend does it work
+        let app = createApp(AppInputRange);
+        let div = document.createElement('div');
+        return  app.mount(div).$el;
       }
     });
     this.$emit('canvas', this.div.querySelector('canvas'));

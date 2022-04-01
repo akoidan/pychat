@@ -138,7 +138,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     super.createPeerConnection();
 
     if (this.streamTrackApi === 'stream') {
-      this.pc!.onaddstream = ((event: MediaStreamEvent) => {
+      this.pc!.onaddstream = ((event: any) => {
         this.logger.log('onaddstream {}', getStreamLog(event.stream))();
         if (event.stream) {
           this.addStream(event.stream);

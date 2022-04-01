@@ -304,7 +304,14 @@ const getConfig = async () => {
     //   }
     // }))
     sasscPlugins = [
-      "style-loader", 'css-loader?sourceMap&url=false', // TODO vue3 replace all url=false
+      "style-loader",
+      {
+         loader: "css-loader",
+         options: {
+           sourceMap: true,
+           url: false,
+         }
+      },
       sassOptionsGlobal
     ];
   }
@@ -333,11 +340,6 @@ const getConfig = async () => {
         }
       },
     ];
-    if (linting) {
-      res.push({
-        loader: 'tslint-loader'
-      })
-    }
     return res;
   };
 
@@ -352,9 +354,11 @@ const getConfig = async () => {
     }: 'minimal', // TODO DOESN WORK
     profile: !!options.IS_PROFILE,
     resolve: {
-      extensions: ['.ts', '.js', '.vue', '.sass', '.scss'],
+      extensions: ['.ts', '.js', '.sass'],
       alias: {
-        '@': path.resolve(__dirname, 'src')
+        '@': path.resolve(__dirname, 'src'),
+        // './@': path.resolve(__dirname, 'src'),
+        './@/assets': path.resolve(__dirname, 'src', 'assets')
       }
     },
     mode: options.IS_PROD ? 'production' : 'development',
@@ -650,3 +654,4 @@ setup().catch(e => {
     // process.exit(1);
   }
 });
+

@@ -15,7 +15,6 @@ import UserProfileImage from '@/vue/pages/UserProfileImage.vue';
 import UserProfileInfo from '@/vue/pages/UserProfileInfo.vue';
 import UserProfileSettings from '@/vue/pages/UserProfileSettings.vue';
 import CreatePrivateRoom from '@/vue/pages/CreatePrivateRoom.vue';
-import CreatePublicRoom from '@/vue/pages/CreatePublicRoom.vue';
 import ViewProfilePage from '@/vue/pages/ViewProfilePage.vue';
 import RoomSettings from '@/vue/pages/RoomSettings.vue';
 import ApplyResetPassword from '@/vue/singup/ApplyResetPassword.vue';

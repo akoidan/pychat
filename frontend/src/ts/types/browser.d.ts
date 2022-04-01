@@ -63,14 +63,14 @@ declare interface MediaDevices {
   getUserMedia(constraints: MediaStreamConstraints, successCallback: NavigatorUserMediaSuccessCallback, errorCallback: NavigatorUserMediaErrorCallback): void;
 }
 
-declare class MediaRecorder {
-  public onstop: Function;
-  public ondataavailable: Function;
-  constructor(stream: MediaStream, options: {});
-  public static isTypeSupported(t: string): boolean;
-  public stop(): void;
-  public start(time?: number): void;
-}
+// declare class MediaRecorder {
+//   public onstop: Function;
+//   public ondataavailable: Function;
+//   constructor(stream: MediaStream, options: {});
+//   public static isTypeSupported(t: string): boolean;
+//   public stop(): void;
+//   public start(time?: number): void;
+// }
 
 declare interface MediaStreamTrack {
   isShare: boolean;

@@ -39,7 +39,7 @@ export default class ChannelAddRoom extends Vue {
   }
 
   get channelId(): number {
-      const id = this.$route.params.id;
+      const id: string = this.$route.params.id as string;
       this.$logger.log('Rending channel settings for {}', id)();
 
       return parseInt(id);

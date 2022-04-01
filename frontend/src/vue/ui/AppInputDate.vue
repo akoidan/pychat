@@ -24,7 +24,7 @@ import {
 import { isDateMissing } from '@/ts/utils/htmlApi';
 import { IS_ELECTRON } from '@/ts/utils/consts';
 
-let Datepicker: unknown;
+let Datepicker: any;
 if (!IS_ELECTRON) {
   // @ts-ignore: next-line
   Datepicker = (() => import(/* webpackChunkName: "vuejs-datepicker" */ 'vuejs-datepicker'));

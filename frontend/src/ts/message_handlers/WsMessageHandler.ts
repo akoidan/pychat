@@ -253,7 +253,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       }
 
       return res;
-    } catch (error) {
+    } catch (error:any) {
       const newVar: SetMessageProgressError = {
         messageId,
         roomId,

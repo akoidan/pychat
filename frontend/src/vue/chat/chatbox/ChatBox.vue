@@ -250,11 +250,11 @@ import { isMobile } from '@/ts/utils/runtimeConsts';
     }
 
     created() {
-      this.$messageBus.$on('scroll',this.onEmitScroll);
+      this.$messageBus.on('scroll',this.onEmitScroll);
     }
 
     destroyed() {
-      this.$messageBus.$off('scroll',this.onEmitScroll);
+      this.$messageBus.off('scroll',this.onEmitScroll);
     }
 
     get id() {
