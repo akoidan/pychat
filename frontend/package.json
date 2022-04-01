@@ -131,7 +131,6 @@
     "vue-router": "^4.0.14",
     "vuejs-datepicker": "1.6.2",
     "vuex": "^4.0.2",
-    "vuex-module-decorators": "^2.0.0",
-    "vuex-module-decorators-state": "^1.2.2"
+    "vuex-module-decorators": "^2.0.0"
   }
 }
