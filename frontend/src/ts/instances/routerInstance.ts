@@ -52,8 +52,10 @@ export const router = createRouter({
     {
       path: '',
       component: MainPage,
-      meta: {
-        loginRequired: true
+      beforeEnter: (to, from) => {
+        if (!sessionHolder.session) {
+          return '/auth/login'
+        }
       },
       children: [
         {
@@ -71,10 +73,6 @@ export const router = createRouter({
           component: ChannelsPage,
           meta: {
             hasOwnNavBar: true,
-          },
-          beforeEnter: (to, from) => {
-              logger.debug('setActiveRoomId {}', to.params.id)();
-              store.setActiveRoomId(parseInt(to.params.id as string));
           },
           name: 'chat',
           path: '/chat/:id'
@@ -153,9 +151,6 @@ export const router = createRouter({
     }, {
       path: '/auth',
       component: AuthPage,
-      meta: {
-        loginRequired: false
-      },
       children: [
         {
           path: '',
@@ -186,13 +181,6 @@ export const router = createRouter({
       redirect: `/chat/${ALL_ROOM_ID}`
     }
   ]
-});
-router.beforeEach((to, from, next) => {
-  if (to.matched[0]?.meta?.loginRequired && !sessionHolder.session) {
-    next('/auth/login');
-  } else {
-    next();
-  }
 });
 
 

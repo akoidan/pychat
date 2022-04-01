@@ -1,6 +1,6 @@
 <template>
   <div class="holder">
-    <app-menu-bar v-show="showAppMenuBar"  v-model="showAppMenuBar" @click.native="showAppMenuBar = false"/>
+    <app-menu-bar v-show="showAppMenuBar" v-model="showAppMenuBar" @click.native="showAppMenuBar = false"/>
     <chat-nav-bar
       :low-width="lowWidth"
       :current-page="currentChatPage"
@@ -25,7 +25,10 @@ import ChatBoxes from '@/vue/chat/chatbox/ChatBoxes.vue';
 import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
 import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon.vue';
-import {State} from '@/ts/instances/storeInstance';
+import {
+  State,
+  store
+} from '@/ts/instances/storeInstance';
 import ChatPopupMenu from '@/vue/chat/chatbox/ChatPopupMenu.vue';
 import AppMenuBar from '@/vue/ui/AppMenuBar.vue';
 import {RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
@@ -59,6 +62,12 @@ export default class ChannelsPage extends Vue {
   public readonly currentChatPage!: 'rooms' | 'chat';
   private showPopup = false;
 
+  @Watch('$route.params.id')
+  onIdChange() {
+    this.$logger.debug('setActiveRoomId {}', this.$route.params.id)();
+    this.$store.setActiveRoomId(parseInt(this.$route.params.id as string));
+  }
+
   @Watch('activeRoomId')
   public activeRoomIdChange() {
     if (this.lowWidth) {
@@ -72,6 +81,7 @@ export default class ChannelsPage extends Vue {
 
 
   created() {
+    this.$store.setActiveRoomId(parseInt(this.$route.params.id as string));
     this.mediaQuery = window.matchMedia('(max-width: 700px)');
     this.listener = (e: MediaQueryList) => {
       this.lowWidth = e.matches;

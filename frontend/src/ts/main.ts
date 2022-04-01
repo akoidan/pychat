@@ -176,7 +176,7 @@ async function init() {
   //   return false;
   // };
 
-  vue.mount('#app');
+  vue.mount(document.body);
 
   window.onerror = function (msg, url, linenumber, column, errorObj) {
     const message = `Error occurred in ${url}:${linenumber}\n${msg}`;

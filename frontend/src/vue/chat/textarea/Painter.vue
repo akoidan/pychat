@@ -14,13 +14,6 @@ import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import { createApp } from 'vue';
 
 
-let uniqueId = 1;
-
-function getUniqueId() {
-  return uniqueId++;
-}
-
-
 @Component({name: 'Painter'})
  export default class Painter extends Vue {
 
@@ -34,11 +27,16 @@ function getUniqueId() {
       buttonClass: 'lor-btn',
       logger: loggerFactory.getLogger('painter'),
       rangeFactory: (): HTMLInputElement => {
-        // TODO vue3 vue.extend does it work
         let app = createApp(AppInputRange);
         let div = document.createElement('div');
-        return  app.mount(div).$el;
-      }
+        let instance: AppInputRange = app.mount(div) as any;
+        div.removeChild(instance.$el);
+        setTimeout(()=> instance.fixStyle())
+        return instance.$el;
+      },
+      onBlobPaste: (e: Blob) => {
+        this.$emit('blob', e);
+      },
     });
     this.$emit('canvas', this.div.querySelector('canvas'));
   }
