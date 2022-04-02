@@ -202,8 +202,8 @@ self.addEventListener('install', (event: any) => {
     const staticCache = await caches.open('static');
     const assets = allAssets.filter(url =>
         url.includes('/smileys/') ||
-        url.includes('.js?') ||
-        url.includes('.css?') ||
+        url.includes('.js') ||
+        url.includes('.css') ||
         url.includes('/img/') ||
         url === (self as any).registration.scope
     );

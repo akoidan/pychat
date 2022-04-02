@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
 import sessionHolder from '@/ts/instances/sessionInstance';
 import { store } from '@/ts/instances/storeInstance';
 import MainPage from '@/vue/pages/MainPage.vue';
@@ -47,7 +47,7 @@ import ChannelAddRoom from '@/vue/pages/ChannelAddRoom.vue';
 const logger: Logger = loggerFactory.getLogger('router');
 
 export const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(), // seems like createWebHistory is really hard for sw to detect what to cache, so use this one
   routes: [
     {
       path: '',

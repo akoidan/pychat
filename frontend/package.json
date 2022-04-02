@@ -29,6 +29,7 @@
   },
   "homepage": "https://github.com/akoidan/pychat#readme",
   "devDependencies": {
+    "@types/node": "^17.0.23",
     "@types/chrome": "0.0.91",
     "@types/giphy-api": "^2.0.3",
     "@types/highlightjs": "9.12.0",
