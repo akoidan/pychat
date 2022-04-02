@@ -7,7 +7,6 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 // import webpackServiceWorker from 'serviceworker-webpack-plugin/lib/runtime';
 import {
   IS_DEBUG,
-  MANIFEST,
   SERVICE_WORKER_URL,
   SERVICE_WORKER_VERSION_LS_NAME,
   GIT_HASH
@@ -194,7 +193,7 @@ export default class NotifierHandler extends MessageHandler {
   private async registerWorker() {
     if (!navigator.serviceWorker) {
       throw Error('Service worker is not supported');
-    } else if (!MANIFEST || ! SERVICE_WORKER_URL) {
+    } else if (! SERVICE_WORKER_URL) {
      throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
     }
     let r: ServiceWorkerRegistration = (await navigator.serviceWorker.getRegistration(SERVICE_WORKER_URL))!;

@@ -13,6 +13,8 @@
   <meta name="theme-color" content="#232323" />
   <meta name="msapplication-navbutton-color" content="#232323">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="manifest" href="./assets/manifest.json"/>
+  <link rel="icon" type="image/png" href="./assets/img/favicon.ico">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="description" content="Self-hosted open source video chat based on webrtc and websockets https://github.com/akoidan/pychat">
   <script>
@@ -21,7 +23,7 @@
       window.deferredPrompt = e;
     });
   </script>
-  <script type="module" src="./ts/main.ts" async></script>
+  <script type="module" src="./ts/main.ts" crossorigin="anonymous" async></script>
 </head>
 <body>
 <style> html {background-color: #222222;}  .spinner-main {display: flex;align-items: center;transform: translateY(30vh);flex-direction: column;}  .spinner-main:before {content: " ";display: inline-block;border-radius: 50%;width: 0;height: 0;box-sizing: border-box;border: 30px solid #fff;border-color: #fff transparent #fff transparent;animation: spinner-main-rotate 1.2s infinite;}  .spinner-main:after {margin-top: 7.5px;content: "Loading application...";font-family: sans-serif;color: white;font-size: 18px;text-align: center;animation: spinner-main-text 1.2s infinite;}  @keyframes spinner-main-text { 50% {opacity: 0.5;} }  @keyframes spinner-main-rotate { 0% {transform: rotate(0);animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19);} 50% {transform: rotate(900deg);animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);} 100% {transform: rotate(1800deg);} }</style><div class="spinner-main"></div>

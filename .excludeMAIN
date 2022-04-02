@@ -20,4 +20,4 @@ backend/chat/production.py
 backend/chat/settings.py
 backend/photos/*
 !backend/photos/.gitkeep
-frontend/production.json
+frontend/build/production.json

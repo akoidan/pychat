@@ -97,10 +97,10 @@ file_names_pattern = {
 }
 
 START_CHAR = 13313
-root_path=os.path.dirname(os.path.realpath(__file__))
+root_path=os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir))
 SMILEYS_ROOT = os.sep.join((root_path, 'src', 'assets', 'smileys'))
 OUTPUT_TS_FILE = os.sep.join((root_path, 'src', 'utils', 'staticFiles.ts'))
 smiley_pattern = re.compile(r'^:.*:$')
-pack_path = os.sep.join((root_path, 'DefaultSmilies.cfpack'))
+pack_path = os.sep.join((root_path, 'build', 'DefaultSmilies.cfpack'))
 
 handle()

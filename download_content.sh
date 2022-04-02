@@ -117,7 +117,7 @@ check_files() {
 compile_js() {
     if [ -z "$(ls $DIST_DIRECTORY)" ]; then
        safeRunCommand cd "$FE_DIRECTORY"
-       safeRunCommand yarn run prod
+       safeRunCommand yarn build
     else
         printOut "Js is already compiled in $DIST_DIRECTORY"
     fi

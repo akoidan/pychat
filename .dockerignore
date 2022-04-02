@@ -7,15 +7,11 @@
 !backend/templates
 !frontend/src
 !frontend/patches
+!frontend/build
 !frontend/package.json
 !frontend/yarn.lock
 !frontend/tsconfig.json
-!frontend/DefaultSmilies.cfpack
-!frontend/extract_cfpack.py
-!frontend/tsconfig.esnext.json
-!frontend/webpack.config.js
-!frontend/builder.js
-!frontend/font-config.json
+!frontend/tsconfig.node.json
 !docker/populate
 !docker/tornado
 !docker/nginx.conf
