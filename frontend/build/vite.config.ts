@@ -1,11 +1,13 @@
-import { defineConfig } from 'vite'
+import { defineConfig , splitVendorChunkPlugin} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {
   getConsts,
   getGitRevision,
-  readFileAsync
+  readFileAsync,
 } from './utils';
 import { resolve } from "path";
+import { outputManifest } from './sw.plugin';
+import { OutputChunk } from 'rollup';
 
 export default defineConfig(async ({command, mode}) => {
   let [key, cert, ca, gitHash] = await Promise.all([
@@ -15,19 +17,29 @@ export default defineConfig(async ({command, mode}) => {
     getGitRevision()
   ]);
   const PYCHAT_CONSTS = getConsts(gitHash, command);
+  const srcDir = resolve(__dirname, '..', 'src');
+  const distDir = resolve(__dirname, '..', 'dist');
+  const swFilePath = resolve(srcDir, 'ts', 'sw.ts');
   return {
     resolve: {
       alias: [
-        {find: '@', replacement: resolve(__dirname, '..', 'src')},
+        {find: '@', replacement: srcDir},
       ],
     },
     ...(PYCHAT_CONSTS.PUBLIC_PATH ? {base: PYCHAT_CONSTS.PUBLIC_PATH} : null),
-    root: resolve(__dirname, '..','src'),
-    plugins: [vue()],
+    root: srcDir,
+    plugins: [vue(), splitVendorChunkPlugin(), outputManifest({
+      swFilePath,
+    })],
     build: {
+      emptyOutDir: true,
       minify: false,
-      outDir: resolve(__dirname, '..','dist'),
+      outDir: distDir,
       rollupOptions: {
+        input: {
+          index: resolve(srcDir, 'index.html'), //index should be inside src, otherwise vite won't return it by default
+          sw: swFilePath,
+        },
         output: {
           assetFileNames: (assetInfo) => {
             let dirName = '';
@@ -41,20 +53,24 @@ export default defineConfig(async ({command, mode}) => {
               dirName = `flags`;
             } else if (/assets\/img\/.*\.(png|jpg|svg|gif)$/.test(assetInfo.name)) {
               dirName = `img`;
-            }else if (/cropperjs\/.*\.(png|jpg|svg|gif)$/.test(assetInfo.name)) {
-              dirName = `img/cropperjs`;
             } else if (/\.css$/.test(assetInfo.name)){
               dirName = `css`;
             }
             return `${dirName}/[name]-[hash].[ext]`
           },
-          chunkFileNames (assetInfo: any) {
+          chunkFileNames (assetInfo: OutputChunk) {
             if (Object.keys(assetInfo.modules).find(a => a.indexOf('node_modules/spainter/') >= 0)) {
               return 'js/spainter-[hash].js'
             }
             return 'js/[name]-[hash].js';
           },
-          entryFileNames: 'js/[name]-[hash].js',
+          entryFileNames (assetInfo: OutputChunk) {
+            if (assetInfo.facadeModuleId == swFilePath) {
+              return 'sw.js';
+            } else {
+              return 'js/[name]-[hash].js';
+            }
+          },
         },
       },
     },

@@ -12,7 +12,7 @@ export const loggerMixin = {
           return null as any;
         }
         const fileName = this.$options.__file;
-        if (!name) {
+        if (!name && fileName) {
           name = fileName.substr(fileName.lastIndexOf('/')+1, fileName.lastIndexOf('.') - fileName.lastIndexOf('/')-1);
         }
         if (!name) {

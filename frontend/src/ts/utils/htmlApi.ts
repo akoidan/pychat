@@ -655,7 +655,7 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
 export function highlightCode(element: HTMLElement) {
   const s = element.querySelectorAll('pre');
   if (s.length) {
-    import(/* webpackChunkName: "highlightjs" */ 'highlightjs').then(hljs => {
+    import( 'highlightjs').then(hljs => {
       for (let i = 0; i < s.length; i++) {
         hljs.highlightBlock(s[i]);
       }

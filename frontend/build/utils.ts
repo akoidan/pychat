@@ -28,11 +28,11 @@ export async function readFileAsync(name: string) {
     return promisify(readFile)(name);
 }
 
-export function getConsts(gitHash: string, command: 'build' | 'server') {
+export function getConsts(gitHash: string, command: 'build' | 'server', swMockValue) {
   const result = command === 'build' ? require('./production.json') : require('./development.json');
   result.GIT_HASH = gitHash;
   result.IS_SSL = true;
-  result.SERVICE_WORKER_URL = false; // TODO '/sw.ts';
+  result.SERVICE_WORKER_URL = '/sw.js';
   result.IS_ELECTRON = false;
   result.IS_ANDROID = false;
   result.IS_PROD = false;

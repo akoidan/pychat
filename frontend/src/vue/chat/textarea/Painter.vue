@@ -21,7 +21,7 @@ import { createApp } from 'vue';
   public div!: HTMLElement;
 
   public async mounted() {
-    let painterImport = await import(/* webpackChunkName: "spainter" */ 'spainter');
+    let painterImport = await import('spainter');
     new painterImport.default(this.div, {
       textClass: 'input',
       buttonClass: 'lor-btn',

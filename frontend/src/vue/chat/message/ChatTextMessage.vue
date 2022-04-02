@@ -243,10 +243,10 @@ export default class ChatTextMessage extends Vue {
     ::v-deep .audio-player-ready
       vertical-align: middle
 
-  .color-lor p ::v-deep, .color-reg p ::v-deep
-    @import "../../../../node_modules/highlightjs/styles/railscasts.css"
+  @import url("highlightjs/styles/railscasts.css")
   .color-white p ::v-deep
-    @import "../../../../node_modules/highlightjs/styles/default.css"
+    // TODO vue3 vite import inside selector doesn't concatenate file
+    //@import "../../../../node_modules/highlightjs/styles/default.css"
     .message-others
       background-color: white
 </style>
