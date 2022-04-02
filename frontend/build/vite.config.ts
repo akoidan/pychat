@@ -1,4 +1,7 @@
-import { defineConfig , splitVendorChunkPlugin} from 'vite'
+import {
+  defineConfig,
+  splitVendorChunkPlugin,
+} from 'vite'
 import vue from '@vitejs/plugin-vue'
 import {
   getConsts,
@@ -43,17 +46,17 @@ export default defineConfig(async ({command, mode}) => {
         output: {
           assetFileNames: (assetInfo) => {
             let dirName = '';
-            if (/\.(mp3|wav)$/.test(assetInfo.name)) {
+            if (/\.(mp3|wav)$/.test(assetInfo.name!)) {
               dirName = `sounds`;
-            } else if (/emoji-datasource-apple/.test(assetInfo.name)) {
+            } else if (/emoji-datasource-apple/.test(assetInfo.name!)) {
               dirName = `smileys`;
-            } else if (/((fonts?\/.*\.svg)|(\.(woff2?|eot|ttf|otf)))(\?.*)?/.test(assetInfo.name)) {
+            } else if (/((fonts?\/.*\.svg)|(\.(woff2?|eot|ttf|otf)))(\?.*)?/.test(assetInfo.name!)) {
               dirName = `font`;
-            } else if (/assets\/flags\/.*\.png$/.test(assetInfo.name)) {
+            } else if (/assets\/flags\/.*\.png$/.test(assetInfo.name!)) {
               dirName = `flags`;
-            } else if (/assets\/img\/.*\.(png|jpg|svg|gif)$/.test(assetInfo.name)) {
+            } else if (/assets\/img\/.*\.(png|jpg|svg|gif)$/.test(assetInfo.name!)) {
               dirName = `img`;
-            } else if (/\.css$/.test(assetInfo.name)){
+            } else if (/\.css$/.test(assetInfo.name!)){
               dirName = `css`;
             }
             return `${dirName}/[name]-[hash].[ext]`

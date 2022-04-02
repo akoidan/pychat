@@ -28,7 +28,7 @@ export async function readFileAsync(name: string) {
     return promisify(readFile)(name);
 }
 
-export function getConsts(gitHash: string, command: 'build' | 'server', swMockValue) {
+export function getConsts(gitHash: string, command: 'build' | 'serve') {
   const result = command === 'build' ? require('./production.json') : require('./development.json');
   result.GIT_HASH = gitHash;
   result.IS_SSL = true;
