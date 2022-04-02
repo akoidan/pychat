@@ -32,7 +32,8 @@ export function getConsts(gitHash: string, command: 'build' | 'server', swMockVa
   const result = command === 'build' ? require('./production.json') : require('./development.json');
   result.GIT_HASH = gitHash;
   result.IS_SSL = true;
-  result.SERVICE_WORKER_URL = '/sw.js';
+  // Do not use sw for dev server, it breaks hmr
+  result.SERVICE_WORKER_URL = command === 'build' ? '/sw.js': null;
   result.IS_ELECTRON = false;
   result.IS_ANDROID = false;
   result.IS_PROD = false;

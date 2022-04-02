@@ -1,5 +1,4 @@
-import '@/ts/utils/classComponentHooks.ts';
-import '@/assets/sass/common.sass';
+import '@/assets/sass/common';
 import * as constants from '@/ts/utils/consts';
 
 import * as runtimeConsts from '@/ts/utils/runtimeConsts';

@@ -104,7 +104,7 @@ export default class RoomUsersListPage extends Vue {
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/room_users_table.sass"
+  @import "@/assets/sass/partials/room_users_table"
 
   @import "@/assets/sass/partials/abstract_classes"
 

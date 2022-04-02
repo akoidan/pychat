@@ -192,7 +192,7 @@ export default class NotifierHandler extends MessageHandler {
     if (!navigator.serviceWorker) {
       throw Error('Service worker is not supported');
     } else if (! SERVICE_WORKER_URL) {
-     throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
+     throw Error('FIREBASE_API_KEY is missing in settings.py or file manifest.json is missing');
     }
 
     let r: ServiceWorkerRegistration = (await navigator.serviceWorker.getRegistration())!;

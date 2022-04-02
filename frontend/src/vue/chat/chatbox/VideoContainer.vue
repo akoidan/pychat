@@ -125,7 +125,7 @@ export default class VideoContainer extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins.sass"
+  @import "@/assets/sass/partials/mixins"
 
   .icon-webrtc-cont
     display: none

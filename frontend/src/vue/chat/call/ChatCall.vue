@@ -231,7 +231,7 @@ export default class ChatCall extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins.sass"
+  @import "@/assets/sass/partials/mixins"
 
 
   .callContainer ::v-deep
