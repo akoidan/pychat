@@ -16,7 +16,7 @@
     <chat-tagging
       ref="chatTagging"
       :name="taggingName"
-:user-ids="room.users"
+      :user-ids="room.users"
       @emit-name="addTagInfo"
     />
     <giphy-search v-if="showGiphy" @close="showGiphy = false" @add-gihpy="onEmitGiphy"/>

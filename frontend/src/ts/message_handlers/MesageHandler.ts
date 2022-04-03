@@ -1,4 +1,4 @@
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import type {
   DefaultInMessage,
   HandlerName,

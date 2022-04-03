@@ -16,7 +16,7 @@ import type {
   MessageStatus,
   RoomModel,
 } from "@/ts/types/model";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 
 import type {
   GiphyDto,
@@ -24,10 +24,10 @@ import type {
   SaveFileResponse,
 } from "@/ts/types/dto";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import { sub } from "@/ts/instances/subInstance";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import {sub} from "@/ts/instances/subInstance";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
-import type { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
+import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {
   HandlerName,
   HandlerType,
@@ -41,13 +41,13 @@ import type {
   SetMessageStatusMessage,
   SyncHistoryResponseMessage,
 } from "@/ts/types/messages/wsInMessages";
-import { savedFiles } from "@/ts/utils/htmlApi";
-import type { MessageHelper } from "@/ts/message_handlers/MessageHelper";
+import {savedFiles} from "@/ts/utils/htmlApi";
+import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import {
   LAST_SYNCED,
   MESSAGES_PER_SEARCH,
 } from "@/ts/utils/consts";
-import { convertMessageModelDtoToModel } from "@/ts/types/converters";
+import {convertMessageModelDtoToModel} from "@/ts/types/converters";
 import {
   checkIfIdIsMissing,
   getMissingIds,
@@ -57,11 +57,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WsMessageHandler, "ws-message"> = {
-    deleteMessage: <HandlerType<"deleteMessage", "ws-message">>this.deleteMessage,
-    editMessage: <HandlerType<"editMessage", "ws-message">>this.editMessage,
-    printMessage: <HandlerType<"printMessage", "ws-message">>this.printMessage,
-    internetAppear: <HandlerType<"internetAppear", HandlerName>>this.internetAppear,
-    setMessageStatus: <HandlerType<"setMessageStatus", "ws-message">>this.setMessageStatus,
+    deleteMessage: <HandlerType<"deleteMessage", "ws-message">> this.deleteMessage,
+    editMessage: <HandlerType<"editMessage", "ws-message">> this.editMessage,
+    printMessage: <HandlerType<"printMessage", "ws-message">> this.printMessage,
+    internetAppear: <HandlerType<"internetAppear", HandlerName>> this.internetAppear,
+    setMessageStatus: <HandlerType<"setMessageStatus", "ws-message">> this.setMessageStatus,
   };
 
   /*
@@ -79,10 +79,10 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private readonly messageHelper: MessageHelper;
 
   constructor(
-      store: DefaultStore,
-      api: Api,
-      ws: WsHandler,
-      messageHelper: MessageHelper,
+    store: DefaultStore,
+    api: Api,
+    ws: WsHandler,
+    messageHelper: MessageHelper,
   ) {
     super();
     this.store = store;
@@ -95,9 +95,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   public async markMessagesInCurrentRoomAsRead(roomId: number, messagesIds: number[]) {
     await this.ws.setMessageStatus(
-        messagesIds,
-        roomId,
-        "read",
+      messagesIds,
+      roomId,
+      "read",
     );
   }
 
@@ -152,7 +152,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         }
         this.store.setSearchStateTo({
           roomId,
-          lock: messagesDto.length < MESSAGES_PER_SEARCH
+          lock: messagesDto.length < MESSAGES_PER_SEARCH,
         });
       }
     } else {
@@ -162,7 +162,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   public async loadThreadMessages(roomId: number, threadId: number): Promise<void> {
     const room = this.store.roomsDict[roomId];
-    const myids: number[] = Object.values(room.messages).filter((a) => a.parentMessage === threadId && a.id > 0).map((m) => m.id);
+    const myids: number[] = Object.values(room.messages).filter((a) => a.parentMessage === threadId && a.id > 0).
+      map((m) => m.id);
     const lm = await this.ws.sendLoadMessages(roomId, 0, threadId, myids);
     if (lm.content.length > 0) {
       this.addMessages(roomId, lm.content);
@@ -174,7 +175,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   public async loadUpMessages(roomId: number, count: number): Promise<void> {
     const room = this.store.roomsDict[roomId];
     if (!room.allLoaded) {
-      const myids: number[] = Object.values(room.messages).map((m) => m.id).filter((a) => a > 0);
+      const myids: number[] = Object.values(room.messages).map((m) => m.id).
+        filter((a) => a > 0);
       const lm = await this.ws.sendLoadMessages(roomId, count, null, myids);
       if (lm.content.length > 0) {
         // Backend return messages that don't have thread, so we don't neeed to sync parent message here
@@ -199,14 +201,14 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     const giphies: GiphyDto[] = this.getGiphiesFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
       const a: PrintMessage = await this.ws.sendPrintMessage(
-          storeMessage.content,
-          roomId,
-          fileIds,
-          storeMessage.id,
-          Date.now() - storeMessage.time,
-          storeMessage.parentMessage,
-          {...storeMessage.tags},
-          giphies,
+        storeMessage.content,
+        roomId,
+        fileIds,
+        storeMessage.id,
+        Date.now() - storeMessage.time,
+        storeMessage.parentMessage,
+        {...storeMessage.tags},
+        giphies,
       );
       const rmMes: RoomMessageIds = {
         messageId: storeMessage.id,
@@ -222,9 +224,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   }
 
   public async uploadFiles(
-      messageId: number,
-      roomId: number,
-      files: UploadFile[],
+    messageId: number,
+    roomId: number,
+    files: UploadFile[],
   ): Promise<SaveFileResponse> {
     let size: number = 0;
     files.forEach((f) => size += f.file.size);
@@ -239,24 +241,24 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.store.setUploadProgress(sup);
     try {
       const res: SaveFileResponse = await this.api.uploadFiles(
-          files,
-          (evt) => {
-            if (evt.lengthComputable) {
-              const payload: SetMessageProgress = {
-                messageId,
-                roomId,
-                uploaded: evt.loaded,
-              };
-              this.store.setMessageProgress(payload);
-            }
-          },
-          (xhr) => {
-            this.store.setUploadXHR({
-              xhr,
+        files,
+        (evt) => {
+          if (evt.lengthComputable) {
+            const payload: SetMessageProgress = {
               messageId,
-              roomId
-            });
-          },
+              roomId,
+              uploaded: evt.loaded,
+            };
+            this.store.setMessageProgress(payload);
+          }
+        },
+        (xhr) => {
+          this.store.setUploadXHR({
+            xhr,
+            messageId,
+            roomId,
+          });
+        },
       );
       const newVar: RemoveMessageProgress = {
         messageId,
@@ -287,7 +289,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.store.addMessages({
       messages,
       roomId,
-      syncingThreadMessageRequired
+      syncingThreadMessageRequired,
     });
   }
 
@@ -297,7 +299,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     const messages: MessageModel[] = newMesages.map((nm) => convertMessageModelDtoToModel(nm, null, (time) => this.ws.convertServerTimeToPC(time)));
     this.store.addSearchMessages({
       messages,
-      roomId
+      roomId,
     });
   }
 
@@ -352,9 +354,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     if (inMessage.userId !== this.store.myId) {
       const isRead = this.store.isCurrentWindowActive && this.store.activeRoomId === inMessage.roomId;
       this.ws.setMessageStatus(
-          [inMessage.id],
-          inMessage.roomId,
-          isRead ? "read" : "received",
+        [inMessage.id],
+        inMessage.roomId,
+        isRead ? "read" : "received",
       );
     }
     if (checkIfIdIsMissing(message, this.store)) {
@@ -379,11 +381,12 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     if (!storeMessage.files) {
       return [];
     }
-    return Object.entries(storeMessage.files).filter(([k, v]) => v.type === "g" && !v.serverId).map(([k, v]) => ({
-      url: v.url!,
-      symbol: k,
-      webp: v.preview!,
-    }));
+    return Object.entries(storeMessage.files).filter(([k, v]) => v.type === "g" && !v.serverId).
+      map(([k, v]) => ({
+        url: v.url!,
+        symbol: k,
+        webp: v.preview!,
+      }));
   }
 
   private getFileIdsFromMessage(storeMessage: MessageModel): number[] {
@@ -406,25 +409,26 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private async uploadFilesForMessages(storeMessage: MessageModel) {
     if (storeMessage.files) {
       const uploadFiles: UploadFile[] = [];
-      Object.keys(storeMessage.files).filter((k) => !storeMessage.files![k].fileId && storeMessage.files![k].sending).forEach((k) => {
-        const file: FileModel = storeMessage.files![k];
-        uploadFiles.push({
-          file: savedFiles[file.url!], // TODO why null?
-          key: file.type + k,
-        });
-        if (file.preview) {
+      Object.keys(storeMessage.files).filter((k) => !storeMessage.files![k].fileId && storeMessage.files![k].sending).
+        forEach((k) => {
+          const file: FileModel = storeMessage.files![k];
           uploadFiles.push({
-            file: savedFiles[file.preview],
-            key: `p${k}`,
+            file: savedFiles[file.url!], // TODO why null?
+            key: file.type + k,
           });
-        }
-      });
+          if (file.preview) {
+            uploadFiles.push({
+              file: savedFiles[file.preview],
+              key: `p${k}`,
+            });
+          }
+        });
       if (uploadFiles.length > 0) {
         const fileIds = await this.uploadFiles(storeMessage.id, storeMessage.roomId, uploadFiles);
         this.store.setMessageFileIds({
           roomId: storeMessage.roomId,
           messageId: storeMessage.id,
-          fileIds
+          fileIds,
         });
       }
     }
@@ -435,7 +439,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       return;
     }
     this.store.roomsArray.forEach((r) => {
-      const messagesIds = Object.values(r.messages).map((m) => m.id).filter((id) => inMessagesIds.includes(id));
+      const messagesIds = Object.values(r.messages).map((m) => m.id).
+        filter((id) => inMessagesIds.includes(id));
       if (messagesIds.length > 0) {
         this.store.setMessagesStatus({
           messagesIds,
@@ -475,11 +480,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     joined = parseInt(joined);
 
     const result: SyncHistoryResponseMessage = await this.ws.syncHistory(
-        roomIds,
-        messagesIds,
-        receivedMessageIds,
-        onServerMessageIds,
-        Date.now() - joined,
+      roomIds,
+      messagesIds,
+      receivedMessageIds,
+      onServerMessageIds,
+      Date.now() - joined,
     );
 
     // Updating information if message that I sent were received/read
@@ -519,11 +524,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     if (roomId === this.store.activeRoomId) {
       ids = inMessages.
 
-          /*
-           * If we received a message from the server from our second device
-           * We still don't need to mark those messages as received
-           */
-          filter((m) => m.userId !== this.store.myId && (m.status === "received" || m.status === "on_server")).map((m) => m.id);
+      /*
+       * If we received a message from the server from our second device
+       * We still don't need to mark those messages as received
+       */
+        filter((m) => m.userId !== this.store.myId && (m.status === "received" || m.status === "on_server")).map((m) => m.id);
       messageStatus = "read";
     } else {
       ids = inMessages.filter((m) => m.status === "on_server").map((m) => m.id);
@@ -531,9 +536,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
     if (ids.length > 0) {
       this.ws.setMessageStatus(
-          ids,
-          roomId,
-          messageStatus,
+        ids,
+        roomId,
+        messageStatus,
       );
     }
   }

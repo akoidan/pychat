@@ -23,7 +23,8 @@ import AppGrowl from "@/vue/ui/AppGrowl.vue";
   components: {AppGrowl},
 })
 export default class Growls extends Vue {
-  @Watch("$route", {immediate: true, deep: true})
+  @Watch("$route", {immediate: true,
+    deep: true})
   onUrlChange(newVal: any) {
     this.$store.clearGrowls();
   }

@@ -1,6 +1,6 @@
-import type { CheckTransferDestroy } from "@/ts/types/messages/innerMessages";
+import type {CheckTransferDestroy} from "@/ts/types/messages/innerMessages";
 import BaseTransferHandler from "@/ts/webrtc/BaseTransferHandler";
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 
 export abstract class FileAndCallTransfer extends BaseTransferHandler {

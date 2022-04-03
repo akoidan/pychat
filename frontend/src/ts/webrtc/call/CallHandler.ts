@@ -3,7 +3,7 @@ import {
   isChrome,
   isMobile,
 } from "@/ts/utils/runtimeConsts";
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 import type {
   CallsInfoModel,
@@ -16,7 +16,7 @@ import type {
   NumberIdentifier,
   SetDevices,
 } from "@/ts/types/types";
-import { VideoType } from "@/ts/types/types";
+import {VideoType} from "@/ts/types/types";
 import {
   CHROME_EXTENSION_ID,
   CHROME_EXTENSION_URL,
@@ -50,8 +50,8 @@ import type {
   DestroyPeerConnectionMessage,
   RouterNavigateMessage,
 } from "@/ts/types/messages/innerMessages";
-import { FileAndCallTransfer } from "@/ts/webrtc/FileAndCallTransfer";
-import { stopVideo } from "@/ts/utils/htmlApi";
+import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
+import {stopVideo} from "@/ts/utils/htmlApi";
 
 
 export default class CallHandler extends FileAndCallTransfer {
@@ -59,9 +59,9 @@ export default class CallHandler extends FileAndCallTransfer {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
-    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*">>this.replyCall,
-    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*">>this.acceptCall,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">>this.checkTransferDestroy,
+    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*">> this.replyCall,
+    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*">> this.acceptCall,
+    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">> this.checkTransferDestroy,
   };
 
   private canvas: HTMLCanvasElement | null = null;
@@ -85,7 +85,7 @@ export default class CallHandler extends FileAndCallTransfer {
 
   public inflateDevices(devices: MediaDeviceInfo[]): void {
     let c: number = 0,
-        k: number, n: number;
+      k: number, n: number;
     const microphones: Record<string, string> = {};
     const speakers: Record<string, string> = {};
     const webcams: Record<string, string> = {};
@@ -140,7 +140,7 @@ export default class CallHandler extends FileAndCallTransfer {
     } else {
       await this.pingExtension();
       this.logger.log("Ping to extension succeeded")();
-      const response = await new Promise<{ streamId: string; data: string }>((resolve, reject) => {
+      const response = await new Promise<{streamId: string; data: string}>((resolve, reject) => {
         chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {type: "PYCHAT_SCREEN_SHARE_REQUEST"}, resolve);
       });
       if (response && response.data === "success") {
@@ -181,8 +181,8 @@ export default class CallHandler extends FileAndCallTransfer {
         if (audioProc.volumeValuesCount === 100 && audioProc.prevVolumeValues === 0) {
           let url = isChrome ? "setting in chrome://settings/content" : "your browser settings";
           url += navigator.platform.includes("Linux")
-              ? ". Open pavucontrol for more info"
-              : " . Right click on volume icon in system tray -> record devices -> input -> microphone";
+            ? ". Open pavucontrol for more info"
+            : " . Right click on volume icon in system tray -> record devices -> input -> microphone";
           this.store.growlError(`Unable to capture input from microphone. Check your microphone connection or ${url}`);
         }
       }
@@ -331,7 +331,7 @@ export default class CallHandler extends FileAndCallTransfer {
     }
   }
 
-  public createCallPeerConnection({opponentWsId, userId}: { opponentWsId: string; userId: number }) {
+  public createCallPeerConnection({opponentWsId, userId}: {opponentWsId: string; userId: number}) {
     if (sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) !== 0) {
       this.logger.warn(`Peer connection ${opponentWsId} won't be created as it's already exists`)();
       return;
@@ -349,11 +349,11 @@ export default class CallHandler extends FileAndCallTransfer {
     this.acceptedPeers.push(opponentWsId);
     this.createCallPeerConnection({
       opponentWsId,
-      userId
+      userId,
     });
     this.store.setCallActiveButNotJoinedYet({
       state: true,
-      id: this.roomId
+      id: this.roomId,
     });
   }
 
@@ -369,7 +369,7 @@ export default class CallHandler extends FileAndCallTransfer {
     if (this.acceptedPeers.length === 0) {
       this.store.setCallActiveButNotJoinedYet({
         state: false,
-        id: this.roomId
+        id: this.roomId,
       });
     }
   }
@@ -593,7 +593,7 @@ export default class CallHandler extends FileAndCallTransfer {
       this.logger.debug("navigator.mediaDevices.getUserMedia({audio, video})")();
       stream = await navigator.mediaDevices.getUserMedia({
         audio,
-        video
+        video,
       });
       this.logger.debug("navigator.mediaDevices.getUserMedia({audio, video})")();
       if (!stream) {

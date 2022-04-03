@@ -1,26 +1,26 @@
 <template>
   <div>
     <span
-        v-if="newMessagesCount > 0"
-        :title="`You have ${newMessagesCount} new messages in this room`"
-        class="newMessagesCount"
+      v-if="newMessagesCount > 0"
+      :title="`You have ${newMessagesCount} new messages in this room`"
+      class="newMessagesCount"
     >
       {{ newMessagesCount }}
     </span>
     <span
-        v-else-if="room.callInfo.callActive"
-        class="icon-phone icon-no-cog"
+      v-else-if="room.callInfo.callActive"
+      class="icon-phone icon-no-cog"
     />
     <template v-else-if="room.p2p">
       <span
-          v-if="room.p2pInfo.liveConnections.length > 0"
-          :title="`This room has opened ${room.p2pInfo.liveConnections} connection with other devices`"
-          class="icon-spin1 icon-no-cog animate-spin"
+        v-if="room.p2pInfo.liveConnections.length > 0"
+        :title="`This room has opened ${room.p2pInfo.liveConnections} connection with other devices`"
+        class="icon-spin1 icon-no-cog animate-spin"
       />
       <span
-          v-else
-          class="icon-wifi icon-no-cog"
-          title="This room is secure. When you send a message a direct connection will be established and maintained with the enduser"
+        v-else
+        class="icon-wifi icon-no-cog"
+        title="This room is secure. When you send a message a direct connection will be established and maintained with the enduser"
       />
     </template>
   </div>
@@ -31,8 +31,8 @@ import {
   Prop,
   Vue,
 } from "vue-property-decorator";
-import type { MessageModel } from "@/ts/types/model";
-import { RoomModel } from "@/ts/types/model";
+import type {MessageModel} from "@/ts/types/model";
+import {RoomModel} from "@/ts/types/model";
 
 @Component({name: "RoomRightIcon"})
 export default class RoomRightIcon extends Vue {
@@ -41,12 +41,12 @@ export default class RoomRightIcon extends Vue {
   get newMessagesCount(): number {
     return this.$store.calculatedMessagesForRoom(this.room.id).filter((m: MessageModel) =>
 
-        /*
-         * On_server is not really required, since all received messages are gonna be 'received'
-         * But it's an additional failsafe check, in case of a bug in another place
-         */
-        (m.status === "received" || m.status === "on_server") &&
-        m.userId !== this.$store.myId).length;
+      /*
+       * On_server is not really required, since all received messages are gonna be 'received'
+       * But it's an additional failsafe check, in case of a bug in another place
+       */
+      (m.status === "received" || m.status === "on_server") &&
+      m.userId !== this.$store.myId).length;
   }
 }
 </script>

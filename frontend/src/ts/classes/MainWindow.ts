@@ -1,5 +1,5 @@
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import type { Logger } from "lines-logger";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 
 const LAST_TAB_ID_VARNAME = "lastTabId";

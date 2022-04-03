@@ -3,8 +3,8 @@ import type {
   SetSendingFileStatus,
   SetSendingFileUploaded,
 } from "@/ts/types/types";
-import type { SendingFileTransfer } from "@/ts/types/model";
-import { FileTransferStatus } from "@/ts/types/model";
+import type {SendingFileTransfer} from "@/ts/types/model";
+import {FileTransferStatus} from "@/ts/types/model";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import {
   bytesToSize,
@@ -15,7 +15,7 @@ import {
   SEND_CHUNK_SIZE,
 } from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,
@@ -27,10 +27,10 @@ import type {
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">>this.destroyFileConnection,
-    acceptFile: <HandlerType<"acceptFile", "peerConnection:*">>this.acceptFile,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
-    declineSending: <HandlerType<"declineSending", "peerConnection:*">>this.declineSending,
+    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
+    acceptFile: <HandlerType<"acceptFile", "peerConnection:*">> this.acceptFile,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
+    declineSending: <HandlerType<"declineSending", "peerConnection:*">> this.declineSending,
   };
 
   private readonly file: File;
@@ -218,8 +218,8 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
           if (now - this.lastPrinted > 1000) {
             this.lastPrinted = now;
             this.logger.debug(
-                "Buffer overflow by {}, waiting to flush...",
-                bytesToSize(this.sendChannel!.bufferedAmount),
+              "Buffer overflow by {}, waiting to flush...",
+              bytesToSize(this.sendChannel!.bufferedAmount),
             )();
           }
           this.sendDataTimeout = setTimeout(this.sendData.bind(this), 100, data, offset, cb) as any;

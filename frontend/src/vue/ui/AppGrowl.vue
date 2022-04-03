@@ -3,8 +3,8 @@
     <div :class="['growl', growl.type]">
       <!--Single line-->
       <div
-          class="icon-cancel"
-          @click="close"
+        class="icon-cancel"
+        @click="close"
       />
       <div v-html="growl.html"/>
     </div>
@@ -17,7 +17,7 @@ import {
   Prop,
   Vue,
 } from "vue-property-decorator";
-import { GrowlModel } from "@/ts/types/model";
+import {GrowlModel} from "@/ts/types/model";
 
 @Component({name: "AppGrowl"})
 export default class AppGrowl extends Vue {

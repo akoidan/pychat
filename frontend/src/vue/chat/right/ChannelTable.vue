@@ -2,18 +2,18 @@
   <chat-right-collapsed-section :value="channel.expanded" @input="expandChannel">
     <template #name>
       <router-link
-          :to="`/chat/${mainRoomId(channel)}`"
-          class="active-room"
-          @click.native="navigate"
+        :to="`/chat/${mainRoomId(channel)}`"
+        class="active-room"
+        @click.native="navigate"
       >
         {{ channel.name }}
       </router-link>
     </template>
 
     <room-row-wrapper
-        v-for="room in channel.rooms"
-        :key="room.id"
-        :room="room"
+      v-for="room in channel.rooms"
+      :key="room.id"
+      :room="room"
     >
       {{ room.name }}
     </room-row-wrapper>
@@ -25,8 +25,8 @@ import {
   Prop,
   Vue,
 } from "vue-property-decorator";
-import { State } from "@/ts/instances/storeInstance";
-import { ChannelUIModel } from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
+import {ChannelUIModel} from "@/ts/types/model";
 import ChatRightCollapsedSection from "@/vue/chat/right/ChatRightCollapsedSection.vue";
 import RoomRowWrapper from "@/vue/chat/right/RoomRowWrapper.vue";
 
@@ -34,7 +34,7 @@ import RoomRowWrapper from "@/vue/chat/right/RoomRowWrapper.vue";
   name: "ChannelTable",
   components: {
     RoomRowWrapper,
-    ChatRightCollapsedSection
+    ChatRightCollapsedSection,
   },
 })
 export default class ChannelTable extends Vue {

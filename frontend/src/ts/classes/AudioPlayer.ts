@@ -1,6 +1,6 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
-import type { MainWindow } from "@/ts/classes/MainWindow";
+import type {Logger} from "lines-logger";
+import type {MainWindow} from "@/ts/classes/MainWindow";
 
 
 export class AudioPlayer {

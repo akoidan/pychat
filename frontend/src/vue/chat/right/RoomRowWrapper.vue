@@ -13,8 +13,8 @@ import {
   Vue,
 } from "vue-property-decorator";
 import RoomRightIcon from "@/vue/chat/right/RoomRightIcon.vue";
-import { RoomModel } from "@/ts/types/model";
-import { State } from "@/ts/instances/storeInstance";
+import {RoomModel} from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
 
 @Component({
   name: "RoomRowWrapper",

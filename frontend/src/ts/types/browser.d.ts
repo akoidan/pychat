@@ -28,7 +28,7 @@ declare interface NotificationOptions {
   replaced: number;
 }
 
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+type Writeable<T> = {-readonly [P in keyof T]: T[P]};
 
 declare interface RTCDataChannelInit {
   reliable?: boolean;
@@ -89,7 +89,7 @@ declare interface MediaStreamTrack {
 }
 
 declare class MediaRecorderDataAvailableEvent {
-  public data: { size: number };
+  public data: {size: number};
 }
 
 declare interface Blob {

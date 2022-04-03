@@ -6,8 +6,8 @@ import {
   LOG_LEVEL_LS,
 } from "@/ts/utils/consts";
 import type {
-  Logger,
   LogLevel,
+  Logger,
 } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
@@ -33,9 +33,9 @@ import type {
   UserProfileDtoWoImage,
   UserSettingsDto,
 } from "@/ts/types/dto";
-import { sub } from "@/ts/instances/subInstance";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import { WsMessageProcessor } from "@/ts/message_handlers/WsMessageProcessor";
+import {sub} from "@/ts/instances/subInstance";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
 import type {
   AddChannelMessage,
   AddInviteMessage,
@@ -73,23 +73,26 @@ enum WsState {
 }
 
 export default class WsHandler extends MessageHandler implements MessageSupplier {
-
   protected readonly logger: Logger;
+
   protected readonly handlers: HandlerTypes<keyof WsHandler, "ws"> = {
-    setSettings: <HandlerType<"setSettings", "ws">>this.setSettings,
-    setUserProfile: <HandlerType<"setUserProfile", "ws">>this.setUserProfile,
-    setProfileImage: <HandlerType<"setProfileImage", "ws">>this.setProfileImage,
-    setWsId: <HandlerType<"setWsId", "ws">>this.setWsId,
-    logout: <HandlerType<"logout", "ws">>this.logout,
-    userProfileChanged: <HandlerType<"userProfileChanged", "ws">>this.userProfileChanged,
-    ping: <HandlerType<"ping", "ws">>this.ping,
-    pong: <HandlerType<"pong", "ws">>this.pong,
+    setSettings: <HandlerType<"setSettings", "ws">> this.setSettings,
+    setUserProfile: <HandlerType<"setUserProfile", "ws">> this.setUserProfile,
+    setProfileImage: <HandlerType<"setProfileImage", "ws">> this.setProfileImage,
+    setWsId: <HandlerType<"setWsId", "ws">> this.setWsId,
+    logout: <HandlerType<"logout", "ws">> this.logout,
+    userProfileChanged: <HandlerType<"userProfileChanged", "ws">> this.userProfileChanged,
+    ping: <HandlerType<"ping", "ws">> this.ping,
+    pong: <HandlerType<"pong", "ws">> this.pong,
   };
+
+
   /*
    * How much current time is ahead of the server time
    * if current time is in the past it will be negative
    */
   private timeDiffWithServer: number = 0;
+
   private pingTimeoutFunction: number | null = null;
 
   private ws: WebSocket | null = null;
@@ -158,7 +161,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       content: {
         browser,
         name,
-        size
+        size,
       },
     });
   }
@@ -207,9 +210,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async search(
-      searchString: string,
-      roomId: number,
-      offset: number,
+    searchString: string,
+    roomId: number,
+    offset: number,
   ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       searchString,
@@ -220,11 +223,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public sendEditMessage(
-      content: string | null,
-      id: number,
-      files: number[] | null,
-      tags: Record<string, number>,
-      giphies: GiphyDto[],
+    content: string | null,
+    id: number,
+    files: number[] | null,
+    tags: Record<string, number>,
+    giphies: GiphyDto[],
   ) {
     const newVar = {
       id,
@@ -238,14 +241,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async sendPrintMessage(
-      content: string,
-      roomId: number,
-      files: number[],
-      id: number,
-      timeDiff: number,
-      parentMessage: number | null,
-      tags: Record<string, number>,
-      giphies: GiphyDto[],
+    content: string,
+    roomId: number,
+    files: number[],
+    id: number,
+    timeDiff: number,
+    parentMessage: number | null,
+    tags: Record<string, number>,
+    giphies: GiphyDto[],
   ): Promise<PrintMessage> {
     const newVar = {
       files,
@@ -295,11 +298,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async syncHistory(
-      roomIds: number[],
-      messagesIds: number[],
-      receivedMessageIds: number[],
-      onServerMessageIds: number[],
-      lastSynced: number,
+    roomIds: number[],
+    messagesIds: number[],
+    receivedMessageIds: number[],
+    onServerMessageIds: number[],
+    lastSynced: number,
   ): Promise<SyncHistoryResponseMessage> {
     const payload: SyncHistoryOutMessage = {
       messagesIds,
@@ -342,11 +345,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async saveChannelSettings(
-      channelName: string,
-      channelId: number,
-      channelCreatorId: number,
-      volume: number,
-      notifications: boolean,
+    channelName: string,
+    channelId: number,
+    channelCreatorId: number,
+    volume: number,
+    notifications: boolean,
   ): Promise<SaveChannelSettingsMessage> {
     return this.messageProc.sendToServerAndAwait({
       action: "saveChannelSettings",
@@ -432,9 +435,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async setMessageStatus(
-      messagesIds: number[],
-      roomId: number,
-      status: MessageStatus,
+    messagesIds: number[],
+    roomId: number,
+    status: MessageStatus,
   ) {
     return this.messageProc.sendToServerAndAwait({
       messagesIds,
@@ -445,10 +448,10 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async sendLoadMessages(
-      roomId: number,
-      count: number,
-      threadId: number | null,
-      excludeIds: number[],
+    roomId: number,
+    count: number,
+    threadId: number | null,
+    excludeIds: number[],
   ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       count,
@@ -460,8 +463,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async sendLoadMessagesByIds(
-      roomId: number,
-      messagesIds: number[],
+    roomId: number,
+    messagesIds: number[],
   ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       messagesIds,
@@ -487,7 +490,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.sendToServer({
       action: "retryFile",
       connId,
-      opponentWsId
+      opponentWsId,
     });
   }
 
@@ -594,7 +597,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.startNoPingTimeout();
     this.sendToServer({
       action: "pong",
-      time: message.time
+      time: message.time,
     });
   }
 
@@ -608,7 +611,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     // }
   }
 
-  notifyCallActive(param: { connectionId: string | null; opponentWsId: string; roomId: number }) {
+  notifyCallActive(param: {connectionId: string | null; opponentWsId: string; roomId: number}) {
     this.sendToServer({
       action: "notifyCallActive",
       connId: param.connectionId,
@@ -719,9 +722,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     } else if (this.wsState === WsState.CONNECTED) {
       // This.store.growlError( `Connection to chat server has been lost, because ${reason}`);
       this.logger.error(
-          "Connection to WebSocket has failed because \"{}\". Trying to reconnect every {}ms",
-          e.reason,
-          CONNECTION_RETRY_TIME,
+        "Connection to WebSocket has failed because \"{}\". Trying to reconnect every {}ms",
+        e.reason,
+        CONNECTION_RETRY_TIME,
       )();
     }
     if (this.wsState !== WsState.TRIED_TO_CONNECT) {

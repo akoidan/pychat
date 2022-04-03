@@ -3,20 +3,20 @@ import type {
   MessageSender,
   UserIdConn,
 } from "@/ts/types/types";
-import type { RoomModel } from "@/ts/types/model";
+import type {RoomModel} from "@/ts/types/model";
 import MessageSenderPeerConnection from "@/ts/webrtc/message/MessageSenderPeerConnection";
 import MessageReceiverPeerConnection from "@/ts/webrtc/message/MessageReceiverPeerConnection";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import { sub } from "@/ts/instances/subInstance";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 import type {
   SendSetMessagesStatusMessage,
   SyncP2PMessage,
 } from "@/ts/types/messages/innerMessages";
-import type { HandlerTypes } from "@/ts/types/messages/baseMessagesInterfaces";
-import type { MessageHelper } from "@/ts/message_handlers/MessageHelper";
+import type {HandlerTypes} from "@/ts/types/messages/baseMessagesInterfaces";
+import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 
 /**
  *
@@ -50,7 +50,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         if (connectionId !== myConnectionId) {
           connectionIdsWithUser.push({
             userId,
-            connectionId
+            connectionId,
           });
         }
       });
@@ -109,7 +109,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     }
   }
 
-  public async acceptConnection({connId}: { connId: string }) {
+  public async acceptConnection({connId}: {connId: string}) {
 
     /*
      * If connection is initing, we make it ready, so init would not refresh connection again
@@ -131,23 +131,23 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         let mpc;
         if (opponentWsId > myConnectionId) {
           mpc = new MessageSenderPeerConnection(
-              this.roomId,
-              this.connectionId!,
-              opponentWsId,
-              this.wsHandler,
-              this.store,
-              connectionIdWithUser.userId,
-              this.messageHelper,
+            this.roomId,
+            this.connectionId!,
+            opponentWsId,
+            this.wsHandler,
+            this.store,
+            connectionIdWithUser.userId,
+            this.messageHelper,
           );
         } else {
           mpc = new MessageReceiverPeerConnection(
-              this.roomId,
-              this.connectionId!,
-              opponentWsId,
-              this.wsHandler,
-              this.store,
-              connectionIdWithUser.userId,
-              this.messageHelper,
+            this.roomId,
+            this.connectionId!,
+            opponentWsId,
+            this.wsHandler,
+            this.store,
+            connectionIdWithUser.userId,
+            this.messageHelper,
           );
         }
         mpc.makeConnection();

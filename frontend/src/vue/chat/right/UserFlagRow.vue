@@ -1,9 +1,9 @@
 <template>
   <user-row :user="user">
     <img
-        v-if="consts.FLAGS && user.location.countryCode"
-        :src="flag"
-        :title="title"
+      v-if="consts.FLAGS && user.location.countryCode"
+      :src="flag"
+      :title="title"
     />
   </user-row>
 </template>
@@ -14,9 +14,9 @@ import {
   Vue,
 } from "vue-property-decorator";
 import UserRow from "@/vue/chat/right/UserRow.vue";
-import { UserModel } from "@/ts/types/model";
-import { FLAGS } from "@/ts/utils/consts";
-import { getFlagPath } from "@/ts/utils/htmlApi";
+import {UserModel} from "@/ts/types/model";
+import {FLAGS} from "@/ts/utils/consts";
+import {getFlagPath} from "@/ts/utils/htmlApi";
 
 @Component({
   name: "UserFlagRow",
@@ -25,7 +25,7 @@ import { getFlagPath } from "@/ts/utils/htmlApi";
 export default class UserFlagRow extends Vue {
   @Prop() public user!: UserModel;
 
-  public get consts(): { FLAGS: boolean } {
+  public get consts(): {FLAGS: boolean} {
     return {
       FLAGS,
     };
@@ -36,8 +36,8 @@ export default class UserFlagRow extends Vue {
       return "";
     }
     return this.user.location.region === this.user.location.city
-        ? `${this.user.location.country} ${this.user.location.city}`
-        : `${this.user.location.country} ${this.user.location.region} ${this.user.location.city}`;
+      ? `${this.user.location.country} ${this.user.location.city}`
+      : `${this.user.location.country} ${this.user.location.region} ${this.user.location.city}`;
   }
 
   public get flag() {

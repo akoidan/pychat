@@ -1,6 +1,6 @@
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type WebRtcApi from "@/ts/webrtc/WebRtcApi";
-import type { MessageSender } from "@/ts/types/types";
+import type {MessageSender} from "@/ts/types/types";
 import type WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
 
 export class MessageSenderProxy {
@@ -11,9 +11,9 @@ export class MessageSenderProxy {
   private readonly wsMessageHandler: WsMessageHandler;
 
   constructor(
-      store: DefaultStore,
-      webrtcApi: WebRtcApi,
-      wsMessageHandler: WsMessageHandler,
+    store: DefaultStore,
+    webrtcApi: WebRtcApi,
+    wsMessageHandler: WsMessageHandler,
   ) {
     this.store = store;
     this.webrtcApi = webrtcApi;

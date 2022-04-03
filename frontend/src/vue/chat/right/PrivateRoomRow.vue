@@ -4,15 +4,15 @@
   </room-row-wrapper>
 </template>
 <script lang="ts">
-import { State } from "@/ts/instances/storeInstance";
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
   Vue,
 } from "vue-property-decorator";
-import type { UserModel } from "@/ts/types/model";
-import { RoomModel } from "@/ts/types/model";
-import { PrivateRoomsIds } from "@/ts/types/types";
+import type {UserModel} from "@/ts/types/model";
+import {RoomModel} from "@/ts/types/model";
+import {PrivateRoomsIds} from "@/ts/types/types";
 import RoomRightIcon from "@/vue/chat/right/RoomRightIcon.vue";
 import RoomRowWrapper from "@/vue/chat/right/RoomRowWrapper.vue";
 import UserRow from "@/vue/chat/right/UserRow.vue";
@@ -22,7 +22,7 @@ import UserRow from "@/vue/chat/right/UserRow.vue";
   components: {
     UserRow,
     RoomRowWrapper,
-    RoomRightIcon
+    RoomRightIcon,
   },
 })
 export default class PrivateRoomRow extends Vue {

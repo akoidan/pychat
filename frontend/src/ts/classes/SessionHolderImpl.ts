@@ -1,4 +1,4 @@
-import type { SessionHolder } from "@/ts/types/types";
+import type {SessionHolder} from "@/ts/types/types";
 
 export class SessionHolderImpl implements SessionHolder {
   private static readonly SESSION_KEY = "sessionId";

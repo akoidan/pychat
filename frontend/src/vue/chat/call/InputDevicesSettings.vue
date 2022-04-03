@@ -1,70 +1,70 @@
 <template>
   <table class="settingsContainer">
     <tbody>
-    <tr>
-      <td>
-        <i class="icon-quote-left"/>
-        <span class="callInfo">Call info</span>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <i class="icon-volume-2"/>
-        <select
+      <tr>
+        <td>
+          <i class="icon-quote-left"/>
+          <span class="callInfo">Call info</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <i class="icon-volume-2"/>
+          <select
             :value="callInfo.currentSpeaker"
             class="input"
             @change="setCurrentSpeakerProxy"
-        >
-          <option
+          >
+            <option
               v-for="(speaker, id) in speakers"
               :key="id"
               :value="id"
-          >
-            {{ speaker }}
-          </option>
-        </select>
-        <span
+            >
+              {{ speaker }}
+            </option>
+          </select>
+          <span
             class="playTestSound"
             @click="playTest"
-        >Play test sound</span>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <i class="icon-videocam"/>
-        <select
+          >Play test sound</span>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <i class="icon-videocam"/>
+          <select
             :value="callInfo.currentWebcam"
             class="input"
             @change="setCurrentWebcamProxy"
-        >
-          <option
+          >
+            <option
               v-for="(webcam, id) in webcams"
               :key="id"
               :value="id"
-          >
-            {{ webcam }}
-          </option>
-        </select>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <i class="icon-mic"/>
-        <select
+            >
+              {{ webcam }}
+            </option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <i class="icon-mic"/>
+          <select
             :value="callInfo.currentMic"
             class="input"
             @change="setCurrentMicProxy"
-        >
-          <option
+          >
+            <option
               v-for="(mic, id) in microphones"
               :key="id"
               :value="id"
-          >
-            {{ mic }}
-          </option>
-        </select>
-      </td>
-    </tr>
+            >
+              {{ mic }}
+            </option>
+          </select>
+        </td>
+      </tr>
     </tbody>
   </table>
 </template>
@@ -75,10 +75,10 @@ import {
   Prop,
   Vue,
 } from "vue-property-decorator";
-import { CallsInfoModel } from "@/ts/types/model";
-import type { StringIdentifier } from "@/ts/types/types";
-import { State } from "@/ts/instances/storeInstance";
-import { file } from "@/ts/utils/audio";
+import {CallsInfoModel} from "@/ts/types/model";
+import type {StringIdentifier} from "@/ts/types/types";
+import {State} from "@/ts/instances/storeInstance";
+import {file} from "@/ts/utils/audio";
 
 @Component({name: "InputDevicesSettings"})
 export default class InputDevicesSettings extends Vue {

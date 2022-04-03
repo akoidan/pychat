@@ -53,8 +53,8 @@ import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppSuspense from "@/vue/ui/AppSuspense.vue";
 import {webpSupported} from "@/ts/utils/runtimeConsts";
-import {GIFObject} from "giphy-api";
 import type {
+  GIFObject,
   MultiResponse,
 } from "giphy-api";
 import AppLoadingImage from "@/vue/ui/AppLoadingImage.vue";

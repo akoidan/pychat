@@ -8,7 +8,7 @@ import {
   RESPONSE_SUCCESS,
 } from "@/ts/utils/consts";
 import Http from "@/ts/classes/Http";
-import { XHR_API_URL } from "@/ts/utils/runtimeConsts";
+import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
 
 /**
  * @param params : object dict of params or DOM form
@@ -40,13 +40,13 @@ export default class Xhr extends Http {
         xobj.setRequestHeader("session_id", this.sessionHolder.session!);
       }
       xobj.onreadystatechange = this.getOnreadystatechange(
-          xobj,
-          d.isJsonDecoded || false,
-          d.checkOkString || false,
-          fileUrl,
-          undefined,
-          reject,
-          resolve,
+        xobj,
+        d.isJsonDecoded || false,
+        d.checkOkString || false,
+        fileUrl,
+        undefined,
+        reject,
+        resolve,
       );
       xobj.send(null);
     });
@@ -56,13 +56,13 @@ export default class Xhr extends Http {
     return new Promise<T>((resolve, reject) => {
       const r: XMLHttpRequest = new XMLHttpRequest();
       r.onreadystatechange = this.getOnreadystatechange<T>(
-          r,
-          d.isJsonDecoded || false,
-          d.checkOkString || false,
-          d.url,
-          d.errorDescription,
-          reject,
-          resolve,
+        r,
+        d.isJsonDecoded || false,
+        d.checkOkString || false,
+        d.url,
+        d.errorDescription,
+        reject,
+        resolve,
       );
 
       const url = `${XHR_API_URL}${d.url}`;
@@ -108,13 +108,13 @@ export default class Xhr extends Http {
   }
 
   private getOnreadystatechange<T>(
-      r: XMLHttpRequest,
-      isJsonDecoded: boolean,
-      checkOkString: boolean,
-      url: string,
-      errorDescription: string | undefined,
-      reject: (error: string) => void,
-      resolve: (data: T) => void,
+    r: XMLHttpRequest,
+    isJsonDecoded: boolean,
+    checkOkString: boolean,
+    url: string,
+    errorDescription: string | undefined,
+    reject: (error: string) => void,
+    resolve: (data: T) => void,
   ): () => void {
     return () => {
       if (r.readyState === 4) {

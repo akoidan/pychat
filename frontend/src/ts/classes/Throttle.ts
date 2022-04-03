@@ -34,4 +34,4 @@ class Throttle {
   }
 }
 
-export { Throttle };
+export {Throttle};

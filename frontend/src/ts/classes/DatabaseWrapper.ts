@@ -4,7 +4,7 @@ import type {
   SetRoomsUsers,
 } from "@/ts/types/types";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import type {
   BlobType,
   ChannelModel,
@@ -39,8 +39,8 @@ import type {
   TagDB,
   UserDB,
 } from "@/ts/types/db";
-import type { SetStateFromStorage } from "@/ts/types/dto";
-import type { MainWindow } from "@/ts/classes/MainWindow";
+import type {SetStateFromStorage} from "@/ts/types/dto";
+import type {MainWindow} from "@/ts/classes/MainWindow";
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];
@@ -118,25 +118,25 @@ export default class DatabaseWrapper implements IStorage {
   public insertMessage(t: SQLTransaction, message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);
     this.executeSql(
-        t,
-        "insert or replace into message (id, time, content, symbol, deleted, edited, room_id, user_id, status, parent_message_id, thread_messages_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.edited, message.roomId, message.userId, message.status, message.parentMessage || null, message.threadMessagesCount],
-        (t, d) => {
-          for (const k in message.files) {
-            const f = message.files[k];
-            this.executeSql(t, "insert or replace into file (server_id, file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [f.serverId, f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
-            // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+      t,
+      "insert or replace into message (id, time, content, symbol, deleted, edited, room_id, user_id, status, parent_message_id, thread_messages_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.edited, message.roomId, message.userId, message.status, message.parentMessage || null, message.threadMessagesCount],
+      (t, d) => {
+        for (const k in message.files) {
+          const f = message.files[k];
+          this.executeSql(t, "insert or replace into file (server_id, file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [f.serverId, f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
+          // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
 
-            // })();
-          }
-          for (const k in message.tags) {
-            const userId = message.tags[k];
-            this.executeSql(t, "insert into tag (user_id, message_id, symbol) values (?, ?, ?)", [userId, message.id, k])();
-            // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+          // })();
+        }
+        for (const k in message.tags) {
+          const userId = message.tags[k];
+          this.executeSql(t, "insert into tag (user_id, message_id, symbol) values (?, ?, ?)", [userId, message.id, k])();
+          // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
 
-            // })();
-          }
-        },
+          // })();
+        }
+      },
     )();
   }
 
@@ -341,11 +341,11 @@ export default class DatabaseWrapper implements IStorage {
   public updateFileIds(m: SetFileIdsForMessage): void {
     this.write((t) => {
       this.executeMultiple(
-          t,
-          Object.keys(m.fileIds).map((symb) => [
-            "update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?",
-            [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId],
-          ]),
+        t,
+        Object.keys(m.fileIds).map((symb) => [
+          "update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?",
+          [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId],
+        ]),
       )();
     });
   }
@@ -371,36 +371,36 @@ export default class DatabaseWrapper implements IStorage {
       "select * from message",
       "select * from channel where deleted = 0",
       "select * from tag",
-    ].map(async (sql) => new Promise((resolve, reject) => {
+    ].map(async(sql) => new Promise((resolve, reject) => {
       this.executeSql(
-          t,
-          sql,
-          [],
-          (t: SQLTransaction, d: SQLResultSet) => {
-            this.logger.debug("sql {} fetched {} ", sql, d)();
-            const res: unknown[] = [];
-            for (let i = 0; i < d.rows.length; i++) {
-              const {rows} = d;
-              res.push(rows.item(i)); // TODO does that work
-            }
-            resolve(res);
-          },
-          (t: SQLTransaction, e: SQLError) => {
-            reject(e);
-            return false;
-          },
+        t,
+        sql,
+        [],
+        (t: SQLTransaction, d: SQLResultSet) => {
+          this.logger.debug("sql {} fetched {} ", sql, d)();
+          const res: unknown[] = [];
+          for (let i = 0; i < d.rows.length; i++) {
+            const {rows} = d;
+            res.push(rows.item(i)); // TODO does that work
+          }
+          resolve(res);
+        },
+        (t: SQLTransaction, e: SQLError) => {
+          reject(e);
+          return false;
+        },
       )();
     })));
 
     const dbFiles: FileDB[] = f[0] as FileDB[],
-        dbProfile: ProfileDB[] = f[1] as ProfileDB[],
-        dbRooms: RoomDB[] = f[2] as RoomDB[],
-        dbRoomUsers: RoomUsersDB[] = f[3] as RoomUsersDB[],
-        dbSettings: SettingsDB[] = f[4] as SettingsDB[],
-        dbUsers: UserDB[] = f[5] as UserDB[],
-        dbMessages: MessageDB[] = f[6] as MessageDB[],
-        dbChannels: ChannelDB[] = f[7] as ChannelDB[],
-        dbTags: TagDB[] = f[8] as TagDB[];
+      dbProfile: ProfileDB[] = f[1] as ProfileDB[],
+      dbRooms: RoomDB[] = f[2] as RoomDB[],
+      dbRoomUsers: RoomUsersDB[] = f[3] as RoomUsersDB[],
+      dbSettings: SettingsDB[] = f[4] as SettingsDB[],
+      dbUsers: UserDB[] = f[5] as UserDB[],
+      dbMessages: MessageDB[] = f[6] as MessageDB[],
+      dbChannels: ChannelDB[] = f[7] as ChannelDB[],
+      dbTags: TagDB[] = f[8] as TagDB[];
     this.logger.debug("resolved all sqls")();
 
     if (!dbProfile.length) {
@@ -417,16 +417,16 @@ export default class DatabaseWrapper implements IStorage {
       profile,
       channelsDict,
       allUsersDict,
-      roomsDict
+      roomsDict,
     };
   }
 
   private getRooms(
-      dbRooms: RoomDB[],
-      dbRoomUsers: RoomUsersDB[],
-      dbTags: TagDB[],
-      dbMessages: MessageDB[],
-      dbFiles: FileDB[],
+    dbRooms: RoomDB[],
+    dbRoomUsers: RoomUsersDB[],
+    dbTags: TagDB[],
+    dbMessages: MessageDB[],
+    dbFiles: FileDB[],
   ): RoomDictModel {
     const roomsDict: RoomDictModel = {};
     dbRooms.forEach((r: RoomDB) => {
@@ -591,11 +591,11 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   private executeSql(
-      t: SQLTransaction,
-      sql: string,
-      args: unknown[] = [],
-      cb: SQLStatementCallback | undefined = undefined,
-      e: SQLStatementErrorCallback | undefined = undefined,
+    t: SQLTransaction,
+    sql: string,
+    args: unknown[] = [],
+    cb: SQLStatementCallback | undefined = undefined,
+    e: SQLStatementErrorCallback | undefined = undefined,
   ): Function {
     const err: SQLStatementErrorCallback = e ? e : (t: SQLTransaction, e: SQLError) => {
       this.logger.error("{} {}, error: {}, message {}", sql, args, e, e && e.message)();
@@ -611,7 +611,7 @@ export default class DatabaseWrapper implements IStorage {
       this.executeSql(t, sql, [], resolve, (t: SQLTransaction, e: SQLError) => {
         reject({
           sql,
-          e
+          e,
         });
 
         return false;
@@ -625,17 +625,17 @@ export default class DatabaseWrapper implements IStorage {
       cb({
         executeSql(sql: string, args: any[]) {
           that.logQuery(that, sql, that.logger.warn("Skipping sql {} with args {}, since this is not a main tab", sql, args))();
-        }
+        },
       });
       return;
     }
     this.db.transaction(
-        (t) => {
-          cb(t);
-        },
-        (e) => {
-          this.logger.error("Error during saving message {}", e)();
-        },
+      (t) => {
+        cb(t);
+      },
+      (e) => {
+        this.logger.error("Error during saving message {}", e)();
+      },
     );
   }
 
