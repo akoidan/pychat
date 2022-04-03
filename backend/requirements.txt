@@ -17,5 +17,5 @@ Pillow==8.1.0
 # PyMySQL
 # mysql-connector-python
 # for windows you can install client with mysql installer or via whl file specified in readme
-# mysqlclient
+mysqlclient==1.3.13
 pyfcm==1.5.1
