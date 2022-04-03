@@ -76,8 +76,8 @@ export default defineConfig(async ({command, mode}) => {
             let dirName = '';
             if (/\.(mp3|wav)$/.test(assetInfo.name!)) {
               dirName = `sounds/`;
-            } else if (/emoji-datasource-apple/.test(assetInfo.name!)) {
-              dirName = `smileys/`;
+            } else if (/\/assets\/flags/.test(assetInfo.name!)) {
+              dirName = `flags/`;
             } else if (/((fonts?\/.*\.svg)|(\.(woff2?|eot|ttf|otf)))(\?.*)?/.test(assetInfo.name!)) {
               dirName = `font/`;
             } else if (/assets\/flags\/.*\.png$/.test(assetInfo.name!)) {
