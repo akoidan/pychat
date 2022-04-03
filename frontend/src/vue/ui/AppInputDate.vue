@@ -13,7 +13,6 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { IS_ELECTRON } from '@/ts/utils/consts';
 
 
 // @ts-ignore: next-line

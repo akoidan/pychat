@@ -3,7 +3,7 @@ import {
   permissions_type,
   PlatformUtil
 } from '@/ts/types/model';
-import type cordova from 'cordova';
+import cordova from 'cordova';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 

@@ -34,8 +34,6 @@ export function getConsts(gitHash: string, command: 'build' | 'serve') {
   result.IS_SSL = true;
   // Do not use sw for dev server, it breaks hmr
   result.SERVICE_WORKER_URL = command === 'build' ? '/sw.js': null;
-  result.IS_ELECTRON = false;
   result.IS_ANDROID = false;
-  result.IS_PROD = false;
   return result;
 }
