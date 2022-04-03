@@ -16,14 +16,59 @@ export interface Smile extends SmileVariation {
 
 export type SmileysStructure = Record<string, Record<string, Smile>>;
 
-Object.values(smileysData).forEach(v => {
-  Object.values(v).forEach((s: any) => {
-    s.src = `${PUBLIC_PATH ?? ''}/smileys/${s.src}`;
-    if (s.skinVariations) {
-      Object.values(s.skinVariations).forEach((variation: any) => {
-        variation.src = `${PUBLIC_PATH ?? ''}/smileys/${variation.src}`;
-      });
-    }
+export const smileys: SmileysStructure = (function () {
+  Object.values(smileysData).forEach(v => {
+    Object.values(v).forEach((s: any) => {
+      s.src = `${PUBLIC_PATH ?? ''}/smileys/${s.src}`;
+      if (s.skinVariations) {
+        Object.values(s.skinVariations).forEach((variation: any) => {
+          variation.src = `${PUBLIC_PATH ?? ''}/smileys/${variation.src}`;
+        });
+      }
+    })
+  });
+  return smileysData;
+})();
+
+export const allSmileysKeysNoVariations: Record<string, Smile> = (function () {
+  const result: Record<string, Smile> = {};
+  Object.entries(smileys).forEach(([tabName, tabSmileys]) => {
+    Object.entries(tabSmileys).forEach(([smileyCode, smileyValue]) => {
+      result[smileyCode] = {
+        alt: smileyValue.alt,
+        src: smileyValue.src,
+        skinVariations: smileyValue.skinVariations,
+      }
+    });
   })
-});
-export const smileys: SmileysStructure = smileysData;
+  return result;
+})()
+
+export const allSmileysKeys: Record<string, Smile> = (function () {
+  const result: Record<string, Smile> = {};
+  Object.entries(smileys).forEach(([tabName, tabSmileys]) => {
+    Object.entries(tabSmileys).forEach(([smileyCode, smileyValue]) => {
+      if (smileyValue.skinVariations) {
+        Object.entries(smileyValue.skinVariations).forEach(([smileyCodeVar, smileyValueVasr]) => {
+          if (smileyCode !== smileyCodeVar) {
+            // order of properties of object is js matter,
+            // first object added will be first in Object.keys array
+            // skin variation should be set first, in order to smileyUniceRegex to be gready
+            // since we have smileys like \u01 = smiley white person, and \u01\u02 = smiley black person
+            // they both start with \u01 so, we should replace \u01\u02, otherwiose we leave \u02 symbol undecoded
+            result[smileyCodeVar] = {
+              alt: smileyValueVasr.alt,
+              src: smileyValueVasr.src
+            }
+          }
+        });
+      }
+      result[smileyCode] = {
+        alt: smileyValue.alt,
+        src: smileyValue.src,
+        skinVariations: smileyValue.skinVariations,
+      }
+    });
+  })
+  return result;
+})()
