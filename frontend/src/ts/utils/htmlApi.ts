@@ -1,64 +1,53 @@
-import type {HLJSApi} from 'highlight.js';
-
 import {
   IS_DEBUG,
+  PASTED_GIPHY_CLASS,
   PASTED_IMG_CLASS,
   USERNAME_REGEX,
-  PASTED_GIPHY_CLASS
-} from '@/ts/utils/consts';
-import {
-  MessageDataEncode,
-  UploadFile
-} from '@/ts/types/types';
-import {
+} from "@/ts/utils/consts";
+import type { MessageDataEncode } from "@/ts/types/types";
+import type {
   BlobType,
   CurrentUserSettingsModel,
   FileModel,
   MessageModel,
-  UserModel
-} from '@/ts/types/model';
-import recordIcon from '@/assets/img/audio.svg';
-import fileIcon from '@/assets/img/file.svg';
-import { getFlag } from '@/ts/utils/flags';
-import videoIcon from '@/assets/img/icon-play-red.svg';
-import {
-  allSmileysKeys,
-  Smile,
-  smileys,
-} from '@/ts/utils/smileys';
-import loggerFactory from '@/ts/instances/loggerFactory';
-import {
-  Logger,
-  LogLevel
-} from 'lines-logger';
+  UserModel,
+} from "@/ts/types/model";
+import recordIcon from "@/assets/img/audio.svg";
+import fileIcon from "@/assets/img/file.svg";
+import { getFlag } from "@/ts/utils/flags";
+import videoIcon from "@/assets/img/icon-play-red.svg";
+import type { Smile } from "@/ts/utils/smileys";
+import { allSmileysKeys, } from "@/ts/utils/smileys";
+import loggerFactory from "@/ts/instances/loggerFactory";
+import type { Logger } from "lines-logger";
 import {
   MEDIA_API_URL,
-  webpSupported
-} from '@/ts/utils/runtimeConsts';
-import {DefaultStore} from '@/ts/classes/DefaultStore';
-import { hexEncode } from '@/ts/utils/pureFunctions';
-import { GIFObject } from 'giphy-api';
-import { Emitter } from 'mitt';
+  webpSupported,
+} from "@/ts/utils/runtimeConsts";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import { hexEncode } from "@/ts/utils/pureFunctions";
+import type { GIFObject } from "giphy-api";
+import type { Emitter } from "mitt";
 
-const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
+const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
-const logger: Logger = loggerFactory.getLogger('htmlApi');
+const logger: Logger = loggerFactory.getLogger("htmlApi");
 
-export const savedFiles: { [id: string]: Blob } = {};
+export const savedFiles: Record<string, Blob> = {};
 
 if (IS_DEBUG) {
   window.savedFiles = savedFiles;
 }
 
 export const requestFileSystem: (type: number, size: number, successCallback: FileSystemCallback, errorCallback?: ErrorCallback) => void = window.webkitRequestFileSystem || window.mozRequestFileSystem || window.requestFileSystem;
-const escapeMap: { [id: string]: string } = {
-  '&': '&amp;',
-  '<': '&lt;',
-  '>': '&gt;',
-  '"': '&quot;',
-  '\'': '&#39;',
-  '\n': '<br>',
-  '/': '&#x2F;'
+const escapeMap: Record<string, string> = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  "\"": "&quot;",
+  "'": "&#39;",
+  "\n": "<br>",
+  "/": "&#x2F;",
 };
 
 export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a: T) => void) {
@@ -69,78 +58,79 @@ export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a
   }
 }
 
-export const smileUnicodeRegex = (function () {
-  let allSmileyRegexarray = Object.keys(allSmileysKeys).map(hexEncode);
-  return new RegExp(allSmileyRegexarray.join('|'), 'g');
-})();
+export const smileUnicodeRegex = (function() {
+  const allSmileyRegexarray = Object.keys(allSmileysKeys).map(hexEncode);
+  return new RegExp(allSmileyRegexarray.join("|"), "g");
+}());
 
 
 const imageUnicodeRegex = /[\u3501-\u3600]/g;
 const patterns = [
   {
-    search: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
-    replace: '<a href="$1" target="_blank">$1</a>',
-    name: 'links'
-  }, {
+    search: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /* http://anycharacter except end of text, <br> or space*/
+    replace: "<a href=\"$1\" target=\"_blank\">$1</a>",
+    name: "links",
+  },
+  {
     search: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/g,
-    replace: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
-    name: 'embeddedYoutube'
+    replace: "<div class=\"youtube-player\" data-id=\"$1\" data-time=\"$2\"><div><img src=\"https://i.ytimg.com/vi/$1/hqdefault.jpg\"><div class=\"icon-youtube-play\"></div></div></div>",
+    name: "embeddedYoutube",
   },
   {
     search: /```(.+?)(?=```)```/g,
-    replace: '<pre>$1</pre>',
-    name: 'highlightCode'
+    replace: "<pre>$1</pre>",
+    name: "highlightCode",
   },
   {
     search: new RegExp(`(^\(\d\d:\d\d:\d\d\)\s${USERNAME_REGEX}:)(.*)&gt;&gt;&gt;<br>`),
-    replace: '<div class="quote"><span>$1</span>$2</div>',
-    name: 'quote'
-  }
+    replace: "<div class=\"quote\"><span>$1</span>$2</div>",
+    name: "quote",
+  },
 ];
 
 export function getCurrentWordInHtml(el: HTMLElement) {
   let position = 0;
   const sel: Selection = window.getSelection()!;
   if (!sel.rangeCount) {
-    return
+    return;
   }
   const range = sel.getRangeAt(0);
   if (range.commonAncestorContainer.parentNode === el) {
     position = range.endOffset;
   }
   // Get content of div
-  const content = (range.commonAncestorContainer as any).data; // this this is undefined todo, really undefied somethng
+  const content = (range.commonAncestorContainer as any).data; // This this is undefined todo, really undefied somethng
 
-  if (!content) { // content is undefined when e.g. user selects all
+  if (!content) { // Content is undefined when e.g. user selects all
     return "";
   }
 
   // Check if clicked at the end of word
-  position = content![position] === ' ' ? position - 1 : position;  /* TODO vue.js:1897 TypeError: Cannot read property '0' of undefined*/
+  position = content[position] === " " ? position - 1 : position; /* TODO vue.js:1897 TypeError: Cannot read property '0' of undefined*/
 
   // Get the start and end index
-  let startPosition = content!.lastIndexOf(' ', position);
-  startPosition = startPosition === content!.length ? 0 : startPosition;
-  let endPosition = content!.indexOf(' ', position);
-  endPosition = endPosition === -1 ? content!.length : endPosition;
+  let startPosition = content.lastIndexOf(" ", position);
+  startPosition = startPosition === content.length ? 0 : startPosition;
+  let endPosition = content.indexOf(" ", position);
+  endPosition = endPosition === -1 ? content.length : endPosition;
 
-  return content!.substring(startPosition + 1, endPosition);
+  return content.substring(startPosition + 1, endPosition);
 }
 
 export function sliceZero(n: number, count: number = -2) {
-  return String('00' + n).slice(count);
+  return String(`00${n}`).slice(count);
 }
 
 export function timeToString(time: number) {
   const date = new Date(time);
 
-  return [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
+  return [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(":");
 }
 
-const replaceHtmlRegex = new RegExp('[' + Object.keys(escapeMap).join('') + ']', 'g');
+const replaceHtmlRegex = new RegExp(`[${Object.keys(escapeMap).join("")}]`, "g");
 
 export function encodeHTML(html: string) {
-  return html.replace(replaceHtmlRegex, s => escapeMap[s]);
+  return html.replace(replaceHtmlRegex, (s) => escapeMap[s]);
 }
 
 export function getFlagPath(countryCode: string) {
@@ -149,7 +139,7 @@ export function getFlagPath(countryCode: string) {
 
 
 export function getSmileyHtml(symbol: string) {
-  let smile: Smile | undefined = allSmileysKeys[symbol];
+  const smile: Smile | undefined = allSmileysKeys[symbol];
   if (!smile) {
     throw Error(`Invalid smile ${symbol}`);
   }
@@ -160,21 +150,21 @@ export function getSmileyHtml(symbol: string) {
 export function getGiphyHtml(gif: GIFObject) {
   let src;
   if (gif.images.fixed_height_small) {
-    src =  webpSupported && gif.images.fixed_height_small.webp ? gif.images.fixed_height_small.webp : gif.images.fixed_height_small.url;
+    src = webpSupported && gif.images.fixed_height_small.webp ? gif.images.fixed_height_small.webp : gif.images.fixed_height_small.url;
   } else if (gif.images.fixed_height) {
     src = webpSupported && gif.images.fixed_height.webp ? gif.images.fixed_height.webp : gif.images.fixed_height.url;
   } else {
-    throw Error(`Invalid image ${JSON.stringify(gif)}`)
+    throw Error(`Invalid image ${JSON.stringify(gif)}`);
   }
-  const webp = gif.images.original.webp ? `webp="${gif.images.original.webp}"` : ``;
+  const webp = gif.images.original.webp ? `webp="${gif.images.original.webp}"` : "";
   return `<img src="${src}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" ${webp} url="${gif.images.original.url}" />`;
 }
 
-export function resolveMediaUrl<T extends string|null>(src: T): T {
+export function resolveMediaUrl<T extends string | null>(src: T): T {
   if (!src) {
     return null as T;
   }
-  return src.indexOf('blob:http') === 0 ? src : `${MEDIA_API_URL}${src}` as T;
+  return src.startsWith("blob:http") ? src : `${MEDIA_API_URL}${src}` as T;
 }
 
 export function encodeSmileys(html: string): string {
@@ -193,7 +183,7 @@ export function encodeP(data: MessageModel, store: DefaultStore) {
 }
 
 
-export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO wtf it's nullable?
+export const canvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO wtf it's nullable?
 
 export function placeCaretAtEnd(userMessage: HTMLElement) {
   const range = document.createRange();
@@ -204,21 +194,20 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
     sel.removeAllRanges();
     sel.addRange(range);
   } else {
-    logger.warn(`Can't place selection`)();
+    logger.warn("Can't place selection")();
   }
-
 }
 
 export function encodeMessage(data: MessageModel, store: DefaultStore) {
-  //logger.debug('Encoding message {}: {}', data.id, data)();
+  // Logger.debug('Encoding message {}: {}', data.id, data)();
   if (!data.content) {
     throw Error(`Message ${data.id} doesn't have content`);
   }
   let html = encodeHTML(data.content);
   const replaceElements: unknown[] = [];
   patterns.forEach((pattern) => {
-    if (store.userSettings
-        && store.userSettings[pattern.name as keyof CurrentUserSettingsModel] === false) { // can be undefined as well
+    if (store.userSettings &&
+        store.userSettings[pattern.name as keyof CurrentUserSettingsModel] === false) { // Can be undefined as well
       return;
     }
     const res = html.replace(pattern.search, pattern.replace);
@@ -228,67 +217,66 @@ export function encodeMessage(data: MessageModel, store: DefaultStore) {
     }
   });
   if (replaceElements.length) {
-    logger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
+    logger.debug("Replaced {} in message #{}", replaceElements.join(", "), data.id)();
   }
   html = encodeFiles(html, data.files);
-  html = encodeTags(html,  data.tags, store);
+  html = encodeTags(html, data.tags, store);
   return encodeSmileys(html);
 }
 
-function encodePTags(html: string,   tags: { [id: string]: number } | null, store: DefaultStore) {
+function encodePTags(html: string, tags: Record<string, number> | null, store: DefaultStore) {
   if (tags && Object.keys(tags).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = tags[s];
       if (v) {
-        let tag = createTag(store.allUsersDict[v]);
+        const tag = createTag(store.allUsersDict[v]);
         return tag.outerHTML;
       }
 
-      return s;  // if it's absent in files, it could be also in tags so return it. (don't replace )
+      return s; // If it's absent in files, it could be also in tags so return it. (don't replace )
     });
   }
   return html;
 }
 
-function encodeTags(html: string,   tags: { [id: string]: number } | null, store: DefaultStore) {
+function encodeTags(html: string, tags: Record<string, number> | null, store: DefaultStore) {
   if (tags && Object.keys(tags).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = tags[s];
       if (v) {
-        return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].user}</span>`
+        return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].user}</span>`;
       }
 
-      return s;  // if it's absent in files, it could be also in tags so return it. (don't replace )
+      return s; // If it's absent in files, it could be also in tags so return it. (don't replace )
     });
   }
   return html;
 }
 
 
-function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
+function encodeFiles(html: string, files: Record<string, FileModel> | null) {
   if (files && Object.keys(files).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];
       if (v) {
-        if (v.type === 'i') {
+        if (v.type === "i") {
           return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}' serverId="${v.serverId}"/>`;
-        } else if (v.type === 'v' || v.type === 'm') {
-          const className = v.type === 'v' ? 'video-player' : 'video-player video-record';
+        } else if (v.type === "v" || v.type === "m") {
+          const className = v.type === "v" ? "video-player" : "video-player video-record";
 
-          return `<div class='${className}' serverId="${v.serverId}" associatedVideo='${v.url}'><div><img ${v.preview? `src="${resolveMediaUrl(v.preview)}"`: ""} symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
-        } else if (v.type === 'a') {
+          return `<div class='${className}' serverId="${v.serverId}" associatedVideo='${v.url}'><div><img ${v.preview ? `src="${resolveMediaUrl(v.preview)}"` : ""} symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+        } else if (v.type === "a") {
           return `<img src='${recordIcon}' serverId="${v.serverId}" symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
-        } else if (v.type === 'f') {
+        } else if (v.type === "f") {
           return `<a href="${resolveMediaUrl(v.url!)}" serverId="${v.serverId}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
-        } else if (v.type === 'g') {
-          // giphy api sometimes doesn't contain webp, so it can be null
-          return `<img serverId="${v.serverId}" src='${webpSupported && v.preview? v.preview : v.url}' ${v.preview ? `webp="${v.preview}"`: ''} url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
-        }  else {
-          logger.error('Invalid type {}', v.type)();
+        } else if (v.type === "g") {
+          // Giphy api sometimes doesn't contain webp, so it can be null
+          return `<img serverId="${v.serverId}" src='${webpSupported && v.preview ? v.preview : v.url}' ${v.preview ? `webp="${v.preview}"` : ""} url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
         }
+        logger.error("Invalid type {}", v.type)();
       }
 
-      return s; // if it's absent in files, it could be also in tags so return it. (don't replace )
+      return s; // If it's absent in files, it could be also in tags so return it. (don't replace )
     });
   }
 
@@ -302,58 +290,59 @@ function getUniqueTagId() {
 }
 
 export function createTag(user: UserModel) {
-  let a = document.createElement('span');
+  const a = document.createElement("span");
 
-  const style = document.createElement('style');
-  style.type = 'text/css';
-  let id = `usertag${getUniqueTagId()}`;
+  const style = document.createElement("style");
+  style.type = "text/css";
+  const id = `usertag${getUniqueTagId()}`;
   style.innerHTML = ` #${id}:after { content: '@${user.user}'}`;
-  document.getElementsByTagName('head')[0].appendChild(style);
+  document.getElementsByTagName("head")[0].appendChild(style);
   a.id = id;
 
-  a.setAttribute('user-id', String(user.id));
-  a.className = 'tag-user';
+  a.setAttribute("user-id", String(user.id));
+  a.className = "tag-user";
   return a;
 }
 
 export function replaceCurrentWord(containerEl: HTMLElement, replacedTo: HTMLElement) {
   containerEl.focus();
   let range;
-  let sel = window.getSelection()!;
+  const sel = window.getSelection()!;
   if (sel.rangeCount === 0) {
-    logger.error('Can\'t place tag, rangeCount is 0')();
-    return
+    logger.error("Can't place tag, rangeCount is 0")();
+    return;
   }
   range = sel.getRangeAt(0).cloneRange()!;
   range.collapse(true);
   range.setStart(containerEl, 0);
 
-  let words = range.toString().trim().split(' ');
-  let lastWord = words[words.length - 1];
+  const words = range.toString().trim().
+    split(" ");
+  const lastWord = words[words.length - 1];
 
   if (!lastWord) {
-    logger.error('Can\'t place tag, last word not found')();
+    logger.error("Can't place tag, last word not found")();
   }
-  logger.log('replace word ' + lastWord)();
+  logger.log(`replace word ${lastWord}`)();
 
   /* Find word start and end */
-  let data = (range.endContainer as any).data;
+  const {data} = range.endContainer as any;
   if (!data) {
-    logger.error('Can\'t place tag, Selected word data is null')();
-    return
+    logger.error("Can't place tag, Selected word data is null")();
+    return;
   }
-  let wordStart = data.lastIndexOf(lastWord);
-  let wordEnd = wordStart + lastWord.length;
-  logger.log('pos: (' + wordStart + ', ' + wordEnd + ')')();
+  const wordStart = data.lastIndexOf(lastWord);
+  const wordEnd = wordStart + lastWord.length;
+  logger.log(`pos: (${wordStart}, ${wordEnd})`)();
 
   range.setStart(range.endContainer, wordStart);
   range.setEnd(range.endContainer, wordEnd);
   range.deleteContents();
   range.insertNode(replacedTo);
-  // delete That specific word and replace if with resultValue
+  // Delete That specific word and replace if with resultValue
 
   range.setStartAfter(replacedTo);
-  let textAfter = document.createTextNode(' ');
+  const textAfter = document.createTextNode(" ");
   range.insertNode(textAfter);
   range.setStartAfter(textAfter);
   sel.removeAllRanges();
@@ -366,8 +355,11 @@ export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
   if (sel) {
     let range = sel.getRangeAt(0);
     range.deleteContents();
-    // Range.createContextualFragment() would be useful here but is
-    // non-standard and not supported in all browsers (IE9, for one)
+
+    /*
+     * Range.createContextualFragment() would be useful here but is
+     * non-standard and not supported in all browsers (IE9, for one)
+     */
     const frag = document.createDocumentFragment();
     frag.appendChild(img);
     range.insertNode(frag);
@@ -379,31 +371,31 @@ export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
     sel.addRange(range);
   } else {
     div.appendChild(img);
-    logger.warn(`Can't handle selection`)();
+    logger.warn("Can't handle selection")();
   }
 }
 
 export function pasteHtmlAtCaret(html: string, div: HTMLElement) {
-  const divOuter = document.createElement('div');
+  const divOuter = document.createElement("div");
   divOuter.innerHTML = html;
   const img: Node | null = divOuter.firstChild;
   if (!img) {
-    throw Error(`Can't paste image`);
+    throw Error("Can't paste image");
   }
   pasteNodeAtCaret(img, div);
 }
 
 export function setVideoEvent(e: HTMLElement) {
-  const r: NodeListOf<HTMLElement> = e.querySelectorAll('.video-player');
-  forEach(r, e => {
-    const querySelector: HTMLElement = <HTMLElement>e.querySelector('.icon-youtube-play')!;
-    const url: string = e.getAttribute('associatedVideo')!;
-    logger.debug('Embedding video url {}', url)();
-    querySelector.onclick = function (event) {
-      const video = document.createElement('video');
-      video.setAttribute('controls', '');
-      video.className = 'video-player-ready';
-      logger.debug('Replacing video url {}', url)();
+  const r: NodeListOf<HTMLElement> = e.querySelectorAll(".video-player");
+  forEach(r, (e) => {
+    const querySelector: HTMLElement = e.querySelector(".icon-youtube-play")!;
+    const url: string = e.getAttribute("associatedVideo")!;
+    logger.debug("Embedding video url {}", url)();
+    querySelector.onclick = function(event) {
+      const video = document.createElement("video");
+      video.setAttribute("controls", "");
+      video.className = "video-player-ready";
+      logger.debug("Replacing video url {}", url)();
       video.src = resolveMediaUrl(url);
       e.parentNode!.replaceChild(video, e);
       video.play();
@@ -412,15 +404,15 @@ export function setVideoEvent(e: HTMLElement) {
 }
 
 export function setAudioEvent(e: HTMLElement) {
-  const r: NodeListOf<HTMLElement> = e.querySelectorAll('.audio-record');
+  const r: NodeListOf<HTMLElement> = e.querySelectorAll(".audio-record");
   forEach<HTMLElement>(r, (e: HTMLElement) => {
-    e.onclick = function (event) {
-      const associatedAudio: string = e.getAttribute('associatedAudio')!;
+    e.onclick = function(event) {
+      const associatedAudio: string = e.getAttribute("associatedAudio")!;
       const url: string = resolveMediaUrl(associatedAudio);
-      const audio = document.createElement('audio');
-      audio.setAttribute('controls', '');
-      audio.className = 'audio-player-ready';
-      logger.debug('Replacing audio url {}', url)();
+      const audio = document.createElement("audio");
+      audio.setAttribute("controls", "");
+      audio.className = "audio-player-ready";
+      logger.debug("Replacing audio url {}", url)();
       audio.src = url;
       e.parentNode!.replaceChild(audio, e);
       audio.play();
@@ -429,16 +421,16 @@ export function setAudioEvent(e: HTMLElement) {
 }
 
 export function setImageFailEvents(e: HTMLElement, bus: Emitter<any>) {
-  const r = e.querySelectorAll('img');
+  const r = e.querySelectorAll("img");
   for (let i = 0; i < r.length; i++) {
-    (function (img) {
-      img.onerror = function () {
-        this.className += ' failed';
+    (function(img) {
+      img.onerror = function() {
+        this.className += " failed";
       };
-      img.onload = function () {
-        bus.emit('scroll');
+      img.onload = function() {
+        bus.emit("scroll");
       };
-    })(r[i]);
+    }(r[i]));
   }
 }
 
@@ -466,25 +458,25 @@ function getTime(time: string): number {
 }
 
 export function setYoutubeEvent(e: HTMLElement) {
-  const r: NodeListOf<HTMLElement> = e.querySelectorAll('.youtube-player');
+  const r: NodeListOf<HTMLElement> = e.querySelectorAll(".youtube-player");
   forEach(r, (a: HTMLElement) => {
-    const querySelector: HTMLElement = <HTMLElement>a.querySelector('.icon-youtube-play')!;
-    const id = a.getAttribute('data-id');
-    logger.debug('Embedding youtube view {}', id)();
-    querySelector.onclick = function (event: MouseEvent) {
-      const iframe = document.createElement('iframe');
-      let time: string = getTime(e.getAttribute('data-time')!).toString();
+    const querySelector: HTMLElement = a.querySelector(".icon-youtube-play")!;
+    const id = a.getAttribute("data-id");
+    logger.debug("Embedding youtube view {}", id)();
+    querySelector.onclick = function(event: MouseEvent) {
+      const iframe = document.createElement("iframe");
+      let time: string = getTime(e.getAttribute("data-time")!).toString();
       if (time) {
-        time = '&start=' + time;
+        time = `&start=${time}`;
       } else {
-        time = '';
+        time = "";
       }
       const src = `https://www.youtube.com/embed/${id}?autoplay=1${time}`;
-      iframe.setAttribute('src', src);
-      iframe.setAttribute('frameborder', '0');
-      iframe.className = 'video-player-ready';
-      logger.log('Replacing youtube url {}', src)();
-      iframe.setAttribute('allowfullscreen', '1');
+      iframe.setAttribute("src", src);
+      iframe.setAttribute("frameborder", "0");
+      iframe.className = "video-player-ready";
+      logger.log("Replacing youtube url {}", src)();
+      iframe.setAttribute("allowfullscreen", "1");
       e.parentNode!.replaceChild(iframe, e);
     };
   });
@@ -492,23 +484,25 @@ export function setYoutubeEvent(e: HTMLElement) {
 
 export function stopVideo(stream: MediaStream | null) {
   if (stream) {
-    logger.debug('Stopping stream {}', stream)();
+    logger.debug("Stopping stream {}", stream)();
     if ((stream as any).stop) {
       (stream as any).stop();
     } else {
-      stream.getTracks().forEach(e => e.stop());
+      stream.getTracks().forEach((e) => {
+        e.stop();
+      });
     }
   }
 }
 
 function setBlobName(blob: Blob) {
-  if (!blob.name && blob.type.indexOf('/') > 1) {
-    blob.name = '.' + blob.type.split('/')[1];
+  if (!blob.name && blob.type.indexOf("/") > 1) {
+    blob.name = `.${blob.type.split("/")[1]}`;
   }
 }
 
 function blobToImg(blob: Blob) {
-  const img = document.createElement('img');
+  const img = document.createElement("img");
   img.className = PASTED_IMG_CLASS;
   const src = URL.createObjectURL(blob);
   img.src = src;
@@ -524,35 +518,35 @@ export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
 }
 
 export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType: string, errCb: Function) {
-  const video = document.createElement('video');
+  const video = document.createElement("video");
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
     const src = URL.createObjectURL(file);
     video.loop = false;
-    video.addEventListener('loadeddata', function () {
+    video.addEventListener("loadeddata", () => {
       tmpCanvasContext.canvas.width = video.videoWidth;
       tmpCanvasContext.canvas.height = video.videoHeight;
       tmpCanvasContext.drawImage(video, 0, 0);
       tmpCanvasContext.canvas.toBlob(
-        function (blob) {
-          const img = document.createElement('img');
+        (blob) => {
+          const img = document.createElement("img");
           if (!blob) {
-             logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
-             img.src = videoIcon as string;
+            logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
+            img.src = videoIcon as string;
           } else {
             const url = URL.createObjectURL(blob);
             savedFiles[url] = blob;
-            blob.name = '.jpg';
+            blob.name = ".jpg";
             img.src = url;
           }
           img.className = PASTED_IMG_CLASS;
-          img.setAttribute('videoType', videoType);
-          img.setAttribute('associatedVideo', src);
+          img.setAttribute("videoType", videoType);
+          img.setAttribute("associatedVideo", src);
           savedFiles[src] = file;
           pasteNodeAtCaret(img, textArea);
         },
-        'image/jpeg',
-        0.95
+        "image/jpeg",
+        0.95,
       );
     }, false);
     video.src = src;
@@ -562,9 +556,9 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
 }
 
 export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
-  const img = document.createElement('img');
+  const img = document.createElement("img");
   const associatedAudio = URL.createObjectURL(file);
-  img.setAttribute('associatedAudio', associatedAudio);
+  img.setAttribute("associatedAudio", associatedAudio);
   img.className = `audio-record ${PASTED_IMG_CLASS}`;
   setBlobName(file);
   savedFiles[associatedAudio] = file;
@@ -573,9 +567,9 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
 }
 
 export function pasteBlobFileToTextArea(file: Blob, textArea: HTMLElement) {
-  const img = document.createElement('img');
+  const img = document.createElement("img");
   const associatedFile = URL.createObjectURL(file);
-  img.setAttribute('associatedFile', associatedFile);
+  img.setAttribute("associatedFile", associatedFile);
   img.className = `uploading-file ${PASTED_IMG_CLASS}`;
   setBlobName(file);
   savedFiles[associatedFile] = file;
@@ -586,27 +580,27 @@ export function pasteBlobFileToTextArea(file: Blob, textArea: HTMLElement) {
 
 export function pasteFileToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
   if (file.size > 90_000_000) {
-    errCb(`Can't upload file greater than 90MB`);
+    errCb("Can't upload file greater than 90MB");
   } else {
     pasteBlobFileToTextArea(file, textArea);
   }
 }
 
 export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
-  if (file.type.indexOf('image') >= 0) {
+  if (file.type.includes("image")) {
     const img = blobToImg(file);
     pasteNodeAtCaret(img, textArea);
-  } else if (file.type.indexOf('video') >= 0) {
-    pasteBlobVideoToTextArea(file, textArea, 'v', errCb);
+  } else if (file.type.includes("video")) {
+    pasteBlobVideoToTextArea(file, textArea, "v", errCb);
   } else {
     errCb(`Pasted file type ${file.type}, which is not an image`);
   }
 }
 
 export async function highlightCode(element: HTMLElement) {
-  const s = element.querySelectorAll('pre');
+  const s = element.querySelectorAll("pre");
   if (s.length) {
-    const hljs = await import('highlight.js')
+    const hljs = await import("highlight.js");
     for (let i = 0; i < s.length; i++) {
       hljs.default.highlightBlock(s[i]);
     }
@@ -618,19 +612,19 @@ function nextChar(c: string): string {
 }
 
 export function getMessageData(userMessage: HTMLElement, messageModel?: MessageModel): MessageDataEncode {
-  let currSymbol: string =  messageModel?.symbol ?? '\u3500';
-  const files: Record<string, FileModel>| null = {}; // return array from nodeList
+  let currSymbol: string = messageModel?.symbol ?? "\u3500";
+  const files: Record<string, FileModel> | null = {}; // Return array from nodeList
   const images = userMessage.querySelectorAll(`.${PASTED_IMG_CLASS}`);
-  forEach(images, img => {
-    let oldSymbol = img.getAttribute('symbol');
-    let src = img.getAttribute('src');
-    const assVideo = img.getAttribute('associatedVideo') ?? null;
-    const assAudio = img.getAttribute('associatedAudio')  ?? null;
-    const assFile = img.getAttribute('associatedFile')  ?? null;
-    const serverId = parseInt(img.getAttribute('serverId')!);
-    const asGiphy = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('url') : null;
-    const asGiphyPreview = img.className.indexOf(PASTED_GIPHY_CLASS) >= 0 ? img.getAttribute('webp') : null;
-    const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
+  forEach(images, (img) => {
+    const oldSymbol = img.getAttribute("symbol");
+    const src = img.getAttribute("src");
+    const assVideo = img.getAttribute("associatedVideo") ?? null;
+    const assAudio = img.getAttribute("associatedAudio") ?? null;
+    const assFile = img.getAttribute("associatedFile") ?? null;
+    const serverId = parseInt(img.getAttribute("serverId")!);
+    const asGiphy = img.className.includes(PASTED_GIPHY_CLASS) ? img.getAttribute("url") : null;
+    const asGiphyPreview = img.className.includes(PASTED_GIPHY_CLASS) ? img.getAttribute("webp") : null;
+    const videoType: BlobType = img.getAttribute("videoType")! as BlobType;
 
     let elSymbol = oldSymbol;
     if (!elSymbol) {
@@ -642,7 +636,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     img.parentNode!.replaceChild(textNode, img);
 
     if (messageModel?.files) {
-      let fm: FileModel = messageModel.files[elSymbol];
+      const fm: FileModel = messageModel.files[elSymbol];
       if (fm && !fm.sending) {
         files[elSymbol] = fm;
         return;
@@ -652,13 +646,13 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     if (videoType) {
       type = videoType;
     } else if (assAudio) {
-      type = 'a'
+      type = "a";
     } else if (assFile) {
-      type = 'f'
+      type = "f";
     } else if (asGiphy) {
-      type = 'g'
+      type = "g";
     } else {
-      type = 'i'
+      type = "i";
     }
 
     let url: string;
@@ -673,7 +667,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     } else {
       url = src!;
     }
-    let preview: string|null = null;
+    let preview: string | null = null;
     if (assVideo && src !== videoIcon) {
       preview = src;
     } else if (asGiphyPreview) {
@@ -687,27 +681,29 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
       preview,
       url,
       serverId: serverId || null,
-      sending: !asGiphy, // if it's not giphy, we need to transfer it to backend. giphy as absolute url already
+      sending: !asGiphy, // If it's not giphy, we need to transfer it to backend. giphy as absolute url already
       fileId: null,
       previewFileId: null,
-    }
-
+    };
   });
-  let tags: Record<string, number> = {};
-  forEach(userMessage.querySelectorAll(`.tag-user`), img => {
+  const tags: Record<string, number> = {};
+  forEach(userMessage.querySelectorAll(".tag-user"), (img) => {
     currSymbol = nextChar(currSymbol);
-    tags[currSymbol] =  parseInt(img.getAttribute('user-id')!);
+    tags[currSymbol] = parseInt(img.getAttribute("user-id")!);
 
-    /// https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/replaceWith
+    // / https://developer.mozilla.org/en-US/docs/Web/API/ChildNode/replaceWith
     img.replaceWith(document.createTextNode(currSymbol));
   });
-  userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
-  let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
-  messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
+  userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, "$1");
+  let messageContent: string | null = typeof userMessage.innerText !== "undefined" ? userMessage.innerText : userMessage.textContent;
+  messageContent = !messageContent || (/^\s*$/).test(messageContent) ? null : messageContent;
   if (messageContent) {
     messageContent = messageContent.trim();
   }
-  userMessage.innerHTML = '';
+  userMessage.innerHTML = "";
 
-  return {files, messageContent, currSymbol, tags};
+  return {files,
+    messageContent,
+    currSymbol,
+    tags};
 }

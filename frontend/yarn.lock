@@ -2912,11 +2912,6 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
-run-s@^0.0.0:
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/run-s/-/run-s-0.0.0.tgz#599912be20c00ba7698655c9936d075d31b71754"
-  integrity sha1-WZkSviDAC6dphlXJk20HXTG3F1Q=
-
 safe-buffer@~5.1.0, safe-buffer@~5.1.1:
   version "5.1.2"
   resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"

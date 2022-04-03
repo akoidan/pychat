@@ -1,78 +1,81 @@
-import loggerFactory from '@/ts/instances/loggerFactory';
-import { Logger } from 'lines-logger';
-import WsHandler from '@/ts/message_handlers/WsHandler';
-import {
-  FileTransferStatus,
-  ReceivingFile
-} from '@/ts/types/model';
-import FileHandler from '@/ts/webrtc/file/FileHandler';
-import NotifierHandler from '@/ts/classes/NotificationHandler';
-import MessageHandler from '@/ts/message_handlers/MesageHandler';
-import { sub } from '@/ts/instances/subInstance';
-import { MAX_ACCEPT_FILE_SIZE_WO_FS_API } from '@/ts/utils/consts';
+import loggerFactory from "@/ts/instances/loggerFactory";
+import type { Logger } from "lines-logger";
+import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type { ReceivingFile, } from "@/ts/types/model";
+import { FileTransferStatus, } from "@/ts/types/model";
+import FileHandler from "@/ts/webrtc/file/FileHandler";
+import type NotifierHandler from "@/ts/classes/NotificationHandler";
+import MessageHandler from "@/ts/message_handlers/MesageHandler";
+import { sub } from "@/ts/instances/subInstance";
+import { MAX_ACCEPT_FILE_SIZE_WO_FS_API } from "@/ts/utils/consts";
 import {
   requestFileSystem,
-  resolveMediaUrl
-} from '@/ts/utils/htmlApi';
-import FileReceiverPeerConnection from '@/ts/webrtc/file/FileReceiveerPeerConnection';
-import Subscription from '@/ts/classes/Subscription';
-import CallHandler from '@/ts/webrtc/call/CallHandler';
-import faviconUrl from '@/assets/img/favicon.ico';
-import { DefaultStore } from '@/ts/classes/DefaultStore';
-import { browserVersion } from '@/ts/utils/runtimeConsts';
-import MessageTransferHandler from '@/ts/webrtc/message/MessageTransferHandler';
-import { bytesToSize } from '@/ts/utils/pureFunctions';
-import {
+  resolveMediaUrl,
+} from "@/ts/utils/htmlApi";
+import FileReceiverPeerConnection from "@/ts/webrtc/file/FileReceiveerPeerConnection";
+import Subscription from "@/ts/classes/Subscription";
+import CallHandler from "@/ts/webrtc/call/CallHandler";
+import faviconUrl from "@/assets/img/favicon.ico";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import { browserVersion } from "@/ts/utils/runtimeConsts";
+import MessageTransferHandler from "@/ts/webrtc/message/MessageTransferHandler";
+import { bytesToSize } from "@/ts/utils/pureFunctions";
+import type {
   NotifyCallActiveMessage,
   OfferCall,
   OfferFile,
   OfferMessage,
-  WebRtcSetConnectionIdMessage
-} from '@/ts/types/messages/wsInMessages';
-import {
+  WebRtcSetConnectionIdMessage,
+} from "@/ts/types/messages/wsInMessages";
+import type {
   HandlerName,
   HandlerType,
-  HandlerTypes
-} from '@/ts/types/messages/baseMessagesInterfaces';
-import { VideoType } from '@/ts/types/types';
-import {
+  HandlerTypes,
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import type { VideoType } from "@/ts/types/types";
+import type {
   ChangeP2pRoomInfoMessage,
   ChangeUserOnlineInfoMessage,
   InternetAppearMessage,
-  LogoutMessage
-} from '@/ts/types/messages/innerMessages';
-import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
-import {MessageSenderProxy} from '@/ts/message_handlers/MessageSenderProxy';
+  LogoutMessage,
+} from "@/ts/types/messages/innerMessages";
+import type { MessageHelper } from "@/ts/message_handlers/MessageHelper";
+import type { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
 
 export default class WebRtcApi extends MessageHandler {
-
   protected logger: Logger;
 
-  protected readonly handlers: HandlerTypes<keyof WebRtcApi, 'webrtc'>  = {
-    offerFile: <HandlerType<'offerFile', 'webrtc'>>this.offerFile,
-    changeDevices: <HandlerType<'changeDevices', 'webrtc'>>this.changeDevices,
-    offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
-    offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
-    changeOnline: <HandlerType<'changeOnline', 'webrtc'>>this.changeOnline,
-    logout: <HandlerType<'logout', HandlerName>>this.logout,
-    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
-    notifyCallActive:  <HandlerType<'notifyCallActive', HandlerName>>this.notifyCallActive
+  protected readonly handlers: HandlerTypes<keyof WebRtcApi, "webrtc"> = {
+    offerFile: <HandlerType<"offerFile", "webrtc">> this.offerFile,
+    changeDevices: <HandlerType<"changeDevices", "webrtc">> this.changeDevices,
+    offerCall: <HandlerType<"offerCall", "webrtc">> this.offerCall,
+    offerMessage: <HandlerType<"offerMessage", "webrtc">> this.offerMessage,
+    changeOnline: <HandlerType<"changeOnline", "webrtc">> this.changeOnline,
+    logout: <HandlerType<"logout", HandlerName>> this.logout,
+    internetAppear: <HandlerType<"internetAppear", HandlerName>> this.internetAppear,
+    notifyCallActive: <HandlerType<"notifyCallActive", HandlerName>> this.notifyCallActive,
   };
 
   private readonly wsHandler: WsHandler;
+
   private readonly store: DefaultStore;
+
   private readonly notifier: NotifierHandler;
-  private readonly callHandlers: {[id: number]: CallHandler} = {};
+
+  private readonly callHandlers: Record<number, CallHandler> = {};
+
   private readonly messageHandlers: Record<number, MessageTransferHandler> = {};
+
   private readonly messageHelper: MessageHelper;
-  private messageSenderProxy!: MessageSenderProxy; // via setter
+
+  private messageSenderProxy!: MessageSenderProxy; // Via setter
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper) {
     super();
-    sub.subscribe('webrtc', this);
+    sub.subscribe("webrtc", this);
     this.wsHandler = ws;
     this.notifier = notifier;
-    this.logger = loggerFactory.getLogger('WEBRTC');
+    this.logger = loggerFactory.getLogger("WEBRTC");
     this.store = store;
     this.messageHelper = messageHelper;
   }
@@ -91,52 +94,56 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public async changeDevices(m: ChangeP2pRoomInfoMessage): Promise<void> {
-    this.logger.log('change devices {}', m)();
+    this.logger.log("change devices {}", m)();
     this.updateCallTransfer(m);
     await this.updateMessagesTransfer(m);
   }
 
   private updateCallTransfer(m: ChangeP2pRoomInfoMessage) {
-    if (m.changeType === 'someone_joined' || m.changeType === 'someone_left') {
-      this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(m.userId!)).forEach(r => {
-        if (m.changeType === 'someone_joined') {
+    if (m.changeType === "someone_joined" || m.changeType === "someone_left") {
+      this.store.roomsArray.filter((r) => r.callInfo.callActive && r.users.includes(m.userId!)).forEach((r) => {
+        if (m.changeType === "someone_joined") {
           if (this.store.onlineDict[m.userId!]) {
             this.store.onlineDict[m.userId!].forEach((opponentWsId: string) => {
-              this.getCallHandler(r.id).createCallPeerConnection({opponentWsId, userId: m.userId!});
+              this.getCallHandler(r.id).createCallPeerConnection({opponentWsId,
+                userId: m.userId!});
               this.wsHandler.notifyCallActive({
                 opponentWsId,
                 connectionId: this.getCallHandler(r.id).getConnectionId(),
-                roomId: r.id
+                roomId: r.id,
               });
-            })
+            });
           }
         } else {
-          // we dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
+          // We dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
           if (this.callHandlers[r.id]) {
             this.callHandlers[r.id].removeUserOpponent(m.userId!);
           }
         }
-      })
+      });
     }
   }
 
   private async updateMessagesTransfer(m: ChangeP2pRoomInfoMessage) {
-    if (m.changeType === 'i_deleted') { // destroy my room
-      let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
+    if (m.changeType === "i_deleted") { // Destroy my room
+      const mh: MessageTransferHandler = this.messageHandlers[m.roomId];
       if (mh) {
         mh.destroyThisTransferHandler();
       }
-      delete this.messageHandlers[m.roomId!];
-    } else if (this.store.roomsDict[m.roomId!]?.p2p) {
-      //  'someone_left' - destroy peer connection in this room
-      //  'room_created' - send to everyone when new room is created
-      //  'someone_joined' - send to everyone when someone joins the room, but the member who joins receives 'invited'
-      await this.getMessageHandler(m.roomId!).initOrSync();
+      delete this.messageHandlers[m.roomId];
+    } else if (this.store.roomsDict[m.roomId]?.p2p) {
+
+      /*
+       *  'someone_left' - destroy peer connection in this room
+       *  'room_created' - send to everyone when new room is created
+       *  'someone_joined' - send to everyone when someone joins the room, but the member who joins receives 'invited'
+       */
+      await this.getMessageHandler(m.roomId).initOrSync();
     }
   }
 
   initAndSyncMessages() {
-    this.store.roomsArray.forEach(room => {
+    this.store.roomsArray.forEach((room) => {
       if (room.p2p) {
         this.getMessageHandler(room.id).initOrSync();
       }
@@ -152,17 +159,20 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public changeOnline(message: ChangeUserOnlineInfoMessage) {
-    this.store.roomsArray.filter(r => r.callInfo.callActive && r.users.includes(message.userId)).forEach(r => {
-      if (message.changeType === 'appear_online') {
-        this.getCallHandler(r.id).createCallPeerConnection({opponentWsId: message.opponentWsId, userId: message.userId});
-        this.wsHandler.notifyCallActive({opponentWsId: message.opponentWsId, connectionId: this.getCallHandler(r.id).getConnectionId(), roomId: r.id});
+    this.store.roomsArray.filter((r) => r.callInfo.callActive && r.users.includes(message.userId)).forEach((r) => {
+      if (message.changeType === "appear_online") {
+        this.getCallHandler(r.id).createCallPeerConnection({opponentWsId: message.opponentWsId,
+          userId: message.userId});
+        this.wsHandler.notifyCallActive({opponentWsId: message.opponentWsId,
+          connectionId: this.getCallHandler(r.id).getConnectionId(),
+          roomId: r.id});
       } else {
-        // we dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
+        // We dont need to destroy PC here, since disconnect from the server doesn't mean we lost the pear
         if (this.callHandlers[r.id]) {
           this.callHandlers[r.id].removeOpponent(message.opponentWsId);
         }
       }
-    })
+    });
   }
 
   public offerMessage(message: OfferMessage) {
@@ -170,18 +180,21 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public acceptFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'acceptFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+    sub.notify({action: "acceptFileReply",
+      handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
   public declineSending(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'declineSending', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+    sub.notify({action: "declineSending",
+      handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
   public declineFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+    sub.notify({action: "declineFileReply",
+      handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
-  public async sendFileOffer(file: File, channel: number, threadId: number|null) {
+  public async sendFileOffer(file: File, channel: number, threadId: number | null) {
     if (file.size > 0) {
       const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, threadId);
       new FileHandler(channel, threadId, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
@@ -191,8 +204,8 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public retryFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'retryFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
-
+    sub.notify({action: "retryFileReply",
+      handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
   public getCallHandler(roomId: number): CallHandler {
@@ -216,15 +229,18 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public answerCall(connId: string) {
-    sub.notify({action: 'answerCall', handler: Subscription.getTransferId(connId)});
+    sub.notify({action: "answerCall",
+      handler: Subscription.getTransferId(connId)});
   }
 
   public declineCall(connId: string) {
-    sub.notify({action: 'declineCall', handler: Subscription.getTransferId(connId)});
+    sub.notify({action: "declineCall",
+      handler: Subscription.getTransferId(connId)});
   }
 
   public videoAnswerCall(connId: string) {
-    sub.notify({action: 'videoAnswerCall', handler: Subscription.getTransferId(connId)});
+    sub.notify({action: "videoAnswerCall",
+      handler: Subscription.getTransferId(connId)});
   }
 
   public hangCall(roomId: number) {
@@ -250,7 +266,6 @@ export default class WebRtcApi extends MessageHandler {
     for (const k in this.messageHandlers) {
       this.messageHandlers[k].destroyThisTransferHandler();
     }
-
   }
 
   public offerFile(message: OfferFile): void {
@@ -268,14 +283,14 @@ export default class WebRtcApi extends MessageHandler {
       time: this.wsHandler.convertServerTimeToPC(message.time),
       upload: {
         uploaded: 0,
-        total: message.content.size
-      }
+        total: message.content.size,
+      },
     };
     this.notifier.showNotification(this.store.allUsersDict[message.userId].user, {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
       icon: resolveMediaUrl(this.store.allUsersDict[message.userId].image) || faviconUrl as string,
-      replaced: 1
+      replaced: 1,
     });
     this.store.addReceivingFile(payload);
     if (payload.threadId) {
@@ -286,6 +301,4 @@ export default class WebRtcApi extends MessageHandler {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
     }
   }
-
-
 }

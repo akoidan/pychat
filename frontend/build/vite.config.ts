@@ -45,7 +45,7 @@ export default defineConfig(async ({command, mode}) => {
       checker({
           typescript: true,
           vueTsc: true,
-          ...(command === 'serve' ? {eslint: {
+          ...(false ? {eslint: {
             lintCommand: 'eslint --ext .ts,.vue --max-warnings=0 src',
           }}: null)
         }

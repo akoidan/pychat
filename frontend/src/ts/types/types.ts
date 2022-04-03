@@ -1,4 +1,4 @@
-import {
+import type {
   CallInfoModel,
   ChannelModel,
   CurrentUserInfoModel,
@@ -10,21 +10,19 @@ import {
   RoomLog,
   RoomModel,
   RoomSettingsModel,
-  SearchModel,
   SendingFileTransfer,
   UploadProgressModel,
-  UserModel
-} from '@/ts/types/model';
-import {
-  MessageModelDto,
+  UserModel,
+} from "@/ts/types/model";
+import type {
   SaveFileResponse,
-  SetStateFromStorage
-} from '@/ts/types/dto';
+  SetStateFromStorage,
+} from "@/ts/types/dto";
 
 
 export interface UploadFile {
-   key: string;
-   file: File|Blob;
+  key: string;
+  file: Blob | File;
 }
 
 export type ValueFilterForKey<T extends object, U> = {
@@ -32,14 +30,11 @@ export type ValueFilterForKey<T extends object, U> = {
 }[keyof T];
 
 
-
-
-
 type StuctureMappedType<K extends string> = Record<K, K>;
 
 const sample: StuctureMappedType<string> = {
-  'any3': "andy3"
-}
+  any3: "andy3",
+};
 
 
 export interface UserIdConn {
@@ -48,26 +43,26 @@ export interface UserIdConn {
 }
 
 export interface MessageDataEncode {
-  messageContent: string|null;
-  files:  Record<string, FileModel>| null;
+  messageContent: string | null;
+  files: Record<string, FileModel> | null;
   currSymbol: string;
   tags: Record<string, number>;
 }
 
 export enum VideoType {
-  AUDIO, VIDEO, SHARE, PAINT
+  AUDIO, VIDEO, SHARE, PAINT,
 }
 
 export interface SetDevices {
-  microphones: { [id: string]: string };
-  speakers: { [id: string]: string };
-  webcams: { [id: string]: string };
+  microphones: Record<string, string>;
+  speakers: Record<string, string>;
+  webcams: Record<string, string>;
   roomId: number;
 }
 
 export interface MessageSender {
-  syncMessage(roomId: number, messageId: number):  Promise<void>;
-  loadMessages(roomId: number, messageId: number[]):  Promise<void>;
+  syncMessage(roomId: number, messageId: number): Promise<void>;
+  loadMessages(roomId: number, messageId: number[]): Promise<void>;
   loadUpMessages(roomId: number, count: number): Promise<void>;
   loadThreadMessages(roomId: number, threadId: number): Promise<void>;
   loadUpSearchMessages(roomId: number, count: number, checkIfSet: (found: boolean) => boolean): Promise<void>;
@@ -95,7 +90,7 @@ export interface SetUploadXHR {
 export interface SetCallOpponent {
   roomId: number;
   opponentWsId: string;
-  callInfoModel: CallInfoModel|null;
+  callInfoModel: CallInfoModel | null;
 }
 
 export interface MarkMessageAsRead {
@@ -128,7 +123,7 @@ export interface BooleanIdentifier {
 
 export interface ShareIdentifier {
   id: number;
-  type: 'webcam' | 'desktop'| 'paint';
+  type: "desktop" | "paint" | "webcam";
   state: boolean;
 }
 
@@ -144,7 +139,7 @@ export interface StringIdentifier {
 
 export interface MediaIdentifier {
   id: number;
-  media: MediaStream|null;
+  media: MediaStream | null;
 }
 
 export interface RoomLogEntry {
@@ -155,7 +150,7 @@ export interface RoomLogEntry {
 export interface SetMessageProgressError {
   messageId: number;
   roomId: number;
-  error: string|null;
+  error: string | null;
 }
 
 export interface SetFileIdsForMessage {
@@ -180,7 +175,7 @@ export interface MessageSupplier {
 }
 
 export interface IStorage {
-  // getIds(cb: SingleParamCB<object>);
+  // GetIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]): void;
   deleteMessage(id: number, replaceThreadId: number): void;
   setThreadMessageCount(mesageid: number, count: number): void;
@@ -201,15 +196,15 @@ export interface IStorage {
   saveUser(users: UserModel): void;
   clearStorage(): void;
   clearMessages(): void;
-  connect(): Promise<SetStateFromStorage|null>;
-  // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
+  connect(): Promise<SetStateFromStorage | null>;
+  // GetRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
   markMessageAsSent(messagesId: number[]): void;
 }
 
 export interface PostData {
   url: string;
-  params?: {[id: string]: string|Blob|null|number|boolean};
+  params?: Record<string, Blob | boolean | number | string | null>;
   formData?: FormData;
   isJsonEncoded?: boolean;
   isJsonDecoded?: boolean;
@@ -238,11 +233,11 @@ export interface SetReceivingFileStatus {
   roomId: number;
   connId: string;
   status: FileTransferStatus;
-  error?: string|null;
+  error?: string | null;
   anchor?: string;
 }
 
-export type ConnectionStatus = 'new' | 'closed';
+export type ConnectionStatus = "closed" | "new";
 
 interface SetSendingFileBase {
   roomId: number;
@@ -262,7 +257,7 @@ export interface SetReceivingFileUploaded {
 
 export interface SetSendingFileStatus extends SetSendingFileBase {
   status: FileTransferStatus;
-  error: string|null;
+  error: string | null;
 }
 
 export interface MessagesLocation {
@@ -280,8 +275,8 @@ export interface LiveConnectionLocation {
 }
 
 export interface PrivateRoomsIds {
-  userRooms: {[id: number]: number};
-  roomUsers: {[id: number]: number};
+  userRooms: Record<number, number>;
+  roomUsers: Record<number, number>;
 }
 export interface SetRoomsUsers {
   roomId: number;
@@ -308,9 +303,9 @@ export interface SetSearchTextTo {
 }
 
 export enum IconColor {
-  SUCCESS = 'success', ERROR = 'error', WARN = 'warn', NOT_SET = ''
+  SUCCESS = "success", ERROR = "error", WARN = "warn", NOT_SET = "",
 }
 
 export interface SessionHolder {
-  session: string|null;
+  session: string | null;
 }

@@ -1,99 +1,99 @@
-import { SessionHolder } from '@/ts/types/types';
+import type { SessionHolder } from "@/ts/types/types";
 
 /**
  * @param params : object dict of params or DOM form
  * @param callback : function calls on response
  * @param url : string url to post
  * @param formData : form in canse form is used
- * */
+ *
+ */
 
-export default class Fetch /*extends Http*/ {
-
+export default class Fetch /* Extends Http*/ {
   constructor(apiUrl: string, sessionHolder: SessionHolder) {
-    // super(apiUrl, sessionHolder);
+    // Super(apiUrl, sessionHolder);
   }
 
   //
   // /**
   //  * Loads file from server on runtime */
-  // public doGet<T>(fileUrl: string, callback: ErrorCB<T>, isJsonDecoded: boolean = false) {
-  //   fileUrl = this.getUrl(fileUrl);
-  //   this.httpLogger.log('GET out {}', fileUrl)();
-  //   let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
-  //   let fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
-  //   let xobj = new XMLHttpRequest();
+  // Public doGet<T>(fileUrl: string, callback: ErrorCB<T>, isJsonDecoded: boolean = false) {
+  //   FileUrl = this.getUrl(fileUrl);
+  //   This.httpLogger.log('GET out {}', fileUrl)();
+  //   Let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
+  //   Let fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
+  //   Let xobj = new XMLHttpRequest();
   //   // special for IE
-  //   if (xobj.overrideMimeType) {
-  //     xobj.overrideMimeType('application/json');
+  //   If (xobj.overrideMimeType) {
+  //     Xobj.overrideMimeType('application/json');
   //   }
-  //   xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
+  //   Xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
   //
-  //   xobj.onreadystatechange = this.getOnreadystatechange<T>(
-  //       xobj,
-  //       fileUrl,
-  //       isJsonDecoded || fileType === 'json',
+  //   Xobj.onreadystatechange = this.getOnreadystatechange<T>(
+  //       Xobj,
+  //       FileUrl,
+  //       IsJsonDecoded || fileType === 'json',
   //       'GET',
-  //       callback
+  //       Callback
   //   );
-  //   xobj.send(null);
+  //   Xobj.send(null);
   // }
   //
-  // async asyncPost<T>(d: PostData<T>) {
-  //   let config: RequestInit = {
-  //     cache: 'no-cache',
-  //     headers: {
+  // Async asyncPost<T>(d: PostData<T>) {
+  //   Let config: RequestInit = {
+  //     Cache: 'no-cache',
+  //     Headers: {
   //       'session-id': this.sessionHolder.session
   //     },
   //   };
-  //   if (d.isJsonEncoded) {
-  //     config.headers['Content-Type'] = 'application/json';
+  //   If (d.isJsonEncoded) {
+  //     Config.headers['Content-Type'] = 'application/json';
   //   } else {
-  //     let body;
-  //     let logOut: string = '';
-  //     body = d.formData ? d.formData : new FormData();
-  //     if (d.params) {
-  //       for (let key in d.params) {
-  //         body.append(key, d.params[key]);
+  //     Let body;
+  //     Let logOut: string = '';
+  //     Body = d.formData ? d.formData : new FormData();
+  //     If (d.params) {
+  //       For (let key in d.params) {
+  //         Body.append(key, d.params[key]);
   //       }
   //     }
-  //     if (body.entries) {
-  //       let entries = body.entries();
-  //       if (entries && entries.next) {
-  //         let d;
-  //         while (d = entries.next()) {
-  //           if (d.done) {
-  //             break;
+  //     If (body.entries) {
+  //       Let entries = body.entries();
+  //       If (entries && entries.next) {
+  //         Let d;
+  //         While (d = entries.next()) {
+  //           If (d.done) {
+  //             Break;
   //           }
-  //           logOut += `${d.value[0]}= ${d.value[1]};`;
+  //           LogOut += `${d.value[0]}= ${d.value[1]};`;
   //         }
   //       }
   //     }
   //   }
-  //   await fetch(d.url, config);
+  //   Await fetch(d.url, config);
   // }
   //
-  // doPost<T>(d: PostData<T>): XMLHttpRequest {
-  //   let r: XMLHttpRequest = new XMLHttpRequest();
-  //   r.onreadystatechange = this.getOnreadystatechange(r, d.url, d.isJsonDecoded, 'POST', d.cb);
+  // DoPost<T>(d: PostData<T>): XMLHttpRequest {
+  //   Let r: XMLHttpRequest = new XMLHttpRequest();
+  //   R.onreadystatechange = this.getOnreadystatechange(r, d.url, d.isJsonDecoded, 'POST', d.cb);
   //
-  //   let url = this.getUrl(d.url);
+  //   Let url = this.getUrl(d.url);
   //
-  //   r.open('POST', url, true);
-  //   let data;
-  //   let logOut: String = '';
-  //   if (d.isJsonEncoded) {
-  //     data = JSON.stringify(d.params);
-  //     r.setRequestHeader('Content-Type', 'application/json');
+  //   R.open('POST', url, true);
+  //   Let data;
+  //   Let logOut: String = '';
+  //   If (d.isJsonEncoded) {
+  //     Data = JSON.stringify(d.params);
+  //     R.setRequestHeader('Content-Type', 'application/json');
   //   } else {
   //     /*Firefox doesn't accept null*/
   //
   //   }
   //
-  //   this.httpLogger.log('POST out {} ::: {} ::: {}', url, d.params, logOut)();
-  //   if (d.process) {
-  //     d.process(r);
+  //   This.httpLogger.log('POST out {} ::: {} ::: {}', url, d.params, logOut)();
+  //   If (d.process) {
+  //     D.process(r);
   //   }
-  //   r.send(data);
-  //   return r;
+  //   R.send(data);
+  //   Return r;
   // }
 }

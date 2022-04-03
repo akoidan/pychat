@@ -12,7 +12,7 @@
     "lint:style": "stylelint 'src/**/*.vue' 'src/**/*.sass'",
     "lint": "run-s -c lint:style lint:es",
     "lint:new": "eslint-find-rules -u ./.eslintrc.json",
-    "autoformat": "eslint --fix --ext .ts,.vue src; eslint --fix -c ./cypress/.eslintrc.json --ext .ts --max-warnings=0 cypress/integration"
+    "lint:fix": "eslint --fix --ext .ts,.vue src"
   },
   "repository": {
     "type": "git",

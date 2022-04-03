@@ -1,23 +1,26 @@
-import {DefaultStore} from '@/ts/classes/DefaultStore';
-import {Logger} from 'lines-logger';
-import loggerFactory from '@/ts/instances/loggerFactory';
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type { Logger } from "lines-logger";
+import loggerFactory from "@/ts/instances/loggerFactory";
 
-const LAST_TAB_ID_VARNAME = 'lastTabId';
+const LAST_TAB_ID_VARNAME = "lastTabId";
 
 export class MainWindow {
   private readonly currentTabId: string;
+
   private unloaded: boolean = false;
+
   private readonly store: DefaultStore;
+
   private readonly logger: Logger;
 
   constructor(store: DefaultStore) {
-    window.addEventListener('beforeunload', this.onUnload.bind(this));
-    window.addEventListener('unload', this.onUnload.bind(this));
-    window.addEventListener('blur', this.onFocusOut.bind(this));
-    window.addEventListener('focus', this.onFocus.bind(this));
+    window.addEventListener("beforeunload", this.onUnload.bind(this));
+    window.addEventListener("unload", this.onUnload.bind(this));
+    window.addEventListener("blur", this.onFocusOut.bind(this));
+    window.addEventListener("focus", this.onFocus.bind(this));
     this.currentTabId = Date.now().toString();
     this.markCurrentTabAsMain();
-    this.logger = loggerFactory.getLogger('mainWindow');
+    this.logger = loggerFactory.getLogger("mainWindow");
     this.store = store;
   }
 
@@ -28,7 +31,7 @@ export class MainWindow {
 
   public onFocusOut() {
     this.store.setIsCurrentWindowActive(false);
-    this.logger.debug('Deactivating current tab')();
+    this.logger.debug("Deactivating current tab")();
   }
 
   public markCurrentTabAsMain() {

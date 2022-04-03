@@ -1,27 +1,28 @@
-import type WsHandler from '@/ts/message_handlers/WsHandler';
-import type Api from '@/ts/message_handlers/Api';
-import type { Logger } from 'lines-logger';
-import type { DefaultStore } from '@/ts/classes/DefaultStore';
+import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type Api from "@/ts/message_handlers/Api";
+import type { Logger } from "lines-logger";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type {
   GoogleCaptcha,
-  PlatformUtil
-} from '@/ts/types/model';
-import type WsMessageHandler from '@/ts/message_handlers/WsMessageHandler';
+  PlatformUtil,
+} from "@/ts/types/model";
+import type WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
 import type {
   IStorage,
-  JsAudioAnalyzer
-} from '@/ts/types/types';
-import type WebRtcApi from '@/ts/webrtc/WebRtcApi';
-import type Subscription from '@/ts/classes/Subscription';
-import type Http from '@/ts/classes/Http';
-import type {Router} from 'vue-router';
-import type { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
-import type { RoomHandler } from '@/ts/message_handlers/RomHandler';
-import type {App as VueApp} from '@vue/runtime-core'
-import type { Emitter } from 'mitt';
+  JsAudioAnalyzer,
+} from "@/ts/types/types";
+import type WebRtcApi from "@/ts/webrtc/WebRtcApi";
+import type Subscription from "@/ts/classes/Subscription";
+import type Http from "@/ts/classes/Http";
+import type { Router } from "vue-router";
+import type { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
+import type { RoomHandler } from "@/ts/message_handlers/RomHandler";
+import type { App as VueApp } from "@vue/runtime-core";
+import type { Emitter } from "mitt";
+
 declare global {
   interface Window {
-    GIT_VERSION: string|undefined;
+    GIT_VERSION: string | undefined;
     vue: VueApp;
     router: Router;
     api: Api;
@@ -35,18 +36,18 @@ declare global {
     webrtcApi: WebRtcApi;
     grecaptcha: GoogleCaptcha;
     audioProcesssors: JsAudioAnalyzer[];
-    savedFiles: { [id: string]: Blob };
+    savedFiles: Record<string, Blob>;
     sub: Subscription;
     consts: {};
     runtimeConsts: {};
   }
 }
 
-declare module '@vue/runtime-core' {
+declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
     $ws: WsHandler;
     $api: Api;
-    $store: DefaultStore; // if $store conflicts with node_modules/vuex/types/vue.d.ts if
+    $store: DefaultStore; // If $store conflicts with node_modules/vuex/types/vue.d.ts if
     $logger: Logger;
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;

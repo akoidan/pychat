@@ -10,7 +10,7 @@ declare interface Document {
 
 declare interface RTCPeerConnection {
   onaddstream(event: any): void;
-  // obsolete (deprecated) TODO
+  // Obsolete (deprecated) TODO
   addStream(a: MediaStream): void;
   removeStream(a: MediaStream): void;
 }
@@ -20,7 +20,7 @@ declare interface Notification {
 declare interface NotificationOptions {
   replaced: number;
 }
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
+type Writeable<T> = {-readonly [P in keyof T]: T[P]};
 
 declare interface RTCDataChannelInit {
   reliable?: boolean;
@@ -40,14 +40,14 @@ declare interface BeforeInstallPromptEvent extends Event {
    * for example, "web" or "play" which would allow the user to chose between a web version or
    * an Android version.
    */
-  readonly platforms: Array<string>;
+  readonly platforms: string[];
 
   /**
    * Returns a Promise that resolves to a DOMString containing either "accepted" or "dismissed".
    */
   readonly userChoice: Promise<{
-    outcome: 'accepted' | 'dismissed',
-    platform: string
+    outcome: "accepted" | "dismissed";
+    platform: string;
   }>;
 
   /**
@@ -63,14 +63,16 @@ declare interface MediaDevices {
   getUserMedia(constraints: MediaStreamConstraints, successCallback: any, errorCallback: any): void;
 }
 
-// declare class MediaRecorder {
-//   public onstop: Function;
-//   public ondataavailable: Function;
-//   constructor(stream: MediaStream, options: {});
-//   public static isTypeSupported(t: string): boolean;
-//   public stop(): void;
-//   public start(time?: number): void;
-// }
+/*
+ * Declare class MediaRecorder {
+ *   public onstop: Function;
+ *   public ondataavailable: Function;
+ *   constructor(stream: MediaStream, options: {});
+ *   public static isTypeSupported(t: string): boolean;
+ *   public stop(): void;
+ *   public start(time?: number): void;
+ * }
+ */
 
 declare interface MediaStreamTrack {
   isShare: boolean;
@@ -78,10 +80,10 @@ declare interface MediaStreamTrack {
 }
 
 declare class MediaRecorderDataAvailableEvent {
-  public data: { size: number };
+  public data: {size: number};
 }
 
-declare  interface Blob {
+declare interface Blob {
   name?: string;
 }
 
@@ -91,7 +93,7 @@ declare interface LocalFileSystem {
 }
 
 declare interface FormData {
-  entries?(): Iterator<[unknown| Blob]>;
+  entries?(): Iterator<[Blob | unknown]>;
 }
 
 declare interface HTMLElement {

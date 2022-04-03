@@ -1,17 +1,17 @@
-import { LogLevel } from 'lines-logger';
+import type { LogLevel } from "lines-logger";
 
 export enum GrowlType {
-  SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
+  SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
 }
 
-export  interface GrowlModel {
+export interface GrowlModel {
   id: number;
   html: string;
   type: GrowlType;
 }
-export type permissions_type = ('audio' | 'video')[]
+export type permissions_type = ("audio" | "video")[];
 export interface PlatformUtil {
-  askPermissions(...askedPermissions: permissions_type): Promise<void>
+  askPermissions(...askedPermissions: permissions_type): Promise<void>;
 }
 export interface EditingMessage {
   messageId: number;
@@ -39,15 +39,15 @@ export interface GoogleCaptcha {
 }
 
 export interface PastingTextAreaElement {
-  elType: 'blob';
+  elType: "blob";
   content: string;
   roomId: number;
-  editedMessageId: number|null;
-  openedThreadId: number|null;
+  editedMessageId: number | null;
+  openedThreadId: number | null;
 }
 
-export interface CurrentUserInfoModel extends CurrentUserInfoWoImage{
-  image: string|null;
+export interface CurrentUserInfoModel extends CurrentUserInfoWoImage {
+  image: string | null;
 }
 
 export interface CurrentUserInfoWoImage {
@@ -62,7 +62,7 @@ export interface CurrentUserInfoWoImage {
   sex: SexModelString;
 }
 
-export type SexModelString = 'Secret' | 'Male' | 'Female';
+export type SexModelString = "Female" | "Male" | "Secret";
 
 export interface UserModel {
   user: string;
@@ -74,27 +74,29 @@ export interface UserModel {
 }
 
 export interface Location {
-  city: string |null;
-  country: string|null;
-  countryCode: string|null;
-  region: string|null;
+  city: string | null;
+  country: string | null;
+  countryCode: string | null;
+  region: string | null;
 }
 
-// f - file
-// g - giphy
-// i - image
-// v - video
-// a - audio
-// m - media (same as video, but you need to click on image, in order to load video)
-export type BlobType = 'v' | 'm' | 'a' | 'i' | 'f' | 'g';
+/*
+ * F - file
+ * g - giphy
+ * i - image
+ * v - video
+ * a - audio
+ * m - media (same as video, but you need to click on image, in order to load video)
+ */
+export type BlobType = "a" | "f" | "g" | "i" | "m" | "v";
 
 export interface FileModel {
-  url: string|null;
+  url: string | null;
   type: BlobType;
-  serverId: number|null;
-  previewFileId: number|null;
-  fileId: number|null;
-  preview: string|null;
+  serverId: number | null;
+  previewFileId: number | null;
+  fileId: number | null;
+  preview: string | null;
   sending: boolean;
 }
 
@@ -104,37 +106,37 @@ export interface UploadProgressModel {
 }
 
 export interface MessageTransferInfo {
-  upload: UploadProgressModel| null;
-  error: string|null;
-  xhr: XMLHttpRequest|null;
+  upload: UploadProgressModel | null;
+  error: string | null;
+  xhr: XMLHttpRequest | null;
 }
 
-export type MessageStatus = 'sending' | 'on_server'| 'received' | 'read' ;
+export type MessageStatus = "on_server" | "read" | "received" | "sending";
 
 export interface MessageModel {
   id: number;
   time: number;
-  parentMessage: number|null;
-  files: Record<string, FileModel>| null; // THIS IS STRING, not number!!
-  content: string|null;
-  tags: Record<string, number>; // user id
-  isHighlighted: boolean; // if not read
-  isEditingActive: boolean; // if textarea is opened for this message to edit it
-  isThreadOpened: boolean; // if thread is opened for this message
-  symbol: string|null;
+  parentMessage: number | null;
+  files: Record<string, FileModel> | null; // THIS IS STRING, not number!!
+  content: string | null;
+  tags: Record<string, number>; // User id
+  isHighlighted: boolean; // If not read
+  isEditingActive: boolean; // If textarea is opened for this message to edit it
+  isThreadOpened: boolean; // If thread is opened for this message
+  symbol: string | null;
   threadMessagesCount: number;
   deleted: boolean;
   status: MessageStatus;
   edited: number;
   roomId: number;
   userId: number;
-  transfer: MessageTransferInfo|null;
+  transfer: MessageTransferInfo | null;
 }
 
 export interface RoomSettingsModel {
   id: number;
   name: string;
-  channelId: null | number;
+  channelId: number | null;
   p2p: boolean;
   isMainInChannel: boolean;
   notifications: boolean;
@@ -142,32 +144,24 @@ export interface RoomSettingsModel {
   creator: number;
 }
 
-export interface UserDictModel {
-  [id: string]: UserModel;
-}
+export type UserDictModel = Record<string, UserModel>;
 
-export interface RoomDictModel {
-  [id: string]: RoomModel;
-}
+export type RoomDictModel = Record<string, RoomModel>;
 
-export interface ChannelsDictModel {
-  [id: string]: ChannelModel;
-}
+export type ChannelsDictModel = Record<string, ChannelModel>;
 
-export interface ChannelsDictUIModel {
-  [id: string]: ChannelUIModel;
-}
+export type ChannelsDictUIModel = Record<string, ChannelUIModel>;
 
 export interface SearchModel {
-  searchActive: boolean; // if true search panel is shown
+  searchActive: boolean; // If true search panel is shown
   messages: Record<number, MessageModel>;
   searchText: string;
-  locked: boolean; // if true, no more messages with this search is available from the server
+  locked: boolean; // If true, no more messages with this search is available from the server
 }
 
 export interface RoomLog {
   userId: number;
-  action: 'appeared online' | 'gone offline' | 'joined this room' | 'left this room' | 'been invited to this room';
+  action: "appeared online" | "been invited to this room" | "gone offline" | "joined this room" | "left this room";
   time: number;
 }
 
@@ -181,11 +175,11 @@ export interface SendingFileTransfer {
   status: FileTransferStatus;
   userId: number;
   upload: UploadProgressModel;
-  error: string|null;
+  error: string | null;
 }
 
 export enum FileTransferStatus {
-  NOT_DECIDED_YET, DECLINED_BY_OPPONENT, DECLINED_BY_YOU, FINISHED, ERROR, IN_PROGRESS
+  NOT_DECIDED_YET, DECLINED_BY_OPPONENT, DECLINED_BY_YOU, FINISHED, ERROR, IN_PROGRESS,
 }
 
 export interface ReceivingFile {
@@ -193,27 +187,27 @@ export interface ReceivingFile {
   upload: UploadProgressModel;
   status: FileTransferStatus;
   fileName: string;
-  threadId: number|null;
+  threadId: number | null;
   opponentWsId: string;
   roomId: number;
   connId: string;
-  anchor: string|null;
-  error: string|null;
+  anchor: string | null;
+  error: string | null;
   userId: number;
 }
 
 export interface SendingFile {
   time: number;
   fileName: string;
-  threadId: number|null;
+  threadId: number | null;
   roomId: number;
   connId: string;
   fileSize: number;
-  transfers: { [id: string]: SendingFileTransfer };
+  transfers: Record<string, SendingFileTransfer>;
 }
 
 export interface CallInfoModel {
-  mediaStreamLink: string|null;
+  mediaStreamLink: string | null;
   connected: boolean;
   userId: number;
   opponentCurrentVoice: number;
@@ -227,11 +221,11 @@ export interface CallsInfoModel {
   calls: Record<string, CallInfoModel>;
   callActiveButNotJoinedYet: boolean;
   showMic: boolean;
-  currentMicLevel: number; // voice
-  mediaStreamLink: string|null;
-  currentMic: string|null;
-  currentSpeaker: string|null;
-  currentWebcam: string|null;
+  currentMicLevel: number; // Voice
+  mediaStreamLink: string | null;
+  currentMic: string | null;
+  currentSpeaker: string | null;
+  currentWebcam: string | null;
   showVideo: boolean;
   shareScreen: boolean;
   sharePaint: boolean;
@@ -254,8 +248,8 @@ export interface RoomModel extends RoomSettingsModel {
   users: number[];
   callInfo: CallsInfoModel;
   p2pInfo: P2pMessageModel;
-  sendingFiles:  { [id: string]: SendingFile };
-  receivingFiles:  { [id: string]: ReceivingFile };
+  sendingFiles: Record<string, SendingFile>;
+  receivingFiles: Record<string, ReceivingFile>;
   messages: Record<number, MessageModel>;
   allLoaded: boolean;
   search: SearchModel;

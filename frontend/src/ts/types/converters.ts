@@ -1,4 +1,4 @@
-import {
+import type {
   ChannelModel,
   CurrentUserInfoModel,
   CurrentUserInfoWoImage,
@@ -10,9 +10,9 @@ import {
   RoomModel,
   RoomSettingsModel,
   SexModelString,
-  UserModel
-} from '@/ts/types/model';
-import {
+  UserModel,
+} from "@/ts/types/model";
+import type {
   ChannelDto,
   FileModelDto,
   LocationDto,
@@ -22,13 +22,13 @@ import {
   SexModelDto,
   UserDto,
   UserProfileDtoWoImage,
-  UserSettingsDto
-} from '@/ts/types/dto';
-import {
+  UserSettingsDto,
+} from "@/ts/types/dto";
+import type {
   BooleanDB,
-  SexDB
-} from '@/ts/types/db';
-import {MessageP2pDto} from '@/ts/types/messages/p2pDto';
+  SexDB,
+} from "@/ts/types/db";
+import type { MessageP2pDto } from "@/ts/types/messages/p2pDto";
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
   return {...userInfo};
@@ -52,37 +52,39 @@ export function convertLocation(dto: LocationDto | null): Location {
       city: null,
       country: null,
       countryCode: null,
-      region: null
+      region: null,
     };
   }
   return {...dto};
 }
 
 export function convertSexToNumber(m: SexModelString): number {
-  if ('Secret' === m) {
+  if (m === "Secret") {
     return 0;
-  } else if ('Male' === m) {
+  } else if (m === "Male") {
     return 1;
-  } else if ('Female' === m) {
+  } else if (m === "Female") {
     return 2;
-  } else {
-    throw Error(`Unknown gender ${m}`);
   }
+  throw Error(`Unknown gender ${m}`);
 }
 
 export function getChannelDict(
   {
     channelName,
     channelCreatorId,
-    channelId
+    channelId,
   }: ChannelDto,
-  oldChannel: ChannelModel|null = null
+  oldChannel: ChannelModel | null = null,
 ): ChannelModel {
-  return {name: channelName, id: channelId!, creator: channelCreatorId, expanded: oldChannel?.expanded ?? false};
+  return {name: channelName,
+    id: channelId,
+    creator: channelCreatorId,
+    expanded: oldChannel?.expanded ?? false};
 }
 
 export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
-  return  {
+  return {
     channelId: r.channelId,
     p2p: r.p2p,
     id: r.roomId,
@@ -90,23 +92,23 @@ export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
     isMainInChannel: r.isMainInChannel,
     notifications: r.notifications,
     volume: r.volume,
-    creator: r.roomCreatorId
-  }
+    creator: r.roomCreatorId,
+  };
 }
 
 export function getRoomsBaseDict(
-    {
-      roomId,
-      volume,
-      channelId,
-      isMainInChannel,
-      notifications,
-      roomCreatorId ,
-      p2p,
-      name,
-      users
-    }: RoomDto,
-    databaseRestoredRoom: RoomModel|null = null
+  {
+    roomId,
+    volume,
+    channelId,
+    isMainInChannel,
+    notifications,
+    roomCreatorId,
+    p2p,
+    name,
+    users,
+  }: RoomDto,
+  databaseRestoredRoom: RoomModel | null = null,
 ): RoomModel {
   return {
     id: roomId,
@@ -118,7 +120,7 @@ export function getRoomsBaseDict(
     isMainInChannel,
     usersTyping: {},
     p2pInfo: {
-      liveConnections: []
+      liveConnections: [],
     },
     callInfo: {
       calls: {},
@@ -132,7 +134,7 @@ export function getRoomsBaseDict(
       currentMic: null,
       currentSpeaker: null,
       currentWebcam: null,
-      currentMicLevel: 0
+      currentMicLevel: 0,
     },
     notifications,
     name,
@@ -143,19 +145,19 @@ export function getRoomsBaseDict(
     allLoaded: databaseRestoredRoom ? databaseRestoredRoom.allLoaded : false,
     search: databaseRestoredRoom ? databaseRestoredRoom.search : {
       searchActive: false,
-      searchText: '',
+      searchText: "",
       messages: [],
-      locked: false
+      locked: false,
     },
-    users
+    users,
   };
 }
 
 export function convertNumberToSex(m: SexDB): SexModelString {
-  const newVar: { [id: number]: SexModelString } = {
-    0: 'Secret',
-    1: 'Male',
-    2: 'Female'
+  const newVar: Record<number, SexModelString> = {
+    0: "Secret",
+    1: "Male",
+    2: "Female",
   };
 
   return newVar[m];
@@ -163,9 +165,9 @@ export function convertNumberToSex(m: SexDB): SexModelString {
 
 export function convertSexToString(m: SexDB): SexModelString {
   const newVar: Record<SexDB, SexModelString> = {
-    0: 'Secret',
-    1: 'Male',
-    2: 'Female'
+    0: "Secret",
+    1: "Male",
+    2: "Female",
   };
 
   return newVar[m];
@@ -176,17 +178,17 @@ export function convertToBoolean(value: BooleanDB): boolean {
 }
 
 export function convertStringSexToNumber(m: SexModelString): SexDB {
-  const newVar: Record<SexModelString, SexDB> =  {
+  const newVar: Record<SexModelString, SexDB> = {
     Secret: 0,
     Male: 1,
-    Female: 2
+    Female: 2,
   };
   return newVar[m];
 }
 
 
 export function messageModelToP2p(m: MessageModel): MessageP2pDto {
-  return  {
+  return {
     content: m.content,
     deleted: m.deleted,
     edited: m.edited,
@@ -196,15 +198,15 @@ export function messageModelToP2p(m: MessageModel): MessageP2pDto {
     parentMessage: m.parentMessage,
     symbol: m.symbol,
     timeAgo: Date.now() - m.time,
-    userId: m.userId
-  }
+    userId: m.userId,
+  };
 }
 
 
-export function convertFiles(dtos: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
-  const res: {[id: number]: FileModel} = {};
+export function convertFiles(dtos: Record<number, FileModelDto>): Record<number, FileModel> {
+  const res: Record<number, FileModel> = {};
   for (const k in dtos) {
-    let dto = dtos[k];
+    const dto = dtos[k];
     res[k] = {
       fileId: null,
       serverId: dto.id,
@@ -212,41 +214,41 @@ export function convertFiles(dtos: {[id: number]: FileModelDto}): {[id: number]:
       previewFileId: null,
       preview: dto.preview,
       type: dto.type,
-      url: dto.url
-    }
+      url: dto.url,
+    };
   }
   return res;
 }
 
-export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessage: MessageModel|null, timeConverter: (time: number) => number): MessageModel {
+export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessage: MessageModel | null, timeConverter: (time: number) => number): MessageModel {
   if (message.threadMessagesCount === undefined) {
     throw Error("WTF");
   }
   return {
     id: message.id,
     time: timeConverter(message.time),
-    isHighlighted: oldMessage? oldMessage.isHighlighted : false,
+    isHighlighted: oldMessage ? oldMessage.isHighlighted : false,
     files: message.files ? convertFiles(message.files) : null,
     content: message.content || null,
     symbol: message.symbol || null,
     threadMessagesCount: message.threadMessagesCount,
     edited: message.edited,
     isEditingActive: oldMessage ? oldMessage.isEditingActive : false,
-    isThreadOpened: oldMessage? oldMessage.isThreadOpened : false,
+    isThreadOpened: oldMessage ? oldMessage.isThreadOpened : false,
     roomId: message.roomId,
     userId: message.userId,
     transfer: null,
-    tags: {...message.tags}, // prevent modifying original object by vuex
+    tags: {...message.tags}, // Prevent modifying original object by vuex
     parentMessage: message.parentMessage,
     status: message.status,
-    deleted: message.deleted || false
+    deleted: message.deleted || false,
   };
 }
 
 export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageModel {
-  let status: MessageStatus = 'received';
-  if (m.status === 'read') {
-    status = 'read';
+  let status: MessageStatus = "received";
+  if (m.status === "read") {
+    status = "read";
   }
   return {
     content: m.content,
@@ -265,17 +267,17 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     status,
     roomId,
     isHighlighted: false,
-    transfer: null
+    transfer: null,
   };
 }
 
-export function convertUser(u: UserDto, location: LocationDto|null): UserModel {
+export function convertUser(u: UserDto, location: LocationDto | null): UserModel {
   return {
     user: u.user,
     id: u.userId,
     image: u.userImage,
     lastTimeOnline: u.lastTimeOnline,
     sex: convertSex(u.sex),
-    location: convertLocation(location)
+    location: convertLocation(location),
   };
 }

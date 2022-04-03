@@ -32,36 +32,42 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import {ALL_ROOM_ID} from '@/ts/utils/consts';
-import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
-import PickUser from '@/vue/parts/PickUser.vue';
+import {Component, Vue} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {ALL_ROOM_ID} from "@/ts/utils/consts";
+import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
+import PickUser from "@/vue/parts/PickUser.vue";
 
 @Component({
-  name: 'CreateChannel' ,
-  components: {PickUser, AppSubmit}
+  name: "CreateChannel",
+  components: {
+    PickUser,
+    AppSubmit
+  },
 })
-  export default class CreateChannel extends Vue {
-    public channelName: string = '';
-    public running: boolean = false;
-    public currentUsers: number[] = [];
+export default class CreateChannel extends Vue {
+  public channelName: string = "";
+
+  public running: boolean = false;
+
+  public currentUsers: number[] = [];
 
 
   get userIds(): number[] {
-    return this.$store.usersArray.map(u => u.id)
+    return this.$store.usersArray.map((u) => u.id);
   }
 
-    @ApplyGrowlErr({runningProp: 'running', message: 'Unable to add channel'})
-    public async add() {
-      if (!this.channelName) {
-        throw Error('Please specify a channel name');
-      }
-      let e = await this.$ws.sendAddChannel(this.channelName, this.currentUsers);
-      this.$store.growlSuccess(`Channel '${this.channelName}' has been created`);
-      this.$router.replace(`/chat/${ALL_ROOM_ID}`);
+  @ApplyGrowlErr({runningProp: "running",
+    message: "Unable to add channel"})
+  public async add() {
+    if (!this.channelName) {
+      throw Error("Please specify a channel name");
     }
+    const e = await this.$ws.sendAddChannel(this.channelName, this.currentUsers);
+    this.$store.growlSuccess(`Channel '${this.channelName}' has been created`);
+    this.$router.replace(`/chat/${ALL_ROOM_ID}`);
   }
+}
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
