@@ -6,8 +6,8 @@
       <video
         v-show="isVideo"
         ref="video"
-        muted="muted"
-        autoplay=""
+        muted
+        autoplay
       />
       <img
         v-show="!isVideo"
@@ -45,7 +45,7 @@ import {
   @Prop()
   public readonly isVideo!: boolean;
 
-  private recordState: 'pause' | 'starting' |'running' = 'pause';
+  public recordState: 'pause' | 'starting' |'running' = 'pause';
 
   navigatorRecord: MediaCapture|null = null;
 

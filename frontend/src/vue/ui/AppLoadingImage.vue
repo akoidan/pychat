@@ -12,7 +12,7 @@ import { CallsInfoModel } from '@/ts/types/model';
 @Component({})
 export default class AppLoadingImage extends Vue {
   @Prop() public src!: string;
-  private loaded: boolean = false;
+  public loaded: boolean = false;
 
   onImgLoad() {
     this.loaded = true;

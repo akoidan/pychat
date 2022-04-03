@@ -11,6 +11,7 @@ import {
 import { resolve } from "path";
 import { outputManifest } from './sw.plugin';
 import { OutputChunk } from 'rollup';
+import checker from 'vite-plugin-checker'
 
 export default defineConfig(async ({command, mode}) => {
   let key, cert, ca, gitHash;
@@ -37,9 +38,12 @@ export default defineConfig(async ({command, mode}) => {
     },
     ...(PYCHAT_CONSTS.PUBLIC_PATH ? {base: PYCHAT_CONSTS.PUBLIC_PATH} : null),
     root: srcDir,
-    plugins: [vue(), splitVendorChunkPlugin(), outputManifest({
-      swFilePath,
-    })],
+    plugins: [
+      vue(),
+      checker({ typescript: true, vueTsc: true }),
+      splitVendorChunkPlugin(),
+      outputManifest({swFilePath})
+    ],
     build: {
       emptyOutDir: true,
       minify: !PYCHAT_CONSTS.IS_DEBUG,

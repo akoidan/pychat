@@ -60,10 +60,10 @@
     public readonly activeRoom!: RoomModel;
 
     @Prop()
-    private readonly lowWidth!: boolean;
+    public readonly lowWidth!: boolean;
 
     @Prop()
-    private readonly currentPage!: string;
+    public readonly currentPage!: string;
 
     @State
     public readonly privateRoomsUsersIds!: PrivateRoomsIds;

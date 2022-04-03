@@ -61,7 +61,7 @@ export default class RoomUsersListPage extends Vue {
   public readonly channelsDictUI!: ChannelsDictUIModel;
 
 
-  private userdToAdd: number[] = [];
+  public userdToAdd: number[] = [];
   public running: boolean = false;
 
 

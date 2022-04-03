@@ -67,7 +67,7 @@
       return resolveMediaUrl(this.userInfo.image);
     }
 
-    public get consts(): object {
+    public get consts(): { GITHUB_LINK: string;  ISSUES: string} {
       return {
         GITHUB_LINK,
         ISSUES

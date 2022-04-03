@@ -3,7 +3,7 @@
     <template v-slot:name>
       <router-link
         :to="`/chat/${mainRoomId(channel)}`"
-        @click.native="navigate(channel)"
+        @click.native="navigate"
         class="active-room"
       >
         {{ channel.name }}
@@ -42,7 +42,7 @@
     @State
     public readonly activeRoomId!: number;
 
-    navigate() {
+    public navigate() {
       if (this.activeRoomId === this.channel.mainRoom.id) {
         this.$store.setCurrentChatPage('chat');
       }

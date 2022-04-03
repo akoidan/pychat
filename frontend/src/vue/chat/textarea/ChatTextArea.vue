@@ -166,11 +166,11 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     @State
     public readonly activeRoom!: RoomModel;
 
-    private showAttachments: boolean = false;
-    private showSmileys: boolean = false;
-    private showGiphy: boolean = false;
-    private taggingName: string = '';
-    private isRecordingVideo: boolean = true;
+    public showAttachments: boolean = false;
+    public showSmileys: boolean = false;
+    public showGiphy: boolean = false;
+    public taggingName: string = '';
+    public isRecordingVideo: boolean = true;
     private showIType!: Throttle;
 
     get room(): RoomModel {
@@ -353,7 +353,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
-    private sendMessage() {
+    public sendMessage() {
       this.$logger.debug('Checking sending message')();
       if (this.editMessage) {
         const md: MessageDataEncode = getMessageData(this.userMessage, this.editMessage!);
@@ -396,7 +396,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
-    private pasteImagesToTextArea(files: FileList| File[]) {
+    public pasteImagesToTextArea(files: FileList| File[]) {
       this.showAttachments = false;
       for (let i = 0; i < files.length; i++) {
         pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
@@ -405,35 +405,35 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
-    private invertAttachments() {
+    public invertAttachments() {
       this.showSmileys = false;
       this.showGiphy = false;
       this.showAttachments = !this.showAttachments;
     }
 
-    private invertSmileys() {
+    public invertSmileys() {
       this.showSmileys = !this.showSmileys;
       this.showGiphy = false;
       this.showAttachments = false;
     }
 
-    private addGiphy() {
+    public addGiphy() {
       this.showGiphy = true;
       this.showSmileys = false;
       this.showAttachments = false;
     }
 
-    private addVideo() {
+    public addVideo() {
       this.isRecordingVideo = true;
       this.mediaRecorder.startRecord();
     }
 
-    private addAudio() {
+    public addAudio() {
       this.isRecordingVideo = false;
       this.mediaRecorder.startRecord();
     }
 
-    private pasteFilesToTextArea(files: FileList| File[]) {
+    public pasteFilesToTextArea(files: FileList| File[]) {
       this.showAttachments = false;
       for (let i = 0; i < files.length; i++) {
         pasteFileToTextArea(files[i], this.userMessage, (err: string) => {

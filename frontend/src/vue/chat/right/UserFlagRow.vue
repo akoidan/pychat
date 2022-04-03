@@ -30,7 +30,7 @@
   export default class UserFlagRow extends Vue {
     @Prop() public user!: UserModel;
 
-    public get consts(): object {
+    public get consts(): { FLAGS: boolean } {
       return {
         FLAGS,
       }
@@ -45,11 +45,11 @@
           `${this.user.location.country} ${this.user.location.region} ${this.user.location.city}`;
     }
 
-    get flag() {
+   public get flag() {
       if (this.user.location?.countryCode) {
         return getFlagPath(this.user.location.countryCode.toLowerCase());
       } else {
-        return null;
+        return undefined;
       }
     }
 

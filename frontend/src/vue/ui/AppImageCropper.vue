@@ -27,7 +27,7 @@
         v-show="showVideo"
         ref="changeProfileVideo"
         muted
-        autoplay=""
+        autoplay
       />
     </div>
     <input
@@ -92,13 +92,13 @@
   export default class AppImageCropper extends Vue {
 
     @Ref()
-    private cropper!: VueCropperMethods;
+    public cropper!: VueCropperMethods;
 
     @Prop()
     private initialImage!: string;
 
     @Prop({default: 1})
-    private readonly aspectRatio!: number;
+    public readonly aspectRatio!: number;
 
     @Ref()
     private inputFile!: HTMLInputElement;
@@ -107,14 +107,14 @@
     private changeProfileVideo!: HTMLVideoElement;
 
     private readonly isMobile = isMobile;
-    private scaleX: number = 1;
-    private scaleY: number = 1;
-    private srcImg: string = '';
+    public scaleX: number = 1;
+    public scaleY: number = 1;
+    public srcImg: string = '';
     private srcVideo: MediaStream |null = null;
     private blob: Blob |null = null;
     private fileInputValue: string = '';
-    private showVideo: boolean = false;
-    private isStopped: boolean = true;
+    public showVideo: boolean = false;
+    public isStopped: boolean = true;
 
     public created() {
       this.srcImg = this.initialImage;
@@ -137,7 +137,7 @@
       this.cropper.replace(value);
     }
 
-    private dropPhoto(e: DragEvent) {
+    public dropPhoto(e: DragEvent) {
       this.$logger.debug('Drop photo')();
       const file = e.dataTransfer!.files[0];
       this.blob = file;
@@ -151,12 +151,12 @@
       }
     }
 
-    private selectFile() {
+    public selectFile() {
       this.$logger.debug('Selecting file')();
       this.inputFile.click();
     }
 
-    private photoInputChanged(e: Event) {
+    public photoInputChanged(e: Event) {
       const f: File = (e.target as HTMLInputElement)!.files![0];
       const ok = this.setPhotoFromReader(f, 'input');
       if (!ok) {
@@ -189,7 +189,7 @@
       }
     }
 
-    private takeSnapshot() {
+    public takeSnapshot() {
       if (this.srcVideo) {
         canvasContext.canvas.width = this.changeProfileVideo.videoWidth;
         canvasContext.canvas.height = this.changeProfileVideo.videoHeight;
@@ -209,13 +209,13 @@
       this.stopVideo();
     }
 
-    private async stopCapturingVideo() {
+    public async stopCapturingVideo() {
       this.stopVideo();
       this.showVideo = false;
       this.isStopped = true;
     }
 
-    private async startCapturingVideo() {
+    public async startCapturingVideo() {
       try {
         this.$logger.debug("checking perms")();
         await this.$platformUtil.askPermissions('video');

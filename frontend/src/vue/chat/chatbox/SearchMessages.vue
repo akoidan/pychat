@@ -86,7 +86,7 @@ function getUniqueId() {
     }
   }
 
-  private checkToggleSearch(event: KeyboardEvent) {
+  public checkToggleSearch(event: KeyboardEvent) {
     if (event.key === 'Escape') {
       this.$store.toogleSearch(this.room.id)
     }

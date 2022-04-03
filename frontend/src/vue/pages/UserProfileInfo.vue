@@ -136,7 +136,7 @@ export default class UserProfileInfo extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
 
   public sex: SexModelString[] = ['Male', 'Female', 'Secret'];
-  private model!: UserProfileDtoWoImage;
+  public model!: UserProfileDtoWoImage;
 
   public created() {
     this.model = currentUserInfoModelToDto(this.userInfo);

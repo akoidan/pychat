@@ -25,7 +25,7 @@
               v-model="issue"
               class="input"
               tabindex="-1"
-              required=""
+              required
             />
           </td>
         </tr>

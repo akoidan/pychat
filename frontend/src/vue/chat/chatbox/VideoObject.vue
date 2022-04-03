@@ -19,7 +19,7 @@ import { getStreamLog } from '@/ts/utils/pureFunctions';
 @Component({name: 'VideoObject'})
  export default class VideoObject extends Vue {
   @Prop() public mediaStreamLink!: string;
-  @Prop() public muted!: string;
+  @Prop() public muted!: boolean;
   @Prop() public userId!: number;
   @Prop() public connected!: boolean;
 

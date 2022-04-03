@@ -52,13 +52,13 @@ export default class ChatThread extends Vue {
   @Prop()
   public readonly message!: MessageModel;
 
-  @Prop()
-  public readonly messages!: (MessageModel|ReceivingFile|SendingFile)[];
+  @Prop() // (MessageModel|ReceivingFile|SendingFile)[];
+  public readonly messages!: any[];
 
   @Ref()
   private readonly textarea!: ChatTextArea;
 
-  private locked: boolean = false;
+  public locked: boolean = false;
 
   @Watch('message.threadMessagesCount')
   checkThreadMessagesCountMatch() {

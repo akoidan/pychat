@@ -1,4 +1,5 @@
-import Vue from 'vue';
+import type {HLJSApi} from 'highlight.js';
+
 import {
   IS_DEBUG,
   PASTED_IMG_CLASS,
@@ -533,8 +534,8 @@ export function setYoutubeEvent(e: HTMLElement) {
 export function stopVideo(stream: MediaStream | null) {
   if (stream) {
     logger.debug('Stopping stream {}', stream)();
-    if (stream.stop) {
-      stream.stop();
+    if ((stream as any).stop) {
+      (stream as any).stop();
     } else {
       stream.getTracks().forEach(e => e.stop());
     }
@@ -646,9 +647,9 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
 export function highlightCode(element: HTMLElement) {
   const s = element.querySelectorAll('pre');
   if (s.length) {
-    import( 'highlightjs').then(hljs => {
+    import( 'highlight.js').then((hljs: any) => {
       for (let i = 0; i < s.length; i++) {
-        hljs.highlightBlock(s[i]);
+        (hljs as HLJSApi).highlightBlock(s[i]);
       }
     });
   }

@@ -42,7 +42,7 @@ export default class ChatBoxes extends Vue {
   public readonly roomsArray!: RoomModel[];
 
   // do not render all messages in all rooms, this is too slow
-  private roomInited: Record<string, boolean> = {};
+  public roomInited: Record<string, boolean> = {};
 
   created() {
     // vue.set

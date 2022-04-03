@@ -39,8 +39,8 @@ import AppTab from '@/vue/ui/AppTab.vue';
   components: {AppTab}
 })
 export default class UserProfile extends Vue {
-  private readonly GOOGLE_OAUTH_2_CLIENT_ID = GOOGLE_OAUTH_2_CLIENT_ID;
-  private readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
+  public readonly GOOGLE_OAUTH_2_CLIENT_ID = GOOGLE_OAUTH_2_CLIENT_ID;
+  public readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
 
 }
 </script>

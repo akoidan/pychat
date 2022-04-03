@@ -72,17 +72,17 @@ export default class GiphySearch extends Vue {
   @Ref()
   private readonly giphyContent!: HTMLDivElement;
 
-  private search: string = '';
-  private pagination: MultiResponse['pagination'] = {
+  public search: string = '';
+  public pagination: MultiResponse['pagination'] = {
     count: 0,
     offset: 0,
     total_count: 0,
   };
   private webpSupported: boolean = webpSupported;
   public moreLoading: boolean = false;
-  private images: GIFObject[] = [];
+  public images: GIFObject[] = [];
 
-  private request: XMLHttpRequest|null = null;
+  public request: XMLHttpRequest|null = null;
 
   get showLoadMoreBtn() {
     return !this.request && this.images.length > 0 && this.pagination.count === LOAD_GIPHIES_PER_REQUEST;

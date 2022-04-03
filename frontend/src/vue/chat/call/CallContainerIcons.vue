@@ -95,7 +95,7 @@ import { CallsInfoModel } from '@/ts/types/model';
     };
   }
 
-  private joinCall() {
+  public joinCall() {
     this.$webrtcApi.joinCall(this.roomId);
   }
 

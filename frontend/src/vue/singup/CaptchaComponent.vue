@@ -55,7 +55,7 @@ let captchaId = 1; // just random id to diff one comp fro another
   @Prop() public value!: boolean;
   private event: ((E: MessageEvent) => void) |null = null;
 
-  private ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}` : '';
+  public ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}` : '';
 
   @Watch('value')
   public onValueChange(newValue: boolean, oldValue: boolean) {

@@ -32,7 +32,7 @@ export default class RoomDirectUsersTable extends Vue {
   @State
   public readonly privateRooms!: RoomModel[];
 
-  private privateRoomCollapsed: boolean = false;
+  public privateRoomCollapsed: boolean = false;
 
 }
 </script>

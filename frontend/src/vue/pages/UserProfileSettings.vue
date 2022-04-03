@@ -71,7 +71,7 @@
             >
               <option
                 value="color-reg"
-                selected="selected"
+                selected
               >
                 Modern
               </option>
@@ -156,7 +156,7 @@ export default class UserProfileSettings extends Vue {
   @State
   public readonly userSettings!: CurrentUserSettingsModel;
 
-  private model!: UserSettingsDto;
+  public model!: UserSettingsDto;
 
   private readonly logLevels: LogLevel[] = Object.keys(logLevels) as LogLevel[];
 

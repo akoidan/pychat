@@ -26,7 +26,7 @@
   export default class UserNavInfo extends Vue {
 
     @Prop()
-    private readonly user!: UserModel;
+    public readonly user!: UserModel;
 
     @State
     public readonly online!: number[];

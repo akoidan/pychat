@@ -6,7 +6,7 @@
       ref="imgInput"
       type="file"
       accept="image/*,video/*"
-      multiple="multiple"
+      multiple
       @change="uploadImage"
     >
     <input
@@ -17,7 +17,7 @@
     >
     <input
       v-show="false"
-      multiple="multiple"
+      multiple
       ref="inputFileUpload"
       type="file"
       @change="uploadFile"

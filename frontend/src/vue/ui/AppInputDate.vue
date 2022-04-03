@@ -36,7 +36,7 @@ export default class AppInputDate extends Vue {
   @Prop({default: ''}) public inputClass!: string;
   @Prop({default: ''}) public inputClassDatepicker!: string;
 
-  public oninputnative(e: InputEvent) {
+  public oninputnative(e: any) {
     this.input(e);
   }
 

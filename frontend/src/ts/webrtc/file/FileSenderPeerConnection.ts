@@ -204,7 +204,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
                 bytesToSize(this.sendChannel!.bufferedAmount)
             )();
           }
-          this.sendDataTimeout = setTimeout(this.sendData.bind(this), 100, data, offset, cb);
+          this.sendDataTimeout = setTimeout(this.sendData.bind(this), 100, data, offset, cb) as any;
 
           return;
         } else {

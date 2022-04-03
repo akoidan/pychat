@@ -32,7 +32,7 @@ function getUniqueId() {
   @Prop()
   public readonly value!: boolean;
 
-  private uniqueId!: string;
+  public uniqueId!: string;
 
   @Ref()
   private checkbox!: HTMLInputElement;

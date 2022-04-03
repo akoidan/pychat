@@ -27,7 +27,7 @@
     <div
       ref="chatbox"
       class="chatbox"
-      :class="{'hidden': room.search.searchActive || (room.callInfo.callContainer && room.callInfo.sharePaint)}"
+      :class="{'hidden': room.search.searchActive || (room.callInfo && room.callInfo.sharePaint)}"
       tabindex="1"
       @keydown="keyDownLoadUp"
       @mousewheel="onMouseWheel"
@@ -314,7 +314,7 @@ import { isMobile } from '@/ts/utils/runtimeConsts';
     }
 
     @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})
-    private async loadUpHistory(n: number) {
+    public async loadUpHistory(n: number) {
       if (this.chatbox.scrollTop > 100) {
         return; // we're just scrolling up
       }

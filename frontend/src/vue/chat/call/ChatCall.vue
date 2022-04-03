@@ -116,7 +116,7 @@ export default class ChatCall extends Vue {
     this.showSettings = !this.showSettings;
   }
 
-  private invertShowVideoContainer() {
+  public invertShowVideoContainer() {
     this.showVideoContainer = !this.showVideoContainer;
   }
 

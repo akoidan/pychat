@@ -40,7 +40,7 @@ import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from '@/ts/utils/consts';
   public readonly myId!: number;
 
 
-  private get isMine(): boolean {
+  public get isMine(): boolean {
     return this.message.userId === this.myId;
   }
 

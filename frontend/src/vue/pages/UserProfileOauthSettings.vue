@@ -23,8 +23,8 @@ import GoogleAuth from '@/vue/singup/GoogleAuth.vue';
 })
 export default class UserProfileOauthSettings extends Vue {
 
-  private googleConnected: boolean = false;
-  private facebookConnected: boolean = false;
+  public googleConnected: boolean = false;
+  public facebookConnected: boolean = false;
 
 
   async created() {

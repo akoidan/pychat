@@ -53,15 +53,15 @@ export default class ChannelsPage extends Vue {
 
   private listener!: Function;
   private mediaQuery!: MediaQueryList;
-  private lowWidth = false;
-  private showAppMenuBar = false;
+  public lowWidth = false;
+  public showAppMenuBar = false;
 
   @State
   public readonly activeRoomId!: number;
 
   @State
   public readonly currentChatPage!: 'rooms' | 'chat';
-  private showPopup = false;
+  public showPopup = false;
 
   @Watch('activeRoomId')
   public activeRoomIdChange() {

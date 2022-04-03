@@ -78,7 +78,7 @@ import { ViewUserProfileDto } from "@/ts/types/dto";
   public error: string|null = null;
   @State
   public readonly allUsersDict!: {[id: number]: UserModel} ;
-  private userProfileInfo: ViewUserProfileDto | null = null;
+  public userProfileInfo: ViewUserProfileDto | null = null;
 
   public resolveMediaUrl(src: string) {
     return resolveMediaUrl(src);

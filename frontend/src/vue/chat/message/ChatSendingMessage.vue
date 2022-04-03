@@ -64,7 +64,7 @@ export default class ChatSendingMessage extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
 
   @Ref()
-  private readonly textarea!: ChatTextArea;
+  public readonly textarea!: ChatTextArea;
 
   @State
   public readonly roomsDict!: RoomDictModel;

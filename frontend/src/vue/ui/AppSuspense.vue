@@ -18,8 +18,8 @@ import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
 @Component({})
 export default class AppSuspense extends Vue {
 
-  private currentRequest: XMLHttpRequest|null = null;
-  private error: string = ''
+  public currentRequest: XMLHttpRequest|null = null;
+  public error: string = ''
 
   async checkEmail(doRequest: (r: XMLHttpRequest) => any) {
     this.error = '';

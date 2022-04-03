@@ -28,7 +28,7 @@ function getUniqueId() {
   @Ref()
   public el!: HTMLInputElement;
   private style: any;
-  private cls!: string;
+  public cls!: string;
 
   public created() {
     this.style = document.createElement('style');
