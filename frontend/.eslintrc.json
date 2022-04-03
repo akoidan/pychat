@@ -91,9 +91,9 @@
     "import/no-relative-parent-imports": 1,
     "import/dynamic-import-chunkname": 1,
     "import/exports-last":1,
-    "import/extensions": [1, "never", {"json":  "always", "vue": "always", "sass": "always", "png":  "always"}],
+    "import/extensions": [1, "never", {"json":  "always", "vue": "always", "sass": "always", "png":  "always", "wav": "always", "mp3": "always"}],
     "import/first":1,
-    "import/group-exports": 1,
+    "import/group-exports": 0, // vue3
     "import/max-dependencies": 0,
     "import/newline-after-import": 1,
     "import/no-absolute-path":1,

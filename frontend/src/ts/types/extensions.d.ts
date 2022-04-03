@@ -3,12 +3,30 @@ declare module "*.json" {
   export default value;
 }
 
-declare module "*.ico";
-declare module "*.wav";
-declare module "*.mp3";
-declare module "*.gif";
-declare module "*.svg";
-declare module "*.png";
+declare module "*.ico" {
+  const result: string;
+  export default result;
+}
+declare module "*.wav" {
+  const result: string;
+  export default result;
+}
+declare module "*.mp3" {
+  const result: string;
+  export default result;
+}
+declare module "*.gif" {
+  const result: string;
+  export default result;
+}
+declare module "*.svg" {
+  const result: string;
+  export default result;
+}
+declare module "*.png" {
+  const result: string;
+  export default result;
+}
 
 declare module '*.vue' {
   import type { DefineComponent } from 'vue'

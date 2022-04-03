@@ -47,4 +47,6 @@ export const ACTIVE_ROOM_ID_LS_NAME = "activeRoomId";
 export const SERVICE_WORKER_VERSION_LS_NAME = "serviceWorkerVersion";
 export const USERNAME_REGEX = "[a-zA-Z-_0-9]{1,16}";
 export const SHOW_I_TYPING_INTERVAL = 5_000;
-export const MAX_ACCEPT_FILE_SIZE_WO_FS_API = 268435456; // Math.pow(2, 28) = 256 MB
+// Math.pow(2, 28) = 256 MB
+export const MAX_ACCEPT_FILE_SIZE_WO_FS_API = 268435456;
+

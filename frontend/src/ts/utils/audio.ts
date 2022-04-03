@@ -6,7 +6,7 @@ import ChatOutgoing from "@/assets/sounds/ChatOutgoing.wav";
 import ChatFile from "@/assets/sounds/File.mp3";
 
 
-function createAudio(url: any) {
+function createAudio(url: string) {
   const audio = new Audio();
   audio.preload = "none";
   audio.src = url;
