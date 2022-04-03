@@ -644,14 +644,13 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
   }
 }
 
-export function highlightCode(element: HTMLElement) {
+export async function highlightCode(element: HTMLElement) {
   const s = element.querySelectorAll('pre');
   if (s.length) {
-    import( 'highlight.js').then((hljs: any) => {
-      for (let i = 0; i < s.length; i++) {
-        (hljs as HLJSApi).highlightBlock(s[i]);
-      }
-    });
+    const hljs = await import('highlight.js')
+    for (let i = 0; i < s.length; i++) {
+      hljs.default.highlightBlock(s[i]);
+    }
   }
 }
 
