@@ -42,7 +42,14 @@ export default defineConfig(async ({command, mode}) => {
     root: srcDir,
     plugins: [
       vue(),
-      checker({ typescript: true, vueTsc: true }),
+      checker({
+          typescript: true,
+          vueTsc: true,
+          ...(command === 'serve' ? {eslint: {
+            lintCommand: 'eslint --ext .ts,.vue --max-warnings=0 src',
+          }}: null)
+        }
+      ),
       splitVendorChunkPlugin(),
       outputManifest({swFilePath}),
       viteStaticCopy({
@@ -77,12 +84,12 @@ export default defineConfig(async ({command, mode}) => {
               dirName = `flags/`;
             } else if (/\.(png|jpg|svg|gif|ico)$/.test(assetInfo.name!)) {
               dirName = `img/`;
-            } else if (/\.css$/.test(assetInfo.name!)){
+            } else if (/\.css$/.test(assetInfo.name!)) {
               dirName = `css/`;
             }
             return `${dirName}[name]-[hash].[ext]`
           },
-          chunkFileNames (assetInfo: OutputChunk) {
+          chunkFileNames(assetInfo: OutputChunk) {
             if (Object.keys(assetInfo.modules).find(a => a.indexOf('node_modules/spainter/') >= 0)) {
               return 'js/spainter-[hash].js'
             }
@@ -91,7 +98,7 @@ export default defineConfig(async ({command, mode}) => {
             }
             return 'js/[name]-[hash].js';
           },
-          entryFileNames (assetInfo: OutputChunk) {
+          entryFileNames(assetInfo: OutputChunk) {
             if (assetInfo.facadeModuleId == swFilePath) {
               return 'sw.js';
             } else {
