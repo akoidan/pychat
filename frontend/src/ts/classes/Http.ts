@@ -4,7 +4,7 @@ import type {
   PostData,
   SessionHolder,
 } from "@/ts/types/types";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 
 export default abstract class Http {
   protected httpLogger: Logger;

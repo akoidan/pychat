@@ -1,22 +1,22 @@
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
-import type { SendingFile } from "@/ts/types/model";
+import type {SendingFile} from "@/ts/types/model";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import FileSenderPeerConnection from "@/ts/webrtc/file/FileSenderPeerConnection";
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type { ReplyFileMessage } from "@/ts/types/messages/wsInMessages";
-import { FileAndCallTransfer } from "@/ts/webrtc/FileAndCallTransfer";
+import type {ReplyFileMessage} from "@/ts/types/messages/wsInMessages";
+import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 
 
 export default class FileHandler extends FileAndCallTransfer {
   protected readonly handlers: HandlerTypes<keyof FileHandler, "webrtcTransfer:*"> = {
-    replyFile: <HandlerType<"replyFile", "webrtcTransfer:*">>this.replyFile,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">>this.checkTransferDestroy,
+    replyFile: <HandlerType<"replyFile", "webrtcTransfer:*">> this.replyFile,
+    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">> this.checkTransferDestroy,
   };
 
   private readonly file: File;

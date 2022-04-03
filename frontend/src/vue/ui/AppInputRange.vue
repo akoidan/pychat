@@ -1,10 +1,10 @@
 <template>
   <input
-      ref="el"
-      :class="cls"
-      :value="value"
-      type="range"
-      @input="oninput"
+    ref="el"
+    :class="cls"
+    :value="value"
+    type="range"
+    @input="oninput"
   />
 </template>
 <script lang="ts">
@@ -27,7 +27,9 @@ export default class AppInputRange extends Vue {
 
   @Ref()
   public el!: HTMLInputElement;
+
   public cls!: string;
+
   private style: any;
 
   public created() {

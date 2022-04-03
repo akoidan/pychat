@@ -11,13 +11,13 @@ import type {
   SetOpponentVoice,
 } from "@/ts/types/types";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   ChangeStreamMessage,
   ConnectToRemoteMessage,
   DestroyPeerConnectionMessage,
 } from "@/ts/types/messages/innerMessages";
-import type { DestroyCallConnection } from "@/ts/types/messages/wsInMessages";
+import type {DestroyCallConnection} from "@/ts/types/messages/wsInMessages";
 import type {
   HandlerType,
   HandlerTypes,
@@ -30,29 +30,33 @@ import type {
   CallInfoModel,
   RoomModel,
 } from "@/ts/types/model";
-import { stopVideo } from "@/ts/utils/htmlApi";
+import {stopVideo} from "@/ts/utils/htmlApi";
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {
-    destroy: <HandlerType<"destroy", "peerConnection:*">>this.destroy,
-    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">>this.streamChanged,
-    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">>this.connectToRemote,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
-    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">>this.destroyCallConnection,
+    destroy: <HandlerType<"destroy", "peerConnection:*">> this.destroy,
+    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">> this.streamChanged,
+    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">> this.connectToRemote,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
+    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">> this.destroyCallConnection,
   };
+
   private audioProcessor: any;
+
   // Ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
   private remoteStream: MediaStream | null = null;
+
   private localStream: MediaStream | null = null;
+
   private readonly streamTrackApi: "stream" | "track" = "track";
 
   constructor(
-      roomId: number,
-      connId: string,
-      opponentWsId: string,
-      userId: number,
-      wsHandler: WsHandler,
-      store: DefaultStore,
+    roomId: number,
+    connId: string,
+    opponentWsId: string,
+    userId: number,
+    wsHandler: WsHandler,
+    store: DefaultStore,
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     // @ts-expect-error
@@ -262,7 +266,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         this.logger.log("Connection accepted, consuming sendRtcDataQueue")();
         const queue = this.sendRtcDataQueue;
         this.sendRtcDataQueue = [];
-        queue.forEach(async (message) => this.sendRtcData(message));
+        queue.forEach(async(message) => this.sendRtcData(message));
       }
 
       /*

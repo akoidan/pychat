@@ -1,11 +1,11 @@
 <template>
   <div>
     <input
-        :id="uniqueId"
-        ref="checkbox"
-        :checked="value"
-        type="checkbox"
-        @change="onchange"
+      :id="uniqueId"
+      ref="checkbox"
+      :checked="value"
+      type="checkbox"
+      @change="onchange"
     />
     <label :for="uniqueId"/>
   </div>

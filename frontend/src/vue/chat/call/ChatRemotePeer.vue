@@ -1,18 +1,18 @@
 <template>
   <div class="micVideoWrapper">
     <video-object
-        :connected="callInfo.connected"
-        :media-stream-link="callInfo.mediaStreamLink"
-        :muted="null"
-        :user-id="callInfo.userId"
+      :connected="callInfo.connected"
+      :media-stream-link="callInfo.mediaStreamLink"
+      :muted="null"
+      :user-id="callInfo.userId"
     />
     <div>
       <app-input-range
-          :class="volLevelClass"
-          :value="volumeLevel"
-          max="100"
-          min="0"
-          title="Volume level"
+        :class="volLevelClass"
+        :value="volumeLevel"
+        max="100"
+        min="0"
+        title="Volume level"
       />
       <span>{{ userNameValue }}</span>
     </div>
@@ -26,7 +26,7 @@ import {
   Vue,
   Watch,
 } from "vue-property-decorator";
-import { CallInfoModel } from "@/ts/types/model";
+import {CallInfoModel} from "@/ts/types/model";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
 
@@ -34,7 +34,7 @@ import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
   name: "ChatRemotePeer",
   components: {
     VideoObject,
-    AppInputRange
+    AppInputRange,
   },
 })
 export default class ChatRemotePeer extends Vue {
@@ -42,6 +42,7 @@ export default class ChatRemotePeer extends Vue {
   public video!: VideoObject;
 
   @Prop() public callInfo!: CallInfoModel;
+
   public volumeLevel: number = 100;
 
   get userNameValue(): string {

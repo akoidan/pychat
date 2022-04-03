@@ -9,14 +9,14 @@
       </div>
       <div class="app-section">
         <router-link
-            title="Create a new group of rooms"
-            to="/create-private-room"
+          title="Create a new group of rooms"
+          to="/create-private-room"
         >
           Write to user
         </router-link>
         <router-link
-            title="Create a new group of rooms"
-            to="/create-group"
+          title="Create a new group of rooms"
+          to="/create-group"
         >
           Create group
         </router-link>
@@ -27,16 +27,16 @@
           Settings
         </router-link>
         <router-link
-            v-if="consts.ISSUES"
-            title="Report an issue"
-            to="/report-issue"
+          v-if="consts.ISSUES"
+          title="Report an issue"
+          to="/report-issue"
         >
           Issue
         </router-link>
         <a
-            v-if="consts.GITHUB_LINK"
-            :href="consts.GITHUB_LINK"
-            target="_blank"
+          v-if="consts.GITHUB_LINK"
+          :href="consts.GITHUB_LINK"
+          target="_blank"
         >
           Github
         </a>
@@ -53,10 +53,10 @@ import {
   GITHUB_LINK,
   ISSUES,
 } from "@/ts/utils/consts";
-import { State } from "@/ts/instances/storeInstance";
-import { CurrentUserInfoModel } from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
+import {CurrentUserInfoModel} from "@/ts/types/model";
 import AppModal from "@/vue/ui/AppModal.vue";
-import { resolveMediaUrl } from "@/ts/utils/htmlApi";
+import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 
 @Component({
   name: "AppMenuBar",
@@ -72,7 +72,7 @@ export default class AppMenuBar extends Vue {
     return resolveMediaUrl(this.userInfo.image);
   }
 
-  public get consts(): { GITHUB_LINK: string; ISSUES: string } {
+  public get consts(): {GITHUB_LINK: string; ISSUES: string} {
     return {
       GITHUB_LINK,
       ISSUES,

@@ -2,8 +2,8 @@
   <div class="holder">
     <div class="progress-wrap">
       <div
-          :style="style"
-          class="bar"
+        :style="style"
+        class="bar"
       />
       <div class="text">
         {{ text }}
@@ -17,8 +17,8 @@ import {
   Prop,
   Vue,
 } from "vue-property-decorator";
-import { bytesToSize } from "@/ts/utils/pureFunctions";
-import { UploadProgressModel } from "@/ts/types/model";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
+import {UploadProgressModel} from "@/ts/types/model";
 
 @Component({name: "AppProgressBar"})
 export default class AppProgressBar extends Vue {

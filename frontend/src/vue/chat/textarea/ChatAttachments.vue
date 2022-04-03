@@ -154,10 +154,10 @@ export default class ChatAttachments extends Vue {
      *       }
      *     ]
      *   })
-     *   let files = await Promise.all(filesHandles.map(a => a.getFil()     *    *  tiasteFilesToTextArea(files);
+     *   let files = await Promise.all(filesHandles.map(a = .eFl)  *   *  tiasteFilesToTextArea(files);
      * } else {
      */
-    this.imgInput.click();
+    this.lick();
   }
 
   public uploadFileClick() {

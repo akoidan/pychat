@@ -51,13 +51,13 @@ import type {
   SaveRoomSettingsMessage,
   ShowITypeMessage,
 } from "@/ts/types/messages/wsInMessages";
-import { ALL_ROOM_ID } from "@/ts/utils/consts";
-import { sub } from "@/ts/instances/subInstance";
-import type { Logger } from "lines-logger";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import {ALL_ROOM_ID} from "@/ts/utils/consts";
+import {sub} from "@/ts/instances/subInstance";
+import type {Logger} from "lines-logger";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Api from "@/ts/message_handlers/Api";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type { AudioPlayer } from "@/ts/classes/AudioPlayer";
+import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import {
   login,
@@ -68,21 +68,21 @@ export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof RoomHandler, "room"> = {
-    deleteRoom: <HandlerType<"deleteRoom", "room">>this.deleteRoom,
-    init: <HandlerType<"init", "room">>this.init,
-    leaveUser: <HandlerType<"leaveUser", "room">>this.leaveUser,
-    addRoom: <HandlerType<"addRoom", "room">>this.addRoom,
-    removeOnlineUser: <HandlerType<"removeOnlineUser", "room">>this.removeOnlineUser,
-    addChannel: <HandlerType<"addChannel", "room">>this.addChannel,
-    inviteUser: <HandlerType<"inviteUser", "room">>this.inviteUser,
-    addInvite: <HandlerType<"addInvite", "room">>this.addInvite,
-    addOnlineUser: <HandlerType<"addOnlineUser", "room">>this.addOnlineUser,
-    saveChannelSettings: <HandlerType<"saveChannelSettings", "room">>this.saveChannelSettings,
-    deleteChannel: <HandlerType<"deleteChannel", "room">>this.deleteChannel,
-    saveRoomSettings: <HandlerType<"saveRoomSettings", "room">>this.saveRoomSettings,
-    createNewUser: <HandlerType<"createNewUser", "room">>this.createNewUser,
-    showIType: <HandlerType<"showIType", "room">>this.showIType,
-    logout: <HandlerType<"logout", "room">>this.logout,
+    deleteRoom: <HandlerType<"deleteRoom", "room">> this.deleteRoom,
+    init: <HandlerType<"init", "room">> this.init,
+    leaveUser: <HandlerType<"leaveUser", "room">> this.leaveUser,
+    addRoom: <HandlerType<"addRoom", "room">> this.addRoom,
+    removeOnlineUser: <HandlerType<"removeOnlineUser", "room">> this.removeOnlineUser,
+    addChannel: <HandlerType<"addChannel", "room">> this.addChannel,
+    inviteUser: <HandlerType<"inviteUser", "room">> this.inviteUser,
+    addInvite: <HandlerType<"addInvite", "room">> this.addInvite,
+    addOnlineUser: <HandlerType<"addOnlineUser", "room">> this.addOnlineUser,
+    saveChannelSettings: <HandlerType<"saveChannelSettings", "room">> this.saveChannelSettings,
+    deleteChannel: <HandlerType<"deleteChannel", "room">> this.deleteChannel,
+    saveRoomSettings: <HandlerType<"saveRoomSettings", "room">> this.saveRoomSettings,
+    createNewUser: <HandlerType<"createNewUser", "room">> this.createNewUser,
+    showIType: <HandlerType<"showIType", "room">> this.showIType,
+    logout: <HandlerType<"logout", "room">> this.logout,
   };
 
   private readonly store: DefaultStore;
@@ -92,10 +92,10 @@ export class RoomHandler extends MessageHandler {
   private readonly audioPlayer: AudioPlayer;
 
   constructor(
-      store: DefaultStore,
-      api: Api,
-      ws: WsHandler,
-      audioPlayer: AudioPlayer,
+    store: DefaultStore,
+    api: Api,
+    ws: WsHandler,
+    audioPlayer: AudioPlayer,
   ) {
     super();
     this.store = store;
@@ -153,7 +153,7 @@ export class RoomHandler extends MessageHandler {
           action: "joined this room",
           time: message.time,
           userId: i,
-        }
+        },
       });
     });
     this.notifyDevicesChanged(null, message.roomId, "someone_joined");
@@ -178,7 +178,7 @@ export class RoomHandler extends MessageHandler {
           action: "joined this room",
           time: Date.now(),
           userId: message.userId,
-        }
+        },
       });
       this.notifyDevicesChanged(null, roomId, "someone_joined");
     });
@@ -210,7 +210,7 @@ export class RoomHandler extends MessageHandler {
       if (this.store.myId === message.userId) {
         const oldRoom: RoomModel = {...this.store.channelsDictUI[c.id].mainRoom};
         oldRoom.volume = message.volume,
-            oldRoom.notifications = message.notifications;
+        oldRoom.notifications = message.notifications;
         this.store.setRoomSettings(oldRoom);
       }
     }
@@ -227,7 +227,7 @@ export class RoomHandler extends MessageHandler {
     if (this.store.myId !== message.userId) {
       await this.store.showUserIsTyping({
         userId: message.userId,
-        roomId: message.roomId
+        roomId: message.roomId,
       });
     }
   }

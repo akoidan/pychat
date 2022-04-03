@@ -3,8 +3,8 @@
     <span class="header">
       <div class="header-start">
         <span
-            :class="directClass"
-            @click="invertValue"
+          :class="directClass"
+          @click="invertValue"
         />
         <slot name="name"/>
       </div>

@@ -2,9 +2,9 @@
   <div class="chat-room-users-wrapper">
     <room-direct-users-table/>
     <channel-table
-        v-for="channel in channels"
-        :key="channel.id"
-        :channel="channel"
+      v-for="channel in channels"
+      :key="channel.id"
+      :channel="channel"
     />
   </div>
 </template>
@@ -15,8 +15,8 @@ import {
 } from "vue-property-decorator";
 import RoomDirectUsersTable from "@/vue/chat/right/RoomDirectUsersTable.vue";
 import ChannelTable from "@/vue/chat/right/ChannelTable.vue";
-import type { ChannelUIModel } from "@/ts/types/model";
-import { State } from "@/ts/instances/storeInstance";
+import type {ChannelUIModel} from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
 
 @Component({
   name: "ChatRightSection",

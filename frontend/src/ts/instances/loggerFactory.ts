@@ -1,5 +1,5 @@
-import type { LogLevel } from "lines-logger";
-import { LoggerFactory } from "lines-logger";
+import type {LogLevel} from "lines-logger";
+import {LoggerFactory} from "lines-logger";
 import {
   IS_DEBUG,
   LOG_LEVEL_LS,

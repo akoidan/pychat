@@ -5,11 +5,11 @@
       <section class="cropper-area">
         <div class="img-cropper" @drop.prevent="dropPhoto">
           <vue-cropper
-              v-show="srcImg"
-              ref="cropper"
-              :aspect-ratio="aspectRatio"
-              :auto-crop-area="1"
-              :src="srcImg"
+            v-show="srcImg"
+            ref="cropper"
+            :aspect-ratio="aspectRatio"
+            :auto-crop-area="1"
+            :src="srcImg"
           />
           <div v-if="!srcImg" class="drop-zone"/>
         </div>
@@ -22,45 +22,45 @@
         </div>
       </section>
       <video
-          v-show="showVideo"
-          ref="changeProfileVideo"
-          autoplay
-          muted
+        v-show="showVideo"
+        ref="changeProfileVideo"
+        autoplay
+        muted
       />
     </div>
     <input
-        v-show="false"
-        ref="inputFile"
-        accept="image/*"
-        type="file"
-        @change="photoInputChanged"
+      v-show="false"
+      ref="inputFile"
+      accept="image/*"
+      type="file"
+      @change="photoInputChanged"
     />
     <template v-if="isStopped">
       <input
-          class="lor-btn"
-          type="button"
-          value="Select file"
-          @click="selectFile"
+        class="lor-btn"
+        type="button"
+        value="Select file"
+        @click="selectFile"
       />
       <input
-          class="lor-btn"
-          type="button"
-          value="Make a photo from webcam"
-          @click="startCapturingVideo"
+        class="lor-btn"
+        type="button"
+        value="Make a photo from webcam"
+        @click="startCapturingVideo"
       />
     </template>
     <template v-else>
       <input
-          class="lor-btn"
-          type="button"
-          value="Close webcam"
-          @click="stopCapturingVideo"
+        class="lor-btn"
+        type="button"
+        value="Close webcam"
+        @click="stopCapturingVideo"
       />
       <input
-          class="lor-btn"
-          type="button"
-          value="Take photo"
-          @click="takeSnapshot"
+        class="lor-btn"
+        type="button"
+        value="Take photo"
+        @click="takeSnapshot"
       />
     </template>
   </div>
@@ -73,8 +73,8 @@ import {
   Vue,
   Watch,
 } from "vue-property-decorator";
-import VueCropper, { VueCropperMethods } from "vue-cropperjs";
-import { isMobile } from "@/ts/utils/runtimeConsts";
+import VueCropper, {VueCropperMethods} from "vue-cropperjs";
+import {isMobile} from "@/ts/utils/runtimeConsts";
 import {
   canvasContext,
   stopVideo,
@@ -88,22 +88,35 @@ import {
 export default class AppImageCropper extends Vue {
   @Ref()
   public cropper!: VueCropperMethods;
+
   @Prop({default: 1})
-  public readonly aspectRatio!: number;
+  public readonly aspectRaio!: number;
+
   public scaleX: number = 1;
-  public scaleY: number = 1;
+
+  public scaleY: number = 
+
   public srcImg: string = "";
+
   public showVideo: boolean = false;
+
   public isStopped: boolean = true;
+
   @Prop()
   private initialImage!: string;
+
   @Ref()
   private inputFile!: HTMLInputElement;
+
   @Ref()
   private changeProfileVideo!: HTMLVideoElement;
+
   private readonly isMobile = isMobile;
+
   private srcVideo: MediaStream | null = null;
+
   private blob: Blob | null = null;
+
   private fileInputValue: string = "";
 
   public created() {
@@ -179,7 +192,7 @@ export default class AppImageCropper extends Vue {
       await this.$platformUtil.askPermissions();
       this.srcVideo = await navigator.mediaDevices.getUserMedia({
         audio: true,
-        video: true
+        video: true,
       });
       this.showVideo = true;
       this.isStopped = false;

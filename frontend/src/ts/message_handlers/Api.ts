@@ -4,7 +4,7 @@ import {
   GIPHY_URL,
   RESPONSE_SUCCESS,
 } from "@/ts/utils/consts";
-import type { UploadFile } from "@/ts/types/types";
+import type {UploadFile} from "@/ts/types/types";
 import type {
   OauthSessionResponse,
   OauthStatus,
@@ -14,19 +14,19 @@ import type {
 } from "@/ts/types/dto";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import type Http from "@/ts/classes/Http";
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
-import type { MultiResponse } from "giphy-api";
+import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
+import type {MultiResponse} from "giphy-api";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "any"> = {
-    internetAppear: <HandlerType<"internetAppear", "any">>this.internetAppear,
+    internetAppear: <HandlerType<"internetAppear", "any">> this.internetAppear,
   };
 
   protected readonly logger: Logger;
@@ -56,7 +56,7 @@ export default class Api extends MessageHandler {
       params: {
         issue,
         browser,
-        version
+        version,
       },
       checkOkString: true,
     });
@@ -67,7 +67,7 @@ export default class Api extends MessageHandler {
       url: "/change_password",
       params: {
         old_password,
-        password
+        password,
       },
       checkOkString: true,
     });
@@ -103,16 +103,16 @@ export default class Api extends MessageHandler {
       isJsonDecoded: true,
       params: {
         username,
-        password
+        password,
       },
     });
   }
 
   public async searchGiphys(
-      text: string,
-      offset: number,
-      limit: number,
-      process?: (R: XMLHttpRequest) => void,
+    text: string,
+    offset: number,
+    limit: number,
+    process?: (R: XMLHttpRequest) => void,
   ): Promise<MultiResponse> {
     let response!: MultiResponse;
     if ((/^\s*$/).exec(text)) {
@@ -299,7 +299,7 @@ export default class Api extends MessageHandler {
   }
 
   public async verifyToken(token: string): Promise<string> {
-    const value: { message: string; restoreUser: string } = await this.xhr.doPost<{ message: string; restoreUser: string }>({
+    const value: {message: string; restoreUser: string} = await this.xhr.doPost<{message: string; restoreUser: string}>({
       url: "/verify_token",
       isJsonDecoded: true,
       params: {token},

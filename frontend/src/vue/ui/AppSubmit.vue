@@ -1,11 +1,11 @@
 <template>
   <button
-      :class="btnClass"
-      :disabled="running"
+    :class="btnClass"
+    :disabled="running"
   >
     <div
-        v-if="running"
-        class="spinner"
+      v-if="running"
+      class="spinner"
     />
     <slot/>
     {{ value }}

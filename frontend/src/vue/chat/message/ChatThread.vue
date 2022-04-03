@@ -11,25 +11,25 @@
     <div v-show="message.isThreadOpened" class="thread-opened">
       <template v-for="message in messages">
         <chat-sending-file
-            v-if="message.transfers"
-            :key="message.id"
-            :sending-file="message"
+          v-if="message.transfers"
+          :key="message.id"
+          :sending-file="message"
         />
         <chat-receiving-file
-            v-else-if="message.connId"
-            :key="message.id"
-            :receiving-file="message"
+          v-else-if="message.connId"
+          :key="message.id"
+          :receiving-file="message"
         />
         <chat-sending-message
-            v-else
-            :key="message.id"
-            :message="message"
+          v-else
+          :key="message.id"
+          :message="message"
         />
       </template>
       <chat-text-area
-          ref="textarea"
-          :room-id="message.roomId"
-          :thread-message-id="message.id"
+        ref="textarea"
+        :room-id="message.roomId"
+        :thread-message-id="message.id"
       />
     </div>
   </div>
@@ -40,7 +40,7 @@ import {
   Prop,
   Ref,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
 import {
   MessageModel,
@@ -58,7 +58,7 @@ import AppSeparator from "@/vue/ui/AppSeparator.vue";
     ChatReceivingFile,
     ChatSendingFile,
     ChatTextArea,
-    ChatSendingMessage
+    ChatSendingMessage,
   },
 })
 export default class ChatThread extends Vue {
@@ -110,7 +110,7 @@ export default class ChatThread extends Vue {
     this.$store.setCurrentThread({
       messageId: this.message.id,
       roomId: this.message.roomId,
-      isEditingNow: true
+      isEditingNow: true,
     });
   }
 }

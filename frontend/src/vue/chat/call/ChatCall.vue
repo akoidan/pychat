@@ -1,40 +1,40 @@
 <template>
   <div
-      v-show="callInfo.callActive"
-      class="callContainer"
+    v-show="callInfo.callActive"
+    class="callContainer"
   >
     <div
-        :class="{fullscreen}"
-        class="callContainerContent"
+      :class="{fullscreen}"
+      class="callContainerContent"
     >
       <video-container
-          v-show="showVideoContainer && !showSettings && callInfo.callActive"
-          ref="videoContainer"
-          :call-info="callInfo"
-          :room-id="roomId"
-          @desktop-click="desktopClick"
-          @video-click="videoClick"
-          @hang-up-call="hangUpCall"
-          @mic-click="micClick"
-          @exit-fullscreen="exitFullscreen"
+        v-show="showVideoContainer && !showSettings && callInfo.callActive"
+        ref="videoContainer"
+        :call-info="callInfo"
+        :room-id="roomId"
+        @desktop-click="desktopClick"
+        @video-click="videoClick"
+        @hang-up-call="hangUpCall"
+        @mic-click="micClick"
+        @exit-fullscreen="exitFullscreen"
       />
 
       <input-devices-settings
-          v-show="showSettings"
-          :call-info="callInfo"
-          :room-id="roomId"
+        v-show="showSettings"
+        :call-info="callInfo"
+        :room-id="roomId"
       />
       <call-container-icons
-          :call-info="callInfo"
-          :room-id="roomId"
-          @mic-click="micClick"
-          @hang-up-call="hangUpCall"
-          @video-click="videoClick"
-          @paint-click="paintClick"
-          @invert-show-settings="invertShowSettings"
-          @desktop-click="desktopClick"
-          @enter-fullscreen="enterFullscreen"
-          @invert-show-video-container="invertShowVideoContainer"
+        :call-info="callInfo"
+        :room-id="roomId"
+        @mic-click="micClick"
+        @hang-up-call="hangUpCall"
+        @video-click="videoClick"
+        @paint-click="paintClick"
+        @invert-show-settings="invertShowSettings"
+        @desktop-click="desktopClick"
+        @enter-fullscreen="enterFullscreen"
+        @invert-show-video-container="invertShowVideoContainer"
       />
       <div class="spainter">
         <!--        TODO v-if doesn't detach events on destroy on painter-->
@@ -44,7 +44,7 @@
   </div>
 </template>
 <script lang="ts">
-import { State } from "@/ts/instances/storeInstance";
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
@@ -52,12 +52,12 @@ import {
   Vue,
   Watch,
 } from "vue-property-decorator";
-import { CallsInfoModel } from "@/ts/types/model";
+import {CallsInfoModel} from "@/ts/types/model";
 import type {
   BooleanIdentifier,
   ShareIdentifier,
 } from "@/ts/types/types";
-import { VideoType } from "@/ts/types/types";
+import {VideoType} from "@/ts/types/types";
 
 import ChatRemotePeer from "@/vue/chat/call/ChatRemotePeer.vue";
 import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
@@ -85,11 +85,15 @@ export default class ChatCall extends Vue {
   public showSettings: boolean = false;
 
   public showVideoContainer: boolean = true;
+
   @Ref()
   public videoContainer!: Vue;
+
   @State
   public readonly myId!: number;
+
   public fullscreen: boolean = false;
+
   public listener = this.fullScreenChange.bind(this);
 
   @Watch("callInfo.callActive")

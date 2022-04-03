@@ -1,90 +1,90 @@
 <template>
   <div class="holder" @drop.prevent="dropPhoto">
     <chat-call
-        :call-info="room.callInfo"
-        :room-id="room.id"
+      :call-info="room.callInfo"
+      :room-id="room.id"
     />
     <search-messages :room="room"/>
     <div
-        ref="chatboxSearch"
-        class="chatbox"
-        :class="{'hidden': !room.search.searchActive}"
-        tabindex="1"
-        @keydown="keyDownSearchLoadUp"
-        @mousewheel="onSearchMouseWheel"
-        @scroll.passive="onSearchScroll"
+      ref="chatboxSearch"
+      class="chatbox"
+      :class="{'hidden': !room.search.searchActive}"
+      tabindex="1"
+      @keydown="keyDownSearchLoadUp"
+      @mousewheel="onSearchMouseWheel"
+      @scroll.passive="onSearchScroll"
     >
       <template
-          v-for="message in searchMessages"
+        v-for="message in searchMessages"
       >
         <app-separator
-            v-if="message.fieldDay"
-            :key="message.fieldDay"
-            :day="message.fieldDay"
+          v-if="message.fieldDay"
+          :key="message.fieldDay"
+          :day="message.fieldDay"
         />
         <chat-text-message v-else :key="message.id" :message="message"/>
       </template>
     </div>
     <div
-        ref="chatbox"
-        class="chatbox"
-        :class="{'hidden': room.search.searchActive || (room.callInfo && room.callInfo.sharePaint)}"
-        tabindex="1"
-        @keydown="keyDownLoadUp"
-        @mousewheel="onMouseWheel"
-        @scroll.passive="onScroll"
+      ref="chatbox"
+      class="chatbox"
+      :class="{'hidden': room.search.searchActive || (room.callInfo && room.callInfo.sharePaint)}"
+      tabindex="1"
+      @keydown="keyDownLoadUp"
+      @mousewheel="onMouseWheel"
+      @scroll.passive="onScroll"
     >
       <div v-if="messageLoading" class="spinner"/>
       <input
-          v-else-if="!room.allLoaded"
-          type="button"
-          value="Load more messages"
-          class="lor-btn load-more-msg-btn"
-          @click="loadUpHistory(10)"
+        v-else-if="!room.allLoaded"
+        type="button"
+        value="Load more messages"
+        class="lor-btn load-more-msg-btn"
+        @click="loadUpHistory(10)"
       />
       <div v-else class="start-history">
         This is the start of the history
       </div>
       <template v-for="message in messages">
         <chat-user-action-message
-            v-if="message.isUserAction"
-            :key="`a-${message.time}-${message.userId}`"
-            :time="message.time"
-            :user-id="message.userId"
-            :action="message.action"
+          v-if="message.isUserAction"
+          :key="`a-${message.time}-${message.userId}`"
+          :time="message.time"
+          :user-id="message.userId"
+          :action="message.action"
         />
         <chat-change-name-message
-            v-else-if="message.isChangeName"
-            :key="`n-${message.time}-${message.userId}`"
-            :time="message.time"
-            :old-name="message.oldName"
-            :new-name="message.newName"
+          v-else-if="message.isChangeName"
+          :key="`n-${message.time}-${message.userId}`"
+          :time="message.time"
+          :old-name="message.oldName"
+          :new-name="message.newName"
         />
         <app-separator
-            v-else-if="message.fieldDay"
-            :key="`s-${message.fieldDay}`"
-            :day="message.fieldDay"
+          v-else-if="message.fieldDay"
+          :key="`s-${message.fieldDay}`"
+          :day="message.fieldDay"
         />
         <chat-sending-file
-            v-else-if="message.transfers"
-            :key="message.id"
-            :sending-file="message"
+          v-else-if="message.transfers"
+          :key="message.id"
+          :sending-file="message"
         />
         <chat-receiving-file
-            v-else-if="message.connId"
-            :key="message.id"
-            :receiving-file="message"
+          v-else-if="message.connId"
+          :key="message.id"
+          :receiving-file="message"
         />
         <chat-thread
-            v-else-if="message.thread"
-            :key="message.parent.id"
-            :message="message.parent"
-            :messages="message.messages"
+          v-else-if="message.thread"
+          :key="message.parent.id"
+          :message="message.parent"
+          :messages="message.messages"
         />
         <chat-sending-message
-            v-else
-            :key="message.id"
-            :message="message"
+          v-else
+          :key="message.id"
+          :message="message"
         />
       </template>
     </div>
@@ -107,8 +107,8 @@ import {
 } from "@/ts/instances/storeInstance";
 import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
 import SearchMessages from "@/vue/chat/chatbox/SearchMessages.vue";
-import { RoomModel } from "@/ts/types/model";
-import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
+import {RoomModel} from "@/ts/types/model";
+import AppProgressBar fro "@/vue/ui/AppProgressBar.vue";
 import ChatSendingMessage from "@/vue/chat/message/ChatSendingMessage.vue";
 import ChatUserActionMessage from "@/vue/chat/message/ChatUserActionMessage.vue";
 import ChatSendingFile from "@/vue/chat/message/ChatSendingFile.vue";
@@ -119,7 +119,7 @@ import AppSeparator from "@/vue/ui/AppSeparator.vue";
 import ChatThread from "@/vue/chat/message/ChatThread.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
-import { isMobile } from "@/ts/utils/runtimeConsts";
+import {isMobile} from "@/ts/utils/runtimeConsts";
 
 
 @Component({
@@ -170,6 +170,7 @@ export default class ChatBox extends Vue {
   lastScrollTop: number = 0;
 
   beforeUpdate() {
+
     /*
      * Third party api calls emit('scroll')
      * This triggers vue beforeUpdate event
@@ -200,7 +201,8 @@ export default class ChatBox extends Vue {
 
   public markMessagesInCurrentRoomAsRead() {
     this.$logger.debug("Checking if we can set some messages to status read")();
-    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).map((m) => m.id);
+    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server"))
+.map((m) => m.id);
     if (messagesIds.length > 0) {
       this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
     }
@@ -230,7 +232,7 @@ export default class ChatBox extends Vue {
 
   onEmitScroll() {
     if (this.activeRoomId === this.room.id) {
-      this.$nextTick(function () {
+      this.$nextTick(function() {
         if (this.scrollBottom) {
           if (this.room.search.searchActive && this.chatboxSearch) {
             this.$logger.debug("Scrolling chatboxSearch to bottom")();
@@ -268,7 +270,7 @@ export default class ChatBox extends Vue {
         dates[d] = true;
         newArray.push({
           fieldDay: d,
-          time: Date.parse(d)
+          time: Date.parse(d),
         });
       }
       newArray.push(message);
@@ -282,11 +284,11 @@ export default class ChatBox extends Vue {
   }
 
   keyDownLoadUp(e: KeyboardEvent) {
-    this.loadHistoryWithEvent(e, async (n) => this.loadUpHistory(n));
+    this.loadHistoryWithEvent(e, async(n) => this.loadUpHistory(n));
   }
 
   keyDownSearchLoadUp(e: KeyboardEvent) {
-    this.loadHistoryWithEvent(e, async (n) => this.loadUpSearchHistory(n));
+    this.loadHistoryWithEvent(e, async(n) => this.loadUpSearchHistory(n));
   }
 
   loadHistoryWithEvent(e: KeyboardEvent, callback: (a: number) => void) {
@@ -304,7 +306,7 @@ export default class ChatBox extends Vue {
   @ApplyGrowlErr({
     runningProp: "searchMessageLoading",
     preventStacking: true,
-    message: "Unable to load history"
+    message: "Unable to load history",
   })
   private async loadUpSearchHistory(n: number) {
     if (this.chatboxSearch.scrollTop !== 0) {
@@ -320,7 +322,7 @@ export default class ChatBox extends Vue {
   @ApplyGrowlErr({
     runningProp: "messageLoading",
     preventStacking: true,
-    message: "Unable to load history"
+    message: "Unable to load history",
   })
   public async loadUpHistory(n: number) {
     if (this.chatbox.scrollTop > 100) {

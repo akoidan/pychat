@@ -16,7 +16,7 @@
     <chat-tagging
       ref="chatTagging"
       :name="taggingName"
-:user-ids="room.users"
+      :user-ids="room.users"
       @emit-name="addTagInfo"
     />
     <giphy-search v-if="showGiphy" @close="showGiphy = false" @add-gihpy="onEmitGiphy"/>
@@ -312,7 +312,7 @@ export default class ChatTextArea extends Vue {
     } else if (this.taggingName && ["ArrowUp", "ArrowDown"].includes(event.key)) {
       event.preventDefault();
       if (event.key === "ArrowUp") {
-        this.chatTagging.upArrow();
+        this.chatTagging.upArrow(;
       } else if (event.key == "ArrowDown") {
         this.chatTagging.downArrow();
       }
@@ -390,12 +390,11 @@ export default class ChatTextArea extends Vue {
         return;
       }
       editMessageWs(
-        md.messageContent,
-        this.$messageSenderProxy.getUniqueNegativeMessageId(),
+        md.messageCntent,
+        this.$messageSenderProxy.getUniqueNegativeMessaeId(),
         this.roomId,
         md.currSymbol,
-        md.files,
-        md.tags,
+        mdfiles, md.tags,
         Date.now(),
         0,
         this.threadMessageId ?? null,

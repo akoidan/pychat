@@ -1,9 +1,9 @@
 <template>
   <input
-      :class="inputClass"
-      :value="value"
-      type="date"
-      @input="oninputnative"
+    :class="inputClass"
+    :value="value"
+    type="date"
+    @input="oninputnative"
   />
 </template>
 <script lang="ts">
@@ -20,7 +20,9 @@ import {
 })
 export default class AppInputDate extends Vue {
   @Prop() public value!: string;
+
   @Prop({default: ""}) public inputClass!: string;
+
   @Prop({default: ""}) public inputClassDatepicker!: string;
 
   get datePickerValue() {

@@ -1,6 +1,6 @@
 <template>
   <div
-      :class="onlineClass"
+    :class="onlineClass"
   >
     <div class="user-name-sex">
       <user-image-icon :user="user"/>
@@ -10,7 +10,7 @@
   </div>
 </template>
 <script lang="ts">
-import { State } from "@/ts/instances/storeInstance";
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,

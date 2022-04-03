@@ -1,16 +1,16 @@
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { MessageSupplier } from "@/ts/types/types";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import type { DefaultWsOutMessage } from "@/ts/types/messages/wsOutMessages";
-import type { DefaultWsInMessage } from "@/ts/types/messages/wsInMessages";
+import type {MessageSupplier} from "@/ts/types/types";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type {DefaultWsOutMessage} from "@/ts/types/messages/wsOutMessages";
+import type {DefaultWsInMessage} from "@/ts/types/messages/wsInMessages";
 import type {
   DefaultMessage,
   HandlerName,
 } from "@/ts/types/messages/baseMessagesInterfaces";
 
 export default class AbstractMessageProcessor {
-  protected readonly callBacks: Record<number, { resolve: Function; reject: Function }> = {};
+  protected readonly callBacks: Record<number, {resolve: Function; reject: Function}> = {};
 
   protected readonly logger: Logger;
 
@@ -64,7 +64,7 @@ export default class AbstractMessageProcessor {
       const jsonMessage = this.getJsonMessage(message);
       this.callBacks[message.cbId!] = {
         resolve,
-        reject
+        reject,
       };
       const isSent = this.target.sendRawTextToServer(jsonMessage);
       if (isSent) {

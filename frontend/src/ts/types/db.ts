@@ -1,5 +1,5 @@
-import type { LogLevel } from "lines-logger";
-import type { MessageStatus } from "@/ts/types/model";
+import type {LogLevel} from "lines-logger";
+import type {MessageStatus} from "@/ts/types/model";
 
 export interface UserDB {
   id: number;
