@@ -8,7 +8,8 @@ import {
   isChrome,
   isMobile,
 } from "@/ts/utils/runtimeConsts";
-import App from "@/vue/App.vue"; // Should be after initStore
+// Should be after initStore
+import App from "@/vue/App.vue";
 import {sub} from "@/ts/instances/subInstance";
 import {createApp} from "vue";
 import {store} from "@/ts/instances/storeInstance";
@@ -18,7 +19,7 @@ import sessionHolder from "@/ts/instances/sessionInstance";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {PlatformUtil} from "@/ts/types/model";
 import Xhr from "@/ts/classes/Xhr";
-import "@/assets/icon.png";
+import "@/assets/icon.png"; // eslint-disable-line import/no-unassigned-import
 import WsHandler from "@/ts/message_handlers/WsHandler";
 import WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
 import DatabaseWrapper from "@/ts/classes/DatabaseWrapper";

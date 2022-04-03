@@ -32,6 +32,7 @@
     "camelcase": 0, // replaced with babel-camelcase
     "no-ternary": 0, // too aggressive
     "multiline-ternary": 0,
+    "sort-imports": 0,
     "new-cap": 0, // babel/new-cap
     "array-element-newline": [1, "consistent"],
     "comma-dangle": 0, // using typescript-eslint/comma-dangle
@@ -90,10 +91,10 @@
     "import/no-relative-parent-imports": 1,
     "import/dynamic-import-chunkname": 1,
     "import/exports-last":1,
-    "import/extensions": [1, "never", {"json":  "always", "vue": "always", "sass": "always"}], // w/o  extensiosn ts would not work
+    "import/extensions": [1, "never", {"json":  "always", "vue": "always", "sass": "always", "png":  "always"}],
     "import/first":1,
     "import/group-exports": 1,
-    "import/max-dependencies": 1,
+    "import/max-dependencies": 0,
     "import/newline-after-import": 1,
     "import/no-absolute-path":1,
     "import/no-amd": 1,
@@ -108,7 +109,7 @@
     "import/no-mutable-exports":1,
     "import/no-named-default": 1,
     "import/no-named-export":0, // we want them
-    "import/no-namespace": 1,
+    "import/no-namespace": 0,
     "import/no-nodejs-modules":1,
     "import/no-restricted-paths": 1,
     "import/no-self-import":1,
