@@ -1,22 +1,13 @@
 {
   "name": "pychat",
   "version": "1.0.0",
-  "description": "opensource chat",
-  "main": "index.js",
-  "directories": {
-    "test": "test"
-  },
+  "description": "Opensource chat",
   "scripts": {
     "build": "vite --config build/vite.config.ts build",
-    "prod": "yarn build",
-    "dev": "yarn start",
     "start": "vite --config build/vite.config.ts",
     "cp-prod-files": "tar c dist/ | ssh http@pychat.org -p 8886 \"rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/\"",
-    "publish": "yarn run build && yarn run cp-prod-files",
-    "generate-smileys": "node ./build/generate-smileys.js",
-    "test": "mocha test/index.ts",
-    "postinstall": "patch -p1 -i patches/vue-class-component+8.0.0-rc.1.patch",
-    "serve": "yarn build && node build/static-server.js"
+    "serve": "yarn build && node build/static-server.js",
+    "postinstall": "patch -p1 -i patches/vue-class-component+8.0.0-rc.1.patch"
   },
   "repository": {
     "type": "git",
