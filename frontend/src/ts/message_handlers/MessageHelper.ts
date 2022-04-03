@@ -7,11 +7,9 @@ import {
 import {
   FileModel,
   MessageModel,
-  RoomModel
 } from '@/ts/types/model';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
-import Vue from 'vue';
 import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
