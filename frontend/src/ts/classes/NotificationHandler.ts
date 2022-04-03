@@ -4,10 +4,8 @@ import { extractError } from '@/ts/utils/pureFunctions';
 import Api from '@/ts/message_handlers/Api';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import webpackServiceWorker from 'serviceworker-webpack-plugin/lib/runtime';
 import {
   IS_DEBUG,
-  MANIFEST,
   SERVICE_WORKER_URL,
   SERVICE_WORKER_VERSION_LS_NAME,
   GIT_HASH
@@ -20,7 +18,6 @@ import {InternetAppearMessage} from '@/ts/types/messages/innerMessages';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {sub} from '@/ts/instances/subInstance';
 import {MainWindow} from '@/ts/classes/MainWindow';
-
 
 
 export default class NotifierHandler extends MessageHandler {
@@ -194,17 +191,22 @@ export default class NotifierHandler extends MessageHandler {
   private async registerWorker() {
     if (!navigator.serviceWorker) {
       throw Error('Service worker is not supported');
-    } else if (!MANIFEST || ! SERVICE_WORKER_URL) {
-     throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
+    } else if (! SERVICE_WORKER_URL) {
+     throw Error('FIREBASE_API_KEY is missing in settings.py or file manifest.json is missing');
     }
-    let r: ServiceWorkerRegistration = (await navigator.serviceWorker.getRegistration(SERVICE_WORKER_URL))!;
+
+    let r: ServiceWorkerRegistration = (await navigator.serviceWorker.getRegistration())!;
     let version = localStorage.getItem(SERVICE_WORKER_VERSION_LS_NAME) || '';
     if (version !== GIT_HASH || !r) {
       this.logger.log(`Updating sw {} version ${version} to ${GIT_HASH}`, r)();
-      r = await webpackServiceWorker.register( {scope: '/'}) as ServiceWorkerRegistration;
-      this.logger.log(`Registered SW ${GIT_HASH} {}`, r)();
+      r = await navigator.serviceWorker.register(SERVICE_WORKER_URL, {scope: '/'});
       if (r) {
+        this.logger.debug('Registered service worker {}', r)();
+        this.logger.log(`Registered SW ${GIT_HASH} {}`, r)();
         localStorage.setItem(SERVICE_WORKER_VERSION_LS_NAME, `${GIT_HASH}`);
+      } else {
+         this.logger.error('Registered failed somehow', r)();
+         throw Error('Sw registration failed');
       }
     } else {
       this.logger.log(`SW is up to date, v=${version} {}, skipping the update`, r)();

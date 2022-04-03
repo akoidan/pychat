@@ -52,7 +52,7 @@ export default class UserRow extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/room_users_table.sass"
+  @import "@/assets/sass/partials/room_users_table"
   .user-icon
     width: 60px
     display: flex

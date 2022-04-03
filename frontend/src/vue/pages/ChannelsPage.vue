@@ -1,6 +1,7 @@
 <template>
   <div class="holder">
-    <app-menu-bar v-show="showAppMenuBar"  v-model="showAppMenuBar" @click.native="showAppMenuBar = false"/>
+    <!--    app-menu and popup menu requires to have activeRoomId not null, and painterPage dont have it. so use v-if-->
+    <app-menu-bar v-if="showAppMenuBar" v-model="showAppMenuBar" @click.native="showAppMenuBar = false"/>
     <chat-nav-bar
       :low-width="lowWidth"
       :current-page="currentChatPage"
@@ -8,7 +9,7 @@
       @show-menu="showAppMenuBar = true"
       @show-popup-toggle="showPopup = true"
     />
-    <chat-popup-menu v-show="showPopup" @click.native="showPopup = false" />
+    <chat-popup-menu v-if="showPopup" @click.native="showPopup = false" />
     <div class="wrapper">
       <chat-right-section v-show="!lowWidth || currentChatPage === 'rooms'" />
       <chat-boxes v-show="!lowWidth || currentChatPage === 'chat'"/>
@@ -25,7 +26,10 @@ import ChatBoxes from '@/vue/chat/chatbox/ChatBoxes.vue';
 import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
 import {isMobile} from '@/ts/utils/runtimeConsts';
 import ChatIsOnlineIcon from '@/vue/chat/chatbox/ChatIsOnlineIcon.vue';
-import {State} from '@/ts/instances/storeInstance';
+import {
+  State,
+  store
+} from '@/ts/instances/storeInstance';
 import ChatPopupMenu from '@/vue/chat/chatbox/ChatPopupMenu.vue';
 import AppMenuBar from '@/vue/ui/AppMenuBar.vue';
 import {RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
@@ -47,13 +51,13 @@ import ChatNavBar from '@/vue/chat/chatbox/ChatNavBar.vue';
 })
 export default class ChannelsPage extends Vue {
 
-  @State
-  public readonly activeRoomId!: number;
-
   private listener!: Function;
   private mediaQuery!: MediaQueryList;
   private lowWidth = false;
   private showAppMenuBar = false;
+
+  @State
+  public readonly activeRoomId!: number;
 
   @State
   public readonly currentChatPage!: 'rooms' | 'chat';
@@ -70,8 +74,8 @@ export default class ChannelsPage extends Vue {
     this.$store.setCurrentChatPage('rooms');
   }
 
-
   created() {
+    this.$store.setActiveRoomId(parseInt(this.$route.params.id as string));
     this.mediaQuery = window.matchMedia('(max-width: 700px)');
     this.listener = (e: MediaQueryList) => {
       this.lowWidth = e.matches;
@@ -88,9 +92,9 @@ export default class ChannelsPage extends Vue {
 </script>
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/variables"
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .holder
     display: flex

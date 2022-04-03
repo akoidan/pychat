@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div ref="div" />
+     <painter @blob="onBlobPaste"/>
   </div>
 </template>
 <script lang="ts">
@@ -9,10 +9,9 @@ import {
   Ref,
   Vue
 } from 'vue-property-decorator';
+import Painter from '@/vue/chat/textarea/Painter.vue';
 
 
-import loggerFactory from '@/ts/instances/loggerFactory';
-import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import {savedFiles} from '@/ts/utils/htmlApi';
 
 let uniqueId = 1;
@@ -21,47 +20,31 @@ function getUniqueId() {
   return uniqueId++;
 }
 
-@Component({name: 'PainterPage'})
+@Component({name: 'PainterPage', components: {Painter}})
  export default class PainterPage extends Vue {
 
   @Ref()
   public div!: HTMLElement;
 
-
-  public async mounted() {
-    let painterImport = await import(/* webpackChunkName: "spainter" */'spainter');
-    let painter = new painterImport.default(this.div, {
-      onBlobPaste: (e: Blob) => {
-        let id: string = `paintBlob-${getUniqueId()}`;
-        savedFiles[id] = e;
-        const {roomId, editedMessageId, openedThreadId} = this.$route.query;
-        this.$store.setPastingQueue([{
-          content: id,
-          editedMessageId: parseInt(editedMessageId as string )|| null,
-          elType: 'blob',
-          openedThreadId: parseInt(openedThreadId as string) || null,
-          roomId: parseInt(roomId as string)
-        }]);
-        this.$router.replace(`/chat/${roomId}`);
-      },
-      textClass: 'input',
-      buttonClass: 'lor-btn',
-      logger: loggerFactory.getLogger('painter'),
-      rangeFactory: (): HTMLInputElement => {
-        let ComponentClass = Vue.extend(AppInputRange);
-        let instance = new ComponentClass();
-        instance.$mount();
-
-        return instance.$el as HTMLInputElement;
-      }
-    });
-    this.$emit('canvas', this.div.querySelector('canvas'));
+  public onBlobPaste(e: Blob) {
+    let id: string = `paintBlob-${getUniqueId()}`;
+    savedFiles[id] = e;
+    const {roomId, editedMessageId, openedThreadId} = this.$route.query;
+    this.$store.setPastingQueue([{
+      content: id,
+      editedMessageId: parseInt(editedMessageId as string )|| null,
+      elType: 'blob',
+      openedThreadId: parseInt(openedThreadId as string) || null,
+      roomId: parseInt(roomId as string)
+    }]);
+    this.$router.replace(`/chat/${roomId}`);
   }
+
 }
 </script>
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .container
     height: calc(100% - 55px)

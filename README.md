@@ -166,7 +166,7 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
  - `cd frontend; nvm install; nvm use`.
  - `yarn install --frozen-lockfile`
  - Create production.json based on [Frontend config](#frontend-config). Also you can use and modify `cp docker/pychat.org/production.json ./frontend/`
- - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
+ - Run `yarn build`. This generates static files in `frotnend/dist` directory.
 
 ## Desktop app
 Pychat uses websql and built the way so it renders everything possible w/o network. You have 3 options:
@@ -201,7 +201,7 @@ Example for mac:
  1. Open `frontend/platforms/android` with androidStudio
  1. Start android emulator / connect device
  1. put index.html into www
- 1. Run dev server with `yarn run dev`; `bash download_content.sh android`
+ 1. Run dev server with `yarn start`; `bash download_content.sh android`
  1. TO debug java files you can run it directory from android studio. `Debug` button should be available out of the box after openning a project
  1. To debug js you can open `chrome://inspect/#devices` in chrome 
  1. For any question check [cordova docs](https://cordova.apache.org/docs/en/latest/guide/platforms/android/index.html#installing-the-requirements)
@@ -281,7 +281,7 @@ Remember that Service Worker will work only if certificate is trusted. So flags 
 Change to frontend directory `cd frontend` I would recommend to use node version specified in nvm, so  `nvm install; nvm use`.
  - To get started install dependencies first: `yarn install --frozen-lock` # or use npm if you're old and cranky
  - Take a look at copy [development.json](frontend/development.json). The description is at [Frontend config](#frontend-config)
- - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run devProxy`. Backend should be running during that. Otherwise use `yarn run dev`. You can navigate to http://localhost:8080.
+ - vite dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. `yarn start`. If you open chrome and it's not loading, while main.ts is stuck at pending, increase system file [descriptors](https://unix.stackexchange.com/a/370652/122392). You can navigate to http://localhost:8080.
 
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
@@ -343,9 +343,7 @@ Disable tslint, since it's not used, and enable eslint:
  3. Tslint
  4. Disable tslint
 
- 
-#### Enable aliases for webpack
- - to resolve absolute path for webpack webstorm requires webpack.config.js. Go to settings -> javascript -> webpack -> Webpack config file   
+    
 
 ## Start services and run:
  - Start `mysql` server if it's not started.
@@ -363,7 +361,7 @@ Pychat is written in [Python](https://www.python.org/) and [typescript](https://
 Execute `bash download_content.sh` it will show you help.
 
 ## Frontend logging
-By default each user has turned off browser (console) logs. You can turn them on in [/#/profile](https://localhost:8000/#/profile) page (`logs` checkbox). All logs are logged with `window.logger` object, for ex: `window.logger('message')()`. Note that logger returns a function which is binded to params, that kind of binding shows corrent lines in browser, especially it's handy when all source comes w/o libraries/webpack or other things that transpiles or overhead it. You can also inspect ws messages [here](ws_messages.jpeg) for chromium. You can play with `window.wsHandler.handleMessage(object)` and `window.wsHandler.handle(string)` methods in debug with messages from log to see what's going on
+By default each user has turned off browser (console) logs. You can turn them on in [/#/profile](https://localhost:8000/#/profile) page (`logs` checkbox). All logs are logged with `window.logger` object, for ex: `window.logger('message')()`. Note that logger returns a function which is binded to params, that kind of binding shows corrent lines in browser, especially it's handy when all source comes w/o libraries or other things that transpiles or overhead it. You can also inspect ws messages [here](ws_messages.jpeg) for chromium. You can play with `window.wsHandler.handleMessage(object)` and `window.wsHandler.handle(string)` methods in debug with messages from log to see what's going on
 
 ## Icons
 Chat uses [fontello](fontello.com) and its api for icons. The decision is based on requirements for different icons that come from different fonts and ability to add custom assets. Thus the fonts should be generated (`.wolf` etc). W/o this chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh post_fontello_conf`. Make your changes and hit "Save session". Then execute `bash download_content.sh download_fontello`. If you did everything right new icons should appear under [frontend/src/assets/demo.html](frontend/src/assets/demo.html)
@@ -450,9 +448,9 @@ SEE  WEBRTC_CONFIG at development.json. I personally use turn server coturn, It 
 ## Frontend Stack
 The technologies stack used in project:
 - Typescript
-- Vue, Vuex, VueRouter, lines-logger
+- Vue3, Vuex, VueRouter, lines-logger
 - Vuex-module-decorators, Vue-property-decorator
-- Webpack and loaders
+- Vite
 - Sass
 
 [builder.js](frontend/builder.js) is used to build project. Take a look at it to understand how source files are being processed. Its start point is `entry: ['./src/main.ts']`. Everything is imported in this files are being processed by section `loaders`.
@@ -494,11 +492,9 @@ development.json and production.json have the following format:
 ```json
 {
   "BACKEND_ADDRESS": "e.g. pychat.org:443, protocol shouldn't be there, note there's no trailing slash, you can specify '{}' to use the same host as files served with",
-  "IS_DEBUG": "set true for development and debug mode enabled",
-  "UGLIFY": "true/false uglifies js/css so it has less weight, set this for production.json only, when you're sue you don't need to debug the output",
+  "IS_DEBUG": "if true, build won't be uglifies, logs will be set to trace, window object will be added with useful data and etc",
   "GOOGLE_OAUTH_2_CLIENT_ID" : "check chat/settings_example.py",
   "FACEBOOK_APP_ID": "check chat/settings_example.py",
-  "MANIFEST": "manifest path for firebase push notifications e.g.`/manifest.json`",
   "RECAPTCHA_PUBLIC_KEY": "check chat/settings_example.py RECAPTCHA_SITE_KEY",
   "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username. Don't use RECAPTCHA with this key",
   "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash",
@@ -527,10 +523,10 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
 * user1 writes a message, user1 goes offline, user 2 opens a chat from 1st devices and goes offline, user 2 opens a chat from 2nd devices and responds in its thread and goes offline, user2 opens first deviecs and thread messages count = 0
 * loading messages is too slow, when a lot of messages is printed to local database. It's better to load 20 last messages to chat instead of 100000, probably vuex getter but it's better to think what we should do on scroll.
 * pin messages feature, like telegram
-* webpack [ext] doesn't work for chunks. 
 * Serviceworkerplugin doesn't support hashmaps
 * Room should have an image
 * pasting from painterpage doesn't work

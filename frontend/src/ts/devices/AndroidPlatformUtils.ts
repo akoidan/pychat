@@ -3,7 +3,7 @@ import {
   permissions_type,
   PlatformUtil
 } from '@/ts/types/model';
-import type cordova from 'cordova';
+import cordova from 'cordova';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 
@@ -29,7 +29,7 @@ export class AndroidPlatformUtil implements PlatformUtil {
         throw Error('no persmissins asked')
       }
       this.logger.debug('Checking if user already has permissions for {}', permissions)();
-      await requiredPermissions.map(permission => new Promise((resolve, reject) => {
+      await requiredPermissions.map(permission => new Promise<void>((resolve, reject) => {
         permissions.checkPermission(permission, (status: any)=> {
           this.logger.debug('permission {} status {}', permission, status)();
           if (status.hasPermission) {
@@ -43,7 +43,7 @@ export class AndroidPlatformUtil implements PlatformUtil {
         this.logger.debug('Permissions {} are already acquired', permissions)();
       } else {
         this.logger.debug('Asking  {} permissions', permissions)();
-        await new Promise((resolve, reject) => {
+        await new Promise<void>((resolve, reject) => {
           permissions.requestPermissions(requiredPermissions, (status: any) => {
             if( !status.hasPermission ) {
               reject('User rejected permissions');

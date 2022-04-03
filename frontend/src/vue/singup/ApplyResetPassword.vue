@@ -41,8 +41,7 @@
 </template>
 <script lang="ts">
 
-  import {Prop, Component} from "vue-property-decorator";
-  import Vue from 'vue';
+  import {Prop, Component, Vue} from "vue-property-decorator";
   import {State} from '@/ts/instances/storeInstance';
   import AppSubmit from '@/vue/ui/AppSubmit.vue';
   import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
@@ -81,7 +80,7 @@
 
   $restPassMargin: 20px
 
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/mixins"
 
   .spinner
     @include lds-30-spinner-vertical('Checking token...')

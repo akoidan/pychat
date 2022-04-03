@@ -212,7 +212,7 @@ export default class UserProfileSettings extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .lor-btn
     width: 100%

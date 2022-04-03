@@ -126,6 +126,7 @@ import ParentChannel from '@/vue/parts/ParentChannel.vue';
 import PickUser from '@/vue/parts/PickUser.vue';
 import {PrivateRoomsIds} from '@/ts/types/types';
 
+
 @Component({
   name: 'RoomSettings' ,
   components: {
@@ -144,7 +145,7 @@ export default class RoomSettings extends Vue {
   public admin: number[] = [];
 
   get roomId(): number {
-    const id = this.$route.params.id;
+    const id = this.$route.params.id as string;
     this.$logger.log('Rending room settings for {}', id)();
 
     return parseInt(id);
@@ -273,7 +274,7 @@ export default class RoomSettings extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .holder
     overflow-y: auto

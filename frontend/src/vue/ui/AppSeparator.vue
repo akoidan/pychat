@@ -19,7 +19,7 @@
     lang="sass"
     scoped
 >
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/variables"
   fieldset
     border-top: 1px solid #e8e8e8
     border-bottom: none

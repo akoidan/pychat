@@ -55,7 +55,7 @@ export default class GoogleAuth extends Vue {
       this.$logger.log('gapi 2 is ready')();
       try {
         await gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID});
-      } catch (e) {
+      } catch (e: any) {
         throw Error(e?.details)
       }
       this.$logger.log('gauth 2 is ready')();
@@ -116,7 +116,7 @@ export default class GoogleAuth extends Vue {
       right: 0
       // expand to width
       position: absolute
-      background: url('~@/assets/img/g-icon.svg') no-repeat
+      background: url('@/assets/img/g-icon.svg') no-repeat
       top: -8px
       left: -5px
 

@@ -36,8 +36,6 @@ import {
   RoomModel,
   SearchModel
 } from '@/ts/types/model';
-import { MessageModelDto } from '@/ts/types/dto';
-import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
 
 const START_TYPING = 'Start typing and messages will appear';
 
@@ -94,7 +92,7 @@ function getUniqueId() {
     }
   }
 
-  private created() {
+  public created() {
     this.search = this.room.search.searchText;
     if (!this.search) {
       this.searchResult = START_TYPING;
@@ -129,7 +127,7 @@ function getUniqueId() {
                 return false;
               }
           );
-    } catch (e) {
+    } catch (e: any) {
       if (uniqueId === this.currentRequest) {
         this.currentRequest = 0
       }
@@ -150,7 +148,7 @@ function getUniqueId() {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/mixins"
 
   .icon-cancel-circled-outline
     @include hover-click(red)

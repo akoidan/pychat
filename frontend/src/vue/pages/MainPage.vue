@@ -7,16 +7,15 @@
       v-if="incomingCall"
       :call="incomingCall"
     />
-    <keep-alive
-      v-if="inited"
-      :include="['ChannelsPage', 'Painter']"
-    >
-      <router-view class="body" />
-    </keep-alive>
-    <div
-      v-else
-      class="spinner"
-    />
+    <router-view v-if="inited" v-slot="{ Component, route }">
+      <keep-alive include="PainterPage,ChannelsPage">
+        <component
+          :is="Component"
+          class="body"
+        />
+      </keep-alive>
+    </router-view>
+    <div v-else class="spinner"></div>
   </div>
 </template>
 <script lang="ts">
@@ -70,8 +69,8 @@ export default class MainPage extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .spinner
     margin: auto

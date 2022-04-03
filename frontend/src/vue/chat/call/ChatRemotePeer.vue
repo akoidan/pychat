@@ -60,7 +60,7 @@ export default class ChatRemotePeer extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/variables"
 
   .micVideoWrapper
     display: inline-block

@@ -230,7 +230,7 @@ export default class CallHandler extends FileAndCallTransfer {
           newStream: stream!,
         };
         sub.notify(message)
-      } catch (e) {
+      } catch (e: any) {
         this.handleStream(e, stream);
       }
     // }
@@ -311,7 +311,7 @@ export default class CallHandler extends FileAndCallTransfer {
       this.store.setCallActiveToState(payload);
       let e = await this.wsHandler.offerCall(this.roomId, browserVersion);
       this.setConnectionId(e.connId);
-    } catch (e) {
+    } catch (e: any) {
       this.handleStream(e, stream);
     }
   }

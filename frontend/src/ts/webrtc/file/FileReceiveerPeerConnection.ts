@@ -128,7 +128,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
           )
       );
       this.fileEntry = await new Promise<FileEntry>((resolve, reject) =>
-          fs.root.getFile(this.connectionId, {create: true}, resolve, reject)
+          fs.root.getFile(this.connectionId, {create: true}, resolve as any, reject) // TODO as?
       );
       this.fileWriter = await new Promise<FileWriter>((resolve, reject) =>
           this.fileEntry!.createWriter(resolve, reject)
@@ -139,7 +139,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
       }
       this.fileWriter.onwriteend = this.onWriteEnd.bind(this);
       this.logger.log('FileWriter is created')();
-    } catch (e) {
+    } catch (e: any) {
       this.logger.error('FileSystemApi Error: {}, code {}', e.message || e, e.code)();
       if (fs && e.code === 22) { // TODO move this to specific entry so we can recreate file
         await this.clearFS(fs);
@@ -206,7 +206,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
   private async clearFS(fs: FileSystem) {
     this.logger.log('Quota exceeded, trying to clear it')();
     const entries: Entry[] = await new Promise<Entry[]>((resolve, reject) =>
-        fs.root.createReader().readEntries(resolve, reject)
+        fs.root.createReader().readEntries(resolve as any, reject) //TODO as?
     );
     await Promise.all(entries.map(async (e: Entry) => {
       if (e.isFile) {

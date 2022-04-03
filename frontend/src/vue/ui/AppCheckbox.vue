@@ -54,8 +54,8 @@ function getUniqueId() {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/variables"
 
   .color-reg input[type=checkbox], .color-lor input[type=checkbox]
     display: none

@@ -98,7 +98,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       this.sendChannel = this.pc!.createDataChannel('sendDataChannel', {reliable: false});
       this.sendChannel.onopen = this.onreceiveChannelOpen.bind(this);
       this.logger.log('Created send data channel.')();
-    } catch (e) {
+    } catch (e: any) {
       const error = `Failed to create data channel because ${e.message || e}`;
       this.commitErrorIntoStore(error);
       this.logger.error('acceptFile {}', e)();
@@ -221,7 +221,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       } else {
         throw Error(`Can't write data into ${this.sendChannel!.readyState} channel`);
       }
-    } catch (error) {
+    } catch (error: any) {
       this.commitErrorIntoStore(`Internal error: ${error?.message}`);
       this.unsubscribeAndRemoveFromParent();
       this.logger.error('sendData {}', error)();

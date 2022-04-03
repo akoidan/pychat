@@ -94,7 +94,7 @@ export default class Login extends Vue {
       text-decoration: underline
       cursor: pointer
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
   i
     @extend %i
 </style>

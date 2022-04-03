@@ -43,8 +43,8 @@ import { LoginMessage } from '@/ts/types/messages/innerMessages';
 
 <style lang="sass" scoped>
 
-  @import '~@/assets/sass/partials/mixins.sass'
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/variables"
   %top-btn-register
     border-top: 1px solid rgba(255, 255, 255, 0.6)
     border-left: 1px solid rgba(171, 171, 171, 0.83)

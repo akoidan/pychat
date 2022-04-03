@@ -1,10 +1,8 @@
 {
   "BACKEND_ADDRESS": "{}:8888",
   "IS_DEBUG": true,
-  "UGLIFY": false,
   "ELECTRON_IGNORE_SSL": true,
   "PUBLIC_PATH": null,
-  "MANIFEST": "/manifest.json",
   "GOOGLE_OAUTH_2_CLIENT_ID": false,
   "FACEBOOK_APP_ID": false,
   "RECAPTCHA_PUBLIC_KEY": false,

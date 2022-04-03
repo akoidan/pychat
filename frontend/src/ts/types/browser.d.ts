@@ -9,7 +9,7 @@ declare interface Document {
 }
 
 declare interface RTCPeerConnection {
-  onaddstream(event: MediaStreamEvent): void;
+  onaddstream(event: any): void;
   // obsolete (deprecated) TODO
   addStream(a: MediaStream): void;
   removeStream(a: MediaStream): void;
@@ -60,17 +60,17 @@ declare interface BeforeInstallPromptEvent extends Event {
 
 declare interface MediaDevices {
   getDisplayMedia(constraints: MediaStreamConstraints): Promise<MediaStream>;
-  getUserMedia(constraints: MediaStreamConstraints, successCallback: NavigatorUserMediaSuccessCallback, errorCallback: NavigatorUserMediaErrorCallback): void;
+  getUserMedia(constraints: MediaStreamConstraints, successCallback: any, errorCallback: any): void;
 }
 
-declare class MediaRecorder {
-  public onstop: Function;
-  public ondataavailable: Function;
-  constructor(stream: MediaStream, options: {});
-  public static isTypeSupported(t: string): boolean;
-  public stop(): void;
-  public start(time?: number): void;
-}
+// declare class MediaRecorder {
+//   public onstop: Function;
+//   public ondataavailable: Function;
+//   constructor(stream: MediaStream, options: {});
+//   public static isTypeSupported(t: string): boolean;
+//   public stop(): void;
+//   public start(time?: number): void;
+// }
 
 declare interface MediaStreamTrack {
   isShare: boolean;

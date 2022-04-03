@@ -14,7 +14,7 @@ export default class MessageSenderPeerConnection extends MessagePeerConnection {
       this.sendChannel = this.pc!.createDataChannel('sendDataChannel', {reliable: false});
       this.setupEvents();
       this.logger.log('Created send data channel.')();
-    } catch (e) {
+    } catch (e: any) {
       const error = `Failed to create data channel because ${e.message || e}`;
       this.logger.error('acceptFile {}', e)();
 

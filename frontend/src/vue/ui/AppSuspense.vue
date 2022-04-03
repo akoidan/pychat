@@ -15,7 +15,7 @@
 <script lang="ts">
 import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
 
-@Component
+@Component({})
 export default class AppSuspense extends Vue {
 
   private currentRequest: XMLHttpRequest|null = null;
@@ -34,7 +34,7 @@ export default class AppSuspense extends Vue {
       this.currentRequest = null;
       return result;
     } catch (errors) {
-      this.error = errors.message;
+      this.error = (errors as any).message;
       this.currentRequest = null;
     }
   }
@@ -43,7 +43,7 @@ export default class AppSuspense extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/mixins"
 
   .spinner
     display: inline-block

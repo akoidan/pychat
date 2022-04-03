@@ -54,7 +54,7 @@ import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
 import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import AppSuspense from '@/vue/ui/AppSuspense.vue';
 import {webpSupported} from '@/ts/utils/runtimeConsts';
-import {
+import type {
   GIFObject,
   MultiResponse
 } from 'giphy-api';
@@ -143,7 +143,7 @@ export default class GiphySearch extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .giphy-header
     display: flex

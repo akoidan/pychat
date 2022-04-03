@@ -185,7 +185,7 @@ import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
     }
 
     get channelId(): number {
-      const id = this.$route.params.id;
+      const id = this.$route.params.id as string;
       this.$logger.log('Rending channel settings for {}', id)();
 
       return parseInt(id);

@@ -1,5 +1,5 @@
 import {app, BrowserWindow} from 'electron';
-import {IS_DEBUG, ELECTRON_MAIN_FILE, IS_PROD, ELECTRON_IGNORE_SSL} from '@/ts/utils/consts';
+import {IS_DEBUG, ELECTRON_MAIN_FILE, ELECTRON_IGNORE_SSL} from '@/ts/utils/consts';
 import * as constants from '@/ts/utils/consts';
 
 let mainWindow: BrowserWindow|null;
@@ -27,21 +27,6 @@ async function createWindow() {
   let mainWindow: BrowserWindow | null = new BrowserWindow();
 
   mainWindow.loadURL(url);
-  if (!IS_PROD) {
-    mainWindow.webContents.on('did-frame-finish-load', () => {
-      mainWindow!.webContents.once('devtools-opened', () => {
-        if (mainWindow) {
-          mainWindow.focus();
-          setImmediate(() => {
-            if (mainWindow) {
-              mainWindow.focus();
-            }
-          });
-        }
-      });
-      mainWindow!.webContents.openDevTools();
-    });
-  }
 
   mainWindow.on('closed', () => {
     console.log('closed');

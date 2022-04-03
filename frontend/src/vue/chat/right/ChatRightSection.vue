@@ -34,9 +34,9 @@ export default class ChatRightSection extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/variables"
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/abstract_classes"
 
   .chat-room-users-wrapper
     float: right

@@ -36,6 +36,7 @@ import {
 import {DefaultStore} from '@/ts/classes/DefaultStore';
 import { hexEncode } from '@/ts/utils/pureFunctions';
 import { GIFObject } from 'giphy-api';
+import { Emitter } from 'mitt';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -208,15 +209,6 @@ export function getGiphyHtml(gif: GIFObject) {
   const webp = gif.images.original.webp ? `webp="${gif.images.original.webp}"` : ``;
   return `<img src="${src}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" ${webp} url="${gif.images.original.url}" />`;
 }
-
-export const isDateMissing = (function () {
-  const input = document.createElement('input');
-  input.setAttribute('type', 'date');
-  const notADateValue = 'not-a-date';
-  input.setAttribute('value', notADateValue);
-
-  return input.value === notADateValue;
-})();
 
 export function resolveMediaUrl<T extends string|null>(src: T): T {
   if (!src) {
@@ -476,7 +468,7 @@ export function setAudioEvent(e: HTMLElement) {
   });
 }
 
-export function setImageFailEvents(e: HTMLElement, bus: Vue) {
+export function setImageFailEvents(e: HTMLElement, bus: Emitter<any>) {
   const r = e.querySelectorAll('img');
   for (let i = 0; i < r.length; i++) {
     (function (img) {
@@ -484,7 +476,7 @@ export function setImageFailEvents(e: HTMLElement, bus: Vue) {
         this.className += ' failed';
       };
       img.onload = function () {
-        bus.$emit('scroll');
+        bus.emit('scroll');
       };
     })(r[i]);
   }
@@ -654,7 +646,7 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
 export function highlightCode(element: HTMLElement) {
   const s = element.querySelectorAll('pre');
   if (s.length) {
-    import(/* webpackChunkName: "highlightjs" */ 'highlightjs').then(hljs => {
+    import( 'highlightjs').then(hljs => {
       for (let i = 0; i < s.length; i++) {
         hljs.highlightBlock(s[i]);
       }

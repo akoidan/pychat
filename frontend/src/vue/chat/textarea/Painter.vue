@@ -11,13 +11,7 @@ import {
 
 import loggerFactory from '@/ts/instances/loggerFactory';
 import AppInputRange from '@/vue/ui/AppInputRange.vue';
-
-
-let uniqueId = 1;
-
-function getUniqueId() {
-  return uniqueId++;
-}
+import { createApp } from 'vue';
 
 
 @Component({name: 'Painter'})
@@ -27,18 +21,22 @@ function getUniqueId() {
   public div!: HTMLElement;
 
   public async mounted() {
-    let painterImport = await import(/* webpackChunkName: "spainter" */ 'spainter');
+    let painterImport = await import('spainter');
     new painterImport.default(this.div, {
       textClass: 'input',
       buttonClass: 'lor-btn',
       logger: loggerFactory.getLogger('painter'),
       rangeFactory: (): HTMLInputElement => {
-        let ComponentClass = Vue.extend(AppInputRange);
-        let instance = new ComponentClass();
-        instance.$mount();
-
-        return instance.$el as HTMLInputElement;
-      }
+        let app = createApp(AppInputRange);
+        let div = document.createElement('div');
+        let instance: AppInputRange = app.mount(div) as any;
+        div.removeChild(instance.$el);
+        setTimeout(()=> instance.fixStyle())
+        return instance.$el;
+      },
+      onBlobPaste: (e: Blob) => {
+        this.$emit('blob', e);
+      },
     });
     this.$emit('canvas', this.div.querySelector('canvas'));
   }

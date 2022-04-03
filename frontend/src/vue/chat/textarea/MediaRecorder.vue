@@ -57,7 +57,7 @@ import {
       let src: MediaStream = (await this.navigatorRecord.record())!;
       this.video.srcObject = src;
       this.recordState = 'running';
-    } catch (error) {
+    } catch (error: any) {
       this.recordState = 'pause';
       if (String(error.message).includes("Permission denied")) {
         if (isChrome && !isMobile) {
@@ -95,8 +95,8 @@ import {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/abstract_classes"
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/mixins"
 
   .click-info
     position: absolute

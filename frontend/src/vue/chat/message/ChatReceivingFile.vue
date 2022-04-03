@@ -95,7 +95,7 @@ export default class ChatReceivingFile extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/variables"
 
   .message-receiving-file
     display: flex

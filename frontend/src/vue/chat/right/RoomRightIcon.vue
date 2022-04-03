@@ -52,8 +52,8 @@ import { MessageModel, RoomModel } from '@/ts/types/model';
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/mixins.sass"
-  @import "~@/assets/sass/partials/room_users_table.sass"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/room_users_table"
 
   .icon-phone
     @include hover-click(#3aa130)

@@ -102,8 +102,8 @@ export default class ChatThread extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/variables"
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/mixins"
 
   .loading-history
     display: flex

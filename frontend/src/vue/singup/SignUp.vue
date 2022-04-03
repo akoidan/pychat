@@ -183,7 +183,7 @@ import {USERNAME_REGEX} from '@/ts/utils/consts';
         this.userCheckValue = IconColor.SUCCESS;
         this.userDescription = `Username is ok!`;
         this.usernameValidity = "";
-      } catch (errors) {
+      } catch (errors: any) {
         this.userCheckValue = IconColor.ERROR;
         this.usernameValidity = errors;
         this.userDescription = errors;
@@ -274,7 +274,7 @@ import {USERNAME_REGEX} from '@/ts/utils/consts';
         this.emailCheckValue = IconColor.SUCCESS;
         this.emailDescription = `Email is ok!`;
         this.emailValidity = '';
-      } catch (errors) {
+      } catch (errors: any) {
         this.emailCheckValue = IconColor.ERROR;
         this.emailValidity = errors;
         this.emailDescription = errors;

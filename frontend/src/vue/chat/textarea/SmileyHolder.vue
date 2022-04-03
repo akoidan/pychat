@@ -38,11 +38,8 @@
         @click="addSmileyClick(code)"
       >
     </div>
-    <template v-for="(allSmileys, tabName) in smileys">
-      <div
-        v-show="activeTab === tabName && !showFilterSmiley"
-        :key="tabName"
-      >
+    <template v-for="(allSmileys, tabName) in smileys" :key="tabName">
+      <div v-show="activeTab === tabName && !showFilterSmiley">
         <img
           v-for="(smiley, code) in allSmileys"
           :key="code"
@@ -51,7 +48,7 @@
           :alt="smiley.alt"
           :code="code"
           @click="addSmileyClick(code)"
-        >
+        />
       </div>
     </template>
   </div>
@@ -175,9 +172,9 @@ import { State } from '@/ts/instances/storeInstance';
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/abstract_classes"
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/variables"
 
   .emoji
     width: $emoji-width

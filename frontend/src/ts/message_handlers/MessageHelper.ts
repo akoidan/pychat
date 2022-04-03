@@ -16,16 +16,17 @@ import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import {resolveMediaUrl} from '@/ts/utils/htmlApi';
+import { Emitter } from 'mitt';
 
 export class MessageHelper {
 
   private readonly logger: Logger;
   private readonly store: DefaultStore;
   private readonly notifier: NotifierHandler;
-  private readonly messageBus: Vue;
+  private readonly messageBus: Emitter<any>;
   private readonly audioPlayer: AudioPlayer;
 
-  constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Vue, audioPlayer: AudioPlayer) {
+  constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Emitter<any>, audioPlayer: AudioPlayer) {
     this.store = store;
     this.logger = loggerFactory.getLogger('messageHelper');
     this.audioPlayer = audioPlayer;
@@ -80,7 +81,7 @@ export class MessageHelper {
   }
 
   public processAnyMessage() {
-    this.messageBus.$emit('scroll');
+    this.messageBus.emit('scroll');
   }
 
 }

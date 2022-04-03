@@ -250,11 +250,11 @@ import { isMobile } from '@/ts/utils/runtimeConsts';
     }
 
     created() {
-      this.$messageBus.$on('scroll',this.onEmitScroll);
+      this.$messageBus.on('scroll',this.onEmitScroll);
     }
 
     destroyed() {
-      this.$messageBus.$off('scroll',this.onEmitScroll);
+      this.$messageBus.off('scroll',this.onEmitScroll);
     }
 
     get id() {
@@ -354,9 +354,9 @@ import { isMobile } from '@/ts/utils/runtimeConsts';
 
 <style lang="sass" scoped>
 
-  @import "~@/assets/sass/partials/mixins"
-  @import "~@/assets/sass/partials/abstract_classes"
-  @import "~@/assets/sass/partials/variables"
+  @import "@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/variables"
   .holder
     height: 100%
     display: flex

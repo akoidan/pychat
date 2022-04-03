@@ -129,7 +129,7 @@ export default class FacebookAuth extends Vue {
       right: 0
       // expand to width
       position: absolute
-      background: url('~@/assets/img/f-icon.svg') no-repeat
+      background: url('@/assets/img/f-icon.svg') no-repeat
       top: 5px
       left: 10px
 

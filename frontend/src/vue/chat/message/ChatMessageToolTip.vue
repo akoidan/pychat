@@ -95,7 +95,7 @@ import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from '@/ts/utils/consts';
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/mixins"
+  @import "@/assets/sass/partials/mixins"
 
   .icon-cancel-circled-outline
     @include hover-click(#ee0000)

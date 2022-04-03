@@ -91,7 +91,7 @@ export default class ReportIssue extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "~@/assets/sass/partials/abstract_classes"
+  @import "@/assets/sass/partials/abstract_classes"
   .holder
     @extend %room-settings-holder
     width: calc(100% - 100px)

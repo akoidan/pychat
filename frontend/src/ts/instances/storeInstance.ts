@@ -1,10 +1,26 @@
-import { getModule } from 'vuex-module-decorators';
-import { stateDecoratorFactory } from 'vuex-module-decorators-state';
+import type { VueBase } from 'vue-class-component';
+import { getModule,VuexModule } from 'vuex-module-decorators';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import { IS_DEBUG } from '@/ts/utils/consts';
 import { encodeHTML } from '@/ts/utils/htmlApi';
 import { GrowlType } from '@/ts/types/model';
-import { Vue } from 'vue/types/vue';
+
+
+function stateDecoratorFactory<TPT extends VuexModule>(vuexModule: TPT):
+    <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
+    (vueComponent: TCT, fileName: TPN) => void {
+  return <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
+  (vueComponent: TCT, fileName: TPN): void => {
+    Object.defineProperty(
+        vueComponent,
+        fileName,
+        Object.getOwnPropertyDescriptor(
+            vuexModule,
+            fileName,
+        ) as PropertyDescriptor,
+    );
+  };
+}
+
 
 export const store: DefaultStore = getModule(DefaultStore);
 export const State = stateDecoratorFactory(store);
@@ -39,7 +55,7 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       e = 'Unknown error';
     }
     // @ts-ignore: next-line
-    let processError: Vue = this;
+    let processError: VueBase = this;
     processError.$logger.error(`Error during ${message} {}`, e)();
     if (vueProperty && message) {
       // @ts-ignore: next-line
@@ -62,7 +78,7 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       // TODO this thing breaks fb login
       if (preventStacking && this[runningProp]) {
 
-        (this as Vue).$logger.warn('Skipping {} as it\'s loading', descriptor.value)();
+        (this as VueBase).$logger.warn('Skipping {} as it\'s loading', descriptor.value)();
         return;
       }
       try {
