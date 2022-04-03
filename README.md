@@ -475,11 +475,9 @@ development.json and production.json have the following format:
 ```json
 {
   "BACKEND_ADDRESS": "e.g. pychat.org:443, protocol shouldn't be there, note there's no trailing slash, you can specify '{}' to use the same host as files served with",
-  "IS_DEBUG": "set true for development and debug mode enabled",
-  "UGLIFY": "true/false uglifies js/css so it has less weight, set this for production.json only, when you're sue you don't need to debug the output",
+  "IS_DEBUG": "if true, build won't be uglifies, logs will be set to trace, window object will be added with useful data and etc",
   "GOOGLE_OAUTH_2_CLIENT_ID" : "check chat/settings_example.py",
   "FACEBOOK_APP_ID": "check chat/settings_example.py",
-  "MANIFEST": "manifest path for firebase push notifications e.g.`/manifest.json`",
   "RECAPTCHA_PUBLIC_KEY": "check chat/settings_example.py RECAPTCHA_SITE_KEY",
   "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username. Don't use RECAPTCHA with this key",
   "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash",

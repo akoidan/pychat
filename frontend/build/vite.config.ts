@@ -42,7 +42,7 @@ export default defineConfig(async ({command, mode}) => {
     })],
     build: {
       emptyOutDir: true,
-      minify: false,
+      minify: !PYCHAT_CONSTS.IS_DEBUG,
       outDir: distDir,
       rollupOptions: {
         input: {

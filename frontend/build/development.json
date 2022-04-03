@@ -1,7 +1,6 @@
 {
   "BACKEND_ADDRESS": "{}:8888",
   "IS_DEBUG": true,
-  "UGLIFY": false,
   "ELECTRON_IGNORE_SSL": true,
   "PUBLIC_PATH": null,
   "GOOGLE_OAUTH_2_CLIENT_ID": false,
