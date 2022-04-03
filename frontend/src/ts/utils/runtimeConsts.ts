@@ -9,7 +9,7 @@ import {
 export const isMobile: boolean = mobile.isMobile();
 
 export const browserVersion: string = (function() {
-  let ua = navigator.userAgent;
+  const ua = navigator.userAgent;
   let tem;
   let M: any = (/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i).exec(ua) || [];
   if ((/trident/i).test(M[1])) {
