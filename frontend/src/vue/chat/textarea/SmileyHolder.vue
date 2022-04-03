@@ -70,8 +70,6 @@ import {
   allSmileysKeysNoVariations
 } from '@/ts/utils/htmlApi';
 
-import { State } from '@/ts/instances/storeInstance';
-
 @Component({name: 'SmileyHolder'})
  export default class SmileyHolder extends Vue {
 

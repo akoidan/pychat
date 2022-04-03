@@ -16,7 +16,7 @@
     "generate-smileys": "node ./build/generate-smileys.js",
     "test": "mocha test/index.ts",
     "postinstall": "patch -p1 -i patches/vue-class-component+8.0.0-rc.1.patch",
-    "testdev": "node build/static-server.js"
+    "serve": "yarn build && node build/static-server.js"
   },
   "repository": {
     "type": "git",
@@ -43,6 +43,7 @@
     "sass": "^1.49.9",
     "typescript": "^4.6.3",
     "vite": "^2.9.1",
+    "vite-plugin-static-copy": "https://github.com/akoidan/vite-plugin-static-copy",
     "vue-tsc": "^0.33.9"
   },
   "dependencies": {

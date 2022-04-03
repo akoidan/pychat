@@ -12,6 +12,7 @@ import { resolve } from "path";
 import { outputManifest } from './sw.plugin';
 import { OutputChunk } from 'rollup';
 import checker from 'vite-plugin-checker'
+import { viteStaticCopy } from 'vite-plugin-static-copy'
 
 export default defineConfig(async ({command, mode}) => {
   let key, cert, ca, gitHash;
@@ -29,6 +30,7 @@ export default defineConfig(async ({command, mode}) => {
   const PYCHAT_CONSTS = getConsts(gitHash, command);
   const srcDir = resolve(__dirname, '..', 'src');
   const distDir = resolve(__dirname, '..', 'dist');
+  const nodeModulesDir = resolve(__dirname, '..', 'node_modules');
   const swFilePath = resolve(srcDir, 'ts', 'sw.ts');
   return {
     resolve: {
@@ -42,7 +44,15 @@ export default defineConfig(async ({command, mode}) => {
       vue(),
       checker({ typescript: true, vueTsc: true }),
       splitVendorChunkPlugin(),
-      outputManifest({swFilePath})
+      outputManifest({swFilePath}),
+      viteStaticCopy({
+        targets: [
+          {
+            src: `${resolve(nodeModulesDir, 'emoji-datasource-apple/img/apple/64')}/*`,
+            dest: 'smileys'
+          }
+        ]
+      })
     ],
     build: {
       emptyOutDir: true,
