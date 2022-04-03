@@ -7,7 +7,7 @@
       v-if="incomingCall"
       :call="incomingCall"
     />
-    <router-view v-if="inited" v-slot="{ Component, route }">
+    <router-view v-if="inited" v-slot="{Component, route}">
       <keep-alive include="PainterPage,ChannelsPage">
         <component
           :is="Component"
@@ -15,32 +15,34 @@
         />
       </keep-alive>
     </router-view>
-    <div v-else class="spinner"></div>
+    <div v-else class="spinner"/>
   </div>
 </template>
 <script lang="ts">
 import {
   Component,
-  Vue
-} from 'vue-property-decorator';
+  Vue,
+} from "vue-property-decorator";
 import {
   CurrentUserInfoModel,
-  IncomingCallModel
-} from '@/ts/types/model';
-import { State } from '@/ts/instances/storeInstance';
-import IncomingCall from '@/vue/chat/call/IncomingCall.vue';
-import AppNavWrapper from '@/vue/ui/AppNavWrapper.vue';
-import ChatBackIcon from '@/vue/chat/chatbox/ChatBackIcon.vue';
-import { SetStateFromStorage } from '@/ts/types/dto';
+  IncomingCallModel,
+} from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
+import IncomingCall from "@/vue/chat/call/IncomingCall.vue";
+import AppNavWrapper from "@/vue/ui/AppNavWrapper.vue";
+import ChatBackIcon from "@/vue/chat/chatbox/ChatBackIcon.vue";
+import type {SetStateFromStorage} from "@/ts/types/dto";
 
 @Component({
-  name: 'MainPage' ,
-  components: {ChatBackIcon, AppNavWrapper, IncomingCall}
+  name: "MainPage",
+  components: {ChatBackIcon,
+    AppNavWrapper,
+    IncomingCall},
 })
 export default class MainPage extends Vue {
-
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
   @State
   public readonly incomingCall!: IncomingCallModel;
 
@@ -49,22 +51,24 @@ export default class MainPage extends Vue {
   }
 
   public async created() {
-    this.$logger.log('Main page has been created, fire listening ws, and register notification')();
+    this.$logger.log("Main page has been created, fire listening ws, and register notification")();
     try {
-      // should be before startListen, so syncHistory is called AFTER  this.$store.setStateFromStorage(data);
-      // also we don't care if after login it's called twice, cause it seems it doesnt cause any issues
+
+      /*
+       * Should be before startListen, so syncHistory is called AFTER  this.$store.setStateFromStorage(data);
+       * also we don't care if after login it's called twice, cause it seems it doesnt cause any issues
+       */
       const data: SetStateFromStorage | null = await this.$store.getStorage.connect();
-      this.$logger.log('restored state from db {}, userId: {', data, this.$store.myId)();
+      this.$logger.log("restored state from db {}, userId: {", data, this.$store.myId)();
       if (data) {
         this.$store.setStateFromStorage(data);
       }
     } catch (e) {
-      this.$logger.error("Unable to restore state from db {}", e)()
+      this.$logger.error("Unable to restore state from db {}", e)();
     }
 
-    this.$ws.startListening(); // should not fail main component if ws is not available
+    this.$ws.startListening(); // Should not fail main component if ws is not available
   }
-
 }
 </script>
 

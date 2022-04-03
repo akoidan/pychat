@@ -6,8 +6,8 @@ import {
   LOG_LEVEL_LS,
 } from "@/ts/utils/consts";
 import type {
-  Logger,
   LogLevel,
+  Logger,
 } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
@@ -15,7 +15,7 @@ import type {
   CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
   Location,
-  MessageStatus
+  MessageStatus,
 } from "@/ts/types/model";
 import type {
   MessageSupplier,
@@ -33,9 +33,9 @@ import type {
   UserProfileDtoWoImage,
   UserSettingsDto,
 } from "@/ts/types/dto";
-import { sub } from "@/ts/instances/subInstance";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import { WsMessageProcessor } from "@/ts/message_handlers/WsMessageProcessor";
+import {sub} from "@/ts/instances/subInstance";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
 import type {
   AddChannelMessage,
   AddInviteMessage,

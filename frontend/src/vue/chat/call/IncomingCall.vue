@@ -18,21 +18,21 @@
           class="green-btn"
           @click="answer"
         >
-          <i class="icon-call-aswer" />
+          <i class="icon-call-aswer"/>
           <div>Answer</div>
         </button>
         <button
           class="green-btn"
           @click="videoAnswer"
         >
-          <i class="icon-videocam" />
+          <i class="icon-videocam"/>
           <div>With video</div>
         </button>
         <button
           class="red-btn"
           @click="hangUp"
         >
-          <i class="icon-hang-up" />
+          <i class="icon-hang-up"/>
           <div>Decline</div>
         </button>
       </div>
@@ -40,25 +40,25 @@
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
+  Vue,
+} from "vue-property-decorator";
+import type {UserModel} from "@/ts/types/model";
 import {
   IncomingCallModel,
   RoomDictModel,
-  UserModel
-} from '@/ts/types/model';
+} from "@/ts/types/model";
 
 
-@Component({name: 'IncomingCall'})
- export default class IncomingCall extends Vue {
-
+@Component({name: "IncomingCall"})
+export default class IncomingCall extends Vue {
   @Prop() public call!: IncomingCallModel;
+
   @State
-  public readonly allUsersDict!: {[id: number]: UserModel} ;
+  public readonly allUsersDict!: Record<number, UserModel>;
 
   @State
   public readonly roomsDict!: RoomDictModel;
@@ -82,7 +82,6 @@ import {
   public videoAnswer() {
     this.$webrtcApi.videoAnswerCall(this.call.connId);
   }
-
 }
 </script>
 

@@ -1,13 +1,13 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type { ReceivingFile, } from "@/ts/types/model";
-import { FileTransferStatus, } from "@/ts/types/model";
+import type {ReceivingFile} from "@/ts/types/model";
+import {FileTransferStatus} from "@/ts/types/model";
 import FileHandler from "@/ts/webrtc/file/FileHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import { sub } from "@/ts/instances/subInstance";
-import { MAX_ACCEPT_FILE_SIZE_WO_FS_API } from "@/ts/utils/consts";
+import {sub} from "@/ts/instances/subInstance";
+import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from "@/ts/utils/consts";
 import {
   requestFileSystem,
   resolveMediaUrl,
@@ -16,10 +16,10 @@ import FileReceiverPeerConnection from "@/ts/webrtc/file/FileReceiveerPeerConnec
 import Subscription from "@/ts/classes/Subscription";
 import CallHandler from "@/ts/webrtc/call/CallHandler";
 import faviconUrl from "@/assets/img/favicon.ico";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import { browserVersion } from "@/ts/utils/runtimeConsts";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import {browserVersion} from "@/ts/utils/runtimeConsts";
 import MessageTransferHandler from "@/ts/webrtc/message/MessageTransferHandler";
-import { bytesToSize } from "@/ts/utils/pureFunctions";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
 import type {
   NotifyCallActiveMessage,
   OfferCall,
@@ -32,15 +32,15 @@ import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type { VideoType } from "@/ts/types/types";
+import type {VideoType} from "@/ts/types/types";
 import type {
   ChangeP2pRoomInfoMessage,
   ChangeUserOnlineInfoMessage,
   InternetAppearMessage,
   LogoutMessage,
 } from "@/ts/types/messages/innerMessages";
-import type { MessageHelper } from "@/ts/message_handlers/MessageHelper";
-import type { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
+import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
+import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
 
 export default class WebRtcApi extends MessageHandler {
   protected logger: Logger;

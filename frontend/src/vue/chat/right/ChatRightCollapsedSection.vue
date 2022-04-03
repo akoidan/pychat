@@ -6,39 +6,39 @@
           :class="directClass"
           @click="invertValue"
         />
-      <slot name="name"/>
+        <slot name="name"/>
       </div>
     </span>
     <ul v-show="!value">
-      <slot />
+      <slot/>
     </ul>
   </div>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Prop,
-    Vue,
-    Emit
-  } from 'vue-property-decorator';
+import {
+  Component,
+  Emit,
+  Prop,
+  Vue,
+} from "vue-property-decorator";
 
-  @Component({name: 'ChatRightCollapsedSection'})
- export default class ChatRightCollapsedSection extends Vue {
-    @Prop()
-    public readonly value!: boolean ;
+@Component({name: "ChatRightCollapsedSection"})
+export default class ChatRightCollapsedSection extends Vue {
+  @Prop()
+  public readonly value!: boolean;
 
-    @Prop()
-    public readonly name! : string;
+  @Prop()
+  public readonly name!: string;
 
-    @Emit()
-    public invertValue() {
-      this.$emit('input', !this.value);
-    }
-
-    get directClass() {
-      return this.value ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
-    }
+  @Emit()
+  public invertValue() {
+    this.$emit("input", !this.value);
   }
+
+  get directClass() {
+    return this.value ? "icon-angle-circled-up" : "icon-angle-circled-down";
+  }
+}
 </script>
 <!-- eslint-disable -->
 <style

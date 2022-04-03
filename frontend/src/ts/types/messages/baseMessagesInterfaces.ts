@@ -3,7 +3,7 @@
  */
 import type {
   ChannelDto,
-  RoomDto
+  RoomDto,
 } from "@/ts/types/dto";
 
 

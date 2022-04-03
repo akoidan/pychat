@@ -4,18 +4,15 @@
   </div>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Prop,
-    Vue,
-    Watch,
-    Ref
-  } from 'vue-property-decorator';
+import {
+  Component,
+  Vue,
+} from "vue-property-decorator";
 
-  @Component({name: 'AppTab'})
- export default class AppTab extends Vue {
+@Component({name: "AppTab"})
+export default class AppTab extends Vue {
 
-  }
+}
 </script>
 <!-- eslint-disable -->
 <style

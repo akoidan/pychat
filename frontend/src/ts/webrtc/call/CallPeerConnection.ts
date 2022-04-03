@@ -11,13 +11,13 @@ import type {
   SetOpponentVoice,
 } from "@/ts/types/types";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   ChangeStreamMessage,
   ConnectToRemoteMessage,
   DestroyPeerConnectionMessage,
 } from "@/ts/types/messages/innerMessages";
-import type { DestroyCallConnection, } from "@/ts/types/messages/wsInMessages";
+import type {DestroyCallConnection} from "@/ts/types/messages/wsInMessages";
 import type {
   HandlerType,
   HandlerTypes,
@@ -30,7 +30,7 @@ import type {
   CallInfoModel,
   RoomModel,
 } from "@/ts/types/model";
-import { stopVideo } from "@/ts/utils/htmlApi";
+import {stopVideo} from "@/ts/utils/htmlApi";
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   protected _connectedToRemote: boolean = false;

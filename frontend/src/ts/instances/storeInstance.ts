@@ -1,9 +1,9 @@
-import type { VueBase } from "vue-class-component";
-import type { VuexModule } from "vuex-module-decorators";
-import { getModule } from "vuex-module-decorators";
-import { DefaultStore } from "@/ts/classes/DefaultStore";
-import { encodeHTML } from "@/ts/utils/htmlApi";
-import { GrowlType } from "@/ts/types/model";
+import type {VueBase} from "vue-class-component";
+import type {VuexModule} from "vuex-module-decorators";
+import {getModule} from "vuex-module-decorators";
+import {DefaultStore} from "@/ts/classes/DefaultStore";
+import {encodeHTML} from "@/ts/utils/htmlApi";
+import {GrowlType} from "@/ts/types/model";
 
 
 function stateDecoratorFactory<TPT extends VuexModule>(vuexModule: TPT):

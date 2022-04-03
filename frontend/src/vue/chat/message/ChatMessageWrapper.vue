@@ -1,28 +1,28 @@
 <template>
   <p>
-    <slot name="header" />
-    <slot name="default" />
+    <slot name="header"/>
+    <slot name="default"/>
     <span class="time">{{ getTime }}</span>
   </p>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Prop,
-    Vue
-  } from 'vue-property-decorator';
-  import {timeToString} from '@/ts/utils/htmlApi';
+import {
+  Component,
+  Prop,
+  Vue,
+} from "vue-property-decorator";
+import {timeToString} from "@/ts/utils/htmlApi";
 
-  @Component({name: 'ChatMessageWrapper'})
- export default class ChatMessageWrapper extends Vue {
-    @Prop()
-    private readonly time!: number;
+@Component({name: "ChatMessageWrapper"})
+export default class ChatMessageWrapper extends Vue {
+  @Prop()
+  private readonly time!: number;
 
 
-    get getTime() {
-      return timeToString(this.time);
-    }
+  get getTime() {
+    return timeToString(this.time);
   }
+}
 </script>
 <!-- eslint-disable -->
 <style

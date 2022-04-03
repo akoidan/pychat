@@ -1,8 +1,8 @@
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import type { MessageSupplier } from "@/ts/types/types";
-import { P2PMessageProcessor } from "@/ts/message_handlers/P2PMessageProcessor";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type {MessageSupplier} from "@/ts/types/types";
+import {P2PMessageProcessor} from "@/ts/message_handlers/P2PMessageProcessor";
 
 import type {
   HandlerType,
@@ -37,7 +37,7 @@ import type {
   SendSetMessagesStatusMessage,
   SyncP2PMessage,
 } from "@/ts/types/messages/innerMessages";
-import type { MessageHelper } from "@/ts/message_handlers/MessageHelper";
+import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {

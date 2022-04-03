@@ -3,7 +3,7 @@
     <tr>
       <th>To {{ user }}</th>
       <td v-if="showBar">
-        <app-progress-bar :upload="transfer.upload" />
+        <app-progress-bar :upload="transfer.upload"/>
       </td>
       <td
         v-else
@@ -20,48 +20,52 @@
 </template>
 <script lang="ts">
 
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
+  Vue,
+} from "vue-property-decorator";
+import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
+import type {
+  UserModel,
+} from "@/ts/types/model";
 import {
   FileTransferStatus,
   SendingFileTransfer,
-  UserModel
-} from '@/ts/types/model';
+} from "@/ts/types/model";
 
 
 const fileStatusDict: Record<FileTransferStatus, string> = {
-  [FileTransferStatus.NOT_DECIDED_YET]: 'Waiting to accept',
-  [FileTransferStatus.IN_PROGRESS]: 'Sending...',
-  [FileTransferStatus.FINISHED]: 'Successfully sent',
-  [FileTransferStatus.DECLINED_BY_OPPONENT]: 'Declined by opponent',
-  [FileTransferStatus.DECLINED_BY_YOU]: 'Declined by you',
-  [FileTransferStatus.ERROR]: 'Error'
+  [FileTransferStatus.NOT_DECIDED_YET]: "Waiting to accept",
+  [FileTransferStatus.IN_PROGRESS]: "Sending...",
+  [FileTransferStatus.FINISHED]: "Successfully sent",
+  [FileTransferStatus.DECLINED_BY_OPPONENT]: "Declined by opponent",
+  [FileTransferStatus.DECLINED_BY_YOU]: "Declined by you",
+  [FileTransferStatus.ERROR]: "Error",
 };
 
 @Component({
-  name: 'ChatSendingFileTransfer' ,
-  components: {AppProgressBar}
+  name: "ChatSendingFileTransfer",
+  components: {AppProgressBar},
 })
 export default class ChatSendingFileTransfer extends Vue {
-
   @Prop() public transfer!: SendingFileTransfer;
+
   @Prop() public connId!: string;
+
   @Prop() public opponentId!: string;
+
   @State
-  public readonly allUsersDict!: {[id: number]: UserModel} ;
+  public readonly allUsersDict!: Record<number, UserModel>;
 
   get showBar(): boolean {
     return this.transfer.status === FileTransferStatus.IN_PROGRESS;
   }
 
   get showCancel(): boolean {
-    return this.transfer.status === FileTransferStatus.NOT_DECIDED_YET
-        || this.transfer.status === FileTransferStatus.IN_PROGRESS;
+    return this.transfer.status === FileTransferStatus.NOT_DECIDED_YET ||
+      this.transfer.status === FileTransferStatus.IN_PROGRESS;
   }
 
   public declineSending() {
@@ -71,15 +75,15 @@ export default class ChatSendingFileTransfer extends Vue {
   get cls() {
     return {
       success: FileTransferStatus.FINISHED === this.transfer.status,
-      error: FileTransferStatus.ERROR === this.transfer.status
+      error: FileTransferStatus.ERROR === this.transfer.status,
     };
   }
 
-  get user () {
+  get user() {
     return this.allUsersDict[this.transfer.userId].user;
   }
 
-  get status () {
+  get status() {
     if (this.transfer.error) {
       return this.transfer.error;
     }

@@ -27,34 +27,35 @@
   </chat-message-wrapper>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import { SendingFile } from '@/ts/types/model';
-import { bytesToSize } from '@/ts/utils/pureFunctions';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingFileTransfer from '@/vue/chat/message/ChatSendingFileTransfer.vue';
-import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
-import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+  Vue,
+} from "vue-property-decorator";
+import {SendingFile} from "@/ts/types/model";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
+import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
+import ChatSendingFileTransfer from "@/vue/chat/message/ChatSendingFileTransfer.vue";
+import ChatMessageHeader from "@/vue/chat/message/ChatMessageHeader.vue";
+import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
 
 @Component({
-  name: 'ChatSendingFile' ,
-  components: {
-    ChatMessageWrapper,
-    ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
+  name: "ChatSendingFile",
+  components: {ChatMessageWrapper,
+               ChatMessageHeader,
+    ChatSendingFileTransfer,
+    AppProgressBar},
 })
 export default class ChatSendingFile extends Vue {
   @Prop() public sendingFile!: SendingFile;
+
   @State
   public readonly myId!: number;
 
   get size() {
     return bytesToSize(this.sendingFile.fileSize);
   }
-
 }
 </script>
 

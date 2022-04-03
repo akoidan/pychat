@@ -15,13 +15,13 @@
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import { bytesToSize } from '@/ts/utils/pureFunctions';
-import { UploadProgressModel } from '@/ts/types/model';
+  Vue,
+} from "vue-property-decorator";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
+import {UploadProgressModel} from "@/ts/types/model";
 
-@Component({name: 'AppProgressBar'})
- export default class AppProgressBar extends Vue {
+@Component({name: "AppProgressBar"})
+export default class AppProgressBar extends Vue {
   @Prop()
   public readonly upload!: UploadProgressModel;
 
@@ -43,7 +43,7 @@ import { UploadProgressModel } from '@/ts/types/model';
 
   get style() {
     return {
-      width: this.percents
+      width: this.percents,
     };
   }
 

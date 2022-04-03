@@ -4,7 +4,7 @@ import type {
   SetRoomsUsers,
 } from "@/ts/types/types";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import type {
   BlobType,
   ChannelModel,
@@ -39,8 +39,8 @@ import type {
   TagDB,
   UserDB,
 } from "@/ts/types/db";
-import type { SetStateFromStorage } from "@/ts/types/dto";
-import type { MainWindow } from "@/ts/classes/MainWindow";
+import type {SetStateFromStorage} from "@/ts/types/dto";
+import type {MainWindow} from "@/ts/classes/MainWindow";
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];

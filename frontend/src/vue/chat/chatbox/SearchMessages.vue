@@ -7,13 +7,13 @@
     <div class="input-holder">
       <input
         ref="inputSearch"
-        @keydown="checkToggleSearch"
         v-model.trim="search"
         type="search"
         class="input"
-      >
+        @keydown="checkToggleSearch"
+      />
       <i class="icon-cancel-circled-outline" @click="close"/>
-      <div class="search-loading" />
+      <div class="search-loading"/>
     </div>
     <div
       v-if="searchResultText"
@@ -24,20 +24,20 @@
   </div>
 </template>
 <script lang="ts">
-import debounce from 'lodash.debounce';
+import debounce from "lodash.debounce";
 import {
   Component,
   Prop,
   Ref,
   Vue,
-  Watch
-} from 'vue-property-decorator';
+  Watch,
+} from "vue-property-decorator";
 import {
   RoomModel,
-  SearchModel
-} from '@/ts/types/model';
+  SearchModel,
+} from "@/ts/types/model";
 
-const START_TYPING = 'Start typing and messages will appear';
+const START_TYPING = "Start typing and messages will appear";
 
 
 let uniqueId = 1;
@@ -46,17 +46,15 @@ function getUniqueId() {
   return uniqueId++;
 }
 
-@Component({name: 'SearchMessages'})
- export default class SearchMessages extends Vue {
-
+@Component({name: "SearchMessages"})
+export default class SearchMessages extends Vue {
   get searchResultText() {
     if (this.searchResult) {
       return this.searchResult;
     } else if (!this.room.search.locked) {
-      return 'More messages are available, scroll top to load them';
-    } else {
-      return 'No more messages are available on this search';
+      return "More messages are available, scroll top to load them";
     }
+    return "No more messages are available on this search";
   }
 
   close() {
@@ -73,22 +71,25 @@ function getUniqueId() {
   public inputSearch!: HTMLInputElement;
 
   public debouncedSearch!: Function;
-  public search: string = '';
-  public currentRequest: number = 0;
-  public searchResult: string = '';
 
-  @Watch('searchActive')
+  public search: string = "";
+
+  public currentRequest: number = 0;
+
+  public searchResult: string = "";
+
+  @Watch("searchActive")
   public onSearchActiveChange(value: boolean) {
     if (value) {
-      this.$nextTick(function () {
+      this.$nextTick(function() {
         this.inputSearch.focus();
       });
     }
   }
 
   public checkToggleSearch(event: KeyboardEvent) {
-    if (event.key === 'Escape') {
-      this.$store.toogleSearch(this.room.id)
+    if (event.key === "Escape") {
+      this.$store.toogleSearch(this.room.id);
     }
   }
 
@@ -103,42 +104,42 @@ function getUniqueId() {
   private async doSearch(search: string) {
     if (!search) {
       this.searchResult = START_TYPING;
-      return
+      return;
     }
 
-    let uniqueId = getUniqueId();
+    const uniqueId = getUniqueId();
     try {
       this.currentRequest = uniqueId;
-      await this.$messageSenderProxy
-          .getMessageSender(this.room.id)
-          .loadUpSearchMessages(
-              this.room.id,
-              10,
-              found => {
-                if (found) {
-                  this.searchResult = '';
-                } else {
-                  this.searchResult = 'No results found';
-                }
-                if (this.currentRequest === uniqueId) {
-                  this.currentRequest = 0
-                  return true;
-                }
-                return false;
-              }
-          );
+      await this.$messageSenderProxy.
+        getMessageSender(this.room.id).
+        loadUpSearchMessages(
+          this.room.id,
+          10,
+          (found) => {
+            if (found) {
+              this.searchResult = "";
+            } else {
+              this.searchResult = "No results found";
+            }
+            if (this.currentRequest === uniqueId) {
+              this.currentRequest = 0;
+              return true;
+            }
+            return false;
+          },
+        );
     } catch (e: any) {
       if (uniqueId === this.currentRequest) {
-        this.currentRequest = 0
+        this.currentRequest = 0;
       }
       this.searchResult = e;
     }
-
   }
 
-  @Watch('search')
+  @Watch("search")
   private onSearchChange(search: string) {
-    this.$store.setSearchTextTo({searchText: search, roomId: this.room.id})
+    this.$store.setSearchTextTo({searchText: search,
+      roomId: this.room.id});
     if (this.currentRequest) {
       this.currentRequest = getUniqueId();
     }

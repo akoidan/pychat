@@ -1,17 +1,21 @@
 <template>
   <div>
-    <img :src="src" @load="onImgLoad" v-show="loaded"/>
+    <img v-show="loaded" :src="src" @load="onImgLoad"/>
     <div v-if="!loaded" class="spinner"/>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
-import { CallsInfoModel } from '@/ts/types/model';
+import {
+  Component,
+  Prop,
+  Vue,
+} from "vue-property-decorator";
 
 @Component({})
 export default class AppLoadingImage extends Vue {
   @Prop() public src!: string;
+
   public loaded: boolean = false;
 
   onImgLoad() {

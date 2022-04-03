@@ -1,5 +1,5 @@
-import { IS_ANDROID } from "@/ts/utils/consts";
-import { isMobile } from "@/ts/utils/runtimeConsts";
+import {IS_ANDROID} from "@/ts/utils/consts";
+import {isMobile} from "@/ts/utils/runtimeConsts";
 
 export function validityDirective(el: HTMLElement, binding: any) {
   (<HTMLInputElement>el).setCustomValidity(binding.value);

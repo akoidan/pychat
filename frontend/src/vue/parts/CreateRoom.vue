@@ -12,7 +12,7 @@
               type="text"
               class="input"
               maxlength="16"
-            >
+            />
           </td>
         </tr>
         <tr v-if="!isPublic">
@@ -20,7 +20,7 @@
             Peer to peer
           </th>
           <td>
-            <app-checkbox v-model="p2p" />
+            <app-checkbox v-model="p2p"/>
           </td>
         </tr>
         <tr v-if="!p2p">
@@ -28,7 +28,7 @@
             Notifications
           </th>
           <td>
-            <app-checkbox v-model="notifications" />
+            <app-checkbox v-model="notifications"/>
           </td>
         </tr>
         <tr>
@@ -63,38 +63,38 @@
 <script lang="ts">
 import {
   ApplyGrowlErr,
-  State
-} from '@/ts/instances/storeInstance';
+  State,
+} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import AppInputRange from '@/vue/ui/AppInputRange.vue';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import PickUser from '@/vue/parts/PickUser.vue';
+  Vue,
+} from "vue-property-decorator";
+import AppInputRange from "@/vue/ui/AppInputRange.vue";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import PickUser from "@/vue/parts/PickUser.vue";
 import {
   ChannelsDictUIModel,
-  CurrentUserInfoModel
-} from '@/ts/types/model';
-import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
-import {PrivateRoomsIds} from '@/ts/types/types';
-import ParentChannel from '@/vue/parts/ParentChannel.vue';
+  CurrentUserInfoModel,
+} from "@/ts/types/model";
+import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
+import {PrivateRoomsIds} from "@/ts/types/types";
+import ParentChannel from "@/vue/parts/ParentChannel.vue";
 
 @Component({
-  name: 'CreateRoom' ,
-components: {
-  ParentChannel,
-  AppCheckbox,
-  AppInputRange,
-  AppSubmit,
-  PickUser
-}
+  name: "CreateRoom",
+  components: {
+    ParentChannel,
+    AppCheckbox,
+    AppInputRange,
+    AppSubmit,
+    PickUser,
+  },
 })
 export default class CreateRoom extends Vue {
-
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
@@ -102,10 +102,15 @@ export default class CreateRoom extends Vue {
   public readonly channelsDictUI!: ChannelsDictUIModel;
 
   public currentUsers: number[] = [];
+
   public notifications: boolean = false;
+
   public sound: number = 0;
+
   public p2p: boolean = false;
-  public roomName: string = '';
+
+  public roomName: string = "";
+
   public running: boolean = false;
 
   @Prop() public isPublic!: boolean;
@@ -117,9 +122,9 @@ export default class CreateRoom extends Vue {
 
   get inviteUsers(): string {
     if (this.parentChannelId) {
-      return `Users in a new room in group ${this.channelsDictUI[this.parentChannelId].name}`
+      return `Users in a new room in group ${this.channelsDictUI[this.parentChannelId].name}`;
     }
-    return this.isPublic ? 'Invite users to new room' : 'Select user for private room';
+    return this.isPublic ? "Invite users to new room" : "Select user for private room";
   }
 
   get showInviteUsers() {
@@ -127,25 +132,24 @@ export default class CreateRoom extends Vue {
   }
 
 
-  @ApplyGrowlErr({runningProp: 'running'})
+  @ApplyGrowlErr({runningProp: "running"})
   public async add() {
     if (this.isPublic && !this.roomName) {
-      throw Error('Please specify room name');
+      throw Error("Please specify room name");
     }
     if (!this.isPublic && this.currentUsers.length === 0) {
-      throw Error('Please add user');
+      throw Error("Please add user");
     }
     const e = await this.$ws.sendAddRoom(
-        this.roomName ? this.roomName : null,
-        this.isPublic ? false : this.p2p,
-        this.sound,
-        !this.p2p && this.notifications,
-        this.currentUsers,
-        this.parentChannelId ? this. parentChannelId : null
+      this.roomName ? this.roomName : null,
+      this.isPublic ? false : this.p2p,
+      this.sound,
+      !this.p2p && this.notifications,
+      this.currentUsers,
+      this.parentChannelId ? this.parentChannelId : null,
     );
     this.$router.replace(`/chat/${e.roomId}`);
   }
-
 }
 </script>
 

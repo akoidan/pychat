@@ -5,7 +5,8 @@
       <div
         class="icon-cancel"
         @click="close"
-      /><div v-html="growl.html" />
+      />
+      <div v-html="growl.html"/>
     </div>
   </transition>
 </template>
@@ -14,12 +15,12 @@
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import { GrowlModel } from '@/ts/types/model';
+  Vue,
+} from "vue-property-decorator";
+import {GrowlModel} from "@/ts/types/model";
 
-@Component({name: 'AppGrowl'})
- export default class AppGrowl extends Vue {
+@Component({name: "AppGrowl"})
+export default class AppGrowl extends Vue {
   @Prop() public readonly growl!: GrowlModel;
 
   public close() {

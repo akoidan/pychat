@@ -6,33 +6,33 @@
       <user-image-icon :user="user"/>
       <span>{{ user.user }}</span>
     </div>
-    <slot></slot>
+    <slot/>
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
+  Vue,
+} from "vue-property-decorator";
 import {
   RoomModel,
-  UserModel
-} from '@/ts/types/model';
-import { getFlagPath, } from '@/ts/utils/htmlApi';
-import { FLAGS } from '@/ts/utils/consts';
-import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
+  UserModel,
+} from "@/ts/types/model";
+import UserImageIcon from "@/vue/chat/chatbox/UserImageIcon.vue";
 
 
 @Component({
-  name: 'UserRow' ,
-  components: {UserImageIcon}
+  name: "UserRow",
+  components: {UserImageIcon},
 })
 export default class UserRow extends Vue {
   @Prop() public user!: UserModel;
+
   @State
   public readonly activeRoom!: RoomModel;
+
   @State
   public readonly online!: number[];
 
@@ -41,12 +41,12 @@ export default class UserRow extends Vue {
     return this.user.id;
   }
 
-  get onlineClass () {
-    return this.isOnline ? 'offline' : 'online';
+  get onlineClass() {
+    return this.isOnline ? "offline" : "online";
   }
 
   private get isOnline() {
-    return this.online.indexOf(this.user.id) < 0;
+    return !this.online.includes(this.user.id);
   }
 }
 </script>

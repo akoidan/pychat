@@ -11,12 +11,12 @@
         placeholder="Username or email"
         name="username_or_password"
         value=""
-      >
+      />
       <div class="slider">
         Enter your username or email
       </div>
     </div>
-    <captcha-component v-model="running" />
+    <captcha-component v-model="running"/>
     <div>
       <app-submit
         class="submit-button"
@@ -28,18 +28,17 @@
 </template>
 
 <script lang='ts'>
-import {Vue, Component, Prop, Ref} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import {State} from '@/ts/instances/storeInstance';
-import CaptchaComponent from '@/vue/singup/CaptchaComponent.vue';
-import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import CaptchaComponent from "@/vue/singup/CaptchaComponent.vue";
 
 @Component({
-  name: 'ResetPassword' ,
-  components: {CaptchaComponent, AppSubmit}
+  name: "ResetPassword",
+  components: {CaptchaComponent,
+    AppSubmit},
 })
 export default class ResetPassword extends Vue {
-
   @Ref()
   public form!: HTMLFormElement;
 
@@ -49,15 +48,15 @@ export default class ResetPassword extends Vue {
   public running: boolean = false;
 
   public created() {
-    this.$store.setRegHeader('Restore password');
+    this.$store.setRegHeader("Restore password");
   }
 
-  @ApplyGrowlErr({runningProp: 'running', message: `Can't reset password`})
+  @ApplyGrowlErr({runningProp: "running",
+    message: "Can't reset password"})
   public async restorePassword(event: Event) {
     await this.$api.sendRestorePassword(this.form);
-    this.$store.growlSuccess('A reset email has been sent to your email address, please follow the instruction in it');
+    this.$store.growlSuccess("A reset email has been sent to your email address, please follow the instruction in it");
   }
-
 }
 </script>
 <style lang="sass" scoped>

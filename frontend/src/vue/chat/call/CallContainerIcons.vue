@@ -1,8 +1,12 @@
 <template>
   <div class="callContainerIcons">
-    <div v-if="callInfo.callActiveButNotJoinedYet" class="call-is-active">Call in this room is active already</div>
+    <div v-if="callInfo.callActiveButNotJoinedYet" class="call-is-active">
+      Call in this room is active already
+    </div>
     <div class="callContainerIconsInner">
-      <button v-if="callInfo.callActiveButNotJoinedYet" @click="joinCall" class="green-btn">Join call</button>
+      <button v-if="callInfo.callActiveButNotJoinedYet" class="green-btn" @click="joinCall">
+        Join call
+      </button>
       <i
         :class="iconMicClass"
         :title="micTitle"
@@ -38,8 +42,8 @@
       <i
         v-show="callInfo.callActive"
         class="icon-webrtc-fullscreen"
-        @click="enterFullscreen"
         title="Fullscreen"
+        @click="enterFullscreen"
       />
       <div
         v-show="callInfo.callActive"
@@ -58,40 +62,46 @@
 <script lang="ts">
 import {
   Component,
+  Emit,
   Prop,
   Vue,
-  Watch,
-  Ref,
-  Emit
 } from "vue-property-decorator";
-import { CallsInfoModel } from '@/ts/types/model';
+import {CallsInfoModel} from "@/ts/types/model";
 
-@Component({name: 'CallContainerIcons'})
- export default class CallContainerIcons extends Vue {
+@Component({name: "CallContainerIcons"})
+export default class CallContainerIcons extends Vue {
   @Prop() public callInfo!: CallsInfoModel;
+
   @Prop() public roomId!: number;
 
   @Emit() micClick() {}
+
   @Emit() hangUpCall() {}
+
   @Emit() videoClick() {}
+
   @Emit() desktopClick() {}
+
   @Emit() invertShowSettings() {}
+
   @Emit() enterFullscreen() {}
+
   @Emit() paintClick() {}
+
   @Emit() invertShowVideoContainer() {}
 
   get videoTitle() {
-    return `Turn ${this.callInfo.showVideo ? 'off' : 'on'} your webcam`;
+    return `Turn ${this.callInfo.showVideo ? "off" : "on"} your webcam`;
   }
 
   get micTitle() {
-    return `Turn ${this.callInfo.showMic ? 'off' : 'on'} your microphone`;
+    return `Turn ${this.callInfo.showMic ? "off" : "on"} your microphone`;
   }
 
-  get iconVideoClass (): {} {
+  get iconVideoClass(): {} {
     return {
-      'icon-no-videocam': !this.callInfo.showVideo,
-      'icon-videocam': this.callInfo.showVideo
+      "icon-no-videocam": !this.callInfo.showVideo,
+      "icon-videocam": this.callInfo.showVideo,
     };
   }
 
@@ -99,13 +109,12 @@ import { CallsInfoModel } from '@/ts/types/model';
     this.$webrtcApi.joinCall(this.roomId);
   }
 
-  get iconMicClass (): {} {
+  get iconMicClass(): {} {
     return {
-      'icon-mic': this.callInfo.showMic,
-      'icon-mute': !this.callInfo.showMic
+      "icon-mic": this.callInfo.showMic,
+      "icon-mute": !this.callInfo.showMic,
     };
   }
-
 }
 </script>
 <!-- eslint-disable -->

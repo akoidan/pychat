@@ -20,9 +20,9 @@
         class="input"
         placeholder="Search"
         title="Filter by username"
-      >
+      />
       <ul>
-        <li v-for="user in filteredUsers"   :key="user.id">
+        <li v-for="user in filteredUsers" :key="user.id">
           <user-row :user="user" @click.native="addUser(user.id)"/>
         </li>
       </ul>
@@ -33,37 +33,40 @@
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import { UserModel } from '@/ts/types/model';
-import { State } from '@/ts/instances/storeInstance';
-import UserRow from '@/vue/chat/right/UserRow.vue';
+  Vue,
+} from "vue-property-decorator";
+import type {UserModel} from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
+import UserRow from "@/vue/chat/right/UserRow.vue";
+
 @Component({
-  name: 'PickUser' ,
-  components: {UserRow}
+  name: "PickUser",
+  components: {UserRow},
 })
 export default class PickUser extends Vue {
-
   @Prop() public value!: number[];
+
   @Prop() public text!: string;
+
   @Prop() public usersIds!: number[];
+
   @Prop({default: true}) public showInviteUsers!: boolean;
 
   @State
-  public readonly allUsersDict!: {[id: number]: UserModel} ;
+  public readonly allUsersDict!: Record<number, UserModel>;
 
-  public search: string = '';
+  public search: string = "";
 
   get valueUsers(): UserModel[] {
-    return this.value.map(id => this.allUsersDict[id]);
+    return this.value.map((id) => this.allUsersDict[id]);
   }
 
   get displayedUserIds(): number[] {
-    return this.usersIds.filter(a => this.value.indexOf(a) < 0);
+    return this.usersIds.filter((a) => !this.value.includes(a));
   }
 
   get displayedUsers(): UserModel[] {
-    return this.displayedUserIds.map(id => this.allUsersDict[id]);
+    return this.displayedUserIds.map((id) => this.allUsersDict[id]);
   }
 
   get showAddUsersComp() {
@@ -71,10 +74,10 @@ export default class PickUser extends Vue {
   }
 
   get filteredUsers(): UserModel[] {
-    this.$logger.debug('Reeval filter CreatePrivateRoom')();
+    this.$logger.debug("Reeval filter CreatePrivateRoom")();
     const s = this.search.toLowerCase();
 
-    return this.displayedUsers.filter(u => u.user.toLowerCase().indexOf(s) >= 0);
+    return this.displayedUsers.filter((u) => u.user.toLowerCase().includes(s));
   }
 
   public removeUser(id: number) {
@@ -82,7 +85,7 @@ export default class PickUser extends Vue {
   }
 
   public addUser(id: number) {
-    this.search = '';
+    this.search = "";
     this.value.push(id);
   }
 }

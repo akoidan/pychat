@@ -7,29 +7,31 @@
 </template>
 <script lang="ts">
 import {
-    Component,
-    Vue
-} from 'vue-property-decorator';
-import CreateRoom from '@/vue/parts/CreateRoom.vue';
-import {State} from '@/ts/instances/storeInstance';
+  Component,
+  Vue,
+} from "vue-property-decorator";
+import CreateRoom from "@/vue/parts/CreateRoom.vue";
+import {State} from "@/ts/instances/storeInstance";
+import type {
+  ChannelUIModel,
+} from "@/ts/types/model";
 import {
   ChannelsDictUIModel,
-  ChannelUIModel
-} from '@/ts/types/model';
+} from "@/ts/types/model";
 
 @Component({
-  name: 'ChannelAddRoom',
-    components: {
-        CreateRoom
-    }
+  name: "ChannelAddRoom",
+  components: {
+    CreateRoom,
+  },
 })
 export default class ChannelAddRoom extends Vue {
-
   @State
   public readonly channelsDictUI!: ChannelsDictUIModel;
 
   @State
   public readonly myId!: number;
+
   get userIds(): number[] {
     return this.channel.mainRoom.users;
   }
@@ -39,10 +41,10 @@ export default class ChannelAddRoom extends Vue {
   }
 
   get channelId(): number {
-      const id: string = this.$route.params.id as string;
-      this.$logger.log('Rending channel settings for {}', id)();
+    const id: string = this.$route.params.id as string;
+    this.$logger.log("Rending channel settings for {}", id)();
 
-      return parseInt(id);
+    return parseInt(id);
   }
 }
 </script>

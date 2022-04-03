@@ -1,10 +1,10 @@
 import type {
   FileModel,
-  MessageModel
+  MessageModel,
 } from "@/ts/types/model";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import type { MessageSender } from "@/ts/types/types";
-import { ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO } from "@/ts/utils/consts";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type {MessageSender} from "@/ts/types/types";
+import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from "@/ts/utils/consts";
 
 export function bytesToSize(bytes: number): string {
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];

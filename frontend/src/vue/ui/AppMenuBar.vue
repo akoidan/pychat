@@ -3,7 +3,7 @@
     <div class="app-menu-bar">
       <div class="app-header">
         <span class="username">
-          <img :src="imgSrc" v-if="imgSrc"/>
+          <img v-if="imgSrc" :src="imgSrc"/>
           <div class="user-name">{{ userInfo.user }}</div>
         </span>
       </div>
@@ -45,35 +45,40 @@
   </app-modal>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
-  import {GITHUB_LINK, ISSUES} from '@/ts/utils/consts';
-  import {State} from '@/ts/instances/storeInstance';
-  import {CurrentUserInfoModel} from '@/ts/types/model';
-  import AppModal from '@/vue/ui/AppModal.vue';
-  import {resolveMediaUrl} from '@/ts/utils/htmlApi';
+import {
+  Component,
+  Vue,
+} from "vue-property-decorator";
+import {
+  GITHUB_LINK,
+  ISSUES,
+} from "@/ts/utils/consts";
+import {State} from "@/ts/instances/storeInstance";
+import {CurrentUserInfoModel} from "@/ts/types/model";
+import AppModal from "@/vue/ui/AppModal.vue";
+import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 
-  @Component({
-    name: 'AppMenuBar',
-    components: {
-      AppModal
-    }
-  })
-  export default class AppMenuBar extends Vue {
+@Component({
+  name: "AppMenuBar",
+  components: {
+    AppModal,
+  },
+})
+export default class AppMenuBar extends Vue {
+  @State
+  public readonly userInfo!: CurrentUserInfoModel;
 
-    @State
-    public readonly userInfo!: CurrentUserInfoModel;
-
-    get imgSrc() {
-      return resolveMediaUrl(this.userInfo.image);
-    }
-
-    public get consts(): { GITHUB_LINK: string;  ISSUES: string} {
-      return {
-        GITHUB_LINK,
-        ISSUES
-      }
-    }
+  get imgSrc() {
+    return resolveMediaUrl(this.userInfo.image);
   }
+
+  public get consts(): {GITHUB_LINK: string; ISSUES: string} {
+    return {
+      GITHUB_LINK,
+      ISSUES,
+    };
+  }
+}
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>

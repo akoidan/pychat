@@ -2,17 +2,17 @@ import type {
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
 } from "@/ts/types/types";
-import type { ReceivingFile, } from "@/ts/types/model";
-import { FileTransferStatus, } from "@/ts/types/model";
-import { bytesToSize } from "@/ts/utils/pureFunctions";
+import type {ReceivingFile} from "@/ts/types/model";
+import {FileTransferStatus} from "@/ts/types/model";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import { requestFileSystem } from "@/ts/utils/htmlApi";
+import {requestFileSystem} from "@/ts/utils/htmlApi";
 import {
   MAX_ACCEPT_FILE_SIZE_WO_FS_API,
   MAX_BUFFER_SIZE,
 } from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,

@@ -1,7 +1,7 @@
 <template>
   <div class="reg-required">
-    <i :class="[icon, validation]" />
-    <slot />
+    <i :class="[icon, validation]"/>
+    <slot/>
     <div
       class="slider"
       :class="{closed}"
@@ -11,16 +11,18 @@
   </div>
 </template>
 <script lang="ts">
-import {Prop, Component, Vue} from 'vue-property-decorator';
-import {IconColor} from '@/ts/types/types';
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {IconColor} from "@/ts/types/types";
 
-@Component({name: 'FieldSet'})
- export default class FieldSet extends Vue {
+@Component({name: "FieldSet"})
+export default class FieldSet extends Vue {
   @Prop() public icon!: string;
-  @Prop() public  validation!: IconColor;
-  @Prop() public description!: string;
-  @Prop() public closed: boolean = true; // TODO this doesn't work, default should be in decorator
 
+  @Prop() public validation!: IconColor;
+
+  @Prop() public description!: string;
+
+  @Prop() public closed: boolean = true; // TODO this doesn't work, default should be in decorator
 }
 </script>
 <style lang="sass" scoped>

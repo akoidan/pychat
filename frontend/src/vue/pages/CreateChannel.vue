@@ -42,7 +42,7 @@ import PickUser from "@/vue/parts/PickUser.vue";
   name: "CreateChannel",
   components: {
     PickUser,
-    AppSubmit
+    AppSubmit,
   },
 })
 export default class CreateChannel extends Vue {

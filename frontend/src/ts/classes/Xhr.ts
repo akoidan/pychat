@@ -8,7 +8,7 @@ import {
   RESPONSE_SUCCESS,
 } from "@/ts/utils/consts";
 import Http from "@/ts/classes/Http";
-import { XHR_API_URL } from "@/ts/utils/runtimeConsts";
+import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
 
 /**
  * @param params : object dict of params or DOM form

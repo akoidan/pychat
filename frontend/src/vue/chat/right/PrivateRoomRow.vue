@@ -1,51 +1,51 @@
 <template>
   <room-row-wrapper :room="room" :class="onlineActiveClass">
-    <user-row :user="user"></user-row>
+    <user-row :user="user"/>
   </room-row-wrapper>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import {
-  CurrentUserInfoModel,
-  RoomModel,
-  UserModel
-} from '@/ts/types/model';
-import { PrivateRoomsIds } from '@/ts/types/types';
-import RoomRightIcon from '@/vue/chat/right/RoomRightIcon.vue';
-import RoomRowWrapper from '@/vue/chat/right/RoomRowWrapper.vue';
-import UserRow from '@/vue/chat/right/UserRow.vue';
+  Vue,
+} from "vue-property-decorator";
+import type {UserModel} from "@/ts/types/model";
+import {RoomModel} from "@/ts/types/model";
+import {PrivateRoomsIds} from "@/ts/types/types";
+import RoomRightIcon from "@/vue/chat/right/RoomRightIcon.vue";
+import RoomRowWrapper from "@/vue/chat/right/RoomRowWrapper.vue";
+import UserRow from "@/vue/chat/right/UserRow.vue";
 
 @Component({
-  name: 'PrivateRoomRow' ,
-  components: {UserRow, RoomRowWrapper,  RoomRightIcon}
+  name: "PrivateRoomRow",
+  components: {UserRow,
+    RoomRowWrapper,
+               RoomRightIcon},
 })
 export default class PrivateRoomRow extends Vue {
-
   @Prop() public room!: RoomModel;
+
   @State
   public readonly online!: number[];
+
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+
   @State
-  public readonly allUsersDict!: { [id: number]: UserModel } ;
+  public readonly allUsersDict!: Record<number, UserModel>;
 
   get user() {
     return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.room.id]];
   }
 
   private get isOnline() {
-    return this.online.indexOf(this.user.id) < 0;
+    return !this.online.includes(this.user.id);
   }
 
-  get onlineActiveClass (): string {
-    return this.isOnline ? 'offline' : 'online';
+  get onlineActiveClass(): string {
+    return this.isOnline ? "offline" : "online";
   }
-
 }
 </script>
 

@@ -3,7 +3,7 @@ import {
   isChrome,
   isMobile,
 } from "@/ts/utils/runtimeConsts";
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 import type {
   CallsInfoModel,
@@ -14,9 +14,9 @@ import type {
   JsAudioAnalyzer,
   MediaIdentifier,
   NumberIdentifier,
-  SetDevices
+  SetDevices,
 } from "@/ts/types/types";
-import { VideoType, } from "@/ts/types/types";
+import {VideoType} from "@/ts/types/types";
 import {
   CHROME_EXTENSION_ID,
   CHROME_EXTENSION_URL,
@@ -50,8 +50,8 @@ import type {
   DestroyPeerConnectionMessage,
   RouterNavigateMessage,
 } from "@/ts/types/messages/innerMessages";
-import { FileAndCallTransfer } from "@/ts/webrtc/FileAndCallTransfer";
-import { stopVideo } from "@/ts/utils/htmlApi";
+import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
+import {stopVideo} from "@/ts/utils/htmlApi";
 
 
 export default class CallHandler extends FileAndCallTransfer {

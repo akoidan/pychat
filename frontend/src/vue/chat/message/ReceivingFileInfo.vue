@@ -11,7 +11,9 @@
       </tr>
       <tr>
         <th>Status:</th>
-        <td :class="cls">{{ status }}</td>
+        <td :class="cls">
+          {{ status }}
+        </td>
       </tr>
       <tr v-if="receivingFile.anchor">
         <th>Download:</th>
@@ -40,15 +42,15 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
-import { bytesToSize } from '@/ts/utils/pureFunctions';
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
 import {
   FileTransferStatus,
-  ReceivingFile
-} from '@/ts/types/model';
+  ReceivingFile,
+} from "@/ts/types/model";
 
-@Component({name: 'ReceivingFileInfo'})
- export default class ReceivingFileInfo extends Vue {
+@Component({name: "ReceivingFileInfo"})
+export default class ReceivingFileInfo extends Vue {
   @Prop() public receivingFile!: ReceivingFile;
 
   get size(): string {
@@ -66,7 +68,7 @@ import {
   get cls() {
     return {
       success: FileTransferStatus.FINISHED === this.receivingFile.status,
-      error: FileTransferStatus.ERROR === this.receivingFile.status
+      error: FileTransferStatus.ERROR === this.receivingFile.status,
     };
   }
 
@@ -75,15 +77,15 @@ import {
       case FileTransferStatus.ERROR:
         return this.receivingFile.error!;
       case FileTransferStatus.IN_PROGRESS:
-        return 'Downloading...';
+        return "Downloading...";
       case FileTransferStatus.DECLINED_BY_OPPONENT:
-        return 'Declined by opponent';
+        return "Declined by opponent";
       case FileTransferStatus.DECLINED_BY_YOU:
-        return 'Declined by you';
+        return "Declined by you";
       case FileTransferStatus.FINISHED:
-        return 'Finished';
+        return "Finished";
       case FileTransferStatus.NOT_DECIDED_YET:
-        return 'Waiting for approval';
+        return "Waiting for approval";
     }
   }
 }

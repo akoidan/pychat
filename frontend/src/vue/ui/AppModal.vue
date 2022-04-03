@@ -1,6 +1,6 @@
 <template>
   <div class="modal-wrapper">
-    <slot></slot>
+    <slot/>
   </div>
 </template>
 

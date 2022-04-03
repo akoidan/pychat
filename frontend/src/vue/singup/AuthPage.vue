@@ -9,35 +9,37 @@
       </router-link>
     </div>
     <h1>{{ regHeader }}</h1>
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
 <script lang='ts'>
-import {Component, Vue} from 'vue-property-decorator';
-import {State, ApplyGrowlErr} from '@/ts/instances/storeInstance';
-import {AUTO_REGISTRATION} from '@/ts/utils/consts';
-import {sub} from '@/ts/instances/subInstance'
-import { LoginMessage } from '@/ts/types/messages/innerMessages';
+import {Component, Vue} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {AUTO_REGISTRATION} from "@/ts/utils/consts";
+import {sub} from "@/ts/instances/subInstance";
+import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 
-@Component({name: 'AuthPage'})
- export default class AuthPage extends Vue {
+@Component({name: "AuthPage"})
+export default class AuthPage extends Vue {
   @State
   public readonly regHeader!: string;
 
   public getRandom(): string {
-    return Math.random().toString(36).substring(7);
+    return Math.random().toString(36).
+      substring(7);
   }
 
-  @ApplyGrowlErr({message: 'Auto-registration error'})
+  @ApplyGrowlErr({message: "Auto-registration error"})
   public async created() {
     if (AUTO_REGISTRATION) {
       const {session} = await this.$api.registerDict(this.getRandom(), this.getRandom());
-      let message: LoginMessage = {action: 'login', handler: 'router', session};
-      sub.notify(message)
+      const message: LoginMessage = {action: "login",
+                                     handler: "router",
+                                     session};
+      sub.notify(message);
     }
   }
-
 }
 </script>
 

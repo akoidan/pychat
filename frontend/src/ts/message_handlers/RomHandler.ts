@@ -51,13 +51,13 @@ import type {
   SaveRoomSettingsMessage,
   ShowITypeMessage,
 } from "@/ts/types/messages/wsInMessages";
-import { ALL_ROOM_ID } from "@/ts/utils/consts";
-import { sub } from "@/ts/instances/subInstance";
-import type { Logger } from "lines-logger";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import {ALL_ROOM_ID} from "@/ts/utils/consts";
+import {sub} from "@/ts/instances/subInstance";
+import type {Logger} from "lines-logger";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Api from "@/ts/message_handlers/Api";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type { AudioPlayer } from "@/ts/classes/AudioPlayer";
+import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import {
   login,

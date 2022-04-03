@@ -6,8 +6,8 @@
       :checked="value"
       type="checkbox"
       @change="onchange"
-    >
-    <label :for="uniqueId" />
+    />
+    <label :for="uniqueId"/>
   </div>
 </template>
 <script lang="ts">
@@ -16,19 +16,18 @@ import {
   Emit,
   Prop,
   Ref,
-  Vue
-} from 'vue-property-decorator';
+  Vue,
+} from "vue-property-decorator";
 
 
 let uniqueId = 1;
-// this one is global for all checkboxes, so don't move it into this
+// This one is global for all checkboxes, so don't move it into this
 function getUniqueId() {
   return uniqueId++;
 }
 
-@Component({name: 'AppCheckbox'})
- export default class AppCheckbox extends Vue {
-
+@Component({name: "AppCheckbox"})
+export default class AppCheckbox extends Vue {
   @Prop()
   public readonly value!: boolean;
 

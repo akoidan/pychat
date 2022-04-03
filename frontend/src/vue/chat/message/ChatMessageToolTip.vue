@@ -25,14 +25,15 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
-import {State} from '@/ts/instances/storeInstance';
-import {EditingMessage, MessageModel} from '@/ts/types/model';
-import {editMessageWs, showAllowEditing} from '@/ts/utils/pureFunctions';
-import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from '@/ts/utils/consts';
+import {Component, Emit, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {State} from "@/ts/instances/storeInstance";
+import type {EditingMessage} from "@/ts/types/model";
+import {MessageModel} from "@/ts/types/model";
+import {editMessageWs, showAllowEditing} from "@/ts/utils/pureFunctions";
+import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from "@/ts/utils/consts";
 
-@Component({name: 'ChatMessageToolTip'})
- export default class ChatMessageToolTip extends Vue {
+@Component({name: "ChatMessageToolTip"})
+export default class ChatMessageToolTip extends Vue {
   @Prop()
   public readonly message!: MessageModel;
 
@@ -52,45 +53,46 @@ import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from '@/ts/utils/consts';
     if (!this.showAllowEditing()) {
       this.$store.growlError("You can't edit messages sent more than 1 day ago");
     }
-    let a: EditingMessage = {
+    const a: EditingMessage = {
       messageId: this.message.id,
       isEditingNow,
-      roomId: this.message.roomId
-    }
+      roomId: this.message.roomId,
+    };
     this.$store.setEditedMessage(a);
   }
 
   public deleteMessage() {
     if (!this.showAllowEditing()) {
       this.$store.growlError("You can't delete messages sent more than 1 day ago");
-      return
+      return;
     }
-    if (!confirm(`Are you sure you want to delete this message?`)) {
-      return
+    if (!confirm("Are you sure you want to delete this message?")) {
+      return;
     }
     // TODO, check if opened is the only status with abor request
     if (this.message?.transfer?.xhr?.readyState === XMLHttpRequest.OPENED) {
       this.message.transfer.xhr.abort();
     }
     editMessageWs(
-        null,
-        this.message.id,
-        this.message.roomId,
-        null,
-        null,
-        {},
-        this.message.time,
-        Date.now(),
-        this.message.parentMessage,
-        this.$store,
-        this.$messageSenderProxy.getMessageSender(this.message.roomId)
+      null,
+      this.message.id,
+      this.message.roomId,
+      null,
+      null,
+      {},
+      this.message.time,
+      Date.now(),
+      this.message.parentMessage,
+      this.$store,
+      this.$messageSenderProxy.getMessageSender(this.message.roomId),
     );
   }
 
   public toggleThread() {
-    this.$store.setCurrentThread({messageId: this.message.id, roomId: this.message.roomId, isEditingNow: !this.message.isThreadOpened});
+    this.$store.setCurrentThread({messageId: this.message.id,
+      roomId: this.message.roomId,
+      isEditingNow: !this.message.isThreadOpened});
   }
-
 }
 </script>
 <!-- eslint-disable -->

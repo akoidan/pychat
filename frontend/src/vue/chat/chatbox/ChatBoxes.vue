@@ -22,34 +22,33 @@
 import {
   Component,
   Vue,
-  Watch
-} from 'vue-property-decorator';
-import ChatBox from '@/vue/chat/chatbox/ChatBox.vue';
-import { State } from '@/ts/instances/storeInstance';
+  Watch,
+} from "vue-property-decorator";
+import ChatBox from "@/vue/chat/chatbox/ChatBox.vue";
+import {State} from "@/ts/instances/storeInstance";
 
-import { ALL_ROOM_ID } from '@/ts/utils/consts';
+import {ALL_ROOM_ID} from "@/ts/utils/consts";
 
-import { RoomModel } from '@/ts/types/model';
+import {RoomModel} from "@/ts/types/model";
 
 
 @Component({
-  name: 'ChatBoxes' ,
-  components: {ChatBox}
+  name: "ChatBoxes",
+  components: {ChatBox},
 })
 export default class ChatBoxes extends Vue {
-
   @State
   public readonly roomsArray!: RoomModel[];
 
-  // do not render all messages in all rooms, this is too slow
+  // Do not render all messages in all rooms, this is too slow
   public roomInited: Record<string, boolean> = {};
 
   created() {
-    // vue.set
-    this.roomInited[this.activeRoomId] =  true;
+    // Vue.set
+    this.roomInited[this.activeRoomId] = true;
   }
 
-  @Watch('activeRoomId')
+  @Watch("activeRoomId")
   public onActiveRoomIdChange(newValue: number) {
     // Vue.set
     this.roomInited[newValue] = true;

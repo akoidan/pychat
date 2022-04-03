@@ -16,7 +16,7 @@ import type {
   MessageStatus,
   RoomModel,
 } from "@/ts/types/model";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 
 import type {
   GiphyDto,
@@ -24,10 +24,10 @@ import type {
   SaveFileResponse,
 } from "@/ts/types/dto";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import { sub } from "@/ts/instances/subInstance";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import {sub} from "@/ts/instances/subInstance";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
-import type { InternetAppearMessage, } from "@/ts/types/messages/innerMessages";
+import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {
   HandlerName,
   HandlerType,
@@ -41,16 +41,16 @@ import type {
   SetMessageStatusMessage,
   SyncHistoryResponseMessage,
 } from "@/ts/types/messages/wsInMessages";
-import { savedFiles } from "@/ts/utils/htmlApi";
-import type { MessageHelper } from "@/ts/message_handlers/MessageHelper";
+import {savedFiles} from "@/ts/utils/htmlApi";
+import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import {
   LAST_SYNCED,
-  MESSAGES_PER_SEARCH
+  MESSAGES_PER_SEARCH,
 } from "@/ts/utils/consts";
-import { convertMessageModelDtoToModel } from "@/ts/types/converters";
+import {convertMessageModelDtoToModel} from "@/ts/types/converters";
 import {
   checkIfIdIsMissing,
-  getMissingIds
+  getMissingIds,
 } from "@/ts/utils/pureFunctions";
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {

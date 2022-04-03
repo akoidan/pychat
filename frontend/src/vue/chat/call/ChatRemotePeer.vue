@@ -24,18 +24,18 @@ import {
   Prop,
   Ref,
   Vue,
-  Watch
-} from 'vue-property-decorator';
-import { CallInfoModel } from '@/ts/types/model';
-import AppInputRange from '@/vue/ui/AppInputRange.vue';
-import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
+  Watch,
+} from "vue-property-decorator";
+import {CallInfoModel} from "@/ts/types/model";
+import AppInputRange from "@/vue/ui/AppInputRange.vue";
+import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
 
 @Component({
-  name: 'ChatRemotePeer' ,
-  components: {VideoObject, AppInputRange}
+  name: "ChatRemotePeer",
+  components: {VideoObject,
+    AppInputRange},
 })
 export default class ChatRemotePeer extends Vue {
-
   @Ref()
   public video!: VideoObject;
 
@@ -48,13 +48,13 @@ export default class ChatRemotePeer extends Vue {
   get volLevelClass() {
     return `vol-level-${this.callInfo.opponentCurrentVoice}`;
   }
+
   public volumeLevel: number = 100;
 
-  @Watch('volumeLevel')
+  @Watch("volumeLevel")
   public onVolumeChanged(newValue: number) {
     (this.video.$refs.video as HTMLVideoElement).volume = newValue / 100;
   }
-
 }
 </script>
 

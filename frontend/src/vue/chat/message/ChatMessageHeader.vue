@@ -4,23 +4,24 @@
   </span>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import { UserDictModel } from '@/ts/types/model';
-import { timeToString } from '@/ts/utils/htmlApi';
+  Vue,
+} from "vue-property-decorator";
+import {UserDictModel} from "@/ts/types/model";
+import {timeToString} from "@/ts/utils/htmlApi";
 
-import UserImageIcon from '@/vue/chat/chatbox/UserImageIcon.vue';
+import UserImageIcon from "@/vue/chat/chatbox/UserImageIcon.vue";
+
 @Component({
-  name: 'ChatMessageHeader' ,
-  components: {UserImageIcon}
+  name: "ChatMessageHeader",
+  components: {UserImageIcon},
 })
 export default class ChatMessageHeader extends Vue {
-
   @Prop() public userId!: number;
+
   @Prop() public time!: number;
 
   @State

@@ -29,26 +29,27 @@
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import { MessageModel, RoomModel } from '@/ts/types/model';
+  Vue,
+} from "vue-property-decorator";
+import type {MessageModel} from "@/ts/types/model";
+import {RoomModel} from "@/ts/types/model";
 
-@Component({name: 'RoomRightIcon'})
- export default class RoomRightIcon extends Vue {
+@Component({name: "RoomRightIcon"})
+export default class RoomRightIcon extends Vue {
+  @Prop() public room!: RoomModel;
 
-    @Prop() public room!: RoomModel;
+  get newMessagesCount(): number {
+    return this.$store.calculatedMessagesForRoom(this.room.id).
+      filter((m: MessageModel) =>
 
-    get newMessagesCount(): number {
-      return this.$store.calculatedMessagesForRoom(this.room.id)
-          .filter((m: MessageModel) =>
-              // on_server is not really required, since all received messages are gonna be 'received'
-              // but it's an additional failsafe check, in case of a bug in another place
-              (m.status === 'received' || m.status === 'on_server')
-              && m.userId !== this.$store.myId
-          ).length;
-    }
-
+        /*
+         * On_server is not really required, since all received messages are gonna be 'received'
+         * But it's an additional failsafe check, in case of a bug in another place
+         */
+        (m.status === "received" || m.status === "on_server") &&
+        m.userId !== this.$store.myId).length;
   }
+}
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>

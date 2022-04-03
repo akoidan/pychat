@@ -14,7 +14,7 @@
               maxlength="30"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -25,7 +25,7 @@
               maxlength="30"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -36,7 +36,7 @@
               maxlength="50"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -47,7 +47,7 @@
               maxlength="30"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -68,7 +68,7 @@
               maxlength="100"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -112,50 +112,55 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import {Component, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import {CurrentUserInfoModel, SexModelString} from '@/ts/types/model';
-import {
-  UserProfileDto,
-  UserProfileDtoWoImage
-} from '@/ts/types/dto';
-import {currentUserInfoModelToDto} from '@/ts/types/converters';
-import AppInputDate from '@/vue/ui/AppInputDate.vue';
-import { SetUserProfileMessage } from '@/ts/types/messages/wsInMessages';
-import {LogoutMessage} from '@/ts/types/messages/innerMessages';
-import {sub} from '@/ts/instances/subInstance';
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Vue} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import type {SexModelString} from "@/ts/types/model";
+import {CurrentUserInfoModel} from "@/ts/types/model";
+import type {
+  UserProfileDtoWoImage,
+} from "@/ts/types/dto";
+
+import {currentUserInfoModelToDto} from "@/ts/types/converters";
+import AppInputDate from "@/vue/ui/AppInputDate.vue";
+import type {SetUserProfileMessage} from "@/ts/types/messages/wsInMessages";
+import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
+import {sub} from "@/ts/instances/subInstance";
 
 @Component({
-  name: 'UserProfileInfo' ,
-  components: {AppInputDate, AppSubmit}
+  name: "UserProfileInfo",
+  components: {AppInputDate,
+    AppSubmit},
 })
 export default class UserProfileInfo extends Vue {
   public running: boolean = false;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  public sex: SexModelString[] = ['Male', 'Female', 'Secret'];
+  public sex: SexModelString[] = ["Male", "Female", "Secret"];
+
   public model!: UserProfileDtoWoImage;
 
   public created() {
     this.model = currentUserInfoModelToDto(this.userInfo);
   }
 
-  @ApplyGrowlErr({ message: 'Error saving profile', runningProp: 'running'})
+  @ApplyGrowlErr({message: "Error saving profile",
+    runningProp: "running"})
   public async save() {
-    this.$logger.debug('Saving userProfile')();
+    this.$logger.debug("Saving userProfile")();
     const cui: UserProfileDtoWoImage = {...this.model};
     const e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
-    this.$store.growlSuccess('User profile has been saved');
+    this.$store.growlSuccess("User profile has been saved");
   }
 
 
   public async signOut() {
-    this.$api.logout(); // do not make user wait, logout instantly
-    let message: LogoutMessage = {
-      action: 'logout',
-      handler: 'any'
+    this.$api.logout(); // Do not make user wait, logout instantly
+    const message: LogoutMessage = {
+      action: "logout",
+      handler: "any",
     };
     sub.notify(message);
   }

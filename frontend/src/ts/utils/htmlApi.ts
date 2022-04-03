@@ -4,7 +4,7 @@ import {
   PASTED_IMG_CLASS,
   USERNAME_REGEX,
 } from "@/ts/utils/consts";
-import type { MessageDataEncode } from "@/ts/types/types";
+import type {MessageDataEncode} from "@/ts/types/types";
 import type {
   BlobType,
   CurrentUserSettingsModel,
@@ -14,20 +14,20 @@ import type {
 } from "@/ts/types/model";
 import recordIcon from "@/assets/img/audio.svg";
 import fileIcon from "@/assets/img/file.svg";
-import { getFlag } from "@/ts/utils/flags";
+import {getFlag} from "@/ts/utils/flags";
 import videoIcon from "@/assets/img/icon-play-red.svg";
-import type { Smile } from "@/ts/utils/smileys";
-import { allSmileysKeys, } from "@/ts/utils/smileys";
+import type {Smile} from "@/ts/utils/smileys";
+import {allSmileysKeys} from "@/ts/utils/smileys";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import {
   MEDIA_API_URL,
   webpSupported,
 } from "@/ts/utils/runtimeConsts";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import { hexEncode } from "@/ts/utils/pureFunctions";
-import type { GIFObject } from "giphy-api";
-import type { Emitter } from "mitt";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import {hexEncode} from "@/ts/utils/pureFunctions";
+import type {GIFObject} from "giphy-api";
+import type {Emitter} from "mitt";
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;

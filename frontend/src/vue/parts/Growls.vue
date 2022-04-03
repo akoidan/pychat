@@ -8,33 +8,33 @@
   </div>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Prop,
-    Vue,
-    Watch,
-    Ref
-  } from 'vue-property-decorator';
-  import {GrowlModel} from '@/ts/types/model';
-  import {State} from '@/ts/instances/storeInstance';
-  import AppGrowl from '@/vue/ui/AppGrowl.vue';
-  @Component({
-    components: {AppGrowl}
-  })
-  export default class Growls extends Vue {
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch,
+} from "vue-property-decorator";
+import type {GrowlModel} from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
+import AppGrowl from "@/vue/ui/AppGrowl.vue";
 
-    @Watch('$route', { immediate: true, deep: true })
-    onUrlChange(newVal: any) {
-      this.$store.clearGrowls();
-    }
-
-    @State
-    public readonly growls!: GrowlModel[];
-
-    get last3Growl(): GrowlModel[] {
-      return this.growls.slice(-3);
-    }
+@Component({
+  components: {AppGrowl},
+})
+export default class Growls extends Vue {
+  @Watch("$route", {immediate: true, deep: true})
+  onUrlChange(newVal: any) {
+    this.$store.clearGrowls();
   }
+
+  @State
+  public readonly growls!: GrowlModel[];
+
+  get last3Growl(): GrowlModel[] {
+    return this.growls.slice(-3);
+  }
+}
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>

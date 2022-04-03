@@ -1,9 +1,9 @@
 import {
   createRouter,
-  createWebHashHistory
+  createWebHashHistory,
 } from "vue-router";
 import sessionHolder from "@/ts/instances/sessionInstance";
-import { store } from "@/ts/instances/storeInstance";
+import {store} from "@/ts/instances/storeInstance";
 import MainPage from "@/vue/pages/MainPage.vue";
 import ChannelsPage from "@/vue/pages/ChannelsPage.vue";
 import AuthPage from "@/vue/singup/AuthPage.vue";
@@ -28,9 +28,9 @@ import ConfirmMail from "@/vue/pages/ConfirmMail.vue";
 import UserProfileChangeEmail from "@/vue/pages/UserProfileChangeEmail.vue";
 import CreateChannel from "@/vue/pages/CreateChannel.vue";
 import ChannelSettings from "@/vue/pages/ChannelSettings.vue";
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {
   HandlerType,

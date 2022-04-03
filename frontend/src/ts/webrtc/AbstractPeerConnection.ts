@@ -1,19 +1,19 @@
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import { bytesToSize } from "@/ts/utils/pureFunctions";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
 
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import Subscription from "@/ts/classes/Subscription";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
-import type { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
 import type {
   CheckTransferDestroy,
   ConnectToRemoteMessage,
 } from "@/ts/types/messages/innerMessages";
-import type { SendRtcDataMessage } from "@/ts/types/messages/wsInMessages";
-import { WEBRTC_RUNTIME_CONFIG } from "@/ts/utils/runtimeConsts";
+import type {SendRtcDataMessage} from "@/ts/types/messages/wsInMessages";
+import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
 
 
 export default abstract class AbstractPeerConnection extends MessageHandler {

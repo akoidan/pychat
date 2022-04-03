@@ -2,9 +2,9 @@ import Vuex from "vuex";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {
+  ChannelUIModel,
   ChannelsDictModel,
   ChannelsDictUIModel,
-  ChannelUIModel,
   CurrentUserInfoModel,
   IncomingCallModel,
   Location,
@@ -13,7 +13,7 @@ import type {
   RoomDictModel,
   SendingFileTransfer,
   SexModelString,
-  UserDictModel
+  UserDictModel,
 } from "@/ts/types/model";
 import {
   ChannelModel,
@@ -29,7 +29,7 @@ import {
   SendingFile,
   UserModel,
 } from "@/ts/types/model";
-import type { PrivateRoomsIds } from "@/ts/types/types";
+import type {PrivateRoomsIds} from "@/ts/types/types";
 import {
   AddMessagesDTO,
   AddSendingFileTransfer,
@@ -67,7 +67,7 @@ import {
   SetStateFromStorage,
   SetStateFromWS,
 } from "@/ts/types/dto";
-import { encodeHTML } from "@/ts/utils/htmlApi";
+import {encodeHTML} from "@/ts/utils/htmlApi";
 import {
   ACTIVE_ROOM_ID_LS_NAME,
   ALL_ROOM_ID,

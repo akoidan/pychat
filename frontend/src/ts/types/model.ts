@@ -1,4 +1,4 @@
-import type { LogLevel } from "lines-logger";
+import type {LogLevel} from "lines-logger";
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",

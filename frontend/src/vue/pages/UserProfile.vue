@@ -13,17 +13,17 @@
       <router-link to="/profile/change-email">
         Change email
       </router-link>
-      <router-link to="/profile/oauth-settings" v-if="GOOGLE_OAUTH_2_CLIENT_ID && FACEBOOK_APP_ID">
+      <router-link v-if="GOOGLE_OAUTH_2_CLIENT_ID && FACEBOOK_APP_ID" to="/profile/oauth-settings">
         Social accounts
       </router-link>
     </app-tab>
     <div class="container">
-      <router-view v-slot="{ Component, route }">
+      <router-view v-slot="{Component, route}">
         <keep-alive>
           <component
             :is="Component"
-            class="profileInner"
             :key="route.meta.usePathKey ? route.path : undefined"
+            class="profileInner"
           />
         </keep-alive>
       </router-view>
@@ -31,17 +31,18 @@
   </div>
 </template>
 <script lang="ts">
-import { GOOGLE_OAUTH_2_CLIENT_ID , FACEBOOK_APP_ID} from '@/ts/utils/consts';
-import {Component, Vue} from 'vue-property-decorator';
-import AppTab from '@/vue/ui/AppTab.vue';
+import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/ts/utils/consts";
+import {Component, Vue} from "vue-property-decorator";
+import AppTab from "@/vue/ui/AppTab.vue";
+
 @Component({
-  name: 'UserProfile' ,
-  components: {AppTab}
+  name: "UserProfile",
+  components: {AppTab},
 })
 export default class UserProfile extends Vue {
   public readonly GOOGLE_OAUTH_2_CLIENT_ID = GOOGLE_OAUTH_2_CLIENT_ID;
-  public readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
 
+  public readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
 }
 </script>
 

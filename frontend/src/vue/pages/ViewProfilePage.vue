@@ -14,7 +14,7 @@
     class="profileHolder"
   >
     <div v-if="userProfileInfo.image">
-      <img :src="resolveMediaUrl(userProfileInfo.image)">
+      <img :src="resolveMediaUrl(userProfileInfo.image)"/>
     </div>
     <div class="tableHolder">
       <table>
@@ -57,15 +57,14 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
-import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import {resolveMediaUrl} from '@/ts/utils/htmlApi';
-import {UserModel} from '@/ts/types/model';
-import { ViewUserProfileDto } from "@/ts/types/dto";
+import {Component, Vue} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {resolveMediaUrl} from "@/ts/utils/htmlApi";
+import type {UserModel} from "@/ts/types/model";
+import type {ViewUserProfileDto} from "@/ts/types/dto";
 
-@Component({name: 'ViewProfilePage'})
- export default class ViewProfilePage extends Vue {
-
+@Component({name: "ViewProfilePage"})
+export default class ViewProfilePage extends Vue {
   get id(): number {
     return parseInt(this.$route.params.id as string);
   }
@@ -75,20 +74,24 @@ import { ViewUserProfileDto } from "@/ts/types/dto";
   }
 
   public loading: boolean = false;
-  public error: string|null = null;
+
+  public error: string | null = null;
+
   @State
-  public readonly allUsersDict!: {[id: number]: UserModel} ;
+  public readonly allUsersDict!: Record<number, UserModel>;
+
   public userProfileInfo: ViewUserProfileDto | null = null;
 
   public resolveMediaUrl(src: string) {
     return resolveMediaUrl(src);
   }
 
-  @ApplyGrowlErr({ vueProperty: 'error', message: 'Error loading profile', runningProp: 'loading'})
+  @ApplyGrowlErr({vueProperty: "error",
+    message: "Error loading profile",
+    runningProp: "loading"})
   public async created() {
     this.userProfileInfo = await this.$api.showProfile(this.id);
   }
-
 }
 </script>
 

@@ -1,37 +1,39 @@
 <template>
   <div v-if="users.length > 0" class="users-typing-holder">
-    <span class="user-types"> {{stringifiedTypes}}</span><span v-if="users.length > 1"> are</span><span v-else> is</span> <span class="loading-typing">typing</span>
+    <span class="user-types"> {{ stringifiedTypes }}</span><span v-if="users.length > 1"> are</span><span v-else> is</span> <span class="loading-typing">typing</span>
   </div>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Prop,
-    Vue,
-    Watch,
-    Ref
-  } from 'vue-property-decorator';
-  import {
-    RoomModel,
-    UserModel
-  } from '@/ts/types/model';
-  import {State} from '@/ts/instances/storeInstance';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch,
+} from "vue-property-decorator";
+import type {
+  UserModel,
+} from "@/ts/types/model";
+import {
+  RoomModel,
+} from "@/ts/types/model";
+import {State} from "@/ts/instances/storeInstance";
 
-  @Component({name: 'ChatShowUserTyping'})
- export default class ChatShowUserTyping extends Vue {
-    @Prop() public usersTyping!: Record<number, number>;
+@Component({name: "ChatShowUserTyping"})
+export default class ChatShowUserTyping extends Vue {
+  @Prop() public usersTyping!: Record<number, number>;
 
-    @State
-    public readonly allUsersDict!: {[id: number]: UserModel} ;
+  @State
+  public readonly allUsersDict!: Record<number, UserModel>;
 
-    get users(): UserModel[] {
-      return Object.keys(this.usersTyping).map(uId => this.allUsersDict[uId as unknown as number]);
-    }
-
-    get stringifiedTypes() {
-      return this.users.map(u => u.user).join(', ');
-    }
+  get users(): UserModel[] {
+    return Object.keys(this.usersTyping).map((uId) => this.allUsersDict[uId as unknown as number]);
   }
+
+  get stringifiedTypes() {
+    return this.users.map((u) => u.user).join(", ");
+  }
+}
 </script>
 <!-- eslint-disable -->
 <style

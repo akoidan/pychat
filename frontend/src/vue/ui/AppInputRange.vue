@@ -5,15 +5,15 @@
     :value="value"
     :class="cls"
     @input="oninput"
-  >
+  />
 </template>
 <script lang="ts">
 import {
   Component,
   Prop,
   Ref,
-  Vue
-} from 'vue-property-decorator';
+  Vue,
+} from "vue-property-decorator";
 
 let uniqueId = 1;
 
@@ -21,22 +21,24 @@ function getUniqueId() {
   return uniqueId++;
 }
 
-@Component({name: 'AppInputRange'})
- export default class AppInputRange extends Vue {
+@Component({name: "AppInputRange"})
+export default class AppInputRange extends Vue {
   @Prop() public readonly value!: number;
 
   @Ref()
   public el!: HTMLInputElement;
+
   private style: any;
+
   public cls!: string;
 
   public created() {
-    this.style = document.createElement('style');
+    this.style = document.createElement("style");
     document.head.appendChild(this.style);
     this.cls = `wbktRange${getUniqueId()}`;
   }
 
-  public mounted () {
+  public mounted() {
     this.fixStyle();
   }
 
@@ -46,12 +48,12 @@ function getUniqueId() {
 
   public oninput(event: Event) {
     this.fixStyle();
-    this.$emit('input', parseInt((event.target as HTMLInputElement).value));
+    this.$emit("input", parseInt((event.target as HTMLInputElement).value));
   }
 
   public fixStyle() {
-    const min  = parseInt(this.el.getAttribute('min') || '0');
-    const max = parseInt(this.el.getAttribute('max') || '100');
+    const min = parseInt(this.el.getAttribute("min") || "0");
+    const max = parseInt(this.el.getAttribute("max") || "100");
     const v = parseFloat(this.el.value);
     const p = Math.round((v - min) / (max - min) * 100);
     this.style.textContent = `.${this.cls}::-webkit-slider-runnable-track {background-size: ${p}% 100%, 100% 100% !important; } `;

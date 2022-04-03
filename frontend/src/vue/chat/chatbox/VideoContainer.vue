@@ -43,9 +43,9 @@
         />
       </template>
       <video-object
+        v-show="!currentVideoActive"
         ref="localVideo"
         muted="muted"
-        v-show="!currentVideoActive"
         :media-stream-link="callInfo.mediaStreamLink"
         :user-id="myId"
         class="localVideo"
@@ -67,24 +67,26 @@ import {
   Prop,
   Ref,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
-import { State } from '@/ts/instances/storeInstance';
-import { CallsInfoModel } from '@/ts/types/model';
-import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
-import ChatRemotePeer from '@/vue/chat/call/ChatRemotePeer.vue';
+import {State} from "@/ts/instances/storeInstance";
+import {CallsInfoModel} from "@/ts/types/model";
+import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
+import ChatRemotePeer from "@/vue/chat/call/ChatRemotePeer.vue";
 
 
 @Component({
-  name: 'VideoContainer' ,
-  components: {ChatRemotePeer, VideoObject}
+  name: "VideoContainer",
+  components: {
+    ChatRemotePeer,
+    VideoObject,
+  },
 })
 export default class VideoContainer extends Vue {
-
   @Ref()
   public localVideo!: VideoObject;
 
-  public currentVideoActive: string|null = null;
+  public currentVideoActive: string | null = null;
 
   @State
   public readonly myId!: number;
@@ -96,19 +98,23 @@ export default class VideoContainer extends Vue {
   public roomId!: number;
 
   @Emit() micClick() {}
+
   @Emit() hangUpCall() {}
+
   @Emit() videoClick() {}
+
   @Emit() desktopClick() {}
+
   @Emit() exitFullscreen() {}
 
-  @Watch('callInfo.currentSpeaker')
+  @Watch("callInfo.currentSpeaker")
   public onSpeakerChange(newValue: string) {
-    this.$nextTick(function () {
+    this.$nextTick(function() {
       const video: HTMLVideoElement = this.localVideo.$refs.video as HTMLVideoElement;
       if (video.setSinkId) {
         video.setSinkId(newValue);
-      } else  {
-        this.$logger.error('SetSinkId doesn\'t exist')();
+      } else {
+        this.$logger.error("SetSinkId doesn't exist")();
       }
     });
   }

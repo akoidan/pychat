@@ -1,6 +1,6 @@
 <template>
   <div class="attachments-div" @mousedown.prevent>
-  <!--   @mousedown.prevent prevent looseing focus from contenteditable-->
+    <!--   @mousedown.prevent prevent looseing focus from contenteditable-->
     <input
       v-show="false"
       ref="imgInput"
@@ -8,45 +8,41 @@
       accept="image/*,video/*"
       multiple
       @change="uploadImage"
-    >
+    />
     <input
       v-show="false"
       ref="inputFileSend"
       type="file"
       @change="sendFile"
-    >
+    />
     <input
       v-show="false"
-      multiple
       ref="inputFileUpload"
+      multiple
       type="file"
       @change="uploadFile"
-    >
+    />
     <router-link
-      @click.native="close"
       :to="paintUrl"
       class="icon-brush"
       title="Draw an Image"
-    >
-    </router-link>
+      @click.native="close"
+    />
     <i
       title="Send file directly (p2p)"
       class="icon-doc-inv"
       @click="sendFileClick"
-    >
-    </i>
+    />
     <i
       title="Send a random gif animation from text"
       class="icon-smile"
       @click="addGiphy"
-    >
-    </i>
+    />
     <i
       class="icon-upload-cloud"
       title="Upload file to server"
       @click="uploadFileClick"
-    >
-    </i>
+    />
 
     <i
       class="icon-picture"
@@ -55,13 +51,13 @@
     />
     <i
       class="icon-webrtc-video"
-      @click="addVideo"
       title="Record and send a video message"
+      @click="addVideo"
     />
     <i
       class="icon-mic-1"
-      @click="addAudio"
       title="Record and send an audio message"
+      @click="addAudio"
     />
 
     <i
@@ -75,19 +71,18 @@
 <script lang="ts">
 import {
   Component,
+  Emit,
   Prop,
+  Ref,
   Vue,
   Watch,
-  Emit,
-  Ref
 } from "vue-property-decorator";
-import { State } from '@/ts/instances/storeInstance';
-import { RoomModel } from '@/ts/types/model';
-import {buildQueryParams} from '@/ts/utils/pureFunctions';
+import {State} from "@/ts/instances/storeInstance";
+import {RoomModel} from "@/ts/types/model";
+import {buildQueryParams} from "@/ts/utils/pureFunctions";
 
-@Component({name: 'ChatAttachments'})
- export default class ChatAttachments extends Vue {
-
+@Component({name: "ChatAttachments"})
+export default class ChatAttachments extends Vue {
   @Ref()
   public imgInput!: HTMLInputElement;
 
@@ -126,8 +121,8 @@ import {buildQueryParams} from '@/ts/utils/pureFunctions';
   }
 
   get paintUrl() {
-    let params: Record<string, number|string> = {
-      roomId: this.roomId
+    const params: Record<string, number | string> = {
+      roomId: this.roomId,
     };
     if (this.editMessageId) {
       params.editedMessageId = this.editMessageId;
@@ -135,57 +130,59 @@ import {buildQueryParams} from '@/ts/utils/pureFunctions';
     if (this.threadMessageId) {
       params.openedThreadId = this.threadMessageId;
     }
-    let queryParams = buildQueryParams(params);
+    const queryParams = buildQueryParams(params);
 
     return `/painter?${queryParams}`;
   }
 
 
-
   public async addImage() {
-    // this.$store.setShowAttachments(false);
-    // TODO seems like filePicker has limited about of time which file lives.
-    //  Sometimes it errors `net::ERR_FILE_NOT_FOUND` on upload
-    // if (window.showOpenFilePicker) {
-    //   let filesHandles: FileSystemFileHandle[] = await window.showOpenFilePicker({
-    //     multiple: true,
-    //     types: [
-    //       {
-    //         description: 'Images',
-    //         accept: {
-    //           'image/*': ['.png', '.gif', '.jpeg', '.jpg']
-    //         }
-    //       }
-    //     ]
-    //   })
-    //   let files = await Promise.all(filesHandles.map(a => a.getFile()))
-    //
-    //   this.pasteFilesToTextArea(files);
-    // } else {
+
+    /*
+     * This.$store.setShowAttachments(false);
+     * TODO seems like filePicker has limited about of time which file lives.
+     *  Sometimes it errors `net::ERR_FILE_NOT_FOUND` on upload
+     * if (window.showOpenFilePicker) {
+     *   let filesHandles: FileSystemFileHandle[] = await window.showOpenFilePicker({
+     *     multiple: true,
+     *     types: [
+     *       {
+     *         description: 'Images',
+     *         accept: {
+     *           'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+     *         }
+     *       }
+     *     ]
+     *   })
+     *   let files = await Promise.all(filesHandles.map(a => a.getFil()     *    *  tiasteFilesToTextArea(files);
+     * } else {
+     */
     this.imgInput.click();
-    // }
   }
 
   public uploadFileClick() {
-    this.inputFileUpload.value = '';
-    // this.$store.setShowAttachments(false);
+    this.inputFileUpload.value = "";
+    // This.$store.setShowAttachments(false);
     this.inputFileUpload.click();
   }
 
   public sendFileClick() {
-    this.inputFileSend.value = '';
-    // this.$store.setShowAttachments(false);
+    this.inputFileSend.value = "";
+    // This.$store.setShowAttachments(false);
     this.inputFileSend.click();
   }
 
   @Emit()
   public uploadImage(evt: Event) {
-    this.$logger.log("Got images to send: {}",  (evt.target as HTMLInputElement).files)();
+    this.$logger.log("Got images to send: {}", (evt.target as HTMLInputElement).files)();
     const files: FileList = (evt.target as HTMLInputElement).files!;
-    // save files before clearing input.
-    // if we avoid array.from, default obect filelist is live, meaning it would have size 0 after clearing
-    let result = Array.from(files);
-    this.imgInput.value = '';
+
+    /*
+     * Save files before clearing input.
+     * if we avoid array.from, default obect filelist is live, meaning it would have size 0 after clearing
+     */
+    const result = Array.from(files);
+    this.imgInput.value = "";
     return result;
   }
 
@@ -193,10 +190,13 @@ import {buildQueryParams} from '@/ts/utils/pureFunctions';
   public uploadFile() {
     this.$logger.log("Got files to send: {}", this.inputFileUpload.files)();
     const files: FileList = this.inputFileUpload.files!;
-    let result = Array.from(files);
-    // save files before clearing input.
-    // if we avoid array.from, default obect filelist is live, meaning it would have size 0 after clearing
-    this.inputFileUpload.value = '';
+    const result = Array.from(files);
+
+    /*
+     * Save files before clearing input.
+     * if we avoid array.from, default obect filelist is live, meaning it would have size 0 after clearing
+     */
+    this.inputFileUpload.value = "";
     return result;
   }
 
@@ -209,7 +209,6 @@ import {buildQueryParams} from '@/ts/utils/pureFunctions';
     }
     this.close();
   }
-
 }
 </script>
 <!-- eslint-disable -->

@@ -4,7 +4,7 @@ import {
   GIPHY_URL,
   RESPONSE_SUCCESS,
 } from "@/ts/utils/consts";
-import type { UploadFile, } from "@/ts/types/types";
+import type {UploadFile} from "@/ts/types/types";
 import type {
   OauthSessionResponse,
   OauthStatus,
@@ -14,15 +14,15 @@ import type {
 } from "@/ts/types/dto";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 import type Http from "@/ts/classes/Http";
-import { sub } from "@/ts/instances/subInstance";
+import {sub} from "@/ts/instances/subInstance";
 import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
-import type { MultiResponse, } from "giphy-api";
+import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
+import type {MultiResponse} from "giphy-api";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "any"> = {
@@ -253,7 +253,7 @@ export default class Api extends MessageHandler {
       checkOkString: true,
       params: {
         email,
-        password
+        password,
       },
     });
   }
@@ -308,7 +308,7 @@ export default class Api extends MessageHandler {
       url: "/accept_token",
       params: {
         token,
-        password
+        password,
       },
       checkOkString: true,
     });

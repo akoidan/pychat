@@ -6,16 +6,16 @@
   >●</span>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {State} from '@/ts/instances/storeInstance';
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {State} from "@/ts/instances/storeInstance";
 
-@Component({name: 'ChatIsOnlineIcon'})
- export default class ChatIsOnlineIcon extends Vue {
+@Component({name: "ChatIsOnlineIcon"})
+export default class ChatIsOnlineIcon extends Vue {
   @State
   public readonly isOnline!: boolean;
 
   get title() {
-    return this.isOnline ? 'Websocket connection established. You are online' : 'Trying to connect to the server. You\'re offline';
+    return this.isOnline ? "Websocket connection established. You are online" : "Trying to connect to the server. You're offline";
   }
 }
 </script>

@@ -14,20 +14,20 @@
   </chat-message-wrapper>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
-  Prop,
   Emit,
+  Prop,
   Ref,
-  Vue
-} from 'vue-property-decorator';
+  Vue,
+} from "vue-property-decorator";
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
-  MessageModel
-} from '@/ts/types/model';
+  MessageModel,
+} from "@/ts/types/model";
 import {
   encodeHTML,
   encodeMessage,
@@ -35,18 +35,18 @@ import {
   setAudioEvent,
   setImageFailEvents,
   setVideoEvent,
-  setYoutubeEvent
-} from '@/ts/utils/htmlApi';
+  setYoutubeEvent,
+} from "@/ts/utils/htmlApi";
 
-import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
-import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+import ChatMessageHeader from "@/vue/chat/message/ChatMessageHeader.vue";
+import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
 
 @Component({
-  name: 'ChatTextMessage' ,
-  components: {ChatMessageWrapper, ChatMessageHeader}
+  name: "ChatTextMessage",
+  components: {ChatMessageWrapper,
+    ChatMessageHeader},
 })
 export default class ChatTextMessage extends Vue {
-
   @Prop()
   public message!: MessageModel;
 
@@ -61,22 +61,22 @@ export default class ChatTextMessage extends Vue {
   }
 
   get encoded() {
-    return this.message.content ? encodeMessage(this.message, this.$store) : encodeHTML('This message has been removed');
+    return this.message.content ? encodeMessage(this.message, this.$store) : encodeHTML("This message has been removed");
   }
 
   get mainCls() {
     return {
-      'removed-message': this.message.deleted,
-      'message-content': true,
+      "removed-message": this.message.deleted,
+      "message-content": true,
     };
   }
 
   public updated() {
-    this.$nextTick(function () {
+    this.$nextTick(function() {
       if (this.content) {
         this.seEvents();
       } else {
-        this.$logger.debug('Skipping event settings, because node is gone')();
+        this.$logger.debug("Skipping event settings, because node is gone")();
       }
     });
   }
@@ -86,7 +86,7 @@ export default class ChatTextMessage extends Vue {
   }
 
   private seEvents() {
-    this.$logger.debug('Setting events')();
+    this.$logger.debug("Setting events")();
     if (this.userSettings.highlightCode) {
       highlightCode(this.content);
     }
@@ -97,7 +97,6 @@ export default class ChatTextMessage extends Vue {
     setImageFailEvents(this.content, this.$messageBus);
     setAudioEvent(this.content);
   }
-
 }
 </script>
 <style lang="sass" scoped>

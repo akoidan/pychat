@@ -1,42 +1,44 @@
 <template>
   <div class="user-image-holder">
-    <div class="online-marker"></div>
-    <img v-if="userImg" :src="userImg" :title="user.user">
-    <div class="image-missing" v-else :style="{'background-color': color}" :title="user.user">
-      {{twoLetter}}
+    <div class="online-marker"/>
+    <img v-if="userImg" :src="userImg" :title="user.user"/>
+    <div
+      v-else
+      class="image-missing"
+      :style="{'background-color': color}"
+      :title="user.user"
+    >
+      {{ twoLetter }}
     </div>
   </div>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Prop,
-    Vue,
-    Watch,
-    Ref
-  } from 'vue-property-decorator';
-  import {UserModel} from '@/ts/types/model';
-  import {resolveMediaUrl} from '@/ts/utils/htmlApi';
-  import loggerFactory from '@/ts/instances/loggerFactory';
+import {
+  Component,
+  Prop,
+  Vue,
+} from "vue-property-decorator";
+import {UserModel} from "@/ts/types/model";
+import {resolveMediaUrl} from "@/ts/utils/htmlApi";
+import loggerFactory from "@/ts/instances/loggerFactory";
 
-  @Component({name: 'UserImageIcon'})
- export default class UserImageIcon extends Vue {
+@Component({name: "UserImageIcon"})
+export default class UserImageIcon extends Vue {
+  @Prop()
+  public readonly user!: UserModel;
 
-    @Prop()
-    public readonly user!: UserModel;
-
-    get twoLetter() {
-      return this.user.user.substring(0,2);
-    }
-
-    get color() {
-      return loggerFactory.getRandomColor(this.user.user);
-    }
-
-    get userImg() {
-      return resolveMediaUrl(this.user.image)
-    }
+  get twoLetter() {
+    return this.user.user.substring(0, 2);
   }
+
+  get color() {
+    return loggerFactory.getRandomColor(this.user.user);
+  }
+
+  get userImg() {
+    return resolveMediaUrl(this.user.image);
+  }
+}
 </script>
 <!-- eslint-disable -->
 <style

@@ -1,7 +1,7 @@
 <template>
   <div :class="cls" @mouseover.passive="removeUnread">
-    <div v-if="message.isEditingActive" class="editing-background"></div>
-    <div v-if="message.isThreadOpened" class="thread-background" @click="closeThread"></div>
+    <div v-if="message.isEditingActive" class="editing-background"/>
+    <div v-if="message.isThreadOpened" class="thread-background" @click="closeThread"/>
     <chat-text-message :message="message"/>
     <chat-text-area
       v-if="message.isEditingActive"
@@ -10,7 +10,7 @@
       :edit-message-id="message.id"
     />
     <template v-if="message.transfer">
-      <div class="transfer-file" v-if="message.transfer.upload && !message.transfer.error">
+      <div v-if="message.transfer.upload && !message.transfer.error" class="transfer-file">
         <app-progress-bar :upload="message.transfer.upload"/>
         <i class="icon-cancel-circled-outline" @click="cancelTransfer"/>
       </div>
@@ -25,37 +25,40 @@
         class="message-tooltip"
         :message="message"
       />
-      <i class="icon-ok message-status-read" v-if="isSelf && message.status === 'read'" title="This message has been read by at least one user"/>
-      <i class="icon-ok message-status-received" v-if="isSelf && message.status === 'received'" title="At least one user in this room has received this message"/>
-      <div class="spinner" v-if="message.status === 'sending'" />
+      <i v-if="isSelf && message.status === 'read'" class="icon-ok message-status-read" title="This message has been read by at least one user"/>
+      <i v-if="isSelf && message.status === 'received'" class="icon-ok message-status-received" title="At least one user in this room has received this message"/>
+      <div v-if="message.status === 'sending'" class="spinner"/>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
-  Ref,
-  Prop,
   Emit,
-  Vue
-} from 'vue-property-decorator';
-import ChatTextMessage from '@/vue/chat/message/ChatTextMessage.vue';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
+  Prop,
+  Ref,
+  Vue,
+} from "vue-property-decorator";
+import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
+import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
 
-import { SetMessageProgressError } from '@/ts/types/types';
+import type {SetMessageProgressError} from "@/ts/types/types";
+import type {EditingMessage} from "@/ts/types/model";
 import {
   CurrentUserInfoModel,
-  EditingMessage,
   MessageModel,
-  RoomDictModel
-} from '@/ts/types/model';
-import ChatMessageToolTip from '@/vue/chat/message/ChatMessageToolTip.vue';
-import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
+  RoomDictModel,
+} from "@/ts/types/model";
+import ChatMessageToolTip from "@/vue/chat/message/ChatMessageToolTip.vue";
+import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 
 @Component({
-  name: 'ChatSendingMessage' ,
-  components: {ChatTextArea, ChatMessageToolTip, AppProgressBar, ChatTextMessage}
+  name: "ChatSendingMessage",
+  components: {ChatTextArea,
+    ChatMessageToolTip,
+    AppProgressBar,
+    ChatTextMessage},
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;
@@ -85,13 +88,13 @@ export default class ChatSendingMessage extends Vue {
   get cls() {
     return {
       sendingMessage: this.message.transfer && !this.message.transfer.upload,
-      uploadMessage: this.message.transfer && !!this.message.transfer.upload,
-      'message-self': this.isSelf,
-      'message-others': !this.isSelf,
-      'message-wrapper': true,
-      'message-is-being-sent': this.message.status === 'sending',
-      'removed-message': this.message.deleted,
-      'unread-message': this.message.isHighlighted,
+      uploadMessage: this.message.transfer && Boolean(this.message.transfer.upload),
+      "message-self": this.isSelf,
+      "message-others": !this.isSelf,
+      "message-wrapper": true,
+      "message-is-being-sent": this.message.status === "sending",
+      "removed-message": this.message.deleted,
+      "unread-message": this.message.isHighlighted,
     };
   }
 
@@ -100,17 +103,18 @@ export default class ChatSendingMessage extends Vue {
   }
 
   closeThread() {
-    let a: EditingMessage = {
+    const a: EditingMessage = {
       messageId: this.message.id,
       isEditingNow: false,
-      roomId: this.message.roomId
-    }
+      roomId: this.message.roomId,
+    };
     this.$store.setCurrentThread(a);
   }
 
   removeUnread() {
     if (this.message.isHighlighted) {
-      this.$store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
+      this.$store.markMessageAsRead({messageId: this.message.id,
+        roomId: this.message.roomId});
     }
   }
 
@@ -118,11 +122,11 @@ export default class ChatSendingMessage extends Vue {
     const newVar: SetMessageProgressError = {
       messageId: this.message.id,
       roomId: this.message.roomId,
-      error: null
+      error: null,
     };
     this.$store.setMessageProgressError(newVar);
     this.$messageSenderProxy.getMessageSender(this.message.roomId).syncMessage(this.message.roomId, this.id);
-    this.$store.growlInfo('Trying to upload files again');
+    this.$store.growlInfo("Trying to upload files again");
   }
 }
 </script>

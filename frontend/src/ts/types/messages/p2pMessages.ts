@@ -12,7 +12,7 @@ import type {
   MessageP2pDto,
   MessagesInfo,
 } from "@/ts/types/messages/p2pDto";
-import type { MessageStatus } from "@/ts/types/model";
+import type {MessageStatus} from "@/ts/types/model";
 
 
 export type P2PHandlerType<A extends string> = (a: DefaultP2pMessage<A>) => Promise<void> | void;

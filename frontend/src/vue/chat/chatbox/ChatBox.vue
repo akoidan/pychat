@@ -4,7 +4,7 @@
       :call-info="room.callInfo"
       :room-id="room.id"
     />
-    <search-messages :room="room" />
+    <search-messages :room="room"/>
     <div
       ref="chatboxSearch"
       class="chatbox"
@@ -15,13 +15,14 @@
       @scroll.passive="onSearchScroll"
     >
       <template
-        v-for="message in searchMessages">
+        v-for="message in searchMessages"
+      >
         <app-separator
           v-if="message.fieldDay"
           :key="message.fieldDay"
           :day="message.fieldDay"
         />
-        <chat-text-message v-else :key="message.id" :message="message" />
+        <chat-text-message v-else :key="message.id" :message="message"/>
       </template>
     </div>
     <div
@@ -88,7 +89,7 @@
       </template>
     </div>
     <chat-show-user-typing :users-typing="room.usersTyping"/>
-    <chat-text-area :room-id="room.id" ref="textarea"/>
+    <chat-text-area ref="textarea" :room-id="room.id"/>
   </div>
 </template>
 <script lang="ts">
@@ -97,259 +98,263 @@ import {
   Component,
   Prop,
   Ref,
+  Vue,
   Watch,
-  Vue
 } from "vue-property-decorator";
-import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import ChatTextMessage from '@/vue/chat/message/ChatTextMessage.vue';
-import SearchMessages from '@/vue/chat/chatbox/SearchMessages.vue';
 import {
-  MessageModel,
-  ReceivingFile,
-  RoomModel,
-  SearchModel,
-  SendingFile
-} from '@/ts/types/model';
-import { MessageModelDto } from '@/ts/types/dto';
-
-import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage.vue';
-import ChatUserActionMessage from '@/vue/chat/message/ChatUserActionMessage.vue';
-import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
-import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
-import ChatCall from '@/vue/chat/call/ChatCall.vue';
-import ChatChangeNameMessage from '@/vue/chat/message/ChatChangeNameMessage.vue';
-import AppSeparator from '@/vue/ui/AppSeparator.vue';
-import ChatThread from '@/vue/chat/message/ChatThread.vue';
-import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
-import ChatShowUserTyping from '@/vue/chat/chatbox/ChatShowUserTyping.vue';
-import { isMobile } from '@/ts/utils/runtimeConsts';
+  ApplyGrowlErr,
+  State,
+} from "@/ts/instances/storeInstance";
+import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
+import SearchMessages from "@/vue/chat/chatbox/SearchMessages.vue";
+import {RoomModel} from "@/ts/types/model";
+import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
+import ChatSendingMessage from "@/vue/chat/message/ChatSendingMessage.vue";
+import ChatUserActionMessage from "@/vue/chat/message/ChatUserActionMessage.vue";
+import ChatSendingFile from "@/vue/chat/message/ChatSendingFile.vue";
+import ChatReceivingFile from "@/vue/chat/message/ChatReceivingFile.vue";
+import ChatCall from "@/vue/chat/call/ChatCall.vue";
+import ChatChangeNameMessage from "@/vue/chat/message/ChatChangeNameMessage.vue";
+import AppSeparator from "@/vue/ui/AppSeparator.vue";
+import ChatThread from "@/vue/chat/message/ChatThread.vue";
+import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
+import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
+import {isMobile} from "@/ts/utils/runtimeConsts";
 
 
-  @Component({
-    name: 'ChatBox' ,
-    components: {
-      ChatShowUserTyping,
-      ChatTextArea,
-      ChatThread,
-      AppSeparator,
-      ChatChangeNameMessage,
-      ChatCall,
-      ChatReceivingFile,
-      ChatSendingFile,
-      ChatUserActionMessage,
-      ChatSendingMessage,
-      AppProgressBar,
-      ChatTextMessage,
-      SearchMessages
+@Component({
+  name: "ChatBox",
+  components: {
+    ChatShowUserTyping,
+    ChatTextArea,
+    ChatThread,
+    AppSeparator,
+    ChatChangeNameMessage,
+    ChatCall,
+    ChatReceivingFile,
+    ChatSendingFile,
+    ChatUserActionMessage,
+    ChatSendingMessage,
+    AppProgressBar,
+    ChatTextMessage,
+    SearchMessages,
+  },
+})
+export default class ChatBox extends Vue {
+  @Prop() room!: RoomModel;
+
+  @State
+  public readonly activeRoomId!: number;
+
+  @State
+  public readonly isCurrentWindowActive!: boolean;
+
+  @State
+  public readonly myId!: number;
+
+  messageLoading: boolean = false;
+
+  searchMessageLoading: boolean = false;
+
+  @Ref()
+  private readonly chatbox!: HTMLElement;
+
+  @Ref()
+  public textarea!: ChatTextArea;
+
+  @Ref()
+  private readonly chatboxSearch!: HTMLElement;
+
+  scrollBottom: boolean = true; // Scroll to bottom on load
+
+  lastScrollTop: number = 0;
+
+  beforeUpdate() {
+    /*
+     * Third party api calls emit('scroll')
+     * This triggers vue beforeUpdate event
+     * Check if scroll was on bottom (or botom + 100px) before component updated, if yes save scrollToBottom = true
+     * Html rerenders and update lifecycle hooks is called which checks scrollToBottom and scroll if it's true
+     */
+    const el = this.room.search.searchActive ? this.chatboxSearch : this.chatbox;
+    if (el) { // Checked, el could be missing
+      this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
+    } else {
+      this.scrollBottom = false;
     }
-  })
-  export default class ChatBox extends Vue {
-    @Prop() room!: RoomModel;
+    this.$logger.debug(`Settings scroll element to ${this.scrollBottom}`)();
+  }
 
-    @State
-    public readonly activeRoomId!: number;
+  mounted() {
+    this.$logger.log(`Rendering messages for room #${this.room.id}`)();
+    this.onEmitScroll(); // This seems to be more reliable than created and mounted
+  }
 
-    @State
-    public readonly isCurrentWindowActive!: boolean;
 
-    @State
-    public readonly myId!: number;
-
-    messageLoading: boolean = false;
-    searchMessageLoading: boolean = false;
-
-    @Ref()
-    private readonly chatbox!: HTMLElement;
-
-    @Ref()
-    public textarea!: ChatTextArea;
-
-    @Ref()
-    private readonly chatboxSearch!: HTMLElement;
-
-    scrollBottom: boolean = true; // scroll to bottom on load
-    lastScrollTop: number = 0;
-
-    beforeUpdate() {
-      // third party api calls emit('scroll')
-      // this triggers vue beforeUpdate event
-      // check if scroll was on bottom (or botom + 100px) before component updated, if yes save scrollToBottom = true
-      // html rerenders and update lifecycle hooks is called which checks scrollToBottom and scroll if it's true
-      let el = this.room.search.searchActive ? this.chatboxSearch : this.chatbox;
-      if (el) { // checked, el could be missing
-        this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
-      } else {
-        this.scrollBottom = false;
-      }
-      this.$logger.debug(`Settings scroll element to ${this.scrollBottom}`)()
+  @Watch("isCurrentWindowActive")
+  public onTabFocus(value: boolean) {
+    if (this.activeRoomId === this.room.id && value) {
+      this.markMessagesInCurrentRoomAsRead();
     }
+  }
 
-    mounted() {
-      this.$logger.log(`Rendering messages for room #${this.room.id}`)()
-      this.onEmitScroll(); // this seems to be more reliable than created and mounted
+  public markMessagesInCurrentRoomAsRead() {
+    this.$logger.debug("Checking if we can set some messages to status read")();
+    const messagesIds = Object.values(this.room!.messages).
+      filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).
+      map((m) => m.id);
+    if (messagesIds.length > 0) {
+      this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
     }
+  }
 
-
-    @Watch('isCurrentWindowActive')
-    public onTabFocus(value: boolean) {
-      if (this.activeRoomId === this.room.id && value) {
-        this.markMessagesInCurrentRoomAsRead();
-      }
-    }
-
-    public markMessagesInCurrentRoomAsRead() {
-      this.$logger.debug("Checking if we can set some messages to status read")();
-      let messagesIds = Object.values(this.room!.messages)
-          .filter(m => m.userId !== this.myId && (m.status === 'received' ||  m.status === 'on_server'))
-          .map(m => m.id);
-      if (messagesIds.length > 0) {
-        this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
-      }
-    }
-
-    @Watch('activeRoomId')
-    public onActivate() {
-      if (this.activeRoomId === this.room.id) {
-        this.scrollBottom = true;
-        this.onEmitScroll()
-        this.markMessagesInCurrentRoomAsRead();
-          if (!isMobile) { // do not trigger virtual keyboard on mobile, since it occupies all of space
-            this.$nextTick(() => {
-              this.textarea.userMessage.focus();
-          })
-        }
-      }
-    }
-
-    dropPhoto(evt: DragEvent) {
-      const files: FileList = (evt.dataTransfer?.files) as FileList;
-      this.$logger.debug('Drop photo {} ', files)();
-      if (files) {
-        this.textarea.onEmitDropPhoto(files)
-      }
-    }
-
-    onEmitScroll() {
-      if (this.activeRoomId === this.room.id) {
-        this.$nextTick(function () {
-          if (this.scrollBottom) {
-            if (this.room.search.searchActive && this.chatboxSearch) {
-              this.$logger.debug("Scrolling chatboxSearch to bottom")();
-              this.chatboxSearch.scrollTop = this.chatboxSearch.scrollHeight;
-            } else if (this.chatbox) {
-              this.$logger.debug("Scrolling chatbox to bottom")();
-              this.chatbox.scrollTop = this.chatbox.scrollHeight;
-            } else {
-              this.$logger.warn(`No chatbox to scroll`)()
-            }
-          }
+  @Watch("activeRoomId")
+  public onActivate() {
+    if (this.activeRoomId === this.room.id) {
+      this.scrollBottom = true;
+      this.onEmitScroll();
+      this.markMessagesInCurrentRoomAsRead();
+      if (!isMobile) { // Do not trigger virtual keyboard on mobile, since it occupies all of space
+        this.$nextTick(() => {
+          this.textarea.userMessage.focus();
         });
       }
     }
+  }
 
-    created() {
-      this.$messageBus.on('scroll',this.onEmitScroll);
-    }
-
-    destroyed() {
-      this.$messageBus.off('scroll',this.onEmitScroll);
-    }
-
-    get id() {
-      return this.room.id;
-    }
-
-    get searchMessages() {
-      let dates: {[id: string]: boolean} = {};
-      let newArray: any[] = [];
-      for (let m in this.room.search.messages) {
-        let message = this.room.search.messages[m];
-        let d = new Date(message.time).toDateString();
-        if (!dates[d]) {
-          dates[d] = true;
-          newArray.push({fieldDay: d, time: Date.parse(d)});
-        }
-        newArray.push(message);
-      }
-      newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
-      return newArray;
-    }
-
-    get messages() {
-      return this.$store.calculatedMessagesForRoom(this.room.id);
-    }
-
-    keyDownLoadUp(e: KeyboardEvent) {
-      this.loadHistoryWithEvent(e, n => this.loadUpHistory(n));
-    }
-
-    keyDownSearchLoadUp(e: KeyboardEvent) {
-      this.loadHistoryWithEvent(e, n => this.loadUpSearchHistory(n));
-    }
-
-    loadHistoryWithEvent(e: KeyboardEvent, callback: (a: number) => void) {
-      if (e.which === 33) {    // page up
-        callback(25);
-      } else if (e.which === 38) { // up
-        callback(10);
-      } else if (e.ctrlKey && e.which === 36) {
-        callback(35);
-      } else if (e.shiftKey && e.ctrlKey && e.key.toUpperCase() === 'F') {
-        this.$store.toogleSearch(this.room.id)
-      }
-    }
-
-    @ApplyGrowlErr({runningProp: 'searchMessageLoading',  preventStacking: true, message: 'Unable to load history'})
-    private async loadUpSearchHistory(n: number) {
-      if (this.chatboxSearch.scrollTop !== 0) {
-        return; // we're just scrolling up
-      }
-      await this.messageSender.loadUpSearchMessages(this.room.id, n, () => true);
-    }
-
-    private get messageSender() {
-      return this.$messageSenderProxy.getMessageSender(this.room.id);
-    }
-
-    @ApplyGrowlErr({runningProp: 'messageLoading', preventStacking: true, message: 'Unable to load history'})
-    public async loadUpHistory(n: number) {
-      if (this.chatbox.scrollTop > 100) {
-        return; // we're just scrolling up
-      }
-      await this.messageSender.loadUpMessages(this.room.id, n);
-    }
-
-    onSearchScroll() {
-      const st = this.chatbox.scrollTop;
-      if (st < this.lastScrollTop) {
-        this.loadUpSearchHistory(10);
-      }
-      this.lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
-    }
-
-    onSearchMouseWheel(e: WheelEvent) {
-      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
-      if (e.detail < 0 || e.deltaY < 0) {
-        this.loadUpSearchHistory(10);
-      }
-    }
-
-    onScroll(e: Event) {
-      const st = this.chatbox.scrollTop;
-      if (st < this.lastScrollTop) {
-        this.loadUpHistory(10);
-      }
-      this.lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
-    }
-    onMouseWheel(e: WheelEvent) {
-      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
-      if (e.detail < 0 || e.deltaY < 0) {
-        this.loadUpHistory(10);
-      }
+  dropPhoto(evt: DragEvent) {
+    const files: FileList = evt.dataTransfer?.files!;
+    this.$logger.debug("Drop photo {} ", files)();
+    if (files) {
+      this.textarea.onEmitDropPhoto(files);
     }
   }
+
+  onEmitScroll() {
+    if (this.activeRoomId === this.room.id) {
+      this.$nextTick(function() {
+        if (this.scrollBottom) {
+          if (this.room.search.searchActive && this.chatboxSearch) {
+            this.$logger.debug("Scrolling chatboxSearch to bottom")();
+            this.chatboxSearch.scrollTop = this.chatboxSearch.scrollHeight;
+          } else if (this.chatbox) {
+            this.$logger.debug("Scrolling chatbox to bottom")();
+            this.chatbox.scrollTop = this.chatbox.scrollHeight;
+          } else {
+            this.$logger.warn("No chatbox to scroll")();
+          }
+        }
+      });
+    }
+  }
+
+  created() {
+    this.$messageBus.on("scroll", this.onEmitScroll);
+  }
+
+  destroyed() {
+    this.$messageBus.off("scroll", this.onEmitScroll);
+  }
+
+  get id() {
+    return this.room.id;
+  }
+
+  get searchMessages() {
+    const dates: Record<string, boolean> = {};
+    const newArray: any[] = [];
+    for (const m in this.room.search.messages) {
+      const message = this.room.search.messages[m];
+      const d = new Date(message.time).toDateString();
+      if (!dates[d]) {
+        dates[d] = true;
+        newArray.push({fieldDay: d,
+          time: Date.parse(d)});
+      }
+      newArray.push(message);
+    }
+    newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+    return newArray;
+  }
+
+  get messages() {
+    return this.$store.calculatedMessagesForRoom(this.room.id);
+  }
+
+  keyDownLoadUp(e: KeyboardEvent) {
+    this.loadHistoryWithEvent(e, async(n) => this.loadUpHistory(n));
+  }
+
+  keyDownSearchLoadUp(e: KeyboardEvent) {
+    this.loadHistoryWithEvent(e, async(n) => this.loadUpSearchHistory(n));
+  }
+
+  loadHistoryWithEvent(e: KeyboardEvent, callback: (a: number) => void) {
+    if (e.which === 33) { // Page up
+      callback(25);
+    } else if (e.which === 38) { // Up
+      callback(10);
+    } else if (e.ctrlKey && e.which === 36) {
+      callback(35);
+    } else if (e.shiftKey && e.ctrlKey && e.key.toUpperCase() === "F") {
+      this.$store.toogleSearch(this.room.id);
+    }
+  }
+
+  @ApplyGrowlErr({runningProp: "searchMessageLoading",
+                  preventStacking: true,
+    message: "Unable to load history"})
+  private async loadUpSearchHistory(n: number) {
+    if (this.chatboxSearch.scrollTop !== 0) {
+      return; // We're just scrolling up
+    }
+    await this.messageSender.loadUpSearchMessages(this.room.id, n, () => true);
+  }
+
+  private get messageSender() {
+    return this.$messageSenderProxy.getMessageSender(this.room.id);
+  }
+
+  @ApplyGrowlErr({runningProp: "messageLoading",
+    preventStacking: true,
+    message: "Unable to load history"})
+  public async loadUpHistory(n: number) {
+    if (this.chatbox.scrollTop > 100) {
+      return; // We're just scrolling up
+    }
+    await this.messageSender.loadUpMessages(this.room.id, n);
+  }
+
+  onSearchScroll() {
+    const st = this.chatbox.scrollTop;
+    if (st < this.lastScrollTop) {
+      this.loadUpSearchHistory(10);
+    }
+    this.lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+  }
+
+  onSearchMouseWheel(e: WheelEvent) {
+    // GlobalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
+    if (e.detail < 0 || e.deltaY < 0) {
+      this.loadUpSearchHistory(10);
+    }
+  }
+
+  onScroll(e: Event) {
+    const st = this.chatbox.scrollTop;
+    if (st < this.lastScrollTop) {
+      this.loadUpHistory(10);
+    }
+    this.lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+  }
+
+  onMouseWheel(e: WheelEvent) {
+    // GlobalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
+    if (e.detail < 0 || e.deltaY < 0) {
+      this.loadUpHistory(10);
+    }
+  }
+}
 </script>
 
 <style lang="sass" scoped>

@@ -4,32 +4,35 @@
       {{ error }}
     </div>
     <div v-else-if="!currentRequest">
-      <slot />
+      <slot/>
     </div>
     <div v-else>
-      <div class="spinner" />
+      <div class="spinner"/>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
+import {
+  Component,
+  Vue,
+} from "vue-property-decorator";
 
 @Component({})
 export default class AppSuspense extends Vue {
+  public currentRequest: XMLHttpRequest | null = null;
 
-  public currentRequest: XMLHttpRequest|null = null;
-  public error: string = ''
+  public error: string = "";
 
   async checkEmail(doRequest: (r: XMLHttpRequest) => any) {
-    this.error = '';
+    this.error = "";
     if (this.currentRequest) {
       this.currentRequest.abort();
       this.currentRequest = null;
     }
     try {
-      // @ts-ignore
-      let result = await doRequest((r: XMLHttpRequest) => this.currentRequest = r);
+      // @ts-expect-error
+      const result = await doRequest((r: XMLHttpRequest) => this.currentRequest = r);
       console.warn(result);
       this.currentRequest = null;
       return result;

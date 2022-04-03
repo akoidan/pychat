@@ -4,7 +4,7 @@
     @submit.prevent="login"
   >
     <div>
-      <i class="icon-user" />
+      <i class="icon-user"/>
       <input
         type="text"
         maxlength="254"
@@ -13,10 +13,10 @@
         required
         placeholder="Username/Email"
         name="username"
-      >
+      />
     </div>
     <div>
-      <i class="icon-key" />
+      <i class="icon-key"/>
       <input
         type="password"
         name="password"
@@ -24,7 +24,7 @@
         class="input"
         placeholder="Password"
         required
-      >
+      />
     </div>
     <router-link
       class="forg-pass"
@@ -34,7 +34,7 @@
     </router-link>
     <div>
       <social-auth-sign-up/>
-      <captcha-component v-model="running" />
+      <captcha-component v-model="running"/>
       <app-submit
         class="submit-button"
         value="LOG IN"
@@ -45,37 +45,40 @@
 </template>
 
 <script lang='ts'>
-import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 
-import CaptchaComponent from '@/vue/singup/CaptchaComponent.vue';
-import {sub} from '@/ts/instances/subInstance'
-import { LoginMessage } from '@/ts/types/messages/innerMessages';
-import SocialAuthSignUp from '@/vue/singup/SocialAuthSignUp.vue';
+import CaptchaComponent from "@/vue/singup/CaptchaComponent.vue";
+import {sub} from "@/ts/instances/subInstance";
+import type {LoginMessage} from "@/ts/types/messages/innerMessages";
+import SocialAuthSignUp from "@/vue/singup/SocialAuthSignUp.vue";
 
 @Component({
-  name: 'Login' ,
-  components: {SocialAuthSignUp, CaptchaComponent, AppSubmit}
+  name: "Login",
+  components: {SocialAuthSignUp,
+    CaptchaComponent,
+    AppSubmit},
 })
 export default class Login extends Vue {
-
   @Ref()
   public form!: HTMLFormElement;
 
   public running: boolean = false;
 
   public created() {
-    this.$store.setRegHeader('Welcome back!');
+    this.$store.setRegHeader("Welcome back!");
   }
 
-  @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
+  @ApplyGrowlErr({runningProp: "running",
+    message: "Can't log in"})
   public async login() {
     const {session} = await this.$api.login(this.form);
-    let message: LoginMessage = {action: 'login', handler: 'router', session};
-    sub.notify(message)
+    const message: LoginMessage = {action: "login",
+                                   handler: "router",
+                                   session};
+    sub.notify(message);
   }
-
 }
 </script>
 <style lang="sass" scoped>

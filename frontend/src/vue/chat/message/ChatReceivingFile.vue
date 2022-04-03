@@ -23,13 +23,13 @@
           value="Accept"
           class="green-btn"
           @click="accept"
-        >
+        />
         <input
           type="button"
           value="Decline"
           class="red-btn"
           @click="decline"
-        >
+        />
       </div>
     </div>
   </chat-message-wrapper>
@@ -38,30 +38,31 @@
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import { State } from '@/ts/instances/storeInstance';
+  Vue,
+} from "vue-property-decorator";
+import {State} from "@/ts/instances/storeInstance";
 import {
   FileTransferStatus,
-  ReceivingFile
-} from '@/ts/types/model';
-import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
-import ChatMessageHeader from '@/vue/chat/message/ChatMessageHeader.vue';
-import ReceivingFileInfo from '@/vue/chat/message/ReceivingFileInfo.vue';
-import ChatMessageWrapper from '@/vue/chat/message/ChatMessageWrapper.vue';
+  ReceivingFile,
+} from "@/ts/types/model";
+import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
+import ChatMessageHeader from "@/vue/chat/message/ChatMessageHeader.vue";
+import ReceivingFileInfo from "@/vue/chat/message/ReceivingFileInfo.vue";
+import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
 
 
 @Component({
-  name: 'ChatReceivingFile' ,
+  name: "ChatReceivingFile",
   components: {
     ChatMessageWrapper,
     ReceivingFileInfo,
     ChatMessageHeader,
-    AppProgressBar
-  }
+    AppProgressBar,
+  },
 })
 export default class ChatReceivingFile extends Vue {
   @Prop() public receivingFile!: ReceivingFile;
+
   @State
   public readonly myId!: number;
 
@@ -76,10 +77,9 @@ export default class ChatReceivingFile extends Vue {
 
   get mainClass(): string {
     if (this.receivingFile.userId === this.myId) {
-      return 'message-self message-receiving-file';
-    } else {
-      return 'message-others message-receiving-file';
+      return "message-self message-receiving-file";
     }
+    return "message-others message-receiving-file";
   }
 
   public accept() {
@@ -89,7 +89,6 @@ export default class ChatReceivingFile extends Vue {
   public decline() {
     this.$webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
-
 }
 </script>
 

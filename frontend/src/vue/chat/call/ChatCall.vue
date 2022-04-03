@@ -37,58 +37,57 @@
         @invert-show-video-container="invertShowVideoContainer"
       />
       <div class="spainter">
-<!--        TODO v-if doesn't detach events on destroy on painter-->
-        <painter @canvas="onCanvas" v-if="callInfo.sharePaint"/>
+        <!--        TODO v-if doesn't detach events on destroy on painter-->
+        <painter v-if="callInfo.sharePaint" @canvas="onCanvas"/>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
   Ref,
   Vue,
-  Watch
-} from 'vue-property-decorator';
-import { CallsInfoModel } from '@/ts/types/model';
-import {
+  Watch,
+} from "vue-property-decorator";
+import {CallsInfoModel} from "@/ts/types/model";
+import type {
   BooleanIdentifier,
   ShareIdentifier,
-  StringIdentifier,
-  VideoType
-} from '@/ts/types/types';
+} from "@/ts/types/types";
+import {VideoType} from "@/ts/types/types";
 
-import ChatRemotePeer from '@/vue/chat/call/ChatRemotePeer.vue';
-import { file } from '@/ts/utils/audio';
-import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
-import InputDevicesSettings from '@/vue/chat/call/InputDevicesSettings.vue';
-import VideoContainer from '@/vue/chat/chatbox/VideoContainer.vue';
-import CallContainerIcons from '@/vue/chat/call/CallContainerIcons.vue';
-import Painter from '@/vue/chat/textarea/Painter.vue';
+import ChatRemotePeer from "@/vue/chat/call/ChatRemotePeer.vue";
+import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
+import InputDevicesSettings from "@/vue/chat/call/InputDevicesSettings.vue";
+import VideoContainer from "@/vue/chat/chatbox/VideoContainer.vue";
+import CallContainerIcons from "@/vue/chat/call/CallContainerIcons.vue";
+import Painter from "@/vue/chat/textarea/Painter.vue";
 
 @Component({
-  name: 'ChatCall' ,
+  name: "ChatCall",
   components: {
     Painter,
     CallContainerIcons,
     VideoContainer,
     InputDevicesSettings,
     VideoObject,
-    ChatRemotePeer
-  }
+    ChatRemotePeer,
+  },
 })
 export default class ChatCall extends Vue {
-
-
   @Prop() public callInfo!: CallsInfoModel;
+
   @Prop() public roomId!: number;
+
   public showSettings: boolean = false;
+
   public showVideoContainer: boolean = true;
 
 
-  @Watch('callInfo.callActive')
+  @Watch("callInfo.callActive")
   onCallActive(newValue: boolean) {
     if (newValue) {
       this.showVideoContainer = true;
@@ -121,20 +120,20 @@ export default class ChatCall extends Vue {
   }
 
   public fullScreenChange() {
-    this.$logger.log('fs change')();
+    this.$logger.log("fs change")();
     if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
       this.fullscreen = false;
     }
   }
 
   public created() {
-    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+    ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
       document.addEventListener(e, this.listener, false);
     });
   }
 
   public destroyed() {
-    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+    ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
       document.removeEventListener(e, this.listener, false);
     });
   }
@@ -150,7 +149,7 @@ export default class ChatCall extends Vue {
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     } else {
-      this.$store.growlError('Can\'t enter fullscreen');
+      this.$store.growlError("Can't enter fullscreen");
 
       return;
     }
@@ -161,7 +160,7 @@ export default class ChatCall extends Vue {
     const payload: ShareIdentifier = {
       state: !this.callInfo.shareScreen,
       id: this.roomId,
-      type: 'desktop'
+      type: "desktop",
     };
     this.$store.setVideoToState(payload);
     if (this.callInfo.callActive) {
@@ -173,7 +172,7 @@ export default class ChatCall extends Vue {
     const payload: ShareIdentifier = {
       state: !this.callInfo.sharePaint,
       id: this.roomId,
-      type: 'paint'
+      type: "paint",
     };
     this.$store.setVideoToState(payload);
     if (this.callInfo.callActive && !this.callInfo.sharePaint) {
@@ -185,7 +184,7 @@ export default class ChatCall extends Vue {
     const payload: ShareIdentifier = {
       state: !this.callInfo.showVideo,
       id: this.roomId,
-      type: 'webcam'
+      type: "webcam",
     };
     this.$store.setVideoToState(payload);
     if (this.callInfo.callActive) {
@@ -196,7 +195,7 @@ export default class ChatCall extends Vue {
   public micClick() {
     const payload: BooleanIdentifier = {
       state: !this.callInfo.showMic,
-      id: this.roomId
+      id: this.roomId,
     };
     this.$store.setMicToState(payload);
     if (this.callInfo.callActive) {
@@ -211,8 +210,11 @@ export default class ChatCall extends Vue {
   }
 
   public exitFullscreen() {
-    // TODO if doesn't work in chrome 86, when multiple monitors (if that's relevant):(
-    // if (typeof screen != 'undefined' && screen.height === window.innerHeight) {
+
+    /*
+     * TODO if doesn't work in chrome 86, when multiple monitors (if that's relevant):(
+     * if (typeof screen != 'undefined' && screen.height === window.innerHeight) {
+     */
     if (document.webkitCancelFullScreen) {
       document.webkitCancelFullScreen();
     } else if (document.msCancelFullScreen) {
@@ -220,12 +222,11 @@ export default class ChatCall extends Vue {
     } else if (document.mozCancelFullScreen) {
       document.mozCancelFullScreen();
     } else if (document.cancelFullScreen) {
-      document.cancelFullScreen(); // this should go last, webkit cancel seems to work better than simple one
+      document.cancelFullScreen(); // This should go last, webkit cancel seems to work better than simple one
     }
     // }
     this.fullscreen = false;
   }
-
 }
 </script>
 

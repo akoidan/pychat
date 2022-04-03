@@ -8,7 +8,7 @@ import type {
   SexModelString,
   UserModel,
 } from "@/ts/types/model";
-import type { LogLevel } from "lines-logger";
+import type {LogLevel} from "lines-logger";
 
 export type SexModelDto = "Female" | "Male" | "Secret";
 

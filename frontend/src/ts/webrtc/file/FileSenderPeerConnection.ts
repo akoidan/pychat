@@ -3,8 +3,8 @@ import type {
   SetSendingFileStatus,
   SetSendingFileUploaded,
 } from "@/ts/types/types";
-import type { SendingFileTransfer, } from "@/ts/types/model";
-import { FileTransferStatus, } from "@/ts/types/model";
+import type {SendingFileTransfer} from "@/ts/types/model";
+import {FileTransferStatus} from "@/ts/types/model";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import {
   bytesToSize,
@@ -15,7 +15,7 @@ import {
   SEND_CHUNK_SIZE,
 } from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,

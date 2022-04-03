@@ -29,28 +29,29 @@
   </div>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Vue
-  } from 'vue-property-decorator';
-  import {
-    ApplyGrowlErr,
-    State
-  } from '@/ts/instances/storeInstance';
-  import {
-    ChannelsDictUIModel,
-    RoomDictModel,
-    UserDictModel
-  } from '@/ts/types/model';
-  import AppSubmit from '@/vue/ui/AppSubmit.vue';
-  import PickUser from '@/vue/parts/PickUser.vue';
-  import UserFlagRow from '@/vue/chat/right/UserFlagRow.vue';
+import {
+  Component,
+  Vue,
+} from "vue-property-decorator";
+import {
+  ApplyGrowlErr,
+  State,
+} from "@/ts/instances/storeInstance";
+import {
+  ChannelsDictUIModel,
+  RoomDictModel,
+  UserDictModel,
+} from "@/ts/types/model";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import PickUser from "@/vue/parts/PickUser.vue";
+import UserFlagRow from "@/vue/chat/right/UserFlagRow.vue";
 
-  @Component({
-  components: {UserFlagRow,  AppSubmit, PickUser}
+@Component({
+  components: {UserFlagRow,
+               AppSubmit,
+    PickUser},
 })
 export default class RoomUsersListPage extends Vue {
-
   @State
   public readonly allUsersDict!: UserDictModel;
 
@@ -62,6 +63,7 @@ export default class RoomUsersListPage extends Vue {
 
 
   public userdToAdd: number[] = [];
+
   public running: boolean = false;
 
 
@@ -74,24 +76,24 @@ export default class RoomUsersListPage extends Vue {
   }
 
   get title() {
-    return this.room.isMainInChannel ? 'Users in group' : 'Users in room';
+    return this.room.isMainInChannel ? "Users in group" : "Users in room";
   }
 
   get usersArray() {
-    return this.room.users.map(id => this.allUsersDict[id]);
+    return this.room.users.map((id) => this.allUsersDict[id]);
   }
 
   get userIds(): number[] {
     if (this.room.channelId && !this.room.isMainInChannel) {
-      return this.channelsDictUI[this.room.channelId].mainRoom.users
-          .filter(uId => !this.room.users.includes(uId))
+      return this.channelsDictUI[this.room.channelId].mainRoom.users.
+        filter((uId) => !this.room.users.includes(uId));
     }
-    return this.$store.usersArray
-        .filter(u => this.room.users.indexOf(u.id) < 0)
-        .map(u => u.id)
+    return this.$store.usersArray.
+      filter((u) => !this.room.users.includes(u.id)).
+      map((u) => u.id);
   }
 
-  @ApplyGrowlErr({runningProp: 'running'})
+  @ApplyGrowlErr({runningProp: "running"})
   async add() {
     if (this.userdToAdd.length > 0) {
       const e = await this.$ws.inviteUser(this.roomId, this.userdToAdd);

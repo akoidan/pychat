@@ -1,9 +1,9 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
-import { extractError } from "@/ts/utils/pureFunctions";
+import type {Logger} from "lines-logger";
+import {extractError} from "@/ts/utils/pureFunctions";
 import type Api from "@/ts/message_handlers/Api";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {
   GIT_HASH,
   IS_DEBUG,
@@ -14,10 +14,10 @@ import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
+import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import { sub } from "@/ts/instances/subInstance";
-import type { MainWindow } from "@/ts/classes/MainWindow";
+import {sub} from "@/ts/instances/subInstance";
+import type {MainWindow} from "@/ts/classes/MainWindow";
 
 
 export default class NotifierHandler extends MessageHandler {

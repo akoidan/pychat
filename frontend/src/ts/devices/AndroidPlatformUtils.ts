@@ -1,11 +1,11 @@
-import { IS_ANDROID } from "@/ts/utils/consts";
+import {IS_ANDROID} from "@/ts/utils/consts";
 import type {
-  permissions_type,
   PlatformUtil,
+  permissions_type,
 } from "@/ts/types/model";
-import cordova from 'cordova';
+import cordova from "cordova";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type { Logger } from "lines-logger";
+import type {Logger} from "lines-logger";
 
 export class AndroidPlatformUtil implements PlatformUtil {
   private readonly logger: Logger;

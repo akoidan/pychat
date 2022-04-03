@@ -28,7 +28,7 @@ import type {
   BooleanDB,
   SexDB,
 } from "@/ts/types/db";
-import type { MessageP2pDto } from "@/ts/types/messages/p2pDto";
+import type {MessageP2pDto} from "@/ts/types/messages/p2pDto";
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
   return {...userInfo};

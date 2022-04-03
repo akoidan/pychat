@@ -17,7 +17,7 @@
               type="password"
               name="password"
               minlength="3"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -28,7 +28,7 @@
               maxlength="190"
               class="input"
               type="email"
-            >
+            />
           </td>
         </tr>
       </tbody>
@@ -45,19 +45,20 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/ts/instances/storeInstance';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import {CurrentUserInfoModel} from '@/ts/types/model';
-import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {CurrentUserInfoModel} from "@/ts/types/model";
+
 @Component({
-  name: 'UserProfileChangeEmail' ,
-  components: {AppSubmit}
+  name: "UserProfileChangeEmail",
+  components: {AppSubmit},
 })
 export default class UserProfileChangeEmail extends Vue {
+  public password: string = "";
 
-  public password: string = '';
-  public email: string = '';
+  public email: string = "";
+
   public running: boolean = false;
 
   @State
@@ -67,10 +68,13 @@ export default class UserProfileChangeEmail extends Vue {
     this.email = this.userInfo.email;
   }
 
-  @ApplyGrowlErr({ message: 'Unable to change email', runningProp: 'running'})
+  @ApplyGrowlErr({
+    message: "Unable to change email",
+    runningProp: "running",
+  })
   public async saveProfile() {
     await this.$api.changeEmailLogin(this.email, this.password);
-    this.$store.growlSuccess('Email has been changed');
+    this.$store.growlSuccess("Email has been changed");
   }
 }
 </script>
