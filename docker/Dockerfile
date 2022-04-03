@@ -98,7 +98,7 @@ RUN set -x && \
     sed -ie 's/use net localmount logger/use net localmount logger\n\tneed populate/g' /etc/init.d/redis &&\
     sed -ie 's/logfile .*/logfile \/dev\/stdout/g' /etc/redis.conf && \
     sed -ie 's/--syslog //g' /etc/init.d/mariadb && \
-    sed -ie 's/\[mysqld\]/[mysqld]\nslow_query_log = 1 \n slow_query_log_file=\/dev\/stdout \n general_log = 1 \n general_log_file=\/dev\/stdout \n log_error=\/tmp\/mysql.err \n/g' /etc/my.cnf.d/mariadb-server.cnf && \
+    sed -ie 's/\[mysqld\]/[mysqld]\nslow_query_log = 1 \n slow_query_log_file=\/dev\/stdout \n general_log = 1 \n general_log_file=\/tmp\/mysql.out \n log_error=\/tmp\/mysql.err \n/g' /etc/my.cnf.d/mariadb-server.cnf && \
     adduser -D -g '' http &&\
     addgroup -S nginx &&\
     adduser -D -S -h /var/cache/nginx -s /sbin/nologin -G nginx nginx &&\
@@ -110,9 +110,11 @@ RUN set -x && \
     mv ./docker/nginx.conf /etc/nginx/ && \
     cp ./backend/chat/settings_docker.py ./backend/chat/settings.py &&\
     echo 'SECRET_KEY="123"'>> ./backend/chat/settings.py &&\
-    rm /tmp/mysql.err && \
+    rm -f /tmp/mysql.err && \
+    rm -f /tmp/mysql.out && \
     bash download_content.sh create_db && \
-    rm /tmp/mysql.err && \
+    rm -f /tmp/mysql.err && \
+    rm -f /tmp/mysql.out && \
     rm ./backend/chat/settings.py && \
     rm -rf ./docker &&\
     mv /var/lib/mysql ./mysql &&\
