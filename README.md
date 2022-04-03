@@ -2,6 +2,7 @@
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master) [![Upload Frontend pychat.org](https://github.com/akoidan/pychat/workflows/FE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3AFE%3Apychat.org) [![Refresh backend pychat.org](https://github.com/akoidan/pychat/workflows/BE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3ABE%3Apychat.org)
 
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
+pychat.org could not be available due to server location in Ukraine because of war ;( Russians invaders suffer in hell!
 
 ## Table of contents
 - [About](#about)
@@ -12,13 +13,26 @@
   * [Native setup](#native-setup)
   * [Frontend](#frontend)
   * [Desktop app](#desktop-app)
+    + [PWA](#pwa)
+    + [Natifier](#natifier)
+    + [Electron](#electron)
   * [Android app](#android-app)
 - [Development setup](#development-setup)
   * [Install OS packages](#install-os-packages)
+    + [[Windows](https://www.microsoft.com/en-us/download/windows.aspx):](#-windows--https---wwwmicrosoftcom-en-us-download-windowsaspx--)
+    + [[Ubuntu](http://www.ubuntu.com/):](#-ubuntu--http---wwwubuntucom---)
+    + [[Archlinux](https://www.archlinux.org/):](#-archlinux--https---wwwarchlinuxorg---)
+    + [[MacOS](https://en.wikipedia.org/wiki/MacOS)](#-macos--https---enwikipediaorg-wiki-macos-)
+  * [Ssl](#ssl)
   * [Bootstrap files:](#bootstrap-files-)
   * [Build frontend](#build-frontend)
   * [Configure IDEs if you use it:](#configure-ides-if-you-use-it-)
+    + [Pycharm](#pycharm)
   * [Linting](#linting)
+    + [Webstorm](#webstorm)
+      - [Set template](#set-template)
+      - [Change linting settings](#change-linting-settings)
+      - [Enable aliases for webpack](#enable-aliases-for-webpack)
   * [Start services and run:](#start-services-and-run-)
 - [Contribution guide](#contribution-guide)
   * [Description](#description)
@@ -67,6 +81,9 @@ I would personally use discord or slack as a company chat. They are built and ma
  4. You just feel enthusiastic for bleeding-edge opensource projects. 
 
 # How to host pychat
+
+Notice: 
+pychat is migrating from vue2 to vue3 and this change has been released to master. The older code that supports some feature is still not migrated and located at branch [vue2-webpack](https://github.com/akoidan/pychat/tree/vue2-webpack)
 
 ## Run test docker image
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
