@@ -44,7 +44,8 @@
     "typescript": "^4.6.3",
     "vite": "^2.9.1",
     "vite-plugin-static-copy": "https://github.com/akoidan/vite-plugin-static-copy",
-    "vue-tsc": "^0.33.9"
+    "vue-tsc": "^0.33.9",
+    "vite-plugin-checker": "^0.4.4"
   },
   "dependencies": {
     "electron-devtools-installer": "^3.2.0",
@@ -59,7 +60,6 @@
     "servor": "^4.0.2",
     "spainter": "^1.2.12",
     "typeface-oswald": "0.0.75",
-    "vite-plugin-checker": "^0.4.4",
     "vue": "^3.2.31",
     "vue-class-component": "https://github.com/vuejs/vue-class-component#next",
     "vue-cropperjs": "^4.2.0",
