@@ -210,15 +210,6 @@ export function getGiphyHtml(gif: GIFObject) {
   return `<img src="${src}" class="${PASTED_GIPHY_CLASS} ${PASTED_IMG_CLASS}" ${webp} url="${gif.images.original.url}" />`;
 }
 
-export const isDateMissing = (function () {
-  const input = document.createElement('input');
-  input.setAttribute('type', 'date');
-  const notADateValue = 'not-a-date';
-  input.setAttribute('value', notADateValue);
-
-  return input.value === notADateValue;
-})();
-
 export function resolveMediaUrl<T extends string|null>(src: T): T {
   if (!src) {
     return null as T;

@@ -13,12 +13,18 @@ import { outputManifest } from './sw.plugin';
 import { OutputChunk } from 'rollup';
 
 export default defineConfig(async ({command, mode}) => {
-  let [key, cert, ca, gitHash] = await Promise.all([
-    readFileAsync('./certs/private.key.pem'),
-    readFileAsync('./certs/server.crt.pem'),
-    readFileAsync('./certs/root.cr.pem'),
-    getGitRevision()
-  ]);
+  let key, cert, ca, gitHash;
+  if (command === 'serve') {
+    [key, cert, ca, gitHash] = await Promise.all([
+      readFileAsync('./certs/private.key.pem'),
+      readFileAsync('./certs/server.crt.pem'),
+      readFileAsync('./certs/root.cr.pem'),
+      getGitRevision()
+    ]);
+  } else {
+    gitHash = await getGitRevision();
+  }
+
   const PYCHAT_CONSTS = getConsts(gitHash, command);
   const srcDir = resolve(__dirname, '..', 'src');
   const distDir = resolve(__dirname, '..', 'dist');
