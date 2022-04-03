@@ -217,17 +217,17 @@ export default class UserProfileSettings extends Vue {
   .lor-btn
     width: 100%
 
-  .settings-page ::v-deep
-    button
+  .settings-page
+    :deep(button)
       width: 100%
     padding-top: 10px
     padding-bottom: 10px
-    table
+    :deep(table)
       margin: auto
-    th
+    :deep(th)
       text-align: right
-    td, th
+    :deep(td), :deep(th)
       padding: 4px
-    .input
+    :deep(.input)
       @extend %big-input
 </style>

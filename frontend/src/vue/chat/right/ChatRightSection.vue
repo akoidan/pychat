@@ -48,7 +48,7 @@ export default class ChatRightSection extends Vue {
       width: 100%
       min-width: 200px
 
-  .color-white .chat-room-users-wrapper ::v-deep
+  .color-white .chat-room-users-wrapper
     color: $color-white-main
 
 

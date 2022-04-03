@@ -100,7 +100,7 @@ export default class ChatReceivingFile extends Vue {
   .message-receiving-file
     display: flex
 
-  .progress-wrap-file ::v-deep .progress-wrap
+  .progress-wrap-file :deep(.progress-wrap)
     width: calc(100% - 40px)
   .yesNo
     padding-top: 15px

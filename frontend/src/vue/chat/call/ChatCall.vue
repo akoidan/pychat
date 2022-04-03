@@ -234,39 +234,39 @@ export default class ChatCall extends Vue {
   @import "@/assets/sass/partials/mixins"
 
 
-  .callContainer ::v-deep
+  .callContainer
     border-right: 7.5px solid #1a1a1a
     display: inline-block
     max-width: 100%
     max-height: calc(100% - 160px)
     text-align: center
 
-    label
+    :deep(label)
       cursor: pointer
-    .icon-mic, .icon-videocam, .activeIcon, .icon-phone-circled
+    :deep(.icon-mic), :deep(.icon-videocam), :deep(.activeIcon), :deep(.icon-phone-circled)
       cursor: pointer
       @include hover-click(#3aa130)
 
-    .icon-mute, .icon-no-videocam, .noactiveIcon, .icon-hang-up
+    :deep(.icon-mute), :deep(.icon-no-videocam), :deep(.noactiveIcon), :deep(.icon-hang-up)
       cursor: pointer
       @include hover-click(#c72727)
 
-    .icon-cog, .icon-webrtc-fullscreen, .icon-popup
+    :deep(.icon-cog), :deep(.icon-webrtc-fullscreen), :deep(.icon-popup)
       cursor: pointer
       @include hover-click(#2a8f9c)
 
 
-  .fullscreen ::v-deep
-    .videoContainer
+  .fullscreen
+    :deep(.videoContainer)
       background-color: black
 
-    .micVideoWrapper > video
+    :deep(.micVideoWrapper > video)
       max-height: 99vh
       height: 99vh
 
-    .videoContainer video
+    :deep(.videoContainer video)
       border-color: #272727
-    .icon-webrtc-cont
+    :deep(.icon-webrtc-cont)
       display: block
 
   .callContainerContent
@@ -280,22 +280,21 @@ export default class ChatCall extends Vue {
     padding: 10px
     min-height: 0
     @media screen and (max-height: 850px)
-      ::v-deep .painterTools
+      :deep(.painterTools)
         width: 60px !important
         flex-direction: row !important
         flex-wrap: wrap
     @media screen and (max-height: 650px)
-        ::v-deep .painterTools
+        :deep(.painterTools)
           width: 80px !important
           flex-direction: row !important
           flex-wrap: wrap
 
-    ::v-deep
-      .active-icon
-        color: red
-      > div
-        height: 100%
-      .toolsAndCanvas
-        height: 100%
+    :deep(*div)
+      height: 100%
+    :deep(.active-icon)
+      color: red
+    :deep(.toolsAndCanvas)
+      height: 100%
 
 </style>

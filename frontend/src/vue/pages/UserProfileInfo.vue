@@ -163,6 +163,6 @@ export default class UserProfileInfo extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  .holder ::v-deep .input.input-date
+  .holder :deep(.input.input-date)
     width: 100%
 </style>

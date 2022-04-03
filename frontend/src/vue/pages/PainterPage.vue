@@ -51,8 +51,7 @@ function getUniqueId() {
     padding: 10px
     box-sizing: border-box
 
-  .container ::v-deep
-    .active-icon
+  .container :deep(.active-icon)
       color: red
 
 </style>

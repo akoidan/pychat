@@ -90,7 +90,7 @@ export default class ChatSendingFileTransfer extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  tr ::v-deep .progress-wrap
+  tr :deep(.progress-wrap)
     width: calc(100% - 40px)
 
   .icon-cancel

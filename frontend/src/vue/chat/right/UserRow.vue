@@ -65,7 +65,7 @@ export default class UserRow extends Vue {
 
   .user-name-sex
     display: flex
-    ::v-deep i
+    :deep(i)
       position: relative
       top: 3px
       margin-right: 3px

@@ -504,23 +504,23 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       @extend %chat-icon
       left: 15px
 
-  .color-white .userMessageWrapper ::v-deep
-    .usermsg
+  .color-white .userMessageWrapper
+    :deep(.usermsg)
       background-color: white
-    .icon-picture, .icon-smile, .icon-webrtc-video
+    :deep(.icon-picture), :deep(.icon-smile), :deep(.icon-webrtc-video)
       color: #7b7979
 
 
-  .usermsg ::v-deep img[alt] //smile
+  .usermsg :deep(img[alt]) //smile
     @extend %img-code
 
-  .usermsg ::v-deep .emoji
+  .usermsg :deep(.emoji)
     width: $emoji-width
 
   .usermsg.mobile-user-message
     padding-right: 50px // before smiley and send
 
-  .usermsg ::v-deep .tag-user
+  .usermsg :deep(.tag-user)
     color: #729fcf !important
   .usermsg
     z-index: 2
@@ -538,19 +538,18 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     overflow-y: auto
     white-space: pre-wrap
 
-    ::v-deep .B4j2ContentEditableImg, ::v-deep .giphy-img
+    :deep(.B4j2ContentEditableImg), :deep(.giphy-img)
       max-height: 200px
       max-width: 400px
 
       &.failed
         min-width: 200px
         min-height: 100px
-    ::v-deep .audio-record
+    :deep(.audio-record)
       height: 50px
-    ::v-deep .uploading-file
+    :deep(.uploading-file)
       height: 50px
-
-    ::v-deep *
+    :deep(*)
       background-color: transparent !important
       color: inherit !important
       font-size: inherit !important

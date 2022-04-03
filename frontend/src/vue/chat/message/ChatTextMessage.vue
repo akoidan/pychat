@@ -158,13 +158,13 @@ export default class ChatTextMessage extends Vue {
   .message-text-style
     min-width: 0
 
-    ::v-deep .emoji
+    :deep(.emoji)
       width: $emoji-width
 
-    ::v-deep .youtube-player
+    :deep(.youtube-player)
       @extend %img-play-chat
       @extend %img-play
-    ::v-deep .video-player
+    :deep(.video-player)
       @extend %img-play-chat
       @extend %img-play
       img:not([src])
@@ -172,39 +172,39 @@ export default class ChatTextMessage extends Vue {
         min-width: 200px
         min-height: 100px
 
-    ::v-deep .tag-user
+    :deep(.tag-user)
       color: #729fcf
 
-    ::v-deep :visited
+    :deep(:visited)
       color: #7572CF
-    ::v-deep :link
+    :deep(:link)
       color: $link-color
-    ::v-deep a
+    :deep(a)
       &:hover
         text-decoration: underline
 
-    ::v-deep img[alt] // smile
+    :deep(img[alt]) // smile
       @extend %img-code
 
-    ::v-deep .quote
+    :deep(.quote)
       border-left: 5px solid #4d4d4d
       padding-left: 5px
       margin: 5px
       span
         font-weight: bold
-    ::v-deep pre
+    :deep(pre)
       margin: 10px
       max-width: calc(100% - 15px)
       overflow-x: auto
 
-    ::v-deep .video-player-ready
+    :deep(.video-player-ready)
       border: none
       @include margin-img-def
       width: 500px
       height: 350px
       @include margin-img
 
-    ::v-deep .giphy
+    :deep(.giphy)
       position: relative
       img
         @include margin-img-def
@@ -218,7 +218,7 @@ export default class ChatTextMessage extends Vue {
         width: 100px
         height: 36px
 
-    ::v-deep .B4j2ContentEditableImg
+    :deep(.B4j2ContentEditableImg)
       @include margin-img-def
       @include margin-img
       &.failed
@@ -227,26 +227,26 @@ export default class ChatTextMessage extends Vue {
         + div.icon-youtube-play
           width: 50px
           margin-right: -30px
-    ::v-deep .video-record
+    :deep(.video-record)
       img
         border-radius: 50%
       div
         background-color: transparent
-    ::v-deep .audio-record
+    :deep(.audio-record)
       vertical-align: middle
       height: 50px
       cursor: pointer
-    ::v-deep .uploading-file
+    :deep(.uploading-file)
       vertical-align: middle
       height: 50px
       cursor: pointer
-    ::v-deep .audio-player-ready
+    :deep(.audio-player-ready)
       vertical-align: middle
 
   @import url("highlightjs/styles/railscasts.css")
-  .color-white p ::v-deep
+  .color-white p
     // TODO vue3 vite import inside selector doesn't concatenate file
     //@import "../../../../node_modules/highlightjs/styles/default.css"
-    .message-others
+    :deep(.message-others)
       background-color: white
 </style>

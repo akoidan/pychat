@@ -64,15 +64,15 @@ export default class ChatSendingFile extends Vue {
 
   .message-self
     display: flex
-  table ::v-deep
+  table
     width: 100%
-    th, td
+    :deep(th), :deep(td)
       text-align: left
-    th
+    :deep(th)
       color: #79aeb6
       font-weight: bold
       padding-left: 5px
-    td
+    :deep(td)
       padding-left: 10px
       width: 100%
       text-overflow: ellipsis

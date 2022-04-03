@@ -361,10 +361,10 @@ import { isMobile } from '@/ts/utils/runtimeConsts';
     height: 100%
     display: flex
     flex-direction: column // otherwise chat-call is not full width
-    ::v-deep .message-header
+    :deep(.message-header)
       font-weight: bold
 
-    ::v-deep .message-self, ::v-deep .message-others
+    :deep(.message-self), :deep(.message-others)
       position: relative
 
   .chatbox
@@ -392,7 +392,7 @@ import { isMobile } from '@/ts/utils/runtimeConsts';
       border-radius: 4px
       //margin-top: $space-between-messages/2
       //margin-bottom: $space-between-messages/2
-      ::v-deep p
+      :deep(p)
         margin: 0 !important
     .message-self
       margin-left: auto
@@ -401,20 +401,20 @@ import { isMobile } from '@/ts/utils/runtimeConsts';
   //.dummy //w/o this dim last message would jump on hover if we have scroll
     //margin-top: $space-between-messages
 
-  .color-lor .holder ::v-deep
-    .message-others .message-header
+  .color-lor .holder
+    :deep(.message-others .message-header)
       color: #729fcf
-    .message-self .message-header
+    :deep(.message-self .message-header)
       color: #e29722
-    .message-system .message-header
+    :deep(.message-system .message-header)
       color: #9DD3DD
 
-  .color-reg .holder ::v-deep
-    .message-others .message-header
+  .color-reg .holder
+    :deep(.message-others .message-header)
       color: #729fcf
-    .message-self .message-header
+    :deep(.message-self .message-header)
       color: #e29722
-    .message-system .message-header
+    :deep(.message-system .message-header)
       color: #84B7C0
 
   .load-more-msg-btn

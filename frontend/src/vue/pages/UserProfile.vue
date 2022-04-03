@@ -55,18 +55,18 @@ export default class UserProfile extends Vue {
   .tab
     max-width: 680px
 
-  .profileInner ::v-deep
-    button
+  .profileInner
+    :deep(button)
       width: 100%
     padding-top: 10px
     padding-bottom: 10px
-    table
+    :deep(table)
       margin: auto
-    th
+    :deep(th)
       text-align: right
-    td, th
+    :deep(td), :deep(th)
       padding: 4px
-    .input
+    :deep(.input)
       @extend %big-input
 
 

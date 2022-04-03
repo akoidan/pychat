@@ -171,6 +171,6 @@ export default class GiphySearch extends Vue {
       padding: 5px
       margin: auto
       cursor: pointer
-      ::v-deep img
+      :deep(img)
         max-width: 100% // some images can be fixed hight but really wide, search 'fsg' for e.g
 </style>

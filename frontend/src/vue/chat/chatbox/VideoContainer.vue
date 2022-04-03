@@ -258,26 +258,26 @@ export default class VideoContainer extends Vue {
     background: #555
     margin-bottom: 4px
 
-  .micVideoHolder ::v-deep
+  .micVideoHolder
     @mixin selectIfHasAmountOfChild($child) // renders style depending on amount of children
       $realChild: $child +1
       // select first element, and nth element from the end
       // if it's the same element, e.g. 321 , if 3rd element from the end = first element then container has 3 elements
       // note selector applies to all siblings with class .micVideoWrapper
-      .micVideoWrapper:first-child:nth-last-child(#{$realChild}), .micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ .micVideoWrapper
+      :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild})), :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ .micVideoWrapper)
         @content
 
     @mixin selectVideoIfhasAmountOfChild($child) // renders style depending on amount of children
       $realChild: $child +1
-      .micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ video
+      :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ video)
         @content
 
     @mixin selectNthIfHasAmountOfChildren($amountOfChild, $nth)
-      .micVideoWrapper:first-child:nth-last-child(#{$amountOfChild +1}) ~ .micVideoWrapper:nth-child(#{$nth})
+      :deep(.micVideoWrapper:first-child:nth-last-child(#{$amountOfChild +1}) ~ .micVideoWrapper:nth-child(#{$nth}))
         @content
 
     //default
-    .micVideoWrapper
+    :deep(.micVideoWrapper)
       max-width: calc(33% - 5px)
 
     //1

@@ -57,9 +57,9 @@
   &:not(.active-room)
     @extend %hovered-user-room
   &:hover
-    ::v-deep .icon-cog // this is located in room-right icon and other places
+    :deep(.icon-cog) // this is located in room-right icon and other places
       display: inline
-    ::v-deep .icon-no-cog
+    :deep(.icon-no-cog)
       display: none
 
 

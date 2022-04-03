@@ -57,14 +57,14 @@ import { LoginMessage } from '@/ts/types/messages/innerMessages';
     @extend %top-btn-register
     border-radius: 0
 
-  .reg-log-container ::v-deep .submit-button
+  .reg-log-container :deep(.submit-button)
     @extend %cyan-btn
     width: 100%
     &:active
       border-bottom-color: rgba(0, 0, 0, 0)
 
 
-  .reg-log-container ::v-deep form
+  .reg-log-container :deep(form)
     margin: auto
     text-align: center
 
@@ -73,22 +73,22 @@ import { LoginMessage } from '@/ts/types/messages/innerMessages';
       position: relative
       width: 100%
 
-  .reg-log-container ::v-deep select.input
+  .reg-log-container :deep(select.input)
       -webkit-appearance: none // paddings don't work on devices like macos chrome, but work on windows
 
-  .reg-log-container ::v-deep
-    .input
+  .reg-log-container
+    :deep(.input)
       border-radius: 5px
       margin-bottom: 10px
       font-size: 13px
       width: calc(100% - 58px)
       padding: 15px 22px 15px 35px
 
-    select.input
+    :deep(select.input)
       width: 100%
 
 
-  .reg-log-container ::v-deep input:-webkit-autofill
+  .reg-log-container :deep(input:-webkit-autofill)
     -webkit-box-shadow: 0 0 0 1000px #242400 inset !important
     -webkit-text-fill-color: #C6C6B6 !important
     color: #C6C6B6
@@ -96,13 +96,13 @@ import { LoginMessage } from '@/ts/types/messages/innerMessages';
 
   .color-reg
 
-    .reg-log-container ::v-deep select
+    .reg-log-container ::deep(select)
       color: #79797a
 
-    .reg-log-container ::v-deep .submit-button
+    .reg-log-container :deep(.submit-button)
       border: 1px solid #000
 
-    .reg-log-container ::v-deep .reg-log-container
+    .reg-log-container :deep(.reg-log-container)
       input[type=button], input[type=submit]
         &:active
           padding-top: $register-buttons-vertical-pad + 1
