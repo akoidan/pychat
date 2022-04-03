@@ -8,9 +8,12 @@ import type {
   SexModelString,
   UserModel,
 } from "@/ts/types/model";
-import type {LogLevel} from "lines-logger";
+import type { LogLevel } from "lines-logger";
 
-export type SexModelDto = "Female" | "Male" | "Secret";
+export type SexModelDto =
+    "Female"
+    | "Male"
+    | "Secret";
 
 
 export interface RoomNoUsersDto {
@@ -41,7 +44,7 @@ export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
 }
 
-export type SaveFileResponse = Record<string, {fileId: number; previewFileId?: number}>;
+export type SaveFileResponse = Record<string, { fileId: number; previewFileId?: number }>;
 
 export interface ChannelDto {
   channelName: string;
@@ -117,6 +120,7 @@ export interface OauthStatus {
   google: boolean;
   facebook: boolean;
 }
+
 export interface FileModelDto {
   url: string;
   id: number;

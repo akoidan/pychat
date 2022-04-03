@@ -1,6 +1,6 @@
 import type {
-  PlatformUtil,
   permissions_type,
+  PlatformUtil,
 } from "@/ts/types/model";
 
 export class WebPlatformUtils implements PlatformUtil {

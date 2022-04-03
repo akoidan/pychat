@@ -2,9 +2,9 @@ import Vuex from "vuex";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {
-  ChannelUIModel,
   ChannelsDictModel,
   ChannelsDictUIModel,
+  ChannelUIModel,
   CurrentUserInfoModel,
   IncomingCallModel,
   Location,
@@ -29,7 +29,7 @@ import {
   SendingFile,
   UserModel,
 } from "@/ts/types/model";
-import type {PrivateRoomsIds} from "@/ts/types/types";
+import type { PrivateRoomsIds } from "@/ts/types/types";
 import {
   AddMessagesDTO,
   AddSendingFileTransfer,
@@ -67,7 +67,7 @@ import {
   SetStateFromStorage,
   SetStateFromWS,
 } from "@/ts/types/dto";
-import {encodeHTML} from "@/ts/utils/htmlApi";
+import { encodeHTML } from "@/ts/utils/htmlApi";
 import {
   ACTIVE_ROOM_ID_LS_NAME,
   ALL_ROOM_ID,
@@ -87,10 +87,10 @@ async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const mediaLinkIdGetter: Function = (function() {
+const mediaLinkIdGetter: Function = (function () {
   let i = 0;
 
-  return function() {
+  return function () {
     return String(i++);
   };
 }());
@@ -103,7 +103,7 @@ export const vueStore = new Vuex.Store({
 
 function Validate(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
-  descriptor.value = function(...args: unknown[]) {
+  descriptor.value = function (...args: unknown[]) {
     try {
       original.apply(this, args);
     } catch (e) {
@@ -189,10 +189,12 @@ export class DefaultStore extends VuexModule {
         isUserAction: true,
         ...value,
       }));
-      newArray.push(...room.changeName.map((value) => ({isChangeName: true,
-        ...value})));
+      newArray.push(...room.changeName.map((value) => ({
+        isChangeName: true,
+        ...value
+      })));
       const dates: Record<string, boolean> = {};
-      const messageDict: Record<number, {parent?: MessageModel; messages: (MessageModel | ReceivingFile | SendingFile)[]}> = {};
+      const messageDict: Record<number, { parent?: MessageModel; messages: (MessageModel | ReceivingFile | SendingFile)[] }> = {};
       for (const m in room.messages) {
         const message = room.messages[m];
         if (message.parentMessage) {
@@ -208,8 +210,10 @@ export class DefaultStore extends VuexModule {
           const d = new Date(message.time).toDateString();
           if (!dates[d]) {
             dates[d] = true;
-            newArray.push({fieldDay: d,
-              time: Date.parse(d)});
+            newArray.push({
+              fieldDay: d,
+              time: Date.parse(d)
+            });
           }
         }
       }
@@ -241,10 +245,12 @@ export class DefaultStore extends VuexModule {
         if (v.messages.length || v.parent?.isThreadOpened || v.parent && v.parent.threadMessagesCount > 0) {
           if (v.parent) {
             v.messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
-            newArray.push({parent: v.parent,
+            newArray.push({
+              parent: v.parent,
               thread: true,
               messages: v.messages,
-              time: v.parent.time});
+              time: v.parent.time
+            });
           } else {
             logger.warn(`Skipping rendering messages ${v.messages.map((m) => (m as MessageModel).id)} as parent is not loaded yet`)();
           }
@@ -285,16 +291,14 @@ export class DefaultStore extends VuexModule {
       return dict;
     }, {});
 
-    const allChannels: ChannelsDictUIModel = Object.keys(this.channelsDict).
-      filter((k) => !result[k]).
-      reduce((previousValue, currentValue) => {
-        previousValue[currentValue] = {
-          ...this.channelsDict[currentValue],
-          rooms: [],
-          mainRoom: null!,
-        };
-        return previousValue;
-      }, result);
+    const allChannels: ChannelsDictUIModel = Object.keys(this.channelsDict).filter((k) => !result[k]).reduce((previousValue, currentValue) => {
+      previousValue[currentValue] = {
+        ...this.channelsDict[currentValue],
+        rooms: [],
+        mainRoom: null!,
+      };
+      return previousValue;
+    }, result);
 
     logger.debug("Channels dict {} ", allChannels)();
 
@@ -321,8 +325,10 @@ export class DefaultStore extends VuexModule {
       });
     }
 
-    return {roomUsers,
-      userRooms};
+    return {
+      roomUsers,
+      userRooms
+    };
   }
 
   get roomsArray(): RoomModel[] {
@@ -577,22 +583,20 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setMessagesStatus(
-    {
-      roomId,
-      messagesIds,
-      status,
-    }: {
-      roomId: number;
-      messagesIds: number[];
-      status: MessageStatus;
-    },
+      {
+        roomId,
+        messagesIds,
+        status,
+      }: {
+        roomId: number;
+        messagesIds: number[];
+        status: MessageStatus;
+      },
   ) {
-    const ids = Object.values(this.roomsDict[roomId].messages).
-      filter((m) => messagesIds.includes(m.id)).
-      map((m) => {
-        m.status = status;
-        return m.id;
-      });
+    const ids = Object.values(this.roomsDict[roomId].messages).filter((m) => messagesIds.includes(m.id)).map((m) => {
+      m.status = status;
+      return m.id;
+    });
     if (ids.length) {
       this.storage.setMessagesStatus(ids, status);
     }
@@ -701,9 +705,7 @@ export class DefaultStore extends VuexModule {
     const {messages} = this.roomsDict[rm.roomId];
     // Vue.delete(messages, String(rm.messageId));
     delete messages[rm.messageId];
-    Object.values(messages).
-      filter((m) => m.parentMessage === rm.messageId).
-      forEach((a) => a.parentMessage = rm.newMessageId);
+    Object.values(messages).filter((m) => m.parentMessage === rm.messageId).forEach((a) => a.parentMessage = rm.newMessageId);
     this.storage.deleteMessage(rm.messageId, rm.newMessageId);
   }
 
@@ -873,7 +875,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setUser(user: {id: number; sex: SexModelString; user: string; image: string}) {
+  public setUser(user: { id: number; sex: SexModelString; user: string; image: string }) {
     this.allUsersDict[user.id].user = user.user;
     this.allUsersDict[user.id].sex = user.sex;
     this.allUsersDict[user.id].image = user.image;
@@ -883,8 +885,10 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setUserInfo(userInfo: CurrentUserInfoWoImage) {
     const image: string | null = this.userInfo?.image || null;
-    const newUserInfo: CurrentUserInfoModel = {...userInfo,
-      image};
+    const newUserInfo: CurrentUserInfoModel = {
+      ...userInfo,
+      image
+    };
     this.userInfo = newUserInfo;
     this.storage.setUserProfile(this.userInfo);
   }
@@ -962,7 +966,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setShowITypingUser({userId, roomId, date}: {userId: number; roomId: number; date: number}) {
+  public setShowITypingUser({userId, roomId, date}: { userId: number; roomId: number; date: number }) {
     if (date === 0) {
       // Vue.delete(, userId);
       delete this.roomsDict[roomId].usersTyping[userId];
@@ -990,54 +994,68 @@ export class DefaultStore extends VuexModule {
   }
 
   @Action
-  public async showGrowl({html, type, time}: {html: string; type: GrowlType; time: number}) {
-    const growl: GrowlModel = {id: Date.now(),
+  public async showGrowl({html, type, time}: { html: string; type: GrowlType; time: number }) {
+    const growl: GrowlModel = {
+      id: Date.now(),
       html,
-      type};
+      type
+    };
     this.addGrowl(growl);
     await sleep(time);
     this.removeGrowl(growl);
   }
 
   @Action
-  public async showUserIsTyping({userId, roomId}: {userId: number; roomId: number}) {
+  public async showUserIsTyping({userId, roomId}: { userId: number; roomId: number }) {
     const date = Date.now();
-    this.setShowITypingUser({userId,
+    this.setShowITypingUser({
+      userId,
       roomId,
-      date});
+      date
+    });
     await sleep(SHOW_I_TYPING_INTERVAL_SHOW); // Lets say 1 second ping
     if (this.roomsDict[roomId].usersTyping[userId] === date) {
-      this.setShowITypingUser({userId,
+      this.setShowITypingUser({
+        userId,
         roomId,
-        date: 0});
+        date: 0
+      });
     }
   }
 
   @Action
   public async growlErrorRaw(html: string) {
-    await this.showGrowl({html,
+    await this.showGrowl({
+      html,
       type: GrowlType.ERROR,
-      time: 6000});
+      time: 6000
+    });
   }
 
   @Action
   public async growlError(title: string) {
-    await this.showGrowl({html: encodeHTML(title),
+    await this.showGrowl({
+      html: encodeHTML(title),
       type: GrowlType.ERROR,
-      time: 6000});
+      time: 6000
+    });
   }
 
   @Action
   public async growlInfo(title: string) {
-    await this.showGrowl({html: encodeHTML(title),
+    await this.showGrowl({
+      html: encodeHTML(title),
       type: GrowlType.INFO,
-      time: 5000});
+      time: 5000
+    });
   }
 
   @Action
   public async growlSuccess(title: string) {
-    await this.showGrowl({html: encodeHTML(title),
+    await this.showGrowl({
+      html: encodeHTML(title),
       type: GrowlType.SUCCESS,
-      time: 4000});
+      time: 4000
+    });
   }
 }

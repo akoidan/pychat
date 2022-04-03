@@ -2,17 +2,17 @@ import type {
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
 } from "@/ts/types/types";
-import type {ReceivingFile} from "@/ts/types/model";
-import {FileTransferStatus} from "@/ts/types/model";
-import {bytesToSize} from "@/ts/utils/pureFunctions";
+import type { ReceivingFile } from "@/ts/types/model";
+import { FileTransferStatus } from "@/ts/types/model";
+import { bytesToSize } from "@/ts/utils/pureFunctions";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import {requestFileSystem} from "@/ts/utils/htmlApi";
+import { requestFileSystem } from "@/ts/utils/htmlApi";
 import {
   MAX_ACCEPT_FILE_SIZE_WO_FS_API,
   MAX_BUFFER_SIZE,
 } from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,
@@ -24,12 +24,12 @@ import type {
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileReceiverPeerConnection, "peerConnection:*"> = {
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    retryFile: <HandlerType<"retryFile", "peerConnection:*">> this.retryFile,
-    retryFileReply: <HandlerType<"retryFileReply", "peerConnection:*">> this.retryFileReply,
-    acceptFileReply: <HandlerType<"acceptFileReply", "peerConnection:*">> this.acceptFileReply,
-    declineFileReply: <HandlerType<"declineFileReply", "peerConnection:*">> this.declineFileReply,
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
+    retryFile: <HandlerType<"retryFile", "peerConnection:*">>this.retryFile,
+    retryFileReply: <HandlerType<"retryFileReply", "peerConnection:*">>this.retryFileReply,
+    acceptFileReply: <HandlerType<"acceptFileReply", "peerConnection:*">>this.acceptFileReply,
+    declineFileReply: <HandlerType<"declineFileReply", "peerConnection:*">>this.declineFileReply,
+    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">>this.destroyFileConnection,
   };
 
   private readonly fileSize: number;
@@ -51,6 +51,10 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, size: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.fileSize = size;
+  }
+
+  get receivingFile(): ReceivingFile {
+    return this.store.roomsDict[this.roomId].receivingFiles[this.connectionId];
   }
 
   public retryFileReply() {
@@ -89,6 +93,40 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.waitForAnswer();
   }
 
+  public destroyFileConnection(message: DestroyFileConnectionMessage) {
+    const payload: SetReceivingFileStatus = {
+      error: null,
+      status: FileTransferStatus.DECLINED_BY_OPPONENT,
+      connId: this.connectionId,
+      roomId: this.roomId,
+    };
+    this.store.setReceivingFileStatus(payload);
+    this.unsubscribeAndRemoveFromParent();
+  }
+
+  public retryFile(message: RetryFileMessage) {
+    const payload: SetReceivingFileStatus = {
+      error: null,
+      status: FileTransferStatus.IN_PROGRESS,
+      connId: this.connectionId,
+      roomId: this.roomId,
+    };
+    this.store.setReceivingFileStatus(payload);
+  }
+
+  commitErrorIntoStore(error: string, onlyIfNotFinished: boolean = false): void {
+    if (onlyIfNotFinished && this.receivingFile.status === FileTransferStatus.FINISHED) {
+      return;
+    }
+    const ssfs: SetReceivingFileStatus = {
+      status: FileTransferStatus.ERROR,
+      roomId: this.roomId,
+      error,
+      connId: this.connectionId,
+    };
+    this.store.setReceivingFileStatus(ssfs);
+  }
+
   protected onChannelMessage(event: MessageEvent) {
     this.receiveBuffer.push(event.data);
     // Chrome accepts bufferArray (.byteLength). firefox accepts blob (.size)
@@ -104,17 +142,6 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.assembleFileIfDone();
   }
 
-  public destroyFileConnection(message: DestroyFileConnectionMessage) {
-    const payload: SetReceivingFileStatus = {
-      error: null,
-      status: FileTransferStatus.DECLINED_BY_OPPONENT,
-      connId: this.connectionId,
-      roomId: this.roomId,
-    };
-    this.store.setReceivingFileStatus(payload);
-    this.unsubscribeAndRemoveFromParent();
-  }
-
   private async initFileSystemApi() {
     this.logger.debug("Creating temp location {}", bytesToSize(this.fileSize))();
     if (!requestFileSystem) {
@@ -124,15 +151,15 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     try {
       const fs: FileSystem = await new Promise<FileSystem>((resolve, reject) => {
         requestFileSystem(
-          window.TEMPORARY,
-          this.fileSize,
-          resolve,
-          reject,
+            window.TEMPORARY,
+            this.fileSize,
+            resolve,
+            reject,
         );
       });
       this.fileEntry = await new Promise<FileEntry>((resolve, reject) => {
-        fs.root.getFile(this.connectionId, {create: true}, resolve as any, reject);
-      }, // TODO as?
+            fs.root.getFile(this.connectionId, {create: true}, resolve as any, reject);
+          }, // TODO as?
       );
       this.fileWriter = await new Promise<FileWriter>((resolve, reject) => {
         this.fileEntry!.createWriter(resolve, reject);
@@ -152,16 +179,6 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
       }
       throw e;
     }
-  }
-
-  public retryFile(message: RetryFileMessage) {
-    const payload: SetReceivingFileStatus = {
-      error: null,
-      status: FileTransferStatus.IN_PROGRESS,
-      connId: this.connectionId,
-      roomId: this.roomId,
-    };
-    this.store.setReceivingFileStatus(payload);
   }
 
   private syncBufferWithFs() {
@@ -211,10 +228,10 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
   private async clearFS(fs: FileSystem) {
     this.logger.log("Quota exceeded, trying to clear it")();
     const entries: Entry[] = await new Promise<Entry[]>((resolve, reject) => {
-      fs.root.createReader().readEntries(resolve as any, reject);
-    }, // TODO as?
+          fs.root.createReader().readEntries(resolve as any, reject);
+        }, // TODO as?
     );
-    await Promise.all(entries.map(async(e: Entry) => {
+    await Promise.all(entries.map(async (e: Entry) => {
       if (e.isFile) {
         await new Promise<void>((resolve, reject) => {
           e.remove(resolve, reject);
@@ -245,22 +262,5 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.createPeerConnection();
     this.pc!.ondatachannel = this.gotReceiveChannel.bind(this);
     this.wsHandler.acceptFile(this.connectionId, this.receivedSize);
-  }
-
-  get receivingFile(): ReceivingFile {
-    return this.store.roomsDict[this.roomId].receivingFiles[this.connectionId];
-  }
-
-  commitErrorIntoStore(error: string, onlyIfNotFinished: boolean = false): void {
-    if (onlyIfNotFinished && this.receivingFile.status === FileTransferStatus.FINISHED) {
-      return;
-    }
-    const ssfs: SetReceivingFileStatus = {
-      status: FileTransferStatus.ERROR,
-      roomId: this.roomId,
-      error,
-      connId: this.connectionId,
-    };
-    this.store.setReceivingFileStatus(ssfs);
   }
 }

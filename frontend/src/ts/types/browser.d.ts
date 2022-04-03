@@ -3,24 +3,32 @@ declare interface Document {
   msFullscreenElement: any;
   webkitFullscreenElement: any;
   webkitCancelFullScreen: any;
+
   cancelFullScreen(): void;
+
   msCancelFullScreen(): void;
+
   mozCancelFullScreen(): void;
 }
 
 declare interface RTCPeerConnection {
   onaddstream(event: any): void;
+
   // Obsolete (deprecated) TODO
   addStream(a: MediaStream): void;
+
   removeStream(a: MediaStream): void;
 }
+
 declare interface Notification {
   replaced: number;
 }
+
 declare interface NotificationOptions {
   replaced: number;
 }
-type Writeable<T> = {-readonly [P in keyof T]: T[P]};
+
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 declare interface RTCDataChannelInit {
   reliable?: boolean;
@@ -60,6 +68,7 @@ declare interface BeforeInstallPromptEvent extends Event {
 
 declare interface MediaDevices {
   getDisplayMedia(constraints: MediaStreamConstraints): Promise<MediaStream>;
+
   getUserMedia(constraints: MediaStreamConstraints, successCallback: any, errorCallback: any): void;
 }
 
@@ -80,7 +89,7 @@ declare interface MediaStreamTrack {
 }
 
 declare class MediaRecorderDataAvailableEvent {
-  public data: {size: number};
+  public data: { size: number };
 }
 
 declare interface Blob {
@@ -98,7 +107,9 @@ declare interface FormData {
 
 declare interface HTMLElement {
   msRequestFullscreen(): void;
+
   mozRequestFullScreen(): void;
+
   webkitRequestFullscreen(): void;
 }
 

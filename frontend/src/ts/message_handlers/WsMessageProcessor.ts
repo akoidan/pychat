@@ -3,8 +3,8 @@ import type {
   DefaultWsInMessage,
   GrowlMessage,
 } from "@/ts/types/messages/wsInMessages";
-import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
-import {sub} from "@/ts/instances/subInstance";
+import type { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
+import { sub } from "@/ts/instances/subInstance";
 
 export class WsMessageProcessor extends AbstractMessageProcessor {
   public handleMessage(data: DefaultWsInMessage<string, HandlerName>) {

@@ -1,5 +1,5 @@
-import type {LogLevel} from "lines-logger";
-import type {MessageStatus} from "@/ts/types/model";
+import type { LogLevel } from "lines-logger";
+import type { MessageStatus } from "@/ts/types/model";
 
 export interface UserDB {
   id: number;
@@ -14,8 +14,13 @@ export interface UserDB {
   city: string;
 }
 
-export type SexDB = 0 | 1 | 2;
-export type BooleanDB = 0 | 1;
+export type SexDB =
+    0
+    | 1
+    | 2;
+export type BooleanDB =
+    0
+    | 1;
 
 export interface RoomDB {
   id: number;
@@ -25,7 +30,7 @@ export interface RoomDB {
   volume: number;
   channel_id: number;
   is_main_in_channel: BooleanDB;
-  deleted: BooleanDB ;
+  deleted: BooleanDB;
   creator: number;
 }
 

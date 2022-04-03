@@ -19,8 +19,22 @@ export interface ChangeUserOnlineBase {
  * this means, that handler that registered this event will be called
  * void means that no handlers should process this signal
  */
-export type HandlerName = "any" | "call" | "notifier" | "peerConnection:*" | "room" | "router" | "void" | "webrtc-message" | "webrtc" | "webrtcTransfer:*" | "ws-message" | "ws";
-export type CallHandlerName = HandlerName | "dummyCall";
+export type HandlerName =
+    "any"
+    | "call"
+    | "notifier"
+    | "peerConnection:*"
+    | "room"
+    | "router"
+    | "void"
+    | "webrtc-message"
+    | "webrtc"
+    | "webrtcTransfer:*"
+    | "ws-message"
+    | "ws";
+export type CallHandlerName =
+    HandlerName
+    | "dummyCall";
 
 export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | "any">) => Promise<void> | void;
 
@@ -61,8 +75,16 @@ export interface OfferFileContent extends BrowserBase {
   size: number;
   name: string;
 }
-export type ChangeDeviceType = "i_deleted" | "invited" | "room_created" | "someone_joined" | "someone_left";
-export type ChangeOnlineType = "appear_online" | "gone_offline";
+
+export type ChangeDeviceType =
+    "i_deleted"
+    | "invited"
+    | "room_created"
+    | "someone_joined"
+    | "someone_left";
+export type ChangeOnlineType =
+    "appear_online"
+    | "gone_offline";
 
 export interface BrowserBase {
   browser: string;
@@ -87,6 +109,12 @@ export interface ResolveCallbackId {
 
 export interface IMessageHandler {
   handle(message: DefaultInMessage<string, HandlerName>): void;
+
   getHandler<H extends HandlerName, A extends string>(message: DefaultInMessage<A, H>): HandlerType<A, H> | undefined;
 }
-export type CallStatus = "accepted" | "not_inited" | "received_offer" | "sent_offer";
+
+export type CallStatus =
+    "accepted"
+    | "not_inited"
+    | "received_offer"
+    | "sent_offer";

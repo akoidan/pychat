@@ -8,51 +8,51 @@
         Join call
       </button>
       <i
-        :class="iconMicClass"
-        :title="micTitle"
-        @click="micClick"
+          :class="iconMicClass"
+          :title="micTitle"
+          @click="micClick"
       />
       <i
-        :class="iconVideoClass"
-        :title="videoTitle"
-        @click="videoClick"
+          :class="iconVideoClass"
+          :title="videoTitle"
+          @click="videoClick"
       />
       <i
-        class="icon-desktop"
-        :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
-        title="Capture your desktop screen and start sharing it"
-        @click="desktopClick"
+          :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
+          class="icon-desktop"
+          title="Capture your desktop screen and start sharing it"
+          @click="desktopClick"
       />
       <i
-        class="icon-brush"
-        :class="callInfo.sharePaint ? 'activeIcon' : 'noactiveIcon'"
-        title="Share painter canvas"
-        @click="paintClick"
+          :class="callInfo.sharePaint ? 'activeIcon' : 'noactiveIcon'"
+          class="icon-brush"
+          title="Share painter canvas"
+          @click="paintClick"
       />
       <i
-        v-show="callInfo.callActive"
-        class="icon-popup"
-        title="Hide/Show videos"
-        @click="invertShowVideoContainer"
+          v-show="callInfo.callActive"
+          class="icon-popup"
+          title="Hide/Show videos"
+          @click="invertShowVideoContainer"
       />
       <i
-        class="icon-cog"
-        @click="invertShowSettings"
+          class="icon-cog"
+          @click="invertShowSettings"
       />
       <i
-        v-show="callInfo.callActive"
-        class="icon-webrtc-fullscreen"
-        title="Fullscreen"
-        @click="enterFullscreen"
+          v-show="callInfo.callActive"
+          class="icon-webrtc-fullscreen"
+          title="Fullscreen"
+          @click="enterFullscreen"
       />
       <div
-        v-show="callInfo.callActive"
-        class="hangUpHolder"
+          v-show="callInfo.callActive"
+          class="hangUpHolder"
       >
         <i
-          class="icon-hang-up"
-          title="Hang up"
-          @click="hangUpCall"
+            class="icon-hang-up"
+            title="Hang up"
+            @click="hangUpCall"
         />
       </div>
     </div>
@@ -66,29 +66,13 @@ import {
   Prop,
   Vue,
 } from "vue-property-decorator";
-import {CallsInfoModel} from "@/ts/types/model";
+import { CallsInfoModel } from "@/ts/types/model";
 
 @Component({name: "CallContainerIcons"})
 export default class CallContainerIcons extends Vue {
   @Prop() public callInfo!: CallsInfoModel;
 
   @Prop() public roomId!: number;
-
-  @Emit() micClick() {}
-
-  @Emit() hangUpCall() {}
-
-  @Emit() videoClick() {}
-
-  @Emit() desktopClick() {}
-
-  @Emit() invertShowSettings() {}
-
-  @Emit() enterFullscreen() {}
-
-  @Emit() paintClick() {}
-
-  @Emit() invertShowVideoContainer() {}
 
   get videoTitle() {
     return `Turn ${this.callInfo.showVideo ? "off" : "on"} your webcam`;
@@ -105,55 +89,82 @@ export default class CallContainerIcons extends Vue {
     };
   }
 
-  public joinCall() {
-    this.$webrtcApi.joinCall(this.roomId);
-  }
-
   get iconMicClass(): {} {
     return {
       "icon-mic": this.callInfo.showMic,
       "icon-mute": !this.callInfo.showMic,
     };
   }
+
+  @Emit() micClick() {
+  }
+
+  @Emit() hangUpCall() {
+  }
+
+  @Emit() videoClick() {
+  }
+
+  @Emit() desktopClick() {
+  }
+
+  @Emit() invertShowSettings() {
+  }
+
+  @Emit() enterFullscreen() {
+  }
+
+  @Emit() paintClick() {
+  }
+
+  @Emit() invertShowVideoContainer() {
+  }
+
+  public joinCall() {
+    this.$webrtcApi.joinCall(this.roomId);
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
-  .call-is-active
-    font-size: 10px
-  .icon-webrtc-fullscreen
-    padding-top: 1px
-    margin-bottom: -1px
-    transform: scale(2)
+.call-is-active
+  font-size: 10px
 
-  .callContainerIcons
+.icon-webrtc-fullscreen
+  padding-top: 1px
+  margin-bottom: -1px
+  transform: scale(2)
+
+.callContainerIcons
+  display: flex
+  flex-direction: column
+  font-size: 25px
+  @extend %user-select-none
+  width: 100%
+  padding-top: 10px
+
+  .callContainerIconsInner
     display: flex
-    flex-direction: column
-    font-size: 25px
-    @extend %user-select-none
-    width: 100%
-    padding-top: 10px
+    margin: auto
+    justify-content: space-between
 
-    .callContainerIconsInner
-      display: flex
-      margin: auto
-      justify-content: space-between
-      > *
-        margin: 0 5px
+    > *
+      margin: 0 5px
 
-    .hangUpHolder
-      display: inline-block
-      position: relative
-      width: 46px
-      height: 28px
-      margin-left: 10px
-      margin-top: -7px
-      .icon-hang-up
-        position: absolute
-        font-size: 35px
-        top: 0
-        left: 0
+  .hangUpHolder
+    display: inline-block
+    position: relative
+    width: 46px
+    height: 28px
+    margin-left: 10px
+    margin-top: -7px
+
+    .icon-hang-up
+      position: absolute
+      font-size: 35px
+      top: 0
+      left: 0
 
 </style>

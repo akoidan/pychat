@@ -1,23 +1,23 @@
-import type {VueBase} from "vue-class-component";
-import type {VuexModule} from "vuex-module-decorators";
-import {getModule} from "vuex-module-decorators";
-import {DefaultStore} from "@/ts/classes/DefaultStore";
-import {encodeHTML} from "@/ts/utils/htmlApi";
-import {GrowlType} from "@/ts/types/model";
+import type { VueBase } from "vue-class-component";
+import type { VuexModule } from "vuex-module-decorators";
+import { getModule } from "vuex-module-decorators";
+import { DefaultStore } from "@/ts/classes/DefaultStore";
+import { encodeHTML } from "@/ts/utils/htmlApi";
+import { GrowlType } from "@/ts/types/model";
 
 
 function stateDecoratorFactory<TPT extends VuexModule>(vuexModule: TPT):
-<TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
-(vueComponent: TCT, fileName: TPN) => void {
+    <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
+    (vueComponent: TCT, fileName: TPN) => void {
   return <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
   (vueComponent: TCT, fileName: TPN): void => {
     Object.defineProperty(
-      vueComponent,
-      fileName,
-      Object.getOwnPropertyDescriptor(
-        vuexModule,
+        vueComponent,
         fileName,
-      )!,
+        Object.getOwnPropertyDescriptor(
+            vuexModule,
+            fileName,
+        )!,
     );
   };
 }
@@ -35,14 +35,14 @@ type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
 
 // TODO add success growl, and specify error property so it reflects forever in comp
 export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
-  {message, runningProp, vueProperty, preventStacking}: {
-    message?: string;
-    preventStacking?: boolean;
-    runningProp?: ValueFilterForKey<T, boolean>;
-    vueProperty?: ValueFilterForKey<T, string>;
-  },
+    {message, runningProp, vueProperty, preventStacking}: {
+      message?: string;
+      preventStacking?: boolean;
+      runningProp?: ValueFilterForKey<T, boolean>;
+      vueProperty?: ValueFilterForKey<T, string>;
+    },
 ) {
-  const processError = function(e: any) {
+  const processError = function (e: any) {
     let strError;
     if (e) {
       if (e.message) {
@@ -62,22 +62,26 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       // @ts-expect-error: next-line
       processError[vueProperty] = `${message}: ${strError}`;
     } else if (message) {
-      processError.$store.showGrowl({html: encodeHTML(`${message}:  ${strError}`),
+      processError.$store.showGrowl({
+        html: encodeHTML(`${message}:  ${strError}`),
         type: GrowlType.ERROR,
-        time: 20000});
+        time: 20000
+      });
     } else if (vueProperty) {
       // @ts-expect-error: next-line
       this[vueProperty] = `Error: ${strError}`;
     } else {
-      processError.$store.showGrowl({html: encodeHTML(strError),
+      processError.$store.showGrowl({
+        html: encodeHTML(strError),
         type: GrowlType.ERROR,
-        time: 20000});
+        time: 20000
+      });
     }
   };
 
-  return function(target: T, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
-    descriptor.value = async function(...args: unknown[]) {
+    descriptor.value = async function (...args: unknown[]) {
       // @ts-expect-error: next-line
 
       // TODO this thing breaks fb login

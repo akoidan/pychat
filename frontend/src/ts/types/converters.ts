@@ -28,7 +28,7 @@ import type {
   BooleanDB,
   SexDB,
 } from "@/ts/types/db";
-import type {MessageP2pDto} from "@/ts/types/messages/p2pDto";
+import type { MessageP2pDto } from "@/ts/types/messages/p2pDto";
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
   return {...userInfo};
@@ -70,17 +70,19 @@ export function convertSexToNumber(m: SexModelString): number {
 }
 
 export function getChannelDict(
-  {
-    channelName,
-    channelCreatorId,
-    channelId,
-  }: ChannelDto,
-  oldChannel: ChannelModel | null = null,
+    {
+      channelName,
+      channelCreatorId,
+      channelId,
+    }: ChannelDto,
+    oldChannel: ChannelModel | null = null,
 ): ChannelModel {
-  return {name: channelName,
+  return {
+    name: channelName,
     id: channelId,
     creator: channelCreatorId,
-    expanded: oldChannel?.expanded ?? false};
+    expanded: oldChannel?.expanded ?? false
+  };
 }
 
 export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
@@ -97,18 +99,18 @@ export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
 }
 
 export function getRoomsBaseDict(
-  {
-    roomId,
-    volume,
-    channelId,
-    isMainInChannel,
-    notifications,
-    roomCreatorId,
-    p2p,
-    name,
-    users,
-  }: RoomDto,
-  databaseRestoredRoom: RoomModel | null = null,
+    {
+      roomId,
+      volume,
+      channelId,
+      isMainInChannel,
+      notifications,
+      roomCreatorId,
+      p2p,
+      name,
+      users,
+    }: RoomDto,
+    databaseRestoredRoom: RoomModel | null = null,
 ): RoomModel {
   return {
     id: roomId,

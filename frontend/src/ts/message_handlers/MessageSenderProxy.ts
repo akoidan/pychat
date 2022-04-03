@@ -1,6 +1,6 @@
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type WebRtcApi from "@/ts/webrtc/WebRtcApi";
-import type {MessageSender} from "@/ts/types/types";
+import type { MessageSender } from "@/ts/types/types";
 import type WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
 
 export class MessageSenderProxy {
@@ -11,18 +11,14 @@ export class MessageSenderProxy {
   private readonly wsMessageHandler: WsMessageHandler;
 
   constructor(
-    store: DefaultStore,
-    webrtcApi: WebRtcApi,
-    wsMessageHandler: WsMessageHandler,
+      store: DefaultStore,
+      webrtcApi: WebRtcApi,
+      wsMessageHandler: WsMessageHandler,
   ) {
     this.store = store;
     this.webrtcApi = webrtcApi;
     this.wsMessageHandler = wsMessageHandler;
     webrtcApi.setMessageSenderProxy(this);
-  }
-
-  private getRandomInt(max: number) {
-    return Math.floor(Math.random() * max);
   }
 
   /*
@@ -38,11 +34,14 @@ export class MessageSenderProxy {
     return -(this.getRandomInt(ID_RANGE) + myId * ID_RANGE);
   }
 
-
   getMessageSender(roomId: number): MessageSender {
     if (this.store.roomsDict[roomId].p2p) {
       return this.webrtcApi.getMessageHandler(roomId);
     }
     return this.wsMessageHandler;
+  }
+
+  private getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
   }
 }

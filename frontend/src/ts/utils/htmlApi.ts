@@ -4,7 +4,7 @@ import {
   PASTED_IMG_CLASS,
   USERNAME_REGEX,
 } from "@/ts/utils/consts";
-import type {MessageDataEncode} from "@/ts/types/types";
+import type { MessageDataEncode } from "@/ts/types/types";
 import type {
   BlobType,
   CurrentUserSettingsModel,
@@ -14,20 +14,20 @@ import type {
 } from "@/ts/types/model";
 import recordIcon from "@/assets/img/audio.svg";
 import fileIcon from "@/assets/img/file.svg";
-import {getFlag} from "@/ts/utils/flags";
+import { getFlag } from "@/ts/utils/flags";
 import videoIcon from "@/assets/img/icon-play-red.svg";
-import type {Smile} from "@/ts/utils/smileys";
-import {allSmileysKeys} from "@/ts/utils/smileys";
+import type { Smile } from "@/ts/utils/smileys";
+import { allSmileysKeys } from "@/ts/utils/smileys";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 import {
   MEDIA_API_URL,
   webpSupported,
 } from "@/ts/utils/runtimeConsts";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import {hexEncode} from "@/ts/utils/pureFunctions";
-import type {GIFObject} from "giphy-api";
-import type {Emitter} from "mitt";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import { hexEncode } from "@/ts/utils/pureFunctions";
+import type { GIFObject } from "giphy-api";
+import type { Emitter } from "mitt";
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -58,7 +58,7 @@ export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a
   }
 }
 
-export const smileUnicodeRegex = (function() {
+export const smileUnicodeRegex = (function () {
   const allSmileyRegexarray = Object.keys(allSmileysKeys).map(hexEncode);
   return new RegExp(allSmileyRegexarray.join("|"), "g");
 }());
@@ -316,8 +316,7 @@ export function replaceCurrentWord(containerEl: HTMLElement, replacedTo: HTMLEle
   range.collapse(true);
   range.setStart(containerEl, 0);
 
-  const words = range.toString().trim().
-    split(" ");
+  const words = range.toString().trim().split(" ");
   const lastWord = words[words.length - 1];
 
   if (!lastWord) {
@@ -391,7 +390,7 @@ export function setVideoEvent(e: HTMLElement) {
     const querySelector: HTMLElement = e.querySelector(".icon-youtube-play")!;
     const url: string = e.getAttribute("associatedVideo")!;
     logger.debug("Embedding video url {}", url)();
-    querySelector.onclick = function(event) {
+    querySelector.onclick = function (event) {
       const video = document.createElement("video");
       video.setAttribute("controls", "");
       video.className = "video-player-ready";
@@ -406,7 +405,7 @@ export function setVideoEvent(e: HTMLElement) {
 export function setAudioEvent(e: HTMLElement) {
   const r: NodeListOf<HTMLElement> = e.querySelectorAll(".audio-record");
   forEach<HTMLElement>(r, (e: HTMLElement) => {
-    e.onclick = function(event) {
+    e.onclick = function (event) {
       const associatedAudio: string = e.getAttribute("associatedAudio")!;
       const url: string = resolveMediaUrl(associatedAudio);
       const audio = document.createElement("audio");
@@ -423,11 +422,11 @@ export function setAudioEvent(e: HTMLElement) {
 export function setImageFailEvents(e: HTMLElement, bus: Emitter<any>) {
   const r = e.querySelectorAll("img");
   for (let i = 0; i < r.length; i++) {
-    (function(img) {
-      img.onerror = function() {
+    (function (img) {
+      img.onerror = function () {
         this.className += " failed";
       };
-      img.onload = function() {
+      img.onload = function () {
         bus.emit("scroll");
       };
     }(r[i]));
@@ -463,7 +462,7 @@ export function setYoutubeEvent(e: HTMLElement) {
     const querySelector: HTMLElement = a.querySelector(".icon-youtube-play")!;
     const id = a.getAttribute("data-id");
     logger.debug("Embedding youtube view {}", id)();
-    querySelector.onclick = function(event: MouseEvent) {
+    querySelector.onclick = function (event: MouseEvent) {
       const iframe = document.createElement("iframe");
       let time: string = getTime(e.getAttribute("data-time")!).toString();
       if (time) {
@@ -528,25 +527,25 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
       tmpCanvasContext.canvas.height = video.videoHeight;
       tmpCanvasContext.drawImage(video, 0, 0);
       tmpCanvasContext.canvas.toBlob(
-        (blob) => {
-          const img = document.createElement("img");
-          if (!blob) {
-            logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
-            img.src = videoIcon as string;
-          } else {
-            const url = URL.createObjectURL(blob);
-            savedFiles[url] = blob;
-            blob.name = ".jpg";
-            img.src = url;
-          }
-          img.className = PASTED_IMG_CLASS;
-          img.setAttribute("videoType", videoType);
-          img.setAttribute("associatedVideo", src);
-          savedFiles[src] = file;
-          pasteNodeAtCaret(img, textArea);
-        },
-        "image/jpeg",
-        0.95,
+          (blob) => {
+            const img = document.createElement("img");
+            if (!blob) {
+              logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
+              img.src = videoIcon as string;
+            } else {
+              const url = URL.createObjectURL(blob);
+              savedFiles[url] = blob;
+              blob.name = ".jpg";
+              img.src = url;
+            }
+            img.className = PASTED_IMG_CLASS;
+            img.setAttribute("videoType", videoType);
+            img.setAttribute("associatedVideo", src);
+            savedFiles[src] = file;
+            pasteNodeAtCaret(img, textArea);
+          },
+          "image/jpeg",
+          0.95,
       );
     }, false);
     video.src = src;
@@ -702,8 +701,10 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
   }
   userMessage.innerHTML = "";
 
-  return {files,
+  return {
+    files,
     messageContent,
     currSymbol,
-    tags};
+    tags
+  };
 }

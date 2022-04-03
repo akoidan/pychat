@@ -1,11 +1,10 @@
-import {IS_ANDROID} from "@/ts/utils/consts";
+import { IS_ANDROID } from "@/ts/utils/consts";
 import type {
-  PlatformUtil,
   permissions_type,
+  PlatformUtil,
 } from "@/ts/types/model";
-import cordova from "cordova";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 
 export class AndroidPlatformUtil implements PlatformUtil {
   private readonly logger: Logger;
@@ -28,7 +27,7 @@ export class AndroidPlatformUtil implements PlatformUtil {
         throw Error("no persmissins asked");
       }
       this.logger.debug("Checking if user already has permissions for {}", permissions)();
-      await requiredPermissions.map(async(permission) => new Promise<void>((resolve, reject) => {
+      await requiredPermissions.map(async (permission) => new Promise<void>((resolve, reject) => {
         permissions.checkPermission(permission, (status: any) => {
           this.logger.debug("permission {} status {}", permission, status)();
           if (status.hasPermission) {

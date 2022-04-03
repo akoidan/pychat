@@ -18,12 +18,12 @@ export default class AppNavWrapper extends Vue {
 <style lang="sass" scoped>
 
 
-  @import "@/assets/sass/partials/variables"
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/abstract_classes"
 
 
-  nav
-    max-height: 32px
-    @extend %nav
+nav
+  max-height: 32px
+  @extend %nav
 </style>

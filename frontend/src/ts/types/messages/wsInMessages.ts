@@ -30,7 +30,7 @@ import type {
   RoomExistedBefore,
   WebRtcDefaultMessage,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type {MessageStatus} from "@/ts/types/model";
+import type { MessageStatus } from "@/ts/types/model";
 
 export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H>, CallBackMessage {
   cbBySender?: string;
@@ -213,12 +213,13 @@ export interface SetProfileImageMessage extends DefaultWsInMessage<"setProfileIm
 
 export interface AcceptCallMessage extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<"acceptCall", "webrtcTransfer:*"> {
 }
+
 export interface AcceptFileMessage extends DefaultWsInMessage<"acceptFile", "peerConnection:*"> {
   content: AcceptFileContent;
 }
 
 export interface SendRtcDataMessage extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<"sendRtcData", "peerConnection:*"> {
-  content: RTCIceCandidateInit | RTCSessionDescriptionInit | {message: unknown};
+  content: RTCIceCandidateInit | RTCSessionDescriptionInit | { message: unknown };
 }
 
 export type RetryFileMessage = DefaultWsInMessage<"retryFile", "peerConnection:*">;

@@ -1,12 +1,12 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import {sub} from "@/ts/instances/subInstance";
+import { sub } from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 
 export default abstract class BaseTransferHandler extends MessageHandler {
   protected connectionId: string | null = null;

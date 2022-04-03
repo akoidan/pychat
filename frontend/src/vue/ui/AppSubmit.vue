@@ -1,13 +1,14 @@
 <template>
   <button
-    :disabled="running"
-    :class="btnClass"
+      :class="btnClass"
+      :disabled="running"
   >
     <div
-      v-if="running"
-      class="spinner"
+        v-if="running"
+        class="spinner"
     />
-    <slot/>{{ value }}
+    <slot/>
+    {{ value }}
   </button>
 </template>
 
@@ -33,11 +34,11 @@ export default class AppSubmit extends Vue {
 </script>
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
-  .spinner
-    display: inline-block
-    margin: -4px 10px -4px 10px
-    @include spinner(3px, black)
+.spinner
+  display: inline-block
+  margin: -4px 10px -4px 10px
+  @include spinner(3px, black)
 
 </style>

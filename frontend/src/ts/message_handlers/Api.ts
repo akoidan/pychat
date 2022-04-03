@@ -4,7 +4,7 @@ import {
   GIPHY_URL,
   RESPONSE_SUCCESS,
 } from "@/ts/utils/consts";
-import type {UploadFile} from "@/ts/types/types";
+import type { UploadFile } from "@/ts/types/types";
 import type {
   OauthSessionResponse,
   OauthStatus,
@@ -14,19 +14,19 @@ import type {
 } from "@/ts/types/dto";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 import type Http from "@/ts/classes/Http";
-import {sub} from "@/ts/instances/subInstance";
+import { sub } from "@/ts/instances/subInstance";
 import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
-import type {MultiResponse} from "giphy-api";
+import type { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
+import type { MultiResponse } from "giphy-api";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "any"> = {
-    internetAppear: <HandlerType<"internetAppear", "any">> this.internetAppear,
+    internetAppear: <HandlerType<"internetAppear", "any">>this.internetAppear,
   };
 
   protected readonly logger: Logger;
@@ -53,9 +53,11 @@ export default class Api extends MessageHandler {
   public async sendLogs(issue: string, browser: string, version: string): Promise<void> {
     const result: string = await this.xhr.doPost<string>({
       url: "/report_issue",
-      params: {issue,
+      params: {
+        issue,
         browser,
-        version},
+        version
+      },
       checkOkString: true,
     });
   }
@@ -63,8 +65,10 @@ export default class Api extends MessageHandler {
   public async changePassword(old_password: string, password: string): Promise<void> {
     return this.xhr.doPost<void>({
       url: "/change_password",
-      params: {old_password,
-        password},
+      params: {
+        old_password,
+        password
+      },
       checkOkString: true,
     });
   }
@@ -97,16 +101,18 @@ export default class Api extends MessageHandler {
     return this.xhr.doPost<SessionResponse>({
       url: "/register",
       isJsonDecoded: true,
-      params: {username,
-        password},
+      params: {
+        username,
+        password
+      },
     });
   }
 
   public async searchGiphys(
-    text: string,
-    offset: number,
-    limit: number,
-    process?: (R: XMLHttpRequest) => void,
+      text: string,
+      offset: number,
+      limit: number,
+      process?: (R: XMLHttpRequest) => void,
   ): Promise<MultiResponse> {
     let response!: MultiResponse;
     if ((/^\s*$/).exec(text)) {
@@ -201,7 +207,8 @@ export default class Api extends MessageHandler {
         },
         isJsonEncoded: true,
         checkOkString: true,
-      }); return;
+      });
+      return;
     } catch (e) {
       if (e === CONNECTION_ERROR) {
         this.retryFcb = () => {
@@ -292,7 +299,7 @@ export default class Api extends MessageHandler {
   }
 
   public async verifyToken(token: string): Promise<string> {
-    const value: {message: string; restoreUser: string} = await this.xhr.doPost<{message: string; restoreUser: string}>({
+    const value: { message: string; restoreUser: string } = await this.xhr.doPost<{ message: string; restoreUser: string }>({
       url: "/verify_token",
       isJsonDecoded: true,
       params: {token},

@@ -4,5 +4,6 @@
 
 if (!window.InputEvent) {
   // @ts-expect-error: next-line
-  window.InputEvent = (): void => {};
+  window.InputEvent = (): void => {
+  };
 }

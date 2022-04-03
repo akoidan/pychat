@@ -4,7 +4,7 @@ import type {
   SetRoomsUsers,
 } from "@/ts/types/types";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 import type {
   BlobType,
   ChannelModel,
@@ -39,8 +39,8 @@ import type {
   TagDB,
   UserDB,
 } from "@/ts/types/db";
-import type {SetStateFromStorage} from "@/ts/types/dto";
-import type {MainWindow} from "@/ts/classes/MainWindow";
+import type { SetStateFromStorage } from "@/ts/types/dto";
+import type { MainWindow } from "@/ts/classes/MainWindow";
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];
@@ -87,6 +87,275 @@ export default class DatabaseWrapper implements IStorage {
     return this.getAllTree();
   }
 
+  public async clearMessages() {
+    let t: SQLTransaction = await this.asyncWrite();
+    t = await this.runSql(t, "delete from file");
+    t = await this.runSql(t, "delete from tag");
+    t = await this.runSql(t, "delete from message");
+    this.logger.log("Db has messages removed")();
+  }
+
+  public async clearStorage() {
+    let t: SQLTransaction = await this.asyncWrite();
+    t = await this.runSql(t, "delete from room_users");
+    t = await this.runSql(t, "delete from tag");
+    t = await this.runSql(t, "delete from room");
+    t = await this.runSql(t, "delete from channel");
+    t = await this.runSql(t, "delete from message");
+    t = await this.runSql(t, "delete from user");
+    t = await this.runSql(t, "delete from file");
+    t = await this.runSql(t, "delete from settings");
+    t = await this.runSql(t, "delete from profile");
+    this.logger.log("Db has been purged")();
+  }
+
+  public markMessageAsSent(messagesIds: number[]) {
+    this.write((t) => {
+      this.executeSql(t, `update message set status = 'on_server' where id in ${this.idsToString(messagesIds)}`, [])();
+    });
+  }
+
+  public insertMessage(t: SQLTransaction, message: MessageModel) {
+    this.setRoomHeaderId(message.roomId, message.id);
+    this.executeSql(
+        t,
+        "insert or replace into message (id, time, content, symbol, deleted, edited, room_id, user_id, status, parent_message_id, thread_messages_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.edited, message.roomId, message.userId, message.status, message.parentMessage || null, message.threadMessagesCount],
+        (t, d) => {
+          for (const k in message.files) {
+            const f = message.files[k];
+            this.executeSql(t, "insert or replace into file (server_id, file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [f.serverId, f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
+            // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+
+            // })();
+          }
+          for (const k in message.tags) {
+            const userId = message.tags[k];
+            this.executeSql(t, "insert into tag (user_id, message_id, symbol) values (?, ?, ?)", [userId, message.id, k])();
+            // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+
+            // })();
+          }
+        },
+    )();
+  }
+
+  public saveRoom(room: RoomModel) {
+    this.write((t: SQLTransaction) => {
+      this.executeSingle(t, this.getSetRoomQuery(t, room))();
+      this.setRoomUsers(t, room.id, room.users);
+    });
+  }
+
+  public saveChannel(channel: ChannelModel): void {
+    this.write((t: SQLTransaction) => {
+      this.setChannel(t, channel);
+    });
+  }
+
+  /*
+   * Public getRoomHeaderId (id: number, cb: Function) {
+   *   This.read((t, id, cb ) => {
+   *     This.executeSql(t, 'select min(id) as min from message where room_id = ?', [id], (t, d) => {
+   *       Cb(d.rows.length ? d.rows[0].min : null);
+   *     });
+   *   });
+   * }
+   */
+
+  /*
+   * Public getIds (cb) {
+   *   this.read(t => {
+   *     this.executeSql(t, 'select max(id) as max, room_id, min(id) as min from message group by room_id', [],  (t, d) => {
+   *       let res = {};
+   *       for (let i = 0; i < d.rows.length; i++) {
+   *         let e = d.rows[i];
+   *         res[e.room_id] = {h: e.min, f: this.cache[e.room_id] || e.max};
+   *       }
+   *       cb(res);
+   *     });
+   *   });
+   * }
+   */
+
+  public setChannels(channels: ChannelModel[]) {
+    this.write((t) => {
+      this.executeSql(t, "update channel set deleted = 1", [], (t) => {
+        channels.forEach((c) => {
+          this.setChannel(t, c);
+        });
+      })();
+    });
+  }
+
+  public setRooms(rooms: RoomModel[]) {
+    this.write((t) => {
+      this.executeSql(t, "update room set deleted = 1", [], (t) => {
+        this.executeMultiple(t, rooms.map((r) => this.getSetRoomQuery(t, r)))();
+      })();
+      this.executeSql(t, "delete from room_users", [], (t) => {
+        const sqls: QueryObject[] = [];
+        rooms.forEach((r) => {
+          r.users.forEach((uId) => {
+            sqls.push(this.getInsertRoomUsersQuery(r.id, uId));
+          });
+        });
+        this.executeMultiple(t, sqls)();
+      })();
+    });
+  }
+
+  public executeSingle(t: SQLTransaction, args: QueryObject) {
+    return this.executeSql(t, args[0], args[1]);
+  }
+
+  public executeMultiple(t: SQLTransaction, sqls: QueryObject[]): () => void {
+    sqls.forEach((sqlArgs) => {
+      this.executeSingle(t, sqlArgs);
+    });
+    if (sqls.length) {
+      return this.logger.debug(`${sqls[0][0]} {}`, sqls.map((sql) => sql[1]));
+    }
+    return () => {
+    };
+  }
+
+  /*
+   * Private getMessages (t, cb) {
+   *   this.executeSql(t, 'SELECT * FROM message', [], (t, m) => {
+   *     this.executeSql(t, 'SELECT * from file', [],  (t, i) => {
+   *       let mid = {};
+   *       let messages = [];
+   *       for (let j = 0; j < m.rows.length; j++) {
+   *         let e = m.rows[j];
+   *         mid[e.id] = e;
+   *         e.files = {};
+   *         messages.push(e);
+   *       }
+   *       for (let j = 0; j < i.rows.length; j++) {
+   *         let e = i.rows[j];
+   *         mid[e.message_id].files[e.symbol] = e;
+   *       }
+   *       cb(messages);
+   *     })();
+   *   })();
+   *   return cb;
+   * }
+   */
+
+  public getInsertUser(user: UserModel): QueryObject {
+    return [
+      "insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online, thumbnail) values (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)",
+      [user.id, user.user, convertSexToNumber(user.sex), user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline, user.image],
+    ];
+  }
+
+  public saveUser(user: UserModel) {
+    this.write((t) => {
+      this.executeSingle(t, this.getInsertUser(user));
+    });
+  }
+
+  public setUsers(users: UserModel[]) {
+    this.write((t) => {
+      this.executeSql(t, "update user set deleted = 1", [])();
+      this.executeMultiple(t, users.map((u) => this.getInsertUser(u)))();
+    });
+  }
+
+  public setMessagesStatus(messagesIds: number[], status: MessageStatus): void {
+    this.write((t) => {
+      this.executeSql(t, `update message set status = ? where id in ${this.idsToString(messagesIds)}`, [status])();
+    });
+  }
+
+  public setUserProfile(user: CurrentUserInfoModel) {
+    this.write((t) => {
+      this.executeSql(t, "insert or replace into profile (user_id, user, name, city, surname, email, birthday, contacts, sex, image) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, convertStringSexToNumber(user.sex), user.image])();
+    });
+  }
+
+  public setUserSettings(settings: CurrentUserSettingsModel) {
+    this.write((t) => {
+      this.executeSql(t, "insert or replace into settings (user_id, embedded_youtube, highlight_code, incoming_file_call_sound, message_sound, online_change_sound, send_logs, suggestions, theme, logs, show_when_i_typing) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs, settings.showWhenITyping ? 1 : 0])();
+    });
+  }
+
+  public deleteMessage(id: number, replaceThreadId: number) {
+    this.write((t) => {
+      this.executeSql(t, "delete from file where message_id = ?", [id], (t) => {
+        this.executeSql(t, "delete from tag where message_id = ?", [id], (t) => {
+          this.executeSql(t, "delete from message where id = ? ", [id], (t) => {
+            this.executeSql(t, "update message set parent_message_id = ? where parent_message_id = ?", [id, replaceThreadId])();
+          })();
+        })();
+      })();
+    });
+  }
+
+  public setThreadMessageCount(messageId: number, count: number): void {
+    this.write((t) => {
+      this.executeSql(t, "update message set thread_messages_count = ? where id = ?", [count, messageId])();
+    });
+  }
+
+  public deleteRoom(id: number) {
+    this.write((t) => {
+      this.executeSql(t, "update room set deleted = 1 where id = ? ", [id])();
+      this.executeSql(t, "delete from room_users where room_id = ? ", [id])();
+    });
+  }
+
+  public deleteChannel(id: number) {
+    this.write((t) => {
+      this.executeSql(t, "update channel set deleted = 1 where id = ? ", [id])();
+    });
+  }
+
+  public saveRoomUsers(ru: SetRoomsUsers) {
+    this.write((t: SQLTransaction) => {
+      this.setRoomUsers(t, ru.roomId, ru.users);
+    });
+  }
+
+  public updateRoom(r: RoomSettingsModel) {
+    this.write((t) => {
+      this.executeSql(t, "update room set name = ?, volume = ?, notifications = ?, p2p = ?, creator = ?, is_main_in_channel = ?, channel_id = ? where id = ? ", [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.creator, r.isMainInChannel ? 1 : 0, r.channelId, r.id])();
+    });
+  }
+
+  public saveMessages(messages: MessageModel[]) {
+    this.write((t) => {
+      messages.forEach((m) => {
+        this.insertMessage(t, m);
+      });
+    });
+  }
+
+  public saveMessage(m: MessageModel) {
+    this.write((t) => {
+      this.insertMessage(t, m);
+    });
+  }
+
+  public updateFileIds(m: SetFileIdsForMessage): void {
+    this.write((t) => {
+      this.executeMultiple(
+          t,
+          Object.keys(m.fileIds).map((symb) => [
+            "update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?",
+            [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId],
+          ]),
+      )();
+    });
+  }
+
+  public setRoomHeaderId(roomId: number, headerId: number) {
+    if (!this.cache[roomId] || this.cache[roomId] < headerId) {
+      this.cache[roomId] = headerId;
+    }
+  }
+
   private async getAllTree(): Promise<SetStateFromStorage | null> {
     const t: SQLTransaction = await new Promise((resolve, reject) => {
       this.db.transaction(resolve, reject);
@@ -102,36 +371,36 @@ export default class DatabaseWrapper implements IStorage {
       "select * from message",
       "select * from channel where deleted = 0",
       "select * from tag",
-    ].map(async(sql) => new Promise((resolve, reject) => {
+    ].map(async (sql) => new Promise((resolve, reject) => {
       this.executeSql(
-        t,
-        sql,
-        [],
-        (t: SQLTransaction, d: SQLResultSet) => {
-          this.logger.debug("sql {} fetched {} ", sql, d)();
-          const res: unknown[] = [];
-          for (let i = 0; i < d.rows.length; i++) {
-            const {rows} = d;
-            res.push(rows.item(i)); // TODO does that work
-          }
-          resolve(res);
-        },
-        (t: SQLTransaction, e: SQLError) => {
-          reject(e);
-          return false;
-        },
+          t,
+          sql,
+          [],
+          (t: SQLTransaction, d: SQLResultSet) => {
+            this.logger.debug("sql {} fetched {} ", sql, d)();
+            const res: unknown[] = [];
+            for (let i = 0; i < d.rows.length; i++) {
+              const {rows} = d;
+              res.push(rows.item(i)); // TODO does that work
+            }
+            resolve(res);
+          },
+          (t: SQLTransaction, e: SQLError) => {
+            reject(e);
+            return false;
+          },
       )();
     })));
 
     const dbFiles: FileDB[] = f[0] as FileDB[],
-      dbProfile: ProfileDB[] = f[1] as ProfileDB[],
-      dbRooms: RoomDB[] = f[2] as RoomDB[],
-      dbRoomUsers: RoomUsersDB[] = f[3] as RoomUsersDB[],
-      dbSettings: SettingsDB[] = f[4] as SettingsDB[],
-      dbUsers: UserDB[] = f[5] as UserDB[],
-      dbMessages: MessageDB[] = f[6] as MessageDB[],
-      dbChannels: ChannelDB[] = f[7] as ChannelDB[],
-      dbTags: TagDB[] = f[8] as TagDB[];
+        dbProfile: ProfileDB[] = f[1] as ProfileDB[],
+        dbRooms: RoomDB[] = f[2] as RoomDB[],
+        dbRoomUsers: RoomUsersDB[] = f[3] as RoomUsersDB[],
+        dbSettings: SettingsDB[] = f[4] as SettingsDB[],
+        dbUsers: UserDB[] = f[5] as UserDB[],
+        dbMessages: MessageDB[] = f[6] as MessageDB[],
+        dbChannels: ChannelDB[] = f[7] as ChannelDB[],
+        dbTags: TagDB[] = f[8] as TagDB[];
     this.logger.debug("resolved all sqls")();
 
     if (!dbProfile.length) {
@@ -143,19 +412,21 @@ export default class DatabaseWrapper implements IStorage {
     const allUsersDict: Record<number, UserModel> = this.getUsers(dbUsers);
     const roomsDict: RoomDictModel = this.getRooms(dbRooms, dbRoomUsers, dbTags, dbMessages, dbFiles);
 
-    return {settings,
+    return {
+      settings,
       profile,
       channelsDict,
       allUsersDict,
-      roomsDict};
+      roomsDict
+    };
   }
 
   private getRooms(
-    dbRooms: RoomDB[],
-    dbRoomUsers: RoomUsersDB[],
-    dbTags: TagDB[],
-    dbMessages: MessageDB[],
-    dbFiles: FileDB[],
+      dbRooms: RoomDB[],
+      dbRoomUsers: RoomUsersDB[],
+      dbTags: TagDB[],
+      dbMessages: MessageDB[],
+      dbFiles: FileDB[],
   ): RoomDictModel {
     const roomsDict: RoomDictModel = {};
     dbRooms.forEach((r: RoomDB) => {
@@ -304,164 +575,8 @@ export default class DatabaseWrapper implements IStorage {
     };
   }
 
-  /*
-   * Public getRoomHeaderId (id: number, cb: Function) {
-   *   This.read((t, id, cb ) => {
-   *     This.executeSql(t, 'select min(id) as min from message where room_id = ?', [id], (t, d) => {
-   *       Cb(d.rows.length ? d.rows[0].min : null);
-   *     });
-   *   });
-   * }
-   */
-
-  /*
-   * Public getIds (cb) {
-   *   this.read(t => {
-   *     this.executeSql(t, 'select max(id) as max, room_id, min(id) as min from message group by room_id', [],  (t, d) => {
-   *       let res = {};
-   *       for (let i = 0; i < d.rows.length; i++) {
-   *         let e = d.rows[i];
-   *         res[e.room_id] = {h: e.min, f: this.cache[e.room_id] || e.max};
-   *       }
-   *       cb(res);
-   *     });
-   *   });
-   * }
-   */
-
-  public async clearMessages() {
-    let t: SQLTransaction = await this.asyncWrite();
-    t = await this.runSql(t, "delete from file");
-    t = await this.runSql(t, "delete from tag");
-    t = await this.runSql(t, "delete from message");
-    this.logger.log("Db has messages removed")();
-  }
-
-  public async clearStorage() {
-    let t: SQLTransaction = await this.asyncWrite();
-    t = await this.runSql(t, "delete from room_users");
-    t = await this.runSql(t, "delete from tag");
-    t = await this.runSql(t, "delete from room");
-    t = await this.runSql(t, "delete from channel");
-    t = await this.runSql(t, "delete from message");
-    t = await this.runSql(t, "delete from user");
-    t = await this.runSql(t, "delete from file");
-    t = await this.runSql(t, "delete from settings");
-    t = await this.runSql(t, "delete from profile");
-    this.logger.log("Db has been purged")();
-  }
-
-  public markMessageAsSent(messagesIds: number[]) {
-    this.write((t) => {
-      this.executeSql(t, `update message set status = 'on_server' where id in ${this.idsToString(messagesIds)}`, [])();
-    });
-  }
-
   private idsToString(ids: number[]): string {
     return `(${ids.join(", ")})`;
-  }
-
-  /*
-   * Private getMessages (t, cb) {
-   *   this.executeSql(t, 'SELECT * FROM message', [], (t, m) => {
-   *     this.executeSql(t, 'SELECT * from file', [],  (t, i) => {
-   *       let mid = {};
-   *       let messages = [];
-   *       for (let j = 0; j < m.rows.length; j++) {
-   *         let e = m.rows[j];
-   *         mid[e.id] = e;
-   *         e.files = {};
-   *         messages.push(e);
-   *       }
-   *       for (let j = 0; j < i.rows.length; j++) {
-   *         let e = i.rows[j];
-   *         mid[e.message_id].files[e.symbol] = e;
-   *       }
-   *       cb(messages);
-   *     })();
-   *   })();
-   *   return cb;
-   * }
-   */
-
-  public insertMessage(t: SQLTransaction, message: MessageModel) {
-    this.setRoomHeaderId(message.roomId, message.id);
-    this.executeSql(
-      t,
-      "insert or replace into message (id, time, content, symbol, deleted, edited, room_id, user_id, status, parent_message_id, thread_messages_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-      [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.edited, message.roomId, message.userId, message.status, message.parentMessage || null, message.threadMessagesCount],
-      (t, d) => {
-        for (const k in message.files) {
-          const f = message.files[k];
-          this.executeSql(t, "insert or replace into file (server_id, file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [f.serverId, f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
-          // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
-
-          // })();
-        }
-        for (const k in message.tags) {
-          const userId = message.tags[k];
-          this.executeSql(t, "insert into tag (user_id, message_id, symbol) values (?, ?, ?)", [userId, message.id, k])();
-          // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
-
-          // })();
-        }
-      },
-    )();
-  }
-
-  public saveRoom(room: RoomModel) {
-    this.write((t: SQLTransaction) => {
-      this.executeSingle(t, this.getSetRoomQuery(t, room))();
-      this.setRoomUsers(t, room.id, room.users);
-    });
-  }
-
-  public saveChannel(channel: ChannelModel): void {
-    this.write((t: SQLTransaction) => {
-      this.setChannel(t, channel);
-    });
-  }
-
-  public setChannels(channels: ChannelModel[]) {
-    this.write((t) => {
-      this.executeSql(t, "update channel set deleted = 1", [], (t) => {
-        channels.forEach((c) => {
-          this.setChannel(t, c);
-        });
-      })();
-    });
-  }
-
-  public setRooms(rooms: RoomModel[]) {
-    this.write((t) => {
-      this.executeSql(t, "update room set deleted = 1", [], (t) => {
-        this.executeMultiple(t, rooms.map((r) => this.getSetRoomQuery(t, r)))();
-      })();
-      this.executeSql(t, "delete from room_users", [], (t) => {
-        const sqls: QueryObject[] = [];
-        rooms.forEach((r) => {
-          r.users.forEach((uId) => {
-            sqls.push(this.getInsertRoomUsersQuery(r.id, uId));
-          });
-        });
-        this.executeMultiple(t, sqls)();
-      })();
-    });
-  }
-
-
-  public executeSingle(t: SQLTransaction, args: QueryObject) {
-    return this.executeSql(t, args[0], args[1]);
-  }
-
-  public executeMultiple(t: SQLTransaction, sqls: QueryObject[]): () => void {
-    sqls.forEach((sqlArgs) => {
-      this.executeSingle(t, sqlArgs);
-    });
-    if (sqls.length) {
-      return this.logger.debug(`${sqls[0][0]} {}`, sqls.map((sql) => sql[1]));
-    }
-    return () => {};
   }
 
   private setRoomUsers(t: SQLTransaction, roomId: number, users: number[]) {
@@ -475,126 +590,12 @@ export default class DatabaseWrapper implements IStorage {
     return ["insert into room_users (room_id, user_id) values (?, ?)", [roomId, userId]];
   }
 
-  public getInsertUser(user: UserModel): QueryObject {
-    return [
-      "insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online, thumbnail) values (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)",
-      [user.id, user.user, convertSexToNumber(user.sex), user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline, user.image],
-    ];
-  }
-
-  public saveUser(user: UserModel) {
-    this.write((t) => {
-      this.executeSingle(t, this.getInsertUser(user));
-    });
-  }
-
-  public setUsers(users: UserModel[]) {
-    this.write((t) => {
-      this.executeSql(t, "update user set deleted = 1", [])();
-      this.executeMultiple(t, users.map((u) => this.getInsertUser(u)))();
-    });
-  }
-
-  public setMessagesStatus(messagesIds: number[], status: MessageStatus): void {
-    this.write((t) => {
-      this.executeSql(t, `update message set status = ? where id in ${this.idsToString(messagesIds)}`, [status])();
-    });
-  }
-
-  public setUserProfile(user: CurrentUserInfoModel) {
-    this.write((t) => {
-      this.executeSql(t, "insert or replace into profile (user_id, user, name, city, surname, email, birthday, contacts, sex, image) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, convertStringSexToNumber(user.sex), user.image])();
-    });
-  }
-
-  public setUserSettings(settings: CurrentUserSettingsModel) {
-    this.write((t) => {
-      this.executeSql(t, "insert or replace into settings (user_id, embedded_youtube, highlight_code, incoming_file_call_sound, message_sound, online_change_sound, send_logs, suggestions, theme, logs, show_when_i_typing) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs, settings.showWhenITyping ? 1 : 0])();
-    });
-  }
-
-  public deleteMessage(id: number, replaceThreadId: number) {
-    this.write((t) => {
-      this.executeSql(t, "delete from file where message_id = ?", [id], (t) => {
-        this.executeSql(t, "delete from tag where message_id = ?", [id], (t) => {
-          this.executeSql(t, "delete from message where id = ? ", [id], (t) => {
-            this.executeSql(t, "update message set parent_message_id = ? where parent_message_id = ?", [id, replaceThreadId])();
-          })();
-        })();
-      })();
-    });
-  }
-
-  public setThreadMessageCount(messageId: number, count: number): void {
-    this.write((t) => {
-      this.executeSql(t, "update message set thread_messages_count = ? where id = ?", [count, messageId])();
-    });
-  }
-
-  public deleteRoom(id: number) {
-    this.write((t) => {
-      this.executeSql(t, "update room set deleted = 1 where id = ? ", [id])();
-      this.executeSql(t, "delete from room_users where room_id = ? ", [id])();
-    });
-  }
-
-  public deleteChannel(id: number) {
-    this.write((t) => {
-      this.executeSql(t, "update channel set deleted = 1 where id = ? ", [id])();
-    });
-  }
-
-  public saveRoomUsers(ru: SetRoomsUsers) {
-    this.write((t: SQLTransaction) => {
-      this.setRoomUsers(t, ru.roomId, ru.users);
-    });
-  }
-
-  public updateRoom(r: RoomSettingsModel) {
-    this.write((t) => {
-      this.executeSql(t, "update room set name = ?, volume = ?, notifications = ?, p2p = ?, creator = ?, is_main_in_channel = ?, channel_id = ? where id = ? ", [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.creator, r.isMainInChannel ? 1 : 0, r.channelId, r.id])();
-    });
-  }
-
-  public saveMessages(messages: MessageModel[]) {
-    this.write((t) => {
-      messages.forEach((m) => {
-        this.insertMessage(t, m);
-      });
-    });
-  }
-
-  public saveMessage(m: MessageModel) {
-    this.write((t) => {
-      this.insertMessage(t, m);
-    });
-  }
-
-  public updateFileIds(m: SetFileIdsForMessage): void {
-    this.write((t) => {
-      this.executeMultiple(
-        t,
-        Object.keys(m.fileIds).
-          map((symb) => [
-            "update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?",
-            [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId],
-          ]),
-      )();
-    });
-  }
-
-  public setRoomHeaderId(roomId: number, headerId: number) {
-    if (!this.cache[roomId] || this.cache[roomId] < headerId) {
-      this.cache[roomId] = headerId;
-    }
-  }
-
   private executeSql(
-    t: SQLTransaction,
-    sql: string,
-    args: unknown[] = [],
-    cb: SQLStatementCallback | undefined = undefined,
-    e: SQLStatementErrorCallback | undefined = undefined,
+      t: SQLTransaction,
+      sql: string,
+      args: unknown[] = [],
+      cb: SQLStatementCallback | undefined = undefined,
+      e: SQLStatementErrorCallback | undefined = undefined,
   ): Function {
     const err: SQLStatementErrorCallback = e ? e : (t: SQLTransaction, e: SQLError) => {
       this.logger.error("{} {}, error: {}, message {}", sql, args, e, e && e.message)();
@@ -608,8 +609,10 @@ export default class DatabaseWrapper implements IStorage {
   private async runSql(t: SQLTransaction, sql: string): Promise<SQLTransaction> {
     return new Promise<SQLTransaction>((resolve, reject) => {
       this.executeSql(t, sql, [], resolve, (t: SQLTransaction, e: SQLError) => {
-        reject({sql,
-          e});
+        reject({
+          sql,
+          e
+        });
 
         return false;
       })();
@@ -619,24 +622,27 @@ export default class DatabaseWrapper implements IStorage {
   private write(cb: TransactionCb) {
     if (!this.mainWindow.isTabMain()) {
       const that = this;
-      cb({executeSql(sql: string, args: any[]) {
-        that.logQuery(that, sql, that.logger.warn("Skipping sql {} with args {}, since this is not a main tab", sql, args))();
-      }});
+      cb({
+        executeSql(sql: string, args: any[]) {
+          that.logQuery(that, sql, that.logger.warn("Skipping sql {} with args {}, since this is not a main tab", sql, args))();
+        }
+      });
       return;
     }
     this.db.transaction(
-      (t) => {
-        cb(t);
-      },
-      (e) => {
-        this.logger.error("Error during saving message {}", e)();
-      },
+        (t) => {
+          cb(t);
+        },
+        (e) => {
+          this.logger.error("Error during saving message {}", e)();
+        },
     );
   }
 
   private logQuery(that: this, sql: string, logFn: () => void): () => void {
     if (that.skipSqlCache[sql]) {
-      return () => () => {};
+      return () => () => {
+      };
     }
     that.skipSqlCache[sql] = true;
     setTimeout(() => {

@@ -3,20 +3,20 @@ import * as constants from "@/ts/utils/consts";
 
 import * as runtimeConsts from "@/ts/utils/runtimeConsts";
 import {
-  WS_API_URL,
   browserVersion,
   isChrome,
   isMobile,
+  WS_API_URL
 } from "@/ts/utils/runtimeConsts";
 import App from "@/vue/App.vue"; // Should be after initStore
-import {sub} from "@/ts/instances/subInstance";
-import {createApp} from "vue";
-import {store} from "@/ts/instances/storeInstance";
-import type {Logger} from "lines-logger";
+import { sub } from "@/ts/instances/subInstance";
+import { createApp } from "vue";
+import { store } from "@/ts/instances/storeInstance";
+import type { Logger } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import sessionHolder from "@/ts/instances/sessionInstance";
-import type {App as VueApp} from "@vue/runtime-core";
-import type {PlatformUtil} from "@/ts/types/model";
+import type { App as VueApp } from "@vue/runtime-core";
+import type { PlatformUtil } from "@/ts/types/model";
 import Xhr from "@/ts/classes/Xhr";
 import "@/assets/icon.png";
 import WsHandler from "@/ts/message_handlers/WsHandler";
@@ -27,18 +27,18 @@ import Api from "@/ts/message_handlers/Api";
 import NotifierHandler from "@/ts/classes/NotificationHandler";
 import type Http from "@/ts/classes/Http";
 import WebRtcApi from "@/ts/webrtc/WebRtcApi";
-import {router} from "@/ts/instances/routerInstance";
-import {AudioPlayer} from "@/ts/classes/AudioPlayer";
-import {AndroidPlatformUtil} from "@/ts/devices/AndroidPlatformUtils";
-import {WebPlatformUtils} from "@/ts/devices/WebPlatformUtils";
-import {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
-import {MessageHelper} from "@/ts/message_handlers/MessageHelper";
-import {RoomHandler} from "@/ts/message_handlers/RomHandler";
-import {mainWindow} from "@/ts/instances/mainWindow";
-import type {Emitter} from "mitt";
+import { router } from "@/ts/instances/routerInstance";
+import { AudioPlayer } from "@/ts/classes/AudioPlayer";
+import { AndroidPlatformUtil } from "@/ts/devices/AndroidPlatformUtils";
+import { WebPlatformUtils } from "@/ts/devices/WebPlatformUtils";
+import { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
+import { MessageHelper } from "@/ts/message_handlers/MessageHelper";
+import { RoomHandler } from "@/ts/message_handlers/RomHandler";
+import { mainWindow } from "@/ts/instances/mainWindow";
+import type { Emitter } from "mitt";
 import mitt from "mitt";
-import {vueStore} from "@/ts/classes/DefaultStore";
-import {loggerMixin} from "@/ts/utils/mixins";
+import { vueStore } from "@/ts/classes/DefaultStore";
+import { loggerMixin } from "@/ts/utils/mixins";
 import {
   switchDirective,
   validityDirective,
@@ -105,7 +105,7 @@ async function init() {
 
   vue.mount(document.body);
 
-  window.onerror = function(msg, url, linenumber, column, errorObj) {
+  window.onerror = function (msg, url, linenumber, column, errorObj) {
     const message = `Error occurred in ${url}:${linenumber}\n${msg}`;
     if (store?.userSettings?.sendLogs && api) {
       api.sendLogs(`${url}:${linenumber}:${column || "?"}\n${msg}\n\nOBJ:  ${errorObj || "?"}`, browserVersion, constants.GIT_HASH);

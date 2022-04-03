@@ -1,4 +1,4 @@
-import type {LogLevel} from "lines-logger";
+import type { LogLevel } from "lines-logger";
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
@@ -9,10 +9,13 @@ export interface GrowlModel {
   html: string;
   type: GrowlType;
 }
+
 export type permissions_type = ("audio" | "video")[];
+
 export interface PlatformUtil {
   askPermissions(...askedPermissions: permissions_type): Promise<void>;
 }
+
 export interface EditingMessage {
   messageId: number;
   roomId: number;
@@ -35,6 +38,7 @@ export interface CurrentUserSettingsModel {
 
 export interface GoogleCaptcha {
   render(div: HTMLElement): void;
+
   reset(): void;
 }
 
@@ -62,7 +66,10 @@ export interface CurrentUserInfoWoImage {
   sex: SexModelString;
 }
 
-export type SexModelString = "Female" | "Male" | "Secret";
+export type SexModelString =
+    "Female"
+    | "Male"
+    | "Secret";
 
 export interface UserModel {
   user: string;
@@ -88,7 +95,13 @@ export interface Location {
  * a - audio
  * m - media (same as video, but you need to click on image, in order to load video)
  */
-export type BlobType = "a" | "f" | "g" | "i" | "m" | "v";
+export type BlobType =
+    "a"
+    | "f"
+    | "g"
+    | "i"
+    | "m"
+    | "v";
 
 export interface FileModel {
   url: string | null;
@@ -111,7 +124,11 @@ export interface MessageTransferInfo {
   xhr: XMLHttpRequest | null;
 }
 
-export type MessageStatus = "on_server" | "read" | "received" | "sending";
+export type MessageStatus =
+    "on_server"
+    | "read"
+    | "received"
+    | "sending";
 
 export interface MessageModel {
   id: number;

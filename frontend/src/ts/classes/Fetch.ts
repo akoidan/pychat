@@ -1,4 +1,4 @@
-import type {SessionHolder} from "@/ts/types/types";
+import type { SessionHolder } from "@/ts/types/types";
 
 /**
  * @param params : object dict of params or DOM form

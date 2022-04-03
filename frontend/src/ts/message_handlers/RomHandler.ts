@@ -51,13 +51,13 @@ import type {
   SaveRoomSettingsMessage,
   ShowITypeMessage,
 } from "@/ts/types/messages/wsInMessages";
-import {ALL_ROOM_ID} from "@/ts/utils/consts";
-import {sub} from "@/ts/instances/subInstance";
-import type {Logger} from "lines-logger";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import { ALL_ROOM_ID } from "@/ts/utils/consts";
+import { sub } from "@/ts/instances/subInstance";
+import type { Logger } from "lines-logger";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type Api from "@/ts/message_handlers/Api";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
+import type { AudioPlayer } from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import {
   login,
@@ -68,21 +68,21 @@ export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof RoomHandler, "room"> = {
-    deleteRoom: <HandlerType<"deleteRoom", "room">> this.deleteRoom,
-    init: <HandlerType<"init", "room">> this.init,
-    leaveUser: <HandlerType<"leaveUser", "room">> this.leaveUser,
-    addRoom: <HandlerType<"addRoom", "room">> this.addRoom,
-    removeOnlineUser: <HandlerType<"removeOnlineUser", "room">> this.removeOnlineUser,
-    addChannel: <HandlerType<"addChannel", "room">> this.addChannel,
-    inviteUser: <HandlerType<"inviteUser", "room">> this.inviteUser,
-    addInvite: <HandlerType<"addInvite", "room">> this.addInvite,
-    addOnlineUser: <HandlerType<"addOnlineUser", "room">> this.addOnlineUser,
-    saveChannelSettings: <HandlerType<"saveChannelSettings", "room">> this.saveChannelSettings,
-    deleteChannel: <HandlerType<"deleteChannel", "room">> this.deleteChannel,
-    saveRoomSettings: <HandlerType<"saveRoomSettings", "room">> this.saveRoomSettings,
-    createNewUser: <HandlerType<"createNewUser", "room">> this.createNewUser,
-    showIType: <HandlerType<"showIType", "room">> this.showIType,
-    logout: <HandlerType<"logout", "room">> this.logout,
+    deleteRoom: <HandlerType<"deleteRoom", "room">>this.deleteRoom,
+    init: <HandlerType<"init", "room">>this.init,
+    leaveUser: <HandlerType<"leaveUser", "room">>this.leaveUser,
+    addRoom: <HandlerType<"addRoom", "room">>this.addRoom,
+    removeOnlineUser: <HandlerType<"removeOnlineUser", "room">>this.removeOnlineUser,
+    addChannel: <HandlerType<"addChannel", "room">>this.addChannel,
+    inviteUser: <HandlerType<"inviteUser", "room">>this.inviteUser,
+    addInvite: <HandlerType<"addInvite", "room">>this.addInvite,
+    addOnlineUser: <HandlerType<"addOnlineUser", "room">>this.addOnlineUser,
+    saveChannelSettings: <HandlerType<"saveChannelSettings", "room">>this.saveChannelSettings,
+    deleteChannel: <HandlerType<"deleteChannel", "room">>this.deleteChannel,
+    saveRoomSettings: <HandlerType<"saveRoomSettings", "room">>this.saveRoomSettings,
+    createNewUser: <HandlerType<"createNewUser", "room">>this.createNewUser,
+    showIType: <HandlerType<"showIType", "room">>this.showIType,
+    logout: <HandlerType<"logout", "room">>this.logout,
   };
 
   private readonly store: DefaultStore;
@@ -92,10 +92,10 @@ export class RoomHandler extends MessageHandler {
   private readonly audioPlayer: AudioPlayer;
 
   constructor(
-    store: DefaultStore,
-    api: Api,
-    ws: WsHandler,
-    audioPlayer: AudioPlayer,
+      store: DefaultStore,
+      api: Api,
+      ws: WsHandler,
+      audioPlayer: AudioPlayer,
   ) {
     super();
     this.store = store;
@@ -147,12 +147,14 @@ export class RoomHandler extends MessageHandler {
       users: message.users,
     } as SetRoomsUsers);
     message.inviteeUserId.forEach((i) => {
-      this.store.addRoomLog({roomIds: [message.roomId],
+      this.store.addRoomLog({
+        roomIds: [message.roomId],
         roomLog: {
           action: "joined this room",
           time: message.time,
           userId: i,
-        }});
+        }
+      });
     });
     this.notifyDevicesChanged(null, message.roomId, "someone_joined");
   }
@@ -170,12 +172,14 @@ export class RoomHandler extends MessageHandler {
         users,
       } as SetRoomsUsers);
 
-      this.store.addRoomLog({roomIds: [roomId],
+      this.store.addRoomLog({
+        roomIds: [roomId],
         roomLog: {
           action: "joined this room",
           time: Date.now(),
           userId: message.userId,
-        }});
+        }
+      });
       this.notifyDevicesChanged(null, roomId, "someone_joined");
     });
   }
@@ -206,7 +210,7 @@ export class RoomHandler extends MessageHandler {
       if (this.store.myId === message.userId) {
         const oldRoom: RoomModel = {...this.store.channelsDictUI[c.id].mainRoom};
         oldRoom.volume = message.volume,
-        oldRoom.notifications = message.notifications;
+            oldRoom.notifications = message.notifications;
         this.store.setRoomSettings(oldRoom);
       }
     }
@@ -221,8 +225,10 @@ export class RoomHandler extends MessageHandler {
 
   public async showIType(message: ShowITypeMessage) {
     if (this.store.myId !== message.userId) {
-      await this.store.showUserIsTyping({userId: message.userId,
-        roomId: message.roomId});
+      await this.store.showUserIsTyping({
+        userId: message.userId,
+        roomId: message.roomId
+      });
     }
   }
 
@@ -243,24 +249,6 @@ export class RoomHandler extends MessageHandler {
 
   public deleteRoom(message: DeleteRoomMessage) {
     this.doRoomDelete(message.roomId);
-  }
-
-  private doRoomDelete(roomId: number) {
-    if (this.store.roomsDict[roomId]) {
-      if (this.store.activeRoomId === roomId) {
-        const m: RouterNavigateMessage = {
-          action: "navigate",
-          handler: "router",
-          to: `/chat/${ALL_ROOM_ID}`,
-        };
-        this.store.growlInfo(`Room #${roomId} has been deleted. Navigating to main room`);
-        sub.notify(m);
-      }
-      this.store.deleteRoom(roomId);
-    } else {
-      this.logger.error("Unable to find room {} to delete", roomId)();
-    }
-    this.notifyDevicesChanged(null, roomId, "i_deleted");
   }
 
   public logout(m: LogoutMessage) {
@@ -310,14 +298,29 @@ export class RoomHandler extends MessageHandler {
     this.store.setStateFromWS(newState);
   }
 
+  private doRoomDelete(roomId: number) {
+    if (this.store.roomsDict[roomId]) {
+      if (this.store.activeRoomId === roomId) {
+        const m: RouterNavigateMessage = {
+          action: "navigate",
+          handler: "router",
+          to: `/chat/${ALL_ROOM_ID}`,
+        };
+        this.store.growlInfo(`Room #${roomId} has been deleted. Navigating to main room`);
+        sub.notify(m);
+      }
+      this.store.deleteRoom(roomId);
+    } else {
+      this.logger.error("Unable to find room {} to delete", roomId)();
+    }
+    this.notifyDevicesChanged(null, roomId, "i_deleted");
+  }
 
   private addChangeOnlineEntry(userId: number, serverTime: number, action: "appeared online" | "gone offline") {
     if (this.store.myId == userId) {
       return; // Do nto display I appear Online
     }
-    const roomIds: number[] = this.store.roomsArray.
-      filter((r) => r.users.includes(userId)).
-      map((r) => r.id);
+    const roomIds: number[] = this.store.roomsArray.filter((r) => r.users.includes(userId)).map((r) => r.id);
     const entry: RoomLogEntry = {
       roomIds,
       roomLog: {

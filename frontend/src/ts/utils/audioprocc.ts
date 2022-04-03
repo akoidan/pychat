@@ -1,8 +1,8 @@
-import type {JsAudioAnalyzer} from "@/ts/types/types";
-import {extractError} from "@/ts/utils/pureFunctions";
-import {IS_DEBUG} from "@/ts/utils/consts";
-import {isMobile} from "@/ts/utils/runtimeConsts";
-import type {Logger} from "lines-logger";
+import type { JsAudioAnalyzer } from "@/ts/types/types";
+import { extractError } from "@/ts/utils/pureFunctions";
+import { IS_DEBUG } from "@/ts/utils/consts";
+import { isMobile } from "@/ts/utils/runtimeConsts";
+import type { Logger } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 
 let audioContext: AudioContext;
@@ -13,8 +13,8 @@ if (IS_DEBUG) {
 }
 
 export function createMicrophoneLevelVoice(
-  stream: MediaStream,
-  onaudioprocess: (e: JsAudioAnalyzer) => (e: AudioProcessingEvent) => void,
+    stream: MediaStream,
+    onaudioprocess: (e: JsAudioAnalyzer) => (e: AudioProcessingEvent) => void,
 ): JsAudioAnalyzer | null {
   try {
     if (isMobile) {

@@ -46,10 +46,10 @@ export default class AppSuspense extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
-  .spinner
-    display: inline-block
-    margin: -4px 10px -4px 10px
-    @include spinner(3px, black)
+.spinner
+  display: inline-block
+  margin: -4px 10px -4px 10px
+  @include spinner(3px, black)
 </style>

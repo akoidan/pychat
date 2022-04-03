@@ -3,7 +3,7 @@ import {
   isChrome,
   isMobile,
 } from "@/ts/utils/runtimeConsts";
-import {sub} from "@/ts/instances/subInstance";
+import { sub } from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 import type {
   CallsInfoModel,
@@ -16,7 +16,7 @@ import type {
   NumberIdentifier,
   SetDevices,
 } from "@/ts/types/types";
-import {VideoType} from "@/ts/types/types";
+import { VideoType } from "@/ts/types/types";
 import {
   CHROME_EXTENSION_ID,
   CHROME_EXTENSION_URL,
@@ -50,8 +50,8 @@ import type {
   DestroyPeerConnectionMessage,
   RouterNavigateMessage,
 } from "@/ts/types/messages/innerMessages";
-import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
-import {stopVideo} from "@/ts/utils/htmlApi";
+import { FileAndCallTransfer } from "@/ts/webrtc/FileAndCallTransfer";
+import { stopVideo } from "@/ts/utils/htmlApi";
 
 
 export default class CallHandler extends FileAndCallTransfer {
@@ -59,9 +59,9 @@ export default class CallHandler extends FileAndCallTransfer {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
-    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*">> this.replyCall,
-    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*">> this.acceptCall,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">> this.checkTransferDestroy,
+    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*">>this.replyCall,
+    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*">>this.acceptCall,
+    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">>this.checkTransferDestroy,
   };
 
   private canvas: HTMLCanvasElement | null = null;
@@ -85,7 +85,7 @@ export default class CallHandler extends FileAndCallTransfer {
 
   public inflateDevices(devices: MediaDeviceInfo[]): void {
     let c: number = 0,
-      k: number, n: number;
+        k: number, n: number;
     const microphones: Record<string, string> = {};
     const speakers: Record<string, string> = {};
     const webcams: Record<string, string> = {};
@@ -140,7 +140,7 @@ export default class CallHandler extends FileAndCallTransfer {
     } else {
       await this.pingExtension();
       this.logger.log("Ping to extension succeeded")();
-      const response = await new Promise<{streamId: string; data: string}>((resolve, reject) => {
+      const response = await new Promise<{ streamId: string; data: string }>((resolve, reject) => {
         chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {type: "PYCHAT_SCREEN_SHARE_REQUEST"}, resolve);
       });
       if (response && response.data === "success") {
@@ -181,8 +181,8 @@ export default class CallHandler extends FileAndCallTransfer {
         if (audioProc.volumeValuesCount === 100 && audioProc.prevVolumeValues === 0) {
           let url = isChrome ? "setting in chrome://settings/content" : "your browser settings";
           url += navigator.platform.includes("Linux")
-            ? ". Open pavucontrol for more info"
-            : " . Right click on volume icon in system tray -> record devices -> input -> microphone";
+              ? ". Open pavucontrol for more info"
+              : " . Right click on volume icon in system tray -> record devices -> input -> microphone";
           this.store.growlError(`Unable to capture input from microphone. Check your microphone connection or ${url}`);
         }
       }
@@ -261,7 +261,8 @@ export default class CallHandler extends FileAndCallTransfer {
         const {isCanvas} = tracks[0];
         if (isShare && kind === VideoType.SHARE) {
           track = tracks[0];
-        } if (isCanvas && kind === VideoType.PAINT) {
+        }
+        if (isCanvas && kind === VideoType.PAINT) {
           track = tracks[0];
         } else if (!isShare && !isCanvas && kind === VideoType.VIDEO) {
           track = tracks[0];
@@ -330,7 +331,7 @@ export default class CallHandler extends FileAndCallTransfer {
     }
   }
 
-  public createCallPeerConnection({opponentWsId, userId}: {opponentWsId: string; userId: number}) {
+  public createCallPeerConnection({opponentWsId, userId}: { opponentWsId: string; userId: number }) {
     if (sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) !== 0) {
       this.logger.warn(`Peer connection ${opponentWsId} won't be created as it's already exists`)();
       return;
@@ -342,28 +343,18 @@ export default class CallHandler extends FileAndCallTransfer {
     }
   }
 
-  protected setConnectionId(connId: string | null) {
-    if (this.connectionId) {
-      if (!connId) {
-        sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
-      } else {
-        this.logger.error("Received new connectionId while old one stil exists")();
-      }
-    }
-    if (this.connectionId !== connId && connId) {
-      sub.subscribe(Subscription.getTransferId(connId), this);
-    }
-    super.setConnectionId(connId);
-  }
-
   public addOpponent(connId: string, userId: number, opponentWsId: string): void {
     this.logger.debug(`Adding opponent ${connId} ${userId} ${opponentWsId}`)();
     this.setConnectionId(connId);
     this.acceptedPeers.push(opponentWsId);
-    this.createCallPeerConnection({opponentWsId,
-      userId});
-    this.store.setCallActiveButNotJoinedYet({state: true,
-      id: this.roomId});
+    this.createCallPeerConnection({
+      opponentWsId,
+      userId
+    });
+    this.store.setCallActiveButNotJoinedYet({
+      state: true,
+      id: this.roomId
+    });
   }
 
   public removeUserOpponent(userId: number): void {
@@ -376,8 +367,10 @@ export default class CallHandler extends FileAndCallTransfer {
       this.acceptedPeers.splice(index);
     }
     if (this.acceptedPeers.length === 0) {
-      this.store.setCallActiveButNotJoinedYet({state: false,
-        id: this.roomId});
+      this.store.setCallActiveButNotJoinedYet({
+        state: false,
+        id: this.roomId
+      });
     }
   }
 
@@ -451,17 +444,6 @@ export default class CallHandler extends FileAndCallTransfer {
     this.connectToRemote();
   }
 
-  private connectToRemote() {
-    this.acceptedPeers.forEach((e) => {
-      const message: ConnectToRemoteMessage = {
-        action: "connectToRemote",
-        stream: this.localStream,
-        handler: Subscription.getPeerConnectionId(this.connectionId!, e),
-      };
-      sub.notify(message);
-    });
-  }
-
   public videoAnswerCall() {
     this.doAnswer(true);
   }
@@ -527,6 +509,31 @@ export default class CallHandler extends FileAndCallTransfer {
     }
   }
 
+  protected setConnectionId(connId: string | null) {
+    if (this.connectionId) {
+      if (!connId) {
+        sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
+      } else {
+        this.logger.error("Received new connectionId while old one stil exists")();
+      }
+    }
+    if (this.connectionId !== connId && connId) {
+      sub.subscribe(Subscription.getTransferId(connId), this);
+    }
+    super.setConnectionId(connId);
+  }
+
+  private connectToRemote() {
+    this.acceptedPeers.forEach((e) => {
+      const message: ConnectToRemoteMessage = {
+        action: "connectToRemote",
+        stream: this.localStream,
+        handler: Subscription.getPeerConnectionId(this.connectionId!, e),
+      };
+      sub.notify(message);
+    });
+  }
+
   private async pingExtension(): Promise<void> {
     return new Promise<void>((resolve, reject) => {
       const error = {rawError: `To share your screen you need chrome extension.<b> <a href="${CHROME_EXTENSION_URL}" target="_blank">Click to install</a></b>`};
@@ -584,8 +591,10 @@ export default class CallHandler extends FileAndCallTransfer {
         video = {deviceId: this.callInfo.currentWebcam};
       }
       this.logger.debug("navigator.mediaDevices.getUserMedia({audio, video})")();
-      stream = await navigator.mediaDevices.getUserMedia({audio,
-        video});
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio,
+        video
+      });
       this.logger.debug("navigator.mediaDevices.getUserMedia({audio, video})")();
       if (!stream) {
         throw new Error("Unable to capture stream");

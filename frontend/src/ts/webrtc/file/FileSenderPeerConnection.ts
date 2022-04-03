@@ -3,8 +3,8 @@ import type {
   SetSendingFileStatus,
   SetSendingFileUploaded,
 } from "@/ts/types/types";
-import type {SendingFileTransfer} from "@/ts/types/model";
-import {FileTransferStatus} from "@/ts/types/model";
+import type { SendingFileTransfer } from "@/ts/types/model";
+import { FileTransferStatus } from "@/ts/types/model";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import {
   bytesToSize,
@@ -15,7 +15,7 @@ import {
   SEND_CHUNK_SIZE,
 } from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,
@@ -27,10 +27,10 @@ import type {
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
-    acceptFile: <HandlerType<"acceptFile", "peerConnection:*">> this.acceptFile,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    declineSending: <HandlerType<"declineSending", "peerConnection:*">> this.declineSending,
+    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">>this.destroyFileConnection,
+    acceptFile: <HandlerType<"acceptFile", "peerConnection:*">>this.acceptFile,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
+    declineSending: <HandlerType<"declineSending", "peerConnection:*">>this.declineSending,
   };
 
   private readonly file: File;
@@ -44,22 +44,6 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   private sendDataTimeout: number = 0;
 
   private trackTimeout: number = 0;
-
-  public oniceconnectionstatechange() {
-    super.oniceconnectionstatechange();
-    if (this.pc!.iceConnectionState === "disconnected" ||
-        this.pc!.iceConnectionState === "failed" ||
-        this.pc!.iceConnectionState === "closed") {
-      if (this.sendDataTimeout) {
-        this.logger.log("clearing sendDataTimeout {}", this.sendDataTimeout)();
-        window.clearTimeout(this.sendDataTimeout); // Should this be in destroy?
-      }
-      if (this.trackTimeout) {
-        this.logger.log("clearing trackTimeout {}", this.trackTimeout)();
-        window.clearTimeout(this.trackTimeout);
-      }
-    }
-  }
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
@@ -79,6 +63,26 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       },
     };
     this.store.addSendingFileTransfer(asft);
+  }
+
+  get sendingFileTransfer(): SendingFileTransfer {
+    return this.store.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId];
+  }
+
+  public oniceconnectionstatechange() {
+    super.oniceconnectionstatechange();
+    if (this.pc!.iceConnectionState === "disconnected" ||
+        this.pc!.iceConnectionState === "failed" ||
+        this.pc!.iceConnectionState === "closed") {
+      if (this.sendDataTimeout) {
+        this.logger.log("clearing sendDataTimeout {}", this.sendDataTimeout)();
+        window.clearTimeout(this.sendDataTimeout); // Should this be in destroy?
+      }
+      if (this.trackTimeout) {
+        this.logger.log("clearing trackTimeout {}", this.trackTimeout)();
+        window.clearTimeout(this.trackTimeout);
+      }
+    }
   }
 
   public acceptFile(message: AcceptFileMessage) {
@@ -190,6 +194,20 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     this.wsHandler.destroyPeerFileConnection(this.connectionId, "decline", this.opponentWsId);
   }
 
+  commitErrorIntoStore(error: string, onlyIfNotFinished: boolean = false): void {
+    if (onlyIfNotFinished && this.sendingFileTransfer.status === FileTransferStatus.FINISHED) {
+      return;
+    }
+    const ssfs: SetSendingFileStatus = {
+      status: FileTransferStatus.ERROR,
+      roomId: this.roomId,
+      error,
+      connId: this.connectionId,
+      transfer: this.opponentWsId,
+    };
+    this.store.setSendingFileStatus(ssfs);
+  }
+
   private sendData(data: ArrayBuffer, offset: number, cb: () => void): void {
     this.sendDataTimeout = 0;
     try {
@@ -200,8 +218,8 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
           if (now - this.lastPrinted > 1000) {
             this.lastPrinted = now;
             this.logger.debug(
-              "Buffer overflow by {}, waiting to flush...",
-              bytesToSize(this.sendChannel!.bufferedAmount),
+                "Buffer overflow by {}, waiting to flush...",
+                bytesToSize(this.sendChannel!.bufferedAmount),
             )();
           }
           this.sendDataTimeout = setTimeout(this.sendData.bind(this), 100, data, offset, cb) as any;
@@ -225,23 +243,5 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       this.unsubscribeAndRemoveFromParent();
       this.logger.error("sendData {}", error)();
     }
-  }
-
-  get sendingFileTransfer(): SendingFileTransfer {
-    return this.store.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId];
-  }
-
-  commitErrorIntoStore(error: string, onlyIfNotFinished: boolean = false): void {
-    if (onlyIfNotFinished && this.sendingFileTransfer.status === FileTransferStatus.FINISHED) {
-      return;
-    }
-    const ssfs: SetSendingFileStatus = {
-      status: FileTransferStatus.ERROR,
-      roomId: this.roomId,
-      error,
-      connId: this.connectionId,
-      transfer: this.opponentWsId,
-    };
-    this.store.setSendingFileStatus(ssfs);
   }
 }

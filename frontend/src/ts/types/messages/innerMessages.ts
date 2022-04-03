@@ -14,7 +14,7 @@ import type {
   DefaultInMessage,
   HandlerName,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type {MessageStatus} from "@/ts/types/model";
+import type { MessageStatus } from "@/ts/types/model";
 
 
 export interface DefaultInnerSystemMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H> {

@@ -1,90 +1,90 @@
 <template>
   <div class="holder" @drop.prevent="dropPhoto">
     <chat-call
-      :call-info="room.callInfo"
-      :room-id="room.id"
+        :call-info="room.callInfo"
+        :room-id="room.id"
     />
     <search-messages :room="room"/>
     <div
-      ref="chatboxSearch"
-      class="chatbox"
-      :class="{'hidden': !room.search.searchActive}"
-      tabindex="1"
-      @keydown="keyDownSearchLoadUp"
-      @mousewheel="onSearchMouseWheel"
-      @scroll.passive="onSearchScroll"
+        ref="chatboxSearch"
+        class="chatbox"
+        :class="{'hidden': !room.search.searchActive}"
+        tabindex="1"
+        @keydown="keyDownSearchLoadUp"
+        @mousewheel="onSearchMouseWheel"
+        @scroll.passive="onSearchScroll"
     >
       <template
-        v-for="message in searchMessages"
+          v-for="message in searchMessages"
       >
         <app-separator
-          v-if="message.fieldDay"
-          :key="message.fieldDay"
-          :day="message.fieldDay"
+            v-if="message.fieldDay"
+            :key="message.fieldDay"
+            :day="message.fieldDay"
         />
         <chat-text-message v-else :key="message.id" :message="message"/>
       </template>
     </div>
     <div
-      ref="chatbox"
-      class="chatbox"
-      :class="{'hidden': room.search.searchActive || (room.callInfo && room.callInfo.sharePaint)}"
-      tabindex="1"
-      @keydown="keyDownLoadUp"
-      @mousewheel="onMouseWheel"
-      @scroll.passive="onScroll"
+        ref="chatbox"
+        class="chatbox"
+        :class="{'hidden': room.search.searchActive || (room.callInfo && room.callInfo.sharePaint)}"
+        tabindex="1"
+        @keydown="keyDownLoadUp"
+        @mousewheel="onMouseWheel"
+        @scroll.passive="onScroll"
     >
       <div v-if="messageLoading" class="spinner"/>
       <input
-        v-else-if="!room.allLoaded"
-        type="button"
-        value="Load more messages"
-        class="lor-btn load-more-msg-btn"
-        @click="loadUpHistory(10)"
+          v-else-if="!room.allLoaded"
+          type="button"
+          value="Load more messages"
+          class="lor-btn load-more-msg-btn"
+          @click="loadUpHistory(10)"
       />
       <div v-else class="start-history">
         This is the start of the history
       </div>
       <template v-for="message in messages">
         <chat-user-action-message
-          v-if="message.isUserAction"
-          :key="`a-${message.time}-${message.userId}`"
-          :time="message.time"
-          :user-id="message.userId"
-          :action="message.action"
+            v-if="message.isUserAction"
+            :key="`a-${message.time}-${message.userId}`"
+            :time="message.time"
+            :user-id="message.userId"
+            :action="message.action"
         />
         <chat-change-name-message
-          v-else-if="message.isChangeName"
-          :key="`n-${message.time}-${message.userId}`"
-          :time="message.time"
-          :old-name="message.oldName"
-          :new-name="message.newName"
+            v-else-if="message.isChangeName"
+            :key="`n-${message.time}-${message.userId}`"
+            :time="message.time"
+            :old-name="message.oldName"
+            :new-name="message.newName"
         />
         <app-separator
-          v-else-if="message.fieldDay"
-          :key="`s-${message.fieldDay}`"
-          :day="message.fieldDay"
+            v-else-if="message.fieldDay"
+            :key="`s-${message.fieldDay}`"
+            :day="message.fieldDay"
         />
         <chat-sending-file
-          v-else-if="message.transfers"
-          :key="message.id"
-          :sending-file="message"
+            v-else-if="message.transfers"
+            :key="message.id"
+            :sending-file="message"
         />
         <chat-receiving-file
-          v-else-if="message.connId"
-          :key="message.id"
-          :receiving-file="message"
+            v-else-if="message.connId"
+            :key="message.id"
+            :receiving-file="message"
         />
         <chat-thread
-          v-else-if="message.thread"
-          :key="message.parent.id"
-          :message="message.parent"
-          :messages="message.messages"
+            v-else-if="message.thread"
+            :key="message.parent.id"
+            :message="message.parent"
+            :messages="message.messages"
         />
         <chat-sending-message
-          v-else
-          :key="message.id"
-          :message="message"
+            v-else
+            :key="message.id"
+            :message="message"
         />
       </template>
     </div>
@@ -107,7 +107,7 @@ import {
 } from "@/ts/instances/storeInstance";
 import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
 import SearchMessages from "@/vue/chat/chatbox/SearchMessages.vue";
-import {RoomModel} from "@/ts/types/model";
+import { RoomModel } from "@/ts/types/model";
 import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
 import ChatSendingMessage from "@/vue/chat/message/ChatSendingMessage.vue";
 import ChatUserActionMessage from "@/vue/chat/message/ChatUserActionMessage.vue";
@@ -119,7 +119,7 @@ import AppSeparator from "@/vue/ui/AppSeparator.vue";
 import ChatThread from "@/vue/chat/message/ChatThread.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
-import {isMobile} from "@/ts/utils/runtimeConsts";
+import { isMobile } from "@/ts/utils/runtimeConsts";
 
 
 @Component({
@@ -200,9 +200,7 @@ export default class ChatBox extends Vue {
 
   public markMessagesInCurrentRoomAsRead() {
     this.$logger.debug("Checking if we can set some messages to status read")();
-    const messagesIds = Object.values(this.room!.messages).
-      filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).
-      map((m) => m.id);
+    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).map((m) => m.id);
     if (messagesIds.length > 0) {
       this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
     }
@@ -232,7 +230,7 @@ export default class ChatBox extends Vue {
 
   onEmitScroll() {
     if (this.activeRoomId === this.room.id) {
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         if (this.scrollBottom) {
           if (this.room.search.searchActive && this.chatboxSearch) {
             this.$logger.debug("Scrolling chatboxSearch to bottom")();
@@ -268,8 +266,10 @@ export default class ChatBox extends Vue {
       const d = new Date(message.time).toDateString();
       if (!dates[d]) {
         dates[d] = true;
-        newArray.push({fieldDay: d,
-          time: Date.parse(d)});
+        newArray.push({
+          fieldDay: d,
+          time: Date.parse(d)
+        });
       }
       newArray.push(message);
     }
@@ -282,11 +282,11 @@ export default class ChatBox extends Vue {
   }
 
   keyDownLoadUp(e: KeyboardEvent) {
-    this.loadHistoryWithEvent(e, async(n) => this.loadUpHistory(n));
+    this.loadHistoryWithEvent(e, async (n) => this.loadUpHistory(n));
   }
 
   keyDownSearchLoadUp(e: KeyboardEvent) {
-    this.loadHistoryWithEvent(e, async(n) => this.loadUpSearchHistory(n));
+    this.loadHistoryWithEvent(e, async (n) => this.loadUpSearchHistory(n));
   }
 
   loadHistoryWithEvent(e: KeyboardEvent, callback: (a: number) => void) {
@@ -301,9 +301,11 @@ export default class ChatBox extends Vue {
     }
   }
 
-  @ApplyGrowlErr({runningProp: "searchMessageLoading",
-                  preventStacking: true,
-    message: "Unable to load history"})
+  @ApplyGrowlErr({
+    runningProp: "searchMessageLoading",
+    preventStacking: true,
+    message: "Unable to load history"
+  })
   private async loadUpSearchHistory(n: number) {
     if (this.chatboxSearch.scrollTop !== 0) {
       return; // We're just scrolling up
@@ -315,9 +317,11 @@ export default class ChatBox extends Vue {
     return this.$messageSenderProxy.getMessageSender(this.room.id);
   }
 
-  @ApplyGrowlErr({runningProp: "messageLoading",
+  @ApplyGrowlErr({
+    runningProp: "messageLoading",
     preventStacking: true,
-    message: "Unable to load history"})
+    message: "Unable to load history"
+  })
   public async loadUpHistory(n: number) {
     if (this.chatbox.scrollTop > 100) {
       return; // We're just scrolling up
@@ -359,78 +363,88 @@ export default class ChatBox extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/abstract_classes"
-  @import "@/assets/sass/partials/variables"
-  .holder
-    height: 100%
-    display: flex
-    flex-direction: column // otherwise chat-call is not full width
-    :deep(.message-header)
-      font-weight: bold
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/variables"
+.holder
+  height: 100%
+  display: flex
+  flex-direction: column
+  // otherwise chat-call is not full width
+  :deep(.message-header)
+    font-weight: bold
 
-    :deep(.message-self), :deep(.message-others)
-      position: relative
+  :deep(.message-self), :deep(.message-others)
+    position: relative
 
-  .chatbox
-    overflow-y: scroll
-    height: 100%
-    min-height: 50px
-    padding-left: 8px
-    word-wrap: break-word
-    font-size: 18px
-    @include flex(1) // Fix Safari's 0 height
+.chatbox
+  overflow-y: scroll
+  height: 100%
+  min-height: 50px
+  padding-left: 8px
+  word-wrap: break-word
+  font-size: 18px
+  @include flex(1)
+  // Fix Safari's 0 height
 
-    &.hidden
-      display: none
-    &:focus
-      outline: none
+  &.hidden
+    display: none
+
+  &:focus
+    outline: none
 
 
-  .color-white
-    .message-self, .message-system, .message-others
-      background-color: #f2fbff
-      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
-      color: black
-      display: table
-      //padding: $space-between-messages/2
-      border-radius: 4px
-      //margin-top: $space-between-messages/2
-      //margin-bottom: $space-between-messages/2
-      :deep(p)
-        margin: 0 !important
-    .message-self
-      margin-left: auto
-      margin-right: 5px
+.color-white
+  .message-self, .message-system, .message-others
+    background-color: #f2fbff
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
+    color: black
+    display: table
+    //padding: $space-between-messages/2
+    border-radius: 4px
+    //margin-top: $space-between-messages/2
+    //margin-bottom: $space-between-messages/2
+    :deep(p)
+      margin: 0 !important
 
-  //.dummy //w/o this dim last message would jump on hover if we have scroll
-    //margin-top: $space-between-messages
+  .message-self
+    margin-left: auto
+    margin-right: 5px
 
-  .color-lor .holder
-    :deep(.message-others .message-header)
-      color: #729fcf
-    :deep(.message-self .message-header)
-      color: #e29722
-    :deep(.message-system .message-header)
-      color: #9DD3DD
+//.dummy //w/o this dim last message would jump on hover if we have scroll
+  //margin-top: $space-between-messages
 
-  .color-reg .holder
-    :deep(.message-others .message-header)
-      color: #729fcf
-    :deep(.message-self .message-header)
-      color: #e29722
-    :deep(.message-system .message-header)
-      color: #84B7C0
+.color-lor .holder
+  :deep(.message-others .message-header)
+    color: #729fcf
 
-  .load-more-msg-btn
-    display: block
-    margin: 5px auto
-    padding: 4px 10px
-  .start-history
-    text-align: center
-    font-size: 12px
-  .spinner
-    margin: 5px auto auto
-    @include spinner(3px, white)
+  :deep(.message-self .message-header)
+    color: #e29722
+
+  :deep(.message-system .message-header)
+    color: #9DD3DD
+
+.color-reg .holder
+  :deep(.message-others .message-header)
+    color: #729fcf
+
+  :deep(.message-self .message-header)
+    color: #e29722
+
+  :deep(.message-system .message-header)
+    color: #84B7C0
+
+.load-more-msg-btn
+  display: block
+  margin: 5px auto
+  padding: 4px 10px
+
+.start-history
+  text-align: center
+  font-size: 12px
+
+.spinner
+  margin: 5px auto auto
+  @include spinner(3px, white)
 
 </style>

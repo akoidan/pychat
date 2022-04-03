@@ -1,11 +1,11 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 import type {
   DefaultInMessage,
   HandlerName,
   IMessageHandler,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type {DefaultInnerSystemMessage} from "@/ts/types/messages/innerMessages";
+import type { DefaultInnerSystemMessage } from "@/ts/types/messages/innerMessages";
 
 export default class Subscription {
   // TODO sub should unsubscribe from some events on logout

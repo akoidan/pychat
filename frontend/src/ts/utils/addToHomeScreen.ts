@@ -1,5 +1,5 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import {isChrome} from "@/ts/utils/runtimeConsts";
+import { isChrome } from "@/ts/utils/runtimeConsts";
 
 const logger = loggerFactory.getLogger("home");
 

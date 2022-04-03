@@ -62,10 +62,15 @@ export interface SetDevices {
 
 export interface MessageSender {
   syncMessage(roomId: number, messageId: number): Promise<void>;
+
   loadMessages(roomId: number, messageId: number[]): Promise<void>;
+
   loadUpMessages(roomId: number, count: number): Promise<void>;
+
   loadThreadMessages(roomId: number, threadId: number): Promise<void>;
+
   loadUpSearchMessages(roomId: number, count: number, checkIfSet: (found: boolean) => boolean): Promise<void>;
+
   markMessagesInCurrentRoomAsRead(roomId: number, messageIds: number[]): Promise<void>;
 }
 
@@ -75,6 +80,7 @@ export interface JsAudioAnalyzer {
   prevVolumeValues: any;
   volumeValuesCount: any;
 }
+
 export interface SetUploadProgress {
   upload: UploadProgressModel;
   roomId: number;
@@ -164,6 +170,7 @@ export interface RoomMessageIds {
   roomId: number;
   newMessageId: number;
 }
+
 export interface RoomMessagesIds {
   messagesId: number[];
   roomId: number;
@@ -171,34 +178,57 @@ export interface RoomMessagesIds {
 
 export interface MessageSupplier {
   sendRawTextToServer(message: string): boolean;
+
   getWsConnectionId(): string;
 }
 
 export interface IStorage {
   // GetIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]): void;
+
   deleteMessage(id: number, replaceThreadId: number): void;
+
   setThreadMessageCount(mesageid: number, count: number): void;
+
   deleteRoom(id: number): void;
+
   deleteChannel(id: number): void;
+
   saveMessage(m: MessageModel): void;
+
   updateRoom(m: RoomSettingsModel): void;
+
   updateFileIds(m: SetFileIdsForMessage): void;
+
   setRooms(rooms: RoomSettingsModel[]): void;
+
   setChannels(channels: ChannelModel[]): void;
+
   saveRoom(room: RoomModel): void;
+
   saveChannel(room: ChannelModel): void;
+
   setUserProfile(user: CurrentUserInfoModel): void;
+
   setUserSettings(settings: CurrentUserSettingsModel): void;
+
   saveRoomUsers(ru: SetRoomsUsers): void;
+
   setUsers(users: UserModel[]): void;
+
   setMessagesStatus(messagesIds: number[], status: MessageStatus): void;
+
   saveUser(users: UserModel): void;
+
   clearStorage(): void;
+
   clearMessages(): void;
+
   connect(): Promise<SetStateFromStorage | null>;
+
   // GetRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
+
   markMessageAsSent(messagesId: number[]): void;
 }
 
@@ -210,6 +240,7 @@ export interface PostData {
   isJsonDecoded?: boolean;
   checkOkString?: boolean;
   errorDescription?: string;
+
   process?(R: XMLHttpRequest): void;
 }
 
@@ -219,6 +250,7 @@ export interface GetData {
   checkOkString?: boolean;
   baseUrl?: string;
   skipAuth?: boolean;
+
   process?(R: XMLHttpRequest): void;
 }
 
@@ -237,7 +269,9 @@ export interface SetReceivingFileStatus {
   anchor?: string;
 }
 
-export type ConnectionStatus = "closed" | "new";
+export type ConnectionStatus =
+    "closed"
+    | "new";
 
 interface SetSendingFileBase {
   roomId: number;
@@ -278,6 +312,7 @@ export interface PrivateRoomsIds {
   userRooms: Record<number, number>;
   roomUsers: Record<number, number>;
 }
+
 export interface SetRoomsUsers {
   roomId: number;
   users: number[];

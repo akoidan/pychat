@@ -1,7 +1,7 @@
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {VueBase} from "vue-class-component";
-import type {ComponentOptions} from "vue";
+import type { VueBase } from "vue-class-component";
+import type { ComponentOptions } from "vue";
 
 export const loggerMixin = {
   computed: {

@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="onlineClass"
+      :class="onlineClass"
   >
     <div class="user-name-sex">
       <user-image-icon :user="user"/>
@@ -10,7 +10,7 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from "@/ts/instances/storeInstance";
+import { State } from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
@@ -52,28 +52,30 @@ export default class UserRow extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/room_users_table"
-  .user-icon
-    width: 60px
-    display: flex
-    justify-content: space-around
+@import "@/assets/sass/partials/room_users_table"
+.user-icon
+  width: 60px
+  display: flex
+  justify-content: space-around
 
-  .online, .offline
-    display: flex
-    justify-content: space-between
-    width: 100%
+.online, .offline
+  display: flex
+  justify-content: space-between
+  width: 100%
 
-  .user-name-sex
-    display: flex
-    :deep(i)
-      position: relative
-      top: 3px
-      margin-right: 3px
-  span
-    margin-left: 5px
+.user-name-sex
+  display: flex
 
-  div
-    text-overflow: ellipsis
-    word-break: break-all
-    overflow: hidden
+  :deep(i)
+    position: relative
+    top: 3px
+    margin-right: 3px
+
+span
+  margin-left: 5px
+
+div
+  text-overflow: ellipsis
+  word-break: break-all
+  overflow: hidden
 </style>

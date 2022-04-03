@@ -13,12 +13,13 @@ import type {
   RoomSettingsModel,
   UserModel,
 } from "@/ts/types/model";
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 
 interface LocalStorageMessage {
   f: number;
   h: number;
 }
+
 export default class LocalStorage implements IStorage {
   private readonly logger: Logger;
 
@@ -65,39 +66,56 @@ export default class LocalStorage implements IStorage {
     localStorage.setItem(this.STORAGE_NAME, JSON.stringify(lm));
   }
 
-  public updateFileIds(m: SetFileIdsForMessage) {}
+  public updateFileIds(m: SetFileIdsForMessage) {
+  }
 
-  public deleteMessage(id: number, replaceThreadId: number) {}
+  public deleteMessage(id: number, replaceThreadId: number) {
+  }
 
-  public setThreadMessageCount(mesageid: number, count: number): void {}
+  public setThreadMessageCount(mesageid: number, count: number): void {
+  }
 
-  public deleteRoom(id: number) {}
+  public deleteRoom(id: number) {
+  }
 
-  public deleteChannel(id: number) {}
+  public deleteChannel(id: number) {
+  }
 
-  public updateRoom(m: RoomSettingsModel) {}
+  public updateRoom(m: RoomSettingsModel) {
+  }
 
-  public setRooms(rooms: RoomSettingsModel[]) {}
+  public setRooms(rooms: RoomSettingsModel[]) {
+  }
 
-  public setChannels(channels: ChannelModel[]) {}
+  public setChannels(channels: ChannelModel[]) {
+  }
 
-  public saveRoom(room: RoomSettingsModel) {}
+  public saveRoom(room: RoomSettingsModel) {
+  }
 
-  public saveChannel(room: ChannelModel) {}
+  public saveChannel(room: ChannelModel) {
+  }
 
-  public setUserProfile(user: CurrentUserInfoModel) {}
+  public setUserProfile(user: CurrentUserInfoModel) {
+  }
 
-  public setUserSettings(settings: CurrentUserSettingsModel) {}
+  public setUserSettings(settings: CurrentUserSettingsModel) {
+  }
 
-  public saveRoomUsers(ru: SetRoomsUsers) {}
+  public saveRoomUsers(ru: SetRoomsUsers) {
+  }
 
-  public setUsers(users: UserModel[]) {}
+  public setUsers(users: UserModel[]) {
+  }
 
-  public setMessagesStatus(messagesIds: number[], status: MessageStatus) {}
+  public setMessagesStatus(messagesIds: number[], status: MessageStatus) {
+  }
 
-  public saveUser(users: UserModel) {}
+  public saveUser(users: UserModel) {
+  }
 
-  public markMessageAsSent(m: number[]) {}
+  public markMessageAsSent(m: number[]) {
+  }
 
   public clearMessages() {
     this.clearStorage();

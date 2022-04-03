@@ -1,40 +1,40 @@
 <template>
   <div
-    v-show="callInfo.callActive"
-    class="callContainer"
+      v-show="callInfo.callActive"
+      class="callContainer"
   >
     <div
-      class="callContainerContent"
-      :class="{fullscreen}"
+        :class="{fullscreen}"
+        class="callContainerContent"
     >
       <video-container
-        v-show="showVideoContainer && !showSettings && callInfo.callActive"
-        ref="videoContainer"
-        :call-info="callInfo"
-        :room-id="roomId"
-        @desktop-click="desktopClick"
-        @video-click="videoClick"
-        @hang-up-call="hangUpCall"
-        @mic-click="micClick"
-        @exit-fullscreen="exitFullscreen"
+          v-show="showVideoContainer && !showSettings && callInfo.callActive"
+          ref="videoContainer"
+          :call-info="callInfo"
+          :room-id="roomId"
+          @desktop-click="desktopClick"
+          @video-click="videoClick"
+          @hang-up-call="hangUpCall"
+          @mic-click="micClick"
+          @exit-fullscreen="exitFullscreen"
       />
 
       <input-devices-settings
-        v-show="showSettings"
-        :call-info="callInfo"
-        :room-id="roomId"
+          v-show="showSettings"
+          :call-info="callInfo"
+          :room-id="roomId"
       />
       <call-container-icons
-        :call-info="callInfo"
-        :room-id="roomId"
-        @mic-click="micClick"
-        @hang-up-call="hangUpCall"
-        @video-click="videoClick"
-        @paint-click="paintClick"
-        @invert-show-settings="invertShowSettings"
-        @desktop-click="desktopClick"
-        @enter-fullscreen="enterFullscreen"
-        @invert-show-video-container="invertShowVideoContainer"
+          :call-info="callInfo"
+          :room-id="roomId"
+          @mic-click="micClick"
+          @hang-up-call="hangUpCall"
+          @video-click="videoClick"
+          @paint-click="paintClick"
+          @invert-show-settings="invertShowSettings"
+          @desktop-click="desktopClick"
+          @enter-fullscreen="enterFullscreen"
+          @invert-show-video-container="invertShowVideoContainer"
       />
       <div class="spainter">
         <!--        TODO v-if doesn't detach events on destroy on painter-->
@@ -44,7 +44,7 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from "@/ts/instances/storeInstance";
+import { State } from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
@@ -52,12 +52,12 @@ import {
   Vue,
   Watch,
 } from "vue-property-decorator";
-import {CallsInfoModel} from "@/ts/types/model";
+import { CallsInfoModel } from "@/ts/types/model";
 import type {
   BooleanIdentifier,
   ShareIdentifier,
 } from "@/ts/types/types";
-import {VideoType} from "@/ts/types/types";
+import { VideoType } from "@/ts/types/types";
 
 import ChatRemotePeer from "@/vue/chat/call/ChatRemotePeer.vue";
 import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
@@ -85,7 +85,12 @@ export default class ChatCall extends Vue {
   public showSettings: boolean = false;
 
   public showVideoContainer: boolean = true;
-
+  @Ref()
+  public videoContainer!: Vue;
+  @State
+  public readonly myId!: number;
+  public fullscreen: boolean = false;
+  public listener = this.fullScreenChange.bind(this);
 
   @Watch("callInfo.callActive")
   onCallActive(newValue: boolean) {
@@ -93,16 +98,6 @@ export default class ChatCall extends Vue {
       this.showVideoContainer = true;
     }
   }
-
-  @Ref()
-  public videoContainer!: Vue;
-
-  @State
-  public readonly myId!: number;
-
-  public fullscreen: boolean = false;
-
-  public listener = this.fullScreenChange.bind(this);
 
   onCanvas(canvas: HTMLCanvasElement) {
     this.$webrtcApi.setCanvas(this.roomId, canvas);
@@ -232,70 +227,75 @@ export default class ChatCall extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
 
-  .callContainer
-    border-right: 7.5px solid #1a1a1a
-    display: inline-block
-    max-width: 100%
-    max-height: calc(100% - 160px)
-    text-align: center
+.callContainer
+  border-right: 7.5px solid #1a1a1a
+  display: inline-block
+  max-width: 100%
+  max-height: calc(100% - 160px)
+  text-align: center
 
-    :deep(label)
-      cursor: pointer
-    :deep(.icon-mic), :deep(.icon-videocam), :deep(.activeIcon), :deep(.icon-phone-circled)
-      cursor: pointer
-      @include hover-click(#3aa130)
+  :deep(label)
+    cursor: pointer
 
-    :deep(.icon-mute), :deep(.icon-no-videocam), :deep(.noactiveIcon), :deep(.icon-hang-up)
-      cursor: pointer
-      @include hover-click(#c72727)
+  :deep(.icon-mic), :deep(.icon-videocam), :deep(.activeIcon), :deep(.icon-phone-circled)
+    cursor: pointer
+    @include hover-click(#3aa130)
 
-    :deep(.icon-cog), :deep(.icon-webrtc-fullscreen), :deep(.icon-popup)
-      cursor: pointer
-      @include hover-click(#2a8f9c)
+  :deep(.icon-mute), :deep(.icon-no-videocam), :deep(.noactiveIcon), :deep(.icon-hang-up)
+    cursor: pointer
+    @include hover-click(#c72727)
+
+  :deep(.icon-cog), :deep(.icon-webrtc-fullscreen), :deep(.icon-popup)
+    cursor: pointer
+    @include hover-click(#2a8f9c)
 
 
-  .fullscreen
-    :deep(.videoContainer)
-      background-color: black
+.fullscreen
+  :deep(.videoContainer)
+    background-color: black
 
-    :deep(.micVideoWrapper > video)
-      max-height: 99vh
-      height: 99vh
+  :deep(.micVideoWrapper > video)
+    max-height: 99vh
+    height: 99vh
 
-    :deep(.videoContainer video)
-      border-color: #272727
-    :deep(.icon-webrtc-cont)
-      display: block
+  :deep(.videoContainer video)
+    border-color: #272727
 
-  .callContainerContent
-    padding: 0 // it should not have padding otherwise we would have scroll in painter container
-    display: flex
+  :deep(.icon-webrtc-cont)
+    display: block
+
+.callContainerContent
+  padding: 0
+  // it should not have padding otherwise we would have scroll in painter container
+  display: flex
+  height: 100%
+  flex-direction: column
+  min-width: 150px
+
+.spainter
+  padding: 10px
+  min-height: 0
+  @media screen and (max-height: 850px)
+    :deep(.painterTools)
+      width: 60px !important
+      flex-direction: row !important
+      flex-wrap: wrap
+  @media screen and (max-height: 650px)
+    :deep(.painterTools)
+      width: 80px !important
+      flex-direction: row !important
+      flex-wrap: wrap
+
+  :deep(*div)
     height: 100%
-    flex-direction: column
-    min-width: 150px
 
-  .spainter
-    padding: 10px
-    min-height: 0
-    @media screen and (max-height: 850px)
-      :deep(.painterTools)
-        width: 60px !important
-        flex-direction: row !important
-        flex-wrap: wrap
-    @media screen and (max-height: 650px)
-        :deep(.painterTools)
-          width: 80px !important
-          flex-direction: row !important
-          flex-wrap: wrap
+  :deep(.active-icon)
+    color: red
 
-    :deep(*div)
-      height: 100%
-    :deep(.active-icon)
-      color: red
-    :deep(.toolsAndCanvas)
-      height: 100%
+  :deep(.toolsAndCanvas)
+    height: 100%
 
 </style>

@@ -3,28 +3,27 @@ import type {
   MessageSender,
   UserIdConn,
 } from "@/ts/types/types";
-import type {RoomModel} from "@/ts/types/model";
+import type { RoomModel } from "@/ts/types/model";
 import MessageSenderPeerConnection from "@/ts/webrtc/message/MessageSenderPeerConnection";
 import MessageReceiverPeerConnection from "@/ts/webrtc/message/MessageReceiverPeerConnection";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import {sub} from "@/ts/instances/subInstance";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import { sub } from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 import type {
   SendSetMessagesStatusMessage,
   SyncP2PMessage,
 } from "@/ts/types/messages/innerMessages";
-import type {HandlerTypes} from "@/ts/types/messages/baseMessagesInterfaces";
-import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
+import type { HandlerTypes } from "@/ts/types/messages/baseMessagesInterfaces";
+import type { MessageHelper } from "@/ts/message_handlers/MessageHelper";
 
 /**
  *
  * https://drive.google.com/file/d/1BCtFNNWprfobqQlG4n2lPyWEqroi7nJh/view
  */
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
-  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, "webrtc-message"> = {
-  };
+  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, "webrtc-message"> = {};
 
   private state: "initing" | "not_inited" | "ready" = "not_inited";
 
@@ -33,6 +32,32 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper) {
     super(roomId, wsHandler, notifier, store);
     this.messageHelper = messageHelper;
+  }
+
+  private get room(): RoomModel {
+    return this.store.roomsDict[this.roomId];
+  }
+
+  private get connectionIds(): UserIdConn[] {
+    if (!this.room) {
+      return [];
+    }
+    const usersIds = this.room.users;
+    const myConnectionId = this.wsHandler.getWsConnectionId();
+    const connections = usersIds.reduce<UserIdConn[]>((connectionIdsWithUser, userId) => {
+      const connectionIds: string[] = this.store.onlineDict[userId] ?? [];
+      connectionIds.forEach((connectionId) => {
+        if (connectionId !== myConnectionId) {
+          connectionIdsWithUser.push({
+            userId,
+            connectionId
+          });
+        }
+      });
+      return connectionIdsWithUser;
+    }, []);
+    this.logger.debug("Evaluated {} connectionIds", connections)();
+    return connections;
   }
 
   async syncMessage(roomId: number, messageId: number): Promise<void> {
@@ -47,7 +72,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
       sub.notify(payload);
     }
   }
-
 
   public destroyThisTransferHandler() {
     sub.notify({
@@ -85,7 +109,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     }
   }
 
-  public async acceptConnection({connId}: {connId: string}) {
+  public async acceptConnection({connId}: { connId: string }) {
 
     /*
      * If connection is initing, we make it ready, so init would not refresh connection again
@@ -107,23 +131,23 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         let mpc;
         if (opponentWsId > myConnectionId) {
           mpc = new MessageSenderPeerConnection(
-            this.roomId,
-            this.connectionId!,
-            opponentWsId,
-            this.wsHandler,
-            this.store,
-            connectionIdWithUser.userId,
-            this.messageHelper,
+              this.roomId,
+              this.connectionId!,
+              opponentWsId,
+              this.wsHandler,
+              this.store,
+              connectionIdWithUser.userId,
+              this.messageHelper,
           );
         } else {
           mpc = new MessageReceiverPeerConnection(
-            this.roomId,
-            this.connectionId!,
-            opponentWsId,
-            this.wsHandler,
-            this.store,
-            connectionIdWithUser.userId,
-            this.messageHelper,
+              this.roomId,
+              this.connectionId!,
+              opponentWsId,
+              this.wsHandler,
+              this.store,
+              connectionIdWithUser.userId,
+              this.messageHelper,
           );
         }
         mpc.makeConnection();
@@ -137,31 +161,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
       handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
       allowZeroSubscribers: true,
     });
-  }
-
-
-  private get room(): RoomModel {
-    return this.store.roomsDict[this.roomId];
-  }
-
-  private get connectionIds(): UserIdConn[] {
-    if (!this.room) {
-      return [];
-    }
-    const usersIds = this.room.users;
-    const myConnectionId = this.wsHandler.getWsConnectionId();
-    const connections = usersIds.reduce<UserIdConn[]>((connectionIdsWithUser, userId) => {
-      const connectionIds: string[] = this.store.onlineDict[userId] ?? [];
-      connectionIds.forEach((connectionId) => {
-        if (connectionId !== myConnectionId) {
-          connectionIdsWithUser.push({userId,
-            connectionId});
-        }
-      });
-      return connectionIdsWithUser;
-    }, []);
-    this.logger.debug("Evaluated {} connectionIds", connections)();
-    return connections;
   }
 
   async loadThreadMessages(roomId: number, threadId: number): Promise<void> {

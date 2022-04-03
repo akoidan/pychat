@@ -7,11 +7,12 @@ const {
 } = PYCHAT_CONSTS;
 
 declare let clients: any;
-declare let serviceWorkerOption: {assets: string[]};
+declare let serviceWorkerOption: { assets: string[] };
 
 
 // TODO remove logger
 type DoLog = (format: string, ...args: unknown[]) => () => void;
+
 interface Logger {
   warn: DoLog;
   log: DoLog;
@@ -33,13 +34,25 @@ const logLevels: Record<LogLevel, number> = {
 
 interface MockConsole {
   trace(message?: unknown, ...optionalParams: unknown[]): void;
+
   debug(message?: unknown, ...optionalParams: unknown[]): void;
+
   log(message?: unknown, ...optionalParams: unknown[]): void;
+
   warn(message?: unknown, ...optionalParams: unknown[]): void;
+
   error(message?: unknown, ...optionalParams: unknown[]): void;
 }
 
- type LogLevel = "debug" | "disable" | "error" | "info" | "log_raise_error" | "log_with_warnings" | "trace" | "warn";
+type LogLevel =
+    "debug"
+    | "disable"
+    | "error"
+    | "info"
+    | "log_raise_error"
+    | "log_with_warnings"
+    | "trace"
+    | "warn";
 
 class LoggerFactory {
   private logLevel: LogLevel;
@@ -47,13 +60,13 @@ class LoggerFactory {
   private readonly mockConsole: MockConsole;
 
   constructor(
-    logLevel: LogLevel = "log_with_warnings",
-    mockConsole: MockConsole | null = null,
+      logLevel: LogLevel = "log_with_warnings",
+      mockConsole: MockConsole | null = null,
   ) {
     this.logLevel = logLevel;
     if (!logLevels[logLevel]) {
       throw Error(`Invalid log level ${logLevel} allowed: ${
-        JSON.stringify(logLevels)}`);
+          JSON.stringify(logLevels)}`);
     }
     if (mockConsole) {
       this.mockConsole = mockConsole;
@@ -62,7 +75,18 @@ class LoggerFactory {
     }
   }
 
-  private dummy() {}
+  static getHash(str: string, seed = 0) {
+    let h1 = 0xdeadbeef ^ seed,
+        h2 = 0x41c6ce57 ^ seed;
+    for (let ch, i = 0; i < str.length; i++) {
+      ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507) ^ Math.imul(h2 ^ h2 >>> 13, 3266489909);
+    h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507) ^ Math.imul(h1 ^ h1 >>> 13, 3266489909);
+    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+  }
 
   setLogWarnings(logWarnings: LogLevel): void {
     this.logLevel = logWarnings;
@@ -97,8 +121,8 @@ class LoggerFactory {
   }
 
   getSingleLoggerStyle(
-    name: string, style: string, fn: Function,
-    minLevel: LogLevel = "log_with_warnings",
+      name: string, style: string, fn: Function,
+      minLevel: LogLevel = "log_with_warnings",
   ): DoLog {
     return (...args1: unknown[]) => {
       if (logLevels[this.logLevel] > logLevels[minLevel]) {
@@ -133,20 +157,7 @@ class LoggerFactory {
 
   getColorStyle(color: string): string {
     return `color: white; background-color: ${
-      color}; padding: 2px 6px; border-radius: 2px; font-size: 10px`;
-  }
-
-  static getHash(str: string, seed = 0) {
-    let h1 = 0xdeadbeef ^ seed,
-      h2 = 0x41c6ce57 ^ seed;
-    for (let ch, i = 0; i < str.length; i++) {
-      ch = str.charCodeAt(i);
-      h1 = Math.imul(h1 ^ ch, 2654435761);
-      h2 = Math.imul(h2 ^ ch, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ h1 >>> 16, 2246822507) ^ Math.imul(h2 ^ h2 >>> 13, 3266489909);
-    h2 = Math.imul(h2 ^ h2 >>> 16, 2246822507) ^ Math.imul(h1 ^ h1 >>> 13, 3266489909);
-    return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+        color}; padding: 2px 6px; border-radius: 2px; font-size: 10px`;
   }
 
   getRandomColor(str: string = "") {
@@ -171,6 +182,9 @@ class LoggerFactory {
       warn: this.getSingleLoggerStyle(name, style, this.mockConsole.warn, "warn"),
       error: this.getSingleLoggerStyle(name, style, this.mockConsole.error, "error"),
     };
+  }
+
+  private dummy() {
   }
 }
 
@@ -205,7 +219,7 @@ allAssetsSet[(self as any).registration.scope] = true;
 // This event fires when service worker registers the first time
 self.addEventListener("install", (event: any) => {
   logger.log(" Delaying install event to put static resources")();
-  event.waitUntil((async() => {
+  event.waitUntil((async () => {
     const staticCache = await caches.open("static");
     const assets = allAssets.filter((url) => url.includes("/smileys/") ||
         url.includes(".js") ||
@@ -217,13 +231,13 @@ self.addEventListener("install", (event: any) => {
     const allFiles = await staticCache.keys();
     const oldFiles = allFiles.filter((r) => !allAssetsSet[r.url]);
     logger.log("Putting to static cache finished, removing old files {}", oldFiles)();
-    await Promise.all(oldFiles.map(async(oldFile) => staticCache.delete(oldFile)));
+    await Promise.all(oldFiles.map(async (oldFile) => staticCache.delete(oldFile)));
     logger.log("Removed old files finished. Can proceed to activate now..")();
   })());
 });
 
 // Cache and return requests
-self.addEventListener("fetch", async(event: any) => {
+self.addEventListener("fetch", async (event: any) => {
   // Cache only files, do not cache XHR API, so exist on POST immediately
   if (event.request.method !== "GET") {
     return;
@@ -248,7 +262,7 @@ self.addEventListener("fetch", async(event: any) => {
   if (!belongsToThumbnailCache && !belongsToPhotoCache && !belongsToStaticCache || isSound) {
     return;
   }
-  event.respondWith((async() => {
+  event.respondWith((async () => {
     const {request} = event;
     const cachedResponse: any = await caches.match(request);
 
@@ -304,7 +318,7 @@ function getSubscriptionId(pushSubscription: any) {
       pushSubscription.subscriptionId &&
       pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
     mergedEndpoint = `${pushSubscription.endpoint}/${
-      pushSubscription.subscriptionId}`;
+        pushSubscription.subscriptionId}`;
   }
 
   const GCM_ENDPOINT = "https://fcm.googleapis.com/fcm/send";
@@ -391,9 +405,9 @@ self.addEventListener("notificationclick", (event: any) => {
   }).then((clientList: readonly Response[]) => {
     const roomId = event.notification.data && event.notification.data.roomId;
     if (clientList && clientList[0] && roomId) {
-      (<{navigate: Function}>(<unknown>clientList[0])).navigate(`/#/chat/${roomId}`); // TODO
+      (<{ navigate: Function }>(<unknown>clientList[0])).navigate(`/#/chat/${roomId}`); // TODO
     } else if (clientList && clientList[0]) {
-      (<{focus: Function}>(<unknown>clientList[0])).focus(); // TODO
+      (<{ focus: Function }>(<unknown>clientList[0])).focus(); // TODO
     } else if (roomId) {
       clients.openWindow(`/#/chat/${roomId}`);
     } else {

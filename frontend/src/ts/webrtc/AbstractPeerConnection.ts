@@ -1,19 +1,19 @@
-import type {Logger} from "lines-logger";
+import type { Logger } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import {bytesToSize} from "@/ts/utils/pureFunctions";
+import { bytesToSize } from "@/ts/utils/pureFunctions";
 
-import {sub} from "@/ts/instances/subInstance";
+import { sub } from "@/ts/instances/subInstance";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import Subscription from "@/ts/classes/Subscription";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
+import type { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
 import type {
   CheckTransferDestroy,
   ConnectToRemoteMessage,
 } from "@/ts/types/messages/innerMessages";
-import type {SendRtcDataMessage} from "@/ts/types/messages/wsInMessages";
-import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
+import type { SendRtcDataMessage } from "@/ts/types/messages/wsInMessages";
+import { WEBRTC_RUNTIME_CONFIG } from "@/ts/utils/runtimeConsts";
 
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
@@ -182,17 +182,13 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   // Destroy(Des)
 
-  protected onChannelMessage(event: MessageEvent) {
-    this.logger.log("Received {} from webrtc data channel", bytesToSize(event.data.byteLength))();
-  }
-
   // This event comes from websocket from server, which is created by another PC
   public async sendRtcData(message: SendRtcDataMessage) {
     if (!this.connectedToRemote) {
       this.logger.warn("Putting sendrtc data event to the queue")();
       this.sendRtcDataQueue.push(message);
     } else {
-      const data: RTCIceCandidateInit | RTCSessionDescriptionInit | {message: unknown} = message.content;
+      const data: RTCIceCandidateInit | RTCSessionDescriptionInit | { message: unknown } = message.content;
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== "closed") {
         if ((<RTCSessionDescriptionInit>data).sdp) {
           this.logger.log("Creating answer")();
@@ -204,12 +200,16 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
         } else if ((<RTCIceCandidateInit>data).candidate) {
           this.logger.log("Adding ice candidate {} ", (<RTCIceCandidateInit>data).candidate)();
           await this.pc!.addIceCandidate(new RTCIceCandidate(<RTCIceCandidateInit>data));
-        } else if ((<{message: unknown}>data).message) {
-          this.logger.error("Got unknown message {}", (<{message: unknown}>data).message);
+        } else if ((<{ message: unknown }>data).message) {
+          this.logger.error("Got unknown message {}", (<{ message: unknown }>data).message);
         }
       } else {
         this.logger.error("Skipping onsendRtcData message for closed connection")();
       }
     }
+  }
+
+  protected onChannelMessage(event: MessageEvent) {
+    this.logger.log("Received {} from webrtc data channel", bytesToSize(event.data.byteLength))();
   }
 }

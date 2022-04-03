@@ -11,13 +11,13 @@ import type {
   SetOpponentVoice,
 } from "@/ts/types/types";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type {
   ChangeStreamMessage,
   ConnectToRemoteMessage,
   DestroyPeerConnectionMessage,
 } from "@/ts/types/messages/innerMessages";
-import type {DestroyCallConnection} from "@/ts/types/messages/wsInMessages";
+import type { DestroyCallConnection } from "@/ts/types/messages/wsInMessages";
 import type {
   HandlerType,
   HandlerTypes,
@@ -30,35 +30,29 @@ import type {
   CallInfoModel,
   RoomModel,
 } from "@/ts/types/model";
-import {stopVideo} from "@/ts/utils/htmlApi";
+import { stopVideo } from "@/ts/utils/htmlApi";
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
-  protected _connectedToRemote: boolean = false;
-
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {
-    destroy: <HandlerType<"destroy", "peerConnection:*">> this.destroy,
-    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">> this.streamChanged,
-    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">> this.connectToRemote,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">> this.destroyCallConnection,
+    destroy: <HandlerType<"destroy", "peerConnection:*">>this.destroy,
+    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">>this.streamChanged,
+    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">>this.connectToRemote,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
+    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">>this.destroyCallConnection,
   };
-
   private audioProcessor: any;
-
   // Ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
   private remoteStream: MediaStream | null = null;
-
   private localStream: MediaStream | null = null;
-
   private readonly streamTrackApi: "stream" | "track" = "track";
 
   constructor(
-    roomId: number,
-    connId: string,
-    opponentWsId: string,
-    userId: number,
-    wsHandler: WsHandler,
-    store: DefaultStore,
+      roomId: number,
+      connId: string,
+      opponentWsId: string,
+      userId: number,
+      wsHandler: WsHandler,
+      store: DefaultStore,
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     // @ts-expect-error
@@ -86,6 +80,8 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     };
     this.store.setCallOpponent(payload);
   }
+
+  protected _connectedToRemote: boolean = false;
 
   get connectedToRemote() {
     return this._connectedToRemote;
@@ -162,69 +158,6 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       };
     }
     this.changeStreams(event.stream);
-  }
-
-  private addStream(stream: MediaStream) {
-    if (this.remoteStream !== stream) {
-      this.remoteStream = stream;
-      const payload: SetOpponentAnchor = {
-        anchor: this.remoteStream, // R3d71 search bottom
-        opponentWsId: this.opponentWsId,
-        roomId: this.roomId,
-      };
-      this.store.setOpponentAnchor(payload);
-
-      if (this.sendRtcDataQueue.length > 0) {
-        this.logger.log("Connection accepted, consuming sendRtcDataQueue")();
-        const queue = this.sendRtcDataQueue;
-        this.sendRtcDataQueue = [];
-        queue.forEach(async(message) => this.sendRtcData(message));
-      }
-
-      /*
-       *
-       * If (p) { //firefox video.play doesn't return promise
-       *   // chrome returns promise, if it's on mobile devices video sound would be muted
-       *   // coz it initialized from network instead of user gesture
-       *   p.catch(Utils.clickToPlay(this.dom.remote))
-       * }
-       */
-      removeAudioProcesssor(this.audioProcessor);
-      this.audioProcessor = createMicrophoneLevelVoice(this.remoteStream, this.processAudio.bind(this));
-    } else {
-      this.logger.log("onstream has been called already for this stream. So skipping this cb")();
-    }
-  }
-
-  private changeStreams(stream: MediaStream | null) {
-    const prevStream = this.localStream;
-    this.localStream = stream;
-    if (this.streamTrackApi === "stream") {
-      this.logger.log("Adding local stream {} to remote", getStreamLog(stream))();
-      if (prevStream) {
-        this.pc!.removeStream(prevStream);
-      }
-      this.pc!.addStream(stream!);
-    } else {
-      this.logger.log("Rewriting tracks to remote for stream {}", getStreamLog(stream))();
-      const senders = this.pc!.getSenders();
-      for (const sender of senders) {
-        this.logger.debug("Remove track from sender {}", sender)();
-        this.pc!.removeTrack(sender);
-      }
-      if (stream) {
-        for (const track of stream.getTracks()) {
-
-          /*
-           * https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack
-           * check usage notes, if I don't specify a stream as a second arguments
-           * onaddtracks in r3d71 would be w/o a stream and I would need to create a stream and assemble them manually
-           */
-          this.logger.debug("Adding track {} to sender, of stream {}", getTrackLog(track), getStreamLog(stream))();
-          this.pc!.addTrack(track, stream);
-        }
-      }
-    }
   }
 
   public streamChanged(payload: ChangeStreamMessage) {
@@ -313,5 +246,68 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       callInfoModel: null,
     };
     this.store.setCallOpponent(payload);
+  }
+
+  private addStream(stream: MediaStream) {
+    if (this.remoteStream !== stream) {
+      this.remoteStream = stream;
+      const payload: SetOpponentAnchor = {
+        anchor: this.remoteStream, // R3d71 search bottom
+        opponentWsId: this.opponentWsId,
+        roomId: this.roomId,
+      };
+      this.store.setOpponentAnchor(payload);
+
+      if (this.sendRtcDataQueue.length > 0) {
+        this.logger.log("Connection accepted, consuming sendRtcDataQueue")();
+        const queue = this.sendRtcDataQueue;
+        this.sendRtcDataQueue = [];
+        queue.forEach(async (message) => this.sendRtcData(message));
+      }
+
+      /*
+       *
+       * If (p) { //firefox video.play doesn't return promise
+       *   // chrome returns promise, if it's on mobile devices video sound would be muted
+       *   // coz it initialized from network instead of user gesture
+       *   p.catch(Utils.clickToPlay(this.dom.remote))
+       * }
+       */
+      removeAudioProcesssor(this.audioProcessor);
+      this.audioProcessor = createMicrophoneLevelVoice(this.remoteStream, this.processAudio.bind(this));
+    } else {
+      this.logger.log("onstream has been called already for this stream. So skipping this cb")();
+    }
+  }
+
+  private changeStreams(stream: MediaStream | null) {
+    const prevStream = this.localStream;
+    this.localStream = stream;
+    if (this.streamTrackApi === "stream") {
+      this.logger.log("Adding local stream {} to remote", getStreamLog(stream))();
+      if (prevStream) {
+        this.pc!.removeStream(prevStream);
+      }
+      this.pc!.addStream(stream!);
+    } else {
+      this.logger.log("Rewriting tracks to remote for stream {}", getStreamLog(stream))();
+      const senders = this.pc!.getSenders();
+      for (const sender of senders) {
+        this.logger.debug("Remove track from sender {}", sender)();
+        this.pc!.removeTrack(sender);
+      }
+      if (stream) {
+        for (const track of stream.getTracks()) {
+
+          /*
+           * https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack
+           * check usage notes, if I don't specify a stream as a second arguments
+           * onaddtracks in r3d71 would be w/o a stream and I would need to create a stream and assemble them manually
+           */
+          this.logger.debug("Adding track {} to sender, of stream {}", getTrackLog(track), getStreamLog(stream))();
+          this.pc!.addTrack(track, stream);
+        }
+      }
+    }
   }
 }

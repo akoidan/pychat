@@ -1,16 +1,16 @@
 import faviconUrl from "@/assets/img/favicon.ico";
-import {incoming} from "@/ts/utils/audio";
+import { incoming } from "@/ts/utils/audio";
 import type {
   FileModel,
   MessageModel,
 } from "@/ts/types/model";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
-import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
+import type { AudioPlayer } from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
-import {resolveMediaUrl} from "@/ts/utils/htmlApi";
-import type {Emitter} from "mitt";
+import type { Logger } from "lines-logger";
+import { resolveMediaUrl } from "@/ts/utils/htmlApi";
+import type { Emitter } from "mitt";
 
 export class MessageHelper {
   private readonly logger: Logger;
@@ -29,6 +29,18 @@ export class MessageHelper {
     this.audioPlayer = audioPlayer;
     this.messageBus = messageBus;
     this.notifier = notifier;
+  }
+
+  public processUnknownP2pMessage(message: MessageModel) {
+    if (message.userId !== this.store.myId) {
+      this.processOpponentMessage(message);
+    }
+    this.store.addMessage(message);
+    this.processAnyMessage();
+  }
+
+  public processAnyMessage() {
+    this.messageBus.emit("scroll");
   }
 
   private processOpponentMessage(message: MessageModel) {
@@ -66,17 +78,5 @@ export class MessageHelper {
     if (this.store.userSettings!.messageSound) {
       this.audioPlayer.checkAndPlay(incoming, room.volume);
     }
-  }
-
-  public processUnknownP2pMessage(message: MessageModel) {
-    if (message.userId !== this.store.myId) {
-      this.processOpponentMessage(message);
-    }
-    this.store.addMessage(message);
-    this.processAnyMessage();
-  }
-
-  public processAnyMessage() {
-    this.messageBus.emit("scroll");
   }
 }

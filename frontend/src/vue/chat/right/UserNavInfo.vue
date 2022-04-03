@@ -14,9 +14,9 @@ import {
   Prop,
   Vue,
 } from "vue-property-decorator";
-import {State} from "@/ts/instances/storeInstance";
+import { State } from "@/ts/instances/storeInstance";
 import UserImageIcon from "@/vue/chat/chatbox/UserImageIcon.vue";
-import {UserModel} from "@/ts/types/model";
+import { UserModel } from "@/ts/types/model";
 
 @Component({
   name: "UserNavInfo",
@@ -39,22 +39,26 @@ export default class UserNavInfo extends Vue {
 </script>
 <!-- eslint-disable -->
 <style
-  lang="sass"
-  scoped
+    lang="sass"
+    scoped
 >
-  .user-row
-    width: auto
+.user-row
+  width: auto
+  display: flex
+  padding-left: 8px
+  align-items: center
+
+  .user-info
     display: flex
-    padding-left: 8px
-    align-items: center
-    .user-info
-      display: flex
-      flex-direction: column
-      margin-left: 10px
-    .user-online, .user-offline
-      font-size: 12px
-    .user-online
-      color: #7eb1e3
-    .user-offline
-      color: grey
+    flex-direction: column
+    margin-left: 10px
+
+  .user-online, .user-offline
+    font-size: 12px
+
+  .user-online
+    color: #7eb1e3
+
+  .user-offline
+    color: grey
 </style>

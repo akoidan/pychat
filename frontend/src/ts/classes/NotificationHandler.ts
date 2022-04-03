@@ -1,9 +1,9 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {Logger} from "lines-logger";
-import {extractError} from "@/ts/utils/pureFunctions";
+import type { Logger } from "lines-logger";
+import { extractError } from "@/ts/utils/pureFunctions";
 import type Api from "@/ts/message_handlers/Api";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import {
   GIT_HASH,
   IS_DEBUG,
@@ -14,47 +14,31 @@ import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
-import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
+import type { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import {sub} from "@/ts/instances/subInstance";
-import type {MainWindow} from "@/ts/classes/MainWindow";
+import { sub } from "@/ts/instances/subInstance";
+import type { MainWindow } from "@/ts/classes/MainWindow";
 
 
 export default class NotifierHandler extends MessageHandler {
   protected readonly logger: Logger;
-
+  protected readonly handlers: HandlerTypes<keyof Api, "any"> = {
+    internetAppear: <HandlerType<"internetAppear", "any">>this.internetAppear,
+  };
   private readonly mainWindow: MainWindow;
-
   private readonly popedNotifQueue: Notification[] = [];
-
-
   /* This is required to know if this tab is the only one and don't spam with same notification for each tab*/
   private serviceWorkedTried = false;
-
   private serviceWorkerRegistration: any = null;
-
   private subscriptionId: string | null = null;
-
   private newMessagesCount: number = 0;
-
   private readonly store: DefaultStore;
-
   private readonly api: Api;
-
   private readonly browserVersion: string;
-
   private readonly isChrome: boolean;
-
   private readonly isMobile: boolean;
-
   private readonly ws: WsHandler;
-
   private readonly documentTitle: string;
-
-  protected readonly handlers: HandlerTypes<keyof Api, "any"> = {
-    internetAppear: <HandlerType<"internetAppear", "any">> this.internetAppear,
-  };
-
 
   constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow) {
     super();
@@ -78,7 +62,7 @@ export default class NotifierHandler extends MessageHandler {
     }
   }
 
-  public replaceIfMultiple(data: {title: string; options: NotificationOptions}) {
+  public replaceIfMultiple(data: { title: string; options: NotificationOptions }) {
     let count = 1;
     const newMessData = data.options.data;
     if (newMessData && newMessData.replaced) {
@@ -183,8 +167,10 @@ export default class NotifierHandler extends MessageHandler {
       const r = await this.serviceWorkerRegistration.showNotification(title, options);
       this.logger.debug("res {}", r)(); // TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
     } else {
-      const data = {title,
-        options};
+      const data = {
+        title,
+        options
+      };
       this.replaceIfMultiple(data);
       const not = new Notification(data.title, data.options);
       if (data.options.replaced) {

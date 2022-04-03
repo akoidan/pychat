@@ -1,7 +1,7 @@
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type Api from "@/ts/message_handlers/Api";
-import type {Logger} from "lines-logger";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import type { Logger } from "lines-logger";
+import type { DefaultStore } from "@/ts/classes/DefaultStore";
 import type {
   GoogleCaptcha,
   PlatformUtil,
@@ -14,11 +14,11 @@ import type {
 import type WebRtcApi from "@/ts/webrtc/WebRtcApi";
 import type Subscription from "@/ts/classes/Subscription";
 import type Http from "@/ts/classes/Http";
-import type {Router} from "vue-router";
-import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
-import type {RoomHandler} from "@/ts/message_handlers/RomHandler";
-import type {App as VueApp} from "@vue/runtime-core";
-import type {Emitter} from "mitt";
+import type { Router } from "vue-router";
+import type { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
+import type { RoomHandler } from "@/ts/message_handlers/RomHandler";
+import type { App as VueApp } from "@vue/runtime-core";
+import type { Emitter } from "mitt";
 
 declare global {
   interface Window {

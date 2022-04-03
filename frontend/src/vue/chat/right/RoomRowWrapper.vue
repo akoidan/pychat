@@ -13,8 +13,8 @@ import {
   Vue,
 } from "vue-property-decorator";
 import RoomRightIcon from "@/vue/chat/right/RoomRightIcon.vue";
-import {RoomModel} from "@/ts/types/model";
-import {State} from "@/ts/instances/storeInstance";
+import { RoomModel } from "@/ts/types/model";
+import { State } from "@/ts/instances/storeInstance";
 
 @Component({
   name: "RoomRowWrapper",
@@ -42,14 +42,14 @@ export default class RoomRowWrapper extends Vue {
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/room_users_table"
+@import "@/assets/sass/partials/room_users_table"
 
-  li
-    @extend %li
+li
+  @extend %li
 
-  .link
-    @extend %link
+.link
+  @extend %link
 
-  .active-room
-    @extend %active-room
+.active-room
+  @extend %active-room
 </style>
