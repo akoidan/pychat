@@ -48,7 +48,7 @@ declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
     $ws: WsHandler;
     $api: Api;
-    $store: DefaultStore; // If $store conflicts with node_modules/vuex/types/vue.d.ts if
+    $store: DefaultStore;
     $logger: Logger;
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;

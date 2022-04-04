@@ -3,6 +3,36 @@ declare module "*.json" {
   export default value;
 }
 
+/*
+  eslint-disable @typescript-eslint/naming-convention
+ */
+declare const PYCHAT_CONSTS: {
+  IS_SSL: boolean;
+  IS_DEBUG: boolean;
+  BACKEND_ADDRESS: string;
+  GOOGLE_OAUTH_2_CLIENT_ID: string | false;
+  FACEBOOK_APP_ID: string | false;
+  PUBLIC_PATH: string | null;
+  RECAPTCHA_PUBLIC_KEY: string | false;
+  AUTO_REGISTRATION: boolean;
+  ISSUES: boolean;
+  GITHUB_LINK: string | false;
+  FLAGS: boolean;
+  GIT_HASH: string;
+  IS_ANDROID: boolean;
+  // TODO
+  ELECTRON_MAIN_FILE: string;
+  SERVICE_WORKER_URL: string | null;
+  ELECTRON_IGNORE_SSL: boolean;
+  // TODO
+  CAPTCHA_IFRAME: string | false;
+  WEBRTC_CONFIG: RTCConfiguration;
+  GIPHY_API_KEY: string;
+};
+/*
+  eslint-enable @typescript-eslint/naming-convention
+*/
+
 declare module "*.ico" {
   const result: string;
   export default result;
