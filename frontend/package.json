@@ -34,6 +34,7 @@
     "sass": "^1.49.9",
     "typescript": "^4.6.3",
     "vite": "^2.9.1",
+    "vite-plugin-static-copy": "https://github.com/akoidan/vite-plugin-static-copy",
     "vue-tsc": "^0.33.9",
     "vite-plugin-checker": "^0.4.4"
   },
@@ -51,6 +52,7 @@
     "spainter": "^1.2.12",
     "typeface-oswald": "0.0.75",
     "vue": "^3.2.31",
+    "vue-class-component": "https://github.com/vuejs/vue-class-component#next",
     "vue-cropperjs": "^4.2.0",
     "vue-property-decorator": "npm:@smyld/vue-property-decorator@^10.0.17",
     "vue-router": "^4.0.14",
