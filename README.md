@@ -234,9 +234,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ## Ssl
 Since we're using self singed certificate your OS doesn't know about for development. We need to do some tricks for browser to make it work. If you have valid certificates for your domain you can skip this step.
 
-1. I used the following commands to generate a new self signed certificate. You can use mine located in `frontend/certs` directory. So you can skip this text
+1. I used the following commands to generate a new self signed certificate. You can use mine located in `frontend/build/certs` directory. So you can skip this text
 ```
-cd frontend/certs
+cd frontend/build/certs
 openssl genrsa -out private.key.pem 4096
 openssl req -new -sha256 -out root.ca.pem -key private.key.pem -subj '/CN=localhost' -extensions EXT -config <( printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 openssl x509 -req -days 3650 -in root.ca.pem -signkey private.key.pem -out server.crt.pem -extfile ./v3.ext
@@ -248,9 +248,9 @@ Useful links:
 
 2. You have multiple options:
   - Install development certificate on operating system. Each os will require own configuration. E.g. macos do 
-    - ![browser-1](frontend/certs/browser-cert-1.png)
-    - Drag and drop for image near localhost to finder![browser-1](frontend/certs/browser-cert-2.png)
-    - Double click on newly created file and go to All items, select localhost and mark it as 'Always trust' ![macos-cert](frontend/certs/macos-cert-3.png)
+    - ![browser-1](frontend/builds/certs/browser-cert-1.png)
+    - Drag and drop for image near localhost to finder![browser-1](frontend/build/certs/browser-cert-2.png)
+    - Double click on newly created file and go to All items, select localhost and mark it as 'Always trust' ![macos-cert](frontend/build/certs/macos-cert-3.png)
   - Click on Proceed unsafe when accessing your site. Proceed unsafe may be unavailable in some cases. E.g. for MacOS chrome you can use hack: just type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
    -  If you use different ports for back and front (like its described above) you may need to accept certificate from localhost:8888 (use for api) as well. For that open https://localhost:8888 
   - Tell Browser to ignore certificate:

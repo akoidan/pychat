@@ -11,8 +11,8 @@ async function main() {
         root: 'dist',
         fallback: 'index.html',
         credentials: {
-            cert: await readFileAsync('./certs/server.crt.pem'),
-            key: await readFileAsync('./certs/private.key.pem'),
+            cert: await readFileAsync('./build/certs/server.crt.pem'),
+            key: await readFileAsync('./build/certs/private.key.pem'),
         },
         port: 8080,
     });

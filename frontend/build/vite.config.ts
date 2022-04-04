@@ -20,9 +20,9 @@ export default defineConfig(async ({command, mode}) => {
   let key, cert, ca, gitHash;
   if (command === 'serve') {
     [key, cert, ca, gitHash] = await Promise.all([
-      readFileAsync('./certs/private.key.pem'),
-      readFileAsync('./certs/server.crt.pem'),
-      readFileAsync('./certs/root.cr.pem'),
+      readFileAsync('./build/certs/private.key.pem'),
+      readFileAsync('./build/certs/server.crt.pem'),
+      readFileAsync('./build/certs/root.cr.pem'),
       getGitRevision()
     ]);
   } else {
