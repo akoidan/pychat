@@ -40,6 +40,9 @@ export default defineConfig(async ({command, mode}) => {
     },
     ...(PYCHAT_CONSTS.PUBLIC_PATH ? {base: PYCHAT_CONSTS.PUBLIC_PATH} : null),
     root: srcDir,
+    css: {
+      devSourcemap: true,
+    },
     plugins: [
       vue(),
       checker({
@@ -66,6 +69,7 @@ export default defineConfig(async ({command, mode}) => {
       assetsInlineLimit: 0,
       minify: !PYCHAT_CONSTS.IS_DEBUG,
       outDir: distDir,
+      sourcemap: true,
       rollupOptions: {
         input: {
           index: resolve(srcDir, 'index.html'), //index should be inside src, otherwise vite won't return it by default

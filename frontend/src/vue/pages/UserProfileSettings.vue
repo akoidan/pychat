@@ -161,7 +161,7 @@ export default class UserProfileSettings extends Vue {
 
   public model!: UserSettingsDto;
 
-  private readonly logLevels: LogLevel[] = Object.keys(logLevels) as LogLevel[];
+  public readonly logLevels: LogLevel[] = Object.keys(logLevels) as LogLevel[];
 
   public async created() {
     this.model = userSettingsDtoToModel(this.userSettings);
