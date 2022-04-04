@@ -131,7 +131,7 @@ RUN set -x && \
     rm -rf /var/lib/redis &&\
     mv ./backend/chat/migrations . &&\
     ln -sf /data/settings.py ./backend/chat/settings.py && \
-    ln -sf /data/production.json ./frontend/production.json && \
+    ln -sf /data/production.json ./frontend/build/production.json && \
     ln -sf /data/turnserver.conf /etc/coturn/turnserver.conf && \
     mkdir /etc/nginx/ssl &&\
     ln -sf /data/certificate.crt /etc/nginx/ssl && \

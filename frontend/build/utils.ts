@@ -29,7 +29,8 @@ export async function readFileAsync(name: string) {
 }
 
 export function getConsts(gitHash: string, command: 'build' | 'serve') {
-  const result = command === 'build' ? require('./production.json') : require('./development.json');
+  const buildName = command === 'build' ?  './production.json' : './development.json';
+  const result = require (buildName);
   result.GIT_HASH = gitHash;
   result.IS_SSL = true;
   // Do not use sw for dev server, it breaks hmr
