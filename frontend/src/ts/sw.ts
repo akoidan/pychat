@@ -11,7 +11,7 @@ declare let clients: any;
 declare let serviceWorkerOption: {assets: string[]};
 
 
-const loggerFactory = new LoggerFactory(IS_DEBUG ? "trace" : "error");
+const loggerFactory = new LoggerFactory(IS_DEBUG ? "trace" : "info");
 const logger: Logger = loggerFactory.getLogger(`SW_${GIT_HASH}`);
 
 let subScr: string | null = null;
@@ -41,22 +41,25 @@ allAssets.push((self as any).registration.scope);
 allAssetsSet[(self as any).registration.scope] = true;
 // This event fires when service worker registers the first time
 self.addEventListener("install", (event: any) => {
-  logger.log(" Delaying install event to put static resources")();
+  logger.debug(" Delaying install event to put static resources")();
   event.waitUntil((async() => {
     const staticCache = await caches.open("static");
-    const assets = allAssets.filter((url) => url.includes("/smileys/") ||
-        url.includes(".js") ||
-        url.includes(".css") ||
-        url.includes(".json") ||
+    const assets = allAssets.filter((url) =>
+      url.includes("/smileys/") ||
+      url.includes("/flags/") ||
+        url.includes("/js/") ||
+        url.includes("/css/") ||
         url.includes("/img/") ||
+        /\/font\/fontello.*\.woff2/.test(url) ||
+        /\/manifest.*\.json/.test(url) ||
         url === (self as any).registration.scope);
     logger.log("Putting to static cache {}", assets)();
     await staticCache.addAll(assets);
     const allFiles = await staticCache.keys();
     const oldFiles = allFiles.filter((r) => !allAssetsSet[r.url]);
-    logger.log("Putting to static cache finished, removing old files {}", oldFiles)();
+    logger.debug("Putting to static cache finished, removing old files {}", oldFiles)();
     await Promise.all(oldFiles.map(async(oldFile) => staticCache.delete(oldFile)));
-    logger.log("Removed old files finished. Can proceed to activate now..")();
+    logger.debug("Removed old files finished. Can proceed to activate now..")();
   })());
 });
 
@@ -91,7 +94,7 @@ self.addEventListener("fetch", async(event: any) => {
     const cachedResponse: any = await caches.match(request);
 
     if (cachedResponse && request.mode !== "navigate") {
-      logger.debug(`Returning ${request.url} from cache`)();
+      logger.log(`Returning ${request.url} from cache`)();
       return cachedResponse;
     }
 
@@ -117,7 +120,7 @@ self.addEventListener("fetch", async(event: any) => {
         logger.debug(`Adding ${request.url} to photos cache`)();
         await cache.put(request, fetchedResponse.clone());
       } else if (belongsToStaticCache) {
-        logger.log(`Putting ${request.url} to static cache`)();
+        logger.debug(`Putting ${request.url} to static cache`)();
         const cache = await caches.open("static"); // All static assets
         await cache.put(request, fetchedResponse.clone());
       }
@@ -153,7 +156,7 @@ function getSubscriptionId(pushSubscription: any) {
 }
 
 async function getPlayBack(event: unknown) {
-  logger.log("Received a push message {}", event)();
+  logger.debug("Received a push message {}", event)();
   if (!subScr) {
     const r = await (<any>self).registration.pushManager.getSubscription();
     subScr = getSubscriptionId(r);
@@ -172,11 +175,11 @@ async function getPlayBack(event: unknown) {
   const response = await fetch(`${address}/api/get_firebase_playback?registration_id=${subScr}`, {
     credentials: "omit",
   });
-  logger.log("Fetching finished {}", response)();
+  logger.debug("Fetching finished {}", response)();
   const t = await response.text();
   logger.debug("response is {}", t)();
   const m = JSON.parse(t);
-  logger.log("Parsed response {}", m)();
+  logger.debug("Parsed response {}", m)();
   const notifications = await (<any>self).registration.getNotifications();
   let count = 1;
   if (m.options && m.options.data) {
@@ -205,14 +208,14 @@ async function getPlayBack(event: unknown) {
       }
     }
   }
-  logger.log("Spawned notification {}", m)();
+  logger.debug("Spawned notification {}", m)();
   await (<any>self).registration.showNotification(m.title, m.options);
 }
 
 self.addEventListener("push", (e: any) => e.waitUntil(getPlayBack(e)));
 
 self.addEventListener("notificationclick", (event: any) => {
-  logger.log("On notification click: {}", event.notification.tag)();
+  logger.debug("On notification click: {}", event.notification.tag)();
 
   /*
    * Android doesn’t close the notification when you click on it
