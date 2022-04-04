@@ -37,7 +37,7 @@
     "array-element-newline": [1, "consistent"],
     "comma-dangle": 0, // using typescript-eslint/comma-dangle
     "function-call-argument-newline": [1, "consistent"],
-    "max-len": [1, { "code": 120, "ignorePattern": "http?s:\/\/", "ignoreTrailingComments": true}], // override 80 that is too low
+    "max-len": [1, { "code": 140, "ignorePattern": "http?s:\/\/", "ignoreTrailingComments": true}], // override 80 that is too low
     "padded-blocks": [1, "never"],
     "max-statements": [1, 15],
     "function-paren-newline": [1, "consistent"],
