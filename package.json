@@ -1,1 +1,62 @@
-./frontend/package.json
+{
+  "name": "pychat",
+  "version": "1.0.0",
+  "description": "Opensource chat",
+  "scripts": {
+    "build": "vite --config build/vite.config.ts build",
+    "start": "vite --config build/vite.config.ts",
+    "cp-prod-files": "tar c dist/ | ssh http@pychat.org -p 8886 \"rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/\"",
+    "serve": "yarn build && node build/static-server.js",
+    "postinstall": "patch -p1 -i patches/vue-class-component+8.0.0-rc.1.patch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akoidan/pychat.git"
+  },
+  "author": "Andrew Koidan <deathangel908@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/akoidan/pychat/issues"
+  },
+  "homepage": "https://github.com/akoidan/pychat#readme",
+  "devDependencies": {
+    "@babel/types": "^7.17.0",
+    "@types/chrome": "^0.0.180",
+    "@types/cordova": "^0.0.34",
+    "@types/electron": "^1.6.10",
+    "@types/giphy-api": "^2.0.3",
+    "@types/lodash.debounce": "4.0.6",
+    "@types/node": "^17.0.23",
+    "@types/vue-cropperjs": "^4.1.1",
+    "@types/websql": "0.0.27",
+    "@vitejs/plugin-vue": "^2.3.1",
+    "patch-package": "^6.2.2",
+    "sass": "^1.49.9",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.1",
+    "vite-plugin-static-copy": "https://github.com/akoidan/vite-plugin-static-copy",
+    "vue-tsc": "^0.33.9",
+    "vite-plugin-checker": "^0.4.4"
+  },
+  "dependencies": {
+    "electron-devtools-installer": "^3.2.0",
+    "emoji-datasource-apple": "^7.0.2",
+    "highlight.js": "^11.5.0",
+    "is-mobile": "2.1.0",
+    "lines-logger": "^2.0.2",
+    "lodash.debounce": "4.0.8",
+    "mitt": "^3.0.0",
+    "npm-font-open-sans": "1.1.0",
+    "reflect-metadata": "0.1.13",
+    "servor": "^4.0.2",
+    "spainter": "^1.2.12",
+    "typeface-oswald": "0.0.75",
+    "vue": "^3.2.31",
+    "vue-class-component": "https://github.com/vuejs/vue-class-component#next",
+    "vue-cropperjs": "^4.2.0",
+    "vue-property-decorator": "npm:@smyld/vue-property-decorator@^10.0.17",
+    "vue-router": "^4.0.14",
+    "vuex": "^4.0.2",
+    "vuex-module-decorators": "^2.0.0"
+  }
+}
