@@ -39,11 +39,11 @@
     "function-call-argument-newline": [1, "consistent"],
     "max-len": [1, { "code": 140, "ignorePattern": "http?s:\/\/", "ignoreTrailingComments": true}], // override 80 that is too low
     "padded-blocks": [1, "never"],
-    "max-statements": [1, 15],
+    "max-statements": [1, 25],
     "function-paren-newline": [1, "consistent"],
     "no-inline-comments": 0,
     "no-confusing-arrow": 0, // conflict with no-extra-parens
-    "max-params": [1, 4],
+    "max-params": [1, 5],
     "no-void": [0], // allow void for void promise
     "@typescript-eslint/no-untyped-public-signature": 0, // this breaks a lot: constructions public, ES6 setter should have return type etc
     "@typescript-eslint/ban-ts-ignore": 0, // who cares, we explicitly define it.

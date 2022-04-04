@@ -3,6 +3,7 @@ import type Api from "@/ts/message_handlers/Api";
 import type {Logger} from "lines-logger";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
+  EventTypes,
   GoogleCaptcha,
   PlatformUtil,
 } from "@/ts/types/model";
@@ -51,7 +52,7 @@ declare module "@vue/runtime-core" {
     $logger: Logger;
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;
-    $messageBus: Emitter<any>;
+    $messageBus: Emitter<EventTypes>;
     $webrtcApi: WebRtcApi;
   }
 }

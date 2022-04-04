@@ -113,6 +113,10 @@ export interface FileModel {
   sending: boolean;
 }
 
+export type EventTypes = {
+  scroll: undefined;
+};
+
 export interface UploadProgressModel {
   total: number;
   uploaded: number;

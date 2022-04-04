@@ -37,7 +37,7 @@ export default class GoogleAuth extends Vue {
 
   public googleToken: string | null = null;
 
-  public oauth_token: string = GOOGLE_OAUTH_2_CLIENT_ID;
+  public oauth_token: string|false = GOOGLE_OAUTH_2_CLIENT_ID;
 
   get googleRunning() {
     return this.grunning || !this.googleApiLoaded;

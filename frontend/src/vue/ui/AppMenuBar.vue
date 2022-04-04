@@ -72,7 +72,7 @@ export default class AppMenuBar extends Vue {
     return resolveMediaUrl(this.userInfo.image);
   }
 
-  public get consts(): {GITHUB_LINK: string; ISSUES: string} {
+  public get consts() {
     return {
       GITHUB_LINK,
       ISSUES,

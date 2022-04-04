@@ -17,7 +17,7 @@ import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import sessionHolder from "@/ts/instances/sessionInstance";
 import type {App as VueApp} from "@vue/runtime-core";
-import type {PlatformUtil} from "@/ts/types/model";
+import type {PlatformUtil, EventTypes} from "@/ts/types/model";
 import Xhr from "@/ts/classes/Xhr";
 import "@/assets/icon.png"; // eslint-disable-line import/no-unassigned-import
 import WsHandler from "@/ts/message_handlers/WsHandler";
@@ -49,37 +49,16 @@ import {
 const logger: Logger = loggerFactory.getLoggerColor("main", "#007a70");
 logger.log(`Evaluating main script ${constants.GIT_HASH}`)();
 
-async function init() {
-  document.body.addEventListener("drop", (e) => {
-    e.preventDefault();
-  });
-  document.body.addEventListener("dragover", (e) => {
-    e.preventDefault();
-  });
 
-  const xhr: Http = /* Window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
-  const api: Api = new Api(xhr);
-
-  let storage;
-  try {
-    storage = new DatabaseWrapper(mainWindow);
-  } catch (e) {
-    logger.error("Unable to init websql, because {}. Falling back to localstorage", e)();
-    storage = new LocalStorage();
-  }
-
-  const audioPlayer: AudioPlayer = new AudioPlayer(mainWindow);
-  store.setStorage(storage);
-  const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
-  const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow);
-  const messageBus: Emitter<any> = mitt();
-  const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
-  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
-  const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
-  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
-  const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
-  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
-
+// eslint-disable-next-line max-params
+function bootstrapVue(
+  messageBus: Emitter<EventTypes>,
+  api: Api,
+  ws: WsHandler,
+  webrtcApi: WebRtcApi,
+  platformUtil: PlatformUtil,
+  messageSenderProxy: MessageSenderProxy,
+): VueApp {
   const vue: VueApp = createApp(App, {
     store: vueStore,
   });
@@ -113,15 +92,55 @@ async function init() {
     logger.error("Error occurred in vue component err: '{}', vm '{}', info '{}'", err, vm, info)();
     return false;
   };
+  return vue;
+}
+
+// eslint-disable-next-line max-lines-per-function, max-statements
+function init(): void {
+  document.body.addEventListener("drop", (event) => {
+    event.preventDefault();
+  });
+  document.body.addEventListener("dragover", (event) => {
+    event.preventDefault();
+  });
+
+  const xhr: Http = /* Window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
+  const api: Api = new Api(xhr);
+
+  let storage;
+  try {
+    storage = new DatabaseWrapper(mainWindow);
+  } catch (event) {
+    logger.error("Unable to init websql, because {}. Falling back to localstorage", event)();
+    storage = new LocalStorage();
+  }
+
+  const audioPlayer: AudioPlayer = new AudioPlayer(mainWindow);
+  store.setStorage(storage);
+  const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
+  const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow);
+  const messageBus: Emitter<EventTypes> = mitt<EventTypes>();
+  const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
+  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
+  const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
+  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
+  const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
+  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
+
+  const vue = bootstrapVue(messageBus, api, ws, webrtcApi, platformUtil, messageSenderProxy);
 
   vue.mount(document.body);
 
-  window.onerror = function(msg, url, linenumber, column, errorObj) {
-    const message = `Error occurred in ${url}:${linenumber}\n${msg}`;
+  window.onerror = function onerror(msg, url, linenumber, column, errorObj): boolean {
+    const message = `Error occurred in ${url!}:${linenumber!}\n${JSON.stringify(msg)}`;
     if (store?.userSettings?.sendLogs && api) {
-      api.sendLogs(`${url}:${linenumber}:${column || "?"}\n${msg}\n\nOBJ:  ${errorObj || "?"}`, browserVersion, constants.GIT_HASH);
+      void api.sendLogs(
+        `${url!}:${linenumber!}:${column ?? "?"}\n${JSON.stringify(msg)}\n\nOBJ:  ${JSON.stringify(errorObj) ?? "?"}`,
+        browserVersion,
+        constants.GIT_HASH,
+      );
     }
-    store.growlError(message);
+    void store.growlError(message);
 
     return false;
   };
@@ -155,8 +174,8 @@ async function init() {
    */
 }
 
-if (document.readyState !== "loading") {
-  init();
-} else {
+if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init);
+} else {
+  init();
 }
