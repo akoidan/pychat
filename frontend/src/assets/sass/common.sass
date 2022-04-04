@@ -3,7 +3,7 @@ $FontPathOpenSans: "npm-font-open-sans/fonts" !default
 @import "typeface-oswald/index.css"
 @import "spainter/no-fonts.sass"
 @import "@/assets/sass/partials/animation"
-
+@import "@/assets/sass/partials/mixins"
 @import "@/assets/sass/partials/fontello"
 
 @import "@/assets/sass/themes/common_lor"
@@ -23,6 +23,9 @@ $FontelloPath: "@/assets/font"
 .icon-spin1
   width: 24px
   height: 24px // fix height otherwise it will jump while spinning
+
+.spinner-main
+  @include spinner(10px, white)
 
 [class^="icon-"]:before, [class*=" icon-"]:before
   font-family: "fontello"

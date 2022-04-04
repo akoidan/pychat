@@ -17,7 +17,6 @@ import fileIcon from "@/assets/img/file.svg";
 import {getFlag} from "@/ts/utils/flags";
 import videoIcon from "@/assets/img/icon-play-red.svg";
 import type {Smile} from "@/ts/utils/smileys";
-import {allSmileysKeys} from "@/ts/utils/smileys";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {
@@ -25,9 +24,9 @@ import {
   webpSupported,
 } from "@/ts/utils/runtimeConsts";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import {hexEncode} from "@/ts/utils/pureFunctions";
 import type {GIFObject} from "giphy-api";
 import type {Emitter} from "mitt";
+import { SmileysApi } from '@/ts/utils/smileys';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -57,11 +56,6 @@ export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a
     }
   }
 }
-
-export const smileUnicodeRegex = (function() {
-  const allSmileyRegexarray = Object.keys(allSmileysKeys).map(hexEncode);
-  return new RegExp(allSmileyRegexarray.join("|"), "g");
-}());
 
 
 const imageUnicodeRegex = /[\u3501-\u3600]/g;
@@ -137,16 +131,6 @@ export function getFlagPath(countryCode: string) {
   return getFlag(countryCode);
 }
 
-
-export function getSmileyHtml(symbol: string) {
-  const smile: Smile | undefined = allSmileysKeys[symbol];
-  if (!smile) {
-    throw Error(`Invalid smile ${symbol}`);
-  }
-
-  return `<img src="${smile.src}" symbol="${symbol}" class="emoji" alt="${smile.alt}">`;
-}
-
 export function getGiphyHtml(gif: GIFObject) {
   let src;
   if (gif.images.fixed_height_small) {
@@ -167,11 +151,7 @@ export function resolveMediaUrl<T extends string | null>(src: T): T {
   return src.startsWith("blob:http") ? src : `${MEDIA_API_URL}${src}` as T;
 }
 
-export function encodeSmileys(html: string): string {
-  return html.replace(smileUnicodeRegex, getSmileyHtml);
-}
-
-export function encodeP(data: MessageModel, store: DefaultStore) {
+export async function encodeP(data: MessageModel, store: DefaultStore, smileyApi: SmileysApi): Promise<string> {
   if (!data.content) {
     throw Error(`Message ${data.id} doesn't have content`);
   }
@@ -179,7 +159,7 @@ export function encodeP(data: MessageModel, store: DefaultStore) {
   html = encodeFiles(html, data.files);
 
   html = encodePTags(html, data.tags, store);
-  return encodeSmileys(html);
+  return smileyApi.encodeSmileys(html);
 }
 
 
@@ -198,7 +178,7 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
   }
 }
 
-export function encodeMessage(data: MessageModel, store: DefaultStore) {
+export function encodeMessageInited(data: MessageModel, store: DefaultStore, smileyApi: SmileysApi): string {
   // Logger.debug('Encoding message {}: {}', data.id, data)();
   if (!data.content) {
     throw Error(`Message ${data.id} doesn't have content`);
@@ -221,7 +201,7 @@ export function encodeMessage(data: MessageModel, store: DefaultStore) {
   }
   html = encodeFiles(html, data.files);
   html = encodeTags(html, data.tags, store);
-  return encodeSmileys(html);
+  return smileyApi.encodeSmileysSync(html);
 }
 
 function encodePTags(html: string, tags: Record<string, number> | null, store: DefaultStore) {

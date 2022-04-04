@@ -70,7 +70,6 @@ import {
   getCurrentWordInHtml,
   getGiphyHtml,
   getMessageData,
-  getSmileyHtml,
   pasteBlobAudioToTextArea,
   pasteBlobToContentEditable,
   pasteBlobVideoToTextArea,
@@ -205,13 +204,13 @@ export default class ChatTextArea extends Vue {
     return null;
   }
 
-  public mounted() {
+   public async mounted() {
     // Do not spam ws every type user types something, wait 10s at least
     this.showIType = new Throttle(() => {
       this.$ws.showIType(this.roomId);
     }, SHOW_I_TYPING_INTERVAL); // Every 10s
     if (this.editMessage) {
-      this.userMessage.innerHTML = encodeP(this.editMessage, this.$store);
+      this.userMessage.innerHTML = await encodeP(this.editMessage, this.$store, this.$smileyApi);
       placeCaretAtEnd(this.userMessage);
     }
   }
@@ -243,19 +242,19 @@ export default class ChatTextArea extends Vue {
     pasteHtmlAtCaret(getGiphyHtml(gif), this.userMessage);
   }
 
-  onEmitAddSmile(code: string) {
+  async onEmitAddSmile(code: string) {
     this.$logger.log("Adding smiley {}", code)();
-    pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
+    pasteHtmlAtCaret(await this.$smileyApi.getSmileyHtml(code), this.userMessage);
   }
 
-  onEmitQuote(message: MessageModel) {
+  async onEmitQuote(message: MessageModel) {
     this.userMessage.focus();
     let oldValue = this.userMessage.innerHTML;
     const match = timePattern.exec(oldValue);
     const user = this.allUsersDict[message.userId];
     oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
     // TODO refactor quote
-    this.userMessage.innerHTML = `${encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message, this.$store) + encodeHTML(" >>>") + String.fromCharCode(13)} ${oldValue}`;
+    this.userMessage.innerHTML = `${encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + await (encodeP(message, this.$store, this.$smileyApi)) + encodeHTML(" >>>") + String.fromCharCode(13)} ${oldValue}`;
     placeCaretAtEnd(this.userMessage);
   }
 

@@ -11,8 +11,10 @@ import {
 import { resolve } from "path";
 import { outputManifest } from './sw.plugin';
 import { OutputChunk } from 'rollup';
-import checker from 'vite-plugin-checker'
+import viteChecker from 'vite-plugin-checker'
 import { viteStaticCopy } from 'vite-plugin-static-copy'
+import viteCompression from 'vite-plugin-compression'
+import viteVisualizer from 'rollup-plugin-visualizer'
 
 export default defineConfig(async ({command, mode}) => {
   let key, cert, ca, gitHash;
@@ -45,7 +47,7 @@ export default defineConfig(async ({command, mode}) => {
     },
     plugins: [
       vue(),
-      checker({
+      viteChecker({
           typescript: true,
           vueTsc: true,
           ...(false ? {eslint: {
@@ -53,6 +55,9 @@ export default defineConfig(async ({command, mode}) => {
           }}: null)
         }
       ),
+      viteCompression({
+        filter: () => true,
+      }),
       splitVendorChunkPlugin(),
       outputManifest({swFilePath}),
       viteStaticCopy({
@@ -71,6 +76,11 @@ export default defineConfig(async ({command, mode}) => {
       outDir: distDir,
       sourcemap: true,
       rollupOptions: {
+        plugins: [
+          viteVisualizer({
+            filename:  resolve(__dirname, 'stats.html'),
+          })
+        ],
         input: {
           index: resolve(srcDir, 'index.html'), //index should be inside src, otherwise vite won't return it by default
           sw: swFilePath,

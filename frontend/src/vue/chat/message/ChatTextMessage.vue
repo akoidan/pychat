@@ -30,7 +30,7 @@ import {
 } from "@/ts/types/model";
 import {
   encodeHTML,
-  encodeMessage,
+  encodeMessageInited,
   highlightCode,
   setAudioEvent,
   setImageFailEvents,
@@ -53,6 +53,9 @@ export default class ChatTextMessage extends Vue {
   @State
   public readonly userSettings!: CurrentUserSettingsModel;
 
+  @State
+  public smileysLoaded!: boolean;
+
   @Ref()
   public content!: HTMLElement;
 
@@ -61,7 +64,12 @@ export default class ChatTextMessage extends Vue {
   }
 
   get encoded() {
-    return this.message.content ? encodeMessage(this.message, this.$store) : encodeHTML("This message has been removed");
+    if (this.smileysLoaded) {
+      return this.message.content ? encodeMessageInited(this.message, this.$store, this.$smileyApi) : encodeHTML("This message has been removed");
+    } else {
+      return "";
+    }
+
   }
 
   get mainCls() {
@@ -81,11 +89,14 @@ export default class ChatTextMessage extends Vue {
     });
   }
 
-  public mounted() {
+  public async mounted() {
     this.seEvents();
   }
 
   private seEvents() {
+    if (!this.smileysLoaded) {
+      return
+    }
     this.$logger.debug("Setting events")();
     if (this.userSettings.highlightCode) {
       highlightCode(this.content);

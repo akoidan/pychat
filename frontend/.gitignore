@@ -6,5 +6,6 @@ electron_dist/
 platforms/android/app/src/main/assets
 www/*
 .fontello
+build/stats.html
 yarn-error.log
 dist

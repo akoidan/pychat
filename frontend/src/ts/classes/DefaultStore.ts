@@ -131,6 +131,8 @@ export class DefaultStore extends VuexModule {
 
   public incomingCall: IncomingCallModel | null = null;
 
+  public smileysLoaded: boolean = false;
+
   public microphones: Record<string, string> = {};
 
   public speakers: Record<string, string> = {};
@@ -388,6 +390,11 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setStorage(payload: IStorage) {
     this.storage = payload;
+  }
+
+  @Mutation
+  public finishLoadingSmileys() {
+    this.smileysLoaded = true;
   }
 
   @Mutation

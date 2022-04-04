@@ -20,6 +20,7 @@ import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy"
 import type {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {Emitter} from "mitt";
+import { SmileysApi } from '@/ts/utils/smileys';
 
 declare global {
   interface Window {
@@ -50,6 +51,7 @@ declare module "@vue/runtime-core" {
     $api: Api;
     $store: DefaultStore;
     $logger: Logger;
+    $smileyApi: SmileysApi;
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;
     $messageBus: Emitter<EventTypes>;

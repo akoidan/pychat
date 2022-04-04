@@ -38,7 +38,7 @@ import {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import {mainWindow} from "@/ts/instances/mainWindow";
 import type {Emitter} from "mitt";
 import mitt from "mitt";
-import {vueStore} from "@/ts/classes/DefaultStore";
+import {SmileysApi} from "@/ts/utils/smileys";
 import {loggerMixin} from "@/ts/utils/mixins";
 import {
   switchDirective,
@@ -58,10 +58,9 @@ function bootstrapVue(
   webrtcApi: WebRtcApi,
   platformUtil: PlatformUtil,
   messageSenderProxy: MessageSenderProxy,
+  smileyApi: SmileysApi,
 ): VueApp {
-  const vue: VueApp = createApp(App, {
-    store: vueStore,
-  });
+  const vue: VueApp = createApp(App);
   vue.mixin(loggerMixin);
   vue.use(router);
   vue.directive("switcher", switchDirective);
@@ -73,6 +72,7 @@ function bootstrapVue(
   vue.config.globalProperties.$webrtcApi = webrtcApi;
   vue.config.globalProperties.$platformUtil = platformUtil;
   vue.config.globalProperties.$messageSenderProxy = messageSenderProxy;
+  vue.config.globalProperties.$smileyApi = smileyApi;
   vue.config.errorHandler = (err, vm, info): boolean => {
     /* eslint-disable
       @typescript-eslint/restrict-template-expressions,
@@ -117,6 +117,8 @@ function init(): void {
 
   const audioPlayer: AudioPlayer = new AudioPlayer(mainWindow);
   store.setStorage(storage);
+  const smileyApi = new SmileysApi(store);
+  void smileyApi.init();
   const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow);
   const messageBus: Emitter<EventTypes> = mitt<EventTypes>();
@@ -127,7 +129,7 @@ function init(): void {
   const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
 
-  const vue = bootstrapVue(messageBus, api, ws, webrtcApi, platformUtil, messageSenderProxy);
+  const vue = bootstrapVue(messageBus, api, ws, webrtcApi, platformUtil, messageSenderProxy, smileyApi);
 
   vue.mount(document.body);
 
@@ -174,7 +176,7 @@ function init(): void {
    */
 }
 
-if (document.readyState === "loading") {
+if (!document.body) {
   document.addEventListener("DOMContentLoaded", init);
 } else {
   init();

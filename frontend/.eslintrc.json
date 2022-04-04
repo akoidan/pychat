@@ -90,7 +90,7 @@
     "import/no-named-as-default": 1, //is not part of default sert
     "import/no-unresolved": 0,
     "import/no-relative-parent-imports": 1,
-    "import/dynamic-import-chunkname": 1,
+    "import/dynamic-import-chunkname": 0,
     "import/exports-last":1,
     "import/extensions": [1, "never", {"json":  "always", "vue": "always", "sass": "always", "png":  "always", "wav": "always", "mp3": "always"}],
     "import/first":1,

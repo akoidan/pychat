@@ -1,5 +1,6 @@
 <template>
   <div
+    v-if="smileysLoaded"
     class="smile-parent-holder"
     @mousedown="mouseDownMain"
   >
@@ -52,6 +53,7 @@
       </div>
     </template>
   </div>
+  <div v-else></div>
 </template>
 <script lang="ts">
 import {
@@ -63,16 +65,14 @@ import {
 import type {
   Smile,
   SmileVariation,
+  SmileysStructure,
 } from "@/ts/utils/smileys";
-import {
-  allSmileysKeys,
-  allSmileysKeysNoVariations,
-  smileys,
-} from "@/ts/utils/smileys";
+import { State } from '@/ts/instances/storeInstance';
 
 @Component({name: "SmileyHolder"})
 export default class SmileyHolder extends Vue {
-  public activeTab: string = Object.keys(smileys)[0];
+  // Object.keys(smileys)[0];
+  public activeTab: string = "Smileys";
 
   public skinVariations: Record<string, SmileVariation> = {};
 
@@ -82,16 +82,30 @@ export default class SmileyHolder extends Vue {
 
   public searchSmile: string = "";
 
-  mounted() {
+  // this can't be state, since we need to set local properties before
+  public smileysLoaded: boolean = false;
+
+  public smileysData: SmileysStructure|null = null;
+  public allSmileysKeys:Record<string, Smile>|null = null;
+  public allSmileysKeysNoVariations: Record<string, SmileVariation>|null = null;
+
+  async mounted() {
     this.recentSmileysCodes = JSON.parse(localStorage.getItem("recentSmileys") || "[]");
+    const {smileys, allSmileysKeys, allSmileysKeysNoVariations} = await this.$smileyApi.allData();
+    this.smileysData = smileys;
+    this.allSmileysKeys = allSmileysKeys;
+    this.allSmileysKeysNoVariations = allSmileysKeysNoVariations;
+    this.smileysLoaded = true;
   }
 
   get smileys() {
     if (this.recentSmileysCodes.length > 0) {
-      return {Recent: this.recentSmileys,
-              ...smileys};
+      return {
+        Recent: this.recentSmileys,
+        ...this.smileysData,
+      };
     }
-    return smileys;
+    return this.smileysData;
   }
 
   get filterSmiley() {
@@ -106,7 +120,7 @@ export default class SmileyHolder extends Vue {
 
   get recentSmileys(): Record<string, SmileVariation> {
     return this.recentSmileysCodes.slice(0, 15).reduce<Record<string, Smile>>((obj, key) => {
-      obj[key] = allSmileysKeys[key];
+      obj[key] = this.allSmileysKeys![key];
       return obj;
     }, {});
   }
@@ -121,7 +135,7 @@ export default class SmileyHolder extends Vue {
       this.searchResults = {};
       return;
     }
-    this.searchResults = Object.entries(allSmileysKeysNoVariations).
+    this.searchResults = Object.entries(this.allSmileysKeysNoVariations!).
       filter(([key, value]) => value.alt.includes(this.searchSmile)).
       slice(0, 30).
       reduce<Record<string, Smile>>((obj, [key, value]) => {
@@ -144,7 +158,7 @@ export default class SmileyHolder extends Vue {
   addSmileyClick(code: string) {
     this.searchSmile = "";
     this.skinVariations = {};
-    const b = allSmileysKeys[code];
+    const b = this.allSmileysKeys![code];
     if (b.skinVariations) {
       this.skinVariations = b.skinVariations;
       return;
