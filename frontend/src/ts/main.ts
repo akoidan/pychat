@@ -94,12 +94,22 @@ async function init() {
   vue.config.globalProperties.$webrtcApi = webrtcApi;
   vue.config.globalProperties.$platformUtil = platformUtil;
   vue.config.globalProperties.$messageSenderProxy = messageSenderProxy;
-  vue.config.errorHandler = (err, vm, info) => {
+  vue.config.errorHandler = (err, vm, info): boolean => {
+    /* eslint-disable
+      @typescript-eslint/restrict-template-expressions,
+      @typescript-eslint/restrict-template-expressions,
+      no-underscore-dangle
+    */
     const message = `Error occurred in ${vm?.$options?.__file}:${err}:\n${info}`;
     if (store?.userSettings?.sendLogs && api) {
-      api.sendLogs(`${vm?.$options?.__file}:${err}:${info}`, browserVersion, constants.GIT_HASH);
+      void api.sendLogs(`${vm?.$options?.__file}:${err}:${info}`, browserVersion, constants.GIT_HASH);
     }
-    store.growlError(message);
+    /* eslint-enable
+      @typescript-eslint/restrict-template-expressions,
+      @typescript-eslint/restrict-template-expressions,
+      no-underscore-dangle
+    */
+    void store.growlError(message);
     logger.error("Error occurred in vue component err: '{}', vm '{}', info '{}'", err, vm, info)();
     return false;
   };

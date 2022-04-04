@@ -44,6 +44,7 @@
     "no-inline-comments": 0,
     "no-confusing-arrow": 0, // conflict with no-extra-parens
     "max-params": [1, 4],
+    "no-void": [0], // allow void for void promise
     "@typescript-eslint/no-untyped-public-signature": 0, // this breaks a lot: constructions public, ES6 setter should have return type etc
     "@typescript-eslint/ban-ts-ignore": 0, // who cares, we explicitly define it.
     "@typescript-eslint/ban-ts-comment": 0, // who cares, we explicitly define it.

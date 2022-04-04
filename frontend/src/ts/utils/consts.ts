@@ -1,7 +1,30 @@
-// Webpack global consts
-declare const PYCHAT_CONSTS: any;
+/*
+  eslint-disable @typescript-eslint/naming-convention
+ */
+declare const PYCHAT_CONSTS: {
+  IS_SSL: boolean;
+  IS_DEBUG: boolean;
+  BACKEND_ADDRESS: string;
+  GOOGLE_OAUTH_2_CLIENT_ID: string | false;
+  FACEBOOK_APP_ID: string | false;
+  PUBLIC_PATH: string | null;
+  RECAPTCHA_PUBLIC_KEY: string | false;
+  AUTO_REGISTRATION: boolean;
+  ISSUES: boolean;
+  GITHUB_LINK: string | false;
+  FLAGS: boolean;
+  GIT_HASH: string;
+  IS_ANDROID: boolean;
+  // TODO
+  ELECTRON_MAIN_FILE: string;
+  SERVICE_WORKER_URL: string | null;
+  ELECTRON_IGNORE_SSL: boolean;
+  // TODO
+  CAPTCHA_IFRAME: string | false;
+  WEBRTC_CONFIG: RTCConfiguration;
+  GIPHY_API_KEY: string;
+};
 
-const allConsts = PYCHAT_CONSTS;
 export const {
   IS_DEBUG,
   IS_SSL,
@@ -22,15 +45,17 @@ export const {
   CAPTCHA_IFRAME,
   WEBRTC_CONFIG,
   GIPHY_API_KEY,
-} = allConsts;
+} = PYCHAT_CONSTS;
 
-export const PING_CLOSE_JS_DELAY = 5000;
 export const CONNECTION_RETRY_TIME = 5000;
 export const LOAD_GIPHIES_PER_REQUEST = 12;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;
 export const RESPONSE_SUCCESS = "ok";
 export const LOG_LEVEL_LS = "logLevel";
-export const ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO = 24 * 60 * 60 * 1000; // 1 day
+
+// 1 day
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
+export const ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO = 24 * 60 * 60 * 1000;
 export const ALL_ROOM_ID = 1;
 export const CHROME_EXTENSION_ID = "cnlplcfdldebgdlcmpkafcialnbopedn";
 export const CHROME_EXTENSION_URL = `https://chrome.google.com/webstore/detail/pychat-screensharing-exte/${CHROME_EXTENSION_ID}`;
@@ -41,6 +66,7 @@ export const MESSAGES_PER_SEARCH = 10;
 export const CONNECTION_ERROR = "Connection error";
 export const LAST_SYNCED = "lastSynced";
 export const SEND_CHUNK_SIZE = 16384;
+// eslint-disable-next-line @typescript-eslint/no-magic-numbers
 export const READ_CHUNK_SIZE = SEND_CHUNK_SIZE * 64;
 export const MAX_BUFFER_SIZE = 256;
 export const ACTIVE_ROOM_ID_LS_NAME = "activeRoomId";
