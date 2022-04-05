@@ -270,8 +270,8 @@ export interface SetReceivingFileStatus {
 }
 
 export type ConnectionStatus =
-    "closed"
-    | "new";
+  "closed"
+  | "new";
 
 interface SetSendingFileBase {
   roomId: number;

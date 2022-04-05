@@ -6,8 +6,8 @@ export default abstract class FilePeerConnection extends AbstractPeerConnection 
   public oniceconnectionstatechange() {
     this.logger.log(`iceconnectionstate has been changed to ${this.pc!.iceConnectionState}`);
     if (this.pc!.iceConnectionState === "disconnected" ||
-        this.pc!.iceConnectionState === "failed" ||
-        this.pc!.iceConnectionState === "closed") {
+      this.pc!.iceConnectionState === "failed" ||
+      this.pc!.iceConnectionState === "closed") {
       this.commitErrorIntoStore("Connection has been lost", true);
       // Do not destroy peer connection here, opponent may want to retry
     }

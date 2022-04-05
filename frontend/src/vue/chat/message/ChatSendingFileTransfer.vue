@@ -10,10 +10,10 @@
         :class="cls"
       >
         {{ status }}<span
-          v-if="showCancel"
-          class="icon-cancel"
-          @click="declineSending"
-        />
+        v-if="showCancel"
+        class="icon-cancel"
+        @click="declineSending"
+      />
       </td>
     </tr>
   </tbody>
@@ -27,9 +27,7 @@ import {
   Vue,
 } from "vue-property-decorator";
 import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
-import type {
-  UserModel,
-} from "@/ts/types/model";
+import type {UserModel,} from "@/ts/types/model";
 import {
   FileTransferStatus,
   SendingFileTransfer,
@@ -68,10 +66,6 @@ export default class ChatSendingFileTransfer extends Vue {
       this.transfer.status === FileTransferStatus.IN_PROGRESS;
   }
 
-  public declineSending() {
-    this.$webrtcApi.declineSending(this.connId, this.opponentId);
-  }
-
   get cls() {
     return {
       success: FileTransferStatus.FINISHED === this.transfer.status,
@@ -90,18 +84,24 @@ export default class ChatSendingFileTransfer extends Vue {
 
     return fileStatusDict[this.transfer.status];
   }
+
+  public declineSending() {
+    this.$webrtcApi.declineSending(this.connId, this.opponentId);
+  }
 }
 </script>
 
 <style lang="sass" scoped>
-  tr :deep(.progress-wrap)
-    width: calc(100% - 40px)
+tr :deep(.progress-wrap)
+  width: calc(100% - 40px)
 
-  .icon-cancel
-    cursor: pointer
-    color: red
-  .error
-    color: red
-  .success
-    color: #3eb22b
+.icon-cancel
+  cursor: pointer
+  color: red
+
+.error
+  color: red
+
+.success
+  color: #3eb22b
 </style>

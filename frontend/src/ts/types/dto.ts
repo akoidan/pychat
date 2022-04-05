@@ -11,9 +11,9 @@ import type {
 import type {LogLevel} from "lines-logger";
 
 export type SexModelDto =
-    "Female"
-    | "Male"
-    | "Secret";
+  "Female"
+  | "Male"
+  | "Secret";
 
 
 export interface RoomNoUsersDto {

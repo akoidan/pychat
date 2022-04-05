@@ -9,10 +9,10 @@
           <th><label for="reportIssueIssue">Git revision</label></th>
           <td>
             <input
-              class="input"
-              type="text"
-              disabled
               :value="git"
+              class="input"
+              disabled
+              type="text"
             />
           </td>
         </tr>
@@ -24,8 +24,8 @@
               ref="textarea"
               v-model="issue"
               class="input"
-              tabindex="-1"
               required
+              tabindex="-1"
             />
           </td>
         </tr>
@@ -43,15 +43,20 @@
       </tbody>
     </table>
     <app-submit
+      :running="running"
       class="green-btn"
       value="Submit Issue"
-      :running="running"
     />
   </form>
 </template>
 <script lang="ts">
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
-import {Component, Ref, Vue, Watch} from "vue-property-decorator";
+import {
+  Component,
+  Ref,
+  Vue,
+  Watch
+} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {GIT_HASH} from "@/ts/utils/consts";
 import {browserVersion} from "@/ts/utils/runtimeConsts";
@@ -61,20 +66,16 @@ import {browserVersion} from "@/ts/utils/runtimeConsts";
   components: {AppSubmit},
 })
 export default class ReportIssue extends Vue {
+  public running: boolean = false;
+  public browser: string = browserVersion;
+  public issue: string = "";
+  public textAreaStyle: string = "";
+  @Ref()
+  private readonly textarea!: HTMLTextAreaElement;
+
   get git() {
     return GIT_HASH;
   }
-
-  public running: boolean = false;
-
-  public browser: string = browserVersion;
-
-  public issue: string = "";
-
-  public textAreaStyle: string = "";
-
-  @Ref()
-  private readonly textarea!: HTMLTextAreaElement;
 
   @Watch("issue")
   public fixStyle() {
@@ -83,8 +84,10 @@ export default class ReportIssue extends Vue {
     textarea.style.height = `${textarea.scrollHeight - 16}px`;
   }
 
-  @ApplyGrowlErr({runningProp: "running",
-    message: "Unable to submit issue"})
+  @ApplyGrowlErr({
+    runningProp: "running",
+    message: "Unable to submit issue"
+  })
   public async submit() {
     await this.$api.sendLogs(this.issue, this.browser, this.git);
     this.$store.growlSuccess("Your issue has ben submitted");
@@ -94,17 +97,21 @@ export default class ReportIssue extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/abstract_classes"
-  .holder
-    @extend %room-settings-holder
-    width: calc(100% - 100px)
-    max-width: 800px
-  th
-    max-width: 160px
-  th, td
-    padding: 4px
-  th
-    text-align: right
-  .input
-    @extend %big-input
+@import "@/assets/sass/partials/abstract_classes"
+.holder
+  @extend %room-settings-holder
+  width: calc(100% - 100px)
+  max-width: 800px
+
+th
+  max-width: 160px
+
+th, td
+  padding: 4px
+
+th
+  text-align: right
+
+.input
+  @extend %big-input
 </style>

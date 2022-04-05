@@ -19,9 +19,9 @@
         <th>Download:</th>
         <td>
           <a
-            class="green-btn"
-            :href="receivingFile.anchor"
             :download="receivingFile.fileName"
+            :href="receivingFile.anchor"
+            class="green-btn"
           >Save</a>
         </td>
       </tr>
@@ -42,7 +42,11 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {
+  Component,
+  Prop,
+  Vue
+} from "vue-property-decorator";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
 import {
   FileTransferStatus,
@@ -59,10 +63,6 @@ export default class ReceivingFileInfo extends Vue {
 
   get isError(): boolean {
     return this.receivingFile.status === FileTransferStatus.ERROR;
-  }
-
-  public retry() {
-    this.$webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
 
   get cls() {
@@ -88,34 +88,44 @@ export default class ReceivingFileInfo extends Vue {
         return "Waiting for approval";
     }
   }
+
+  public retry() {
+    this.$webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  .error
-    color: red
-  .success
-    color: #3eb22b
-  table
+.error
+  color: red
+
+.success
+  color: #3eb22b
+
+table
+  width: 100%
+  text-align: left
+
+  th
+    color: #79aeb6
+    font-weight: bold
+    padding-left: 5px
+
+  td
+    text-overflow: ellipsis
+    max-width: 250px
+    overflow: hidden
     width: 100%
-    text-align: left
-    th
-      color: #79aeb6
-      font-weight: bold
-      padding-left: 5px
-    td
-      text-overflow: ellipsis
-      max-width: 250px
-      overflow: hidden
-      width: 100%
-      padding-left: 10px
-  a
-    width: calc(100% - 50px)
-    display: block
-    text-align: center
-    margin-left: 10px
-    margin-right: 10px
-  .icon-repeat
-    cursor: pointer
+    padding-left: 10px
+
+a
+  width: calc(100% - 50px)
+  display: block
+  text-align: center
+  margin-left: 10px
+  margin-right: 10px
+
+.icon-repeat
+  cursor: pointer
 </style>

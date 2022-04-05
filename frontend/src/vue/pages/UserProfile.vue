@@ -31,8 +31,14 @@
   </div>
 </template>
 <script lang="ts">
-import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/ts/utils/consts";
-import {Component, Vue} from "vue-property-decorator";
+import {
+  FACEBOOK_APP_ID,
+  GOOGLE_OAUTH_2_CLIENT_ID
+} from "@/ts/utils/consts";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
 import AppTab from "@/vue/ui/AppTab.vue";
 
 @Component({
@@ -48,27 +54,32 @@ export default class UserProfile extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/variables"
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .holder
-    @extend %room-settings-holder
-  .tab
-    max-width: 680px
+.holder
+  @extend %room-settings-holder
 
-  .profileInner
-    :deep(button)
-      width: 100%
-    padding-top: 10px
-    padding-bottom: 10px
-    :deep(table)
-      margin: auto
-    :deep(th)
-      text-align: right
-    :deep(td), :deep(th)
-      padding: 4px
-    :deep(.input)
-      @extend %big-input
+.tab
+  max-width: 680px
+
+.profileInner
+  :deep(button)
+    width: 100%
+  padding-top: 10px
+  padding-bottom: 10px
+
+  :deep(table)
+    margin: auto
+
+  :deep(th)
+    text-align: right
+
+  :deep(td), :deep(th)
+    padding: 4px
+
+  :deep(.input)
+    @extend %big-input
 
 
 </style>

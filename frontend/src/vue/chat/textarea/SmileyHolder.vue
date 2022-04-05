@@ -16,9 +16,9 @@
       <li>
         <input
           v-model="searchSmile"
-          type="search"
           class="input"
           placeholder="search smile"
+          type="search"
         />
       </li>
       <li class="holder-icon-cancel">
@@ -32,10 +32,10 @@
       <img
         v-for="(smiley, code) in filterSmiley"
         :key="code"
-        class="emoji"
-        :src="smiley.src"
         :alt="smiley.alt"
         :code="code"
+        :src="smiley.src"
+        class="emoji"
         @click="addSmileyClick(code)"
       />
     </div>
@@ -44,10 +44,10 @@
         <img
           v-for="(smiley, code) in allSmileys"
           :key="code"
-          class="emoji"
-          :src="smiley.src"
           :alt="smiley.alt"
           :code="code"
+          :src="smiley.src"
+          class="emoji"
           @click="addSmileyClick(code)"
         />
       </div>
@@ -67,7 +67,6 @@ import type {
   SmileVariation,
   SmileysStructure,
 } from "@/ts/utils/smileys";
-import {State} from "@/ts/instances/storeInstance";
 
 @Component({name: "SmileyHolder"})
 export default class SmileyHolder extends Vue {
@@ -90,15 +89,6 @@ export default class SmileyHolder extends Vue {
   public allSmileysKeys: Record<string, Smile> | null = null;
 
   public allSmileysKeysNoVariations: Record<string, SmileVariation> | null = null;
-
-  async mounted() {
-    this.recentSmileysCodes = JSON.parse(localStorage.getItem("recentSmileys") || "[]");
-    const {smileys, allSmileysKeys, allSmileysKeysNoVariations} = await this.$smileyApi.allData();
-    this.smileysData = smileys;
-    this.allSmileysKeys = allSmileysKeys;
-    this.allSmileysKeysNoVariations = allSmileysKeysNoVariations;
-    this.smileysLoaded = true;
-  }
 
   get smileys() {
     if (this.recentSmileysCodes.length > 0) {
@@ -131,19 +121,28 @@ export default class SmileyHolder extends Vue {
     return Object.keys(this.skinVariations).length > 0 || Object.keys(this.searchResults).length > 0 || this.searchSmile;
   }
 
+  async mounted() {
+    this.recentSmileysCodes = JSON.parse(localStorage.getItem("recentSmileys") || "[]");
+    const {smileys, allSmileysKeys, allSmileysKeysNoVariations} = await this.$smileyApi.allData();
+    this.smileysData = smileys;
+    this.allSmileysKeys = allSmileysKeys;
+    this.allSmileysKeysNoVariations = allSmileysKeysNoVariations;
+    this.smileysLoaded = true;
+  }
+
   @Watch("searchSmile")
   searchSmileChange() {
     if (!this.searchSmile) {
       this.searchResults = {};
       return;
     }
-    this.searchResults = Object.entries(this.allSmileysKeysNoVariations!).
-      filter(([key, value]) => value.alt.includes(this.searchSmile)).
-      slice(0, 30).
-      reduce<Record<string, Smile>>((obj, [key, value]) => {
-      obj[key] = value;
-      return obj;
-    }, {});
+    this.searchResults = Object.entries(this.allSmileysKeysNoVariations!)
+      .filter(([key, value]) => value.alt.includes(this.searchSmile))
+      .slice(0, 30)
+      .reduce<Record<string, Smile>>((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      }, {});
   }
 
   mouseDownMain(e: MouseEvent) {
@@ -188,61 +187,64 @@ export default class SmileyHolder extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/variables"
 
-  .emoji
-    width: $emoji-width
+.emoji
+  width: $emoji-width
+  cursor: pointer
+
+.icon-cancel-circled-outline
+  position: relative
+  // icon is broken a bit, it occupies 1 px above the screen
+  top: 1px
+  right: -10px
+  // ignore padding right
+  @include hover-click(red)
+
+.smile-parent-holder
+  padding: 10px
+  max-height: calc(100vh - 220px)
+  overflow: scroll
+
+  input[type=search]
+    width: 100px
+
+.tabNames
+  margin: 0
+  padding-left: 0
+  padding-bottom: 12px
+  display: block
+
+  > li
+    display: inline-block
+    padding-left: 10px
+    font-size: 12px
+    padding-right: 10px
+
+    &:hover
+      cursor: pointer
+      text-decoration: underline
+
+  .holder-icon-cancel
+    margin-left: auto
+
+  img
     cursor: pointer
 
-  .icon-cancel-circled-outline
-    position: relative // icon is broken a bit, it occupies 1 px above the screen
-    top: 1px
-    right: -10px // ignore padding right
-    @include hover-click(red)
+.smile-parent-holder
+  @extend %modal-window
 
-  .smile-parent-holder
-    padding: 10px
-    max-height: calc(100vh - 220px)
-    overflow: scroll
-    input[type=search]
-      width: 100px
+.color-lor
+  .activeTab
+    color: #fcaf3e
 
-  .tabNames
-    margin: 0
-    padding-left: 0
-    padding-bottom: 12px
-    display: block
+.color-reg
+  .activeTab
+    color: #C6B955
 
-    > li
-      display: inline-block
-      padding-left: 10px
-      font-size: 12px
-      padding-right: 10px
-
-      &:hover
-        cursor: pointer
-        text-decoration: underline
-
-    .holder-icon-cancel
-      margin-left: auto
-
-    img
-      cursor: pointer
-
-  .smile-parent-holder
-    @extend %modal-window
-
-  .color-lor
-    .activeTab
-      color: #fcaf3e
-
-  .color-reg
-    .activeTab
-      color: #C6B955
-
-  .color-white
-    .activeTab
-      color: #11970d
+.color-white
+  .activeTab
+    color: #11970d
 </style>

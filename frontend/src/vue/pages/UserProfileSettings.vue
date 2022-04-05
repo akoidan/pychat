@@ -66,12 +66,12 @@
           <td>
             <select
               v-model="model.theme"
-              name="theme"
               class="input"
+              name="theme"
             >
               <option
-                value="color-reg"
                 selected
+                value="color-reg"
               >
                 Modern
               </option>
@@ -87,8 +87,8 @@
         <tr>
           <td colspan="2">
             <input
-              type="button"
               class="lor-btn"
+              type="button"
               value="Delete app cache"
               @click="clearHistory"
             />
@@ -98,8 +98,8 @@
           <td colspan="2">
             <input
               v-if="canBeInstalled"
-              type="button"
               class="lor-btn"
+              type="button"
               value="Add to home screen"
               @click="addToHomeScreen"
             />
@@ -108,9 +108,9 @@
         <tr>
           <td colspan="2">
             <app-submit
+              :running="running"
               class="green-btn"
               value="Apply Settings"
-              :running="running"
               @click.native="save"
             />
           </td>
@@ -136,20 +136,22 @@ import {userSettingsDtoToModel} from "@/ts/types/converters";
 import type {UserSettingsDto} from "@/ts/types/dto";
 import type {SetSettingsMessage} from "@/ts/types/messages/wsInMessages";
 import type {LogLevel} from "lines-logger";
-import {
-  logLevels,
-} from "lines-logger";
+import {logLevels,} from "lines-logger";
 import {
   LAST_SYNCED,
   SERVICE_WORKER_VERSION_LS_NAME,
 } from "@/ts/utils/consts";
-import {isChrome} from "@/ts/utils/runtimeConsts";
-import {addToHomeScreen, canBeInstalled} from "@/ts/utils/addToHomeScreen";
+import {
+  addToHomeScreen,
+  canBeInstalled
+} from "@/ts/utils/addToHomeScreen";
 
 @Component({
   name: "UserProfileSettings",
-  components: {AppSubmit,
-    AppCheckbox},
+  components: {
+    AppSubmit,
+    AppCheckbox
+  },
 })
 export default class UserProfileSettings extends Vue {
   public running: boolean = false;
@@ -205,8 +207,10 @@ export default class UserProfileSettings extends Vue {
     this.$store.growlSuccess("Cash has been deleted ");
   }
 
-  @ApplyGrowlErr({message: "Error saving settings",
-    runningProp: "running"})
+  @ApplyGrowlErr({
+    message: "Error saving settings",
+    runningProp: "running"
+  })
   public async save() {
     this.$logger.debug("Saving userSettings")();
     const cui: UserSettingsDto = {...this.model};
@@ -218,22 +222,26 @@ export default class UserProfileSettings extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .lor-btn
+.lor-btn
+  width: 100%
+
+.settings-page
+  :deep(button)
     width: 100%
+  padding-top: 10px
+  padding-bottom: 10px
 
-  .settings-page
-    :deep(button)
-      width: 100%
-    padding-top: 10px
-    padding-bottom: 10px
-    :deep(table)
-      margin: auto
-    :deep(th)
-      text-align: right
-    :deep(td), :deep(th)
-      padding: 4px
-    :deep(.input)
-      @extend %big-input
+  :deep(table)
+    margin: auto
+
+  :deep(th)
+    text-align: right
+
+  :deep(td), :deep(th)
+    padding: 4px
+
+  :deep(.input)
+    @extend %big-input
 </style>

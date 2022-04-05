@@ -4,9 +4,9 @@
     <img v-if="userImg" :src="userImg" :title="user.user"/>
     <div
       v-else
-      class="image-missing"
       :style="{'background-color': color}"
       :title="user.user"
+      class="image-missing"
     >
       {{ twoLetter }}
     </div>
@@ -45,27 +45,30 @@ export default class UserImageIcon extends Vue {
   lang="sass"
   scoped
 >
-  img, .image-missing
-    width: 36px
-    display: flex
-    align-items: center
-    justify-content: center
-    height: 36px
-    color: white
-    border-radius: 50%
-  .user-image-holder
-    position: relative
+img, .image-missing
+  width: 36px
+  display: flex
+  align-items: center
+  justify-content: center
+  height: 36px
+  color: white
+  border-radius: 50%
 
-  .online .online-marker
-    background-color: green
-  .offline .online-marker
-    background-color: #a50000
-  .online-marker
-    /*display: none*/
-    width: 10px
-    height: 10px
-    position: absolute
-    bottom: 1px
-    right: 1px
-    border-radius: 50%
+.user-image-holder
+  position: relative
+
+.online .online-marker
+  background-color: green
+
+.offline .online-marker
+  background-color: #a50000
+
+.online-marker
+  /*display: none*/
+  width: 10px
+  height: 10px
+  position: absolute
+  bottom: 1px
+  right: 1px
+  border-radius: 50%
 </style>

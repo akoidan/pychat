@@ -28,7 +28,7 @@ declare interface NotificationOptions {
   replaced: number;
 }
 
-type Writeable<T> = {-readonly [P in keyof T]: T[P]};
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 declare interface RTCDataChannelInit {
   reliable?: boolean;

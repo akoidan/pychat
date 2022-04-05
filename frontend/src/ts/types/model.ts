@@ -67,9 +67,9 @@ export interface CurrentUserInfoWoImage {
 }
 
 export type SexModelString =
-    "Female"
-    | "Male"
-    | "Secret";
+  "Female"
+  | "Male"
+  | "Secret";
 
 export interface UserModel {
   user: string;
@@ -96,12 +96,12 @@ export interface Location {
  * m - media (same as video, but you need to click on image, in order to load video)
  */
 export type BlobType =
-    "a"
-    | "f"
-    | "g"
-    | "i"
-    | "m"
-    | "v";
+  "a"
+  | "f"
+  | "g"
+  | "i"
+  | "m"
+  | "v";
 
 export interface FileModel {
   url: string | null;
@@ -125,10 +125,10 @@ export interface MessageTransferInfo {
 }
 
 export type MessageStatus =
-    "on_server"
-    | "read"
-    | "received"
-    | "sending";
+  "on_server"
+  | "read"
+  | "received"
+  | "sending";
 
 export interface MessageModel {
   id: number;

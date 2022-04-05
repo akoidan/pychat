@@ -7,8 +7,8 @@
     <search-messages :room="room"/>
     <div
       ref="chatboxSearch"
-      class="chatbox"
       :class="{'hidden': !room.search.searchActive}"
+      class="chatbox"
       tabindex="1"
       @keydown="keyDownSearchLoadUp"
       @mousewheel="onSearchMouseWheel"
@@ -27,8 +27,8 @@
     </div>
     <div
       ref="chatbox"
-      class="chatbox"
       :class="{'hidden': room.search.searchActive || (room.callInfo && room.callInfo.sharePaint)}"
+      class="chatbox"
       tabindex="1"
       @keydown="keyDownLoadUp"
       @mousewheel="onMouseWheel"
@@ -37,9 +37,9 @@
       <div v-if="messageLoading" class="spinner"/>
       <input
         v-else-if="!room.allLoaded"
+        class="lor-btn load-more-msg-btn"
         type="button"
         value="Load more messages"
-        class="lor-btn load-more-msg-btn"
         @click="loadUpHistory(10)"
       />
       <div v-else class="start-history">
@@ -49,16 +49,16 @@
         <chat-user-action-message
           v-if="message.isUserAction"
           :key="`a-${message.time}-${message.userId}`"
+          :action="message.action"
           :time="message.time"
           :user-id="message.userId"
-          :action="message.action"
         />
         <chat-change-name-message
           v-else-if="message.isChangeName"
           :key="`n-${message.time}-${message.userId}`"
-          :time="message.time"
-          :old-name="message.oldName"
           :new-name="message.newName"
+          :old-name="message.oldName"
+          :time="message.time"
         />
         <app-separator
           v-else-if="message.fieldDay"
@@ -160,21 +160,46 @@ export default class ChatBox extends Vue {
   messageLoading: boolean = false;
 
   searchMessageLoading: boolean = false;
-
-  @Ref()
-  private readonly chatbox!: HTMLElement;
-
   @Ref()
   public textarea!: ChatTextArea;
-
+  scrollBottom: boolean = true; // Scroll to bottom on load
+  lastScrollTop: number = 0;
+  @Ref()
+  private readonly chatbox!: HTMLElement;
   @Ref()
   private readonly chatboxSearch!: HTMLElement;
-
-  scrollBottom: boolean = true; // Scroll to bottom on load
-
-  lastScrollTop: number = 0;
-
   private handler!: MessageHandler;
+
+  get id() {
+    return this.room.id;
+  }
+
+  get searchMessages() {
+    const dates: Record<string, boolean> = {};
+    const newArray: any[] = [];
+    for (const m in this.room.search.messages) {
+      const message = this.room.search.messages[m];
+      const d = new Date(message.time).toDateString();
+      if (!dates[d]) {
+        dates[d] = true;
+        newArray.push({
+          fieldDay: d,
+          time: Date.parse(d),
+        });
+      }
+      newArray.push(message);
+    }
+    newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+    return newArray;
+  }
+
+  get messages() {
+    return this.$store.calculatedMessagesForRoom(this.room.id);
+  }
+
+  private get messageSender() {
+    return this.$messageSenderProxy.getMessageSender(this.room.id);
+  }
 
   beforeUpdate() {
 
@@ -198,7 +223,6 @@ export default class ChatBox extends Vue {
     this.onEmitScroll(); // This seems to be more reliable than created and mounted
   }
 
-
   @Watch("isCurrentWindowActive")
   public onTabFocus(value: boolean) {
     if (this.activeRoomId === this.room.id && value) {
@@ -208,8 +232,7 @@ export default class ChatBox extends Vue {
 
   public markMessagesInCurrentRoomAsRead() {
     this.$logger.debug("Checking if we can set some messages to status read")();
-    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).
-      map((m) => m.id);
+    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).map((m) => m.id);
     if (messagesIds.length > 0) {
       this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
     }
@@ -239,7 +262,7 @@ export default class ChatBox extends Vue {
 
   onEmitScroll() {
     if (this.activeRoomId === this.room.id) {
-      this.$nextTick(function() {
+      this.$nextTick(function () {
         if (this.scrollBottom) {
           if (this.room.search.searchActive && this.chatboxSearch) {
             this.$logger.debug("Scrolling chatboxSearch to bottom")();
@@ -261,7 +284,7 @@ export default class ChatBox extends Vue {
       logger = that.$logger;
 
       protected readonly handlers: HandlerTypes<keyof ChatBoxHandler, "*"> = {
-        scroll: <HandlerType<"scroll", "*">> this.scroll,
+        scroll: <HandlerType<"scroll", "*">>this.scroll,
       };
 
       scroll() {
@@ -273,33 +296,6 @@ export default class ChatBox extends Vue {
 
   destroyed() {
     this.$messageBus.unsubscribe("*", this.handler);
-  }
-
-  get id() {
-    return this.room.id;
-  }
-
-  get searchMessages() {
-    const dates: Record<string, boolean> = {};
-    const newArray: any[] = [];
-    for (const m in this.room.search.messages) {
-      const message = this.room.search.messages[m];
-      const d = new Date(message.time).toDateString();
-      if (!dates[d]) {
-        dates[d] = true;
-        newArray.push({
-          fieldDay: d,
-          time: Date.parse(d),
-        });
-      }
-      newArray.push(message);
-    }
-    newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
-    return newArray;
-  }
-
-  get messages() {
-    return this.$store.calculatedMessagesForRoom(this.room.id);
   }
 
   keyDownLoadUp(e: KeyboardEvent) {
@@ -320,22 +316,6 @@ export default class ChatBox extends Vue {
     } else if (e.shiftKey && e.ctrlKey && e.key.toUpperCase() === "F") {
       this.$store.toogleSearch(this.room.id);
     }
-  }
-
-  @ApplyGrowlErr({
-    runningProp: "searchMessageLoading",
-    preventStacking: true,
-    message: "Unable to load history",
-  })
-  private async loadUpSearchHistory(n: number) {
-    if (this.chatboxSearch.scrollTop !== 0) {
-      return; // We're just scrolling up
-    }
-    await this.messageSender.loadUpSearchMessages(this.room.id, n, () => true);
-  }
-
-  private get messageSender() {
-    return this.$messageSenderProxy.getMessageSender(this.room.id);
   }
 
   @ApplyGrowlErr({
@@ -378,6 +358,18 @@ export default class ChatBox extends Vue {
     if (e.detail < 0 || e.deltaY < 0) {
       this.loadUpHistory(10);
     }
+  }
+
+  @ApplyGrowlErr({
+    runningProp: "searchMessageLoading",
+    preventStacking: true,
+    message: "Unable to load history",
+  })
+  private async loadUpSearchHistory(n: number) {
+    if (this.chatboxSearch.scrollTop !== 0) {
+      return; // We're just scrolling up
+    }
+    await this.messageSender.loadUpSearchMessages(this.room.id, n, () => true);
   }
 }
 </script>

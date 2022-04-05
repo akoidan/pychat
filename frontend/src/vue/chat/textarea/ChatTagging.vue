@@ -13,8 +13,17 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Emit, Prop, Ref, Vue, Watch} from "vue-property-decorator";
-import {ChannelUIModel, UserDictModel, UserModel} from "@/ts/types/model";
+import {
+  Component,
+  Emit,
+  Prop,
+  Vue,
+  Watch
+} from "vue-property-decorator";
+import {
+  UserDictModel,
+  UserModel
+} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 
 @Component({name: "ChatTagging"})
@@ -33,6 +42,10 @@ export default class ChatTagging extends Vue {
       return this.name.substring(1);
     }
     return "";
+  }
+
+  get userList(): UserModel[] {
+    return this.userIds.map((id) => this.allUsersDict[id]).filter((u) => u.user.toLowerCase().includes(this.onlyUserName.toLowerCase()));
   }
 
   @Watch("name")
@@ -80,10 +93,6 @@ export default class ChatTagging extends Vue {
     this.emitName(user);
   }
 
-  get userList(): UserModel[] {
-    return this.userIds.map((id) => this.allUsersDict[id]).filter((u) => u.user.toLowerCase().includes(this.onlyUserName.toLowerCase()));
-  }
-
   @Emit()
   emitName(user: UserModel) {
     this.currentSelected = null;
@@ -94,20 +103,23 @@ export default class ChatTagging extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .chat-tagging
-    @extend %modal-window
-    overflow-y: auto
-    max-height: 50vh
+.chat-tagging
+  @extend %modal-window
+  overflow-y: auto
+  max-height: 50vh
+  padding: 5px
+
+  > div
     padding: 5px
-    > div
-      padding: 5px
-      &:hover
-        text-decoration: underline
-        color: #ff9e00
-        cursor: pointer
-      &.tag-selected
-        color: yellow
-        text-decoration: underline
+
+    &:hover
+      text-decoration: underline
+      color: #ff9e00
+      cursor: pointer
+
+    &.tag-selected
+      color: yellow
+      text-decoration: underline
 </style>

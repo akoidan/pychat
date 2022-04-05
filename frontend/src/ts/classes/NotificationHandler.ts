@@ -24,7 +24,7 @@ export default class NotifierHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
-    internetAppear: <HandlerType<"internetAppear", "*">> this.internetAppear,
+    internetAppear: <HandlerType<"internetAppear", "*">>this.internetAppear,
   };
 
   private readonly mainWindow: MainWindow;
@@ -149,7 +149,7 @@ export default class NotifierHandler extends MessageHandler {
     }
     // Last opened tab not this one, leave the oppotunity to show notification from last tab
     if (!(<any>window).Notification ||
-        !this.mainWindow.isTabMain()) {
+      !this.mainWindow.isTabMain()) {
       return;
     }
     await this.checkPermissions();

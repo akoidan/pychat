@@ -37,9 +37,11 @@ export default class ConfirmMail extends Vue {
 
   public loading!: boolean;
 
-  @ApplyGrowlErr({runningProp: "loading",
+  @ApplyGrowlErr({
+    runningProp: "loading",
     vueProperty: "errorMessage",
-    message: "Confirming email error "})
+    message: "Confirming email error "
+  })
   public async created() {
     await this.$api.confirmEmail(this.$route.query.token as string);
     this.message = "Email has been confirmed";
@@ -48,23 +50,24 @@ export default class ConfirmMail extends Vue {
 </script>
 <style lang="sass" scoped>
 
-    @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
-    .green
-        color: green
+.green
+  color: green
 
-    .red
-        color: red
-    .spinner
-        @include lds-30-spinner-vertical('Verifying email...')
+.red
+  color: red
 
-    .message
-        text-align: center
-        font-size: 30px
-        font-family: monospace
-        display: table
-        width: 100%
-        vertical-align: middle
-        margin-top: 15%
+.spinner
+  @include lds-30-spinner-vertical('Verifying email...')
+
+.message
+  text-align: center
+  font-size: 30px
+  font-family: monospace
+  display: table
+  width: 100%
+  vertical-align: middle
+  margin-top: 15%
 </style>
 

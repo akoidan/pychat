@@ -62,16 +62,17 @@ export default class ChatPopupMenu extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  .popup-menu
-    display: flex
-    flex-direction: column
-    background-color: #252526
-    padding: 5px 10px
-    font-size: 26px
-    border: 1px #696951 solid
-    margin-left: auto
-    margin-top: 51px
-    align-self: flex-start
-    > *
-      padding: 5px
+.popup-menu
+  display: flex
+  flex-direction: column
+  background-color: #252526
+  padding: 5px 10px
+  font-size: 26px
+  border: 1px #696951 solid
+  margin-left: auto
+  margin-top: 51px
+  align-self: flex-start
+
+  > *
+    padding: 5px
 </style>

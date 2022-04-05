@@ -6,26 +6,33 @@
 .color-reg
   %link
     color: $color-lor-main
+
   %active-room
     background-color: rgba(33, 158, 147, 0.45)
+
   %header-left-icon
     @include hover-click(#e3e3e3)
+
   %icon-cog
     @include hover-click(#59b2c1)
 
 .color-lor
   %active-room
     background-color: #375a70
+
   %icon-cog
     color: #59b2c1
 
 .color-white
   %link
     color: $color-white-main
+
   %active-room
     background-color: #656888
+
   %header-left-icon
     color: #cccccc
+
   %icon-cog
     color: #59b2c1
 
@@ -50,18 +57,23 @@
   position: relative
   height: 36px
   padding-left: 7px
+
   .online
     order: 1
+
   .offline
     order: 2
+
   &:not(.active-room)
     @extend %hovered-user-room
+
   &:hover
-    :deep(.icon-cog) // this is located in room-right icon and other places
-      display: inline
+    :deep(.icon-cog)
+    // this is located in room-right icon and other places
+         display: inline
+
     :deep(.icon-no-cog)
       display: none
-
 
 
 %header-left-icon
@@ -76,7 +88,8 @@
   position: absolute
   top: 2px
   right: 4px
-  padding-right: 2px // wifi icon got cut
+  padding-right: 2px
+// wifi icon got cut
 
 %icon-cog
   @extend %right-icon

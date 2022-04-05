@@ -6,8 +6,8 @@
     <chat-text-area
       v-if="message.isEditingActive"
       :ref="textarea"
-      :room-id="message.roomId"
       :edit-message-id="message.id"
+      :room-id="message.roomId"
     />
     <template v-if="message.transfer">
       <div v-if="message.transfer.upload && !message.transfer.error" class="transfer-file">
@@ -22,11 +22,13 @@
     </template>
     <div class="absolute-right">
       <chat-message-tool-tip
-        class="message-tooltip"
         :message="message"
+        class="message-tooltip"
       />
-      <i v-if="isSelf && message.status === 'read'" class="icon-ok message-status-read" title="This message has been read by at least one user"/>
-      <i v-if="isSelf && message.status === 'received'" class="icon-ok message-status-received" title="At least one user in this room has received this message"/>
+      <i v-if="isSelf && message.status === 'read'" class="icon-ok message-status-read"
+         title="This message has been read by at least one user"/>
+      <i v-if="isSelf && message.status === 'received'" class="icon-ok message-status-received"
+         title="At least one user in this room has received this message"/>
       <div v-if="message.status === 'sending'" class="spinner"/>
     </div>
   </div>
@@ -35,7 +37,6 @@
 import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
-  Emit,
   Prop,
   Ref,
   Vue,
@@ -55,10 +56,12 @@ import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 
 @Component({
   name: "ChatSendingMessage",
-  components: {ChatTextArea,
+  components: {
+    ChatTextArea,
     ChatMessageToolTip,
     AppProgressBar,
-    ChatTextMessage},
+    ChatTextMessage
+  },
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;
@@ -81,10 +84,6 @@ export default class ChatSendingMessage extends Vue {
     return this.message.id;
   }
 
-  cancelTransfer() {
-    this.message.transfer?.xhr?.abort();
-  }
-
   get cls() {
     return {
       sendingMessage: this.message.transfer && !this.message.transfer.upload,
@@ -102,6 +101,10 @@ export default class ChatSendingMessage extends Vue {
     return this.message.userId === this.userInfo.userId;
   }
 
+  cancelTransfer() {
+    this.message.transfer?.xhr?.abort();
+  }
+
   closeThread() {
     const a: EditingMessage = {
       messageId: this.message.id,
@@ -113,8 +116,10 @@ export default class ChatSendingMessage extends Vue {
 
   removeUnread() {
     if (this.message.isHighlighted) {
-      this.$store.markMessageAsRead({messageId: this.message.id,
-        roomId: this.message.roomId});
+      this.$store.markMessageAsRead({
+        messageId: this.message.id,
+        roomId: this.message.roomId
+      });
     }
   }
 
@@ -133,81 +138,97 @@ export default class ChatSendingMessage extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/variables"
 
 
-  .icon-cancel-circled-outline
-    cursor: pointer
-    margin-left: 20px
-    @include hover-click(red)
+.icon-cancel-circled-outline
+  cursor: pointer
+  margin-left: 20px
+  @include hover-click(red)
 
-  %message-status
-    margin: 0 8px
-    font-size: 10px
-  .message-status-read
-    @extend %message-status
-    color: #00b500
-  .message-status-received
-    @extend %message-status
-    color: #dfdd00
+%message-status
+  margin: 0 8px
+  font-size: 10px
+
+.message-status-read
+  @extend %message-status
+  color: #00b500
+
+.message-status-received
+  @extend %message-status
+  color: #dfdd00
+
+.editing-background
+  border: 1px solid $editing-border-color
+  background-color: rgba(255, 255, 255, 0.11)
+
+.thread-background
+  cursor: pointer
+
+.editing-background, .thread-background
+  position: absolute
+  top: 0
+  //-$space-between-messages/2
+  right: 0
+  left: 0
+  bottom: 0
+//-$space-between-messages/2
+.color-white
   .editing-background
-    border: 1px solid $editing-border-color
+    border: 1px solid #3f3f3f
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.5), 0 3px 10px 0 rgba(0, 0, 0, 0.5)
+
+.message-tooltip
+  display: none
+
+.absolute-right
+  position: absolute
+  right: 0
+  top: 0
+
+.spinner
+  display: inline-block
+  margin: -4px 8px
+  @include spinner(3px, white)
+
+.message-wrapper
+  position: relative
+
+  &:hover
     background-color: rgba(255, 255, 255, 0.11)
-  .thread-background
-    cursor: pointer
-  .editing-background, .thread-background
-    position: absolute
-    top: 0 //-$space-between-messages/2
-    right: 0
-    left: 0
-    bottom: 0 //-$space-between-messages/2
-  .color-white
-    .editing-background
-      border: 1px solid #3f3f3f
-      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
-  .message-tooltip
-    display: none
-  .absolute-right
-    position: absolute
-    right: 0
-    top: 0
-  .spinner
-    display: inline-block
-    margin: -4px 8px
-    @include spinner(3px, white)
 
-  .message-wrapper
-    position: relative
-    &:hover
-      background-color: rgba(255, 255, 255, 0.11)
-      .absolute-right
-        top: 0 // $space-between-messages/2
-      .message-tooltip
-        display: inline-block
-      %message-status, .spinner
-        display: none
+    .absolute-right
+      top: 0
+    // $space-between-messages/2
+    .message-tooltip
+      display: inline-block
 
-  .sendingMessage
-    position: relative
-    > p
-      padding-right: 30px
+    %message-status, .spinner
+      display: none
 
-  .unread-message:before
-    content: ""
-    background-color: #444444 !important
-    border-radius: 5px
-    position: absolute
-    width: 100%
-    height: 100%
-    z-index: -1
-    padding: 4px 0
+.sendingMessage
+  position: relative
 
-  .icon-repeat
-    display: block
-    text-align: center
-    cursor: pointer
-  .transfer-file
-    display: flex
-    justify-content: center
+  > p
+    padding-right: 30px
+
+.unread-message:before
+  content: ""
+  background-color: #444444 !important
+  border-radius: 5px
+  position: absolute
+  width: 100%
+  height: 100%
+  z-index: -1
+  padding: 4px 0
+
+.icon-repeat
+  display: block
+  text-align: center
+  cursor: pointer
+
+.transfer-file
+  display: flex
+  justify-content: center
 </style>

@@ -2,8 +2,8 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {stopVideo} from "@/ts/utils/htmlApi";
 import type {
-  PlatformUtil,
   permissions_type,
+  PlatformUtil,
 } from "@/ts/types/model";
 
 export default class MediaCapture {

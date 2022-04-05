@@ -20,21 +20,21 @@ export interface ChangeUserOnlineBase {
  * void means that no handlers should process this signal
  */
 export type HandlerName =
-    "*"
-    | "call"
-    | "notifier"
-    | "peerConnection:*"
-    | "room"
-    | "router"
-    | "void"
-    | "webrtc-message"
-    | "webrtc"
-    | "webrtcTransfer:*"
-    | "ws-message"
-    | "ws";
+  "*"
+  | "call"
+  | "notifier"
+  | "peerConnection:*"
+  | "room"
+  | "router"
+  | "void"
+  | "webrtc-message"
+  | "webrtc"
+  | "webrtcTransfer:*"
+  | "ws-message"
+  | "ws";
 export type CallHandlerName =
-    HandlerName
-    | "dummyCall";
+  HandlerName
+  | "dummyCall";
 
 export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | "*">) => Promise<void> | void;
 
@@ -77,14 +77,14 @@ export interface OfferFileContent extends BrowserBase {
 }
 
 export type ChangeDeviceType =
-    "i_deleted"
-    | "invited"
-    | "room_created"
-    | "someone_joined"
-    | "someone_left";
+  "i_deleted"
+  | "invited"
+  | "room_created"
+  | "someone_joined"
+  | "someone_left";
 export type ChangeOnlineType =
-    "appear_online"
-    | "gone_offline";
+  "appear_online"
+  | "gone_offline";
 
 export interface BrowserBase {
   browser: string;
@@ -114,7 +114,7 @@ export interface IMessageHandler {
 }
 
 export type CallStatus =
-    "accepted"
-    | "not_inited"
-    | "received_offer"
-    | "sent_offer";
+  "accepted"
+  | "not_inited"
+  | "received_offer"
+  | "sent_offer";

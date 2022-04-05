@@ -6,8 +6,8 @@ import {
   LOG_LEVEL_LS,
 } from "@/ts/utils/consts";
 import type {
-  LogLevel,
   Logger,
+  LogLevel,
 } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
@@ -76,14 +76,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WsHandler, "ws"> = {
-    setSettings: <HandlerType<"setSettings", "ws">> this.setSettings,
-    setUserProfile: <HandlerType<"setUserProfile", "ws">> this.setUserProfile,
-    setProfileImage: <HandlerType<"setProfileImage", "ws">> this.setProfileImage,
-    setWsId: <HandlerType<"setWsId", "ws">> this.setWsId,
-    logout: <HandlerType<"logout", "ws">> this.logout,
-    userProfileChanged: <HandlerType<"userProfileChanged", "ws">> this.userProfileChanged,
-    ping: <HandlerType<"ping", "ws">> this.ping,
-    pong: <HandlerType<"pong", "ws">> this.pong,
+    setSettings: <HandlerType<"setSettings", "ws">>this.setSettings,
+    setUserProfile: <HandlerType<"setUserProfile", "ws">>this.setUserProfile,
+    setProfileImage: <HandlerType<"setProfileImage", "ws">>this.setProfileImage,
+    setWsId: <HandlerType<"setWsId", "ws">>this.setWsId,
+    logout: <HandlerType<"logout", "ws">>this.logout,
+    userProfileChanged: <HandlerType<"userProfileChanged", "ws">>this.userProfileChanged,
+    ping: <HandlerType<"ping", "ws">>this.ping,
+    pong: <HandlerType<"pong", "ws">>this.pong,
   };
 
 

@@ -65,8 +65,8 @@ export default class ChannelTable extends Vue {
 </script>
 <!-- eslint-disable -->
 <style
-    lang="sass"
-    scoped
+  lang="sass"
+  scoped
 >
 @import "@/assets/sass/partials/room_users_table"
 .router-link-active.active-room

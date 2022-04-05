@@ -1,5 +1,5 @@
 <template>
-  <chat-message-wrapper :time="receivingFile.time" :class="mainClass">
+  <chat-message-wrapper :class="mainClass" :time="receivingFile.time">
     <template #header>
       <chat-message-header
         :user-id="receivingFile.userId"
@@ -11,23 +11,23 @@
       />
       <app-progress-bar
         v-if="showProgress"
-        class="progress-wrap-file"
         :upload="receivingFile.upload"
+        class="progress-wrap-file"
       />
       <div
         v-if="showYesNo"
         class="yesNo"
       >
         <input
+          class="green-btn"
           type="button"
           value="Accept"
-          class="green-btn"
           @click="accept"
         />
         <input
+          class="red-btn"
           type="button"
           value="Decline"
-          class="red-btn"
           @click="decline"
         />
       </div>
@@ -94,20 +94,23 @@ export default class ChatReceivingFile extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/variables"
 
-  .message-receiving-file
-    display: flex
+.message-receiving-file
+  display: flex
 
-  .progress-wrap-file :deep(.progress-wrap)
-    width: calc(100% - 40px)
-  .yesNo
-    padding-top: 15px
-    padding-bottom: 5px
-    display: flex
-    justify-content: space-around
-    input[type=button]
-      width: 100%
-      &:first-child
-        margin-right: 10px
+.progress-wrap-file :deep(.progress-wrap)
+  width: calc(100% - 40px)
+
+.yesNo
+  padding-top: 15px
+  padding-bottom: 5px
+  display: flex
+  justify-content: space-around
+
+  input[type=button]
+    width: 100%
+
+    &:first-child
+      margin-right: 10px
 </style>

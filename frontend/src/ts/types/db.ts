@@ -15,12 +15,12 @@ export interface UserDB {
 }
 
 export type SexDB =
-    0
-    | 1
-    | 2;
+  0
+  | 1
+  | 2;
 export type BooleanDB =
-    0
-    | 1;
+  0
+  | 1;
 
 export interface RoomDB {
   id: number;

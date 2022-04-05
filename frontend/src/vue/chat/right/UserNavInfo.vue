@@ -39,8 +39,8 @@ export default class UserNavInfo extends Vue {
 </script>
 <!-- eslint-disable -->
 <style
-    lang="sass"
-    scoped
+  lang="sass"
+  scoped
 >
 .user-row
   width: auto

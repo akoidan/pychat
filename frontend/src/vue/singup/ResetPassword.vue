@@ -5,11 +5,11 @@
   >
     <div>
       <input
-        type="text"
         class="input"
-        required
-        placeholder="Username or email"
         name="username_or_password"
+        placeholder="Username or email"
+        required
+        type="text"
         value=""
       />
       <div class="slider">
@@ -19,24 +19,30 @@
     <captcha-component v-model="running"/>
     <div>
       <app-submit
+        :running="running"
         class="submit-button"
         value="Recover password"
-        :running="running"
       />
     </div>
   </form>
 </template>
 
 <script lang='ts'>
-import {Component, Prop, Ref, Vue} from "vue-property-decorator";
+import {
+  Component,
+  Ref,
+  Vue
+} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
-import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import CaptchaComponent from "@/vue/singup/CaptchaComponent.vue";
 
 @Component({
   name: "ResetPassword",
-  components: {CaptchaComponent,
-    AppSubmit},
+  components: {
+    CaptchaComponent,
+    AppSubmit
+  },
 })
 export default class ResetPassword extends Vue {
   @Ref()
@@ -51,8 +57,10 @@ export default class ResetPassword extends Vue {
     this.$store.setRegHeader("Restore password");
   }
 
-  @ApplyGrowlErr({runningProp: "running",
-    message: "Can't reset password"})
+  @ApplyGrowlErr({
+    runningProp: "running",
+    message: "Can't reset password"
+  })
   public async restorePassword(event: Event) {
     await this.$api.sendRestorePassword(this.form);
     this.$store.growlSuccess("A reset email has been sent to your email address, please follow the instruction in it");
@@ -61,33 +69,36 @@ export default class ResetPassword extends Vue {
 </script>
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/variables"
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .slider
-    @extend %slider
+.slider
+  @extend %slider
 
-  form
-    margin-top: 10%
-    flex-direction: column
-    @include display-flex(!important)
-    max-width: 400px
-    min-width: 200px
-    $height: 70px
-    $padding: 20px
-    > input
-      padding: $padding
-      margin:  20px
-      display: block
-      width: 100%
-      height: 50px
-      font-size: 20px
-    [type=password]
-      $dif: $padding * 2
-      width: calc(100% - #{$dif})
-      height: $height - ($padding + 1) * 2
-    [type=submit]
-      height: $height
+form
+  margin-top: 10%
+  flex-direction: column
+  @include display-flex(!important)
+  max-width: 400px
+  min-width: 200px
+  $height: 70px
+  $padding: 20px
+
+  > input
+    padding: $padding
+    margin: 20px
+    display: block
+    width: 100%
+    height: 50px
+    font-size: 20px
+
+  [type=password]
+    $dif: $padding * 2
+    width: calc(100% - #{$dif})
+    height: $height - ($padding + 1) * 2
+
+  [type=submit]
+    height: $height
 
 </style>

@@ -13,13 +13,18 @@ import {
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import FacebookAuth from "@/vue/singup/FacebookAuth.vue";
 import GoogleAuth from "@/vue/singup/GoogleAuth.vue";
-import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/ts/utils/consts";
+import {
+  FACEBOOK_APP_ID,
+  GOOGLE_OAUTH_2_CLIENT_ID
+} from "@/ts/utils/consts";
 import type {OauthSessionResponse} from "@/ts/types/dto";
 
 @Component({
   name: "SocialAuthSignUp",
-  components: {GoogleAuth,
-    FacebookAuth},
+  components: {
+    GoogleAuth,
+    FacebookAuth
+  },
 })
 export default class SocialAuthSignUp extends Vue {
   public readonly GOOGLE_OAUTH_2_CLIENT_ID = GOOGLE_OAUTH_2_CLIENT_ID;
@@ -40,9 +45,11 @@ export default class SocialAuthSignUp extends Vue {
       if (oauthSessionResponse.isNewAccount) {
         this.$store.growlInfo(`Username ${oauthSessionResponse.username} has been generated while signing up via Social auth. You can change it in UserProfile settings.`);
       }
-      const message: LoginMessage = {action: "login",
-                                     handler: "router",
-                                     session: oauthSessionResponse.session};
+      const message: LoginMessage = {
+        action: "login",
+        handler: "router",
+        session: oauthSessionResponse.session
+      };
       this.$messageBus.notify(message);
     } catch (e) {
       reject(e);
@@ -55,8 +62,8 @@ export default class SocialAuthSignUp extends Vue {
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  div
-    display: flex
-    padding: 5px 0 15px 0
-    flex-direction: row
+div
+  display: flex
+  padding: 5px 0 15px 0
+  flex-direction: row
 </style>

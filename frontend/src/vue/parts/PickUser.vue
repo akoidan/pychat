@@ -16,10 +16,10 @@
     <template v-if="showAddUsersComp">
       <input
         v-model="search"
-        type="search"
         class="input"
         placeholder="Search"
         title="Filter by username"
+        type="search"
       />
       <ul>
         <li v-for="user in filteredUsers" :key="user.id">
@@ -93,43 +93,45 @@ export default class PickUser extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
-  .spann
-    @extend %hovered-user-room
+@import "@/assets/sass/partials/abstract_classes"
+.spann
+  @extend %hovered-user-room
 
-  .controls
-    display: flex
-    flex-direction: column
-    > *
-      margin-bottom: 5px
+.controls
+  display: flex
+  flex-direction: column
 
-  .icon-cancel
-    cursor: pointer
+  > *
+    margin-bottom: 5px
 
-  .color-reg .icon-cancel
-      @include hover-click($red-cancel-reg)
-  .color-lor .icon-cancel
-    color: #a94442
+.icon-cancel
+  cursor: pointer
 
-  .spanHo
-    max-width: 300px
-    max-height: calc(50vh - 100px)
-    overflow: auto
+.color-reg .icon-cancel
+  @include hover-click($red-cancel-reg)
 
-  ul
-    min-height: 50px
-    width: 100%
-    max-height: calc(50vh - 100px)
-    margin-top: 5px
-    overflow-y: scroll
-    padding-left: 0
+.color-lor .icon-cancel
+  color: #a94442
 
-  li
-    padding: 0 0 0 5px
-    border-radius: 2px
-    text-overflow: ellipsis
-    overflow: hidden
-    text-align: left
-    white-space: nowrap
-    @extend %hovered-user-room
+.spanHo
+  max-width: 300px
+  max-height: calc(50vh - 100px)
+  overflow: auto
+
+ul
+  min-height: 50px
+  width: 100%
+  max-height: calc(50vh - 100px)
+  margin-top: 5px
+  overflow-y: scroll
+  padding-left: 0
+
+li
+  padding: 0 0 0 5px
+  border-radius: 2px
+  text-overflow: ellipsis
+  overflow: hidden
+  text-align: left
+  white-space: nowrap
+  @extend %hovered-user-room
 </style>

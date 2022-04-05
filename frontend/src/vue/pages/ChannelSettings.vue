@@ -19,10 +19,10 @@
             <td>
               <input
                 v-model="channelName"
-                type="text"
-                required="true"
                 class="input"
                 maxlength="16"
+                required="true"
+                type="text"
               />
             </td>
           </tr>
@@ -41,8 +41,8 @@
             <td>
               <app-input-range
                 v-model="sound"
-                min="0"
                 max="100"
+                min="0"
               />
             </td>
           </tr>
@@ -67,18 +67,18 @@
             <td colspan="2">
               <app-submit
                 v-if="isAdmin"
-                type="button"
-                class="red-btn"
-                value="DELETE THIS GROUP"
                 :running="running"
+                class="red-btn"
+                type="button"
+                value="DELETE THIS GROUP"
                 @click.native="deleteChannel"
               />
               <app-submit
                 v-else-if="noRooms"
-                type="button"
-                class="red-btn"
-                value="LEAVE THIS GROUP"
                 :running="running"
+                class="red-btn"
+                type="button"
+                value="LEAVE THIS GROUP"
                 @click.native="leaveChannel"
               />
             </td>
@@ -86,9 +86,9 @@
           <tr>
             <td colspan="2">
               <app-submit
-                value="APPLY SETTINGS"
-                class="green-btn"
                 :running="running"
+                class="green-btn"
+                value="APPLY SETTINGS"
               />
             </td>
           </tr>
@@ -101,10 +101,22 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from "vue-property-decorator";
-import type {ChannelUIModel, UserModel} from "@/ts/types/model";
-import {ChannelsDictUIModel, CurrentUserInfoModel} from "@/ts/types/model";
-import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
+import type {
+  ChannelUIModel,
+  UserModel
+} from "@/ts/types/model";
+import {
+  ChannelsDictUIModel,
+  CurrentUserInfoModel
+} from "@/ts/types/model";
+import {
+  ApplyGrowlErr,
+  State
+} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import type {RouterNavigateMessage} from "@/ts/types/messages/innerMessages";
@@ -114,10 +126,12 @@ import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 
 @Component({
   name: "ChannelSettings",
-  components: {AppCheckbox,
+  components: {
+    AppCheckbox,
     AppInputRange,
     PickUser,
-    AppSubmit},
+    AppSubmit
+  },
 })
 export default class ChannelSettings extends Vue {
   public running: boolean = false;
@@ -170,6 +184,13 @@ export default class ChannelSettings extends Vue {
     return this.allUsersDict[this.channel.creator];
   }
 
+  get channelId(): number {
+    const id = this.$route.params.id as string;
+    this.$logger.log("Rending channel settings for {}", id)();
+
+    return parseInt(id);
+  }
+
   @ApplyGrowlErr({runningProp: "running"})
   async apply() {
     if (this.isAdmin && this.admin.length === 0) {
@@ -184,22 +205,6 @@ export default class ChannelSettings extends Vue {
     );
     this.$store.growlSuccess("Settings has been saved");
     this.$router.go(-1);
-  }
-
-  get channelId(): number {
-    const id = this.$route.params.id as string;
-    this.$logger.log("Rending channel settings for {}", id)();
-
-    return parseInt(id);
-  }
-
-  private goToMain() { // TODO, should go back instead of main
-    const message1: RouterNavigateMessage = {
-      handler: "router",
-      action: "navigate",
-      to: `/chat/${ALL_ROOM_ID}`,
-    };
-    this.$messageBus.notify(message1);
   }
 
   @ApplyGrowlErr({runningProp: "running"})
@@ -229,32 +234,45 @@ export default class ChannelSettings extends Vue {
     this.sound = this.channel.mainRoom.volume;
     this.notifications = this.channel.mainRoom.notifications;
   }
+
+  private goToMain() { // TODO, should go back instead of main
+    const message1: RouterNavigateMessage = {
+      handler: "router",
+      action: "navigate",
+      to: `/chat/${ALL_ROOM_ID}`,
+    };
+    this.$messageBus.notify(message1);
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  .top-div
-    display: flex
-    justify-content: center
+.top-div
+  display: flex
+  justify-content: center
 
-  .holder
-    overflow-y: auto
-    display: flex
-    justify-content: center
-    align-items: center
+.holder
+  overflow-y: auto
+  display: flex
+  justify-content: center
+  align-items: center
 
-    input[type=text]
-      width: 150px
+  input[type=text]
+    width: 150px
 
-    th
-      text-align: right
-    th, td
-      padding: 5px
-    td
-      text-align: center
-      > *
-        margin: auto
-      &[colspan="2"] > *
-        width: 100%
+  th
+    text-align: right
+
+  th, td
+    padding: 5px
+
+  td
+    text-align: center
+
+    > *
+      margin: auto
+
+    &[colspan="2"] > *
+      width: 100%
 </style>

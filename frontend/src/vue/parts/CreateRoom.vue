@@ -9,9 +9,9 @@
           <td>
             <input
               v-model="roomName"
-              type="text"
               class="input"
               maxlength="16"
+              type="text"
             />
           </td>
         </tr>
@@ -38,8 +38,8 @@
           <td>
             <app-input-range
               v-model="sound"
-              min="0"
               max="100"
+              min="0"
             />
           </td>
         </tr>
@@ -47,15 +47,15 @@
     </table>
     <pick-user
       v-model="currentUsers"
+      :show-invite-users="showInviteUsers"
       :text="inviteUsers"
       :users-ids="userIds"
-      :show-invite-users="showInviteUsers"
     />
     <app-submit
+      :running="running"
+      class="green-btn"
       type="button"
       value="Create Room"
-      class="green-btn"
-      :running="running"
       @click.native="add"
     />
   </div>
@@ -155,21 +155,22 @@ export default class CreateRoom extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  input[type="text"]
-    max-width: calc(100vw - 140px)
+input[type="text"]
+  max-width: calc(100vw - 140px)
 
-  .holder
-    @extend %room-settings-holder
+.holder
+  @extend %room-settings-holder
 
-  select
-    width: 100%
-  th, td
-    padding: 5px
+select
+  width: 100%
 
-  .green-btn
-    width: 100%
-    flex-shrink: 0
+th, td
+  padding: 5px
+
+.green-btn
+  width: 100%
+  flex-shrink: 0
 
 </style>

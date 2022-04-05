@@ -1,11 +1,11 @@
 <template>
   <app-submit
     v-if="oauth_token"
-    class="g-icon lor-btn"
-    :value="buttonName"
-    type="button"
     :running="googleRunning"
+    :value="buttonName"
+    class="g-icon lor-btn"
     title="Sign in using google account"
+    type="button"
     @click.native="logWithGoogle"
   />
 </template>
@@ -70,8 +70,10 @@ export default class GoogleAuth extends Vue {
   }
 
 
-  @ApplyGrowlErr({message: "Unable to login in with google",
-    runningProp: "grunning"})
+  @ApplyGrowlErr({
+    message: "Unable to login in with google",
+    runningProp: "grunning"
+  })
   public async logWithGoogle() {
     const auth2 = gapi.auth2.getAuthInstance();
     this.$logger.log("Calling signin on google api object")();
@@ -90,9 +92,11 @@ export default class GoogleAuth extends Vue {
     )();
     this.googleToken = googleUser.getAuthResponse().id_token;
     await new Promise((resolve, reject) => {
-      this.$emit("token", {resolve,
+      this.$emit("token", {
+        resolve,
         reject,
-        token: this.googleToken});
+        token: this.googleToken
+      });
     });
   }
 }
@@ -100,28 +104,28 @@ export default class GoogleAuth extends Vue {
 
 <style lang="sass" scoped>
 
-  .g-icon
-    margin-right: 5px
-    font: 12px Oswald
-    position: relative
-    flex-grow: 1
+.g-icon
+  margin-right: 5px
+  font: 12px Oswald
+  position: relative
+  flex-grow: 1
 
-    margin-left: 0
-    overflow: hidden
+  margin-left: 0
+  overflow: hidden
 
-    &:before
-      content: ''
-      bottom: 0
-      // expand to height
-      right: 0
-      // expand to width
-      position: absolute
-      background: url('@/assets/img/g-icon.svg') no-repeat
-      top: -8px
-      left: -5px
+  &:before
+    content: ''
+    bottom: 0
+    // expand to height
+    right: 0
+    // expand to width
+    position: absolute
+    background: url('@/assets/img/g-icon.svg') no-repeat
+    top: -8px
+    left: -5px
 
-    &:active:before
-      top: -6px
-      left: -3px
+  &:active:before
+    top: -6px
+    left: -3px
 
 </style>

@@ -1,7 +1,7 @@
 import {IS_ANDROID} from "@/ts/utils/consts";
 import type {
-  PlatformUtil,
   permissions_type,
+  PlatformUtil,
 } from "@/ts/types/model";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";

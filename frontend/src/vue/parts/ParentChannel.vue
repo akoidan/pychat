@@ -1,5 +1,5 @@
 <template>
-  <select class="input" :value="value" @change="onchange">
+  <select :value="value" class="input" @change="onchange">
     <option :value="null" selected>
       W/o channel
     </option>
@@ -46,9 +46,9 @@ export default class ParentChannel extends Vue {
 </script>
 <!-- eslint-disable -->
 <style
-    lang="sass"
-    scoped
+  lang="sass"
+  scoped
 >
-  select
-    width: 100%
+select
+  width: 100%
 </style>

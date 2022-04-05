@@ -42,10 +42,12 @@ import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
 
 @Component({
   name: "ChatSendingFile",
-  components: {ChatMessageWrapper,
-               ChatMessageHeader,
+  components: {
+    ChatMessageWrapper,
+    ChatMessageHeader,
     ChatSendingFileTransfer,
-    AppProgressBar},
+    AppProgressBar
+  },
 })
 export default class ChatSendingFile extends Vue {
   @Prop() public sendingFile!: SendingFile;
@@ -61,22 +63,26 @@ export default class ChatSendingFile extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/variables"
 
-  .message-self
-    display: flex
-  table
+.message-self
+  display: flex
+
+table
+  width: 100%
+
+  :deep(th), :deep(td)
+    text-align: left
+
+  :deep(th)
+    color: #79aeb6
+    font-weight: bold
+    padding-left: 5px
+
+  :deep(td)
+    padding-left: 10px
     width: 100%
-    :deep(th), :deep(td)
-      text-align: left
-    :deep(th)
-      color: #79aeb6
-      font-weight: bold
-      padding-left: 5px
-    :deep(td)
-      padding-left: 10px
-      width: 100%
-      text-overflow: ellipsis
-      max-width: 250px
-      overflow: hidden
+    text-overflow: ellipsis
+    max-width: 250px
+    overflow: hidden
 </style>

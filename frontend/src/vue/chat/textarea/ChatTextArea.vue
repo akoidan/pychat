@@ -2,8 +2,8 @@
   <div class="userMessageWrapper">
     <chat-attachments
       v-if="showAttachments"
-      :room-id="roomId"
       :edit-message-id="editMessageId"
+      :room-id="roomId"
       :thread-message-id="threadMessageId"
       @close="showAttachments = false"
       @upload-file="pasteFilesToTextArea"
@@ -23,8 +23,8 @@
     <media-recorder
       ref="mediaRecorder"
       :is-video="isRecordingVideo"
-      @video="handleAddVideo"
       @audio="handleAddAudio"
+      @video="handleAddVideo"
     />
     <div>
       <i
@@ -45,9 +45,9 @@
       />
       <div
         ref="userMessage"
-        contenteditable="true"
-        class="usermsg input"
         :class="{'mobile-user-message': isMobile}"
+        class="usermsg input"
+        contenteditable="true"
         @keydown="onTextAreaKeyDown"
         @keyup="onTextAreaKeyUp"
         @paste="onImagePaste"
@@ -76,7 +76,6 @@ import {
   pasteFileToTextArea,
   pasteHtmlAtCaret,
   pasteImgToTextArea,
-  pasteNodeAtCaret,
   placeCaretAtEnd,
   replaceCurrentWord,
   savedFiles,
@@ -91,17 +90,15 @@ import type {
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
-  FileModel,
   RoomDictModel,
   RoomModel,
   UserDictModel,
 } from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 
-import type {MessageDataEncode,
-             MessageSender} from "@/ts/types/types";
-import {
-  UploadFile,
+import type {
+  MessageDataEncode,
+  MessageSender
 } from "@/ts/types/types";
 import {
   editMessageWs,
@@ -122,14 +119,16 @@ import type {GIFObject} from "giphy-api";
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-@Component({name: "ChatTextArea",
+@Component({
+  name: "ChatTextArea",
   components: {
     ChatTagging,
     SmileyHolder,
     GiphySearch,
     ChatAttachments,
     MediaRecorder
-  }})
+  }
+})
 export default class ChatTextArea extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
@@ -204,6 +203,10 @@ export default class ChatTextArea extends Vue {
     return null;
   }
 
+  get messageSender(): MessageSender { // Todo does vuew cache this?
+    return this.$messageSenderProxy.getMessageSender(this.roomId);
+  }
+
   public async mounted() {
     // Do not spam ws every type user types something, wait 10s at least
     this.showIType = new Throttle(() => {
@@ -235,7 +238,6 @@ export default class ChatTextArea extends Vue {
     this.taggingName = "";
   }
 
-
   onEmitGiphy(gif: GIFObject) {
     this.showGiphy = false;
     this.$logger.log("Adding giphy {}", gif)();
@@ -258,7 +260,6 @@ export default class ChatTextArea extends Vue {
     placeCaretAtEnd(this.userMessage);
   }
 
-
   @Watch("pastingTextAreaQueue")
   onBlob() {
     if (this.pastingTextAreaQueue.length > 0) {
@@ -273,11 +274,6 @@ export default class ChatTextArea extends Vue {
       placeCaretAtEnd(this.userMessage);
     }
   }
-
-  get messageSender(): MessageSender { // Todo does vuew cache this?
-    return this.$messageSenderProxy.getMessageSender(this.roomId);
-  }
-
 
   onTextAreaKeyUp(event: KeyboardEvent) {
     const content: string = this.userMessage.textContent!;
@@ -317,47 +313,6 @@ export default class ChatTextArea extends Vue {
       }
     } else if (this.userSettings.showWhenITyping) {
       this.showIType.fire();
-    }
-  }
-
-
-  private setEditedMessage() {
-    const {messages} = this.activeRoom;
-    if (Object.keys(messages).length > 0) {
-      let latestMessage: MessageModel | null = null;
-      for (const m in messages) {
-        if (messages[m].userId == this.myId && !messages[m].deleted && (!latestMessage || messages[m].time >= latestMessage.time)) {
-          latestMessage = messages[m];
-        }
-      }
-      if (!showAllowEditing(latestMessage!)) {
-        return;
-      }
-      const newlet: EditingMessage = {
-        messageId: latestMessage!.id,
-        isEditingNow: true,
-        roomId: latestMessage!.roomId,
-      };
-      this.$store.setEditedMessage(newlet);
-    }
-  }
-
-  private cancelCurrentAction() {
-    if (this.editMessageId) {
-      this.userMessage.innerHTML = "";
-      this.$store.setEditedMessage({
-        messageId: this.editMessageId,
-        isEditingNow: false,
-        roomId: this.roomId,
-      });
-    } else if (this.threadMessageId) {
-      this.$store.setCurrentThread({
-        roomId: this.roomId,
-        isEditingNow: false,
-        messageId: this.threadMessageId,
-      });
-    } else if (this.showSmileys) { // Do not cancel all at once, cancel one by one
-      this.showSmileys = false;
     }
   }
 
@@ -483,86 +438,137 @@ export default class ChatTextArea extends Vue {
       });
     }
   }
+
+  private setEditedMessage() {
+    const {messages} = this.activeRoom;
+    if (Object.keys(messages).length > 0) {
+      let latestMessage: MessageModel | null = null;
+      for (const m in messages) {
+        if (messages[m].userId == this.myId && !messages[m].deleted && (!latestMessage || messages[m].time >= latestMessage.time)) {
+          latestMessage = messages[m];
+        }
+      }
+      if (!showAllowEditing(latestMessage!)) {
+        return;
+      }
+      const newlet: EditingMessage = {
+        messageId: latestMessage!.id,
+        isEditingNow: true,
+        roomId: latestMessage!.roomId,
+      };
+      this.$store.setEditedMessage(newlet);
+    }
+  }
+
+  private cancelCurrentAction() {
+    if (this.editMessageId) {
+      this.userMessage.innerHTML = "";
+      this.$store.setEditedMessage({
+        messageId: this.editMessageId,
+        isEditingNow: false,
+        roomId: this.roomId,
+      });
+    } else if (this.threadMessageId) {
+      this.$store.setCurrentThread({
+        roomId: this.roomId,
+        isEditingNow: false,
+        messageId: this.threadMessageId,
+      });
+    } else if (this.showSmileys) { // Do not cancel all at once, cancel one by one
+      this.showSmileys = false;
+    }
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
 
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/variables"
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .userMessageWrapper
-    padding: 8px
-    position: relative
-    width: calc(100% - 16px)
+.userMessageWrapper
+  padding: 8px
+  position: relative
+  width: calc(100% - 16px)
 
-    .icon-attach-outline
-      @extend %chat-icon
-      left: 15px
-    .icon-paper-plane
-      @extend %chat-icon
-      right: 40px
-    .icon-smile
-      @extend %chat-icon
-      right: 10px
-    .icon-picture
-      @extend %chat-icon
-      left: 15px
+  .icon-attach-outline
+    @extend %chat-icon
+    left: 15px
 
-  .color-white .userMessageWrapper
-    :deep(.usermsg)
-      background-color: white
-    :deep(.icon-picture), :deep(.icon-smile), :deep(.icon-webrtc-video)
-      color: #7b7979
+  .icon-paper-plane
+    @extend %chat-icon
+    right: 40px
+
+  .icon-smile
+    @extend %chat-icon
+    right: 10px
+
+  .icon-picture
+    @extend %chat-icon
+    left: 15px
+
+.color-white .userMessageWrapper
+  :deep(.usermsg)
+    background-color: white
+
+  :deep(.icon-picture), :deep(.icon-smile), :deep(.icon-webrtc-video)
+    color: #7b7979
 
 
-  .usermsg :deep(img[alt]) //smile
-    @extend %img-code
+.usermsg :deep(img[alt])
+//smile
+   @extend %img-code
 
-  .usermsg :deep(.emoji)
-    width: $emoji-width
+.usermsg :deep(.emoji)
+  width: $emoji-width
 
-  .usermsg.mobile-user-message
-    padding-right: 50px // before smiley and send
+.usermsg.mobile-user-message
+  padding-right: 50px
+// before smiley and send
 
-  .usermsg :deep(.tag-user)
-    color: #729fcf !important
-  .usermsg
-    z-index: 2
-    margin-left: 4px
-    padding-left: 25px
-    color: #c1c1c1
-    padding-right: 20px // before smiley
+.usermsg :deep(.tag-user)
+  color: #729fcf !important
+
+.usermsg
+  z-index: 2
+  margin-left: 4px
+  padding-left: 25px
+  color: #c1c1c1
+  padding-right: 20px
+  // before smiley
+  max-height: 200px
+
+  /*fallback
+  max-height: 30vh
+  min-height: 1.15em
+
+  /*Firefox
+  overflow-y: auto
+  white-space: pre-wrap
+
+  :deep(.B4j2ContentEditableImg), :deep(.giphy-img)
     max-height: 200px
+    max-width: 400px
 
-    /*fallback
-    max-height: 30vh
-    min-height: 1.15em
+    &.failed
+      min-width: 200px
+      min-height: 100px
 
-    /*Firefox
-    overflow-y: auto
-    white-space: pre-wrap
+  :deep(.audio-record)
+    height: 50px
 
-    :deep(.B4j2ContentEditableImg), :deep(.giphy-img)
-      max-height: 200px
-      max-width: 400px
+  :deep(.uploading-file)
+    height: 50px
 
-      &.failed
-        min-width: 200px
-        min-height: 100px
-    :deep(.audio-record)
-      height: 50px
-    :deep(.uploading-file)
-      height: 50px
-    :deep(*)
-      background-color: transparent !important
-      color: inherit !important
-      font-size: inherit !important
-      font-family: inherit !important
-      cursor: inherit !important
-      font-weight: inherit !important
-      margin: 0 !important
-      padding: 0 !important
+  :deep(*)
+    background-color: transparent !important
+    color: inherit !important
+    font-size: inherit !important
+    font-family: inherit !important
+    cursor: inherit !important
+    font-weight: inherit !important
+    margin: 0 !important
+    padding: 0 !important
 </style>

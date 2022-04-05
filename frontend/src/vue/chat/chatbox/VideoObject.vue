@@ -1,8 +1,8 @@
 <template>
   <video
     ref="video"
-    :muted="muted"
     :class="{connected}"
+    :muted="muted"
   />
 </template>
 
@@ -112,6 +112,7 @@ video
   max-height: calc(60vh - 120px)
   max-width: 100%
   background-color: #630000
+
   &.connected
     background-color: #165620
 </style>

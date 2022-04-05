@@ -7,25 +7,31 @@
           :src="ifIframeUrl"
         />
         <input
-          type="hidden"
-          name="g-recaptcha-response"
           :value="value"
+          name="g-recaptcha-response"
+          type="hidden"
         />
       </template>
 
       <div
         v-else
         ref="repactha"
+        :data-sitekey="captcha_key"
         class="g-recaptcha"
         data-theme="dark"
-        :data-sitekey="captcha_key"
       />
     </template>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch
+} from "vue-property-decorator";
 import {
   CAPTCHA_IFRAME,
   RECAPTCHA_PUBLIC_KEY,
@@ -56,10 +62,20 @@ export default class CaptchaComponent extends Vue {
   public id = captchaId++;
 
   @Prop() public value!: boolean;
-
+  public ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}` : "";
   private event: ((E: MessageEvent) => void) | null = null;
 
-  public ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}` : "";
+  get grecaptcha(): GoogleCaptcha {
+    if (window.grecaptcha) {
+      return window.grecaptcha;
+    }
+    return {
+      render: () => {
+      },
+      reset: () => {
+      },
+    };
+  }
 
   @Watch("value")
   public onValueChange(newValue: boolean, oldValue: boolean) {
@@ -75,16 +91,6 @@ export default class CaptchaComponent extends Vue {
       this.resettingAllowed = true;
     }
     this.skipInitReset = false;
-  }
-
-  get grecaptcha(): GoogleCaptcha {
-    if (window.grecaptcha) {
-      return window.grecaptcha;
-    }
-    return {
-      render: () => {},
-      reset: () => {},
-    };
   }
 
   public renderCaptcha() {
@@ -125,10 +131,10 @@ export default class CaptchaComponent extends Vue {
 }
 </script>
 <style lang="sass" scoped>
-    iframe
-        width: 320px
-        border: none
-        height: 500px
+iframe
+  width: 320px
+  border: none
+  height: 500px
 
 </style>
 

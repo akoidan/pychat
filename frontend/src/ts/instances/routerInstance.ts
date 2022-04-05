@@ -74,9 +74,9 @@ export function routerFactory(sub: Subscription) {
           {
             component: ChannelsPage,
             meta: {
-            // This should be in meta, if it's in the same lvl as component, it won't be executed when route.params.id change
+              // This should be in meta, if it's in the same lvl as component, it won't be executed when route.params.id change
               beforeEnter: (to: any, from: any) => {
-              // This should be set before instance is creeated, otherwise activeRoomId could be null and lots of componentfail
+                // This should be set before instance is creeated, otherwise activeRoomId could be null and lots of componentfail
                 logger.debug("setActiveRoomId {}", to.params.id)();
                 store.setActiveRoomId(parseInt(to.params.id as string));
               },
@@ -206,9 +206,9 @@ export function routerFactory(sub: Subscription) {
     protected readonly logger: Logger = logger;
 
     protected readonly handlers: HandlerTypes<keyof RouterProcessor, "router"> = {
-      login: <HandlerType<"login", "router">> this.login,
-      logout: <HandlerType<"logout", "router">> this.logout,
-      navigate: <HandlerType<"navigate", "router">> this.navigate,
+      login: <HandlerType<"login", "router">>this.login,
+      logout: <HandlerType<"logout", "router">>this.logout,
+      navigate: <HandlerType<"navigate", "router">>this.navigate,
     };
 
     logout(a: LogoutMessage) {

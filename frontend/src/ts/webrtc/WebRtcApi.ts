@@ -45,14 +45,14 @@ export default class WebRtcApi extends MessageHandler {
   protected logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WebRtcApi, "webrtc"> = {
-    offerFile: <HandlerType<"offerFile", "webrtc">> this.offerFile,
-    changeDevices: <HandlerType<"changeDevices", "webrtc">> this.changeDevices,
-    offerCall: <HandlerType<"offerCall", "webrtc">> this.offerCall,
-    offerMessage: <HandlerType<"offerMessage", "webrtc">> this.offerMessage,
-    changeOnline: <HandlerType<"changeOnline", "webrtc">> this.changeOnline,
-    logout: <HandlerType<"logout", HandlerName>> this.logout,
-    internetAppear: <HandlerType<"internetAppear", HandlerName>> this.internetAppear,
-    notifyCallActive: <HandlerType<"notifyCallActive", HandlerName>> this.notifyCallActive,
+    offerFile: <HandlerType<"offerFile", "webrtc">>this.offerFile,
+    changeDevices: <HandlerType<"changeDevices", "webrtc">>this.changeDevices,
+    offerCall: <HandlerType<"offerCall", "webrtc">>this.offerCall,
+    offerMessage: <HandlerType<"offerMessage", "webrtc">>this.offerMessage,
+    changeOnline: <HandlerType<"changeOnline", "webrtc">>this.changeOnline,
+    logout: <HandlerType<"logout", HandlerName>>this.logout,
+    internetAppear: <HandlerType<"internetAppear", HandlerName>>this.internetAppear,
+    notifyCallActive: <HandlerType<"notifyCallActive", HandlerName>>this.notifyCallActive,
   };
 
   private readonly wsHandler: WsHandler;

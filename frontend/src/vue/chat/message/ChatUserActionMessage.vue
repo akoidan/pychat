@@ -1,5 +1,5 @@
 <template>
-  <chat-message-wrapper class="message-system" :time="time">
+  <chat-message-wrapper :time="time" class="message-system">
     <template #header>
       <span class="message-header">
         <span>System</span>: </span>
@@ -15,7 +15,6 @@ import {
   Vue,
 } from "vue-property-decorator";
 import type {UserModel} from "@/ts/types/model";
-import {timeToString} from "@/ts/utils/htmlApi";
 import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
 
 @Component({
@@ -54,6 +53,6 @@ export default class ChatUserActionMessage extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  .color-white .message-system
-    background-color: #f2fbff
+.color-white .message-system
+  background-color: #f2fbff
 </style>

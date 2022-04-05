@@ -46,12 +46,12 @@ self.addEventListener("install", (event: any) => {
     const staticCache = await caches.open("static");
     const assets = allAssets.filter((url) => url.includes("/smileys/") ||
       url.includes("/flags/") ||
-        url.includes("/js/") ||
-        url.includes("/css/") ||
-        url.includes("/img/") ||
-        (/\/font\/fontello.*\.woff2/).test(url) ||
-        (/\/manifest.*\.json/).test(url) ||
-        url === (self as any).registration.scope);
+      url.includes("/js/") ||
+      url.includes("/css/") ||
+      url.includes("/img/") ||
+      (/\/font\/fontello.*\.woff2/).test(url) ||
+      (/\/manifest.*\.json/).test(url) ||
+      url === (self as any).registration.scope);
     logger.log("Putting to static cache {}", assets)();
     await staticCache.addAll(assets);
     const allFiles = await staticCache.keys();
@@ -141,8 +141,8 @@ self.addEventListener("fetch", async(event: any) => {
 function getSubscriptionId(pushSubscription: any) {
   let mergedEndpoint = pushSubscription.endpoint;
   if (pushSubscription.endpoint.indexOf("https://fcm.googleapis.com/fcm/send") === 0 &&
-      pushSubscription.subscriptionId &&
-      pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
+    pushSubscription.subscriptionId &&
+    pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
     mergedEndpoint = `${pushSubscription.endpoint}/${
       pushSubscription.subscriptionId}`;
   }
@@ -192,7 +192,7 @@ async function getPlayBack(event: unknown) {
     const {sender} = m.options.data;
     for (let i = 0; i < notifications.length; i++) {
       if (room && notifications[i].data.room === room ||
-          sender && notifications[i].data.sender === sender) {
+        sender && notifications[i].data.sender === sender) {
         notifications[i].close();
         count += notifications[i].data.replaced || 1;
       }

@@ -3,15 +3,19 @@
     <i :class="[icon, validation]"/>
     <slot/>
     <div
-      class="slider"
       :class="{closed}"
+      class="slider"
     >
       {{ description }}
     </div>
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from "vue-property-decorator";
+import {
+  Component,
+  Prop,
+  Vue
+} from "vue-property-decorator";
 import {IconColor} from "@/ts/types/types";
 
 @Component({name: "FieldSet"})
@@ -27,32 +31,33 @@ export default class FieldSet extends Vue {
 </script>
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
-  .slider
-    @extend %slider
-    overflow-y: hidden
-    height: 30px
+@import "@/assets/sass/partials/abstract_classes"
+.slider
+  @extend %slider
+  overflow-y: hidden
+  height: 30px
 
-    /* approximate max height
-    transition: 1s height 0s
+  /* approximate max height
+  transition: 1s height 0s
 
-    &.closed
-      height: 2px // Chrome53 pushes block all FORM left if height is set to 0
+  &.closed
+    height: 2px
+// Chrome53 pushes block all FORM left if height is set to 0
 
-  .reg-required
-    position: relative
+.reg-required
+  position: relative
 
-    &:after
-      content: " *"
-      position: absolute
-      right: 7px
-      top: 17px
-      font-size: 17px
-      display: inline-block
-      font-weight: bold
-      color: #6E6E6E
+  &:after
+    content: " *"
+    position: absolute
+    right: 7px
+    top: 17px
+    font-size: 17px
+    display: inline-block
+    font-weight: bold
+    color: #6E6E6E
 
-  i
-    @extend %i
+i
+  @extend %i
 
 </style>

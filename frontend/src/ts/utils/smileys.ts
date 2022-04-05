@@ -100,16 +100,6 @@ export class SmileysApi {
     }
   }
 
-
-  private getSmileyHtmlNotInited(symbol: string) {
-    const smile: Smile | undefined = this.allSmileysKeysCache![symbol];
-    if (!smile) {
-      throw Error(`Invalid smile ${symbol}`);
-    }
-
-    return `<img src="${smile.src}" symbol="${symbol}" class="emoji" alt="${smile.alt}">`;
-  }
-
   public async getSmileyHtml(symbol: string) {
     await this.init();
     return this.getSmileyHtmlNotInited(symbol);
@@ -149,6 +139,15 @@ export class SmileysApi {
   public async allSmileysKeysNoVariations(): Promise<Record<string, Smile>> {
     await this.init();
     return this.allSmileysKeysNoVariationsCache!;
+  }
+
+  private getSmileyHtmlNotInited(symbol: string) {
+    const smile: Smile | undefined = this.allSmileysKeysCache![symbol];
+    if (!smile) {
+      throw Error(`Invalid smile ${symbol}`);
+    }
+
+    return `<img src="${smile.src}" symbol="${symbol}" class="emoji" alt="${smile.alt}">`;
   }
 }
 

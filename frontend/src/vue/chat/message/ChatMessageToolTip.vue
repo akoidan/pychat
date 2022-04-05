@@ -1,5 +1,5 @@
 <template>
-  <div class="message-tooltip" :class="{'message-tooltip-opened': message.isEditingActive}">
+  <div :class="{'message-tooltip-opened': message.isEditingActive}" class="message-tooltip">
     <i
       v-if="message.isEditingActive"
       class="icon-cancel-circled-outline"
@@ -25,12 +25,18 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Emit, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {
+  Component,
+  Prop,
+  Vue
+} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 import type {EditingMessage} from "@/ts/types/model";
 import {MessageModel} from "@/ts/types/model";
-import {editMessageWs, showAllowEditing} from "@/ts/utils/pureFunctions";
-import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from "@/ts/utils/consts";
+import {
+  editMessageWs,
+  showAllowEditing
+} from "@/ts/utils/pureFunctions";
 
 @Component({name: "ChatMessageToolTip"})
 export default class ChatMessageToolTip extends Vue {
@@ -89,35 +95,41 @@ export default class ChatMessageToolTip extends Vue {
   }
 
   public toggleThread() {
-    this.$store.setCurrentThread({messageId: this.message.id,
+    this.$store.setCurrentThread({
+      messageId: this.message.id,
       roomId: this.message.roomId,
-      isEditingNow: !this.message.isThreadOpened});
+      isEditingNow: !this.message.isThreadOpened
+    });
   }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
-  .icon-cancel-circled-outline
-    @include hover-click(#ee0000)
-  .message-tooltip-opened
-    display: block !important
+.icon-cancel-circled-outline
+  @include hover-click(#ee0000)
 
-  .color-reg .message-tooltip
-    background: #3e3e3f
-  .message-tooltip
-    padding: 6px
-    margin: 0
-    > *
-      cursor: pointer
-  .icon-trash-circled
-    @include hover-click(red)
+.message-tooltip-opened
+  display: block !important
 
-  .icon-pencil
-    @include hover-click(#396eff)
+.color-reg .message-tooltip
+  background: #3e3e3f
 
-  .icon-comment
-    @include hover-click(#23ff00)
+.message-tooltip
+  padding: 6px
+  margin: 0
+
+  > *
+    cursor: pointer
+
+.icon-trash-circled
+  @include hover-click(red)
+
+.icon-pencil
+  @include hover-click(#396eff)
+
+.icon-comment
+  @include hover-click(#23ff00)
 
 </style>

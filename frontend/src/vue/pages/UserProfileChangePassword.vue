@@ -14,9 +14,9 @@
             <input
               v-show="false"
               v-model="username"
-              type="text"
-              name="username"
               autocomplete="username"
+              name="username"
+              type="text"
             />
             <input
               v-model="oldPassword"
@@ -34,11 +34,11 @@
             <input
               v-model="newPassword"
               autocomplete="new-password"
-              required
               class="input"
-              type="password"
-              name="password"
               minlength="3"
+              name="password"
+              required
+              type="password"
             />
           </td>
         </tr>
@@ -48,10 +48,10 @@
             <input
               v-model="confirmPassword"
               autocomplete="new-password"
-              required
               class="input"
-              type="password"
               minlength="3"
+              required
+              type="password"
             />
           </td>
         </tr>
@@ -59,9 +59,9 @@
       <tr>
         <td colspan="2">
           <app-submit
+            :running="running"
             class="green-btn"
             value="Apply Password"
-            :running="running"
           />
         </td>
       </tr>
@@ -69,8 +69,14 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
-import {Component, Vue} from "vue-property-decorator";
+import {
+  ApplyGrowlErr,
+  State
+} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 
@@ -94,8 +100,10 @@ export default class UserProfileChangePassword extends Vue {
     return this.userInfo.user;
   }
 
-  @ApplyGrowlErr({message: "Error changing pass:",
-    runningProp: "running"})
+  @ApplyGrowlErr({
+    message: "Error changing pass:",
+    runningProp: "running"
+  })
   public async saveProfile() {
     if (this.newPassword != this.confirmPassword) {
       this.$store.growlError("Passwords don't match");

@@ -24,6 +24,6 @@ export default class ChatBackIcon extends Vue {
   lang="sass"
   scoped
 >
-  .icon-left
-    cursor: pointer
+.icon-left
+  cursor: pointer
 </style>

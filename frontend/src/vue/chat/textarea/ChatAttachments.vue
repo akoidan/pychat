@@ -4,9 +4,9 @@
     <input
       v-show="false"
       ref="imgInput"
-      type="file"
       accept="image/*,video/*"
       multiple
+      type="file"
       @change="uploadImage"
     />
     <input
@@ -29,13 +29,13 @@
       @click.native="close"
     />
     <i
-      title="Send file directly (p2p)"
       class="icon-doc-inv"
+      title="Send file directly (p2p)"
       @click="sendFileClick"
     />
     <i
-      title="Send a random gif animation from text"
       class="icon-smile"
+      title="Send a random gif animation from text"
       @click="addGiphy"
     />
     <i
@@ -75,10 +75,7 @@ import {
   Prop,
   Ref,
   Vue,
-  Watch,
 } from "vue-property-decorator";
-import {State} from "@/ts/instances/storeInstance";
-import {RoomModel} from "@/ts/types/model";
 import {buildQueryParams} from "@/ts/utils/pureFunctions";
 
 @Component({name: "ChatAttachments"})
@@ -102,24 +99,6 @@ export default class ChatAttachments extends Vue {
   @Prop()
   public readonly roomId!: number;
 
-  @Emit()
-  close() {}
-
-  @Emit()
-  public addGiphy() {
-    this.close();
-  }
-
-  @Emit()
-  public addVideo() {
-    this.close();
-  }
-
-  @Emit()
-  public addAudio() {
-    this.close();
-  }
-
   get paintUrl() {
     const params: Record<string, number | string> = {
       roomId: this.roomId,
@@ -135,6 +114,24 @@ export default class ChatAttachments extends Vue {
     return `/painter?${queryParams}`;
   }
 
+  @Emit()
+  close() {
+  }
+
+  @Emit()
+  public addGiphy() {
+    this.close();
+  }
+
+  @Emit()
+  public addVideo() {
+    this.close();
+  }
+
+  @Emit()
+  public addAudio() {
+    this.close();
+  }
 
   public async addImage() {
 
@@ -214,58 +211,73 @@ export default class ChatAttachments extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
+
+.icon-cancel-circled-outline
+  margin-left: auto
+
+.attachments-div
+  padding: 10px 10px 3px 5px
+  bottom: 2px
+  // otherwise there would be scroll
+  font-size: 30px
+  display: flex
+  flex-wrap: wrap
+  // dont push width on mobile
+  border-radius: 10px
+  @extend %modal-window
+
+  [class^="icon-"]
+    padding: 5px
+    display: inline-block
+    cursor: pointer
+
+.color-lor
+  .icon-doc-inv
+    color: #b8b800
+
+  .icon-brush
+    color: #960000
+
+  .icon-upload-cloud
+    color: #40b2b2
+
+  .icon-picture
+    color: green
+
+
+.color-reg
+  .icon-mic-1
+    @include hover-click(#b87300)
+
+  .icon-webrtc-video
+    @include hover-click(#c149b7)
+
+  .icon-doc-inv
+    @include hover-click(#b8b800)
+
+  .icon-upload-cloud
+    @include hover-click(#15dfff)
+
+  .icon-brush
+    @include hover-click(#6b75ff)
 
   .icon-cancel-circled-outline
-    margin-left: auto
-  .attachments-div
-    padding: 10px 10px 3px 5px
-    bottom: 2px // otherwise there would be scroll
-    font-size: 30px
-    display: flex
-    flex-wrap: wrap // dont push width on mobile
-    border-radius: 10px
-    @extend %modal-window
-    [class^="icon-"]
-      padding: 5px
-      display: inline-block
-      cursor: pointer
+    @include hover-click(#ee0000)
 
-  .color-lor
-    .icon-doc-inv
-      color: #b8b800
-    .icon-brush
-      color: #960000
-    .icon-upload-cloud
-      color: #40b2b2
-    .icon-picture
-      color: green
+  .icon-picture
+    @include hover-click(#37ce00)
+
+  .icon-smile
+    @include hover-click(#ce793e)
 
 
-  .color-reg
-    .icon-mic-1
-      @include hover-click(#b87300)
-    .icon-webrtc-video
-      @include hover-click(#c149b7)
-    .icon-doc-inv
-      @include hover-click(#b8b800)
-    .icon-upload-cloud
-      @include hover-click(#15dfff)
-    .icon-brush
-      @include hover-click(#6b75ff)
-    .icon-cancel-circled-outline
-      @include hover-click(#ee0000)
-    .icon-picture
-      @include hover-click(#37ce00)
-    .icon-smile
-      @include hover-click(#ce793e)
+.color-white
+  .icon-upload-cloud
+    color: #0095ad
 
-
-  .color-white
-    .icon-upload-cloud
-      color: #0095ad
-    .icon-brush
-      color: #c51900
+  .icon-brush
+    color: #c51900
 
 
 </style>

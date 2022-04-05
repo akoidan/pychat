@@ -16,8 +16,8 @@ export default class AppTab extends Vue {
 </script>
 <!-- eslint-disable -->
 <style
-    lang="sass"
-    scoped
+  lang="sass"
+  scoped
 >
 @import "@/assets/sass/partials/variables"
 @import "@/assets/sass/partials/abstract_classes"

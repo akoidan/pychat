@@ -28,10 +28,10 @@ import type Subscription from "@/ts/classes/Subscription";
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
-    acceptFile: <HandlerType<"acceptFile", "peerConnection:*">> this.acceptFile,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    declineSending: <HandlerType<"declineSending", "peerConnection:*">> this.declineSending,
+    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">>this.destroyFileConnection,
+    acceptFile: <HandlerType<"acceptFile", "peerConnection:*">>this.acceptFile,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
+    declineSending: <HandlerType<"declineSending", "peerConnection:*">>this.declineSending,
   };
 
   private readonly file: File;
@@ -73,8 +73,8 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   public oniceconnectionstatechange() {
     super.oniceconnectionstatechange();
     if (this.pc!.iceConnectionState === "disconnected" ||
-        this.pc!.iceConnectionState === "failed" ||
-        this.pc!.iceConnectionState === "closed") {
+      this.pc!.iceConnectionState === "failed" ||
+      this.pc!.iceConnectionState === "closed") {
       if (this.sendDataTimeout) {
         this.logger.log("clearing sendDataTimeout {}", this.sendDataTimeout)();
         window.clearTimeout(this.sendDataTimeout); // Should this be in destroy?

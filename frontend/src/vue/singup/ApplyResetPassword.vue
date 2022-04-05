@@ -20,29 +20,32 @@
     </div>
     <input
       v-model="password"
-      type="password"
       class="input"
-      required
       placeholder="password"
+      required
+      type="password"
     />
     <input
       v-model="repeatPassword"
-      type="password"
       class="input"
-      required
       placeholder="repeat password"
+      required
+      type="password"
     />
     <app-submit
+      :running="running"
       class="submit-button"
       value="Submit Password"
-      :running="running"
     />
   </form>
 </template>
 <script lang="ts">
 
-import {Component, Prop, Vue} from "vue-property-decorator";
-import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
+import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 
 @Component({
@@ -62,15 +65,19 @@ export default class ApplyResetPassword extends Vue {
 
   repeatPassword: string = "";
 
-  @ApplyGrowlErr({runningProp: "checkingToken",
-    vueProperty: "error"})
+  @ApplyGrowlErr({
+    runningProp: "checkingToken",
+    vueProperty: "error"
+  })
   async created() {
     this.restoreUser = await this.$api.verifyToken((this.$route.query.token) as string);
   }
 
-  @ApplyGrowlErr({runningProp: "running",
+  @ApplyGrowlErr({
+    runningProp: "running",
     vueProperty: "error",
-    message: "Resetting pass err"})
+    message: "Resetting pass err"
+  })
   async submitResetPassword() {
     if (this.password !== this.repeatPassword) {
       this.$store.growlError("Passords don't match");
@@ -82,22 +89,22 @@ export default class ApplyResetPassword extends Vue {
   }
 }
 </script>
-<style scoped lang="sass">
+<style lang="sass" scoped>
 
-  $restPassMargin: 20px
+$restPassMargin: 20px
 
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
-  .spinner
-    @include lds-30-spinner-vertical('Checking token...')
+.spinner
+  @include lds-30-spinner-vertical('Checking token...')
 
-  .restoreHeader
-    font-size: 25px
-    text-align: center
-    width: 100%
-    margin-left: $restPassMargin
-    margin-right: $restPassMargin
+.restoreHeader
+  font-size: 25px
+  text-align: center
+  width: 100%
+  margin-left: $restPassMargin
+  margin-right: $restPassMargin
 
-  .error
-    color: red
+.error
+  color: red
 </style>

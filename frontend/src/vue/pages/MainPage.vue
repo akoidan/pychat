@@ -35,9 +35,11 @@ import type {SetStateFromStorage} from "@/ts/types/dto";
 
 @Component({
   name: "MainPage",
-  components: {ChatBackIcon,
+  components: {
+    ChatBackIcon,
     AppNavWrapper,
-    IncomingCall},
+    IncomingCall
+  },
 })
 export default class MainPage extends Vue {
   @State
@@ -73,37 +75,37 @@ export default class MainPage extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .spinner
-    margin: auto
-    @include lds-30-spinner-vertical('Loading user data...')
+.spinner
+  margin: auto
+  @include lds-30-spinner-vertical('Loading user data...')
 
-  .flex
-    height: 100%
-    @include display-flex()
-    flex-direction: column
+.flex
+  height: 100%
+  @include display-flex()
+  flex-direction: column
 
-  nav
-    @extend %nav
+nav
+  @extend %nav
 
-  .body
-    flex: 1
-    min-height: 0
+.body
+  flex: 1
+  min-height: 0
 
-  .wait
-    cursor: wait
-    display: block
-    position: fixed
-    background-color: #000
-    opacity: 0.5
-    background-repeat: no-repeat
-    background-position: center
-    left: 0
-    bottom: 0
-    right: 0
-    top: 0
+.wait
+  cursor: wait
+  display: block
+  position: fixed
+  background-color: #000
+  opacity: 0.5
+  background-repeat: no-repeat
+  background-position: center
+  left: 0
+  bottom: 0
+  right: 0
+  top: 0
 
 
 </style>

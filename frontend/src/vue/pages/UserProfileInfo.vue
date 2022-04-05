@@ -11,8 +11,8 @@
           <td>
             <input
               v-model="model.user"
-              maxlength="30"
               class="input"
+              maxlength="30"
               type="text"
             />
           </td>
@@ -22,8 +22,8 @@
           <td>
             <input
               v-model="model.name"
-              maxlength="30"
               class="input"
+              maxlength="30"
               type="text"
             />
           </td>
@@ -33,8 +33,8 @@
           <td>
             <input
               v-model="model.city"
-              maxlength="50"
               class="input"
+              maxlength="50"
               type="text"
             />
           </td>
@@ -44,8 +44,8 @@
           <td>
             <input
               v-model="model.surname"
-              maxlength="30"
               class="input"
+              maxlength="30"
               type="text"
             />
           </td>
@@ -55,8 +55,8 @@
           <td>
             <app-input-date
               v-model="model.birthday"
-              input-class-datepicker="input-date"
               input-class="input"
+              input-class-datepicker="input-date"
             />
           </td>
         </tr>
@@ -65,8 +65,8 @@
           <td>
             <input
               v-model="model.contacts"
-              maxlength="100"
               class="input"
+              maxlength="100"
               type="text"
             />
           </td>
@@ -91,17 +91,17 @@
         <tr>
           <td colspan="2">
             <app-submit
+              :running="running"
               class="green-btn"
               value="Save Profile"
-              :running="running"
             />
           </td>
         </tr>
         <tr>
           <td colspan="2">
             <app-submit
-              type="button"
               class="red-btn"
+              type="button"
               value="Sign out"
               @click.native="signOut"
             />
@@ -112,14 +112,18 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
-import {Component, Vue} from "vue-property-decorator";
+import {
+  ApplyGrowlErr,
+  State
+} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import type {SexModelString} from "@/ts/types/model";
 import {CurrentUserInfoModel} from "@/ts/types/model";
-import type {
-  UserProfileDtoWoImage,
-} from "@/ts/types/dto";
+import type {UserProfileDtoWoImage,} from "@/ts/types/dto";
 
 import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
@@ -128,8 +132,10 @@ import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
 
 @Component({
   name: "UserProfileInfo",
-  components: {AppInputDate,
-    AppSubmit},
+  components: {
+    AppInputDate,
+    AppSubmit
+  },
 })
 export default class UserProfileInfo extends Vue {
   public running: boolean = false;
@@ -145,8 +151,10 @@ export default class UserProfileInfo extends Vue {
     this.model = currentUserInfoModelToDto(this.userInfo);
   }
 
-  @ApplyGrowlErr({message: "Error saving profile",
-    runningProp: "running"})
+  @ApplyGrowlErr({
+    message: "Error saving profile",
+    runningProp: "running"
+  })
   public async save() {
     this.$logger.debug("Saving userProfile")();
     const cui: UserProfileDtoWoImage = {...this.model};
@@ -167,6 +175,6 @@ export default class UserProfileInfo extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  .holder :deep(.input.input-date)
-    width: 100%
+.holder :deep(.input.input-date)
+  width: 100%
 </style>

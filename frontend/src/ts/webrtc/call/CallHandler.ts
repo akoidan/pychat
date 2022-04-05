@@ -58,9 +58,9 @@ export default class CallHandler extends FileAndCallTransfer {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
-    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*">> this.replyCall,
-    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*">> this.acceptCall,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">> this.checkTransferDestroy,
+    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*">>this.replyCall,
+    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*">>this.acceptCall,
+    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">>this.checkTransferDestroy,
   };
 
   private canvas: HTMLCanvasElement | null = null;

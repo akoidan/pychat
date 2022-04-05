@@ -23,28 +23,30 @@ export default class ConfirmMail extends Vue {
 
   public message: string | null = null;
 
-  @ApplyGrowlErr({runningProp: "loading",
+  @ApplyGrowlErr({
+    runningProp: "loading",
     vueProperty: "message",
-    message: "Error changing mail"})
+    message: "Error changing mail"
+  })
   public async created() {
-    this.message = await this.$api.changeEmail(<string> this.$route.query.token);
+    this.message = await this.$api.changeEmail(<string>this.$route.query.token);
   }
 }
 </script>
 <style lang="sass" scoped>
 
-    @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
-    .spinner
-        @include lds-30-spinner-vertical('Changing email...')
+.spinner
+  @include lds-30-spinner-vertical('Changing email...')
 
-    .message
-        text-align: center
-        font-size: 30px
-        font-family: monospace
-        display: table
-        width: 100%
-        vertical-align: middle
-        margin-top: 15%
+.message
+  text-align: center
+  font-size: 30px
+  font-family: monospace
+  display: table
+  width: 100%
+  vertical-align: middle
+  margin-top: 15%
 </style>re
 

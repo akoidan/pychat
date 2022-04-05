@@ -1,29 +1,30 @@
 <!DOCTYPE html>
-<html lang="en" class="color-reg">
+<html class="color-reg" lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
   <title>PyChat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
-  <meta http-equiv="Pragma" content="no-cache">
-  <meta property="og:title" content="Open Source Chat"/>
-  <meta property="og:image" content="favicon.ico"/>
-  <meta property="og:site_name" content="Pychat"/>
-  <meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
-  <meta name="theme-color" content="#232323" />
-  <meta name="msapplication-navbutton-color" content="#232323">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <link rel="manifest" href="./assets/manifest.json"/>
-  <link rel="icon" type="image/png" href="./assets/img/favicon.ico">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="description" content="Self-hosted open source video chat based on webrtc and websockets https://github.com/akoidan/pychat">
+  <meta content="width=device-width, initial-scale=1" name="viewport"/>
+  <meta content="no-cache, no-store, must-revalidate" http-equiv="Cache-control">
+  <meta content="no-cache" http-equiv="Pragma">
+  <meta content="Open Source Chat" property="og:title"/>
+  <meta content="favicon.ico" property="og:image"/>
+  <meta content="Pychat" property="og:site_name"/>
+  <meta content="Chat with your friends, make video calls or transfer files with Pychat!" property="og:description"/>
+  <meta content="#232323" name="theme-color"/>
+  <meta content="#232323" name="msapplication-navbutton-color">
+  <meta content="yes" name="apple-mobile-web-app-capable">
+  <link href="./assets/manifest.json" rel="manifest"/>
+  <link href="./assets/img/favicon.ico" rel="icon" type="image/png">
+  <meta content="black" name="apple-mobile-web-app-status-bar-style">
+  <meta content="Self-hosted open source video chat based on webrtc and websockets https://github.com/akoidan/pychat"
+        name="description">
   <script>
-    window.addEventListener('beforeinstallprompt', function(e) {
-      e.preventDefault();
-      window.deferredPrompt = e;
-    });
+      window.addEventListener('beforeinstallprompt', function (e) {
+          e.preventDefault();
+          window.deferredPrompt = e;
+      });
   </script>
-  <script type="module" src="./ts/main.ts" crossorigin="anonymous" async></script>
+  <script async crossorigin="anonymous" src="./ts/main.ts" type="module"></script>
 </head>
 <body style="background-color: #222222; margin: auto">
 <div class="spinner-main"></div>

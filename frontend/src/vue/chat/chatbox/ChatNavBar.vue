@@ -94,7 +94,8 @@ export default class ChatNavBar extends Vue {
   }
 
   @Emit()
-  goBack() {}
+  goBack() {
+  }
 
   @Emit()
   showPopupToggle(e: Event) {
@@ -113,12 +114,15 @@ export default class ChatNavBar extends Vue {
   scoped
 >
 
-  .room-name
-    margin-left: 10px
-  .chat-right-icons
-    margin-left: auto
-  .icon-chat
-    margin-right: 20px
-  .icon-menu, .icon-chat
-    cursor: pointer
+.room-name
+  margin-left: 10px
+
+.chat-right-icons
+  margin-left: auto
+
+.icon-chat
+  margin-right: 20px
+
+.icon-menu, .icon-chat
+  cursor: pointer
 </style>

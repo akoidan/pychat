@@ -54,7 +54,7 @@ export default class UserFlagRow extends Vue {
 </script>
 <!-- eslint-disable -->
 <style
-    lang="sass"
-    scoped
+  lang="sass"
+  scoped
 >
 </style>

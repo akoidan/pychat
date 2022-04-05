@@ -10,8 +10,6 @@
 <script lang="ts">
 import {
   Component,
-  Prop,
-  Ref,
   Vue,
   Watch,
 } from "vue-property-decorator";
@@ -23,35 +21,38 @@ import AppGrowl from "@/vue/ui/AppGrowl.vue";
   components: {AppGrowl},
 })
 export default class Growls extends Vue {
-  @Watch("$route", {immediate: true,
-    deep: true})
-  onUrlChange(newVal: any) {
-    this.$store.clearGrowls();
-  }
-
   @State
   public readonly growls!: GrowlModel[];
 
   get last3Growl(): GrowlModel[] {
     return this.growls.slice(-3);
   }
+
+  @Watch("$route", {
+    immediate: true,
+    deep: true
+  })
+  onUrlChange(newVal: any) {
+    this.$store.clearGrowls();
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  .growlHolder
-    top: 10px
-    min-width: 250px
-    /*51 is nav + margin
-    right: 10px
-    position: absolute
-    max-width: 50%
-    z-index: 1
-    width: 400px
-    max-height: calc(100% - 60px)
+.growlHolder
+  top: 10px
+  min-width: 250px
+  /*51 is nav + margin
+  right: 10px
+  position: absolute
+  max-width: 50%
+  z-index: 1
+  width: 400px
+  max-height: calc(100% - 60px)
 
-    /*55 is top, +5px bot
-    overflow: hidden
-    .progress-wrap
-      width: 100%
+  /*55 is top, +5px bot
+  overflow: hidden
+
+  .progress-wrap
+    width: 100%
 </style>

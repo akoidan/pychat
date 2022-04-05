@@ -2,9 +2,9 @@ import Vuex from "vuex";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {
-  ChannelUIModel,
   ChannelsDictModel,
   ChannelsDictUIModel,
+  ChannelUIModel,
   CurrentUserInfoModel,
   IncomingCallModel,
   Location,
@@ -87,10 +87,10 @@ async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const mediaLinkIdGetter: Function = (function() {
+const mediaLinkIdGetter: Function = (function () {
   let i = 0;
 
-  return function() {
+  return function () {
     return String(i++);
   };
 }());
@@ -103,7 +103,7 @@ export const vueStore = new Vuex.Store({
 
 function Validate(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
-  descriptor.value = function(...args: unknown[]) {
+  descriptor.value = function (...args: unknown[]) {
     try {
       original.apply(this, args);
     } catch (e) {
@@ -293,15 +293,14 @@ export class DefaultStore extends VuexModule {
       return dict;
     }, {});
 
-    const allChannels: ChannelsDictUIModel = Object.keys(this.channelsDict).filter((k) => !result[k]).
-      reduce((previousValue, currentValue) => {
-        previousValue[currentValue] = {
-          ...this.channelsDict[currentValue],
-          rooms: [],
-          mainRoom: null!,
-        };
-        return previousValue;
-      }, result);
+    const allChannels: ChannelsDictUIModel = Object.keys(this.channelsDict).filter((k) => !result[k]).reduce((previousValue, currentValue) => {
+      previousValue[currentValue] = {
+        ...this.channelsDict[currentValue],
+        rooms: [],
+        mainRoom: null!,
+      };
+      return previousValue;
+    }, result);
 
     logger.debug("Channels dict {} ", allChannels)();
 
@@ -601,11 +600,10 @@ export class DefaultStore extends VuexModule {
       status: MessageStatus;
     },
   ) {
-    const ids = Object.values(this.roomsDict[roomId].messages).filter((m) => messagesIds.includes(m.id)).
-      map((m) => {
-        m.status = status;
-        return m.id;
-      });
+    const ids = Object.values(this.roomsDict[roomId].messages).filter((m) => messagesIds.includes(m.id)).map((m) => {
+      m.status = status;
+      return m.id;
+    });
     if (ids.length) {
       this.storage.setMessagesStatus(ids, status);
     }
@@ -652,8 +650,8 @@ export class DefaultStore extends VuexModule {
      * and this message is a new one (not syncing current message)
      */
     if (m.parentMessage && om[m.parentMessage] && !om[m.id] &&
-        // And this message is not from us (otherwise we already increased message count when sending it and storing in store)
-        !(m.userId === this.userInfo?.userId && m.id > 0)) {
+      // And this message is not from us (otherwise we already increased message count when sending it and storing in store)
+      !(m.userId === this.userInfo?.userId && m.id > 0)) {
       om[m.parentMessage].threadMessagesCount++;
       this.storage.setThreadMessageCount(m.parentMessage, om[m.parentMessage].threadMessagesCount);
     }
@@ -714,8 +712,7 @@ export class DefaultStore extends VuexModule {
     const {messages} = this.roomsDict[rm.roomId];
     // Vue.delete(messages, String(rm.messageId));
     delete messages[rm.messageId];
-    Object.values(messages).filter((m) => m.parentMessage === rm.messageId).
-      forEach((a) => a.parentMessage = rm.newMessageId);
+    Object.values(messages).filter((m) => m.parentMessage === rm.messageId).forEach((a) => a.parentMessage = rm.newMessageId);
     this.storage.deleteMessage(rm.messageId, rm.newMessageId);
   }
 

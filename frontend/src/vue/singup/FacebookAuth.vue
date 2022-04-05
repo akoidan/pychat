@@ -1,11 +1,11 @@
 <template>
   <app-submit
     v-if="fb_app_id"
-    class="f-icon lor-btn"
-    :value="buttonName"
-    type="button"
     :running="facebookRunning"
+    :value="buttonName"
+    class="f-icon lor-btn"
     title="Sign in using facebook account"
+    type="button"
     @click.native="facebookLogin"
   />
 </template>
@@ -63,8 +63,10 @@ export default class FacebookAuth extends Vue {
   }
 
 
-  @ApplyGrowlErr({message: "Unable to login in with facebook",
-    runningProp: "frunning"})
+  @ApplyGrowlErr({
+    message: "Unable to login in with facebook",
+    runningProp: "frunning"
+  })
   public async fbStatusChangeIfReAuth(response: any) {
     this.$logger.debug("fbStatusChangeIfReAuth {}", response)();
     if (response.status === "connected") {
@@ -82,9 +84,11 @@ export default class FacebookAuth extends Vue {
        */
 
       await new Promise((resolve, reject) => {
-        this.$emit("token", {resolve,
+        this.$emit("token", {
+          resolve,
           reject,
-          token: response.authResponse.accessToken});
+          token: response.authResponse.accessToken
+        });
       });
 
       return false;
@@ -120,27 +124,27 @@ export default class FacebookAuth extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  .f-icon
-    font: 12px Oswald
-    position: relative
-    flex-grow: 1
+.f-icon
+  font: 12px Oswald
+  position: relative
+  flex-grow: 1
 
-    margin-left: 0
-    overflow: hidden
+  margin-left: 0
+  overflow: hidden
 
-    &:before
-      content: ''
-      bottom: 0
-      // expand to height
-      right: 0
-      // expand to width
-      position: absolute
-      background: url('@/assets/img/f-icon.svg') no-repeat
-      top: 5px
-      left: 10px
+  &:before
+    content: ''
+    bottom: 0
+    // expand to height
+    right: 0
+    // expand to width
+    position: absolute
+    background: url('@/assets/img/f-icon.svg') no-repeat
+    top: 5px
+    left: 10px
 
-    &:active:before
-      top: 7px
-      left: 12px
+  &:active:before
+    top: 7px
+    left: 12px
 
 </style>

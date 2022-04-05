@@ -9,9 +9,9 @@
           <td>
             <input
               v-model="channelName"
-              type="text"
               class="input"
               maxlength="16"
+              type="text"
             />
           </td>
         </tr>
@@ -19,20 +19,23 @@
     </table>
     <pick-user
       v-model="currentUsers"
-      text="Invite users"
       :users-ids="userIds"
+      text="Invite users"
     />
     <app-submit
+      :running="running"
+      class="green-btn"
       type="button"
       value="Create Group"
-      class="green-btn"
-      :running="running"
       @click.native="add"
     />
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from "vue-property-decorator";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
@@ -57,8 +60,10 @@ export default class CreateChannel extends Vue {
     return this.$store.usersArray.map((u) => u.id);
   }
 
-  @ApplyGrowlErr({runningProp: "running",
-    message: "Unable to add channel"})
+  @ApplyGrowlErr({
+    runningProp: "running",
+    message: "Unable to add channel"
+  })
   public async add() {
     if (!this.channelName) {
       throw Error("Please specify a channel name");
@@ -71,18 +76,18 @@ export default class CreateChannel extends Vue {
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  input[type="text"]
-    width: 100%
+input[type="text"]
+  width: 100%
 
-  .holder
-    @extend %room-settings-holder
+.holder
+  @extend %room-settings-holder
 
-  th, td
-    padding: 5px
+th, td
+  padding: 5px
 
-  .green-btn
-    width: 100%
-    flex-shrink: 0
+.green-btn
+  width: 100%
+  flex-shrink: 0
 </style>

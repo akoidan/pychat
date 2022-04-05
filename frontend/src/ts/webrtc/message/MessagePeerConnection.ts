@@ -45,18 +45,18 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   connectedToRemote: boolean = true;
 
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, "peerConnection:*"> = {
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    checkDestroy: <HandlerType<"checkDestroy", "peerConnection:*">> this.checkDestroy,
-    syncP2pMessage: <HandlerType<"syncP2pMessage", "peerConnection:*">> this.syncP2pMessage,
-    sendSetMessagesStatus: <HandlerType<"sendSetMessagesStatus", "peerConnection:*">> this.sendSetMessagesStatus,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
+    checkDestroy: <HandlerType<"checkDestroy", "peerConnection:*">>this.checkDestroy,
+    syncP2pMessage: <HandlerType<"syncP2pMessage", "peerConnection:*">>this.syncP2pMessage,
+    sendSetMessagesStatus: <HandlerType<"sendSetMessagesStatus", "peerConnection:*">>this.sendSetMessagesStatus,
   };
 
   protected status: "inited" | "not_inited" = "not_inited";
 
   private readonly p2pHandlers: P2PHandlerTypes<keyof MessagePeerConnection> = {
-    exchangeMessageInfoRequest: <P2PHandlerType<"exchangeMessageInfoRequest">> this.exchangeMessageInfoRequest,
-    sendNewP2PMessage: <P2PHandlerType<"sendNewP2PMessage">> this.sendNewP2PMessage,
-    setMessageStatus: <P2PHandlerType<"setMessageStatus">> this.setMessageStatus,
+    exchangeMessageInfoRequest: <P2PHandlerType<"exchangeMessageInfoRequest">>this.exchangeMessageInfoRequest,
+    sendNewP2PMessage: <P2PHandlerType<"sendNewP2PMessage">>this.sendNewP2PMessage,
+    setMessageStatus: <P2PHandlerType<"setMessageStatus">>this.setMessageStatus,
   };
 
   private readonly messageProc: P2PMessageProcessor;
@@ -136,8 +136,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   public oniceconnectionstatechange() {
     this.logger.log(`iceconnectionstate has been changed to ${this.pc!.iceConnectionState}`);
     if (this.pc!.iceConnectionState === "disconnected" ||
-        this.pc!.iceConnectionState === "failed" ||
-        this.pc!.iceConnectionState === "closed") {
+      this.pc!.iceConnectionState === "failed" ||
+      this.pc!.iceConnectionState === "closed") {
       this.logger.error("Connection has changed to state {}", this.pc!.iceConnectionState)();
       // TODO do we need to close?
     } else {

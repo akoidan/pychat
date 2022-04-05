@@ -4,7 +4,7 @@ declare module "*.json" {
 }
 
 /*
-  eslint-disable @typescript-eslint/naming-convention
+ eslint-disable @typescript-eslint/naming-convention
  */
 declare const PYCHAT_CONSTS: {
   IS_SSL: boolean;
@@ -30,8 +30,8 @@ declare const PYCHAT_CONSTS: {
   GIPHY_API_KEY: string;
 };
 /*
-  eslint-enable @typescript-eslint/naming-convention
-*/
+ eslint-enable @typescript-eslint/naming-convention
+ */
 
 declare module "*.ico" {
   const result: string;
@@ -59,13 +59,13 @@ declare module "*.png" {
 }
 
 declare module '*.vue' {
-  import type { DefineComponent } from 'vue'
+  import type {DefineComponent} from 'vue'
   const component: DefineComponent<{}, {}, any>
   export default component
 }
 
 declare module "*.vue.ts" {
-  import type { DefineComponent } from 'vue'
+  import type {DefineComponent} from 'vue'
   const component: DefineComponent<{}, {}, any>;
   export default component;
 }

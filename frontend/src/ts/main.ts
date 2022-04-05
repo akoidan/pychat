@@ -3,10 +3,10 @@ import * as constants from "@/ts/utils/consts";
 
 import * as runtimeConsts from "@/ts/utils/runtimeConsts";
 import {
-  WS_API_URL,
   browserVersion,
   isChrome,
   isMobile,
+  WS_API_URL
 } from "@/ts/utils/runtimeConsts";
 // Should be after initStore
 import App from "@/vue/App.vue";
@@ -75,19 +75,19 @@ function bootstrapVue(
   vue.config.globalProperties.$smileyApi = smileyApi;
   vue.config.errorHandler = (err, vm, info): boolean => {
     /* eslint-disable
-      @typescript-eslint/restrict-template-expressions,
-      @typescript-eslint/restrict-template-expressions,
-      no-underscore-dangle
-    */
+     @typescript-eslint/restrict-template-expressions,
+     @typescript-eslint/restrict-template-expressions,
+     no-underscore-dangle
+     */
     const message = `Error occurred in ${vm?.$options?.__file}:${err}:\n${info}`;
     if (store?.userSettings?.sendLogs && api) {
       void api.sendLogs(`${vm?.$options?.__file}:${err}:${info}`, browserVersion, constants.GIT_HASH);
     }
     /* eslint-enable
-      @typescript-eslint/restrict-template-expressions,
-      @typescript-eslint/restrict-template-expressions,
-      no-underscore-dangle
-    */
+     @typescript-eslint/restrict-template-expressions,
+     @typescript-eslint/restrict-template-expressions,
+     no-underscore-dangle
+     */
     void store.growlError(message);
     logger.error("Error occurred in vue component err: '{}', vm '{}', info '{}'", err, vm, info)();
     return false;
@@ -98,9 +98,9 @@ function bootstrapVue(
 // eslint-disable-next-line max-lines-per-function, max-statements
 function init(): void {
 
-    /**
-     *  Hotfix for Edge 15 for reflect data
-     */
+  /**
+   *  Hotfix for Edge 15 for reflect data
+   */
 
   if (!window.InputEvent) {
     // @ts-expect-error: next-line

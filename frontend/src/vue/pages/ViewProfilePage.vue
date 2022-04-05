@@ -57,14 +57,26 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from "vue-property-decorator";
-import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
+import {
+  ApplyGrowlErr,
+  State
+} from "@/ts/instances/storeInstance";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import type {UserModel} from "@/ts/types/model";
 import type {ViewUserProfileDto} from "@/ts/types/dto";
 
 @Component({name: "ViewProfilePage"})
 export default class ViewProfilePage extends Vue {
+  public loading: boolean = false;
+  public error: string | null = null;
+  @State
+  public readonly allUsersDict!: Record<number, UserModel>;
+  public userProfileInfo: ViewUserProfileDto | null = null;
+
   get id(): number {
     return parseInt(this.$route.params.id as string);
   }
@@ -73,22 +85,15 @@ export default class ViewProfilePage extends Vue {
     return this.allUsersDict[this.id].user;
   }
 
-  public loading: boolean = false;
-
-  public error: string | null = null;
-
-  @State
-  public readonly allUsersDict!: Record<number, UserModel>;
-
-  public userProfileInfo: ViewUserProfileDto | null = null;
-
   public resolveMediaUrl(src: string) {
     return resolveMediaUrl(src);
   }
 
-  @ApplyGrowlErr({vueProperty: "error",
+  @ApplyGrowlErr({
+    vueProperty: "error",
     message: "Error loading profile",
-    runningProp: "loading"})
+    runningProp: "loading"
+  })
   public async created() {
     this.userProfileInfo = await this.$api.showProfile(this.id);
   }
@@ -97,40 +102,42 @@ export default class ViewProfilePage extends Vue {
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/variables"
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/mixins"
 
-  th
-    text-align: right
-  th, td
-    padding: 0 5px
+th
+  text-align: right
 
-  .error
+th, td
+  padding: 0 5px
+
+.error
+  padding: 10px
+  display: flex
+  align-self: center
+  font-size: 15px
+
+.spinner
+  @include lds-30-spinner-vertical('Loading user profile...')
+
+.profileHolder
+  display: flex
+  flex-direction: row
+
+  > div
+    flex-grow: 1
+    flex-basis: 0
     padding: 10px
-    display: flex
-    align-self: center
-    font-size: 15px
 
-  .spinner
-    @include lds-30-spinner-vertical('Loading user profile...')
+.tableHolder
+  display: flex
+  justify-content: center
 
+img
+  width: 100%
+
+@media screen and (max-width: $collapse-width)
   .profileHolder
-    display: flex
-    flex-direction: row
-    > div
-      flex-grow: 1
-      flex-basis: 0
-      padding: 10px
-
-  .tableHolder
-    display: flex
-    justify-content: center
-
-  img
-    width: 100%
-
-  @media screen and (max-width: $collapse-width)
-    .profileHolder
-      flex-direction: column
+    flex-direction: column
 
 </style>

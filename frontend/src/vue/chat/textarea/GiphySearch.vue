@@ -4,9 +4,9 @@
     <div class="giphy-header">
       <input
         v-model="search"
-        type="search"
         class="input"
         maxlength="50"
+        type="search"
       />
       <i
         class="icon-cancel-circled-outline"
@@ -26,15 +26,15 @@
       <app-loading-image
         v-for="gif in images"
         :key="gif.id"
-        class="img-wrapper"
         :src="getImageSrc(gif)"
+        class="img-wrapper"
         @click.native="addGihpy(gif)"
       />
       <input
         v-if="showLoadMoreBtn"
-        type="button"
-        class="lor-btn"
         :value="`Load ${pagination.total_count - pagination.offset} more`"
+        class="lor-btn"
+        type="button"
         @click="fetchGiphies"
       />
     </div>
@@ -69,27 +69,20 @@ import {LOAD_GIPHIES_PER_REQUEST} from "@/ts/utils/consts";
   },
 })
 export default class GiphySearch extends Vue {
-  @Ref()
-  private readonly suspense!: AppSuspense;
-
-  @Ref()
-  private readonly giphyContent!: HTMLDivElement;
-
   public search: string = "";
-
   public pagination: MultiResponse["pagination"] = {
     count: 0,
     offset: 0,
     total_count: 0,
   };
-
-  private webpSupported: boolean = webpSupported;
-
   public moreLoading: boolean = false;
-
   public images: GIFObject[] = [];
-
   public request: XMLHttpRequest | null = null;
+  @Ref()
+  private readonly suspense!: AppSuspense;
+  @Ref()
+  private readonly giphyContent!: HTMLDivElement;
+  private webpSupported: boolean = webpSupported;
 
   get showLoadMoreBtn() {
     return !this.request && this.images.length > 0 && this.pagination.count === LOAD_GIPHIES_PER_REQUEST;
@@ -137,9 +130,11 @@ export default class GiphySearch extends Vue {
     }
   }
 
-  @ApplyGrowlErr({message: "Unable to load more giphies",
+  @ApplyGrowlErr({
+    message: "Unable to load more giphies",
     runningProp: "moreLoading",
-    preventStacking: true})
+    preventStacking: true
+  })
   async fetchGiphies() {
 
     /*
@@ -152,40 +147,48 @@ export default class GiphySearch extends Vue {
   }
 
   @Emit()
-  close() {}
+  close() {
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .giphy-header
-    display: flex
-    padding-bottom: 15px
-    input
-      flex: 1
-      margin-right: 10px
-    i
-      @include hover-click(red)
-  .giphy-search
+.giphy-header
+  display: flex
+  padding-bottom: 15px
+
+  input
+    flex: 1
+    margin-right: 10px
+
+  i
+    @include hover-click(red)
+
+.giphy-search
+  padding: 5px
+  @extend %modal-window
+
+input[type=button]
+  width: 100%
+
+.giphy-content
+  overflow: scroll
+  max-height: 800px
+  height: calc(100vh - 300px)
+  min-height: 100px
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+
+  .img-wrapper
     padding: 5px
-    @extend %modal-window
+    margin: auto
+    cursor: pointer
 
-  input[type=button]
-    width: 100%
-  .giphy-content
-    overflow: scroll
-    max-height: 800px
-    height: calc(100vh - 300px)
-    min-height: 100px
-    display: flex
-    flex-direction: row
-    flex-wrap: wrap
-    .img-wrapper
-      padding: 5px
-      margin: auto
-      cursor: pointer
-      :deep(img)
-        max-width: 100% // some images can be fixed hight but really wide, search 'fsg' for e.g
+    :deep(img)
+      max-width: 100%
+// some images can be fixed hight but really wide, search 'fsg' for e.g
 </style>

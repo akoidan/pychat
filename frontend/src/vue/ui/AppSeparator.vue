@@ -20,8 +20,8 @@ export default class AppSeparator extends Vue {
 </script>
 <!-- eslint-disable -->
 <style
-    lang="sass"
-    scoped
+  lang="sass"
+  scoped
 >
 @import "@/assets/sass/partials/variables"
 fieldset

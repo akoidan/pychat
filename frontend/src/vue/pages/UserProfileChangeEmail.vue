@@ -12,11 +12,11 @@
             <input
               v-model="password"
               autocomplete="password"
-              required
               class="input"
-              type="password"
-              name="password"
               minlength="3"
+              name="password"
+              required
+              type="password"
             />
           </td>
         </tr>
@@ -25,8 +25,8 @@
           <td>
             <input
               v-model="email"
-              maxlength="190"
               class="input"
+              maxlength="190"
               type="email"
             />
           </td>
@@ -35,9 +35,9 @@
       <tr>
         <td colspan="2">
           <app-submit
+            :running="running"
             class="green-btn"
             value="Apply Password"
-            :running="running"
           />
         </td>
       </tr>
@@ -45,8 +45,14 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
-import {Component, Prop, Vue} from "vue-property-decorator";
+import {
+  ApplyGrowlErr,
+  State
+} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 

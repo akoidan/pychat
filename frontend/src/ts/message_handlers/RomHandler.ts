@@ -68,21 +68,21 @@ export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof RoomHandler, "room"> = {
-    deleteRoom: <HandlerType<"deleteRoom", "room">> this.deleteRoom,
-    init: <HandlerType<"init", "room">> this.init,
-    leaveUser: <HandlerType<"leaveUser", "room">> this.leaveUser,
-    addRoom: <HandlerType<"addRoom", "room">> this.addRoom,
-    removeOnlineUser: <HandlerType<"removeOnlineUser", "room">> this.removeOnlineUser,
-    addChannel: <HandlerType<"addChannel", "room">> this.addChannel,
-    inviteUser: <HandlerType<"inviteUser", "room">> this.inviteUser,
-    addInvite: <HandlerType<"addInvite", "room">> this.addInvite,
-    addOnlineUser: <HandlerType<"addOnlineUser", "room">> this.addOnlineUser,
-    saveChannelSettings: <HandlerType<"saveChannelSettings", "room">> this.saveChannelSettings,
-    deleteChannel: <HandlerType<"deleteChannel", "room">> this.deleteChannel,
-    saveRoomSettings: <HandlerType<"saveRoomSettings", "room">> this.saveRoomSettings,
-    createNewUser: <HandlerType<"createNewUser", "room">> this.createNewUser,
-    showIType: <HandlerType<"showIType", "room">> this.showIType,
-    logout: <HandlerType<"logout", "room">> this.logout,
+    deleteRoom: <HandlerType<"deleteRoom", "room">>this.deleteRoom,
+    init: <HandlerType<"init", "room">>this.init,
+    leaveUser: <HandlerType<"leaveUser", "room">>this.leaveUser,
+    addRoom: <HandlerType<"addRoom", "room">>this.addRoom,
+    removeOnlineUser: <HandlerType<"removeOnlineUser", "room">>this.removeOnlineUser,
+    addChannel: <HandlerType<"addChannel", "room">>this.addChannel,
+    inviteUser: <HandlerType<"inviteUser", "room">>this.inviteUser,
+    addInvite: <HandlerType<"addInvite", "room">>this.addInvite,
+    addOnlineUser: <HandlerType<"addOnlineUser", "room">>this.addOnlineUser,
+    saveChannelSettings: <HandlerType<"saveChannelSettings", "room">>this.saveChannelSettings,
+    deleteChannel: <HandlerType<"deleteChannel", "room">>this.deleteChannel,
+    saveRoomSettings: <HandlerType<"saveRoomSettings", "room">>this.saveRoomSettings,
+    createNewUser: <HandlerType<"createNewUser", "room">>this.createNewUser,
+    showIType: <HandlerType<"showIType", "room">>this.showIType,
+    logout: <HandlerType<"logout", "room">>this.logout,
   };
 
   private readonly store: DefaultStore;
@@ -214,7 +214,7 @@ export class RoomHandler extends MessageHandler {
       if (this.store.myId === message.userId) {
         const oldRoom: RoomModel = {...this.store.channelsDictUI[c.id].mainRoom};
         oldRoom.volume = message.volume,
-        oldRoom.notifications = message.notifications;
+          oldRoom.notifications = message.notifications;
         this.store.setRoomSettings(oldRoom);
       }
     }

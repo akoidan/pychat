@@ -29,9 +29,11 @@ import GoogleAuth from "@/vue/singup/GoogleAuth.vue";
 
 @Component({
   name: "UserProfileOauthSettings",
-  components: {GoogleAuth,
+  components: {
+    GoogleAuth,
     FacebookAuth,
-    AppSubmit},
+    AppSubmit
+  },
 })
 export default class UserProfileOauthSettings extends Vue {
   public googleConnected: boolean = false;
@@ -86,12 +88,13 @@ export default class UserProfileOauthSettings extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  .oauth-div
-    margin: auto
-    max-width: 500px
-    text-align: center
-    > *
-      display: inline-block
-      margin: 10px
-      width: 220px !important
+.oauth-div
+  margin: auto
+  max-width: 500px
+  text-align: center
+
+  > *
+    display: inline-block
+    margin: 10px
+    width: 220px !important
 </style>

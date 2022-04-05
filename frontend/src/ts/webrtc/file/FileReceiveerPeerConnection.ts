@@ -25,12 +25,12 @@ import type Subscription from "@/ts/classes/Subscription";
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileReceiverPeerConnection, "peerConnection:*"> = {
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    retryFile: <HandlerType<"retryFile", "peerConnection:*">> this.retryFile,
-    retryFileReply: <HandlerType<"retryFileReply", "peerConnection:*">> this.retryFileReply,
-    acceptFileReply: <HandlerType<"acceptFileReply", "peerConnection:*">> this.acceptFileReply,
-    declineFileReply: <HandlerType<"declineFileReply", "peerConnection:*">> this.declineFileReply,
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
+    retryFile: <HandlerType<"retryFile", "peerConnection:*">>this.retryFile,
+    retryFileReply: <HandlerType<"retryFileReply", "peerConnection:*">>this.retryFileReply,
+    acceptFileReply: <HandlerType<"acceptFileReply", "peerConnection:*">>this.acceptFileReply,
+    declineFileReply: <HandlerType<"declineFileReply", "peerConnection:*">>this.declineFileReply,
+    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">>this.destroyFileConnection,
   };
 
   private readonly fileSize: number;
@@ -159,8 +159,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
         );
       });
       this.fileEntry = await new Promise<FileEntry>((resolve, reject) => {
-        fs.root.getFile(this.connectionId, {create: true}, resolve as any, reject);
-      }, // TODO as?
+          fs.root.getFile(this.connectionId, {create: true}, resolve as any, reject);
+        }, // TODO as?
       );
       this.fileWriter = await new Promise<FileWriter>((resolve, reject) => {
         this.fileEntry!.createWriter(resolve, reject);
@@ -229,8 +229,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
   private async clearFS(fs: FileSystem) {
     this.logger.log("Quota exceeded, trying to clear it")();
     const entries: Entry[] = await new Promise<Entry[]>((resolve, reject) => {
-      fs.root.createReader().readEntries(resolve as any, reject);
-    }, // TODO as?
+        fs.root.createReader().readEntries(resolve as any, reject);
+      }, // TODO as?
     );
     await Promise.all(entries.map(async(e: Entry) => {
       if (e.isFile) {
