@@ -50,6 +50,7 @@
     "@typescript-eslint/ban-ts-comment": 0, // who cares, we explicitly define it.
     "@typescript-eslint/space-before-function-paren": [1, "never"],
     "@typescript-eslint/strict-boolean-expressions": 0,
+    "@typescript-eslint/no-unnecessary-type-assertion": 0, // this shity rule has bugs during lint:fix
     "@typescript-eslint/indent": [1, 2], //replace 4 spaces
     "@typescript-eslint/no-inferrable-types": 0, // @typescript-eslint/typedef
     "@typescript-eslint/no-non-null-assertion": 0,
