@@ -179,6 +179,7 @@
     {
       "files": ["*.vue"],
       "rules": {
+        "@typescript-eslint/no-empty-function": 0, // empty method @Emit
         "@typescript-eslint/prefer-readonly": 0, // can be used in template
         "import/unambiguous": 0 // vue SFC can miss script tags
       }

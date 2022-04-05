@@ -96,31 +96,39 @@ export default class CallContainerIcons extends Vue {
     };
   }
 
-  @Emit() micClick() {
+  @Emit()
+  public micClick(): void {
   }
 
-  @Emit() hangUpCall() {
+  @Emit()
+  public hangUpCall(): void {
   }
 
-  @Emit() videoClick() {
+  @Emit()
+  public videoClick(): void {
   }
 
-  @Emit() desktopClick() {
+  @Emit()
+  public desktopClick(): void {
   }
 
-  @Emit() invertShowSettings() {
+  @Emit()
+  public invertShowSettings(): void {
   }
 
-  @Emit() enterFullscreen() {
+  @Emit()
+  public enterFullscreen(): void {
   }
 
-  @Emit() paintClick() {
+  @Emit()
+  public paintClick(): void {
   }
 
-  @Emit() invertShowVideoContainer() {
+  @Emit()
+  public invertShowVideoContainer(): void {
   }
 
-  public joinCall() {
+  public joinCall(): void {
     this.$webrtcApi.joinCall(this.roomId);
   }
 }
