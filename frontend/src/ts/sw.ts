@@ -43,6 +43,8 @@ allAssetsSet[(self as any).registration.scope] = true;
 self.addEventListener("install", (event: any) => {
   logger.debug(" Delaying install event to put static resources")();
   event.waitUntil((async() => {
+    // assets cache filter only works for build into js files and then serve, rather than on vite-dev-server
+    // since vite-dev-server uses ecma script modules
     const staticCache = await caches.open("static");
     const assets = allAssets.filter((url) => url.includes("/smileys/") ||
       url.includes("/flags/") ||
@@ -109,6 +111,8 @@ self.addEventListener("fetch", async(event: any) => {
       return fetchedResponse;
     }
     if (fetchedResponse?.ok) {
+       // assets cache filter only works for build into js files and then serve, rather than on vite-dev-server
+      // since vite-dev-server uses ecma script modules
       // Do not put partial response. E.g. preload audio
       if (belongsToThumbnailCache) {
         logger.debug(`Adding ${request.url} to thumbnail cache`)();

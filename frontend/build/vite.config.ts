@@ -8,15 +8,15 @@ import {
   getGitRevision,
   readFileAsync,
 } from './utils';
-import { resolve } from "path";
-import { outputManifest } from './sw.plugin';
-import { OutputChunk } from 'rollup';
+import {resolve} from "path";
+import {outputManifest} from './sw.plugin';
+import {OutputChunk} from 'rollup';
 import viteChecker from 'vite-plugin-checker'
-import { viteStaticCopy } from 'vite-plugin-static-copy'
+import {viteStaticCopy} from 'vite-plugin-static-copy'
 import viteCompression from 'vite-plugin-compression'
 import viteVisualizer from 'rollup-plugin-visualizer'
 
-export default defineConfig(async ({command, mode}) => {
+export default defineConfig(async({command, mode}) => {
   let key, cert, ca, gitHash;
   if (command === 'serve') {
     [key, cert, ca, gitHash] = await Promise.all([
@@ -47,17 +47,22 @@ export default defineConfig(async ({command, mode}) => {
     },
     plugins: [
       vue(),
-      viteChecker({
-          typescript: true,
-          vueTsc: true,
-          ...(false ? {eslint: {
-            lintCommand: 'eslint --ext .ts,.vue --max-warnings=0 src',
-          }}: null)
-        }
-      ),
-      viteCompression({
-        filter: () => true,
-      }),
+      ...(!process.env.VITE_LIGHT ? [
+        viteChecker({
+            typescript: !process.env.VITE_LIGHT,
+            vueTsc: !process.env.VITE_LIGHT,
+            ...(process.env.VITE_LINT ? {
+              eslint: {
+                lintCommand: 'eslint --ext .vue --ext .ts ts vue',
+                dev: {}
+              }
+            } : null)
+          }
+        ),
+        viteCompression({
+          filter: () => true,
+        }),
+      ] : []),
       splitVendorChunkPlugin(),
       outputManifest({swFilePath}),
       viteStaticCopy({
@@ -78,7 +83,7 @@ export default defineConfig(async ({command, mode}) => {
       rollupOptions: {
         plugins: [
           viteVisualizer({
-            filename:  resolve(__dirname, 'stats.html'),
+            filename: resolve(__dirname, 'stats.html'),
           })
         ],
         input: {
