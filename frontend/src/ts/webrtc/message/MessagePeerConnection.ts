@@ -39,6 +39,7 @@ import type {
 } from "@/ts/types/messages/innerMessages";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";
+import Subscription from '@/ts/classes/Subscription';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
   connectedToRemote: boolean = true;
@@ -74,8 +75,9 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     store: DefaultStore,
     userId: number,
     messageHelper: MessageHelper,
+    sub: Subscription
   ) {
-    super(roomId, connId, opponentWsId, wsHandler, store);
+    super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.opponentUserId = userId;
     this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, "#4c002b");
     this.messageProc = new P2PMessageProcessor(this, store, `peer:${connId}:${opponentWsId}`);

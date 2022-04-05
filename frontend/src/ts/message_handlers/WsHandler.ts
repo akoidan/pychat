@@ -33,7 +33,6 @@ import type {
   UserProfileDtoWoImage,
   UserSettingsDto,
 } from "@/ts/types/dto";
-import {sub} from "@/ts/instances/subInstance";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
 import type {
@@ -67,6 +66,7 @@ import type {
   DefaultWsOutMessage,
   SyncHistoryOutMessage,
 } from "@/ts/types/messages/wsOutMessages";
+import Subscription from '@/ts/classes/Subscription';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
@@ -120,12 +120,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
    * private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
    */
   private wsConnectionId = "";
+  private readonly sub: Subscription;
 
-  constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore) {
+  constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore, sub: Subscription) {
     super();
-    sub.subscribe("ws", this);
+    this.sub = sub;
+    this.sub.subscribe("ws", this);
     this.API_URL = API_URL;
-    this.messageProc = new WsMessageProcessor(this, store, "ws");
+    this.messageProc = new WsMessageProcessor(this, store, "ws", sub);
     this.logger = loggerFactory.getLoggerColor("ws", "#4c002b");
     this.sessionHolder = sessionHolder;
     this.store = store;
@@ -566,13 +568,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       online: message.online,
       users: message.users,
     };
-    sub.notify(pubSetRooms);
+    this.sub.notify(pubSetRooms);
     const inetAppear: InternetAppearMessage = {
       action: "internetAppear",
-      handler: "any",
+      handler: "*",
     };
 
-    sub.notify(inetAppear);
+    this.sub.notify(inetAppear);
     this.logger.debug("CONNECTION ID HAS BEEN SET TO {})", this.wsConnectionId)();
     if (FLAGS) {
       const getCountryCodeMessage = await this.getCountryCode();
@@ -711,9 +713,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       this.store.growlError(message);
       const message1: LogoutMessage = {
         action: "logout",
-        handler: "any",
+        handler: "*",
       };
-      sub.notify(message1);
+      this.sub.notify(message1);
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
       // This.store.growlError( 'Can\'t establish connection with server');

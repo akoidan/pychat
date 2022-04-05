@@ -9,7 +9,6 @@ import MessageReceiverPeerConnection from "@/ts/webrtc/message/MessageReceiverPe
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 import type {
   SendSetMessagesStatusMessage,
@@ -29,8 +28,8 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
 
   private readonly messageHelper: MessageHelper;
 
-  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper) {
-    super(roomId, wsHandler, notifier, store);
+  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper, sub: Subscription) {
+    super(roomId, wsHandler, notifier, store, sub);
     this.messageHelper = messageHelper;
   }
 
@@ -69,12 +68,12 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         id: messageId,
         allowZeroSubscribers: true,
       };
-      sub.notify(payload);
+      this.sub.notify(payload);
     }
   }
 
   public destroyThisTransferHandler() {
-    sub.notify({
+    this.sub.notify({
       action: "checkDestroy",
       handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
     });
@@ -127,7 +126,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     const newConnectionIdsWithUser = this.connectionIds;
     newConnectionIdsWithUser.forEach((connectionIdWithUser) => {
       const opponentWsId = connectionIdWithUser.connectionId;
-      if (sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) == 0) {
+      if (this.sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) == 0) {
         let mpc;
         if (opponentWsId > myConnectionId) {
           mpc = new MessageSenderPeerConnection(
@@ -138,6 +137,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
             this.store,
             connectionIdWithUser.userId,
             this.messageHelper,
+            this.sub
           );
         } else {
           mpc = new MessageReceiverPeerConnection(
@@ -148,6 +148,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
             this.store,
             connectionIdWithUser.userId,
             this.messageHelper,
+            this.sub
           );
         }
         mpc.makeConnection();
@@ -156,7 +157,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     // Let newConnectionIds: string[] = newConnectionIdsWithUser.map(a => a.connectionId);
 
     // Let connectionsToRemove = this.webrtcConnnectionsIds.filter(oldC => newConnectionIds.indexOf(oldC) < 0);
-    sub.notify({
+    this.sub.notify({
       action: "checkDestroy",
       handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
       allowZeroSubscribers: true,
@@ -187,7 +188,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         status: "read",
         allowZeroSubscribers: true,
       };
-      sub.notify(payload);
+      this.sub.notify(payload);
     }
   }
 

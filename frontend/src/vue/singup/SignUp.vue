@@ -133,7 +133,6 @@ import RegisterFieldSet from "@/vue/singup/RegisterFieldSet.vue";
 import debounce from "lodash.debounce";
 import {IconColor} from "@/ts/types/types";
 import {SexModelString} from "@/ts/types/model";
-import {sub} from "@/ts/instances/subInstance";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import SocialAuthSignUp from "@/vue/singup/SocialAuthSignUp.vue";
 import {USERNAME_REGEX} from "@/ts/utils/consts";
@@ -357,7 +356,7 @@ export default class SignUp extends Vue {
     const message: LoginMessage = {action: "login",
                                    handler: "router",
                                    session};
-    sub.notify(message);
+    this.$messageBus.notify(message);
   }
 }
 </script>

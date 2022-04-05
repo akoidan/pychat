@@ -52,7 +52,6 @@ import type {
   ShowITypeMessage,
 } from "@/ts/types/messages/wsInMessages";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
-import {sub} from "@/ts/instances/subInstance";
 import type {Logger} from "lines-logger";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Api from "@/ts/message_handlers/Api";
@@ -63,6 +62,7 @@ import {
   login,
   logout,
 } from "@/ts/utils/audio";
+import Subscription from '@/ts/classes/Subscription';
 
 export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
@@ -90,15 +90,18 @@ export class RoomHandler extends MessageHandler {
   private readonly ws: WsHandler;
 
   private readonly audioPlayer: AudioPlayer;
+  private readonly sub: Subscription;
 
   constructor(
     store: DefaultStore,
     api: Api,
     ws: WsHandler,
     audioPlayer: AudioPlayer,
+    sub: Subscription
   ) {
     super();
     this.store = store;
+    this.sub = sub;
     sub.subscribe("room", this);
     this.logger = loggerFactory.getLogger("room");
     this.ws = ws;
@@ -198,7 +201,7 @@ export class RoomHandler extends MessageHandler {
       userId: message.userId,
       opponentWsId: message.opponentWsId,
     };
-    sub.notify(payload);
+    this.sub.notify(payload);
   }
 
   public saveChannelSettings(message: SaveChannelSettingsMessage) {
@@ -307,7 +310,7 @@ export class RoomHandler extends MessageHandler {
           to: `/chat/${ALL_ROOM_ID}`,
         };
         this.store.growlInfo(`Room #${roomId} has been deleted. Navigating to main room`);
-        sub.notify(m);
+        this.sub.notify(m);
       }
       this.store.deleteRoom(roomId);
     } else {
@@ -346,7 +349,7 @@ export class RoomHandler extends MessageHandler {
       roomId,
       userId,
     };
-    sub.notify(message);
+    this.sub.notify(message);
   }
 
   private mutateRoomAddition(message: AddRoomBase, type: "invited" | "room_created") {

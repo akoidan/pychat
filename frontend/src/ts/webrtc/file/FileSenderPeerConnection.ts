@@ -24,6 +24,7 @@ import type {
   AcceptFileMessage,
   DestroyFileConnectionMessage,
 } from "@/ts/types/messages/wsInMessages";
+import Subscription from '@/ts/classes/Subscription';
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {
@@ -45,8 +46,8 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
 
   private trackTimeout: number = 0;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number) {
-    super(roomId, connId, opponentWsId, wsHandler, store);
+  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number, sub: Subscription) {
+    super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.file = file;
     const asft: AddSendingFileTransfer = {
       connId,

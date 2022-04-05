@@ -19,7 +19,6 @@ import type {Router} from "vue-router";
 import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
 import type {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import type {App as VueApp} from "@vue/runtime-core";
-import type {Emitter} from "mitt";
 import { SmileysApi } from '@/ts/utils/smileys';
 
 declare global {
@@ -54,7 +53,7 @@ declare module "@vue/runtime-core" {
     $smileyApi: SmileysApi;
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;
-    $messageBus: Emitter<EventTypes>;
+    $messageBus: Subscription;
     $webrtcApi: WebRtcApi;
   }
 }

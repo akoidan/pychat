@@ -3,7 +3,6 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
 
-import {sub} from "@/ts/instances/subInstance";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -45,14 +44,16 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       {RtpDataChannels: false /* True*/},
     ],
   };
+  protected readonly sub: Subscription;
 
-  constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore) {
+  constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore, sub: Subscription) {
     super();
     this.roomId = roomId;
     this.connectionId = connectionId;
     this.opponentWsId = opponentWsId;
-    sub.subscribe(Subscription.allPeerConnectionsForTransfer(connectionId), this);
-    sub.subscribe(this.mySubscriberId, this);
+    this.sub = sub;
+    this.sub.subscribe(Subscription.allPeerConnectionsForTransfer(connectionId), this);
+    this.sub.subscribe(this.mySubscriberId, this);
     this.wsHandler = ws;
     this.store = store;
     this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, "#960055");
@@ -81,15 +82,15 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     } else {
       this.logger.log("No peer connection to close")();
     }
-    sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
-    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
+    this.sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
+    this.sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
     const message: CheckTransferDestroy = { // Destroy parent TransferHandler
       handler: Subscription.getTransferId(this.connectionId),
       action: "checkTransferDestroy",
       allowZeroSubscribers: true,
       wsOpponentId: this.opponentWsId,
     };
-    sub.notify(message);
+    this.sub.notify(message);
   }
 
   public createPeerConnection(arg?: ConnectToRemoteMessage) {

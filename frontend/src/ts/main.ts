@@ -10,7 +10,6 @@ import {
 } from "@/ts/utils/runtimeConsts";
 // Should be after initStore
 import App from "@/vue/App.vue";
-import {sub} from "@/ts/instances/subInstance";
 import {createApp} from "vue";
 import {store} from "@/ts/instances/storeInstance";
 import type {Logger} from "lines-logger";
@@ -28,7 +27,7 @@ import Api from "@/ts/message_handlers/Api";
 import NotifierHandler from "@/ts/classes/NotificationHandler";
 import type Http from "@/ts/classes/Http";
 import WebRtcApi from "@/ts/webrtc/WebRtcApi";
-import {router} from "@/ts/instances/routerInstance";
+import {routerFactory} from "@/ts/instances/routerInstance";
 import {AudioPlayer} from "@/ts/classes/AudioPlayer";
 import {AndroidPlatformUtil} from "@/ts/devices/AndroidPlatformUtils";
 import {WebPlatformUtils} from "@/ts/devices/WebPlatformUtils";
@@ -36,14 +35,14 @@ import {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
 import {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import {mainWindow} from "@/ts/instances/mainWindow";
-import type {Emitter} from "mitt";
-import mitt from "mitt";
 import {SmileysApi} from "@/ts/utils/smileys";
 import {loggerMixin} from "@/ts/utils/mixins";
 import {
   switchDirective,
   validityDirective,
 } from "@/ts/utils/directives";
+import Subscription from '@/ts/classes/Subscription';
+import { Router } from 'vue-router';
 
 
 const logger: Logger = loggerFactory.getLoggerColor("main", "#007a70");
@@ -52,13 +51,14 @@ logger.log(`Evaluating main script ${constants.GIT_HASH}`)();
 
 // eslint-disable-next-line max-params
 function bootstrapVue(
-  messageBus: Emitter<EventTypes>,
+  messageBus: Subscription,
   api: Api,
   ws: WsHandler,
   webrtcApi: WebRtcApi,
   platformUtil: PlatformUtil,
   messageSenderProxy: MessageSenderProxy,
   smileyApi: SmileysApi,
+  router: Router,
 ): VueApp {
   const vue: VueApp = createApp(App);
   vue.mixin(loggerMixin);
@@ -97,6 +97,18 @@ function bootstrapVue(
 
 // eslint-disable-next-line max-lines-per-function, max-statements
 function init(): void {
+
+
+    /**
+   *  Hotfix for Edge 15 for reflect data
+   */
+
+  if (!window.InputEvent) {
+    // @ts-expect-error: next-line
+    window.InputEvent = (): void => {
+    };
+  }
+
   document.body.addEventListener("drop", (event) => {
     event.preventDefault();
   });
@@ -104,8 +116,9 @@ function init(): void {
     event.preventDefault();
   });
 
+  const sub = new Subscription();
   const xhr: Http = /* Window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
-  const api: Api = new Api(xhr);
+  const api: Api = new Api(xhr, sub);
 
   let storage;
   try {
@@ -119,17 +132,16 @@ function init(): void {
   store.setStorage(storage);
   const smileyApi = new SmileysApi(store);
   void smileyApi.init();
-  const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
-  const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow);
-  const messageBus: Emitter<EventTypes> = mitt<EventTypes>();
-  const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
-  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper);
-  const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer);
-  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
+  const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store, sub);
+  const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow, sub);
+  const messageHelper: MessageHelper = new MessageHelper(store, notifier, sub, audioPlayer);
+  const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper, sub);
+  const roomHandler: RoomHandler = new RoomHandler(store, api, ws, audioPlayer, sub);
+  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper, sub);
   const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
-
-  const vue = bootstrapVue(messageBus, api, ws, webrtcApi, platformUtil, messageSenderProxy, smileyApi);
+  const router = routerFactory(sub);
+  const vue = bootstrapVue(sub, api, ws, webrtcApi, platformUtil, messageSenderProxy, smileyApi, router);
 
   vue.mount(document.body);
 

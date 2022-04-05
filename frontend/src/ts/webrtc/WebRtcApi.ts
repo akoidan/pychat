@@ -6,7 +6,6 @@ import {FileTransferStatus} from "@/ts/types/model";
 import FileHandler from "@/ts/webrtc/file/FileHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import {sub} from "@/ts/instances/subInstance";
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from "@/ts/utils/consts";
 import {
   requestFileSystem,
@@ -69,10 +68,12 @@ export default class WebRtcApi extends MessageHandler {
   private readonly messageHelper: MessageHelper;
 
   private messageSenderProxy!: MessageSenderProxy; // Via setter
+  private readonly sub: Subscription;
 
-  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper) {
+  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper, sub: Subscription) {
     super();
-    sub.subscribe("webrtc", this);
+    this.sub = sub;
+    this.sub.subscribe("webrtc", this);
     this.wsHandler = ws;
     this.notifier = notifier;
     this.logger = loggerFactory.getLogger("WEBRTC");
@@ -141,21 +142,21 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public acceptFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({
+    this.sub.notify({
       action: "acceptFileReply",
       handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId),
     });
   }
 
   public declineSending(connId: string, webRtcOpponentId: string) {
-    sub.notify({
+    this.sub.notify({
       action: "declineSending",
       handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId),
     });
   }
 
   public declineFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({
+    this.sub.notify({
       action: "declineFileReply",
       handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId),
     });
@@ -164,14 +165,14 @@ export default class WebRtcApi extends MessageHandler {
   public async sendFileOffer(file: File, channel: number, threadId: number | null) {
     if (file.size > 0) {
       const e: WebRtcSetConnectionIdMessage = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, threadId);
-      new FileHandler(channel, threadId, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time));
+      new FileHandler(channel, threadId, e.connId, this.wsHandler, this.notifier, this.store, file, this.wsHandler.convertServerTimeToPC(e.time), this.sub);
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }
   }
 
   public retryFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({
+    this.sub.notify({
       action: "retryFileReply",
       handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId),
     });
@@ -179,7 +180,7 @@ export default class WebRtcApi extends MessageHandler {
 
   public getCallHandler(roomId: number): CallHandler {
     if (!this.callHandlers[roomId]) {
-      this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store);
+      this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store, this.sub);
     }
 
     return this.callHandlers[roomId];
@@ -187,7 +188,7 @@ export default class WebRtcApi extends MessageHandler {
 
   public getMessageHandler(roomId: number): MessageTransferHandler {
     if (!this.messageHandlers[roomId]) {
-      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store, this.messageHelper);
+      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store, this.messageHelper, this.sub);
     }
 
     return this.messageHandlers[roomId];
@@ -198,21 +199,21 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public answerCall(connId: string) {
-    sub.notify({
+    this.sub.notify({
       action: "answerCall",
       handler: Subscription.getTransferId(connId),
     });
   }
 
   public declineCall(connId: string) {
-    sub.notify({
+    this.sub.notify({
       action: "declineCall",
       handler: Subscription.getTransferId(connId),
     });
   }
 
   public videoAnswerCall(connId: string) {
-    sub.notify({
+    this.sub.notify({
       action: "videoAnswerCall",
       handler: Subscription.getTransferId(connId),
     });
@@ -273,7 +274,7 @@ export default class WebRtcApi extends MessageHandler {
     }
     this.wsHandler.replyFile(message.connId, browserVersion);
     if (!limitExceeded) {
-      new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
+      new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size, this.sub);
     }
   }
 

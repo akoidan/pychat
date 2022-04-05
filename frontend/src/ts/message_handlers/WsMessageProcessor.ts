@@ -4,12 +4,20 @@ import type {
   GrowlMessage,
 } from "@/ts/types/messages/wsInMessages";
 import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
-import {sub} from "@/ts/instances/subInstance";
+import Subscription from '@/ts/classes/Subscription';
+import { MessageSupplier } from '@/ts/types/types';
+import { DefaultStore } from '@/ts/classes/DefaultStore';
 
 export class WsMessageProcessor extends AbstractMessageProcessor {
+  private sub: Subscription;
+
+  constructor(target: MessageSupplier, store: DefaultStore, label: string, sub: Subscription) {
+    super(target, store, label);
+    this.sub = sub;
+  }
   public handleMessage(data: DefaultWsInMessage<string, HandlerName>) {
     if (data.handler !== "void" && data.action !== "growlError") {
-      sub.notify(data);
+      this.sub.notify(data);
     }
     if (data.cbId && this.callBacks[data.cbId] && (!data.cbBySender || data.cbBySender === this.target.getWsConnectionId())) {
       this.logger.debug("resolving cb")();

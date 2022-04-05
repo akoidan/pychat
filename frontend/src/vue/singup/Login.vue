@@ -50,7 +50,6 @@ import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 
 import CaptchaComponent from "@/vue/singup/CaptchaComponent.vue";
-import {sub} from "@/ts/instances/subInstance";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import SocialAuthSignUp from "@/vue/singup/SocialAuthSignUp.vue";
 
@@ -77,7 +76,7 @@ export default class Login extends Vue {
     const message: LoginMessage = {action: "login",
                                    handler: "router",
                                    session};
-    sub.notify(message);
+    this.$messageBus.notify(message);
   }
 }
 </script>

@@ -125,7 +125,6 @@ import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
 import type {SetUserProfileMessage} from "@/ts/types/messages/wsInMessages";
 import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
-import {sub} from "@/ts/instances/subInstance";
 
 @Component({
   name: "UserProfileInfo",
@@ -160,9 +159,9 @@ export default class UserProfileInfo extends Vue {
     this.$api.logout(); // Do not make user wait, logout instantly
     const message: LogoutMessage = {
       action: "logout",
-      handler: "any",
+      handler: "*",
     };
-    sub.notify(message);
+    this.$messageBus.notify(message);
   }
 }
 </script>

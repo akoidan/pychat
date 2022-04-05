@@ -63,7 +63,7 @@ export default class Subscription {
 
   public notify<T extends DefaultInMessage<string, HandlerName>>(message: T): boolean {
     this.logger.debug("notifing {}", message)();
-    if (message.handler === "any") {
+    if (message.handler === "*") {
       Object.values(this.suscribers).forEach((channel) => {
         channel.forEach((h: IMessageHandler) => {
           if (h.getHandler(message)) {

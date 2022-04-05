@@ -3,7 +3,6 @@ import type {Logger} from "lines-logger";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -20,19 +19,21 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected readonly store: DefaultStore;
 
   protected readonly roomId: number;
+  protected readonly sub: Subscription;
 
-  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
+  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, sub: Subscription) {
     super();
     this.roomId = roomId;
     this.notifier = notifier;
     this.wsHandler = wsHandler;
     this.store = store;
+    this.sub = sub;
     this.logger = loggerFactory.getLoggerColor(`transfer:r${roomId}`, "#960055");
     this.logger.log(`${this.constructor.name} has been created`)();
   }
 
   public checkDestroy() {
-    if (this.connectionId && sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId)) === 0) {
+    if (this.connectionId && this.sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId)) === 0) {
       this.onDestroy();
     }
   }
@@ -46,7 +47,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
 
   protected onDestroy() {
     if (this.connectionId) {
-      sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
+      this.sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
     }
   }
 }

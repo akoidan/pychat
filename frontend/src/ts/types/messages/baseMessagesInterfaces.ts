@@ -20,7 +20,7 @@ export interface ChangeUserOnlineBase {
  * void means that no handlers should process this signal
  */
 export type HandlerName =
-    "any"
+    "*"
     | "call"
     | "notifier"
     | "peerConnection:*"
@@ -36,7 +36,7 @@ export type CallHandlerName =
     HandlerName
     | "dummyCall";
 
-export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | "any">) => Promise<void> | void;
+export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | "*">) => Promise<void> | void;
 
 export type HandlerTypes<K extends string, H extends HandlerName> = {
   [Key in K]?: HandlerType<Key, H>

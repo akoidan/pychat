@@ -25,8 +25,8 @@ import {
 } from "@/ts/utils/runtimeConsts";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
-import type {Emitter} from "mitt";
 import { SmileysApi } from '@/ts/utils/smileys';
+import Subscription from '@/ts/classes/Subscription';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -400,7 +400,7 @@ export function setAudioEvent(e: HTMLElement) {
   });
 }
 
-export function setImageFailEvents(e: HTMLElement, bus: Emitter<any>) {
+export function setImageFailEvents(e: HTMLElement, bus: Subscription) {
   const r = e.querySelectorAll("img");
   for (let i = 0; i < r.length; i++) {
     (function(img) {
@@ -408,7 +408,10 @@ export function setImageFailEvents(e: HTMLElement, bus: Emitter<any>) {
         this.className += " failed";
       };
       img.onload = function() {
-        bus.emit("scroll");
+        bus.notify({
+          action: "scroll",
+          handler: "*",
+        });
       };
     }(r[i]));
   }

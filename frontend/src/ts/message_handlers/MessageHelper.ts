@@ -10,7 +10,7 @@ import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
-import type {Emitter} from "mitt";
+import Subscription from '@/ts/classes/Subscription';
 
 export class MessageHelper {
   private readonly logger: Logger;
@@ -19,11 +19,11 @@ export class MessageHelper {
 
   private readonly notifier: NotifierHandler;
 
-  private readonly messageBus: Emitter<any>;
+  private readonly messageBus: Subscription;
 
   private readonly audioPlayer: AudioPlayer;
 
-  constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Emitter<any>, audioPlayer: AudioPlayer) {
+  constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Subscription, audioPlayer: AudioPlayer) {
     this.store = store;
     this.logger = loggerFactory.getLogger("messageHelper");
     this.audioPlayer = audioPlayer;
@@ -40,7 +40,7 @@ export class MessageHelper {
   }
 
   public processAnyMessage() {
-    this.messageBus.emit("scroll");
+    this.messageBus.notify({action: "scroll", handler: "*"});
   }
 
   private processOpponentMessage(message: MessageModel) {

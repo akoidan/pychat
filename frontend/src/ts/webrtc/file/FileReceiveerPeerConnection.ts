@@ -21,6 +21,7 @@ import type {
   DestroyFileConnectionMessage,
   RetryFileMessage,
 } from "@/ts/types/messages/wsInMessages";
+import Subscription from '@/ts/classes/Subscription';
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileReceiverPeerConnection, "peerConnection:*"> = {
@@ -48,8 +49,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
 
   private retryFileSend: number = 0;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, size: number) {
-    super(roomId, connId, opponentWsId, wsHandler, store);
+  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, size: number, sub: Subscription) {
+    super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.fileSize = size;
   }
 

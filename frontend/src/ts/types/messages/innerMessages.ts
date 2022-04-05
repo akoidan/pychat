@@ -28,13 +28,13 @@ export interface PubSetRooms extends DefaultInnerSystemMessage<"init", "room"> {
   online: Record<string, string[]>;
 }
 
-export type InternetAppearMessage = DefaultInnerSystemMessage<"internetAppear", "any">;
+export type InternetAppearMessage = DefaultInnerSystemMessage<"internetAppear", "*">;
 
 export interface LoginMessage extends DefaultInnerSystemMessage<"login", "router"> {
   session: string;
 }
 
-export type LogoutMessage = DefaultInnerSystemMessage<"logout", "any">;
+export type LogoutMessage = DefaultInnerSystemMessage<"logout", "*">;
 
 export interface RouterNavigateMessage extends DefaultInnerSystemMessage<"navigate", "router"> {
   to: string;

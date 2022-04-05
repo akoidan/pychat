@@ -108,7 +108,6 @@ import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import type {RouterNavigateMessage} from "@/ts/types/messages/innerMessages";
-import {sub} from "@/ts/instances/subInstance";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
@@ -200,7 +199,7 @@ export default class ChannelSettings extends Vue {
       action: "navigate",
       to: `/chat/${ALL_ROOM_ID}`,
     };
-    sub.notify(message1);
+    this.$messageBus.notify(message1);
   }
 
   @ApplyGrowlErr({runningProp: "running"})

@@ -16,17 +16,17 @@ import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type Http from "@/ts/classes/Http";
-import {sub} from "@/ts/instances/subInstance";
 import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/messages/baseMessagesInterfaces";
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
+import Subscription from '@/ts/classes/Subscription';
 
 export default class Api extends MessageHandler {
-  protected readonly handlers: HandlerTypes<keyof Api, "any"> = {
-    internetAppear: <HandlerType<"internetAppear", "any">> this.internetAppear,
+  protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
+    internetAppear: <HandlerType<"internetAppear", "*">> this.internetAppear,
   };
 
   protected readonly logger: Logger;
@@ -35,9 +35,9 @@ export default class Api extends MessageHandler {
 
   private retryFcb: Function | null = null;
 
-  constructor(xhr: Http) {
+  constructor(xhr: Http, sub: Subscription) {
     super();
-    sub.subscribe("any", this);
+    sub.subscribe("*", this);
     this.logger = loggerFactory.getLogger("api");
     this.xhr = xhr;
   }

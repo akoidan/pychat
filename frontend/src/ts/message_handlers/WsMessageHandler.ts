@@ -24,7 +24,6 @@ import type {
   SaveFileResponse,
 } from "@/ts/types/dto";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import {sub} from "@/ts/instances/subInstance";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
@@ -52,6 +51,7 @@ import {
   checkIfIdIsMissing,
   getMissingIds,
 } from "@/ts/utils/pureFunctions";
+import Subscription from '@/ts/classes/Subscription';
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
   protected readonly logger: Logger;
@@ -83,6 +83,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     api: Api,
     ws: WsHandler,
     messageHelper: MessageHelper,
+    sub: Subscription
   ) {
     super();
     this.store = store;

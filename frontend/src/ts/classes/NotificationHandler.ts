@@ -16,15 +16,15 @@ import type {
 } from "@/ts/types/messages/baseMessagesInterfaces";
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import {sub} from "@/ts/instances/subInstance";
 import type {MainWindow} from "@/ts/classes/MainWindow";
+import Subscription from '@/ts/classes/Subscription';
 
 
 export default class NotifierHandler extends MessageHandler {
   protected readonly logger: Logger;
 
-  protected readonly handlers: HandlerTypes<keyof Api, "any"> = {
-    internetAppear: <HandlerType<"internetAppear", "any">> this.internetAppear,
+  protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
+    internetAppear: <HandlerType<"internetAppear", "*">> this.internetAppear,
   };
 
   private readonly mainWindow: MainWindow;
@@ -55,7 +55,9 @@ export default class NotifierHandler extends MessageHandler {
 
   private readonly documentTitle: string;
 
-  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow) {
+  private readonly sub: Subscription;
+
+  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
     super();
     this.api = api;
     this.browserVersion = browserVersion;
@@ -65,9 +67,10 @@ export default class NotifierHandler extends MessageHandler {
     this.mainWindow = mainWindow;
     this.documentTitle = document.title;
     this.store = store;
+    this.sub = sub;
     this.logger = loggerFactory.getLogger("notify");
     window.addEventListener("focus", this.onFocus.bind(this));
-    sub.subscribe("notifier", this);
+    this.sub.subscribe("notifier", this);
     this.onFocus(null);
   }
 

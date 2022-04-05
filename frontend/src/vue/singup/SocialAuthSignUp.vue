@@ -11,7 +11,6 @@ import {
   Vue,
 } from "vue-property-decorator";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
-import {sub} from "@/ts/instances/subInstance";
 import FacebookAuth from "@/vue/singup/FacebookAuth.vue";
 import GoogleAuth from "@/vue/singup/GoogleAuth.vue";
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/ts/utils/consts";
@@ -44,7 +43,7 @@ export default class SocialAuthSignUp extends Vue {
       const message: LoginMessage = {action: "login",
                                      handler: "router",
                                      session: oauthSessionResponse.session};
-      sub.notify(message);
+      this.$messageBus.notify(message);
     } catch (e) {
       reject(e);
 

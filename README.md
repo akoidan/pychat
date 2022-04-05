@@ -487,7 +487,6 @@ development.json and production.json have the following format:
   "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username. Don't use RECAPTCHA with this key",
   "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash",
   "ISSUES": "if true navigation bar will display link to reporting a issue page",
-  "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
   "GIPHY_API_KEY": "Api keys that is used to fetch gifs from https://giphy.com/. Be aware, this key is gonna be exposed to frontend. So anyone can steal it. To get those sign up in https://developers.giphy.com/, create a new app and replaced with its key.",
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
   "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",

@@ -120,6 +120,12 @@ import ChatThread from "@/vue/chat/message/ChatThread.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
+import MessageHandler from '@/ts/message_handlers/MesageHandler';
+import {
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
+
 
 
 @Component({
@@ -168,6 +174,7 @@ export default class ChatBox extends Vue {
   scrollBottom: boolean = true; // Scroll to bottom on load
 
   lastScrollTop: number = 0;
+  private handler!: MessageHandler;
 
   beforeUpdate() {
 
@@ -249,11 +256,23 @@ export default class ChatBox extends Vue {
   }
 
   created() {
-    this.$messageBus.on("scroll", this.onEmitScroll);
+   const that = this;
+   this.handler = new class ChatBoxHandler extends MessageHandler {
+
+     logger = that.$logger;
+
+      protected readonly handlers: HandlerTypes<keyof ChatBoxHandler, "*"> = {
+        scroll: <HandlerType<"scroll", "*">> this.scroll,
+      };
+      scroll() {
+       that.onEmitScroll()
+      }
+    }();
+    this.$messageBus.subscribe("*", this.handler);
   }
 
   destroyed() {
-    this.$messageBus.off("scroll", this.onEmitScroll);
+    this.$messageBus.unsubscribe("*", this.handler);
   }
 
   get id() {

@@ -3,7 +3,6 @@ import {
   isChrome,
   isMobile,
 } from "@/ts/utils/runtimeConsts";
-import {sub} from "@/ts/instances/subInstance";
 import Subscription from "@/ts/classes/Subscription";
 import type {
   CallsInfoModel,
@@ -126,7 +125,7 @@ export default class CallHandler extends FileAndCallTransfer {
         handler: Subscription.getPeerConnectionId(this.connectionId, message.opponentWsId),
         stream: this.localStream,
       };
-      sub.notify(payload);
+      this.sub.notify(payload);
     } else {
       this.acceptedPeers.push(message.opponentWsId);
     }
@@ -238,7 +237,7 @@ export default class CallHandler extends FileAndCallTransfer {
         allowZeroSubscribers: true,
         newStream: stream!,
       };
-      sub.notify(message);
+      this.sub.notify(message);
     } catch (e: any) {
       this.handleStream(e, stream);
     }
@@ -332,14 +331,14 @@ export default class CallHandler extends FileAndCallTransfer {
   }
 
   public createCallPeerConnection({opponentWsId, userId}: {opponentWsId: string; userId: number}) {
-    if (sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) !== 0) {
+    if (this.sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) !== 0) {
       this.logger.warn(`Peer connection ${opponentWsId} won't be created as it's already exists`)();
       return;
     }
     if (opponentWsId > this.wsHandler.getWsConnectionId()) {
-      new CallSenderPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store);
+      new CallSenderPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store, this.sub);
     } else {
-      new CallReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store);
+      new CallReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store, this.sub);
     }
   }
 
@@ -425,7 +424,7 @@ export default class CallHandler extends FileAndCallTransfer {
       action: "navigate",
       to: `/chat/${this.roomId}`,
     };
-    sub.notify(message1);
+    this.sub.notify(message1);
   }
 
   public async joinCall() {
@@ -492,7 +491,7 @@ export default class CallHandler extends FileAndCallTransfer {
     } else {
       this.logger.warn("Current call doesnt have conenctionId yet, skipping hangup")();
     }
-    const hadConnections = this.connectionId && sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId)) > 0;
+    const hadConnections = this.connectionId && this.sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId)) > 0;
     if (hadConnections) {
       if (!this.connectionId) {
         this.logger.error("Can't close connections since it's null")();
@@ -503,7 +502,7 @@ export default class CallHandler extends FileAndCallTransfer {
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId),
         allowZeroSubscribers: true,
       };
-      sub.notify(message);
+      this.sub.notify(message);
     } else {
       this.onDestroy();
     }
@@ -512,13 +511,13 @@ export default class CallHandler extends FileAndCallTransfer {
   protected setConnectionId(connId: string | null) {
     if (this.connectionId) {
       if (!connId) {
-        sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
+        this.sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
       } else {
         this.logger.error("Received new connectionId while old one stil exists")();
       }
     }
     if (this.connectionId !== connId && connId) {
-      sub.subscribe(Subscription.getTransferId(connId), this);
+      this.sub.subscribe(Subscription.getTransferId(connId), this);
     }
     super.setConnectionId(connId);
   }
@@ -530,7 +529,7 @@ export default class CallHandler extends FileAndCallTransfer {
         stream: this.localStream,
         handler: Subscription.getPeerConnectionId(this.connectionId!, e),
       };
-      sub.notify(message);
+      this.sub.notify(message);
     });
   }
 
