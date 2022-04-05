@@ -14,7 +14,7 @@ export default class Subscription {
 
   private readonly logger: Logger;
 
-  constructor() {
+  public constructor() {
     this.logger = loggerFactory.getLogger("sub");
   }
 

@@ -13,7 +13,7 @@ export class MainWindow {
 
   private readonly logger: Logger;
 
-  constructor(store: DefaultStore) {
+  public constructor(store: DefaultStore) {
     window.addEventListener("beforeunload", this.onUnload.bind(this));
     window.addEventListener("unload", this.onUnload.bind(this));
     window.addEventListener("blur", this.onFocusOut.bind(this));

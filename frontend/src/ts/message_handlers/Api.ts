@@ -35,7 +35,7 @@ export default class Api extends MessageHandler {
 
   private retryFcb: Function | null = null;
 
-  constructor(xhr: Http, sub: Subscription) {
+  public constructor(xhr: Http, sub: Subscription) {
     super();
     sub.subscribe("*", this);
     this.logger = loggerFactory.getLogger("api");

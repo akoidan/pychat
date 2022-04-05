@@ -17,7 +17,7 @@ export default class ChatIsOnlineIcon extends Vue {
   @State
   public readonly isOnline!: boolean;
 
-  get title() {
+  public get title() {
     return this.isOnline ? "Websocket connection established. You are online" : "Trying to connect to the server. You're offline";
   }
 }

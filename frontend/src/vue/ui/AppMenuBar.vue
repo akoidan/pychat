@@ -68,7 +68,7 @@ export default class AppMenuBar extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  get imgSrc() {
+  public get imgSrc() {
     return resolveMediaUrl(this.userInfo.image);
   }
 

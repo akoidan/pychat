@@ -29,7 +29,7 @@ export class SmileysApi {
 
   private readonly store: DefaultStore;
 
-  constructor(store: DefaultStore) {
+  public constructor(store: DefaultStore) {
     this.store = store;
   }
 

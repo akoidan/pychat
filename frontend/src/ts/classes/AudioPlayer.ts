@@ -8,7 +8,7 @@ export class AudioPlayer {
 
   private readonly logger: Logger;
 
-  constructor(mainWindow: MainWindow) {
+  public constructor(mainWindow: MainWindow) {
     this.mainWindow = mainWindow;
     this.logger = loggerFactory.getLogger("audio");
   }

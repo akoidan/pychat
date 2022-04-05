@@ -26,7 +26,7 @@ export default class ChatMessageHeader extends Vue {
   @State
   public readonly allUsersDict!: UserDictModel;
 
-  get user() {
+  public get user() {
     return this.allUsersDict[this.userId];
   }
 }

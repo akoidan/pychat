@@ -37,11 +37,11 @@ export default class UserRow extends Vue {
   public readonly online!: number[];
 
 
-  get id() {
+  public get id() {
     return this.user.id;
   }
 
-  get onlineClass() {
+  public get onlineClass() {
     return this.isOnline ? "offline" : "online";
   }
 

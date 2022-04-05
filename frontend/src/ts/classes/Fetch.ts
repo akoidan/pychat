@@ -9,7 +9,7 @@ import type {SessionHolder} from "@/ts/types/types";
  */
 
 export default class Fetch /* Extends Http*/ {
-  constructor(apiUrl: string, sessionHolder: SessionHolder) {
+  public constructor(apiUrl: string, sessionHolder: SessionHolder) {
     // Super(apiUrl, sessionHolder);
   }
 

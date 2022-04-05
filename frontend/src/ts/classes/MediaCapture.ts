@@ -22,7 +22,7 @@ export default class MediaCapture {
 
   private stream: MediaStream | null = null;
 
-  constructor(isRecordingVideo: boolean, platformUtil: PlatformUtil) {
+  public constructor(isRecordingVideo: boolean, platformUtil: PlatformUtil) {
     this.isRecordingVideo = isRecordingVideo;
     this.platformUtil = platformUtil;
   }

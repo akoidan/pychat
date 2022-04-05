@@ -76,7 +76,7 @@ declare interface MediaDevices {
  * Declare class MediaRecorder {
  *   public onstop: Function;
  *   public ondataavailable: Function;
- *   constructor(stream: MediaStream, options: {});
+ *   public constructor(stream: MediaStream, options: {});
  *   public static isTypeSupported(t: string): boolean;
  *   public stop(): void;
  *   public start(time?: number): void;

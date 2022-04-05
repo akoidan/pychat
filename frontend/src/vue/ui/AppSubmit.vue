@@ -27,7 +27,7 @@ export default class AppSubmit extends Vue {
   @Prop()
   public readonly running!: boolean;
 
-  get btnClass(): string {
+  public get btnClass(): string {
     return this.running ? "sp-loading" : "";
   }
 }

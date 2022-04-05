@@ -19,7 +19,7 @@ import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
  */
 
 export default class Xhr extends Http {
-  constructor(sessionHolder: SessionHolder) {
+  public constructor(sessionHolder: SessionHolder) {
     super(sessionHolder);
   }
 

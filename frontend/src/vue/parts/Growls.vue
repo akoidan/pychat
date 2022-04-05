@@ -24,7 +24,7 @@ export default class Growls extends Vue {
   @State
   public readonly growls!: GrowlModel[];
 
-  get last3Growl(): GrowlModel[] {
+  public get last3Growl(): GrowlModel[] {
     return this.growls.slice(-3);
   }
 

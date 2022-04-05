@@ -34,19 +34,19 @@ export default class ChatUserActionMessage extends Vue {
   @State
   public readonly myId!: number;
 
-  get where() {
+  public get where() {
     return `${this.isMe ? "have" : "has"} ${this.action}`;
   }
 
-  get isUser() {
+  public get isUser() {
     return this.isMe ? "" : "User";
   }
 
-  get user() {
+  public get user() {
     return this.isMe ? "You" : this.allUsersDict[this.userId].user;
   }
 
-  get isMe() {
+  public get isMe() {
     return this.userId === this.myId;
   }
 }

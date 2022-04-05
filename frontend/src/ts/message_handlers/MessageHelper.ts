@@ -23,7 +23,7 @@ export class MessageHelper {
 
   private readonly audioPlayer: AudioPlayer;
 
-  constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Subscription, audioPlayer: AudioPlayer) {
+  public constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Subscription, audioPlayer: AudioPlayer) {
     this.store = store;
     this.logger = loggerFactory.getLogger("messageHelper");
     this.audioPlayer = audioPlayer;

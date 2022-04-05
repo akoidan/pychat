@@ -57,23 +57,23 @@ export default class PickUser extends Vue {
 
   public search: string = "";
 
-  get valueUsers(): UserModel[] {
+  public get valueUsers(): UserModel[] {
     return this.value.map((id) => this.allUsersDict[id]);
   }
 
-  get displayedUserIds(): number[] {
+  public get displayedUserIds(): number[] {
     return this.usersIds.filter((a) => !this.value.includes(a));
   }
 
-  get displayedUsers(): UserModel[] {
+  public get displayedUsers(): UserModel[] {
     return this.displayedUserIds.map((id) => this.allUsersDict[id]);
   }
 
-  get showAddUsersComp() {
+  public get showAddUsersComp() {
     return this.showInviteUsers && this.displayedUserIds.length > 0;
   }
 
-  get filteredUsers(): UserModel[] {
+  public get filteredUsers(): UserModel[] {
     this.$logger.debug("Reeval filter CreatePrivateRoom")();
     const s = this.search.toLowerCase();
 

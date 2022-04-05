@@ -49,7 +49,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
 
   private retryFileSend: number = 0;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, size: number, sub: Subscription) {
+  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, size: number, sub: Subscription) {
     super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.fileSize = size;
   }

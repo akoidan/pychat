@@ -37,14 +37,14 @@ export default class ChatTagging extends Vue {
 
   public currentSelected: number | null = null;
 
-  get onlyUserName(): string {
+  public get onlyUserName(): string {
     if (this.name.length > 0) {
       return this.name.substring(1);
     }
     return "";
   }
 
-  get userList(): UserModel[] {
+  public get userList(): UserModel[] {
     return this.userIds.map((id) => this.allUsersDict[id]).filter((u) => u.user.toLowerCase().includes(this.onlyUserName.toLowerCase()));
   }
 

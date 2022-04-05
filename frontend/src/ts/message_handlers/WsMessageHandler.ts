@@ -78,7 +78,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   private readonly messageHelper: MessageHelper;
 
-  constructor(
+  public constructor(
     store: DefaultStore,
     api: Api,
     ws: WsHandler,

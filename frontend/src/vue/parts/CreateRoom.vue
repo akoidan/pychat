@@ -120,14 +120,14 @@ export default class CreateRoom extends Vue {
   @Prop()
   public readonly userIds!: number[];
 
-  get inviteUsers(): string {
+  public get inviteUsers(): string {
     if (this.parentChannelId) {
       return `Users in a new room in group ${this.channelsDictUI[this.parentChannelId].name}`;
     }
     return this.isPublic ? "Invite users to new room" : "Select user for private room";
   }
 
-  get showInviteUsers() {
+  public get showInviteUsers() {
     return this.isPublic || this.currentUsers.length < 1;
   }
 

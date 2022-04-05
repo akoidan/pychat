@@ -255,7 +255,7 @@ export default class SignUp extends Vue {
 
   repPassCheckValue: IconColor = IconColor.NOT_SET;
 
-  get passRepPass() {
+  public get passRepPass() {
     return `${this.repPass}|${this.password}`;
   }
 

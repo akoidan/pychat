@@ -27,7 +27,7 @@ export default class LocalStorage implements IStorage {
 
   private cache: Record<number, LocalStorageMessage> = {};
 
-  constructor() {
+  public constructor() {
     this.logger = loggerFactory.getLogger("localStor");
     const ms = localStorage.getItem(this.STORAGE_NAME);
     if (ms) {

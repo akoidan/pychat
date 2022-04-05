@@ -31,7 +31,7 @@ export default class UserFlagRow extends Vue {
     };
   }
 
-  get title() {
+  public get title() {
     if (this.user?.location.countryCode) {
       return "";
     }
@@ -47,7 +47,7 @@ export default class UserFlagRow extends Vue {
     return undefined;
   }
 
-  get id() {
+  public get id() {
     return this.user.id;
   }
 }

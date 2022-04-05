@@ -27,15 +27,15 @@ export default class UserImageIcon extends Vue {
   @Prop()
   public readonly user!: UserModel;
 
-  get twoLetter() {
+  public get twoLetter() {
     return this.user.user.substring(0, 2);
   }
 
-  get color() {
+  public get color() {
     return loggerFactory.getRandomColor(this.user.user);
   }
 
-  get userImg() {
+  public get userImg() {
     return resolveMediaUrl(this.user.image);
   }
 }

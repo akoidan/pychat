@@ -21,11 +21,11 @@ export default class ChatShowUserTyping extends Vue {
   @State
   public readonly allUsersDict!: Record<number, UserModel>;
 
-  get users(): UserModel[] {
+  public get users(): UserModel[] {
     return Object.keys(this.usersTyping).map((uId) => this.allUsersDict[uId as unknown as number]);
   }
 
-  get stringifiedTypes() {
+  public get stringifiedTypes() {
     return this.users.map((u) => u.user).join(", ");
   }
 }

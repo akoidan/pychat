@@ -23,7 +23,7 @@ export default class App extends Vue {
   @State
   public readonly userSettings!: CurrentUserSettingsModel;
 
-  get mainClass(): string {
+  public get mainClass(): string {
     return this.userSettings && this.userSettings.theme || "color-reg";
   }
 

@@ -45,11 +45,11 @@ export default class ChatRemotePeer extends Vue {
 
   public volumeLevel: number = 100;
 
-  get userNameValue(): string {
+  public get userNameValue(): string {
     return this.$store.userName(this.callInfo.userId);
   }
 
-  get volLevelClass() {
+  public get volLevelClass() {
     return `vol-level-${this.callInfo.opponentCurrentVoice}`;
   }
 

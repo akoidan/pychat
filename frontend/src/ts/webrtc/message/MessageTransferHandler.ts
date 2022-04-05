@@ -28,7 +28,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
 
   private readonly messageHelper: MessageHelper;
 
-  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper, sub: Subscription) {
+  public constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper, sub: Subscription) {
     super(roomId, wsHandler, notifier, store, sub);
     this.messageHelper = messageHelper;
   }

@@ -37,11 +37,11 @@ export default class PrivateRoomRow extends Vue {
   @State
   public readonly allUsersDict!: Record<number, UserModel>;
 
-  get user() {
+  public get user() {
     return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.room.id]];
   }
 
-  get onlineActiveClass(): string {
+  public get onlineActiveClass(): string {
     return this.isOnline ? "offline" : "online";
   }
 

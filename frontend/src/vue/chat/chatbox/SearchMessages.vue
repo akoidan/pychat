@@ -58,7 +58,7 @@ export default class SearchMessages extends Vue {
 
   public searchResult: string = "";
 
-  get searchResultText() {
+  public get searchResultText() {
     if (this.searchResult) {
       return this.searchResult;
     } else if (!this.room.search.locked) {
@@ -67,7 +67,7 @@ export default class SearchMessages extends Vue {
     return "No more messages are available on this search";
   }
 
-  get searchActive() {
+  public get searchActive() {
     return this.room.search.searchActive;
   }
 

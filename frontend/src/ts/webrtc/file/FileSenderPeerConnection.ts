@@ -46,7 +46,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
 
   private trackTimeout: number = 0;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number, sub: Subscription) {
+  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number, sub: Subscription) {
     super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.file = file;
     const asft: AddSendingFileTransfer = {

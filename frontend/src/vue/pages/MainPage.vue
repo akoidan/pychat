@@ -48,7 +48,7 @@ export default class MainPage extends Vue {
   @State
   public readonly incomingCall!: IncomingCallModel;
 
-  get inited() {
+  public get inited() {
     return this.userInfo;
   }
 

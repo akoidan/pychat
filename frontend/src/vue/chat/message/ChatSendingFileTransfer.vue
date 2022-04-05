@@ -57,27 +57,27 @@ export default class ChatSendingFileTransfer extends Vue {
   @State
   public readonly allUsersDict!: Record<number, UserModel>;
 
-  get showBar(): boolean {
+  public get showBar(): boolean {
     return this.transfer.status === FileTransferStatus.IN_PROGRESS;
   }
 
-  get showCancel(): boolean {
+  public get showCancel(): boolean {
     return this.transfer.status === FileTransferStatus.NOT_DECIDED_YET ||
       this.transfer.status === FileTransferStatus.IN_PROGRESS;
   }
 
-  get cls() {
+  public get cls() {
     return {
       success: FileTransferStatus.FINISHED === this.transfer.status,
       error: FileTransferStatus.ERROR === this.transfer.status,
     };
   }
 
-  get user() {
+  public get user() {
     return this.allUsersDict[this.transfer.userId].user;
   }
 
-  get status() {
+  public get status() {
     if (this.transfer.error) {
       return this.transfer.error;
     }

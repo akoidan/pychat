@@ -67,7 +67,7 @@ export default class CaptchaComponent extends Vue {
 
   private event: ((E: MessageEvent) => void) | null = null;
 
-  get grecaptcha(): GoogleCaptcha {
+  public get grecaptcha(): GoogleCaptcha {
     if (window.grecaptcha) {
       return window.grecaptcha;
     }

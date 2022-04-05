@@ -56,7 +56,7 @@ export default class DatabaseWrapper implements IStorage {
 
   private skipSqlCache: Record<string, boolean> = {};
 
-  constructor(mainWindow: MainWindow) {
+  public constructor(mainWindow: MainWindow) {
     this.mainWindow = mainWindow;
     if (!window.openDatabase) {
       throw Error("DatabaseWrapper not supported");

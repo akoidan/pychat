@@ -73,7 +73,7 @@ export default class ChatNavBar extends Vue {
   @State
   public readonly allUsersDict!: UserDictModel;
 
-  get roomName(): string {
+  public get roomName(): string {
     if (this.activeRoom.name) {
       return this.activeRoom.name;
     }
@@ -86,7 +86,7 @@ export default class ChatNavBar extends Vue {
     throw Error("Invalid structure");
   }
 
-  get user(): UserModel | null {
+  public get user(): UserModel | null {
     if (!this.activeRoom.name) {
       return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.activeRoom.id]];
     }

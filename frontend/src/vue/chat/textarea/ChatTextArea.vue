@@ -181,29 +181,29 @@ export default class ChatTextArea extends Vue {
 
   private showIType!: Throttle;
 
-  get room(): RoomModel {
+  public get room(): RoomModel {
     return this.roomsDict[this.roomId];
   }
 
-  get isMobile() {
+  public get isMobile() {
     return isMobile;
   }
 
-  get editMessage(): MessageModel | null {
+  public get editMessage(): MessageModel | null {
     if (this.editMessageId) {
       return this.room.messages[this.editMessageId];
     }
     return null;
   }
 
-  get threadMesage(): MessageModel | null {
+  public get threadMesage(): MessageModel | null {
     if (this.threadMessageId) {
       return this.room.messages[this.threadMessageId];
     }
     return null;
   }
 
-  get messageSender(): MessageSender { // Todo does vuew cache this?
+  public get messageSender(): MessageSender { // Todo does vuew cache this?
     return this.$messageSenderProxy.getMessageSender(this.roomId);
   }
 

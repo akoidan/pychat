@@ -56,7 +56,7 @@ export default class CreateChannel extends Vue {
   public currentUsers: number[] = [];
 
 
-  get userIds(): number[] {
+  public get userIds(): number[] {
     return this.$store.usersArray.map((u) => u.id);
   }
 

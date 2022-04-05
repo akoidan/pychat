@@ -77,7 +77,7 @@ export default class ReportIssue extends Vue {
   @Ref()
   private readonly textarea!: HTMLTextAreaElement;
 
-  get git() {
+  public get git() {
     return GIT_HASH;
   }
 

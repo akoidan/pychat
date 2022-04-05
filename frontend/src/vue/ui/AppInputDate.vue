@@ -25,7 +25,7 @@ export default class AppInputDate extends Vue {
 
   @Prop({default: ""}) public inputClassDatepicker!: string;
 
-  get datePickerValue() {
+  public get datePickerValue() {
     this.$logger.debug("generating date for datepicker {}", this.value)();
     if (!this.value) {
       return new Date();

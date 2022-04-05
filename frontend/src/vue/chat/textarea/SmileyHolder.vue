@@ -90,7 +90,7 @@ export default class SmileyHolder extends Vue {
 
   public allSmileysKeysNoVariations: Record<string, SmileVariation> | null = null;
 
-  get smileys() {
+  public get smileys() {
     if (this.recentSmileysCodes.length > 0) {
       return {
         Recent: this.recentSmileys,
@@ -100,7 +100,7 @@ export default class SmileyHolder extends Vue {
     return this.smileysData;
   }
 
-  get filterSmiley() {
+  public get filterSmiley() {
     if (Object.keys(this.skinVariations).length > 0) {
       return this.skinVariations;
     }
@@ -110,14 +110,14 @@ export default class SmileyHolder extends Vue {
     return {};
   }
 
-  get recentSmileys(): Record<string, SmileVariation> {
+  public get recentSmileys(): Record<string, SmileVariation> {
     return this.recentSmileysCodes.slice(0, 15).reduce<Record<string, Smile>>((obj, key) => {
       obj[key] = this.allSmileysKeys![key];
       return obj;
     }, {});
   }
 
-  get showFilterSmiley() {
+  public get showFilterSmiley() {
     return Object.keys(this.skinVariations).length > 0 || Object.keys(this.searchResults).length > 0 || this.searchSmile;
   }
 

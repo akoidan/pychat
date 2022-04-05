@@ -49,7 +49,7 @@ export default class ChatBoxes extends Vue {
   @State
   public readonly activeRoomId!: number;
 
-  get ALL_ROOM_ID(): number {
+  public get ALL_ROOM_ID(): number {
     return ALL_ROOM_ID;
   }
 

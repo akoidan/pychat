@@ -14,7 +14,7 @@ export default class ChatBackIcon extends Vue {
   @State
   public readonly activeRoomId!: number;
 
-  get link() {
+  public get link() {
     return `/chat/${this.activeRoomId || ALL_ROOM_ID}`;
   }
 }

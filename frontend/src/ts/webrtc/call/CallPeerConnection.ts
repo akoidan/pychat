@@ -51,7 +51,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
 
   private readonly streamTrackApi: "stream" | "track" = "track";
 
-  constructor(
+  public constructor(
     roomId: number,
     connId: string,
     opponentWsId: string,

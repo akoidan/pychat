@@ -1,6 +1,6 @@
 <template>
   <app-submit
-    v-if="fb_app_id"
+    v-if="fbAppId"
     :running="facebookRunning"
     :value="buttonName"
     class="f-icon lor-btn"
@@ -29,7 +29,7 @@ let fbInited = false; // This is a global variable
   components: {AppSubmit},
 })
 export default class FacebookAuth extends Vue {
-  public fb_app_id: string | false = FACEBOOK_APP_ID;
+  public fbAppId: string | false = FACEBOOK_APP_ID;
 
   public frunning: boolean = false;
 
@@ -38,7 +38,7 @@ export default class FacebookAuth extends Vue {
   @Prop()
   public readonly buttonName!: string;
 
-  get facebookRunning() {
+  public get facebookRunning() {
     return this.frunning || !this.facebookApiLoaded;
   }
 

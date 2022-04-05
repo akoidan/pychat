@@ -29,7 +29,7 @@ export default class UserNavInfo extends Vue {
   @State
   public readonly online!: number[];
 
-  get isOnline(): boolean {
+  public get isOnline(): boolean {
     if (this.user) {
       return this.online.includes(this.user.id);
     }

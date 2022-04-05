@@ -11,7 +11,7 @@ export default abstract class Http {
 
   protected sessionHolder: SessionHolder;
 
-  constructor(sessionHolder: SessionHolder) {
+  public constructor(sessionHolder: SessionHolder) {
     this.sessionHolder = sessionHolder;
     this.httpLogger = loggerFactory.getLogger("http");
   }

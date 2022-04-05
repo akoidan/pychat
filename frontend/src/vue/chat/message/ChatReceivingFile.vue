@@ -66,16 +66,16 @@ export default class ChatReceivingFile extends Vue {
   @State
   public readonly myId!: number;
 
-  get showYesNo(): boolean {
+  public get showYesNo(): boolean {
     return this.receivingFile.status === FileTransferStatus.NOT_DECIDED_YET;
   }
 
 
-  get showProgress(): boolean {
+  public get showProgress(): boolean {
     return FileTransferStatus.IN_PROGRESS === this.receivingFile.status;
   }
 
-  get mainClass(): string {
+  public get mainClass(): string {
     if (this.receivingFile.userId === this.myId) {
       return "message-self message-receiving-file";
     }

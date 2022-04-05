@@ -47,7 +47,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     ],
   };
 
-  constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore, sub: Subscription) {
+  public constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore, sub: Subscription) {
     super();
     this.roomId = roomId;
     this.connectionId = connectionId;

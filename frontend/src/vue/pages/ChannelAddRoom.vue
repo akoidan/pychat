@@ -28,15 +28,15 @@ export default class ChannelAddRoom extends Vue {
   @State
   public readonly myId!: number;
 
-  get userIds(): number[] {
+  public get userIds(): number[] {
     return this.channel.mainRoom.users;
   }
 
-  get channel(): ChannelUIModel {
+  public get channel(): ChannelUIModel {
     return this.channelsDictUI[this.channelId];
   }
 
-  get channelId(): number {
+  public get channelId(): number {
     const id: string = this.$route.params.id as string;
     this.$logger.log("Rending channel settings for {}", id)();
 

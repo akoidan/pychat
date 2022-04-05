@@ -69,23 +69,23 @@ export default class RoomUsersListPage extends Vue {
   public running: boolean = false;
 
 
-  get roomId(): number {
+  public get roomId(): number {
     return parseInt(this.$route.params.id as string);
   }
 
-  get room() {
+  public get room() {
     return this.roomsDict[this.roomId];
   }
 
-  get title() {
+  public get title() {
     return this.room.isMainInChannel ? "Users in group" : "Users in room";
   }
 
-  get usersArray() {
+  public get usersArray() {
     return this.room.users.map((id) => this.allUsersDict[id]);
   }
 
-  get userIds(): number[] {
+  public get userIds(): number[] {
     if (this.room.channelId && !this.room.isMainInChannel) {
       return this.channelsDictUI[this.room.channelId].mainRoom.users.filter((uId) => !this.room.users.includes(uId));
     }

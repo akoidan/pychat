@@ -91,7 +91,7 @@ export default class GiphySearch extends Vue {
 
   private webpSupported: boolean = webpSupported;
 
-  get showLoadMoreBtn() {
+  public get showLoadMoreBtn() {
     return !this.request && this.images.length > 0 && this.pagination.count === LOAD_GIPHIES_PER_REQUEST;
   }
 

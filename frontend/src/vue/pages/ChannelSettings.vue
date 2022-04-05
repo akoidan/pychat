@@ -153,38 +153,38 @@ export default class ChannelSettings extends Vue {
   @State
   public readonly channelsDictUI!: ChannelsDictUIModel;
 
-  get channel(): ChannelUIModel {
+  public get channel(): ChannelUIModel {
     return this.channelsDictUI[this.channelId];
   }
 
-  get showInviteUsers() {
+  public get showInviteUsers() {
     return this.admin.length < 1;
   }
 
-  get singleAdmin(): number {
+  public get singleAdmin(): number {
     if (this.admin.length > 0) {
       return this.admin[0];
     }
     return this.channel.creator;
   }
 
-  get noRooms(): boolean {
+  public get noRooms(): boolean {
     return this.channel.rooms.length === 0;
   }
 
-  get isAdmin(): boolean {
+  public get isAdmin(): boolean {
     return this.channel.creator === this.userInfo.userId;
   }
 
-  get userIds(): number[] {
+  public get userIds(): number[] {
     return [...this.channel.mainRoom.users];
   }
 
-  get currentAdmin(): UserModel {
+  public get currentAdmin(): UserModel {
     return this.allUsersDict[this.channel.creator];
   }
 
-  get channelId(): number {
+  public get channelId(): number {
     const id = this.$route.params.id as string;
     this.$logger.log("Rending channel settings for {}", id)();
 

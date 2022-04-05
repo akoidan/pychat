@@ -176,11 +176,11 @@ export default class ChatBox extends Vue {
 
   private handler!: MessageHandler;
 
-  get id() {
+  public get id() {
     return this.room.id;
   }
 
-  get searchMessages() {
+  public get searchMessages() {
     const dates: Record<string, boolean> = {};
     const newArray: any[] = [];
     for (const m in this.room.search.messages) {
@@ -199,7 +199,7 @@ export default class ChatBox extends Vue {
     return newArray;
   }
 
-  get messages() {
+  public get messages() {
     return this.$store.calculatedMessagesForRoom(this.room.id);
   }
 

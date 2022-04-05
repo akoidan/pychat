@@ -67,7 +67,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   private syncMessageLock: boolean = false;
 
-  constructor(
+  public constructor(
     roomId: number,
     connId: string,
     opponentWsId: string,

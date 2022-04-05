@@ -57,7 +57,7 @@ export default class NotifierHandler extends MessageHandler {
 
   private readonly sub: Subscription;
 
-  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
+  public constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
     super();
     this.api = api;
     this.browserVersion = browserVersion;

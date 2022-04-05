@@ -80,11 +80,11 @@ export default class ViewProfilePage extends Vue {
 
   public userProfileInfo: ViewUserProfileDto | null = null;
 
-  get id(): number {
+  public get id(): number {
     return parseInt(this.$route.params.id as string);
   }
 
-  get username(): string {
+  public get username(): string {
     return this.allUsersDict[this.id].user;
   }
 

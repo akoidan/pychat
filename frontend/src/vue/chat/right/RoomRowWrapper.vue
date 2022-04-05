@@ -29,7 +29,7 @@ export default class RoomRowWrapper extends Vue {
   @State
   public readonly currentChatPage!: "chat" | "rooms";
 
-  get activeClass() {
+  public get activeClass() {
     return this.room.id === this.activeRoomId ? "active-room" : null;
   }
 

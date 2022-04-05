@@ -63,11 +63,11 @@ export default class IncomingCall extends Vue {
   @State
   public readonly roomsDict!: RoomDictModel;
 
-  get caller() {
+  public get caller() {
     return this.allUsersDict[this.call.userId].user;
   }
 
-  get room(): string {
+  public get room(): string {
     return this.roomsDict[this.call.roomId].name;
   }
 

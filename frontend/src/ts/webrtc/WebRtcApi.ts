@@ -71,7 +71,7 @@ export default class WebRtcApi extends MessageHandler {
 
   private readonly sub: Subscription;
 
-  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper, sub: Subscription) {
+  public constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper, sub: Subscription) {
     super();
     this.sub = sub;
     this.sub.subscribe("webrtc", this);

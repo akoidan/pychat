@@ -58,18 +58,18 @@ export default class ChatTextMessage extends Vue {
   @Ref()
   public content!: HTMLElement;
 
-  get id() {
+  public get id() {
     return this.message.id;
   }
 
-  get encoded() {
+  public get encoded() {
     if (this.smileysLoaded) {
       return this.message.content ? encodeMessageInited(this.message, this.$store, this.$smileyApi) : encodeHTML("This message has been removed");
     }
     return "";
   }
 
-  get mainCls() {
+  public get mainCls() {
     return {
       "removed-message": this.message.deleted,
       "message-content": true,

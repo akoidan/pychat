@@ -19,7 +19,7 @@ export default class ChatMessageWrapper extends Vue {
   private readonly time!: number;
 
 
-  get getTime() {
+  public get getTime() {
     return timeToString(this.time);
   }
 }

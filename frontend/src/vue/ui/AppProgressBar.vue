@@ -25,29 +25,29 @@ export default class AppProgressBar extends Vue {
   @Prop()
   public readonly upload!: UploadProgressModel;
 
-  get totalMb() {
+  public get totalMb() {
     return bytesToSize(this.upload.total);
   }
 
-  get valueMb() {
+  public get valueMb() {
     return bytesToSize(this.upload.uploaded);
   }
 
-  get finished() {
+  public get finished() {
     return this.upload.total === this.upload.uploaded && this.upload.total !== 0;
   }
 
-  get text() {
+  public get text() {
     return `${this.valueMb} / ${this.totalMb} (${this.percents})`;
   }
 
-  get style() {
+  public get style() {
     return {
       width: this.percents,
     };
   }
 
-  get percents() {
+  public get percents() {
     return this.upload.total ? `${Math.round(this.upload.uploaded * 100 / this.upload.total)}%` : 0;
   }
 }

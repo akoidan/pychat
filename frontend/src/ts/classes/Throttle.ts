@@ -6,7 +6,7 @@ class Throttle {
 
   private readonly handler: Function;
 
-  constructor(handler: Function, timeout: number) {
+  public constructor(handler: Function, timeout: number) {
     if (timeout < 1000) {
       throw Error("Timeout should be at least 1s");
     }

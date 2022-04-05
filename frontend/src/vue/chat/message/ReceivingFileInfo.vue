@@ -57,22 +57,22 @@ import {
 export default class ReceivingFileInfo extends Vue {
   @Prop() public receivingFile!: ReceivingFile;
 
-  get size(): string {
+  public get size(): string {
     return bytesToSize(this.receivingFile.upload.total);
   }
 
-  get isError(): boolean {
+  public get isError(): boolean {
     return this.receivingFile.status === FileTransferStatus.ERROR;
   }
 
-  get cls() {
+  public get cls() {
     return {
       success: FileTransferStatus.FINISHED === this.receivingFile.status,
       error: FileTransferStatus.ERROR === this.receivingFile.status,
     };
   }
 
-  get status(): string {
+  public get status(): string {
     switch (this.receivingFile.status) {
       case FileTransferStatus.ERROR:
         return this.receivingFile.error!;

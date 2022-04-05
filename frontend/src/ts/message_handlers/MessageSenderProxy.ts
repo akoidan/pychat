@@ -10,7 +10,7 @@ export class MessageSenderProxy {
 
   private readonly wsMessageHandler: WsMessageHandler;
 
-  constructor(
+  public constructor(
     store: DefaultStore,
     webrtcApi: WebRtcApi,
     wsMessageHandler: WsMessageHandler,

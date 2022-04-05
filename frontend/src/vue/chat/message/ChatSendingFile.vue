@@ -55,7 +55,7 @@ export default class ChatSendingFile extends Vue {
   @State
   public readonly myId!: number;
 
-  get size() {
+  public get size() {
     return bytesToSize(this.sendingFile.fileSize);
   }
 }

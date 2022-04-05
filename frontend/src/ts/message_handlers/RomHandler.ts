@@ -93,7 +93,7 @@ export class RoomHandler extends MessageHandler {
 
   private readonly sub: Subscription;
 
-  constructor(
+  public constructor(
     store: DefaultStore,
     api: Api,
     ws: WsHandler,

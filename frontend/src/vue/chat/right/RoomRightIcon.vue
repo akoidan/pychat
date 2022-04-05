@@ -38,7 +38,7 @@ import {RoomModel} from "@/ts/types/model";
 export default class RoomRightIcon extends Vue {
   @Prop() public room!: RoomModel;
 
-  get newMessagesCount(): number {
+  public get newMessagesCount(): number {
     return this.$store.calculatedMessagesForRoom(this.room.id).filter((m: MessageModel) =>
 
       /*

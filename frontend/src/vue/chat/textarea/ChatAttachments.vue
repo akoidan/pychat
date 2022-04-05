@@ -99,7 +99,7 @@ export default class ChatAttachments extends Vue {
   @Prop()
   public readonly roomId!: number;
 
-  get paintUrl() {
+  public get paintUrl() {
     const params: Record<string, number | string> = {
       roomId: this.roomId,
     };

@@ -30,7 +30,7 @@ export default class ChatRightCollapsedSection extends Vue {
   @Prop()
   public readonly name!: string;
 
-  get directClass() {
+  public get directClass() {
     return this.value ? "icon-angle-circled-up" : "icon-angle-circled-down";
   }
 

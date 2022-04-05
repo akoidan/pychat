@@ -82,15 +82,15 @@ export default class ChatSendingMessage extends Vue {
   public readonly roomsDict!: RoomDictModel;
 
 
-  get filesExist() {
+  public get filesExist() {
     return this.message.files && Object.keys(this.message.files).length > 0;
   }
 
-  get id() {
+  public get id() {
     return this.message.id;
   }
 
-  get cls() {
+  public get cls() {
     return {
       sendingMessage: this.message.transfer && !this.message.transfer.upload,
       uploadMessage: this.message.transfer && Boolean(this.message.transfer.upload),
@@ -103,7 +103,7 @@ export default class ChatSendingMessage extends Vue {
     };
   }
 
-  get isSelf() {
+  public get isSelf() {
     return this.message.userId === this.userInfo.userId;
   }
 

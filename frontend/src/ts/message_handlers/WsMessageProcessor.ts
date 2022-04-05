@@ -11,7 +11,7 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 export class WsMessageProcessor extends AbstractMessageProcessor {
   private readonly sub: Subscription;
 
-  constructor(target: MessageSupplier, store: DefaultStore, label: string, sub: Subscription) {
+  public constructor(target: MessageSupplier, store: DefaultStore, label: string, sub: Subscription) {
     super(target, store, label);
     this.sub = sub;
   }

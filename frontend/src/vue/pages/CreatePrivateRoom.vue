@@ -24,7 +24,7 @@ export default class CreatePrivateRoom extends Vue {
   @State
   public readonly myId!: number;
 
-  get userIds(): number[] {
+  public get userIds(): number[] {
     const users = Object.values(this.privateRoomsUsersIds.roomUsers);
     users.push(this.myId);
     return this.$store.usersArray.map((a) => a.id).filter((uId) => !users.includes(uId));

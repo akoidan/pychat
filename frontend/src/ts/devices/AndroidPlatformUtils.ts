@@ -9,7 +9,7 @@ import type {Logger} from "lines-logger";
 export class AndroidPlatformUtil implements PlatformUtil {
   private readonly logger: Logger;
 
-  constructor() {
+  public constructor() {
     this.logger = loggerFactory.getLogger("native");
   }
 

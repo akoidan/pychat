@@ -74,22 +74,22 @@ export default class CallContainerIcons extends Vue {
 
   @Prop() public roomId!: number;
 
-  get videoTitle() {
+  public get videoTitle() {
     return `Turn ${this.callInfo.showVideo ? "off" : "on"} your webcam`;
   }
 
-  get micTitle() {
+  public get micTitle() {
     return `Turn ${this.callInfo.showMic ? "off" : "on"} your microphone`;
   }
 
-  get iconVideoClass(): {} {
+  public get iconVideoClass(): {} {
     return {
       "icon-no-videocam": !this.callInfo.showVideo,
       "icon-videocam": this.callInfo.showVideo,
     };
   }
 
-  get iconMicClass(): {} {
+  public get iconMicClass(): {} {
     return {
       "icon-mic": this.callInfo.showMic,
       "icon-mute": !this.callInfo.showMic,

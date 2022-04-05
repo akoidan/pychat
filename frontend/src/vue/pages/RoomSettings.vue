@@ -179,18 +179,18 @@ export default class RoomSettings extends Vue {
   @State
   public readonly allUsersDict!: UserDictModel;
 
-  get room(): RoomModel {
+  public get room(): RoomModel {
     return this.roomsDict[this.roomId];
   }
 
-  get roomId(): number {
+  public get roomId(): number {
     const id = this.$route.params.id as string;
     this.$logger.log("Rending room settings for {}", id)();
 
     return parseInt(id);
   }
 
-  get user(): string | null {
+  public get user(): string | null {
     if (this.room.name) {
       return null;
     }
@@ -198,34 +198,34 @@ export default class RoomSettings extends Vue {
     return this.allUsersDict[uId].user;
   }
 
-  get isAdmin(): boolean {
+  public get isAdmin(): boolean {
     return this.room.creator === this.myId;
   }
 
-  get showInviteUsers() {
+  public get showInviteUsers() {
     return this.admin.length < 1;
   }
 
-  get canChangeAdmin() {
+  public get canChangeAdmin() {
     return this.isPublic && (!this.room.creator || this.myId === this.room.creator);
   }
 
-  get userIds(): number[] {
+  public get userIds(): number[] {
     return [...this.room.users];
   }
 
-  get oldAdmin(): UserModel | null {
+  public get oldAdmin(): UserModel | null {
     if (this.room.creator) {
       return this.allUsersDict[this.room.creator];
     }
     return null;
   }
 
-  get isMainRoom(): boolean {
+  public get isMainRoom(): boolean {
     return this.roomId === ALL_ROOM_ID;
   }
 
-  get singleAdmin(): number {
+  public get singleAdmin(): number {
     if (this.admin.length > 0) {
       return this.admin[0];
     }

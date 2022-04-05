@@ -123,7 +123,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   private readonly sub: Subscription;
 
-  constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore, sub: Subscription) {
+  public constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore, sub: Subscription) {
     super();
     this.sub = sub;
     this.sub.subscribe("ws", this);

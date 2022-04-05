@@ -20,7 +20,7 @@ export default class FileHandler extends FileAndCallTransfer {
 
   private readonly file: File;
 
-  constructor(roomId: number, threadId: number | null, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number, sub: Subscription) {
+  public constructor(roomId: number, threadId: number | null, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number, sub: Subscription) {
     super(roomId, wsHandler, notifier, store, sub);
     this.file = file;
     this.setConnectionId(connId);
