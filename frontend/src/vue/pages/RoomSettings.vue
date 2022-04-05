@@ -117,22 +117,22 @@
 <script lang="ts">
 import {
   ApplyGrowlErr,
-  State
+  State,
 } from "@/ts/instances/storeInstance";
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 import type {
   RoomModel,
-  UserModel
+  UserModel,
 } from "@/ts/types/model";
 import {
   RoomDictModel,
-  UserDictModel
+  UserDictModel,
 } from "@/ts/types/model";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import ParentChannel from "@/vue/parts/ParentChannel.vue";
@@ -148,23 +148,34 @@ import {PrivateRoomsIds} from "@/ts/types/types";
     AppInputRange,
     AppSubmit,
     AppCheckbox,
-  }
+  },
 })
 export default class RoomSettings extends Vue {
   public admin: number[] = [];
+
   public roomName: string = "";
+
   public sound: number = 0;
+
   public channelId: number | null = null;
+
   public notifications: boolean = false;
+
   public running: boolean = false;
+
   public isPublic: boolean = false;
+
   public p2p: boolean = false;
+
   @State
   public readonly myId!: number;
+
   @State
   public readonly roomsDict!: RoomDictModel;
+
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+
   @State
   public readonly allUsersDict!: UserDictModel;
 
@@ -245,7 +256,7 @@ export default class RoomSettings extends Vue {
 
   @ApplyGrowlErr({
     runningProp: "running",
-    message: "Can't set room settings"
+    message: "Can't set room settings",
   })
   public async apply() {
     this.$logger.log("Applying room {} settings", this.roomId)();

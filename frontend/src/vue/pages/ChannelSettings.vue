@@ -103,19 +103,19 @@
 <script lang="ts">
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import type {
   ChannelUIModel,
-  UserModel
+  UserModel,
 } from "@/ts/types/model";
 import {
   ChannelsDictUIModel,
-  CurrentUserInfoModel
+  CurrentUserInfoModel,
 } from "@/ts/types/model";
 import {
   ApplyGrowlErr,
-  State
+  State,
 } from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
@@ -130,7 +130,7 @@ import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
     AppCheckbox,
     AppInputRange,
     PickUser,
-    AppSubmit
+    AppSubmit,
   },
 })
 export default class ChannelSettings extends Vue {

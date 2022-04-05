@@ -206,9 +206,9 @@ export function routerFactory(sub: Subscription) {
     protected readonly logger: Logger = logger;
 
     protected readonly handlers: HandlerTypes<keyof RouterProcessor, "router"> = {
-      login: <HandlerType<"login", "router">>this.login,
-      logout: <HandlerType<"logout", "router">>this.logout,
-      navigate: <HandlerType<"navigate", "router">>this.navigate,
+      login: <HandlerType<"login", "router">> this.login,
+      logout: <HandlerType<"logout", "router">> this.logout,
+      navigate: <HandlerType<"navigate", "router">> this.navigate,
     };
 
     logout(a: LogoutMessage) {

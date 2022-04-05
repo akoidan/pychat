@@ -14,8 +14,8 @@ import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 
 export default class FileHandler extends FileAndCallTransfer {
   protected readonly handlers: HandlerTypes<keyof FileHandler, "webrtcTransfer:*"> = {
-    replyFile: <HandlerType<"replyFile", "webrtcTransfer:*">>this.replyFile,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">>this.checkTransferDestroy,
+    replyFile: <HandlerType<"replyFile", "webrtcTransfer:*">> this.replyFile,
+    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">> this.checkTransferDestroy,
   };
 
   private readonly file: File;

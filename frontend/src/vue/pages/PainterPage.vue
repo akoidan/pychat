@@ -22,7 +22,7 @@ function getUniqueId() {
 
 @Component({
   name: "PainterPage",
-  components: {Painter}
+  components: {Painter},
 })
 export default class PainterPage extends Vue {
   @Ref()

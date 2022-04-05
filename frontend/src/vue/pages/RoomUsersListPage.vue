@@ -50,7 +50,7 @@ import UserFlagRow from "@/vue/chat/right/UserFlagRow.vue";
   components: {
     UserFlagRow,
     AppSubmit,
-    PickUser
+    PickUser,
   },
 })
 export default class RoomUsersListPage extends Vue {

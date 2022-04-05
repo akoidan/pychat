@@ -26,7 +26,7 @@ import type Subscription from "@/ts/classes/Subscription";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
-    internetAppear: <HandlerType<"internetAppear", "*">>this.internetAppear,
+    internetAppear: <HandlerType<"internetAppear", "*">> this.internetAppear,
   };
 
   protected readonly logger: Logger;

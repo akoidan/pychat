@@ -6,7 +6,7 @@ import * as constants from "@/ts/utils/consts";
 import {
   ELECTRON_IGNORE_SSL,
   ELECTRON_MAIN_FILE,
-  IS_DEBUG
+  IS_DEBUG,
 } from "@/ts/utils/consts";
 
 let mainWindow: BrowserWindow | null;

@@ -45,7 +45,7 @@
 import {
   Component,
   Prop,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
 import {

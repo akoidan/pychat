@@ -26,10 +26,10 @@ export default class ConfirmMail extends Vue {
   @ApplyGrowlErr({
     runningProp: "loading",
     vueProperty: "message",
-    message: "Error changing mail"
+    message: "Error changing mail",
   })
   public async created() {
-    this.message = await this.$api.changeEmail(<string>this.$route.query.token);
+    this.message = await this.$api.changeEmail(<string> this.$route.query.token);
   }
 }
 </script>

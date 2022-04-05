@@ -15,7 +15,7 @@ import FacebookAuth from "@/vue/singup/FacebookAuth.vue";
 import GoogleAuth from "@/vue/singup/GoogleAuth.vue";
 import {
   FACEBOOK_APP_ID,
-  GOOGLE_OAUTH_2_CLIENT_ID
+  GOOGLE_OAUTH_2_CLIENT_ID,
 } from "@/ts/utils/consts";
 import type {OauthSessionResponse} from "@/ts/types/dto";
 
@@ -23,7 +23,7 @@ import type {OauthSessionResponse} from "@/ts/types/dto";
   name: "SocialAuthSignUp",
   components: {
     GoogleAuth,
-    FacebookAuth
+    FacebookAuth,
   },
 })
 export default class SocialAuthSignUp extends Vue {
@@ -48,7 +48,7 @@ export default class SocialAuthSignUp extends Vue {
       const message: LoginMessage = {
         action: "login",
         handler: "router",
-        session: oauthSessionResponse.session
+        session: oauthSessionResponse.session,
       };
       this.$messageBus.notify(message);
     } catch (e) {

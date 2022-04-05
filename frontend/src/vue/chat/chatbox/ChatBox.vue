@@ -160,14 +160,20 @@ export default class ChatBox extends Vue {
   messageLoading: boolean = false;
 
   searchMessageLoading: boolean = false;
+
   @Ref()
   public textarea!: ChatTextArea;
+
   scrollBottom: boolean = true; // Scroll to bottom on load
+
   lastScrollTop: number = 0;
+
   @Ref()
   private readonly chatbox!: HTMLElement;
+
   @Ref()
   private readonly chatboxSearch!: HTMLElement;
+
   private handler!: MessageHandler;
 
   get id() {
@@ -232,7 +238,8 @@ export default class ChatBox extends Vue {
 
   public markMessagesInCurrentRoomAsRead() {
     this.$logger.debug("Checking if we can set some messages to status read")();
-    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).map((m) => m.id);
+    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).
+      map((m) => m.id);
     if (messagesIds.length > 0) {
       this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
     }
@@ -262,7 +269,7 @@ export default class ChatBox extends Vue {
 
   onEmitScroll() {
     if (this.activeRoomId === this.room.id) {
-      this.$nextTick(function () {
+      this.$nextTick(function() {
         if (this.scrollBottom) {
           if (this.room.search.searchActive && this.chatboxSearch) {
             this.$logger.debug("Scrolling chatboxSearch to bottom")();
@@ -284,7 +291,7 @@ export default class ChatBox extends Vue {
       logger = that.$logger;
 
       protected readonly handlers: HandlerTypes<keyof ChatBoxHandler, "*"> = {
-        scroll: <HandlerType<"scroll", "*">>this.scroll,
+        scroll: <HandlerType<"scroll", "*">> this.scroll,
       };
 
       scroll() {

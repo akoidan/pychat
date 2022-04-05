@@ -42,7 +42,7 @@ import {
   Vue,
   Watch,
 } from "vue-property-decorator";
-import {MessageModel,} from "@/ts/types/model";
+import {MessageModel} from "@/ts/types/model";
 import ChatSendingMessage from "@/vue/chat/message/ChatSendingMessage.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatSendingFile from "@/vue/chat/message/ChatSendingFile.vue";
@@ -65,7 +65,9 @@ export default class ChatThread extends Vue {
 
   @Prop() // (MessageModel|ReceivingFile|SendingFile)[];
   public readonly messages!: any[];
+
   public locked: boolean = false;
+
   @Ref()
   private readonly textarea!: ChatTextArea;
 

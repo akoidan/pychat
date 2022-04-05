@@ -12,8 +12,8 @@ import {
 } from "vue-property-decorator";
 import CreateRoom from "@/vue/parts/CreateRoom.vue";
 import {State} from "@/ts/instances/storeInstance";
-import type {ChannelUIModel,} from "@/ts/types/model";
-import {ChannelsDictUIModel,} from "@/ts/types/model";
+import type {ChannelUIModel} from "@/ts/types/model";
+import {ChannelsDictUIModel} from "@/ts/types/model";
 
 @Component({
   name: "ChannelAddRoom",

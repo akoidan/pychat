@@ -37,7 +37,9 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly roomId: number;
 
   protected sendChannel: RTCDataChannel | null = null;
+
   protected readonly sub: Subscription;
+
   private readonly pc_constraints: unknown = {
     optional: [/* Firefox*/
       /* {DtlsSrtpKeyAgreement: true},*/

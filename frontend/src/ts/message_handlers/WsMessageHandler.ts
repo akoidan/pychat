@@ -57,11 +57,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WsMessageHandler, "ws-message"> = {
-    deleteMessage: <HandlerType<"deleteMessage", "ws-message">>this.deleteMessage,
-    editMessage: <HandlerType<"editMessage", "ws-message">>this.editMessage,
-    printMessage: <HandlerType<"printMessage", "ws-message">>this.printMessage,
-    internetAppear: <HandlerType<"internetAppear", HandlerName>>this.internetAppear,
-    setMessageStatus: <HandlerType<"setMessageStatus", "ws-message">>this.setMessageStatus,
+    deleteMessage: <HandlerType<"deleteMessage", "ws-message">> this.deleteMessage,
+    editMessage: <HandlerType<"editMessage", "ws-message">> this.editMessage,
+    printMessage: <HandlerType<"printMessage", "ws-message">> this.printMessage,
+    internetAppear: <HandlerType<"internetAppear", HandlerName>> this.internetAppear,
+    setMessageStatus: <HandlerType<"setMessageStatus", "ws-message">> this.setMessageStatus,
   };
 
   /*
@@ -163,7 +163,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   public async loadThreadMessages(roomId: number, threadId: number): Promise<void> {
     const room = this.store.roomsDict[roomId];
-    const myids: number[] = Object.values(room.messages).filter((a) => a.parentMessage === threadId && a.id > 0).map((m) => m.id);
+    const myids: number[] = Object.values(room.messages).filter((a) => a.parentMessage === threadId && a.id > 0).
+      map((m) => m.id);
     const lm = await this.ws.sendLoadMessages(roomId, 0, threadId, myids);
     if (lm.content.length > 0) {
       this.addMessages(roomId, lm.content);
@@ -175,7 +176,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   public async loadUpMessages(roomId: number, count: number): Promise<void> {
     const room = this.store.roomsDict[roomId];
     if (!room.allLoaded) {
-      const myids: number[] = Object.values(room.messages).map((m) => m.id).filter((a) => a > 0);
+      const myids: number[] = Object.values(room.messages).map((m) => m.id).
+        filter((a) => a > 0);
       const lm = await this.ws.sendLoadMessages(roomId, count, null, myids);
       if (lm.content.length > 0) {
         // Backend return messages that don't have thread, so we don't neeed to sync parent message here
@@ -380,11 +382,12 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     if (!storeMessage.files) {
       return [];
     }
-    return Object.entries(storeMessage.files).filter(([k, v]) => v.type === "g" && !v.serverId).map(([k, v]) => ({
-      url: v.url!,
-      symbol: k,
-      webp: v.preview!,
-    }));
+    return Object.entries(storeMessage.files).filter(([k, v]) => v.type === "g" && !v.serverId).
+      map(([k, v]) => ({
+        url: v.url!,
+        symbol: k,
+        webp: v.preview!,
+      }));
   }
 
   private getFileIdsFromMessage(storeMessage: MessageModel): number[] {
@@ -407,19 +410,20 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   private async uploadFilesForMessages(storeMessage: MessageModel) {
     if (storeMessage.files) {
       const uploadFiles: UploadFile[] = [];
-      Object.keys(storeMessage.files).filter((k) => !storeMessage.files![k].fileId && storeMessage.files![k].sending).forEach((k) => {
-        const file: FileModel = storeMessage.files![k];
-        uploadFiles.push({
-          file: savedFiles[file.url!], // TODO why null?
-          key: file.type + k,
-        });
-        if (file.preview) {
+      Object.keys(storeMessage.files).filter((k) => !storeMessage.files![k].fileId && storeMessage.files![k].sending).
+        forEach((k) => {
+          const file: FileModel = storeMessage.files![k];
           uploadFiles.push({
-            file: savedFiles[file.preview],
-            key: `p${k}`,
+            file: savedFiles[file.url!], // TODO why null?
+            key: file.type + k,
           });
-        }
-      });
+          if (file.preview) {
+            uploadFiles.push({
+              file: savedFiles[file.preview],
+              key: `p${k}`,
+            });
+          }
+        });
       if (uploadFiles.length > 0) {
         const fileIds = await this.uploadFiles(storeMessage.id, storeMessage.roomId, uploadFiles);
         this.store.setMessageFileIds({
@@ -436,7 +440,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       return;
     }
     this.store.roomsArray.forEach((r) => {
-      const messagesIds = Object.values(r.messages).map((m) => m.id).filter((id) => inMessagesIds.includes(id));
+      const messagesIds = Object.values(r.messages).map((m) => m.id).
+        filter((id) => inMessagesIds.includes(id));
       if (messagesIds.length > 0) {
         this.store.setMessagesStatus({
           messagesIds,

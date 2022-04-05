@@ -70,18 +70,25 @@ import {LOAD_GIPHIES_PER_REQUEST} from "@/ts/utils/consts";
 })
 export default class GiphySearch extends Vue {
   public search: string = "";
+
   public pagination: MultiResponse["pagination"] = {
     count: 0,
     offset: 0,
     total_count: 0,
   };
+
   public moreLoading: boolean = false;
+
   public images: GIFObject[] = [];
+
   public request: XMLHttpRequest | null = null;
+
   @Ref()
   private readonly suspense!: AppSuspense;
+
   @Ref()
   private readonly giphyContent!: HTMLDivElement;
+
   private webpSupported: boolean = webpSupported;
 
   get showLoadMoreBtn() {
@@ -133,7 +140,7 @@ export default class GiphySearch extends Vue {
   @ApplyGrowlErr({
     message: "Unable to load more giphies",
     runningProp: "moreLoading",
-    preventStacking: true
+    preventStacking: true,
   })
   async fetchGiphies() {
 

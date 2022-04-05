@@ -38,7 +38,7 @@ import type {SetStateFromStorage} from "@/ts/types/dto";
   components: {
     ChatBackIcon,
     AppNavWrapper,
-    IncomingCall
+    IncomingCall,
   },
 })
 export default class MainPage extends Vue {

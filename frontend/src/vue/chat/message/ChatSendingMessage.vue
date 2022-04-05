@@ -25,10 +25,16 @@
         :message="message"
         class="message-tooltip"
       />
-      <i v-if="isSelf && message.status === 'read'" class="icon-ok message-status-read"
-         title="This message has been read by at least one user"/>
-      <i v-if="isSelf && message.status === 'received'" class="icon-ok message-status-received"
-         title="At least one user in this room has received this message"/>
+      <i
+        v-if="isSelf && message.status === 'read'"
+        class="icon-ok message-status-read"
+        title="This message has been read by at least one user"
+      />
+      <i
+        v-if="isSelf && message.status === 'received'"
+        class="icon-ok message-status-received"
+        title="At least one user in this room has received this message"
+      />
       <div v-if="message.status === 'sending'" class="spinner"/>
     </div>
   </div>
@@ -60,7 +66,7 @@ import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
     ChatTextArea,
     ChatMessageToolTip,
     AppProgressBar,
-    ChatTextMessage
+    ChatTextMessage,
   },
 })
 export default class ChatSendingMessage extends Vue {
@@ -118,7 +124,7 @@ export default class ChatSendingMessage extends Vue {
     if (this.message.isHighlighted) {
       this.$store.markMessageAsRead({
         messageId: this.message.id,
-        roomId: this.message.roomId
+        roomId: this.message.roomId,
       });
     }
   }

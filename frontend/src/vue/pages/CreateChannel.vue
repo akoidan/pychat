@@ -34,7 +34,7 @@
 <script lang="ts">
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
@@ -62,7 +62,7 @@ export default class CreateChannel extends Vue {
 
   @ApplyGrowlErr({
     runningProp: "running",
-    message: "Unable to add channel"
+    message: "Unable to add channel",
   })
   public async add() {
     if (!this.channelName) {

@@ -72,7 +72,7 @@ export default class GoogleAuth extends Vue {
 
   @ApplyGrowlErr({
     message: "Unable to login in with google",
-    runningProp: "grunning"
+    runningProp: "grunning",
   })
   public async logWithGoogle() {
     const auth2 = gapi.auth2.getAuthInstance();
@@ -95,7 +95,7 @@ export default class GoogleAuth extends Vue {
       this.$emit("token", {
         resolve,
         reject,
-        token: this.googleToken
+        token: this.googleToken,
       });
     });
   }

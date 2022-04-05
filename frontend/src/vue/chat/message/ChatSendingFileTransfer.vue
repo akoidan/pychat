@@ -10,10 +10,10 @@
         :class="cls"
       >
         {{ status }}<span
-        v-if="showCancel"
-        class="icon-cancel"
-        @click="declineSending"
-      />
+          v-if="showCancel"
+          class="icon-cancel"
+          @click="declineSending"
+        />
       </td>
     </tr>
   </tbody>
@@ -27,7 +27,7 @@ import {
   Vue,
 } from "vue-property-decorator";
 import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
-import type {UserModel,} from "@/ts/types/model";
+import type {UserModel} from "@/ts/types/model";
 import {
   FileTransferStatus,
   SendingFileTransfer,

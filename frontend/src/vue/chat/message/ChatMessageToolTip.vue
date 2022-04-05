@@ -28,14 +28,14 @@
 import {
   Component,
   Prop,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 import type {EditingMessage} from "@/ts/types/model";
 import {MessageModel} from "@/ts/types/model";
 import {
   editMessageWs,
-  showAllowEditing
+  showAllowEditing,
 } from "@/ts/utils/pureFunctions";
 
 @Component({name: "ChatMessageToolTip"})
@@ -98,7 +98,7 @@ export default class ChatMessageToolTip extends Vue {
     this.$store.setCurrentThread({
       messageId: this.message.id,
       roomId: this.message.roomId,
-      isEditingNow: !this.message.isThreadOpened
+      isEditingNow: !this.message.isThreadOpened,
     });
   }
 }

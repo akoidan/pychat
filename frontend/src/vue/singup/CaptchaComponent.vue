@@ -30,7 +30,7 @@ import {
   Prop,
   Ref,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
 import {
   CAPTCHA_IFRAME,
@@ -62,7 +62,9 @@ export default class CaptchaComponent extends Vue {
   public id = captchaId++;
 
   @Prop() public value!: boolean;
+
   public ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}` : "";
+
   private event: ((E: MessageEvent) => void) | null = null;
 
   get grecaptcha(): GoogleCaptcha {

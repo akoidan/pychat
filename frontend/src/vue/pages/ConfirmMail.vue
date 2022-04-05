@@ -40,7 +40,7 @@ export default class ConfirmMail extends Vue {
   @ApplyGrowlErr({
     runningProp: "loading",
     vueProperty: "errorMessage",
-    message: "Confirming email error "
+    message: "Confirming email error ",
   })
   public async created() {
     await this.$api.confirmEmail(this.$route.query.token as string);

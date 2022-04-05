@@ -7,8 +7,8 @@ import {GrowlType} from "@/ts/types/model";
 
 
 function stateDecoratorFactory<TPT extends VuexModule>(vuexModule: TPT):
-  <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
-  (vueComponent: TCT, fileName: TPN) => void {
+<TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
+(vueComponent: TCT, fileName: TPN) => void {
   return <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
   (vueComponent: TCT, fileName: TPN): void => {
     Object.defineProperty(
@@ -42,7 +42,7 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     vueProperty?: ValueFilterForKey<T, string>;
   },
 ) {
-  const processError = function (e: any) {
+  const processError = function(e: any) {
     let strError;
     if (e) {
       if (e.message) {
@@ -79,9 +79,9 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     }
   };
 
-  return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
+  return function(target: T, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
-    descriptor.value = async function (...args: unknown[]) {
+    descriptor.value = async function(...args: unknown[]) {
       // @ts-expect-error: next-line
 
       // TODO this thing breaks fb login

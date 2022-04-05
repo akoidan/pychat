@@ -21,7 +21,7 @@
 import {
   Component,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
 
 import ChatRightSection from "@/vue/chat/right/ChatRightSection.vue";
@@ -29,7 +29,7 @@ import ChatRightSection from "@/vue/chat/right/ChatRightSection.vue";
 import ChatBoxes from "@/vue/chat/chatbox/ChatBoxes.vue";
 import AppNavWrapper from "@/vue/ui/AppNavWrapper.vue";
 import ChatIsOnlineIcon from "@/vue/chat/chatbox/ChatIsOnlineIcon.vue";
-import {State,} from "@/ts/instances/storeInstance";
+import {State} from "@/ts/instances/storeInstance";
 import ChatPopupMenu from "@/vue/chat/chatbox/ChatPopupMenu.vue";
 import AppMenuBar from "@/vue/ui/AppMenuBar.vue";
 import ChatNavBar from "@/vue/chat/chatbox/ChatNavBar.vue";
@@ -49,13 +49,19 @@ import ChatNavBar from "@/vue/chat/chatbox/ChatNavBar.vue";
 })
 export default class ChannelsPage extends Vue {
   public lowWidth = false;
+
   public showAppMenuBar = false;
+
   @State
   public readonly activeRoomId!: number;
+
   @State
   public readonly currentChatPage!: "chat" | "rooms";
+
   public showPopup = false;
+
   private listener!: Function;
+
   private mediaQuery!: MediaQueryList;
 
   @Watch("activeRoomId")

@@ -71,11 +71,11 @@
 <script lang="ts">
 import {
   ApplyGrowlErr,
-  State
+  State,
 } from "@/ts/instances/storeInstance";
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {CurrentUserInfoModel} from "@/ts/types/model";
@@ -102,7 +102,7 @@ export default class UserProfileChangePassword extends Vue {
 
   @ApplyGrowlErr({
     message: "Error changing pass:",
-    runningProp: "running"
+    runningProp: "running",
   })
   public async saveProfile() {
     if (this.newPassword != this.confirmPassword) {

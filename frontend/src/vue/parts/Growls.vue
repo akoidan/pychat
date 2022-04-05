@@ -30,7 +30,7 @@ export default class Growls extends Vue {
 
   @Watch("$route", {
     immediate: true,
-    deep: true
+    deep: true,
   })
   onUrlChange(newVal: any) {
     this.$store.clearGrowls();

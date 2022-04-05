@@ -8,7 +8,7 @@
 <script lang="ts">
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 

@@ -14,7 +14,7 @@
 import {
   Component,
   Prop,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import {IconColor} from "@/ts/types/types";
 

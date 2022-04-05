@@ -46,7 +46,7 @@ import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
     ChatMessageWrapper,
     ChatMessageHeader,
     ChatSendingFileTransfer,
-    AppProgressBar
+    AppProgressBar,
   },
 })
 export default class ChatSendingFile extends Vue {

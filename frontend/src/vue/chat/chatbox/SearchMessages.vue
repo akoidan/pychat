@@ -32,7 +32,7 @@ import {
   Vue,
   Watch,
 } from "vue-property-decorator";
-import {RoomModel,} from "@/ts/types/model";
+import {RoomModel} from "@/ts/types/model";
 
 const START_TYPING = "Start typing and messages will appear";
 
@@ -46,11 +46,16 @@ function getUniqueId() {
 @Component({name: "SearchMessages"})
 export default class SearchMessages extends Vue {
   @Prop() public room!: RoomModel;
+
   @Ref()
   public inputSearch!: HTMLInputElement;
+
   public debouncedSearch!: Function;
+
   public search: string = "";
+
   public currentRequest: number = 0;
+
   public searchResult: string = "";
 
   get searchResultText() {
@@ -73,7 +78,7 @@ export default class SearchMessages extends Vue {
   @Watch("searchActive")
   public onSearchActiveChange(value: boolean) {
     if (value) {
-      this.$nextTick(function () {
+      this.$nextTick(function() {
         this.inputSearch.focus();
       });
     }
@@ -130,7 +135,7 @@ export default class SearchMessages extends Vue {
   private onSearchChange(search: string) {
     this.$store.setSearchTextTo({
       searchText: search,
-      roomId: this.room.id
+      roomId: this.room.id,
     });
     if (this.currentRequest) {
       this.currentRequest = getUniqueId();

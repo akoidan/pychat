@@ -43,7 +43,7 @@
 
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
@@ -67,7 +67,7 @@ export default class ApplyResetPassword extends Vue {
 
   @ApplyGrowlErr({
     runningProp: "checkingToken",
-    vueProperty: "error"
+    vueProperty: "error",
   })
   async created() {
     this.restoreUser = await this.$api.verifyToken((this.$route.query.token) as string);
@@ -76,7 +76,7 @@ export default class ApplyResetPassword extends Vue {
   @ApplyGrowlErr({
     runningProp: "running",
     vueProperty: "error",
-    message: "Resetting pass err"
+    message: "Resetting pass err",
   })
   async submitResetPassword() {
     if (this.password !== this.repeatPassword) {

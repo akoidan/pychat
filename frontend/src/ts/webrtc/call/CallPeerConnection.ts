@@ -35,11 +35,11 @@ import type Subscription from "@/ts/classes/Subscription";
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {
-    destroy: <HandlerType<"destroy", "peerConnection:*">>this.destroy,
-    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">>this.streamChanged,
-    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">>this.connectToRemote,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">>this.sendRtcData,
-    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">>this.destroyCallConnection,
+    destroy: <HandlerType<"destroy", "peerConnection:*">> this.destroy,
+    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">> this.streamChanged,
+    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">> this.connectToRemote,
+    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
+    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">> this.destroyCallConnection,
   };
 
   private audioProcessor: any;

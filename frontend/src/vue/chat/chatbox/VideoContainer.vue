@@ -114,7 +114,7 @@ export default class VideoContainer extends Vue {
 
   @Watch("callInfo.currentSpeaker")
   public onSpeakerChange(newValue: string) {
-    this.$nextTick(function () {
+    this.$nextTick(function() {
       const video: HTMLVideoElement = this.localVideo.$refs.video as HTMLVideoElement;
       if (video.setSinkId) {
         video.setSinkId(newValue);
@@ -288,20 +288,18 @@ progress
   margin-bottom: 4px
 
 .micVideoHolder
-  @mixin selectIfHasAmountOfChild($child)
-  // renders style depending on amount of children
-       $realChild: $child +1
-       // select first element, and nth element from the end
-       // if it's the same element, e.g. 321 , if 3rd element from the end = first element then container has 3 elements
-       // note selector applies to all siblings with class .micVideoWrapper
-       :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild})), :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ .micVideoWrapper)
-         @content
+  @mixin selectIfHasAmountOfChild($child) // renders style depending on amount of children
+    $realChild: $child +1
+    // select first element, and nth element from the end
+    // if it's the same element, e.g. 321 , if 3rd element from the end = first element then container has 3 elements
+    // note selector applies to all siblings with class .micVideoWrapper
+    :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild})), :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ .micVideoWrapper)
+      @content
 
-  @mixin selectVideoIfhasAmountOfChild($child)
-  // renders style depending on amount of children
-       $realChild: $child +1
-       :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ video)
-         @content
+  @mixin selectVideoIfhasAmountOfChild($child) // renders style depending on amount of children
+    $realChild: $child +1
+    :deep(.micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ video)
+      @content
 
   @mixin selectNthIfHasAmountOfChildren($amountOfChild, $nth)
     :deep(.micVideoWrapper:first-child:nth-last-child(#{$amountOfChild +1}) ~ .micVideoWrapper:nth-child(#{$nth}))

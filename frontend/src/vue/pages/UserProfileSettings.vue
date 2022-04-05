@@ -136,21 +136,21 @@ import {userSettingsDtoToModel} from "@/ts/types/converters";
 import type {UserSettingsDto} from "@/ts/types/dto";
 import type {SetSettingsMessage} from "@/ts/types/messages/wsInMessages";
 import type {LogLevel} from "lines-logger";
-import {logLevels,} from "lines-logger";
+import {logLevels} from "lines-logger";
 import {
   LAST_SYNCED,
   SERVICE_WORKER_VERSION_LS_NAME,
 } from "@/ts/utils/consts";
 import {
   addToHomeScreen,
-  canBeInstalled
+  canBeInstalled,
 } from "@/ts/utils/addToHomeScreen";
 
 @Component({
   name: "UserProfileSettings",
   components: {
     AppSubmit,
-    AppCheckbox
+    AppCheckbox,
   },
 })
 export default class UserProfileSettings extends Vue {
@@ -209,7 +209,7 @@ export default class UserProfileSettings extends Vue {
 
   @ApplyGrowlErr({
     message: "Error saving settings",
-    runningProp: "running"
+    runningProp: "running",
   })
   public async save() {
     this.$logger.debug("Saving userSettings")();

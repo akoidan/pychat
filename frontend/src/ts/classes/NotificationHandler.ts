@@ -24,7 +24,7 @@ export default class NotifierHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
-    internetAppear: <HandlerType<"internetAppear", "*">>this.internetAppear,
+    internetAppear: <HandlerType<"internetAppear", "*">> this.internetAppear,
   };
 
   private readonly mainWindow: MainWindow;

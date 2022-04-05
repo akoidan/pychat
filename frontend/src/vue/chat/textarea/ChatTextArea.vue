@@ -98,7 +98,7 @@ import {State} from "@/ts/instances/storeInstance";
 
 import type {
   MessageDataEncode,
-  MessageSender
+  MessageSender,
 } from "@/ts/types/types";
 import {
   editMessageWs,
@@ -126,8 +126,8 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     SmileyHolder,
     GiphySearch,
     ChatAttachments,
-    MediaRecorder
-  }
+    MediaRecorder,
+  },
 })
 export default class ChatTextArea extends Vue {
   @State
@@ -516,10 +516,9 @@ export default class ChatTextArea extends Vue {
   :deep(.icon-picture), :deep(.icon-smile), :deep(.icon-webrtc-video)
     color: #7b7979
 
-
-.usermsg :deep(img[alt])
 //smile
-   @extend %img-code
+.usermsg :deep(img[alt])
+  @extend %img-code
 
 .usermsg :deep(.emoji)
   width: $emoji-width

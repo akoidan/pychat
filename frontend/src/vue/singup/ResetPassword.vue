@@ -31,7 +31,7 @@
 import {
   Component,
   Ref,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
@@ -41,7 +41,7 @@ import CaptchaComponent from "@/vue/singup/CaptchaComponent.vue";
   name: "ResetPassword",
   components: {
     CaptchaComponent,
-    AppSubmit
+    AppSubmit,
   },
 })
 export default class ResetPassword extends Vue {
@@ -59,7 +59,7 @@ export default class ResetPassword extends Vue {
 
   @ApplyGrowlErr({
     runningProp: "running",
-    message: "Can't reset password"
+    message: "Can't reset password",
   })
   public async restorePassword(event: Event) {
     await this.$api.sendRestorePassword(this.form);

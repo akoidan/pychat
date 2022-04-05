@@ -9,7 +9,7 @@
 import {
   Component,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";

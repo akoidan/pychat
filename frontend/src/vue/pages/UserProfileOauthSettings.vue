@@ -32,7 +32,7 @@ import GoogleAuth from "@/vue/singup/GoogleAuth.vue";
   components: {
     GoogleAuth,
     FacebookAuth,
-    AppSubmit
+    AppSubmit,
   },
 })
 export default class UserProfileOauthSettings extends Vue {

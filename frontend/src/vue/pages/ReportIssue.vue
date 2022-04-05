@@ -55,7 +55,7 @@ import {
   Component,
   Ref,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {GIT_HASH} from "@/ts/utils/consts";
@@ -67,9 +67,13 @@ import {browserVersion} from "@/ts/utils/runtimeConsts";
 })
 export default class ReportIssue extends Vue {
   public running: boolean = false;
+
   public browser: string = browserVersion;
+
   public issue: string = "";
+
   public textAreaStyle: string = "";
+
   @Ref()
   private readonly textarea!: HTMLTextAreaElement;
 
@@ -86,7 +90,7 @@ export default class ReportIssue extends Vue {
 
   @ApplyGrowlErr({
     runningProp: "running",
-    message: "Unable to submit issue"
+    message: "Unable to submit issue",
   })
   public async submit() {
     await this.$api.sendLogs(this.issue, this.browser, this.git);

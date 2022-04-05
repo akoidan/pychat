@@ -12,13 +12,13 @@
 <script lang="ts">
 import {
   ApplyGrowlErr,
-  State
+  State,
 } from "@/ts/instances/storeInstance";
 import {
   Component,
   Ref,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
@@ -55,7 +55,7 @@ export default class UserProfileImage extends Vue {
 
   @ApplyGrowlErr({
     message: "Unable to upload event",
-    runningProp: "running"
+    runningProp: "running",
   })
   public async upload() {
     const blob = await this.cropper.cropImage();

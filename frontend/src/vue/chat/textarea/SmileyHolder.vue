@@ -136,10 +136,10 @@ export default class SmileyHolder extends Vue {
       this.searchResults = {};
       return;
     }
-    this.searchResults = Object.entries(this.allSmileysKeysNoVariations!)
-      .filter(([key, value]) => value.alt.includes(this.searchSmile))
-      .slice(0, 30)
-      .reduce<Record<string, Smile>>((obj, [key, value]) => {
+    this.searchResults = Object.entries(this.allSmileysKeysNoVariations!).
+      filter(([key, value]) => value.alt.includes(this.searchSmile)).
+      slice(0, 30).
+      reduce<Record<string, Smile>>((obj, [key, value]) => {
         obj[key] = value;
         return obj;
       }, {});

@@ -6,7 +6,7 @@ import {
   browserVersion,
   isChrome,
   isMobile,
-  WS_API_URL
+  WS_API_URL,
 } from "@/ts/utils/runtimeConsts";
 // Should be after initStore
 import App from "@/vue/App.vue";

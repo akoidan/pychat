@@ -8,7 +8,7 @@ import {
 
 export const isMobile: boolean = mobile.isMobile();
 
-export const browserVersion: string = (function () {
+export const browserVersion: string = (function() {
   const ua = navigator.userAgent;
   let tem;
   let M: any = (/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i).exec(ua) || [];
@@ -20,7 +20,8 @@ export const browserVersion: string = (function () {
   if (M[1] === "Chrome") {
     tem = (/\b(OPR|Edge)\/(\d+)/).exec(ua);
     if (tem != undefined) {
-      return tem.slice(1).join(" ").replace("OPR", "Opera");
+      return tem.slice(1).join(" ").
+        replace("OPR", "Opera");
     }
   }
   M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, "-?"];
@@ -31,7 +32,7 @@ export const browserVersion: string = (function () {
   return M.join(" ");
 }()) + (isMobile ? " mobile" : "");
 
-export const webpSupported = (function () {
+export const webpSupported = (function() {
   const elem = document.createElement("canvas");
   if (elem.getContext && elem.getContext("2d")) {
     // Was able or not to get WebP representation
@@ -44,7 +45,7 @@ export const webpSupported = (function () {
 export const isFirefox = browserVersion.includes("Firefox");
 export const isChrome = browserVersion.includes("Chrome");
 const BACKEND_CURRENT_ADDRESS = BACKEND_ADDRESS.replace("{}", window.location.hostname);
-export const WEBRTC_RUNTIME_CONFIG = (function () {
+export const WEBRTC_RUNTIME_CONFIG = (function() {
   // Replaces {} in the realm for hostname
   const result = JSON.parse(JSON.stringify(WEBRTC_CONFIG));
   if (result.iceServers) {

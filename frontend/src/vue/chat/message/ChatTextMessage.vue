@@ -42,7 +42,7 @@ import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
   name: "ChatTextMessage",
   components: {
     ChatMessageWrapper,
-    ChatMessageHeader
+    ChatMessageHeader,
   },
 })
 export default class ChatTextMessage extends Vue {
@@ -77,7 +77,7 @@ export default class ChatTextMessage extends Vue {
   }
 
   public updated() {
-    this.$nextTick(function () {
+    this.$nextTick(function() {
       if (this.content) {
         this.seEvents();
       } else {
@@ -198,9 +198,9 @@ export default class ChatTextMessage extends Vue {
     &:hover
       text-decoration: underline
 
-  :deep(img[alt])
   // smile
-       @extend %img-code
+  :deep(img[alt])
+    @extend %img-code
 
   :deep(.quote)
     border-left: 5px solid #4d4d4d

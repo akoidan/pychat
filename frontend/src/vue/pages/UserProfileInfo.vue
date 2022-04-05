@@ -114,16 +114,16 @@
 <script lang="ts">
 import {
   ApplyGrowlErr,
-  State
+  State,
 } from "@/ts/instances/storeInstance";
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import type {SexModelString} from "@/ts/types/model";
 import {CurrentUserInfoModel} from "@/ts/types/model";
-import type {UserProfileDtoWoImage,} from "@/ts/types/dto";
+import type {UserProfileDtoWoImage} from "@/ts/types/dto";
 
 import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
@@ -134,7 +134,7 @@ import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
   name: "UserProfileInfo",
   components: {
     AppInputDate,
-    AppSubmit
+    AppSubmit,
   },
 })
 export default class UserProfileInfo extends Vue {
@@ -153,7 +153,7 @@ export default class UserProfileInfo extends Vue {
 
   @ApplyGrowlErr({
     message: "Error saving profile",
-    runningProp: "running"
+    runningProp: "running",
   })
   public async save() {
     this.$logger.debug("Saving userProfile")();

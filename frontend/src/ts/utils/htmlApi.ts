@@ -295,7 +295,8 @@ export function replaceCurrentWord(containerEl: HTMLElement, replacedTo: HTMLEle
   range.collapse(true);
   range.setStart(containerEl, 0);
 
-  const words = range.toString().trim().split(" ");
+  const words = range.toString().trim().
+    split(" ");
   const lastWord = words[words.length - 1];
 
   if (!lastWord) {
@@ -369,7 +370,7 @@ export function setVideoEvent(e: HTMLElement) {
     const querySelector: HTMLElement = e.querySelector(".icon-youtube-play")!;
     const url: string = e.getAttribute("associatedVideo")!;
     logger.debug("Embedding video url {}", url)();
-    querySelector.onclick = function (event) {
+    querySelector.onclick = function(event) {
       const video = document.createElement("video");
       video.setAttribute("controls", "");
       video.className = "video-player-ready";
@@ -384,7 +385,7 @@ export function setVideoEvent(e: HTMLElement) {
 export function setAudioEvent(e: HTMLElement) {
   const r: NodeListOf<HTMLElement> = e.querySelectorAll(".audio-record");
   forEach<HTMLElement>(r, (e: HTMLElement) => {
-    e.onclick = function (event) {
+    e.onclick = function(event) {
       const associatedAudio: string = e.getAttribute("associatedAudio")!;
       const url: string = resolveMediaUrl(associatedAudio);
       const audio = document.createElement("audio");
@@ -401,11 +402,11 @@ export function setAudioEvent(e: HTMLElement) {
 export function setImageFailEvents(e: HTMLElement, bus: Subscription) {
   const r = e.querySelectorAll("img");
   for (let i = 0; i < r.length; i++) {
-    (function (img) {
-      img.onerror = function () {
+    (function(img) {
+      img.onerror = function() {
         this.className += " failed";
       };
-      img.onload = function () {
+      img.onload = function() {
         bus.notify({
           action: "scroll",
           handler: "*",
@@ -444,7 +445,7 @@ export function setYoutubeEvent(e: HTMLElement) {
     const querySelector: HTMLElement = a.querySelector(".icon-youtube-play")!;
     const id = a.getAttribute("data-id");
     logger.debug("Embedding youtube view {}", id)();
-    querySelector.onclick = function (event: MouseEvent) {
+    querySelector.onclick = function(event: MouseEvent) {
       const iframe = document.createElement("iframe");
       let time: string = getTime(e.getAttribute("data-time")!).toString();
       if (time) {

@@ -18,11 +18,11 @@ import {
   Emit,
   Prop,
   Vue,
-  Watch
+  Watch,
 } from "vue-property-decorator";
 import {
   UserDictModel,
-  UserModel
+  UserModel,
 } from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 

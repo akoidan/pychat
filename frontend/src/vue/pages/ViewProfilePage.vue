@@ -59,11 +59,11 @@
 <script lang="ts">
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import {
   ApplyGrowlErr,
-  State
+  State,
 } from "@/ts/instances/storeInstance";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import type {UserModel} from "@/ts/types/model";
@@ -72,9 +72,12 @@ import type {ViewUserProfileDto} from "@/ts/types/dto";
 @Component({name: "ViewProfilePage"})
 export default class ViewProfilePage extends Vue {
   public loading: boolean = false;
+
   public error: string | null = null;
+
   @State
   public readonly allUsersDict!: Record<number, UserModel>;
+
   public userProfileInfo: ViewUserProfileDto | null = null;
 
   get id(): number {
@@ -92,7 +95,7 @@ export default class ViewProfilePage extends Vue {
   @ApplyGrowlErr({
     vueProperty: "error",
     message: "Error loading profile",
-    runningProp: "loading"
+    runningProp: "loading",
   })
   public async created() {
     this.userProfileInfo = await this.$api.showProfile(this.id);

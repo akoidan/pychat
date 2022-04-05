@@ -16,11 +16,11 @@
 <script lang='ts'>
 import {
   Component,
-  Vue
+  Vue,
 } from "vue-property-decorator";
 import {
   ApplyGrowlErr,
-  State
+  State,
 } from "@/ts/instances/storeInstance";
 import {AUTO_REGISTRATION} from "@/ts/utils/consts";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
@@ -31,7 +31,8 @@ export default class AuthPage extends Vue {
   public readonly regHeader!: string;
 
   public getRandom(): string {
-    return Math.random().toString(36).substring(7);
+    return Math.random().toString(36).
+      substring(7);
   }
 
   @ApplyGrowlErr({message: "Auto-registration error"})
@@ -41,7 +42,7 @@ export default class AuthPage extends Vue {
       const message: LoginMessage = {
         action: "login",
         handler: "router",
-        session
+        session,
       };
       this.$messageBus.notify(message);
     }

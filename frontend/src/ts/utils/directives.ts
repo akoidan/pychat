@@ -24,7 +24,7 @@ const HOLD_TIMEOUT = 300;
 export const switchDirective = {
   created(el: any, binding: any, vnode: any) {
     vnode.switcherTimeout = 0;
-    vnode.switcherStart = async function () {
+    vnode.switcherStart = async function() {
       vnode.context!.$logger.debug("Triggered onMouseDown, waiting {}ms for the next event...", HOLD_TIMEOUT)();
       getEventName("end").forEach((eventName) => el.addEventListener(eventName, vnode.switcherFinish!));
       await new Promise((resolve) => vnode.switcherTimeout = window.setTimeout(resolve, HOLD_TIMEOUT));
@@ -32,7 +32,7 @@ export const switchDirective = {
       vnode.context!.$logger.debug("Timeout expired, firing enable record action")();
       await binding.value.start();
     };
-    vnode.switcherFinish = async function (e: Event) {
+    vnode.switcherFinish = async function(e: Event) {
       getEventName("end").forEach((eventName) => el.removeEventListener(eventName, vnode.switcherFinish!));
       if (vnode.switcherTimeout) {
         vnode.context!.$logger.debug("Click event detected, firing switch recrod action")();

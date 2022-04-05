@@ -65,7 +65,7 @@ export default class FacebookAuth extends Vue {
 
   @ApplyGrowlErr({
     message: "Unable to login in with facebook",
-    runningProp: "frunning"
+    runningProp: "frunning",
   })
   public async fbStatusChangeIfReAuth(response: any) {
     this.$logger.debug("fbStatusChangeIfReAuth {}", response)();
@@ -87,7 +87,7 @@ export default class FacebookAuth extends Vue {
         this.$emit("token", {
           resolve,
           reject,
-          token: response.authResponse.accessToken
+          token: response.authResponse.accessToken,
         });
       });
 
