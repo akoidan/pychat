@@ -44,6 +44,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       {RtpDataChannels: false /* True*/},
     ],
   };
+
   protected readonly sub: Subscription;
 
   constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore, sub: Subscription) {

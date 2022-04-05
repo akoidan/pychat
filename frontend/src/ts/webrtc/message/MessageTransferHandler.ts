@@ -137,7 +137,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
             this.store,
             connectionIdWithUser.userId,
             this.messageHelper,
-            this.sub
+            this.sub,
           );
         } else {
           mpc = new MessageReceiverPeerConnection(
@@ -148,7 +148,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
             this.store,
             connectionIdWithUser.userId,
             this.messageHelper,
-            this.sub
+            this.sub,
           );
         }
         mpc.makeConnection();

@@ -53,7 +53,7 @@
       </div>
     </template>
   </div>
-  <div v-else></div>
+  <div v-else/>
 </template>
 <script lang="ts">
 import {
@@ -67,7 +67,7 @@ import type {
   SmileVariation,
   SmileysStructure,
 } from "@/ts/utils/smileys";
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 
 @Component({name: "SmileyHolder"})
 export default class SmileyHolder extends Vue {
@@ -82,12 +82,14 @@ export default class SmileyHolder extends Vue {
 
   public searchSmile: string = "";
 
-  // this can't be state, since we need to set local properties before
+  // This can't be state, since we need to set local properties before
   public smileysLoaded: boolean = false;
 
-  public smileysData: SmileysStructure|null = null;
-  public allSmileysKeys:Record<string, Smile>|null = null;
-  public allSmileysKeysNoVariations: Record<string, SmileVariation>|null = null;
+  public smileysData: SmileysStructure | null = null;
+
+  public allSmileysKeys: Record<string, Smile> | null = null;
+
+  public allSmileysKeysNoVariations: Record<string, SmileVariation> | null = null;
 
   async mounted() {
     this.recentSmileysCodes = JSON.parse(localStorage.getItem("recentSmileys") || "[]");

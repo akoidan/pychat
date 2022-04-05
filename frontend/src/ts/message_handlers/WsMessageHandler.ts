@@ -51,7 +51,7 @@ import {
   checkIfIdIsMissing,
   getMissingIds,
 } from "@/ts/utils/pureFunctions";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
   protected readonly logger: Logger;
@@ -83,7 +83,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     api: Api,
     ws: WsHandler,
     messageHelper: MessageHelper,
-    sub: Subscription
+    sub: Subscription,
   ) {
     super();
     this.store = store;

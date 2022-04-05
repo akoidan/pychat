@@ -22,7 +22,7 @@ import type {
 } from "@/ts/types/messages/baseMessagesInterfaces";
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {

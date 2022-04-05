@@ -68,6 +68,7 @@ export default class WebRtcApi extends MessageHandler {
   private readonly messageHelper: MessageHelper;
 
   private messageSenderProxy!: MessageSenderProxy; // Via setter
+
   private readonly sub: Subscription;
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper, sub: Subscription) {
@@ -265,7 +266,7 @@ export default class WebRtcApi extends MessageHandler {
     this.notifier.showNotification(this.store.allUsersDict[message.userId].user, {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
-      icon: resolveMediaUrl(this.store.allUsersDict[message.userId].image) || faviconUrl as string,
+      icon: resolveMediaUrl(this.store.allUsersDict[message.userId].image) || faviconUrl,
       replaced: 1,
     });
     this.store.addReceivingFile(payload);

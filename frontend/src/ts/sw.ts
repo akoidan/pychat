@@ -44,14 +44,13 @@ self.addEventListener("install", (event: any) => {
   logger.debug(" Delaying install event to put static resources")();
   event.waitUntil((async() => {
     const staticCache = await caches.open("static");
-    const assets = allAssets.filter((url) =>
-      url.includes("/smileys/") ||
+    const assets = allAssets.filter((url) => url.includes("/smileys/") ||
       url.includes("/flags/") ||
         url.includes("/js/") ||
         url.includes("/css/") ||
         url.includes("/img/") ||
-        /\/font\/fontello.*\.woff2/.test(url) ||
-        /\/manifest.*\.json/.test(url) ||
+        (/\/font\/fontello.*\.woff2/).test(url) ||
+        (/\/manifest.*\.json/).test(url) ||
         url === (self as any).registration.scope);
     logger.log("Putting to static cache {}", assets)();
     await staticCache.addAll(assets);

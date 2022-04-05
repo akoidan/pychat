@@ -53,6 +53,7 @@ import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppSuspense from "@/vue/ui/AppSuspense.vue";
 import {webpSupported} from "@/ts/utils/runtimeConsts";
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type {
   GIFObject,
   MultiResponse,

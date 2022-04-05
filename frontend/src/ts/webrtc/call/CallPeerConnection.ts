@@ -31,7 +31,7 @@ import type {
   RoomModel,
 } from "@/ts/types/model";
 import {stopVideo} from "@/ts/utils/htmlApi";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {
@@ -58,7 +58,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     userId: number,
     wsHandler: WsHandler,
     store: DefaultStore,
-    sub: Subscription
+    sub: Subscription,
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store, sub);
     // @ts-expect-error

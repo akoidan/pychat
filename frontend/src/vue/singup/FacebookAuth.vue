@@ -29,7 +29,7 @@ let fbInited = false; // This is a global variable
   components: {AppSubmit},
 })
 export default class FacebookAuth extends Vue {
-  public fb_app_id: string|false = FACEBOOK_APP_ID;
+  public fb_app_id: string | false = FACEBOOK_APP_ID;
 
   public frunning: boolean = false;
 

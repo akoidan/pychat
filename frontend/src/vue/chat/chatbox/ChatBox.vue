@@ -120,12 +120,11 @@ import ChatThread from "@/vue/chat/message/ChatThread.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
-import MessageHandler from '@/ts/message_handlers/MesageHandler';
-import {
+import MessageHandler from "@/ts/message_handlers/MesageHandler";
+import type {
   HandlerType,
-  HandlerTypes
-} from '@/ts/types/messages/baseMessagesInterfaces';
-
+  HandlerTypes,
+} from "@/ts/types/messages/baseMessagesInterfaces";
 
 
 @Component({
@@ -174,6 +173,7 @@ export default class ChatBox extends Vue {
   scrollBottom: boolean = true; // Scroll to bottom on load
 
   lastScrollTop: number = 0;
+
   private handler!: MessageHandler;
 
   beforeUpdate() {
@@ -208,8 +208,8 @@ export default class ChatBox extends Vue {
 
   public markMessagesInCurrentRoomAsRead() {
     this.$logger.debug("Checking if we can set some messages to status read")();
-    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server"))
-.map((m) => m.id);
+    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).
+      map((m) => m.id);
     if (messagesIds.length > 0) {
       this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
     }
@@ -256,16 +256,16 @@ export default class ChatBox extends Vue {
   }
 
   created() {
-   const that = this;
-   this.handler = new class ChatBoxHandler extends MessageHandler {
-
-     logger = that.$logger;
+    const that = this;
+    this.handler = new class ChatBoxHandler extends MessageHandler {
+      logger = that.$logger;
 
       protected readonly handlers: HandlerTypes<keyof ChatBoxHandler, "*"> = {
         scroll: <HandlerType<"scroll", "*">> this.scroll,
       };
+
       scroll() {
-       that.onEmitScroll()
+        that.onEmitScroll();
       }
     }();
     this.$messageBus.subscribe("*", this.handler);

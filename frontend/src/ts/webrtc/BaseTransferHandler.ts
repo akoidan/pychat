@@ -19,6 +19,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected readonly store: DefaultStore;
 
   protected readonly roomId: number;
+
   protected readonly sub: Subscription;
 
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, sub: Subscription) {

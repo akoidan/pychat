@@ -16,7 +16,7 @@ import recordIcon from "@/assets/img/audio.svg";
 import fileIcon from "@/assets/img/file.svg";
 import {getFlag} from "@/ts/utils/flags";
 import videoIcon from "@/assets/img/icon-play-red.svg";
-import type {Smile} from "@/ts/utils/smileys";
+import type {Smile, SmileysApi} from "@/ts/utils/smileys";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {
@@ -25,8 +25,7 @@ import {
 } from "@/ts/utils/runtimeConsts";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
-import { SmileysApi } from '@/ts/utils/smileys';
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -515,7 +514,7 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
           const img = document.createElement("img");
           if (!blob) {
             logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
-            img.src = videoIcon as string;
+            img.src = videoIcon;
           } else {
             const url = URL.createObjectURL(blob);
             savedFiles[url] = blob;
@@ -545,7 +544,7 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
   img.className = `audio-record ${PASTED_IMG_CLASS}`;
   setBlobName(file);
   savedFiles[associatedAudio] = file;
-  img.src = recordIcon as string;
+  img.src = recordIcon;
   pasteNodeAtCaret(img, textArea);
 }
 
@@ -556,7 +555,7 @@ export function pasteBlobFileToTextArea(file: Blob, textArea: HTMLElement) {
   img.className = `uploading-file ${PASTED_IMG_CLASS}`;
   setBlobName(file);
   savedFiles[associatedFile] = file;
-  img.src = fileIcon as string;
+  img.src = fileIcon;
   pasteNodeAtCaret(img, textArea);
 }
 

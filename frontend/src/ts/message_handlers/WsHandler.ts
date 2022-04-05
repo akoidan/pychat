@@ -66,7 +66,7 @@ import type {
   DefaultWsOutMessage,
   SyncHistoryOutMessage,
 } from "@/ts/types/messages/wsOutMessages";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
@@ -120,6 +120,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
    * private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
    */
   private wsConnectionId = "";
+
   private readonly sub: Subscription;
 
   constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore, sub: Subscription) {

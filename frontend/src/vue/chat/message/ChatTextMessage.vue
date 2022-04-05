@@ -66,10 +66,8 @@ export default class ChatTextMessage extends Vue {
   get encoded() {
     if (this.smileysLoaded) {
       return this.message.content ? encodeMessageInited(this.message, this.$store, this.$smileyApi) : encodeHTML("This message has been removed");
-    } else {
-      return "";
     }
-
+    return "";
   }
 
   get mainCls() {
@@ -95,7 +93,7 @@ export default class ChatTextMessage extends Vue {
 
   private seEvents() {
     if (!this.smileysLoaded) {
-      return
+      return;
     }
     this.$logger.debug("Setting events")();
     if (this.userSettings.highlightCode) {

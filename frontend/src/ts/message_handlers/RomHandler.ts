@@ -62,7 +62,7 @@ import {
   login,
   logout,
 } from "@/ts/utils/audio";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
@@ -90,6 +90,7 @@ export class RoomHandler extends MessageHandler {
   private readonly ws: WsHandler;
 
   private readonly audioPlayer: AudioPlayer;
+
   private readonly sub: Subscription;
 
   constructor(
@@ -97,7 +98,7 @@ export class RoomHandler extends MessageHandler {
     api: Api,
     ws: WsHandler,
     audioPlayer: AudioPlayer,
-    sub: Subscription
+    sub: Subscription,
   ) {
     super();
     this.store = store;

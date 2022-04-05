@@ -21,7 +21,7 @@ import type {
   DestroyFileConnectionMessage,
   RetryFileMessage,
 } from "@/ts/types/messages/wsInMessages";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileReceiverPeerConnection, "peerConnection:*"> = {

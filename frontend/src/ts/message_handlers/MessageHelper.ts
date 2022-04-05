@@ -10,7 +10,7 @@ import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 export class MessageHelper {
   private readonly logger: Logger;
@@ -40,7 +40,10 @@ export class MessageHelper {
   }
 
   public processAnyMessage() {
-    this.messageBus.notify({action: "scroll", handler: "*"});
+    this.messageBus.notify({
+      action: "scroll",
+      handler: "*",
+    });
   }
 
   private processOpponentMessage(message: MessageModel) {
@@ -50,7 +53,7 @@ export class MessageHelper {
     if (room.notifications) {
       const title = this.store.allUsersDict[message.userId].user;
 
-      let icon: string = resolveMediaUrl(this.store.allUsersDict[message.userId].image) || <string>faviconUrl;
+      let icon: string = resolveMediaUrl(this.store.allUsersDict[message.userId].image) || faviconUrl;
       if (message.files) {
         const fff: FileModel = Object.values(message.files)[0];
         if (fff?.url) {

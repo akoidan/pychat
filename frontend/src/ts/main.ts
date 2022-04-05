@@ -16,7 +16,7 @@ import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import sessionHolder from "@/ts/instances/sessionInstance";
 import type {App as VueApp} from "@vue/runtime-core";
-import type {PlatformUtil, EventTypes} from "@/ts/types/model";
+import type {PlatformUtil} from "@/ts/types/model";
 import Xhr from "@/ts/classes/Xhr";
 import "@/assets/icon.png"; // eslint-disable-line import/no-unassigned-import
 import WsHandler from "@/ts/message_handlers/WsHandler";
@@ -41,8 +41,8 @@ import {
   switchDirective,
   validityDirective,
 } from "@/ts/utils/directives";
-import Subscription from '@/ts/classes/Subscription';
-import { Router } from 'vue-router';
+import Subscription from "@/ts/classes/Subscription";
+import type {Router} from "vue-router";
 
 
 const logger: Logger = loggerFactory.getLoggerColor("main", "#007a70");
@@ -98,10 +98,9 @@ function bootstrapVue(
 // eslint-disable-next-line max-lines-per-function, max-statements
 function init(): void {
 
-
     /**
-   *  Hotfix for Edge 15 for reflect data
-   */
+     *  Hotfix for Edge 15 for reflect data
+     */
 
   if (!window.InputEvent) {
     // @ts-expect-error: next-line

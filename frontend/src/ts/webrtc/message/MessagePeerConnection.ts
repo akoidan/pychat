@@ -39,7 +39,7 @@ import type {
 } from "@/ts/types/messages/innerMessages";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
   connectedToRemote: boolean = true;
@@ -75,7 +75,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     store: DefaultStore,
     userId: number,
     messageHelper: MessageHelper,
-    sub: Subscription
+    sub: Subscription,
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.opponentUserId = userId;

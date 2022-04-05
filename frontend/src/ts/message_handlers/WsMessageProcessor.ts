@@ -4,17 +4,18 @@ import type {
   GrowlMessage,
 } from "@/ts/types/messages/wsInMessages";
 import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
-import Subscription from '@/ts/classes/Subscription';
-import { MessageSupplier } from '@/ts/types/types';
-import { DefaultStore } from '@/ts/classes/DefaultStore';
+import type Subscription from "@/ts/classes/Subscription";
+import type {MessageSupplier} from "@/ts/types/types";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 export class WsMessageProcessor extends AbstractMessageProcessor {
-  private sub: Subscription;
+  private readonly sub: Subscription;
 
   constructor(target: MessageSupplier, store: DefaultStore, label: string, sub: Subscription) {
     super(target, store, label);
     this.sub = sub;
   }
+
   public handleMessage(data: DefaultWsInMessage<string, HandlerName>) {
     if (data.handler !== "void" && data.action !== "growlError") {
       this.sub.notify(data);

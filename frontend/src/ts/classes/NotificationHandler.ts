@@ -17,7 +17,7 @@ import type {
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {MainWindow} from "@/ts/classes/MainWindow";
-import Subscription from '@/ts/classes/Subscription';
+import type Subscription from "@/ts/classes/Subscription";
 
 
 export default class NotifierHandler extends MessageHandler {
