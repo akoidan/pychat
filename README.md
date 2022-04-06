@@ -37,14 +37,14 @@
 - [TODO](#todo)
 
 # About
-Pychat is an opensource absolutely free communcation tool targeted for a company use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
+Pychat is an opensource absolutely free communication tool targeted for a company use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
 
 # When should I use pychat
 |                        | Pychat | Slack | Skype | Telegram | Viber | Discord |
 |------------------------|--------|-------|-------|----------|-------|---------|
 | Open Source            | +      | -     | -     | -        | -     | -       |
 | Free                   | +      | +/-   | +/-   | +        | +/-   | +/-     |
-| Screen sharing         | +      | +     | -     | -        | -     | +       |
+| Screen sharing         | +      | +     | -     | +        | -     | +       |
 | Stream drawing         | +      | -     | -     | -        | -     | -       |
 | Syntax highlight       | +      | -     | -     | -        | -     | +       |
 | Only company users     | +      | +     | -     | -        | -     | +       |
@@ -52,7 +52,7 @@ Pychat is an opensource absolutely free communcation tool targeted for a company
 | Can run on your server | +      | -     | -     | -        | -     | -       |
 | Audio/Video messages   | +      | -     | -     | +        | +     | -       |
 | P2P file sharing       | +      | -     | -     | -        | -     | -       |
-| P2P messaging          | +      | -     | -     | -        | -     | -       |
+| P2P messaging          | +      | -     | -     | +        | -     | -       |
 | Message read status    | +      | -     | +     | +        | +     | -       |
 | Tagging user           | +      | +     | -     | +        | +     | +       |
 | Message threads        | +      | +     | -     | -        | -     | -       |
@@ -71,7 +71,7 @@ I would personally use discord or slack as a company chat. They are built and ma
 # How to host pychat
 
 Notice: 
-pychat is migrating from vue2 to vue3 and this change has been released to master. The older code that supports some feature is still not migrated and located at branch [vue2-webpack](https://github.com/akoidan/pychat/tree/vue2-webpack)
+pychat is migrating from vue2 to vue3 and this change has been released to master. The older code that supports some feature (electron/cordova) is still not migrated and located at branch [vue2-webpack](https://github.com/akoidan/pychat/tree/vue2-webpack)
 
 ## Run test docker image
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
