@@ -37,14 +37,14 @@
 - [TODO](#todo)
 
 # About
-Pychat is an opensource absolutely free communcation tool targeted for a company use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
+Pychat is an opensource absolutely free communication tool targeted for a company use. It's created as alternative to Slack/Discord. See the table below to understand its key features.
 
 # When should I use pychat
 |                        | Pychat | Slack | Skype | Telegram | Viber | Discord |
 |------------------------|--------|-------|-------|----------|-------|---------|
 | Open Source            | +      | -     | -     | -        | -     | -       |
 | Free                   | +      | +/-   | +/-   | +        | +/-   | +/-     |
-| Screen sharing         | +      | +     | -     | -        | -     | +       |
+| Screen sharing         | +      | +     | -     | +        | -     | +       |
 | Stream drawing         | +      | -     | -     | -        | -     | -       |
 | Syntax highlight       | +      | -     | -     | -        | -     | +       |
 | Only company users     | +      | +     | -     | -        | -     | +       |
@@ -52,7 +52,7 @@ Pychat is an opensource absolutely free communcation tool targeted for a company
 | Can run on your server | +      | -     | -     | -        | -     | -       |
 | Audio/Video messages   | +      | -     | -     | +        | +     | -       |
 | P2P file sharing       | +      | -     | -     | -        | -     | -       |
-| P2P messaging          | +      | -     | -     | -        | -     | -       |
+| P2P messaging          | +      | -     | -     | +        | -     | -       |
 | Message read status    | +      | -     | +     | +        | +     | -       |
 | Tagging user           | +      | +     | -     | +        | +     | +       |
 | Message threads        | +      | +     | -     | -        | -     | -       |
@@ -71,7 +71,7 @@ I would personally use discord or slack as a company chat. They are built and ma
 # How to host pychat
 
 Notice: 
-pychat is migrating from vue2 to vue3 and this change has been released to master. The older code that supports some feature is still not migrated and located at branch [vue2-webpack](https://github.com/akoidan/pychat/tree/vue2-webpack)
+pychat is migrating from vue2 to vue3 and this change has been released to master. The older code that supports some feature (electron/cordova) is still not migrated and located at branch [vue2-webpack](https://github.com/akoidan/pychat/tree/vue2-webpack)
 
 ## Run test docker image
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
@@ -234,9 +234,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ## Ssl
 Since we're using self singed certificate your OS doesn't know about for development. We need to do some tricks for browser to make it work. If you have valid certificates for your domain you can skip this step.
 
-1. I used the following commands to generate a new self signed certificate. You can use mine located in `frontend/certs` directory. So you can skip this text
+1. I used the following commands to generate a new self signed certificate. You can use mine located in `frontend/build/certs` directory. So you can skip this text
 ```
-cd frontend/certs
+cd frontend/build/certs
 openssl genrsa -out private.key.pem 4096
 openssl req -new -sha256 -out root.ca.pem -key private.key.pem -subj '/CN=localhost' -extensions EXT -config <( printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
 openssl x509 -req -days 3650 -in root.ca.pem -signkey private.key.pem -out server.crt.pem -extfile ./v3.ext
@@ -248,9 +248,9 @@ Useful links:
 
 2. You have multiple options:
   - Install development certificate on operating system. Each os will require own configuration. E.g. macos do 
-    - ![browser-1](frontend/certs/browser-cert-1.png)
-    - Drag and drop for image near localhost to finder![browser-1](frontend/certs/browser-cert-2.png)
-    - Double click on newly created file and go to All items, select localhost and mark it as 'Always trust' ![macos-cert](frontend/certs/macos-cert-3.png)
+    - ![browser-1](frontend/builds/certs/browser-cert-1.png)
+    - Drag and drop for image near localhost to finder![browser-1](frontend/build/certs/browser-cert-2.png)
+    - Double click on newly created file and go to All items, select localhost and mark it as 'Always trust' ![macos-cert](frontend/build/certs/macos-cert-3.png)
   - Click on Proceed unsafe when accessing your site. Proceed unsafe may be unavailable in some cases. E.g. for MacOS chrome you can use hack: just type [thisisunsafe](https://stackoverflow.com/a/58957322/3872976) while you see certificate error
    -  If you use different ports for back and front (like its described above) you may need to accept certificate from localhost:8888 (use for api) as well. For that open https://localhost:8888 
   - Tell Browser to ignore certificate:
@@ -487,7 +487,6 @@ development.json and production.json have the following format:
   "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username. Don't use RECAPTCHA with this key",
   "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash",
   "ISSUES": "if true navigation bar will display link to reporting a issue page",
-  "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
   "GIPHY_API_KEY": "Api keys that is used to fetch gifs from https://giphy.com/. Be aware, this key is gonna be exposed to frontend. So anyone can steal it. To get those sign up in https://developers.giphy.com/, create a new app and replaced with its key.",
   "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
   "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen",

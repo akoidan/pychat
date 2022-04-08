@@ -23,22 +23,16 @@ emojijson.forEach(e => {
       if (!resultingJson[e.category][hexDecode(e.unified)].skinVariations) {
          resultingJson[e.category][hexDecode(e.unified)].skinVariations = {}
       }
-      // add original smile to skin variation
-      resultingJson[e.category][hexDecode(e.unified)].skinVariations[hexDecode(e.unified)] = {
-         src: e.image, // add ___ prefix ti img value so it can be replaced on regex later
-         alt: e.short_names[0]
-      }
-
       Object.entries(e.skin_variations).forEach(([skinCode, skinValue]) => {
 
          let innerFileName = `emoji-datasource-apple/img/apple/64/${skinValue.image}`;
-         if (!fs.existsSync(`./node_modules/${innerFileName}`)) {
+         if (!fs.existsSync(`../node_modules/${innerFileName}`)) {
             console.warn(`file ${innerFileName} is  missing`);
             return
          }
 
          resultingJson[e.category][hexDecode(e.unified)].skinVariations[hexDecode(skinValue.unified)] = {
-            src:  innerFileName,
+            src:  skinValue.image,
             alt: e.short_names[0]
          }
       })

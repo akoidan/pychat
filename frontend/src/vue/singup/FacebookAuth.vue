@@ -1,42 +1,44 @@
 <template>
   <app-submit
-    v-if="fb_app_id"
-    class="f-icon lor-btn"
-    :value="buttonName"
-    type="button"
+    v-if="fbAppId"
     :running="facebookRunning"
+    :value="buttonName"
+    class="f-icon lor-btn"
     title="Sign in using facebook account"
+    type="button"
     @click.native="facebookLogin"
   />
 </template>
 
 <script lang="ts">
-import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
+import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import { FACEBOOK_APP_ID } from '@/ts/utils/consts';
+  Vue,
+} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {FACEBOOK_APP_ID} from "@/ts/utils/consts";
 
 declare const FB: any;
 
-let fbInited = false; // this is a global variable
+let fbInited = false; // This is a global variable
 
 @Component({
-  name: 'FacebookAuth' ,
-  components: {AppSubmit}
+  name: "FacebookAuth",
+  components: {AppSubmit},
 })
 export default class FacebookAuth extends Vue {
-  public fb_app_id: string = FACEBOOK_APP_ID;
+  public fbAppId: string | false = FACEBOOK_APP_ID;
+
   public frunning: boolean = false;
+
   public facebookApiLoaded: boolean = false;
 
   @Prop()
   public readonly buttonName!: string;
 
-  get facebookRunning() {
+  public get facebookRunning() {
     return this.frunning || !this.facebookApiLoaded;
   }
 
@@ -44,15 +46,15 @@ export default class FacebookAuth extends Vue {
     await this.loadFaceBook();
   }
 
-  @ApplyGrowlErr({ message: 'Unable to load facebook'})
+  @ApplyGrowlErr({message: "Unable to load facebook"})
   public async loadFaceBook(): Promise<void> {
     if (!fbInited && FACEBOOK_APP_ID) {
       await this.$api.loadFacebook();
-      this.$logger.log('Initing facebook sdk...')();
+      this.$logger.log("Initing facebook sdk...")();
       FB.init({
         appId: FACEBOOK_APP_ID,
         xfbml: true,
-        version: 'v2.7'
+        version: "v2.7",
       });
       fbInited = true;
     }
@@ -61,49 +63,57 @@ export default class FacebookAuth extends Vue {
   }
 
 
-  @ApplyGrowlErr({ message: 'Unable to login in with facebook', runningProp: 'frunning'})
-  public async fbStatusChangeIfReAuth(response: {status: string}) {
-    this.$logger.debug('fbStatusChangeIfReAuth {}', response)();
-    if (response.status === 'connected') {
+  @ApplyGrowlErr({
+    message: "Unable to login in with facebook",
+    runningProp: "frunning",
+  })
+  public async fbStatusChangeIfReAuth(response: any) {
+    this.$logger.debug("fbStatusChangeIfReAuth {}", response)();
+    if (response.status === "connected") {
       // Logged into your app and Facebook.
-      this.$store.growlInfo('Successfully logged in into facebook, proceeding...');
-      // the code below doesn't return an email. so fb login would be emailess
-      // let emailResponse = await new Promise((resolve, reject) => {
-      //   FB.api('/me?scope=email', resolve, (a: any,b: any,c: any) => {
-      //     console.error(a,b,c)
-      //     reject();
-      //   })
-      // });
+      this.$store.growlInfo("Successfully logged in into facebook, proceeding...");
+
+      /*
+       * The code below doesn't return an email. so fb login would be emailess
+       * let emailResponse = await new Promise((resolve, reject) => {
+       *   FB.api('/me?scope=email', resolve, (a: any,b: any,c: any) => {
+       *     console.error(a,b,c)
+       *     reject();
+       *   })
+       * });
+       */
 
       await new Promise((resolve, reject) => {
-        // @ts-expect-error
-        this.$emit('token', {resolve, reject, token: response.authResponse.accessToken});
+        this.$emit("token", {
+          resolve,
+          reject,
+          token: response.authResponse.accessToken,
+        });
       });
 
       return false;
-    } else if (response.status === 'not_authorized') {
+    } else if (response.status === "not_authorized") {
       this.frunning = false;
-      this.$store.growlInfo('Allow facebook application to use your data');
+      this.$store.growlInfo("Allow facebook application to use your data");
 
       return false;
-    } else {
-      return true;
     }
+    return true;
   }
 
   public async facebookLogin() {
     this.frunning = true;
 
-    const response: {status: string} = await new Promise(resolve => {
+    const response: {status: string} = await new Promise((resolve) => {
       FB.getLoginStatus(resolve);
     });
 
-    this.$logger.log('fbStatusChange {}', response)();
+    this.$logger.log("fbStatusChange {}", response)();
     if (await this.fbStatusChangeIfReAuth(response)) {
-      this.$logger.log('Fblogin')();
+      this.$logger.log("Fblogin")();
       const response: {status: string} = await new Promise((resolve, reject) => {
         FB.login(resolve, {
-          auth_type: 'reauthenticate'
+          auth_type: "reauthenticate",
         });
       });
       await this.fbStatusChangeIfReAuth(response);
@@ -114,27 +124,27 @@ export default class FacebookAuth extends Vue {
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  .f-icon
-    font: 12px Oswald
-    position: relative
-    flex-grow: 1
+.f-icon
+  font: 12px Oswald
+  position: relative
+  flex-grow: 1
 
-    margin-left: 0
-    overflow: hidden
+  margin-left: 0
+  overflow: hidden
 
-    &:before
-      content: ''
-      bottom: 0
-      // expand to height
-      right: 0
-      // expand to width
-      position: absolute
-      background: url('@/assets/img/f-icon.svg') no-repeat
-      top: 5px
-      left: 10px
+  &:before
+    content: ''
+    bottom: 0
+    // expand to height
+    right: 0
+    // expand to width
+    position: absolute
+    background: url('@/assets/img/f-icon.svg') no-repeat
+    top: 5px
+    left: 10px
 
-    &:active:before
-      top: 7px
-      left: 12px
+  &:active:before
+    top: 7px
+    left: 12px
 
 </style>

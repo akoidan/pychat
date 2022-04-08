@@ -1,13 +1,13 @@
-import {MessageStatus} from '@/ts/types/model';
+import type {MessageStatus} from "@/ts/types/model";
 
 export interface MessageP2pDto {
   id: number;
-  content: string|null;
+  content: string | null;
   files: Record<string, FileP2pDto>;
   timeAgo: number;
-  symbol: string|null;
+  symbol: string | null;
   status: MessageStatus;
-  parentMessage: number|null;
+  parentMessage: number | null;
   deleted: boolean;
   edited: number;
   userId: number;
@@ -18,4 +18,4 @@ export interface FileP2pDto {
   name: string;
 }
 
-export type MessagesInfo = Record<string, number|null>;
+export type MessagesInfo = Record<string, number | null>;

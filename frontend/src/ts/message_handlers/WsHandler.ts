@@ -1,52 +1,46 @@
 import {
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
-  IS_DEBUG,
   FLAGS,
-  LOG_LEVEL_LS
-} from '@/ts/utils/consts';
-import {
+  IS_DEBUG,
+  LOG_LEVEL_LS,
+} from "@/ts/utils/consts";
+import type {
   Logger,
   LogLevel,
-} from 'lines-logger';
-import loggerFactory from '@/ts/instances/loggerFactory';
-import MessageHandler from '@/ts/message_handlers/MesageHandler';
-import {
-  CurrentUserInfoModel,
+} from "lines-logger";
+import loggerFactory from "@/ts/instances/loggerFactory";
+import MessageHandler from "@/ts/message_handlers/MesageHandler";
+import type {
   CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
   Location,
   MessageStatus,
-  UserModel
-} from '@/ts/types/model';
-import {
+} from "@/ts/types/model";
+import type {
   MessageSupplier,
-  SessionHolder
-} from '@/ts/types/types';
+  SessionHolder,
+} from "@/ts/types/types";
 import {
   convertLocation,
-  convertUser,
   currentUserInfoDtoToModel,
-  userSettingsDtoToModel
-} from '@/ts/types/converters';
-import {
+  userSettingsDtoToModel,
+} from "@/ts/types/converters";
+import type {
   GiphyDto,
-  MessageModelDto,
   RoomNoUsersDto,
   UserProfileDto,
   UserProfileDtoWoImage,
-  UserSettingsDto
-} from '@/ts/types/dto';
-import { sub } from '@/ts/instances/subInstance';
-import { DefaultStore } from '@/ts/classes/DefaultStore';
-import {WsMessageProcessor }from '@/ts/message_handlers/WsMessageProcessor';
-import {
+  UserSettingsDto,
+} from "@/ts/types/dto";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
+import type {
   AddChannelMessage,
   AddInviteMessage,
   AddRoomMessage,
-  DefaultWsInMessage,
-  DeleteMessage,
-  EditMessage,
+  GetCountryCodeMessage,
+  MessagesResponseMessage,
   PingMessage,
   PongMessage,
   PrintMessage,
@@ -55,135 +49,157 @@ import {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
-  MessagesResponseMessage,
+  SyncHistoryResponseMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
-  SyncHistoryResponseMessage,
-  GetCountryCodeMessage
-} from '@/ts/types/messages/wsInMessages';
-import {
+} from "@/ts/types/messages/wsInMessages";
+import type {
   InternetAppearMessage,
   LogoutMessage,
-  PubSetRooms
-} from '@/ts/types/messages/innerMessages';
-import {
+  PubSetRooms,
+} from "@/ts/types/messages/innerMessages";
+import type {
   HandlerType,
-  HandlerTypes
-} from '@/ts/types/messages/baseMessagesInterfaces';
-import {
+  HandlerTypes,
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import type {
   DefaultWsOutMessage,
-  SyncHistoryOutMessage
-} from '@/ts/types/messages/wsOutMessages';
+  SyncHistoryOutMessage,
+} from "@/ts/types/messages/wsOutMessages";
+import type Subscription from "@/ts/classes/Subscription";
 
 enum WsState {
-  NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
+  NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
 }
 
 export default class WsHandler extends MessageHandler implements MessageSupplier {
-  // how much current time is ahead of the server time
-  // if current time is in the past it will be negative
-  private timeDiffWithServer: number = 0;
-
   protected readonly logger: Logger;
 
-  protected readonly handlers: HandlerTypes<keyof WsHandler, 'ws'> = {
-    setSettings: <HandlerType<'setSettings', 'ws'>>this.setSettings,
-    setUserProfile: <HandlerType<'setUserProfile', 'ws'>>this.setUserProfile,
-    setProfileImage: <HandlerType<'setProfileImage', 'ws'>>this.setProfileImage,
-    setWsId: <HandlerType<'setWsId', 'ws'>>this.setWsId,
-    logout: <HandlerType<'logout', 'ws'>>this.logout,
-    userProfileChanged: <HandlerType<'userProfileChanged', 'ws'>>this.userProfileChanged,
-    ping: <HandlerType<'ping', 'ws'>>this.ping,
-    pong: <HandlerType<'pong', 'ws'>> this.pong
+  protected readonly handlers: HandlerTypes<keyof WsHandler, "ws"> = {
+    setSettings: <HandlerType<"setSettings", "ws">> this.setSettings,
+    setUserProfile: <HandlerType<"setUserProfile", "ws">> this.setUserProfile,
+    setProfileImage: <HandlerType<"setProfileImage", "ws">> this.setProfileImage,
+    setWsId: <HandlerType<"setWsId", "ws">> this.setWsId,
+    logout: <HandlerType<"logout", "ws">> this.logout,
+    userProfileChanged: <HandlerType<"userProfileChanged", "ws">> this.userProfileChanged,
+    ping: <HandlerType<"ping", "ws">> this.ping,
+    pong: <HandlerType<"pong", "ws">> this.pong,
   };
 
-  private pingTimeoutFunction: number|null = null;
+
+  /*
+   * How much current time is ahead of the server time
+   * if current time is in the past it will be negative
+   */
+  private timeDiffWithServer: number = 0;
+
+  private pingTimeoutFunction: number | null = null;
+
   private ws: WebSocket | null = null;
+
   private noServerPingTimeout: any;
+
   private readonly store: DefaultStore;
+
   private readonly sessionHolder: SessionHolder;
-  private listenWsTimeout: number|null = null;
+
+  private listenWsTimeout: number | null = null;
+
   private readonly API_URL: string;
+
   private readonly messageProc: WsMessageProcessor;
+
   private wsState: WsState = WsState.NOT_INITED;
 
-  // this.dom = {
-  //   onlineStatus: $('onlineStatus'),
-  //   onlineClass: 'online',
-  //   offlineClass: OFFLINE_CLASS
-  // };
-  // private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
-  private wsConnectionId = '';
+  /*
+   * This.dom = {
+   *   onlineStatus: $('onlineStatus'),
+   *   onlineClass: 'online',
+   *   offlineClass: OFFLINE_CLASS
+   * };
+   * private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
+   */
+  private wsConnectionId = "";
 
-  constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore) {
+  private readonly sub: Subscription;
+
+  public constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore, sub: Subscription) {
     super();
-    sub.subscribe('ws', this);
+    this.sub = sub;
+    this.sub.subscribe("ws", this);
     this.API_URL = API_URL;
-    this.messageProc = new WsMessageProcessor(this, store, 'ws');
-    this.logger = loggerFactory.getLoggerColor('ws', '#4c002b');
+    this.messageProc = new WsMessageProcessor(this, store, "ws", sub);
+    this.logger = loggerFactory.getLoggerColor("ws", "#4c002b");
     this.sessionHolder = sessionHolder;
     this.store = store;
+  }
+
+  private get wsUrl() {
+    return `${this.API_URL}?id=${this.wsConnectionId}&sessionId=${this.sessionHolder.session}`;
   }
 
   sendRawTextToServer(message: string): boolean {
     if (this.isWsOpen()) {
       this.ws!.send(message);
       return true;
-    } else {
-      return false;
     }
+    return false;
   }
 
-  public getWsConnectionId () {
+  public getWsConnectionId() {
     return this.wsConnectionId;
   }
 
   public async getCountryCode(): Promise<GetCountryCodeMessage> {
     return this.messageProc.sendToServerAndAwait({
-      action: 'getCountryCode'
+      action: "getCountryCode",
     });
   }
 
-  public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number|null): Promise<WebRtcSetConnectionIdMessage> {
+  public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number | null): Promise<WebRtcSetConnectionIdMessage> {
     return this.messageProc.sendToServerAndAwait({
-      action: 'offerFile',
+      action: "offerFile",
       roomId,
       threadId,
-      content: {browser, name, size}
+      content: {
+        browser,
+        name,
+        size,
+      },
     });
   }
 
   public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdMessage> {
     return this.messageProc.sendToServerAndAwait({
-      action: 'offerCall',
-      roomId: roomId,
-      content: {browser}
+      action: "offerCall",
+      roomId,
+      content: {browser},
     });
   }
 
   public acceptFile(connId: string, received: number) {
     this.sendToServer({
-      action: 'acceptFile',
+      action: "acceptFile",
       connId,
       content: {
-        received
-      }
+        received,
+      },
     });
   }
 
   public replyFile(connId: string, browser: string) {
     this.sendToServer({
-      action: 'replyFile',
+      action: "replyFile",
       connId,
-      content: {browser}
+      content: {browser},
     });
   }
 
   public destroyFileConnection(connId: string, content: unknown) {
     this.sendToServer({
       content,
-      action: 'destroyFileConnection',
-      connId
+      action: "destroyFileConnection",
+      connId,
     });
   }
 
@@ -191,113 +207,113 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.sendToServer({
       content,
       opponentWsId,
-      action: 'destroyFileConnection',
-      connId
+      action: "destroyFileConnection",
+      connId,
     });
   }
 
   public async search(
-      searchString: string,
-      roomId: number,
-      offset: number,
+    searchString: string,
+    roomId: number,
+    offset: number,
   ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       searchString,
       roomId,
       offset,
-      action: 'searchMessages'
+      action: "searchMessages",
     });
   }
 
   public sendEditMessage(
-      content: string|null,
-      id: number,
-      files: number[] | null,
-      tags: Record<string, number>,
-      giphies: GiphyDto[]
+    content: string | null,
+    id: number,
+    files: number[] | null,
+    tags: Record<string, number>,
+    giphies: GiphyDto[],
   ) {
     const newVar = {
       id,
-      action: 'editMessage',
+      action: "editMessage",
       files,
       tags,
       giphies,
-      content
+      content,
     };
     this.sendToServer(newVar, true);
   }
 
   public async sendPrintMessage(
-      content: string,
-      roomId: number,
-      files: number[],
-      id: number,
-      timeDiff: number,
-      parentMessage: number|null,
-      tags: Record<string, number>,
-      giphies: GiphyDto[],
+    content: string,
+    roomId: number,
+    files: number[],
+    id: number,
+    timeDiff: number,
+    parentMessage: number | null,
+    tags: Record<string, number>,
+    giphies: GiphyDto[],
   ): Promise<PrintMessage> {
     const newVar = {
       files,
       id,
       timeDiff,
-      action: 'printMessage',
+      action: "printMessage",
       content,
       tags,
       parentMessage,
       roomId,
-      giphies
+      giphies,
     };
     return this.messageProc.sendToServerAndAwait(newVar);
   }
 
-  public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage|unknown> {
+  public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage | unknown> {
     return this.messageProc.sendToServerAndAwait({
-      action: 'setSettings',
-      content
+      action: "setSettings",
+      content,
     });
   }
 
   public showIType(roomId: number): void {
     this.sendToServer({
       roomId,
-      action: 'showIType'
+      action: "showIType",
     });
   }
 
-  public async saveUser(content: UserProfileDtoWoImage): Promise<SetUserProfileMessage|unknown> {
+  public async saveUser(content: UserProfileDtoWoImage): Promise<SetUserProfileMessage | unknown> {
     return this.messageProc.sendToServerAndAwait({
-      action: 'setUserProfile',
-      content
+      action: "setUserProfile",
+      content,
     });
   }
 
-  public async sendAddRoom(name: string|null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number|null): Promise<AddRoomMessage> {
+  public async sendAddRoom(name: string | null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number | null): Promise<AddRoomMessage> {
     return this.messageProc.sendToServerAndAwait({
       users,
       name,
       p2p,
       channelId,
-      action: 'addRoom',
+      action: "addRoom",
       volume,
-      notifications
+      notifications,
     });
   }
 
   public async syncHistory(
-      roomIds: number[],
-      messagesIds: number[],
-      receivedMessageIds: number[],
-      onServerMessageIds: number[],
-      lastSynced: number
+    roomIds: number[],
+    messagesIds: number[],
+    receivedMessageIds: number[],
+    onServerMessageIds: number[],
+    lastSynced: number,
   ): Promise<SyncHistoryResponseMessage> {
-    let payload: SyncHistoryOutMessage = {
+    const payload: SyncHistoryOutMessage = {
       messagesIds,
       receivedMessageIds,
       onServerMessageIds,
       roomIds,
       lastSynced,
-      action: 'syncHistory'
+      action: "syncHistory",
     };
     return this.messageProc.sendToServerAndAwait(payload);
   }
@@ -306,40 +322,40 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.messageProc.sendToServerAndAwait({
       channelName,
       users,
-      action: 'addChannel'
+      action: "addChannel",
     });
   }
 
   public async sendRoomSettings(message: RoomNoUsersDto): Promise<void> {
     return this.messageProc.sendToServerAndAwait({
       ...message,
-      action: 'saveRoomSettings'
+      action: "saveRoomSettings",
     });
   }
 
   public async sendDeleteChannel(channelId: number): Promise<unknown> {
     return this.messageProc.sendToServerAndAwait({
       channelId,
-      action: 'deleteChannel'
+      action: "deleteChannel",
     });
   }
 
   public async sendLeaveChannel(channelId: number): Promise<unknown> {
     return this.messageProc.sendToServerAndAwait({
       channelId,
-      action: 'leaveChannel'
+      action: "leaveChannel",
     });
   }
 
   public async saveChannelSettings(
-      channelName: string,
-      channelId: number,
-      channelCreatorId: number,
-      volume: number,
-      notifications: boolean,
-    ): Promise<SaveChannelSettingsMessage> {
+    channelName: string,
+    channelId: number,
+    channelCreatorId: number,
+    volume: number,
+    notifications: boolean,
+  ): Promise<SaveChannelSettingsMessage> {
     return this.messageProc.sendToServerAndAwait({
-      action: 'saveChannelSettings',
+      action: "saveChannelSettings",
       channelId,
       channelCreatorId,
       channelName,
@@ -352,106 +368,111 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.messageProc.sendToServerAndAwait({
       roomId,
       users,
-      action: 'inviteUser'
+      action: "inviteUser",
     });
   }
 
   public async startListening(): Promise<void> {
-    return new Promise(((resolve, reject) => {
-      this.logger.log('Starting webSocket')();
+    return new Promise((resolve, reject) => {
+      this.logger.log("Starting webSocket")();
       if (!this.listenWsTimeout && !this.ws) {
         this.ws = new WebSocket(this.wsUrl);
         this.ws.onmessage = this.onWsMessage.bind(this);
         this.ws.onclose = (e) => {
-          setTimeout(() => reject(Error('Cannot connect to websocket')));
+          setTimeout(() => {
+            reject(Error("Cannot connect to websocket"));
+          });
           this.onWsClose(e);
-        }
+        };
         this.ws.onopen = () => {
           setTimeout(resolve);
           this.onWsOpen();
-        }
+        };
       } else {
         resolve();
       }
-    }));
+    });
   }
 
   public pingServer() {
-    this.sendToServer({action: 'ping'}, true);
-    // TODO not used
-    // this.answerPong();
-    // this.pingTimeoutFunction = setTimeout(() => {
-    //   this.logger.error('Force closing socket coz pong time out')();
-    //   this.ws.close(1000, 'Ping timeout');
-    // }, PING_CLOSE_JS_DELAY);
-    //
+    this.sendToServer({action: "ping"}, true);
+
+    /*
+     * TODO not used
+     * this.answerPong();
+     * this.pingTimeoutFunction = setTimeout(() => {
+     *   this.logger.error('Force closing socket coz pong time out')();
+     *   this.ws.close(1000, 'Ping timeout');
+     * }, PING_CLOSE_JS_DELAY);
+     *
+     */
   }
 
   public logout(a: LogoutMessage) {
     const info = [];
     if (this.listenWsTimeout) {
       this.listenWsTimeout = null;
-      info.push('purged timeout');
+      info.push("purged timeout");
     }
     if (this.ws) {
       this.ws.onclose = null;
-      info.push('closed ws');
+      info.push("closed ws");
       this.ws.close();
       this.ws = null;
     }
-    this.logger.debug('Finished ws: {}', info.join(', '))();
+    this.logger.debug("Finished ws: {}", info.join(", "))();
   }
 
   public async sendDeleteRoom(roomId: number) {
     return this.messageProc.sendToServerAndAwait({
       roomId,
-      action: 'deleteRoom'
+      action: "deleteRoom",
     });
   }
 
   public async sendLeaveRoom(roomId: number) {
     return this.messageProc.sendToServerAndAwait({
       roomId,
-      action: 'leaveUser'
+      action: "leaveUser",
     });
   }
 
   public async setMessageStatus(
-      messagesIds: number[],
-      roomId: number,
-      status: MessageStatus
+    messagesIds: number[],
+    roomId: number,
+    status: MessageStatus,
   ) {
     return this.messageProc.sendToServerAndAwait({
       messagesIds,
-      action: 'setMessageStatus',
+      action: "setMessageStatus",
       status,
-      roomId // this room event will be published to
+      roomId, // This room event will be published to
     });
   }
 
   public async sendLoadMessages(
-      roomId: number,
-      count: number,
-      threadId: number|null,
-      excludeIds: number[]
+    roomId: number,
+    count: number,
+    threadId: number | null,
+    excludeIds: number[],
   ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       count,
       excludeIds,
       threadId,
-      action: 'loadMessages',
-      roomId
+      action: "loadMessages",
+      roomId,
     });
   }
 
   public async sendLoadMessagesByIds(
-      roomId: number,
-      messagesIds: number[]
+    roomId: number,
+    messagesIds: number[],
   ): Promise<MessagesResponseMessage> {
     return this.messageProc.sendToServerAndAwait({
       messagesIds,
-      action: 'loadMessagesByIds',
-      roomId
+      action: "loadMessagesByIds",
+      roomId,
     });
   }
 
@@ -459,58 +480,61 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.ws?.readyState === WebSocket.OPEN;
   }
 
-  public sendRtcData(content: RTCSessionDescriptionInit| RTCIceCandidate, connId: string, opponentWsId: string) {
+  public sendRtcData(content: RTCIceCandidate | RTCSessionDescriptionInit, connId: string, opponentWsId: string) {
     this.sendToServer({
       content,
       connId,
       opponentWsId,
-      action: 'sendRtcData'
+      action: "sendRtcData",
     });
   }
 
   public retry(connId: string, opponentWsId: string) {
-    this.sendToServer({action: 'retryFile',  connId, opponentWsId});
+    this.sendToServer({
+      action: "retryFile",
+      connId,
+      opponentWsId,
+    });
   }
 
   public replyCall(connId: string, browser: string) {
     this.sendToServer({
-      action: 'replyCall',
+      action: "replyCall",
       connId,
       content: {
-        browser
-      }
+        browser,
+      },
     });
   }
 
-  public destroyCallConnection(connId: string, content: 'decline'| 'hangup') {
+  public destroyCallConnection(connId: string, content: "decline" | "hangup") {
     this.sendToServer({
-      content: content,
-      action: 'destroyCallConnection',
-      connId
+      content,
+      action: "destroyCallConnection",
+      connId,
     });
   }
 
   public async offerMessageConnection(roomId: number): Promise<WebRtcSetConnectionIdMessage> {
     return this.messageProc.sendToServerAndAwait({
-      action: 'offerMessage',
-      roomId: roomId
+      action: "offerMessage",
+      roomId,
     });
   }
 
   public acceptCall(connId: string) {
     this.sendToServer({
-      action: 'acceptCall',
-      connId
+      action: "acceptCall",
+      connId,
     });
   }
 
   public joinCall(connId: string) {
     this.sendToServer({
-      action: 'joinCall',
-      connId
+      action: "joinCall",
+      connId,
     });
   }
-
 
   public setSettings(m: SetSettingsMessage) {
     const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
@@ -519,7 +543,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   public setUserProfile(m: SetUserProfileMessage) {
     const a: CurrentUserInfoWoImage = currentUserInfoDtoToModel(m.content);
-    a.userId = this.store.userInfo!.userId; // this could came only when we logged in
+    a.userId = this.store.userInfo!.userId; // This could came only when we logged in
     this.store.setUserInfo(a);
   }
 
@@ -528,7 +552,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public convertServerTimeToPC(serverTime: number) {
-    return serverTime + this.timeDiffWithServer; // serverTime + (Date.now - serverTime) === Date.now
+    return serverTime + this.timeDiffWithServer; // ServerTime + (Date.now - serverTime) === Date.now
   }
 
   public async setWsId(message: SetWsIdMessage) {
@@ -538,24 +562,24 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.setUserImage(message.userInfo.userImage);
     this.timeDiffWithServer = Date.now() - message.time;
     const pubSetRooms: PubSetRooms = {
-      action: 'init',
+      action: "init",
       channels: message.channels,
-      handler: 'room',
+      handler: "room",
       rooms: message.rooms,
       online: message.online,
-      users: message.users
+      users: message.users,
     };
-    sub.notify(pubSetRooms);
+    this.sub.notify(pubSetRooms);
     const inetAppear: InternetAppearMessage = {
-      action: 'internetAppear',
-      handler: 'any'
+      action: "internetAppear",
+      handler: "*",
     };
 
-    sub.notify(inetAppear);
-    this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+    this.sub.notify(inetAppear);
+    this.logger.debug("CONNECTION ID HAS BEEN SET TO {})", this.wsConnectionId)();
     if (FLAGS) {
-      let getCountryCodeMessage = await this.getCountryCode();
-      let modelLocal: Record<string, Location> = {}
+      const getCountryCodeMessage = await this.getCountryCode();
+      const modelLocal: Record<string, Location> = {};
       Object.entries(getCountryCodeMessage.content).forEach(([k, v]) => {
         modelLocal[k] = convertLocation(v);
       });
@@ -568,23 +592,35 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       id: message.userId,
       user: message.user,
       image: message.userImage,
-      sex: message.sex
+      sex: message.sex,
     });
   }
 
   public ping(message: PingMessage) {
     this.startNoPingTimeout();
-    this.sendToServer({action: 'pong', time: message.time});
+    this.sendToServer({
+      action: "pong",
+      time: message.time,
+    });
   }
 
   public pong(message: PongMessage) {
-  // private answerPong() {
+    // Private answerPong() {
     if (this.pingTimeoutFunction) {
-      this.logger.debug('Clearing pingTimeoutFunction')();
+      this.logger.debug("Clearing pingTimeoutFunction")();
       clearTimeout(this.pingTimeoutFunction);
       this.pingTimeoutFunction = null;
     }
     // }
+  }
+
+  notifyCallActive(param: {connectionId: string | null; opponentWsId: string; roomId: number}) {
+    this.sendToServer({
+      action: "notifyCallActive",
+      connId: param.connectionId,
+      opponentWsId: param.opponentWsId,
+      roomId: param.roomId,
+    });
   }
 
   private setUserInfo(userInfo: UserProfileDto) {
@@ -594,7 +630,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   private setUserSettings(userInfo: UserSettingsDto) {
     const um: UserSettingsDto = userSettingsDtoToModel(userInfo);
-    const logLevel: LogLevel =  userInfo.logs || (IS_DEBUG ? 'trace' : 'error');
+    const logLevel: LogLevel = userInfo.logs || (IS_DEBUG ? "trace" : "error");
     localStorage.setItem(LOG_LEVEL_LS, logLevel);
     loggerFactory.setLogWarnings(logLevel);
     this.store.setUserSettings(um);
@@ -604,63 +640,69 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.store.setUserImage(image);
   }
 
+  /*
+   * Private hideGrowlProgress(key: number) {
+   *   let progInter = this.progressInterval[key];
+   *   if (progInter) {
+   *     this.logger.debug('Removing progressInterval {}', key)();
+   *     progInter.growl.hide();
+   *     if (progInter.interval) {
+   *       clearInterval(progInter.interval);
+   *     }
+   *     delete this.progressInterval[key];
+   *   }
+   * }
+   */
+
+
+  /*
+   * SendPreventDuplicates(data, skipGrowl) {
+   *   this.messageId++;
+   *   data.messageId = this.messageId;
+   *   let jsonRequest = JSON.stringify(data);
+   *   if (!this.duplicates[jsonRequest]) {
+   *     this.duplicates[jsonRequest] = Date.now();
+   *     this.sendRawTextToServer(jsonRequest, skipGrowl, data);
+   *     setTimeout(() => {
+   *       delete this.duplicates[jsonRequest];
+   *     }, 5000);
+   *   } else {
+   *     this.logger.warn('blocked duplicate from sending: {}', jsonRequest)();
+   *   }
+   * }
+   */
+
   private onWsOpen() {
     this.setStatus(true);
     this.startNoPingTimeout();
     this.wsState = WsState.CONNECTED;
-    this.logger.debug('Connection has been established')();
+    this.logger.debug("Connection has been established")();
   }
 
   private onWsMessage(message: MessageEvent) {
-    let data = this.messageProc.parseMessage(message.data);
+    const data = this.messageProc.parseMessage(message.data);
     if (data) {
       this.messageProc.handleMessage(data);
     }
   }
 
-  // private hideGrowlProgress(key: number) {
-  //   let progInter = this.progressInterval[key];
-  //   if (progInter) {
-  //     this.logger.debug('Removing progressInterval {}', key)();
-  //     progInter.growl.hide();
-  //     if (progInter.interval) {
-  //       clearInterval(progInter.interval);
-  //     }
-  //     delete this.progressInterval[key];
-  //   }
-  // }
-
-
-  // sendPreventDuplicates(data, skipGrowl) {
-  //   this.messageId++;
-  //   data.messageId = this.messageId;
-  //   let jsonRequest = JSON.stringify(data);
-  //   if (!this.duplicates[jsonRequest]) {
-  //     this.duplicates[jsonRequest] = Date.now();
-  //     this.sendRawTextToServer(jsonRequest, skipGrowl, data);
-  //     setTimeout(() => {
-  //       delete this.duplicates[jsonRequest];
-  //     }, 5000);
-  //   } else {
-  //     this.logger.warn('blocked duplicate from sending: {}', jsonRequest)();
-  //   }
-  // }
-
   private setStatus(isOnline: boolean) {
     this.store.setIsOnline(isOnline);
-    this.logger.debug('Setting online to {}', isOnline)();
+    this.logger.debug("Setting online to {}", isOnline)();
   }
 
-
   private onWsClose(e: CloseEvent) {
-    this.logger.log('Got onclose event')();
+    this.logger.log("Got onclose event")();
     this.ws = null;
     this.setStatus(false);
-    // tornado drops connection if exception occurs during processing an event we send from WsHandler
-    this.messageProc.onDropConnection(e.code === 1006 ? 'Server error' : 'Connection to server is lost')
-    // for (let k in this.progressInterval) {
-    //   this.hideGrowlProgress(k);
-    // }
+    // Tornado drops connection if exception occurs during processing an event we send from WsHandler
+    this.messageProc.onDropConnection(e.code === 1006 ? "Server error" : "Connection to server is lost");
+
+    /*
+     * For (let k in this.progressInterval) {
+     *   this.hideGrowlProgress(k);
+     * }
+     */
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
       this.noServerPingTimeout = null;
@@ -668,29 +710,33 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     const reason = e.reason || e;
     if (e.code === 403) {
       const message = `Server has forbidden request because '${reason}'. Logging out...`;
-      this.logger.error('onWsClose {}', message)();
+      this.logger.error("onWsClose {}", message)();
       this.store.growlError(message);
-      let message1: LogoutMessage = {
-        action: 'logout',
-        handler: 'any'
+      const message1: LogoutMessage = {
+        action: "logout",
+        handler: "*",
       };
-      sub.notify(message1);
+      this.sub.notify(message1);
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
-      // this.store.growlError( 'Can\'t establish connection with server');
-      this.logger.warn('Chat server is down because {}', reason)();
+      // This.store.growlError( 'Can\'t establish connection with server');
+      this.logger.warn("Chat server is down because {}", reason)();
       this.wsState = WsState.TRIED_TO_CONNECT;
     } else if (this.wsState === WsState.CONNECTED) {
-      // this.store.growlError( `Connection to chat server has been lost, because ${reason}`);
+      // This.store.growlError( `Connection to chat server has been lost, because ${reason}`);
       this.logger.error(
-          'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
-          e.reason, CONNECTION_RETRY_TIME)();
+        "Connection to WebSocket has failed because \"{}\". Trying to reconnect every {}ms",
+        e.reason,
+        CONNECTION_RETRY_TIME,
+      )();
     }
     if (this.wsState !== WsState.TRIED_TO_CONNECT) {
       this.wsState = WsState.CONNECTION_IS_LOST;
     }
     // Try to reconnect in 10 seconds
-    this.listenWsTimeout = window.setTimeout(() => this.listenWS(), CONNECTION_RETRY_TIME);
+    this.listenWsTimeout = window.setTimeout(() => {
+      this.listenWS();
+    }, CONNECTION_RETRY_TIME);
   }
 
   private listenWS() {
@@ -700,39 +746,25 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.ws.onopen = this.onWsOpen.bind(this);
   }
 
-  private get wsUrl() {
-    return `${this.API_URL}?id=${this.wsConnectionId}&sessionId=${this.sessionHolder.session}`;
-  }
-
   private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
     const isSent = this.messageProc.sendToServer(messageRequest);
     if (!isSent && !skipGrowl) {
-      this.logger.warn('Can\'t send message, because connection is lost :(')();
+      this.logger.warn("Can't send message, because connection is lost :(")();
     }
     return isSent;
   }
 
-
   private startNoPingTimeout() {
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
-      this.logger.debug('Clearing noServerPingTimeout')();
+      this.logger.debug("Clearing noServerPingTimeout")();
       this.noServerPingTimeout = null;
     }
     this.noServerPingTimeout = setTimeout(() => {
       if (this.ws) {
-        this.logger.error('Force closing socket coz server didn\'t ping us')();
-        this.ws.close(1000, 'Sever didn\'t ping us');
+        this.logger.error("Force closing socket coz server didn't ping us")();
+        this.ws.close(1000, "Sever didn't ping us");
       }
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
-  }
-
-  notifyCallActive(param: { connectionId: string | null; opponentWsId: string; roomId: number }) {
-    this.sendToServer({
-      action: 'notifyCallActive',
-      connId: param.connectionId,
-      opponentWsId: param.opponentWsId,
-      roomId: param.roomId
-    })
   }
 }

@@ -12,12 +12,12 @@
             <input
               v-model="password"
               autocomplete="password"
-              required
               class="input"
-              type="password"
-              name="password"
               minlength="3"
-            >
+              name="password"
+              required
+              type="password"
+            />
           </td>
         </tr>
         <tr>
@@ -25,19 +25,19 @@
           <td>
             <input
               v-model="email"
-              maxlength="190"
               class="input"
+              maxlength="190"
               type="email"
-            >
+            />
           </td>
         </tr>
       </tbody>
       <tr>
         <td colspan="2">
           <app-submit
+            :running="running"
             class="green-btn"
             value="Apply Password"
-            :running="running"
           />
         </td>
       </tr>
@@ -45,19 +45,26 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/ts/instances/storeInstance';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import {CurrentUserInfoModel} from '@/ts/types/model';
-import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
+import {
+  ApplyGrowlErr,
+  State,
+} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue,
+} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {CurrentUserInfoModel} from "@/ts/types/model";
+
 @Component({
-  name: 'UserProfileChangeEmail' ,
-  components: {AppSubmit}
+  name: "UserProfileChangeEmail",
+  components: {AppSubmit},
 })
 export default class UserProfileChangeEmail extends Vue {
+  public password: string = "";
 
-  public password: string = '';
-  public email: string = '';
+  public email: string = "";
+
   public running: boolean = false;
 
   @State
@@ -67,10 +74,13 @@ export default class UserProfileChangeEmail extends Vue {
     this.email = this.userInfo.email;
   }
 
-  @ApplyGrowlErr({ message: 'Unable to change email', runningProp: 'running'})
+  @ApplyGrowlErr({
+    message: "Unable to change email",
+    runningProp: "running",
+  })
   public async saveProfile() {
     await this.$api.changeEmailLogin(this.email, this.password);
-    this.$store.growlSuccess('Email has been changed');
+    this.$store.growlSuccess("Email has been changed");
   }
 }
 </script>

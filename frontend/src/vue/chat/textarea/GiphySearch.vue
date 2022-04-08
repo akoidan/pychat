@@ -4,10 +4,10 @@
     <div class="giphy-header">
       <input
         v-model="search"
-        type="search"
         class="input"
         maxlength="50"
-      >
+        type="search"
+      />
       <i
         class="icon-cancel-circled-outline"
         title="Close"
@@ -26,15 +26,15 @@
       <app-loading-image
         v-for="gif in images"
         :key="gif.id"
-        @click.native="addGihpy(gif)"
-        class="img-wrapper"
         :src="getImageSrc(gif)"
+        class="img-wrapper"
+        @click.native="addGihpy(gif)"
       />
       <input
-        type="button"
-        class="lor-btn"
         v-if="showLoadMoreBtn"
         :value="`Load ${pagination.total_count - pagination.offset} more`"
+        class="lor-btn"
+        type="button"
         @click="fetchGiphies"
       />
     </div>
@@ -44,27 +44,44 @@
 <script lang="ts">
 import {
   Component,
-  Prop,
+  Emit,
+  Ref,
   Vue,
   Watch,
-  Ref,
-  Emit
 } from "vue-property-decorator";
-import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import AppSuspense from '@/vue/ui/AppSuspense.vue';
-import {webpSupported} from '@/ts/utils/runtimeConsts';
+import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import AppSuspense from "@/vue/ui/AppSuspense.vue";
+import {webpSupported} from "@/ts/utils/runtimeConsts";
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 import type {
   GIFObject,
-  MultiResponse
-} from 'giphy-api';
-import AppLoadingImage from '@/vue/ui/AppLoadingImage.vue';
-import { LOAD_GIPHIES_PER_REQUEST } from '@/ts/utils/consts';
+  MultiResponse,
+} from "giphy-api";
+import AppLoadingImage from "@/vue/ui/AppLoadingImage.vue";
+import {LOAD_GIPHIES_PER_REQUEST} from "@/ts/utils/consts";
 
 @Component({
-  components: {AppLoadingImage, AppSuspense, AppSubmit}
+  components: {
+    AppLoadingImage,
+    AppSuspense,
+    AppSubmit,
+  },
 })
 export default class GiphySearch extends Vue {
+  public search: string = "";
+
+  public pagination: MultiResponse["pagination"] = {
+    count: 0,
+    offset: 0,
+    total_count: 0,
+  };
+
+  public moreLoading: boolean = false;
+
+  public images: GIFObject[] = [];
+
+  public request: XMLHttpRequest | null = null;
 
   @Ref()
   private readonly suspense!: AppSuspense;
@@ -72,19 +89,9 @@ export default class GiphySearch extends Vue {
   @Ref()
   private readonly giphyContent!: HTMLDivElement;
 
-  public search: string = '';
-  public pagination: MultiResponse['pagination'] = {
-    count: 0,
-    offset: 0,
-    total_count: 0,
-  };
   private webpSupported: boolean = webpSupported;
-  public moreLoading: boolean = false;
-  public images: GIFObject[] = [];
 
-  public request: XMLHttpRequest|null = null;
-
-  get showLoadMoreBtn() {
+  public get showLoadMoreBtn() {
     return !this.request && this.images.length > 0 && this.pagination.count === LOAD_GIPHIES_PER_REQUEST;
   }
 
@@ -107,70 +114,88 @@ export default class GiphySearch extends Vue {
     return img;
   }
 
-  @Watch('search')
-  @ApplyGrowlErr({message: "Unable to load more giphies", runningProp: 'moreLoading'})
+  @Watch("search")
+  @ApplyGrowlErr({
+    message: "Unable to load more giphies",
+    runningProp: "moreLoading",
+  })
   async onSearchChange() {
     if (this.request) {
       this.request.abort();
       this.request = null;
     }
-    const response = await this.$api.searchGiphys(this.search, 0, LOAD_GIPHIES_PER_REQUEST,r => this.request = r);
+    const response = await this.$api.searchGiphys(this.search, 0, LOAD_GIPHIES_PER_REQUEST, (r) => this.request = r);
     this.pagination = response.pagination;
     this.request = null;
     this.images = response.data;
   }
 
   async loadMore() {
-    const {scrollHeight, scrollTop, clientHeight } =  this.giphyContent;
-    if (scrollHeight - scrollTop  < clientHeight + 100) {
+    const {scrollHeight, scrollTop, clientHeight} = this.giphyContent;
+    if (scrollHeight - scrollTop < clientHeight + 100) {
       await this.fetchGiphies();
     }
   }
 
-  @ApplyGrowlErr({message: "Unable to load more giphies", runningProp: 'moreLoading', preventStacking: true})
+  @ApplyGrowlErr({
+    message: "Unable to load more giphies",
+    runningProp: "moreLoading",
+    preventStacking: true,
+  })
   async fetchGiphies() {
-    // w/0 +1, it returns duplicate id
-    // the weird thing docs say, that pagination start with 0, but it seems like with 1
-    let response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, LOAD_GIPHIES_PER_REQUEST, r => this.request = r);
+
+    /*
+     * W/0 +1, it returns duplicate id
+     * the weird thing docs say, that pagination start with 0, but it seems like with 1
+     */
+    const response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, LOAD_GIPHIES_PER_REQUEST, (r) => this.request = r);
     this.pagination = response.pagination;
-    this.images.push(...response.data.filter(n => !this.images.find(o => o.id === n.id)));
+    this.images.push(...response.data.filter((n) => !this.images.find((o) => o.id === n.id)));
   }
 
   @Emit()
-  close() {}
+  close() {
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .giphy-header
-    display: flex
-    padding-bottom: 15px
-    input
-      flex: 1
-      margin-right: 10px
-    i
-      @include hover-click(red)
-  .giphy-search
+.giphy-header
+  display: flex
+  padding-bottom: 15px
+
+  input
+    flex: 1
+    margin-right: 10px
+
+  i
+    @include hover-click(red)
+
+.giphy-search
+  padding: 5px
+  @extend %modal-window
+
+input[type=button]
+  width: 100%
+
+.giphy-content
+  overflow: scroll
+  max-height: 800px
+  height: calc(100vh - 300px)
+  min-height: 100px
+  display: flex
+  flex-direction: row
+  flex-wrap: wrap
+
+  .img-wrapper
     padding: 5px
-    @extend %modal-window
+    margin: auto
+    cursor: pointer
 
-  input[type=button]
-    width: 100%
-  .giphy-content
-    overflow: scroll
-    max-height: 800px
-    height: calc(100vh - 300px)
-    min-height: 100px
-    display: flex
-    flex-direction: row
-    flex-wrap: wrap
-    .img-wrapper
-      padding: 5px
-      margin: auto
-      cursor: pointer
-      :deep(img)
-        max-width: 100% // some images can be fixed hight but really wide, search 'fsg' for e.g
+    :deep(img)
+      max-width: 100%
+// some images can be fixed hight but really wide, search 'fsg' for e.g
 </style>

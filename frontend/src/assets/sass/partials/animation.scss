@@ -8,6 +8,7 @@
   animation: spin 2s infinite linear;
   display: inline-block;
 }
+
 @-moz-keyframes spin {
   0% {
     -moz-transform: rotate(0deg);
@@ -23,6 +24,7 @@
     transform: rotate(359deg);
   }
 }
+
 @-webkit-keyframes spin {
   0% {
     -moz-transform: rotate(0deg);
@@ -38,6 +40,7 @@
     transform: rotate(359deg);
   }
 }
+
 @-o-keyframes spin {
   0% {
     -moz-transform: rotate(0deg);
@@ -53,6 +56,7 @@
     transform: rotate(359deg);
   }
 }
+
 @-ms-keyframes spin {
   0% {
     -moz-transform: rotate(0deg);
@@ -68,6 +72,7 @@
     transform: rotate(359deg);
   }
 }
+
 @keyframes spin {
   0% {
     -moz-transform: rotate(0deg);

@@ -22,75 +22,76 @@
 import {
   Component,
   Vue,
-  Watch
-} from 'vue-property-decorator';
-import ChatBox from '@/vue/chat/chatbox/ChatBox.vue';
-import { State } from '@/ts/instances/storeInstance';
+  Watch,
+} from "vue-property-decorator";
+import ChatBox from "@/vue/chat/chatbox/ChatBox.vue";
+import {State} from "@/ts/instances/storeInstance";
 
-import { ALL_ROOM_ID } from '@/ts/utils/consts';
+import {ALL_ROOM_ID} from "@/ts/utils/consts";
 
-import { RoomModel } from '@/ts/types/model';
+import {RoomModel} from "@/ts/types/model";
 
 
 @Component({
-  name: 'ChatBoxes' ,
-  components: {ChatBox}
+  name: "ChatBoxes",
+  components: {ChatBox},
 })
 export default class ChatBoxes extends Vue {
-
   @State
   public readonly roomsArray!: RoomModel[];
 
-  // do not render all messages in all rooms, this is too slow
+  // Do not render all messages in all rooms, this is too slow
   public roomInited: Record<string, boolean> = {};
-
-  created() {
-    // vue.set
-    this.roomInited[this.activeRoomId] =  true;
-  }
-
-  @Watch('activeRoomId')
-  public onActiveRoomIdChange(newValue: number) {
-    // Vue.set
-    this.roomInited[newValue] = true;
-  }
-
-  get ALL_ROOM_ID(): number {
-    return ALL_ROOM_ID;
-  }
 
   @State
   public readonly activeRoom!: RoomModel;
 
   @State
   public readonly activeRoomId!: number;
+
+  public get ALL_ROOM_ID(): number {
+    return ALL_ROOM_ID;
+  }
+
+  created() {
+    // Vue.set
+    this.roomInited[this.activeRoomId] = true;
+  }
+
+  @Watch("activeRoomId")
+  public onActiveRoomIdChange(newValue: number) {
+    // Vue.set
+    this.roomInited[newValue] = true;
+  }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
-  @import "@/assets/sass/partials/variables"
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/abstract_classes"
 
 
-  .noRoom
-    justify-content: center
-    align-items: center
-    display: flex
-    font-size: 30px
-    margin-top: 30px
-    > *
-      text-align: center
-      color: #8fadff
-      cursor: pointer
-      &:hover
-        text-decoration: underline
+.noRoom
+  justify-content: center
+  align-items: center
+  display: flex
+  font-size: 30px
+  margin-top: 30px
 
-  .chatBoxHolder
-    +wrapper-inner
-    overflow-y: auto
-    position: relative
-    @include flex-direction(column)
+  > *
+    text-align: center
+    color: #8fadff
+    cursor: pointer
+
+    &:hover
+      text-decoration: underline
+
+.chatBoxHolder
+  +wrapper-inner
+  overflow-y: auto
+  position: relative
+  @include flex-direction(column)
 
 </style>

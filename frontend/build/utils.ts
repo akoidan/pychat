@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import  {promisify} from 'util';
 import {readFile} from "fs";
+import smileysData from '../src/assets/smileys.json';
 
 function makeid(length) {
   let result           = '';
@@ -10,6 +11,19 @@ function makeid(length) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
   }
   return result;
+}
+
+export function getSmileyUrls() {
+  const assets = [];
+  Object.values(smileysData).forEach(tab => {
+    Object.values(tab).forEach((v: any) => {
+      assets.push(`smileys/${v.src}`);
+      if (v.skinVariations) {
+        assets.push(...Object.values(v.skinVariations).map((v: any) => `/smileys/${v.src}`))
+      }
+    })
+  })
+  return assets;
 }
 
 export async function getGitRevision() {

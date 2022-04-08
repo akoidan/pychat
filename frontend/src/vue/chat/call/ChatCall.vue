@@ -4,8 +4,8 @@
     class="callContainer"
   >
     <div
-      class="callContainerContent"
       :class="{fullscreen}"
+      class="callContainerContent"
     >
       <video-container
         v-show="showVideoContainer && !showSettings && callInfo.callActive"
@@ -37,63 +37,54 @@
         @invert-show-video-container="invertShowVideoContainer"
       />
       <div class="spainter">
-<!--        TODO v-if doesn't detach events on destroy on painter-->
-        <painter @canvas="onCanvas" v-if="callInfo.sharePaint"/>
+        <!--        TODO v-if doesn't detach events on destroy on painter-->
+        <painter v-if="callInfo.sharePaint" @canvas="onCanvas"/>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/ts/instances/storeInstance';
+import {State} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
   Ref,
   Vue,
-  Watch
-} from 'vue-property-decorator';
-import { CallsInfoModel } from '@/ts/types/model';
-import {
+  Watch,
+} from "vue-property-decorator";
+import {CallsInfoModel} from "@/ts/types/model";
+import type {
   BooleanIdentifier,
   ShareIdentifier,
-  StringIdentifier,
-  VideoType
-} from '@/ts/types/types';
+} from "@/ts/types/types";
+import {VideoType} from "@/ts/types/types";
 
-import ChatRemotePeer from '@/vue/chat/call/ChatRemotePeer.vue';
-import { file } from '@/ts/utils/audio';
-import VideoObject from '@/vue/chat/chatbox/VideoObject.vue';
-import InputDevicesSettings from '@/vue/chat/call/InputDevicesSettings.vue';
-import VideoContainer from '@/vue/chat/chatbox/VideoContainer.vue';
-import CallContainerIcons from '@/vue/chat/call/CallContainerIcons.vue';
-import Painter from '@/vue/chat/textarea/Painter.vue';
+import ChatRemotePeer from "@/vue/chat/call/ChatRemotePeer.vue";
+import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";
+import InputDevicesSettings from "@/vue/chat/call/InputDevicesSettings.vue";
+import VideoContainer from "@/vue/chat/chatbox/VideoContainer.vue";
+import CallContainerIcons from "@/vue/chat/call/CallContainerIcons.vue";
+import Painter from "@/vue/chat/textarea/Painter.vue";
 
 @Component({
-  name: 'ChatCall' ,
+  name: "ChatCall",
   components: {
     Painter,
     CallContainerIcons,
     VideoContainer,
     InputDevicesSettings,
     VideoObject,
-    ChatRemotePeer
-  }
+    ChatRemotePeer,
+  },
 })
 export default class ChatCall extends Vue {
-
-
   @Prop() public callInfo!: CallsInfoModel;
+
   @Prop() public roomId!: number;
+
   public showSettings: boolean = false;
+
   public showVideoContainer: boolean = true;
-
-
-  @Watch('callInfo.callActive')
-  onCallActive(newValue: boolean) {
-    if (newValue) {
-      this.showVideoContainer = true;
-    }
-  }
 
   @Ref()
   public videoContainer!: Vue;
@@ -104,6 +95,13 @@ export default class ChatCall extends Vue {
   public fullscreen: boolean = false;
 
   public listener = this.fullScreenChange.bind(this);
+
+  @Watch("callInfo.callActive")
+  onCallActive(newValue: boolean) {
+    if (newValue) {
+      this.showVideoContainer = true;
+    }
+  }
 
   onCanvas(canvas: HTMLCanvasElement) {
     this.$webrtcApi.setCanvas(this.roomId, canvas);
@@ -121,20 +119,20 @@ export default class ChatCall extends Vue {
   }
 
   public fullScreenChange() {
-    this.$logger.log('fs change')();
+    this.$logger.log("fs change")();
     if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
       this.fullscreen = false;
     }
   }
 
   public created() {
-    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+    ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
       document.addEventListener(e, this.listener, false);
     });
   }
 
   public destroyed() {
-    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+    ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
       document.removeEventListener(e, this.listener, false);
     });
   }
@@ -150,7 +148,7 @@ export default class ChatCall extends Vue {
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     } else {
-      this.$store.growlError('Can\'t enter fullscreen');
+      this.$store.growlError("Can't enter fullscreen");
 
       return;
     }
@@ -161,7 +159,7 @@ export default class ChatCall extends Vue {
     const payload: ShareIdentifier = {
       state: !this.callInfo.shareScreen,
       id: this.roomId,
-      type: 'desktop'
+      type: "desktop",
     };
     this.$store.setVideoToState(payload);
     if (this.callInfo.callActive) {
@@ -173,7 +171,7 @@ export default class ChatCall extends Vue {
     const payload: ShareIdentifier = {
       state: !this.callInfo.sharePaint,
       id: this.roomId,
-      type: 'paint'
+      type: "paint",
     };
     this.$store.setVideoToState(payload);
     if (this.callInfo.callActive && !this.callInfo.sharePaint) {
@@ -185,7 +183,7 @@ export default class ChatCall extends Vue {
     const payload: ShareIdentifier = {
       state: !this.callInfo.showVideo,
       id: this.roomId,
-      type: 'webcam'
+      type: "webcam",
     };
     this.$store.setVideoToState(payload);
     if (this.callInfo.callActive) {
@@ -196,7 +194,7 @@ export default class ChatCall extends Vue {
   public micClick() {
     const payload: BooleanIdentifier = {
       state: !this.callInfo.showMic,
-      id: this.roomId
+      id: this.roomId,
     };
     this.$store.setMicToState(payload);
     if (this.callInfo.callActive) {
@@ -211,8 +209,11 @@ export default class ChatCall extends Vue {
   }
 
   public exitFullscreen() {
-    // TODO if doesn't work in chrome 86, when multiple monitors (if that's relevant):(
-    // if (typeof screen != 'undefined' && screen.height === window.innerHeight) {
+
+    /*
+     * TODO if doesn't work in chrome 86, when multiple monitors (if that's relevant):(
+     * if (typeof screen != 'undefined' && screen.height === window.innerHeight) {
+     */
     if (document.webkitCancelFullScreen) {
       document.webkitCancelFullScreen();
     } else if (document.msCancelFullScreen) {
@@ -220,81 +221,85 @@ export default class ChatCall extends Vue {
     } else if (document.mozCancelFullScreen) {
       document.mozCancelFullScreen();
     } else if (document.cancelFullScreen) {
-      document.cancelFullScreen(); // this should go last, webkit cancel seems to work better than simple one
+      document.cancelFullScreen(); // This should go last, webkit cancel seems to work better than simple one
     }
     // }
     this.fullscreen = false;
   }
-
 }
 </script>
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/mixins"
 
 
-  .callContainer
-    border-right: 7.5px solid #1a1a1a
-    display: inline-block
-    max-width: 100%
-    max-height: calc(100% - 160px)
-    text-align: center
+.callContainer
+  border-right: 7.5px solid #1a1a1a
+  display: inline-block
+  max-width: 100%
+  max-height: calc(100% - 160px)
+  text-align: center
 
-    :deep(label)
-      cursor: pointer
-    :deep(.icon-mic), :deep(.icon-videocam), :deep(.activeIcon), :deep(.icon-phone-circled)
-      cursor: pointer
-      @include hover-click(#3aa130)
+  :deep(label)
+    cursor: pointer
 
-    :deep(.icon-mute), :deep(.icon-no-videocam), :deep(.noactiveIcon), :deep(.icon-hang-up)
-      cursor: pointer
-      @include hover-click(#c72727)
+  :deep(.icon-mic), :deep(.icon-videocam), :deep(.activeIcon), :deep(.icon-phone-circled)
+    cursor: pointer
+    @include hover-click(#3aa130)
 
-    :deep(.icon-cog), :deep(.icon-webrtc-fullscreen), :deep(.icon-popup)
-      cursor: pointer
-      @include hover-click(#2a8f9c)
+  :deep(.icon-mute), :deep(.icon-no-videocam), :deep(.noactiveIcon), :deep(.icon-hang-up)
+    cursor: pointer
+    @include hover-click(#c72727)
+
+  :deep(.icon-cog), :deep(.icon-webrtc-fullscreen), :deep(.icon-popup)
+    cursor: pointer
+    @include hover-click(#2a8f9c)
 
 
-  .fullscreen
-    :deep(.videoContainer)
-      background-color: black
+.fullscreen
+  :deep(.videoContainer)
+    background-color: black
 
-    :deep(.micVideoWrapper > video)
-      max-height: 99vh
-      height: 99vh
+  :deep(.micVideoWrapper > video)
+    max-height: 99vh
+    height: 99vh
 
-    :deep(.videoContainer video)
-      border-color: #272727
-    :deep(.icon-webrtc-cont)
-      display: block
+  :deep(.videoContainer video)
+    border-color: #272727
 
-  .callContainerContent
-    padding: 0 // it should not have padding otherwise we would have scroll in painter container
-    display: flex
+  :deep(.icon-webrtc-cont)
+    display: block
+
+.callContainerContent
+  padding: 0
+  // it should not have padding otherwise we would have scroll in painter container
+  display: flex
+  height: 100%
+  flex-direction: column
+  min-width: 150px
+
+.spainter
+  padding: 10px
+  min-height: 0
+  @media screen and (max-height: 850px)
+    :deep(.painterTools)
+      width: 60px !important
+      flex-direction: row !important
+      flex-wrap: wrap
+  @media screen and (max-height: 650px)
+    :deep(.painterTools)
+      width: 80px !important
+      flex-direction: row !important
+      flex-wrap: wrap
+
+  :deep(*div)
     height: 100%
-    flex-direction: column
-    min-width: 150px
 
-  .spainter
-    padding: 10px
-    min-height: 0
-    @media screen and (max-height: 850px)
-      :deep(.painterTools)
-        width: 60px !important
-        flex-direction: row !important
-        flex-wrap: wrap
-    @media screen and (max-height: 650px)
-        :deep(.painterTools)
-          width: 80px !important
-          flex-direction: row !important
-          flex-wrap: wrap
+  :deep(.active-icon)
+    color: red
 
-    :deep(*div)
-      height: 100%
-    :deep(.active-icon)
-      color: red
-    :deep(.toolsAndCanvas)
-      height: 100%
+  :deep(.toolsAndCanvas)
+    height: 100%
 
 </style>

@@ -9,10 +9,10 @@
           <td>
             <input
               v-model="roomName"
-              type="text"
               class="input"
               maxlength="16"
-            >
+              type="text"
+            />
           </td>
         </tr>
         <tr v-if="!isPublic">
@@ -20,7 +20,7 @@
             Peer to peer
           </th>
           <td>
-            <app-checkbox v-model="p2p" />
+            <app-checkbox v-model="p2p"/>
           </td>
         </tr>
         <tr v-if="!p2p">
@@ -28,7 +28,7 @@
             Notifications
           </th>
           <td>
-            <app-checkbox v-model="notifications" />
+            <app-checkbox v-model="notifications"/>
           </td>
         </tr>
         <tr>
@@ -38,8 +38,8 @@
           <td>
             <app-input-range
               v-model="sound"
-              min="0"
               max="100"
+              min="0"
             />
           </td>
         </tr>
@@ -47,15 +47,15 @@
     </table>
     <pick-user
       v-model="currentUsers"
+      :show-invite-users="showInviteUsers"
       :text="inviteUsers"
       :users-ids="userIds"
-      :show-invite-users="showInviteUsers"
     />
     <app-submit
+      :running="running"
+      class="green-btn"
       type="button"
       value="Create Room"
-      class="green-btn"
-      :running="running"
       @click.native="add"
     />
   </div>
@@ -63,38 +63,38 @@
 <script lang="ts">
 import {
   ApplyGrowlErr,
-  State
-} from '@/ts/instances/storeInstance';
+  State,
+} from "@/ts/instances/storeInstance";
 import {
   Component,
   Prop,
-  Vue
-} from 'vue-property-decorator';
-import AppInputRange from '@/vue/ui/AppInputRange.vue';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import PickUser from '@/vue/parts/PickUser.vue';
+  Vue,
+} from "vue-property-decorator";
+import AppInputRange from "@/vue/ui/AppInputRange.vue";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import PickUser from "@/vue/parts/PickUser.vue";
 import {
   ChannelsDictUIModel,
-  CurrentUserInfoModel
-} from '@/ts/types/model';
-import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
-import {PrivateRoomsIds} from '@/ts/types/types';
-import ParentChannel from '@/vue/parts/ParentChannel.vue';
+  CurrentUserInfoModel,
+} from "@/ts/types/model";
+import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
+import {PrivateRoomsIds} from "@/ts/types/types";
+import ParentChannel from "@/vue/parts/ParentChannel.vue";
 
 @Component({
-  name: 'CreateRoom' ,
-components: {
-  ParentChannel,
-  AppCheckbox,
-  AppInputRange,
-  AppSubmit,
-  PickUser
-}
+  name: "CreateRoom",
+  components: {
+    ParentChannel,
+    AppCheckbox,
+    AppInputRange,
+    AppSubmit,
+    PickUser,
+  },
 })
 export default class CreateRoom extends Vue {
-
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
@@ -102,10 +102,15 @@ export default class CreateRoom extends Vue {
   public readonly channelsDictUI!: ChannelsDictUIModel;
 
   public currentUsers: number[] = [];
+
   public notifications: boolean = false;
+
   public sound: number = 0;
+
   public p2p: boolean = false;
-  public roomName: string = '';
+
+  public roomName: string = "";
+
   public running: boolean = false;
 
   @Prop() public isPublic!: boolean;
@@ -115,57 +120,57 @@ export default class CreateRoom extends Vue {
   @Prop()
   public readonly userIds!: number[];
 
-  get inviteUsers(): string {
+  public get inviteUsers(): string {
     if (this.parentChannelId) {
-      return `Users in a new room in group ${this.channelsDictUI[this.parentChannelId].name}`
+      return `Users in a new room in group ${this.channelsDictUI[this.parentChannelId].name}`;
     }
-    return this.isPublic ? 'Invite users to new room' : 'Select user for private room';
+    return this.isPublic ? "Invite users to new room" : "Select user for private room";
   }
 
-  get showInviteUsers() {
+  public get showInviteUsers() {
     return this.isPublic || this.currentUsers.length < 1;
   }
 
 
-  @ApplyGrowlErr({runningProp: 'running'})
+  @ApplyGrowlErr({runningProp: "running"})
   public async add() {
     if (this.isPublic && !this.roomName) {
-      throw Error('Please specify room name');
+      throw Error("Please specify room name");
     }
     if (!this.isPublic && this.currentUsers.length === 0) {
-      throw Error('Please add user');
+      throw Error("Please add user");
     }
     const e = await this.$ws.sendAddRoom(
-        this.roomName ? this.roomName : null,
-        this.isPublic ? false : this.p2p,
-        this.sound,
-        !this.p2p && this.notifications,
-        this.currentUsers,
-        this.parentChannelId ? this. parentChannelId : null
+      this.roomName ? this.roomName : null,
+      this.isPublic ? false : this.p2p,
+      this.sound,
+      !this.p2p && this.notifications,
+      this.currentUsers,
+      this.parentChannelId ? this.parentChannelId : null,
     );
     this.$router.replace(`/chat/${e.roomId}`);
   }
-
 }
 </script>
 
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  input[type="text"]
-    max-width: calc(100vw - 140px)
+input[type="text"]
+  max-width: calc(100vw - 140px)
 
-  .holder
-    @extend %room-settings-holder
+.holder
+  @extend %room-settings-holder
 
-  select
-    width: 100%
-  th, td
-    padding: 5px
+select
+  width: 100%
 
-  .green-btn
-    width: 100%
-    flex-shrink: 0
+th, td
+  padding: 5px
+
+.green-btn
+  width: 100%
+  flex-shrink: 0
 
 </style>

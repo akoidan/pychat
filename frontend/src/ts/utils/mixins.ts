@@ -1,39 +1,39 @@
-import type { Logger } from 'lines-logger';
-import loggerFactory from '@/ts/instances/loggerFactory';
-import type {VueBase} from 'vue-class-component';
-import type { ComponentOptions } from 'vue';
+import type {Logger} from "lines-logger";
+import loggerFactory from "@/ts/instances/loggerFactory";
+import type {VueBase} from "vue-class-component";
+import type {ComponentOptions} from "vue";
 
 export const loggerMixin = {
   computed: {
     $logger(this: ComponentOptions): Logger {
-      if (!this.__logger && this.$options._componentTag !== 'router-link') {
-        let name = this.$options.name;
-        if (['RouterView', 'RouterLink'].includes(name)) {
+      if (!this.__logger && this.$options._componentTag !== "router-link") {
+        let {name} = this.$options;
+        if (["RouterView", "RouterLink"].includes(name)) {
           return null as any;
         }
         const fileName = this.$options.__file;
         if (!name && fileName) {
-          name = fileName.substr(fileName.lastIndexOf('/')+1, fileName.lastIndexOf('.') - fileName.lastIndexOf('/')-1);
+          name = fileName.substr(fileName.lastIndexOf("/") + 1, fileName.lastIndexOf(".") - fileName.lastIndexOf("/") - 1);
         }
         if (!name) {
-          name = 'vue-comp'
+          name = "vue-comp";
         }
         if (this.id) {
           name += `:${this.id}`;
         }
-        this.__logger = loggerFactory.getLoggerColor(name, '#35495e');
+        this.__logger = loggerFactory.getLoggerColor(name, "#35495e");
       }
       return this.__logger;
-    }
+    },
   },
-  updated: function (this: VueBase): void {
-    this.$logger && this.$logger.debug('Updated')();
+  updated(this: VueBase): void {
+    this.$logger && this.$logger.debug("Updated")();
   },
   unmounted(this: VueBase) {
-    this.$logger && this.$logger.debug('unmounted')();
+    this.$logger && this.$logger.debug("unmounted")();
   },
-  created: function (this: VueBase) {
-    this.$logger && this.$logger.debug('Created')();
-  }
+  created(this: VueBase) {
+    this.$logger && this.$logger.debug("Created")();
+  },
 };
 

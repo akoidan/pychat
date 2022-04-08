@@ -7,15 +7,17 @@
     <table>
       <tbody>
         <tr>
-          <th title="Leave empty if you signed up with oauth">Old password:</th>
+          <th title="Leave empty if you signed up with oauth">
+            Old password:
+          </th>
           <td>
             <input
               v-show="false"
               v-model="username"
-              type="text"
-              name="username"
               autocomplete="username"
-            >
+              name="username"
+              type="text"
+            />
             <input
               v-model="oldPassword"
               autocomplete="password"
@@ -23,7 +25,7 @@
               minlength="3"
               required
               type="password"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -32,12 +34,12 @@
             <input
               v-model="newPassword"
               autocomplete="new-password"
-              required
               class="input"
-              type="password"
-              name="password"
               minlength="3"
-            >
+              name="password"
+              required
+              type="password"
+            />
           </td>
         </tr>
         <tr>
@@ -46,20 +48,20 @@
             <input
               v-model="confirmPassword"
               autocomplete="new-password"
-              required
               class="input"
-              type="password"
               minlength="3"
-            >
+              required
+              type="password"
+            />
           </td>
         </tr>
       </tbody>
       <tr>
         <td colspan="2">
           <app-submit
+            :running="running"
             class="green-btn"
             value="Apply Password"
-            :running="running"
           />
         </td>
       </tr>
@@ -67,36 +69,47 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/ts/instances/storeInstance';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit.vue';
-import {CurrentUserInfoModel} from '@/ts/types/model';
-import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
+import {
+  ApplyGrowlErr,
+  State,
+} from "@/ts/instances/storeInstance";
+import {
+  Component,
+  Vue,
+} from "vue-property-decorator";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {CurrentUserInfoModel} from "@/ts/types/model";
+
 @Component({
-  name: 'UserProfileChangePassword' ,
-  components: {AppSubmit}
+  name: "UserProfileChangePassword",
+  components: {AppSubmit},
 })
 export default class UserProfileChangePassword extends Vue {
+  public oldPassword: string = "";
 
-  public oldPassword: string = '';
-  public newPassword: string = '';
-  public confirmPassword: string = '';
+  public newPassword: string = "";
+
+  public confirmPassword: string = "";
+
   public running: boolean = false;
 
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  get username(): string {
+  public get username(): string {
     return this.userInfo.user;
   }
 
-  @ApplyGrowlErr({ message: 'Error changing pass:', runningProp: 'running'})
+  @ApplyGrowlErr({
+    message: "Error changing pass:",
+    runningProp: "running",
+  })
   public async saveProfile() {
     if (this.newPassword != this.confirmPassword) {
-      this.$store.growlError('Passwords don\'t match');
+      this.$store.growlError("Passwords don't match");
     } else {
       await this.$api.changePassword(this.oldPassword, this.newPassword);
-      this.$store.growlSuccess('Password has been changed');
+      this.$store.growlSuccess("Password has been changed");
     }
   }
 }

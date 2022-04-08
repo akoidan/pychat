@@ -11,15 +11,17 @@
       </tr>
       <tr>
         <th>Status:</th>
-        <td :class="cls">{{ status }}</td>
+        <td :class="cls">
+          {{ status }}
+        </td>
       </tr>
       <tr v-if="receivingFile.anchor">
         <th>Download:</th>
         <td>
           <a
-            class="green-btn"
-            :href="receivingFile.anchor"
             :download="receivingFile.fileName"
+            :href="receivingFile.anchor"
+            class="green-btn"
           >Save</a>
         </td>
       </tr>
@@ -40,80 +42,90 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
-import { bytesToSize } from '@/ts/utils/pureFunctions';
+import {
+  Component,
+  Prop,
+  Vue,
+} from "vue-property-decorator";
+import {bytesToSize} from "@/ts/utils/pureFunctions";
 import {
   FileTransferStatus,
-  ReceivingFile
-} from '@/ts/types/model';
+  ReceivingFile,
+} from "@/ts/types/model";
 
-@Component({name: 'ReceivingFileInfo'})
- export default class ReceivingFileInfo extends Vue {
+@Component({name: "ReceivingFileInfo"})
+export default class ReceivingFileInfo extends Vue {
   @Prop() public receivingFile!: ReceivingFile;
 
-  get size(): string {
+  public get size(): string {
     return bytesToSize(this.receivingFile.upload.total);
   }
 
-  get isError(): boolean {
+  public get isError(): boolean {
     return this.receivingFile.status === FileTransferStatus.ERROR;
   }
 
-  public retry() {
-    this.$webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
-  }
-
-  get cls() {
+  public get cls() {
     return {
       success: FileTransferStatus.FINISHED === this.receivingFile.status,
-      error: FileTransferStatus.ERROR === this.receivingFile.status
+      error: FileTransferStatus.ERROR === this.receivingFile.status,
     };
   }
 
-  get status(): string {
+  public get status(): string {
     switch (this.receivingFile.status) {
       case FileTransferStatus.ERROR:
         return this.receivingFile.error!;
       case FileTransferStatus.IN_PROGRESS:
-        return 'Downloading...';
+        return "Downloading...";
       case FileTransferStatus.DECLINED_BY_OPPONENT:
-        return 'Declined by opponent';
+        return "Declined by opponent";
       case FileTransferStatus.DECLINED_BY_YOU:
-        return 'Declined by you';
+        return "Declined by you";
       case FileTransferStatus.FINISHED:
-        return 'Finished';
+        return "Finished";
       case FileTransferStatus.NOT_DECIDED_YET:
-        return 'Waiting for approval';
+        return "Waiting for approval";
     }
+  }
+
+  public retry() {
+    this.$webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  .error
-    color: red
-  .success
-    color: #3eb22b
-  table
+.error
+  color: red
+
+.success
+  color: #3eb22b
+
+table
+  width: 100%
+  text-align: left
+
+  th
+    color: #79aeb6
+    font-weight: bold
+    padding-left: 5px
+
+  td
+    text-overflow: ellipsis
+    max-width: 250px
+    overflow: hidden
     width: 100%
-    text-align: left
-    th
-      color: #79aeb6
-      font-weight: bold
-      padding-left: 5px
-    td
-      text-overflow: ellipsis
-      max-width: 250px
-      overflow: hidden
-      width: 100%
-      padding-left: 10px
-  a
-    width: calc(100% - 50px)
-    display: block
-    text-align: center
-    margin-left: 10px
-    margin-right: 10px
-  .icon-repeat
-    cursor: pointer
+    padding-left: 10px
+
+a
+  width: calc(100% - 50px)
+  display: block
+  text-align: center
+  margin-left: 10px
+  margin-right: 10px
+
+.icon-repeat
+  cursor: pointer
 </style>

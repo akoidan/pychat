@@ -1,5 +1,5 @@
-import { LogLevel } from 'lines-logger';
-import {MessageStatus} from '@/ts/types/model';
+import type {LogLevel} from "lines-logger";
+import type {MessageStatus} from "@/ts/types/model";
 
 export interface UserDB {
   id: number;
@@ -14,8 +14,13 @@ export interface UserDB {
   city: string;
 }
 
-export type SexDB = 0 | 1 | 2;
-export type BooleanDB = 0 | 1;
+export type SexDB =
+  0
+  | 1
+  | 2;
+export type BooleanDB =
+  0
+  | 1;
 
 export interface RoomDB {
   id: number;
@@ -25,7 +30,7 @@ export interface RoomDB {
   volume: number;
   channel_id: number;
   is_main_in_channel: BooleanDB;
-  deleted: BooleanDB ;
+  deleted: BooleanDB;
   creator: number;
 }
 
@@ -35,7 +40,7 @@ export interface ChannelDB {
   creator: number;
 }
 
-export  interface TagDB {
+export interface TagDB {
   id: number;
   user_id: number;
   message_id: number;
@@ -47,7 +52,7 @@ export interface MessageDB {
   time: number;
   content: string;
   symbol: string;
-  parent_message_id: number|null;
+  parent_message_id: number | null;
   thread_messages_count: number;
   deleted: BooleanDB;
   edited: number;
@@ -58,9 +63,9 @@ export interface MessageDB {
 
 export interface FileDB {
   id: number;
-  preview_file_id: number; //  so this is UploadFile.id for "preview" File
-  file_id: number;  // so this is UploadFile.id for "url" File
-  server_id: number;  // if we saved this file on backend, it would have its id
+  preview_file_id: number; //  So this is UploadFile.id for "preview" File
+  file_id: number; // So this is UploadFile.id for "url" File
+  server_id: number; // If we saved this file on backend, it would have its id
   symbol: string;
   sending: BooleanDB;
   url: string;

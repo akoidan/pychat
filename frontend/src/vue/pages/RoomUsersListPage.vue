@@ -18,10 +18,10 @@
           :users-ids="userIds"
         />
         <app-submit
+          :running="running"
+          class="green-btn"
           type="button"
           value="Apply"
-          class="green-btn"
-          :running="running"
           @click.native="add"
         />
       </div>
@@ -29,28 +29,31 @@
   </div>
 </template>
 <script lang="ts">
-  import {
-    Component,
-    Vue
-  } from 'vue-property-decorator';
-  import {
-    ApplyGrowlErr,
-    State
-  } from '@/ts/instances/storeInstance';
-  import {
-    ChannelsDictUIModel,
-    RoomDictModel,
-    UserDictModel
-  } from '@/ts/types/model';
-  import AppSubmit from '@/vue/ui/AppSubmit.vue';
-  import PickUser from '@/vue/parts/PickUser.vue';
-  import UserFlagRow from '@/vue/chat/right/UserFlagRow.vue';
+import {
+  Component,
+  Vue,
+} from "vue-property-decorator";
+import {
+  ApplyGrowlErr,
+  State,
+} from "@/ts/instances/storeInstance";
+import {
+  ChannelsDictUIModel,
+  RoomDictModel,
+  UserDictModel,
+} from "@/ts/types/model";
+import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import PickUser from "@/vue/parts/PickUser.vue";
+import UserFlagRow from "@/vue/chat/right/UserFlagRow.vue";
 
-  @Component({
-  components: {UserFlagRow,  AppSubmit, PickUser}
+@Component({
+  components: {
+    UserFlagRow,
+    AppSubmit,
+    PickUser,
+  },
 })
 export default class RoomUsersListPage extends Vue {
-
   @State
   public readonly allUsersDict!: UserDictModel;
 
@@ -62,36 +65,34 @@ export default class RoomUsersListPage extends Vue {
 
 
   public userdToAdd: number[] = [];
+
   public running: boolean = false;
 
 
-  get roomId(): number {
+  public get roomId(): number {
     return parseInt(this.$route.params.id as string);
   }
 
-  get room() {
+  public get room() {
     return this.roomsDict[this.roomId];
   }
 
-  get title() {
-    return this.room.isMainInChannel ? 'Users in group' : 'Users in room';
+  public get title() {
+    return this.room.isMainInChannel ? "Users in group" : "Users in room";
   }
 
-  get usersArray() {
-    return this.room.users.map(id => this.allUsersDict[id]);
+  public get usersArray() {
+    return this.room.users.map((id) => this.allUsersDict[id]);
   }
 
-  get userIds(): number[] {
+  public get userIds(): number[] {
     if (this.room.channelId && !this.room.isMainInChannel) {
-      return this.channelsDictUI[this.room.channelId].mainRoom.users
-          .filter(uId => !this.room.users.includes(uId))
+      return this.channelsDictUI[this.room.channelId].mainRoom.users.filter((uId) => !this.room.users.includes(uId));
     }
-    return this.$store.usersArray
-        .filter(u => this.room.users.indexOf(u.id) < 0)
-        .map(u => u.id)
+    return this.$store.usersArray.filter((u) => !this.room.users.includes(u.id)).map((u) => u.id);
   }
 
-  @ApplyGrowlErr({runningProp: 'running'})
+  @ApplyGrowlErr({runningProp: "running"})
   async add() {
     if (this.userdToAdd.length > 0) {
       const e = await this.$ws.inviteUser(this.roomId, this.userdToAdd);
@@ -104,33 +105,34 @@ export default class RoomUsersListPage extends Vue {
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
-  @import "@/assets/sass/partials/room_users_table"
+@import "@/assets/sass/partials/room_users_table"
 
-  @import "@/assets/sass/partials/abstract_classes"
+@import "@/assets/sass/partials/abstract_classes"
 
-  .current-room-users-table-header
-    font-size: 20px
-    padding: 10px
-  .holder
-    @extend %room-settings-holder
+.current-room-users-table-header
+  font-size: 20px
+  padding: 10px
 
-  .green-btn
-    flex-shrink: 0
+.holder
+  @extend %room-settings-holder
 
-  .current-room-users-table
-    font-size: 24px
-    width: 350px
-    margin: auto
+.green-btn
+  flex-shrink: 0
 
-  ul
-    @extend %ul
+.current-room-users-table
+  font-size: 24px
+  width: 350px
+  margin: auto
 
-  li
-    @extend %li
-    justify-content: space-between
-    display: flex
+ul
+  @extend %ul
 
-  .usersStateText:hover
-    cursor: pointer
-    color: #f1f1f1
+li
+  @extend %li
+  justify-content: space-between
+  display: flex
+
+.usersStateText:hover
+  cursor: pointer
+  color: #f1f1f1
 </style>

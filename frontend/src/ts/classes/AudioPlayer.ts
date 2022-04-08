@@ -1,16 +1,16 @@
-import NotifierHandler from '@/ts/classes/NotificationHandler';
-import loggerFactory from '@/ts/instances/loggerFactory';
-import { Logger } from 'lines-logger';
-import {MainWindow} from '@/ts/classes/MainWindow';
+import loggerFactory from "@/ts/instances/loggerFactory";
+import type {Logger} from "lines-logger";
+import type {MainWindow} from "@/ts/classes/MainWindow";
 
 
 export class AudioPlayer {
   private readonly mainWindow: MainWindow;
+
   private readonly logger: Logger;
 
-  constructor(mainWindow: MainWindow) {
+  public constructor(mainWindow: MainWindow) {
     this.mainWindow = mainWindow;
-    this.logger = loggerFactory.getLogger('audio');
+    this.logger = loggerFactory.getLogger("audio");
   }
 
   checkAndPlay(element: HTMLAudioElement, volume: number) {
@@ -20,10 +20,10 @@ export class AudioPlayer {
         element.currentTime = 0;
         element.volume = volume * volume / 10_000;
         const prom = element.play();
-        prom && prom.catch(function (e) {
+        prom && prom.catch((e) => {
         });
       } catch (e) {
-        this.logger.error('Skipping playing message, because {}', e)();
+        this.logger.error("Skipping playing message, because {}", e)();
       }
     }
   }

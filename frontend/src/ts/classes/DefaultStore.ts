@@ -1,33 +1,35 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import Vuex from "vuex";
 
-import loggerFactory from '@/ts/instances/loggerFactory';
-import {
-  ChannelModel,
+import loggerFactory from "@/ts/instances/loggerFactory";
+import type {
   ChannelsDictModel,
   ChannelsDictUIModel,
   ChannelUIModel,
   CurrentUserInfoModel,
+  IncomingCallModel,
+  Location,
+  MessageStatus,
+  PastingTextAreaElement,
+  RoomDictModel,
+  SendingFileTransfer,
+  SexModelString,
+  UserDictModel,
+} from "@/ts/types/model";
+import {
+  ChannelModel,
   CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
   EditingMessage,
   GrowlModel,
   GrowlType,
-  IncomingCallModel,
-  Location,
   MessageModel,
-  MessageStatus,
-  PastingTextAreaElement,
   ReceivingFile,
-  RoomDictModel,
   RoomModel,
   RoomSettingsModel,
   SendingFile,
-  SendingFileTransfer,
-  SexModelString,
-  UserDictModel,
-  UserModel
-} from '@/ts/types/model';
+  UserModel,
+} from "@/ts/types/model";
+import type {PrivateRoomsIds} from "@/ts/types/types";
 import {
   AddMessagesDTO,
   AddSendingFileTransfer,
@@ -38,7 +40,6 @@ import {
   MediaIdentifier,
   MessagesLocation,
   NumberIdentifier,
-  PrivateRoomsIds,
   RemoveMessageProgress,
   RoomLogEntry,
   RoomMessageIds,
@@ -60,53 +61,53 @@ import {
   SetUploadProgress,
   SetUploadXHR,
   ShareIdentifier,
-  StringIdentifier
-} from '@/ts/types/types';
+  StringIdentifier,
+} from "@/ts/types/types";
 import {
   SetStateFromStorage,
-  SetStateFromWS
-} from '@/ts/types/dto';
-import {encodeHTML} from '@/ts/utils/htmlApi';
+  SetStateFromWS,
+} from "@/ts/types/dto";
+import {encodeHTML} from "@/ts/utils/htmlApi";
 import {
   ACTIVE_ROOM_ID_LS_NAME,
   ALL_ROOM_ID,
-  SHOW_I_TYPING_INTERVAL
-} from '@/ts/utils/consts';
+  SHOW_I_TYPING_INTERVAL,
+} from "@/ts/utils/consts";
 import {
   Action,
   Module,
   Mutation,
-  VuexModule
-} from 'vuex-module-decorators';
+  VuexModule,
+} from "vuex-module-decorators";
 
-const logger = loggerFactory.getLogger('store');
+const logger = loggerFactory.getLogger("store");
 
 
-function sleep(ms: number) {
+async function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const mediaLinkIdGetter: Function = (function () {
+const mediaLinkIdGetter: Function = (function() {
   let i = 0;
 
-  return function () {
+  return function() {
     return String(i++);
   };
-})();
+}());
 
 export const vueStore = new Vuex.Store({
   state: {},
   mutations: {},
-  actions: {}
+  actions: {},
 });
 
 function Validate(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
-  descriptor.value = function (...args: unknown[]) {
+  descriptor.value = function(...args: unknown[]) {
     try {
       original.apply(this, args);
     } catch (e) {
-      logger.warn(`Invalid temporal store structure.${propertyKey} {} {}`, args, JSON.parse(JSON.stringify(this)) )();
+      logger.warn(`Invalid temporal store structure.${propertyKey} {} {}`, args, JSON.parse(JSON.stringify(this)))();
     }
   };
 }
@@ -116,32 +117,51 @@ const SHOW_I_TYPING_INTERVAL_SHOW = SHOW_I_TYPING_INTERVAL * 1.5;
 @Module({
   dynamic: true,
   namespaced: true,
-  name: 'default',
-  store: vueStore
+  name: "default",
+  store: vueStore,
 })
 export class DefaultStore extends VuexModule {
-
   public storage!: IStorage; // We proxy this as soon as we created Storage
-  public isOnline: boolean = false;
-  public growls: GrowlModel[] = [];
-  public pastingTextAreaQueue: PastingTextAreaElement[] = [];
-  public incomingCall: IncomingCallModel | null = null;
-  public microphones: { [id: string]: string } = {};
-  public speakers: { [id: string]: string } = {};
-  public webcams: { [id: string]: string } = {};
-  public activeRoomId: number | null = ALL_ROOM_ID;
-  public userInfo: CurrentUserInfoModel | null = null;
-  public userSettings: CurrentUserSettingsModel | null = null;
-  public allUsersDict: UserDictModel = {};
-  public regHeader: string | null = null;
-  public onlineDict: Record<string, string[]> = {};
-  public roomsDict: RoomDictModel = {};
-  public channelsDict: ChannelsDictModel = {};
-  public mediaObjects: { [id: string]: MediaStream } = {};
-  public isCurrentWindowActive: boolean = true;
-  public currentChatPage: 'rooms' | 'chat' = 'chat';
 
-  public get getStorage() { // not reactive state is not available outside
+  public isOnline: boolean = false;
+
+  public growls: GrowlModel[] = [];
+
+  public pastingTextAreaQueue: PastingTextAreaElement[] = [];
+
+  public incomingCall: IncomingCallModel | null = null;
+
+  public smileysLoaded: boolean = false;
+
+  public microphones: Record<string, string> = {};
+
+  public speakers: Record<string, string> = {};
+
+  public webcams: Record<string, string> = {};
+
+  public activeRoomId: number | null = ALL_ROOM_ID;
+
+  public userInfo: CurrentUserInfoModel | null = null;
+
+  public userSettings: CurrentUserSettingsModel | null = null;
+
+  public allUsersDict: UserDictModel = {};
+
+  public regHeader: string | null = null;
+
+  public onlineDict: Record<string, string[]> = {};
+
+  public roomsDict: RoomDictModel = {};
+
+  public channelsDict: ChannelsDictModel = {};
+
+  public mediaObjects: Record<string, MediaStream> = {};
+
+  public isCurrentWindowActive: boolean = true;
+
+  public currentChatPage: "chat" | "rooms" = "chat";
+
+  public get getStorage() { // Not reactive state is not available outside
     return this.storage;
   }
 
@@ -150,51 +170,57 @@ export class DefaultStore extends VuexModule {
   }
 
   get privateRooms(): RoomModel[] {
-    const roomModels: RoomModel[] = this.roomsArray.filter(r => !r.name && !r.channelId);
-    logger.debug('privateRooms {} ', roomModels)();
+    const roomModels: RoomModel[] = this.roomsArray.filter((r) => !r.name && !r.channelId);
+    logger.debug("privateRooms {} ", roomModels)();
 
     return roomModels;
   }
 
   get online(): number[] {
-    return Object.keys(this.onlineDict).map(a => parseInt(a, 10));
+    return Object.keys(this.onlineDict).map((a) => parseInt(a, 10));
   }
 
-  get calculatedMessagesForRoom() : (roomId: number) => any[] {
+  get calculatedMessagesForRoom(): (roomId: number) => any[] {
     return (roomId: number): any[] => {
-      let room = this.roomsDict[roomId];
-      let roomLog = room.roomLog;
+      const room = this.roomsDict[roomId];
+      let {roomLog} = room;
       if (!this.userSettings?.onlineChangeSound) {
-        roomLog = roomLog.filter(l => l.action !== 'appeared online' && l.action !== 'gone offline')
+        roomLog = roomLog.filter((l) => l.action !== "appeared online" && l.action !== "gone offline");
       }
-      let newArray: any[] = roomLog.map(value => ({
+      const newArray: any[] = roomLog.map((value) => ({
         isUserAction: true,
-        ...value
+        ...value,
       }));
-      newArray.push(...room.changeName.map(value => ({isChangeName: true, ...value})));
-      let dates: {[id: string]: boolean} = {};
-      let messageDict: Record<number, {parent?: MessageModel, messages: (MessageModel|ReceivingFile|SendingFile)[]}> = {};
-      for (let m in room.messages) {
-        let message = room.messages[m];
+      newArray.push(...room.changeName.map((value) => ({
+        isChangeName: true,
+        ...value,
+      })));
+      const dates: Record<string, boolean> = {};
+      const messageDict: Record<number, {parent?: MessageModel; messages: (MessageModel | ReceivingFile | SendingFile)[]}> = {};
+      for (const m in room.messages) {
+        const message = room.messages[m];
         if (message.parentMessage) {
           if (!messageDict[message.parentMessage]) {
-            messageDict[message.parentMessage] = {messages: []}
+            messageDict[message.parentMessage] = {messages: []};
           }
-          messageDict[message.parentMessage].messages.push(message)
+          messageDict[message.parentMessage].messages.push(message);
         } else {
           if (!messageDict[message.id]) {
-            messageDict[message.id] = {messages: []}
+            messageDict[message.id] = {messages: []};
           }
           messageDict[message.id].parent = message;
-          let d = new Date(message.time).toDateString();
+          const d = new Date(message.time).toDateString();
           if (!dates[d]) {
             dates[d] = true;
-            newArray.push({fieldDay: d, time: Date.parse(d)});
+            newArray.push({
+              fieldDay: d,
+              time: Date.parse(d),
+            });
           }
         }
       }
-      for (let m in room.sendingFiles) {
-        let sendingFile: SendingFile = room.sendingFiles[m];
+      for (const m in room.sendingFiles) {
+        const sendingFile: SendingFile = room.sendingFiles[m];
         if (sendingFile.threadId) {
           if (messageDict[sendingFile.threadId]) {
             messageDict[sendingFile.threadId].messages.push(sendingFile);
@@ -205,8 +231,8 @@ export class DefaultStore extends VuexModule {
           newArray.push(sendingFile);
         }
       }
-      for (let m in room.receivingFiles) {
-        let receivingFile: ReceivingFile = room.receivingFiles[m];
+      for (const m in room.receivingFiles) {
+        const receivingFile: ReceivingFile = room.receivingFiles[m];
         if (receivingFile.threadId) {
           if (messageDict[receivingFile.threadId]) {
             messageDict[receivingFile.threadId].messages.push(receivingFile);
@@ -217,32 +243,37 @@ export class DefaultStore extends VuexModule {
           newArray.push(receivingFile);
         }
       }
-      Object.values(messageDict).forEach(v => {
-        if (v.messages.length || v.parent?.isThreadOpened || (v.parent && v.parent.threadMessagesCount > 0)) {
+      Object.values(messageDict).forEach((v) => {
+        if (v.messages.length || v.parent?.isThreadOpened || v.parent && v.parent.threadMessagesCount > 0) {
           if (v.parent) {
             v.messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
-            newArray.push({parent: v.parent, thread: true, messages: v.messages, time: v.parent.time});
+            newArray.push({
+              parent: v.parent,
+              thread: true,
+              messages: v.messages,
+              time: v.parent.time,
+            });
           } else {
-            logger.warn(`Skipping rendering messages ${v.messages.map(m => (m as MessageModel).id)} as parent is not loaded yet`)()
+            logger.warn(`Skipping rendering messages ${v.messages.map((m) => (m as MessageModel).id)} as parent is not loaded yet`)();
           }
         } else {
-          newArray.push(v.parent)
+          newArray.push(v.parent);
         }
       });
       newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
       logger.debug("Reevaluating messages in room #{}: {}", room.id, newArray)();
       return newArray;
-    }
+    };
   }
 
   get channelsDictUI(): ChannelsDictUIModel {
-    let result : ChannelsDictUIModel = this.roomsArray.reduce((dict, current: RoomModel) => {
-      let channelId = current.channelId;
+    const result: ChannelsDictUIModel = this.roomsArray.reduce<ChannelsDictUIModel>((dict, current: RoomModel) => {
+      const {channelId} = current;
       if (channelId) {
         if (!dict[channelId]) {
-          let channel = this.channelsDict[channelId];
+          const channel = this.channelsDict[channelId];
           if (!channel) {
-            throw Error(`Unknown channel ${channelId}`)
+            throw Error(`Unknown channel ${channelId}`);
           }
           dict[channelId] = {
             id: channel.id,
@@ -260,19 +291,19 @@ export class DefaultStore extends VuexModule {
         }
       }
       return dict;
-    } , {} as ChannelsDictUIModel)
+    }, {});
 
-    const allChannels: ChannelsDictUIModel = Object.keys(this.channelsDict)
-        .filter(k => !result[k]).reduce(((previousValue, currentValue) => {
-            previousValue[currentValue] = {
-              ...this.channelsDict[currentValue],
-              rooms: [],
-              mainRoom: null!,
-            };
-            return previousValue;
-          }), result);
+    const allChannels: ChannelsDictUIModel = Object.keys(this.channelsDict).filter((k) => !result[k]).
+      reduce((previousValue, currentValue) => {
+        previousValue[currentValue] = {
+          ...this.channelsDict[currentValue],
+          rooms: [],
+          mainRoom: null!,
+        };
+        return previousValue;
+      }, result);
 
-    logger.debug('Channels dict {} ', allChannels)();
+    logger.debug("Channels dict {} ", allChannels)();
 
     return allChannels;
   }
@@ -286,10 +317,10 @@ export class DefaultStore extends VuexModule {
   }
 
   get privateRoomsUsersIds(): PrivateRoomsIds {
-    const roomUsers: { [id: number]: number } = {};
-    const userRooms: { [id: number]: number } = {};
+    const roomUsers: Record<number, number> = {};
+    const userRooms: Record<number, number> = {};
     if (this.userInfo) {
-      const myId = this.myId;
+      const {myId} = this;
       this.privateRooms.forEach((r: RoomModel) => {
         const anotherUId = myId === r.users[0] && r.users.length === 2 ? r.users[1] : r.users[0];
         roomUsers[r.id] = anotherUId;
@@ -297,19 +328,22 @@ export class DefaultStore extends VuexModule {
       });
     }
 
-    return {roomUsers, userRooms};
+    return {
+      roomUsers,
+      userRooms,
+    };
   }
 
   get roomsArray(): RoomModel[] {
     const anies = Object.values(this.roomsDict);
-    logger.debug('roomsArray {}', anies)();
+    logger.debug("roomsArray {}", anies)();
 
     return anies;
   }
 
   get usersArray(): UserModel[] {
     const res: UserModel[] = Object.values(this.allUsersDict);
-    logger.debug('usersArray {}', res)();
+    logger.debug("usersArray {}", res)();
 
     return res;
   }
@@ -317,15 +351,14 @@ export class DefaultStore extends VuexModule {
   get activeRoom(): RoomModel | null {
     if (this.activeRoomId && this.roomsDict) {
       return this.roomsDict[this.activeRoomId];
-    } else {
-      return null;
     }
+    return null;
   }
 
   get activeRoomOnline(): string[] {
-    let online: string[] = [];
+    const online: string[] = [];
     if (this.activeRoom) {
-      this.activeRoom.users.forEach(u => {
+      this.activeRoom.users.forEach((u) => {
         if (this.onlineDict[u]) {
           online.push(...this.onlineDict[u]);
         }
@@ -336,17 +369,16 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setMessageProgress(payload: SetMessageProgress) {
-    const transfer = this.roomsDict[payload.roomId].messages[payload.messageId].transfer;
+    const {transfer} = this.roomsDict[payload.roomId].messages[payload.messageId];
     if (transfer && transfer.upload) {
       transfer.upload.uploaded = payload.uploaded;
     } else {
       throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
     }
-
   }
 
   @Mutation
-  public setCurrentChatPage(currentChatPage: 'rooms' | 'chat') {
+  public setCurrentChatPage(currentChatPage: "chat" | "rooms") {
     this.currentChatPage = currentChatPage;
   }
 
@@ -358,6 +390,11 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setStorage(payload: IStorage) {
     this.storage = payload;
+  }
+
+  @Mutation
+  public finishLoadingSmileys() {
+    this.smileysLoaded = true;
   }
 
   @Mutation
@@ -406,14 +443,14 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setOpponentAnchor(payload: SetOpponentAnchor) {
     let key = null;
-    for (let k in this.mediaObjects) {
+    for (const k in this.mediaObjects) {
       if (this.mediaObjects[k] === payload.anchor) {
         key = k;
       }
     }
     if (!key) {
       // TODO do we need to fire watch if track added but stream hasn't changed?
-      let key = mediaLinkIdGetter();
+      const key = mediaLinkIdGetter();
       this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
       // Vue.set
       this.mediaObjects[key] = payload.anchor;
@@ -467,11 +504,11 @@ export class DefaultStore extends VuexModule {
     ci.shareScreen = false;
     ci.sharePaint = false;
     ci.showVideo = false;
-    if (payload.type === 'desktop') {
+    if (payload.type === "desktop") {
       ci.shareScreen = payload.state;
-    } else if (payload.type === 'webcam') {
+    } else if (payload.type === "webcam") {
       ci.showVideo = payload.state;
-    } else if (payload.type === 'paint') {
+    } else if (payload.type === "paint") {
       ci.sharePaint = payload.state;
     }
   }
@@ -515,7 +552,7 @@ export class DefaultStore extends VuexModule {
   @Validate
   public addSendingFileTransfer(payload: AddSendingFileTransfer) {
     // Vue.set
-    this.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transferId]= payload.transfer;
+    this.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transferId] = payload.transfer;
   }
 
   @Mutation
@@ -554,30 +591,31 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setMessagesStatus(
-      {
-        roomId,
-        messagesIds,
-        status,
-      }: {
-        roomId: number;
-        messagesIds: number[];
-        status: MessageStatus;
-      }
+    {
+      roomId,
+      messagesIds,
+      status,
+    }: {
+      roomId: number;
+      messagesIds: number[];
+      status: MessageStatus;
+    },
   ) {
-    let ids = Object.values(this.roomsDict[roomId].messages)
-        .filter(m => messagesIds.includes(m.id))
-        .map(m => {
-          m.status = status;
-          return m.id;
-        });
+    const ids = Object.values(this.roomsDict[roomId].messages).filter((m) => messagesIds.includes(m.id)).
+      map((m) => {
+        m.status = status;
+        return m.id;
+      });
     if (ids.length) {
       this.storage.setMessagesStatus(ids, status);
     }
   }
 
-  // resetNewMessagesCount(roomId: number) {
-  //   this.roomsDict[roomId].newMessagesCount = 0;
-  // }
+  /*
+   * ResetNewMessagesCount(roomId: number) {
+   *   this.roomsDict[roomId].newMessagesCount = 0;
+   * }
+   */
 
   @Mutation
   public removeMessageProgress(payload: RemoveMessageProgress) {
@@ -597,7 +635,7 @@ export class DefaultStore extends VuexModule {
     if (!mm.files) {
       throw Error(`Message ${payload.messageId} in room ${payload.roomId} doesn't have files`);
     }
-    Object.keys(payload.fileIds).forEach(symb => {
+    Object.keys(payload.fileIds).forEach((symb) => {
       mm.files![symb].fileId = payload.fileIds[symb].fileId || null;
       mm.files![symb].previewFileId = payload.fileIds[symb].previewFileId || null;
     });
@@ -606,93 +644,99 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public addMessage(m: MessageModel) {
-    const om: { [id: number]: MessageModel } = this.roomsDict[m.roomId].messages;
-    // if this message is in thread
-    // and parent message already loaded (so its threadMessageId is not actualanymore)
-    // and this message is a new one (not syncing current message)
-    if (m.parentMessage && om[m.parentMessage] && !om[m.id]
-        // and this message is not from us (otherwise we already increased message count when sending it and storing in store)
-        && !(m.userId === this.userInfo?.userId && m.id > 0)) {
+    const om: Record<number, MessageModel> = this.roomsDict[m.roomId].messages;
+
+    /*
+     * If this message is in thread
+     * and parent message already loaded (so its threadMessageId is not actualanymore)
+     * and this message is a new one (not syncing current message)
+     */
+    if (m.parentMessage && om[m.parentMessage] && !om[m.id] &&
+      // And this message is not from us (otherwise we already increased message count when sending it and storing in store)
+      !(m.userId === this.userInfo?.userId && m.id > 0)) {
       om[m.parentMessage].threadMessagesCount++;
       this.storage.setThreadMessageCount(m.parentMessage, om[m.parentMessage].threadMessagesCount);
     }
-    //Vue.set(
+    // Vue.set(
     om[m.id] = m;
     this.storage.saveMessage(m);
   }
 
-  // we're saving it to database, we restored this message from.
-  // seems like we can't split 2 methods, since 1 should be in actions
-  // and one in mutation, but storage is not available in actions
+  /*
+   * We're saving it to database, we restored this message from.
+   * seems like we can't split 2 methods, since 1 should be in actions
+   * and one in mutation, but storage is not available in actions
+   */
   @Mutation
   public addMessageWoDB(m: MessageModel) {
-    // calling mutation from another mutation is not allowed in vuex
-    // https://github.com/championswimmer/vuex-module-decorators/issues/363
-    const om: { [id: number]: MessageModel } = this.roomsDict[m.roomId].messages;
-    //Vue.set(
-    om[m.id] =m;
+
+    /*
+     * Calling mutation from another mutation is not allowed in vuex
+     * https://github.com/championswimmer/vuex-module-decorators/issues/363
+     */
+    const om: Record<number, MessageModel> = this.roomsDict[m.roomId].messages;
+    // Vue.set(
+    om[m.id] = m;
   }
 
   @Mutation
   public addLiveConnectionToRoom(m: LiveConnectionLocation) {
-    if (this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection) >= 0) {
-      throw Error('This connection is already here');
+    if (this.roomsDict[m.roomId].p2pInfo.liveConnections.includes(m.connection)) {
+      throw Error("This connection is already here");
     }
     this.roomsDict[m.roomId].p2pInfo.liveConnections.push(m.connection);
   }
 
   @Mutation
   public removeLiveConnectionToRoom(m: LiveConnectionLocation) {
-    let indexOf = this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection);
+    const indexOf = this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection);
     if (indexOf < 0) {
-      throw Error('This connection is not present');
+      throw Error("This connection is not present");
     }
     this.roomsDict[m.roomId].p2pInfo.liveConnections.splice(indexOf, 1);
   }
 
   @Mutation
   public markMessageAsSent(m: RoomMessagesIds) {
-    let markSendingIds: number[] = []
-    m.messagesId.forEach(messageId => {
-      let message = this.roomsDict[m.roomId].messages[messageId];
-      if (message.status === 'sending') {
-        message.status = 'on_server';
+    const markSendingIds: number[] = [];
+    m.messagesId.forEach((messageId) => {
+      const message = this.roomsDict[m.roomId].messages[messageId];
+      if (message.status === "sending") {
+        message.status = "on_server";
         markSendingIds.push(messageId);
       }
     });
     this.storage.markMessageAsSent(markSendingIds);
-
   }
 
   @Mutation
   public deleteMessage(rm: RoomMessageIds) {
-    let messages = this.roomsDict[rm.roomId].messages;
+    const {messages} = this.roomsDict[rm.roomId];
     // Vue.delete(messages, String(rm.messageId));
-    delete messages[rm.messageId]
-    Object.values(messages)
-        .filter(m => m.parentMessage === rm.messageId)
-        .forEach(a => a.parentMessage = rm.newMessageId);
+    delete messages[rm.messageId];
+    Object.values(messages).filter((m) => m.parentMessage === rm.messageId).
+      forEach((a) => a.parentMessage = rm.newMessageId);
     this.storage.deleteMessage(rm.messageId, rm.newMessageId);
   }
 
   @Mutation
   public addMessages(ml: AddMessagesDTO) {
-    const om: { [id: number]: MessageModel } = this.roomsDict[ml.roomId].messages;
+    const om: Record<number, MessageModel> = this.roomsDict[ml.roomId].messages;
     if (ml.syncingThreadMessageRequired) {
       const messageWithParent: Record<string, number> = {};
-      ml.messages.filter(m => m.parentMessage && !om[m.id] && om[m.parentMessage]).forEach(m => {
+      ml.messages.filter((m) => m.parentMessage && !om[m.id] && om[m.parentMessage]).forEach((m) => {
         if (!messageWithParent[m.parentMessage!]) {
           messageWithParent[m.parentMessage!] = 0;
         }
         messageWithParent[m.parentMessage!]++;
-      })
+      });
       Object.entries(messageWithParent).forEach(([parentRoomId, amountNewmessages]) => {
         const roomId = parseInt(parentRoomId);
         om[roomId].threadMessagesCount += amountNewmessages;
         this.storage.setThreadMessageCount(roomId, om[roomId].threadMessagesCount);
-      })
+      });
     }
-    ml.messages.forEach(m => {
+    ml.messages.forEach((m) => {
       // VUe.set
       om[m.id] = m;
     });
@@ -702,8 +746,8 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public addSearchMessages(ml: MessagesLocation) {
     const om: Record<number, MessageModel> = this.roomsDict[ml.roomId].search.messages;
-    ml.messages.forEach(m => {
-      // vue.set
+    ml.messages.forEach((m) => {
+      // Vue.set
       om[m.id] = m;
     });
   }
@@ -722,7 +766,7 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setCurrentThread(editingThread: EditingMessage) {
-    let m: MessageModel = this.roomsDict[editingThread.roomId].messages[editingThread.messageId];
+    const m: MessageModel = this.roomsDict[editingThread.roomId].messages[editingThread.messageId];
     m.isThreadOpened = editingThread.isEditingNow;
   }
 
@@ -748,7 +792,7 @@ export class DefaultStore extends VuexModule {
       room.changeName.push({
         newName: srm.name,
         oldName: room.name,
-        time: Date.now()
+        time: Date.now(),
       });
     }
     room.notifications = srm.notifications;
@@ -820,7 +864,7 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public addRoomLog(payload: RoomLogEntry) {
-    payload.roomIds.forEach(r => {
+    payload.roomIds.forEach((r) => {
       this.roomsDict[r].roomLog.push(payload.roomLog);
     });
   }
@@ -832,7 +876,7 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setOnline(ids: Record<string, string[]>) {
-    Object.keys(ids).forEach(k => {
+    Object.keys(ids).forEach((k) => {
       if (ids[k].length === 0) {
         delete ids[k];
       }
@@ -850,8 +894,11 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setUserInfo(userInfo: CurrentUserInfoWoImage) {
-    let image: string|null = this.userInfo?.image || null;
-    let newUserInfo: CurrentUserInfoModel= {...userInfo, image}
+    const image: string | null = this.userInfo?.image || null;
+    const newUserInfo: CurrentUserInfoModel = {
+      ...userInfo,
+      image,
+    };
     this.userInfo = newUserInfo;
     this.storage.setUserProfile(this.userInfo);
   }
@@ -875,31 +922,31 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setStateFromWS(state: SetStateFromWS) {
-    logger.debug('init store from WS')();
+    logger.debug("init store from WS")();
 
     this.roomsDict = state.roomsDict;
     this.channelsDict = state.channelsDict;
     this.allUsersDict = state.allUsersDict;
 
     this.storage.setChannels(Object.values(this.channelsDict));
-    this.storage.setRooms(Object.values(this.roomsDict ));
+    this.storage.setRooms(Object.values(this.roomsDict));
     this.storage.setUsers(Object.values(this.allUsersDict));
   }
 
   @Mutation
   public setCountryCode(locations: Record<string, Location>) {
-    Object.values(this.allUsersDict).forEach(u => {
+    Object.values(this.allUsersDict).forEach((u) => {
       if (locations[u.id]) {
         u.location = locations[u.id];
       }
-    })
+    });
     this.storage.setUsers(Object.values(this.allUsersDict));
   }
 
   @Mutation
-  // called while restoring from db
+  // Called while restoring from db
   public setStateFromStorage(setRooms: SetStateFromStorage) {
-    logger.debug('init store from database')();
+    logger.debug("init store from database")();
     this.roomsDict = setRooms.roomsDict;
     this.userInfo = setRooms.profile;
     this.userSettings = setRooms.settings;
@@ -917,7 +964,7 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public addChannel(channel: ChannelModel) {
     // Vue.set(, String(), channel);
-    this.channelsDict[channel.id] = channel
+    this.channelsDict[channel.id] = channel;
     this.storage.saveChannel(channel);
   }
 
@@ -952,13 +999,17 @@ export class DefaultStore extends VuexModule {
     this.allUsersDict = {};
     this.onlineDict = {};
     this.activeRoomId = null;
-    localStorage.clear(); // remove LAST_SYNC, serviceWorkerUrl, sessionId, smileyRecent and other trash
+    localStorage.clear(); // Remove LAST_SYNC, serviceWorkerUrl, sessionId, smileyRecent and other trash
     this.storage.clearStorage();
   }
 
   @Action
-  public async showGrowl({html, type, time}: { html: string; type: GrowlType; time: number }) {
-    const growl: GrowlModel = {id: Date.now(), html, type};
+  public async showGrowl({html, type, time}: {html: string; type: GrowlType; time: number}) {
+    const growl: GrowlModel = {
+      id: Date.now(),
+      html,
+      type,
+    };
     this.addGrowl(growl);
     await sleep(time);
     this.removeGrowl(growl);
@@ -966,32 +1017,55 @@ export class DefaultStore extends VuexModule {
 
   @Action
   public async showUserIsTyping({userId, roomId}: {userId: number; roomId: number}) {
-    let date = Date.now();
-    this.setShowITypingUser({userId, roomId, date});
-    await sleep(SHOW_I_TYPING_INTERVAL_SHOW); // lets say 1 second ping
+    const date = Date.now();
+    this.setShowITypingUser({
+      userId,
+      roomId,
+      date,
+    });
+    await sleep(SHOW_I_TYPING_INTERVAL_SHOW); // Lets say 1 second ping
     if (this.roomsDict[roomId].usersTyping[userId] === date) {
-      this.setShowITypingUser({userId, roomId, date: 0});
+      this.setShowITypingUser({
+        userId,
+        roomId,
+        date: 0,
+      });
     }
   }
 
   @Action
   public async growlErrorRaw(html: string) {
-    await this.showGrowl({html, type: GrowlType.ERROR, time: 6000});
+    await this.showGrowl({
+      html,
+      type: GrowlType.ERROR,
+      time: 6000,
+    });
   }
 
   @Action
   public async growlError(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.ERROR, time: 6000});
+    await this.showGrowl({
+      html: encodeHTML(title),
+      type: GrowlType.ERROR,
+      time: 6000,
+    });
   }
 
   @Action
   public async growlInfo(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO, time: 5000});
+    await this.showGrowl({
+      html: encodeHTML(title),
+      type: GrowlType.INFO,
+      time: 5000,
+    });
   }
 
   @Action
   public async growlSuccess(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.SUCCESS, time: 4000});
+    await this.showGrowl({
+      html: encodeHTML(title),
+      type: GrowlType.SUCCESS,
+      time: 4000,
+    });
   }
-
 }

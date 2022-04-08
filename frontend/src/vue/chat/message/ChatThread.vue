@@ -1,7 +1,9 @@
 <template>
   <div>
     <chat-sending-message :message="message"/>
-    <div v-if="!message.isThreadOpened" @click="activate" class="thread-replies-count">{{message.threadMessagesCount}} replies</div>
+    <div v-if="!message.isThreadOpened" class="thread-replies-count" @click="activate">
+      {{ message.threadMessagesCount }} replies
+    </div>
     <div v-if="locked" class="loading-history">
       <div class="spinner"/>
       <div>Loading history...</div>
@@ -33,20 +35,29 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {MessageModel, ReceivingFile, SendingFile} from '@/ts/types/model';
-import ChatSendingMessage from '@/vue/chat/message/ChatSendingMessage.vue';
-import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import ChatTextArea from '@/vue/chat/textarea/ChatTextArea.vue';
-import ChatSendingFile from '@/vue/chat/message/ChatSendingFile.vue';
-import ChatReceivingFile from '@/vue/chat/message/ChatReceivingFile.vue';
-import AppSeparator from '@/vue/ui/AppSeparator.vue';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch,
+} from "vue-property-decorator";
+import {MessageModel} from "@/ts/types/model";
+import ChatSendingMessage from "@/vue/chat/message/ChatSendingMessage.vue";
+import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
+import ChatSendingFile from "@/vue/chat/message/ChatSendingFile.vue";
+import ChatReceivingFile from "@/vue/chat/message/ChatReceivingFile.vue";
+import AppSeparator from "@/vue/ui/AppSeparator.vue";
+
 @Component({
-  name: 'ChatThread' ,
+  name: "ChatThread",
   components: {
     AppSeparator,
     ChatReceivingFile,
-    ChatSendingFile, ChatTextArea, ChatSendingMessage}
+    ChatSendingFile,
+    ChatTextArea,
+    ChatSendingMessage,
+  },
 })
 export default class ChatThread extends Vue {
   @Prop()
@@ -55,26 +66,26 @@ export default class ChatThread extends Vue {
   @Prop() // (MessageModel|ReceivingFile|SendingFile)[];
   public readonly messages!: any[];
 
+  public locked: boolean = false;
+
   @Ref()
   private readonly textarea!: ChatTextArea;
 
-  public locked: boolean = false;
-
-  @Watch('message.threadMessagesCount')
+  @Watch("message.threadMessagesCount")
   checkThreadMessagesCountMatch() {
-    // during printing message there's time when old message exists with a new one
-    if (this.message.threadMessagesCount !== this.messages.length ?? this.message.threadMessagesCount +1 !== this.messages.length) {
-      this.$logger.warn(`Message #${this.message.id} has mismatched thread messages count ${this.message.threadMessagesCount}!=${this.messages.length}`)()
+    // During printing message there's time when old message exists with a new one
+    if (this.message.threadMessagesCount !== this.messages.length ?? this.message.threadMessagesCount + 1 !== this.messages.length) {
+      this.$logger.warn(`Message #${this.message.id} has mismatched thread messages count ${this.message.threadMessagesCount}!=${this.messages.length}`)();
     }
   }
 
-  @Watch('message.isThreadOpened')
+  @Watch("message.isThreadOpened")
   async onThreadOpen(value: boolean) {
     if (value) {
       if (this.message.threadMessagesCount > this.messages.length) {
         if (this.locked) {
           this.$logger.warn("Messages are locked, so syncing won't be triggered")();
-          return ;
+          return;
         }
         try {
           this.locked = true;
@@ -85,7 +96,7 @@ export default class ChatThread extends Vue {
       }
       this.$nextTick(() => {
         this.textarea.userMessage.focus();
-      })
+      });
     }
   }
 
@@ -94,36 +105,42 @@ export default class ChatThread extends Vue {
   }
 
   activate() {
-    this.$store.setCurrentThread({messageId: this.message.id, roomId: this.message.roomId, isEditingNow: true});
+    this.$store.setCurrentThread({
+      messageId: this.message.id,
+      roomId: this.message.roomId,
+      isEditingNow: true,
+    });
   }
-
 }
 </script>
 <!-- eslint-disable -->
 <style lang="sass" scoped>
 
-  @import "@/assets/sass/partials/variables"
-  @import "@/assets/sass/partials/mixins"
+@import "@/assets/sass/partials/variables"
+@import "@/assets/sass/partials/mixins"
 
-  .loading-history
-    display: flex
-    padding: 2px 14px
-    justify-content: center
-  .spinner
-    margin-right: 10px
-    @include spinner(3px, white)
+.loading-history
+  display: flex
+  padding: 2px 14px
+  justify-content: center
 
-  .thread-replies-count
-    margin-left: 15px
-    cursor: pointer
-    padding-left: 10px
-    color: darken($thread-border-color, 10%)
-    border-left: 4px solid darken($thread-border-color, 10%)
-    &:hover
-      color: $thread-border-color
-      border-left: 4px solid $thread-border-color
-  .thread-opened
-    padding-left: 10px
+.spinner
+  margin-right: 10px
+  @include spinner(3px, white)
+
+.thread-replies-count
+  margin-left: 15px
+  cursor: pointer
+  padding-left: 10px
+  color: darken($thread-border-color, 10%)
+  border-left: 4px solid darken($thread-border-color, 10%)
+
+  &:hover
+    color: $thread-border-color
     border-left: 4px solid $thread-border-color
-    margin-left: 15px
+
+.thread-opened
+  padding-left: 10px
+  border-left: 4px solid $thread-border-color
+  margin-left: 15px
 </style>

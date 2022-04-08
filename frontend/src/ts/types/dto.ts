@@ -1,4 +1,4 @@
-import {
+import type {
   BlobType,
   ChannelsDictModel,
   CurrentUserInfoModel,
@@ -6,14 +6,18 @@ import {
   MessageStatus,
   RoomDictModel,
   SexModelString,
-  UserModel
-} from '@/ts/types/model';
-import {LogLevel} from 'lines-logger';
-export type SexModelDto = 'Male' | 'Female' |'Secret';
+  UserModel,
+} from "@/ts/types/model";
+import type {LogLevel} from "lines-logger";
+
+export type SexModelDto =
+  "Female"
+  | "Male"
+  | "Secret";
 
 
 export interface RoomNoUsersDto {
-  channelId: number|null;
+  channelId: number | null;
   notifications: boolean;
   p2p: boolean;
   volume: number;
@@ -40,7 +44,7 @@ export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
 }
 
-export type SaveFileResponse = Record<string, { fileId: number; previewFileId?: number}>;
+export type SaveFileResponse = Record<string, {fileId: number; previewFileId?: number}>;
 
 export interface ChannelDto {
   channelName: string;
@@ -79,7 +83,7 @@ export interface UserSettingsDto {
 export interface SetStateFromWS {
   roomsDict: RoomDictModel;
   channelsDict: ChannelsDictModel;
-  allUsersDict: {[id: number]: UserModel};
+  allUsersDict: Record<number, UserModel>;
 }
 
 export interface SetStateFromStorage {
@@ -87,7 +91,7 @@ export interface SetStateFromStorage {
   channelsDict: ChannelsDictModel;
   settings: CurrentUserSettingsModel;
   profile: CurrentUserInfoModel;
-  allUsersDict: {[id: number]: UserModel};
+  allUsersDict: Record<number, UserModel>;
 }
 
 export interface UserProfileDtoWoImage {
@@ -116,6 +120,7 @@ export interface OauthStatus {
   google: boolean;
   facebook: boolean;
 }
+
 export interface FileModelDto {
   url: string;
   id: number;
@@ -127,8 +132,8 @@ export interface MessageModelDto {
   id: number;
   time: number;
   parentMessage: number;
-  files?: {[id: number]: FileModelDto};
-  tags: {[id: number]: number};
+  files?: Record<number, FileModelDto>;
+  tags: Record<number, number>;
   content: string;
   status: MessageStatus;
   symbol?: string;
@@ -139,6 +144,6 @@ export interface MessageModelDto {
   userId: number;
 }
 
-export interface WebRtcMessageModelDto extends Omit<MessageModelDto, 'userId'| 'roomId'| 'time'> {
+export interface WebRtcMessageModelDto extends Omit<MessageModelDto, "roomId" | "time" | "userId"> {
   timeDiff: number;
 }

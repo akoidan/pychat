@@ -1,304 +1,307 @@
 @import "@/assets/sass/partials/variables"
 
 @mixin fix-user-icon-top-position()
-	i:before
-		transform: translate(0, 3px)
+  i:before
+    transform: translate(0, 3px)
 
 @mixin border-radius($radius...)
-	-webkit-border-radius: $radius
-	-moz-border-radius: $radius
-	-ms-border-radius: $radius
-	border-radius: $radius
+  -webkit-border-radius: $radius
+  -moz-border-radius: $radius
+  -ms-border-radius: $radius
+  border-radius: $radius
 
 @mixin box-shadow($text...)
-	-moz-box-shadow: $text
-	-webkit-box-shadow: $text
-	box-shadow: $text
+  -moz-box-shadow: $text
+  -webkit-box-shadow: $text
+  box-shadow: $text
 
 @mixin transition($text...)
-	-webkit-transition: $text
-	-moz-transition: $text
-	-o-transition: $text
-	-ms-transition: $text
-	transition: $text
+  -webkit-transition: $text
+  -moz-transition: $text
+  -o-transition: $text
+  -ms-transition: $text
+  transition: $text
 
 @mixin spinner($size, $color)
-	@-webkit-keyframes pychat-rotate
-		to
-			-webkit-transform: rotate(360deg)
-	width: $size * 7
-	height: $size * 7
-	-webkit-animation: pychat-rotate 1s infinite linear
-	border-radius: $size * 15
-	border-bottom: $size solid $color
+  @-webkit-keyframes pychat-rotate
+    to
+      -webkit-transform: rotate(360deg)
+  width: $size * 7
+  height: $size * 7
+  -webkit-animation: pychat-rotate 1s infinite linear
+  border-radius: $size * 15
+  border-bottom: $size solid $color
 
 @mixin drop-padding($top, $left)
-	padding: $top + 1px $left - 1px $top - 1px $left + 1px
+  padding: $top + 1px $left - 1px $top - 1px $left + 1px
 
 @mixin linear-gradient-values($value...)
-	background-image: -webkit-linear-gradient($value)
-	background-image: -moz-linear-gradient($value)
-	background-image: -o-linear-gradient($value)
-	background-image: -ms-linear-gradient($value)
-	background-image: linear-gradient($value)
+  background-image: -webkit-linear-gradient($value)
+  background-image: -moz-linear-gradient($value)
+  background-image: -o-linear-gradient($value)
+  background-image: -ms-linear-gradient($value)
+  background-image: linear-gradient($value)
 
 @mixin linear-gradient($begin, $end)
-	@include linear-gradient-values($begin 0%, $end 100%)
+  @include linear-gradient-values($begin 0%, $end 100%)
 
 
 @mixin lds-spinner($radius, $text, $is-in-line)
 
-	text-align: center
-	display: flex
-	align-items: center
-	justify-content: center
+  text-align: center
+  display: flex
+  align-items: center
+  justify-content: center
 
-	@if $is-in-line
-		flex-direction: row
-	@else
-		flex-direction: column
+  @if $is-in-line
+    flex-direction: row
+  @else
+    flex-direction: column
 
-	&:before
-		content: " "
-		display: inline-block
-		border-radius: 50%
-		width: 0
-		height: 0
-		box-sizing: border-box
-		border: $radius solid #fff
-		border-color: #fff transparent #fff transparent
-		animation: lds-hourglass 1.2s infinite
+  &:before
+    content: " "
+    display: inline-block
+    border-radius: 50%
+    width: 0
+    height: 0
+    box-sizing: border-box
+    border: $radius solid #fff
+    border-color: #fff transparent #fff transparent
+    animation: lds-hourglass 1.2s infinite
 
-	&:after
-		@if $is-in-line
-			margin-left: calc($radius/4)
-		@else
-			margin-top: calc($radius/4)
-		content: $text
-		font-size: 18px
-		text-align: center
-		animation: lds-blinker 1.2s infinite
+  &:after
+    @if $is-in-line
+      margin-left: calc($radius / 4)
+    @else
+      margin-top: calc($radius / 4)
+    content: $text
+    font-size: 18px
+    text-align: center
+    animation: lds-blinker 1.2s infinite
 
-	@keyframes lds-blinker
-		0%
-			opacity: 1
-		50%
-			opacity: 0.5
+  @keyframes lds-blinker
+    0%
+      opacity: 1
+    50%
+      opacity: 0.5
 
-	@keyframes lds-hourglass
-		0%
-			transform: rotate(0)
-			animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19)
-		50%
-			transform: rotate(900deg)
-			animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1)
-			opacity: 0.5
-		100%
-			transform: rotate(1800deg)
+  @keyframes lds-hourglass
+    0%
+      transform: rotate(0)
+      animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19)
+    50%
+      transform: rotate(900deg)
+      animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1)
+      opacity: 0.5
+    100%
+      transform: rotate(1800deg)
 
 @mixin lds-30-spinner-vertical($text)
-	@include lds-spinner(30px, $text, false)
+  @include lds-spinner(30px, $text, false)
 
 @mixin linear-gradient-hover($textColor, $backgroundColor, $padding-vert: 7px, $padding-hori: 14px, $bgEnd: darken($backgroundColor, 15.7%))
-	text-shadow: #000 0 1px 5px
-	border-radius: 4px
-	outline: none
-	color: $textColor
-	border: 1px solid transparent
-	&:disabled
-		cursor: not-allowed
-	&:not(:hover):not(:active)
-		border-top: 1px solid lighten($backgroundColor, 20%)
-		border-left: 1px solid lighten($backgroundColor, 5%)
-		border-bottom: 1px solid darken($backgroundColor, 25%)
-		border-right: 1px solid darken($backgroundColor, 25%)
-		@include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
-	&:hover:not(:active)
-		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
-		color: lighten($textColor, 8%)
-		//background-color: desaturate(darken($backgroundColor, 5%), 5%)
-		background-color: darken($backgroundColor, 8%)
-		&:not(:disabled)
-			cursor: pointer
-	&:active
-		border: 1px solid transparent
-		border-top: 1px solid darken($backgroundColor, 25%)
-		border-left: 1px solid darken($backgroundColor, 25%)
-		border-right: 1px solid transparent
-		border-bottom: 1px solid $backgroundColor
-		@include box-shadow(1px 1px 1px rgba(255, 255, 255, 0.2))
-		color: lighten($textColor, 15%)
-		@include linear-gradient-values(darken($backgroundColor, 8.7%) 0%, darken($backgroundColor, 1.7%) 100%)
-		&:not(:disabled)
-			cursor: pointer
-	padding: $padding-vert $padding-hori
-	&:active:not([disabled])
-		@include drop-padding($padding-vert, $padding-hori)
-	&[disabled]
-		@include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
-		color: darken($textColor, 20%) !important
+  text-shadow: #000 0 1px 5px
+  border-radius: 4px
+  outline: none
+  color: $textColor
+  border: 1px solid transparent
+  &:disabled
+    cursor: not-allowed
+  &:not(:hover):not(:active)
+    border-top: 1px solid lighten($backgroundColor, 20%)
+    border-left: 1px solid lighten($backgroundColor, 5%)
+    border-bottom: 1px solid darken($backgroundColor, 25%)
+    border-right: 1px solid darken($backgroundColor, 25%)
+    @include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
+  &:hover:not(:active)
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
+    color: lighten($textColor, 8%)
+    //background-color: desaturate(darken($backgroundColor, 5%), 5%)
+    background-color: darken($backgroundColor, 8%)
+
+    &:not(:disabled)
+      cursor: pointer
+  &:active
+    border: 1px solid transparent
+    border-top: 1px solid darken($backgroundColor, 25%)
+    border-left: 1px solid darken($backgroundColor, 25%)
+    border-right: 1px solid transparent
+    border-bottom: 1px solid $backgroundColor
+    @include box-shadow(1px 1px 1px rgba(255, 255, 255, 0.2))
+    color: lighten($textColor, 15%)
+    @include linear-gradient-values(darken($backgroundColor, 8.7%) 0%, darken($backgroundColor, 1.7%) 100%)
+
+    &:not(:disabled)
+      cursor: pointer
+  padding: $padding-vert $padding-hori
+  &:active:not([disabled])
+    @include drop-padding($padding-vert, $padding-hori)
+  &[disabled]
+    @include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
+    color: darken($textColor, 20%) !important
 
 @mixin linear-double-gradient($f1, $f2, $s1, $s2)
-	background-image: -webkit-linear-gradient($s1, $s2), -webkit-linear-gradient($f1, $f2)
-	background-image: -moz-linear-gradient($s1, $s2), -moz-linear-gradient($f1, $f2)
-	background-image: -o-linear-gradient($s1, $s2), -o-linear-gradient($f1, $f2)
-	background-image: linear-gradient($s1, $s2), linear-gradient($f1, $f2)
-	background-image: -ms-linear-gradient($s1, $s2), -ms-linear-gradient($f1, $f2)
+  background-image: -webkit-linear-gradient($s1, $s2), -webkit-linear-gradient($f1, $f2)
+  background-image: -moz-linear-gradient($s1, $s2), -moz-linear-gradient($f1, $f2)
+  background-image: -o-linear-gradient($s1, $s2), -o-linear-gradient($f1, $f2)
+  background-image: linear-gradient($s1, $s2), linear-gradient($f1, $f2)
+  background-image: -ms-linear-gradient($s1, $s2), -ms-linear-gradient($f1, $f2)
 
 =wrapper-inner
-	@include display-flex
-	flex: 1
-	width: 100%
+  @include display-flex
+  flex: 1
+  width: 100%
 
 @mixin placeholder
-	\::-webkit-input-placeholder
-		@content
-	\:-moz-placeholder
-		/* Firefox 18-
-		@content
-	\::-moz-placeholder
-		/* Firefox 19+
-		@content
-	\:-ms-input-placeholder // TODO doesn't work
-		@content
+  \::-webkit-input-placeholder
+    @content
+  \:-moz-placeholder
+    /* Firefox 18-
+    @content
+  \::-moz-placeholder
+    /* Firefox 19+
+    @content
+  \:-ms-input-placeholder
+     @content
 
 @mixin display-flex($important: null)
-	display: -ms-flexbox $important
-	display: -webkit-flex $important
-	display: flex $important
+  display: -ms-flexbox $important
+  display: -webkit-flex $important
+  display: flex $important
 
 @mixin flex($value...)
-	-webkit-flex: $value
-	-ms-flex: $value
-	flex: $value
+  -webkit-flex: $value
+  -ms-flex: $value
+  flex: $value
 
 @mixin hover-click($color)
-	cursor: pointer
-	color: desaturate(darken($color, 8%), 15%)
-	-webkit-mask-image: -webkit-linear-gradient(top, rgba(0,0,0,1),rgba(0,0,0,0.5))
-	&:hover
-		text-shadow: 0 0 0.2em #575757
-		color: saturate(lighten($color, 8%), 15%)
+  cursor: pointer
+  color: desaturate(darken($color, 8%), 15%)
+  -webkit-mask-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0.5))
+  &:hover
+    text-shadow: 0 0 0.2em #575757
+    color: saturate(lighten($color, 8%), 15%)
 
 @mixin flex-direction($value...)
-	-webkit-flex-direction: $value
-	flex-direction: $value
-	-ms-flex-direction: $value
+  -webkit-flex-direction: $value
+  flex-direction: $value
+  -ms-flex-direction: $value
 
 %user-select-none
-	-webkit-touch-callout: none
-	-webkit-user-select: none
-	-khtml-user-select: none
-	-moz-user-select: none
-	-ms-user-select: none
-	user-select: none
+  -webkit-touch-callout: none
+  -webkit-user-select: none
+  -khtml-user-select: none
+  -moz-user-select: none
+  -ms-user-select: none
+  user-select: none
 
 @mixin raw-animation($values...)
-	-webkit-animation: $values
-	-moz-animation: $values
-	-ms-animation: $values
-	-o-animation: $values
-	animation: $values
+  -webkit-animation: $values
+  -moz-animation: $values
+  -ms-animation: $values
+  -o-animation: $values
+  animation: $values
 
 @mixin animation($name, $time , $steps)
-	@include raw-animation($name $time steps($steps) infinite)
+  @include raw-animation($name $time steps($steps) infinite)
 
 @mixin appearance($value)
-	-webkit-appearance: $value
-	-moz-appearance: $value
-	appearance: $value
+  -webkit-appearance: $value
+  -moz-appearance: $value
+  appearance: $value
 
 @mixin box-sizing($value)
-	-webkit-box-sizing: $value
-	-moz-box-sizing: $value
-	-ms-box-sizing: $value
-	-o-box-sizing: $value
-	box-sizing: $value
+  -webkit-box-sizing: $value
+  -moz-box-sizing: $value
+  -ms-box-sizing: $value
+  -o-box-sizing: $value
+  box-sizing: $value
 
 @mixin top-left-border($value...)
-	border-top: $value
-	border-left: $value
+  border-top: $value
+  border-left: $value
 
 @mixin right-bottom-border($value...)
-	border-right: $value
-	border-bottom: $value
+  border-right: $value
+  border-bottom: $value
 
 
 @mixin keyframes($name)
-	@-moz-keyframes #{$name}
-		@content
-	@-ms-keyframes #{$name}
-		@content
-	@-webkit-keyframes #{$name}
-		@content
-	@keyframes #{$name}
-		@content
+  @-moz-keyframes #{$name}
+    @content
+  @-ms-keyframes #{$name}
+    @content
+  @-webkit-keyframes #{$name}
+    @content
+  @keyframes #{$name}
+    @content
 
 @mixin play($prefix, $name, $y, $width, $steps)
-	//#{'@' + $prefix + 'keyframes'} $name
-	@-webkit-keyframes #{$name}
-		from
-			background-position: 0 #{"-" + $y + 'px'}
-		to
-			background-position: #{ -$width*($steps) + 'px'} #{'-' + $y+'px'}
+  //#{'@' + $prefix + 'keyframes'} $name
+  @-webkit-keyframes #{$name}
+    from
+      background-position: 0 #{"-" + $y + 'px'}
+    to
+      background-position: #{ -$width*($steps) + 'px'} #{'-' + $y+'px'}
 
 
 @function pow($number, $exponent)
-	$value: 1
+  $value: 1
 
-	@if $exponent > 0
-		@for $i from 1 through $exponent
-			$value: $value * $number
+  @if $exponent > 0
+    @for $i from 1 through $exponent
+      $value: $value * $number
 
-	@return $value
+  @return $value
 
 @mixin ellipsis
-	text-overflow: ellipsis
-	white-space: nowrap
-	overflow: hidden
+  text-overflow: ellipsis
+  white-space: nowrap
+  overflow: hidden
 
 @mixin scrollbar($background, $thumb, $ie-3dlight, $ie-highlight, $ie-arrow)
 
-	// chrome and other webkit like opera/safari
-	::-webkit-scrollbar
-		background-color: $background
-		height: 8px
-		width: 8px
-	::-webkit-scrollbar-thumb
-		background-color: $thumb
-		-webkit-border-radius: 1ex
-		height: 10px
-	::-webkit-scrollbar-corner
-		background-color: #1c1c1c
+  // chrome and other webkit like opera/safari
+  ::-webkit-scrollbar
+    background-color: $background
+    height: 8px
+    width: 8px
+  ::-webkit-scrollbar-thumb
+    background-color: $thumb
+    -webkit-border-radius: 1ex
+    height: 10px
+  ::-webkit-scrollbar-corner
+    background-color: #1c1c1c
 
-	// IE
-	scrollbar-base-color: $thumb
-	scrollbar-track-color: $background
-	scrollbar-3dlight-color: $ie-3dlight
-	scrollbar-highlight-color: $ie-highlight
-	scrollbar-arrow-color: $ie-arrow
+  // IE
+  scrollbar-base-color: $thumb
+  scrollbar-track-color: $background
+  scrollbar-3dlight-color: $ie-3dlight
+  scrollbar-highlight-color: $ie-highlight
+  scrollbar-arrow-color: $ie-arrow
 
-	// firefox
-	scrollbar-color: $thumb $background
-	scrollbar-width: thin
+  // firefox
+  scrollbar-color: $thumb $background
+  scrollbar-width: thin
 
 
 @mixin lor-button-style
-	color: $grayish-green
-	outline: none
-	border-radius: 3px
-	border: 1px solid transparent
-	&:not(:hover)
-		background-color: rgb(62, 65, 58)
-	&:hover
-		color: #000000
-		background: linear-gradient($grayish-green, #abbdab) repeat scroll 0 0 transparent
-		@include box-shadow($default-box-shadow)
+  color: $grayish-green
+  outline: none
+  border-radius: 3px
+  border: 1px solid transparent
+  &:not(:hover)
+    background-color: rgb(62, 65, 58)
+  &:hover
+    color: #000000
+    background: linear-gradient($grayish-green, #abbdab) repeat scroll 0 0 transparent
+    @include box-shadow($default-box-shadow)
 
 @mixin color-lor-submit
-	@include lor-button-style
-	padding: 10px 12px
-	font-size: 18px
+  @include lor-button-style
+  padding: 10px 12px
+  font-size: 18px
+
 @mixin color-lor-btn
-	@include lor-button-style
-	padding: 6px 12px
+  @include lor-button-style
+  padding: 6px 12px
