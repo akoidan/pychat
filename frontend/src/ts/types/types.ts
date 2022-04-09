@@ -32,11 +32,6 @@ export type ValueFilterForKey<T extends object, U> = {
 
 type StuctureMappedType<K extends string> = Record<K, K>;
 
-const sample: StuctureMappedType<string> = {
-  any3: "andy3",
-};
-
-
 export interface UserIdConn {
   connectionId: string;
   userId: number;

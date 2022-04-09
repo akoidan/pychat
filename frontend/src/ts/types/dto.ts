@@ -8,6 +8,14 @@ import type {
   SexModelString,
   UserModel,
 } from "@/ts/types/model";
+
+export * from './backend/dto';
+
+export interface SessionResponse {
+  session: string;
+}
+
+
 import type {LogLevel} from "lines-logger";
 
 export type SexModelDto =
@@ -27,9 +35,7 @@ export interface RoomNoUsersDto {
   roomCreatorId: number;
 }
 
-export interface SessionResponse {
-  session: string;
-}
+
 
 export interface OauthSessionResponse extends SessionResponse {
   isNewAccount: boolean;

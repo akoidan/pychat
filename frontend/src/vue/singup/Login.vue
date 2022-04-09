@@ -8,6 +8,7 @@
       <input
         autocomplete="username"
         class="input"
+        v-model="username"
         maxlength="254"
         name="username"
         placeholder="Username/Email"
@@ -20,6 +21,7 @@
       <input
         autocomplete="password"
         class="input"
+        v-model="password"
         name="password"
         placeholder="Password"
         required
@@ -69,6 +71,8 @@ export default class Login extends Vue {
   @Ref()
   public form!: HTMLFormElement;
 
+  public username: string = '';
+  public password: string = '';
   public running: boolean = false;
 
   public created() {
@@ -80,7 +84,10 @@ export default class Login extends Vue {
     message: "Can't log in",
   })
   public async login() {
-    const {session} = await this.$api.login(this.form);
+    const {session} = await this.$api.login({
+      username: this.username,
+      password: this.password,
+    });
     const message: LoginMessage = {
       action: "login",
       handler: "router",

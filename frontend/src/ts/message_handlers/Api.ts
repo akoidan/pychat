@@ -23,6 +23,7 @@ import type {
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
+import {LoginRequest} from '@/ts/types/dto';
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
@@ -42,11 +43,12 @@ export default class Api extends MessageHandler {
     this.xhr = xhr;
   }
 
-  public async login(form: HTMLFormElement): Promise<SessionResponse> {
+  public async login(body: LoginRequest): Promise<SessionResponse> {
     return this.xhr.doPost<SessionResponse>({
       url: "/auth",
       isJsonDecoded: true,
-      formData: new FormData(form),
+      isJsonEncoded: true,
+      params: {...body}
     });
   }
 
