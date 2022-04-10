@@ -8,6 +8,7 @@ import {
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
+import {VerificationModel} from '@/data/database/model/verification.model';
 
 @Injectable()
 @Table({ tableName: 'user_auth'})
@@ -51,10 +52,13 @@ export class UserAuthModel extends Model<UserAuthModel> {
   })
   public googleId: string;
 
+  @ForeignKey(() => VerificationModel)
   @Column({
     type: DataType.DATE,
     allowNull: true,
   })
   public emailVerificationId: string;
 
+  @BelongsTo(() => VerificationModel)
+  public emailVerification: VerificationModel;
 }
