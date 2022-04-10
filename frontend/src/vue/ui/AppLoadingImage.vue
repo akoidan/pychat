@@ -12,7 +12,9 @@ import {
   Vue,
 } from "vue-property-decorator";
 
-@Component({})
+@Component({
+  name: "AppLoadingImage",
+})
 export default class AppLoadingImage extends Vue {
   @Prop() public src!: string;
 

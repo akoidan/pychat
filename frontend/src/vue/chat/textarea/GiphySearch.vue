@@ -62,6 +62,7 @@ import AppLoadingImage from "@/vue/ui/AppLoadingImage.vue";
 import {LOAD_GIPHIES_PER_REQUEST} from "@/ts/utils/consts";
 
 @Component({
+  name: 'GiphySearch',
   components: {
     AppLoadingImage,
     AppSuspense,
