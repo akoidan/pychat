@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -20,8 +21,7 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
+    autoIncrement: true,
     primaryKey: true,
   })
   public id: number;
@@ -34,6 +34,9 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
   })
   public userId: string;
 
+  @BelongsTo(() => UserModel)
+  public user: UserModel;
+
   @ForeignKey(() => MessageModel)
   @Unique(uniqueUserIdSymbMess)
   @Column({
@@ -41,6 +44,9 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
     allowNull: false
   })
   public messageId: string;
+
+  @BelongsTo(() => MessageModel)
+  public message: MessageModel;
 
   @Unique(uniqueUserIdSymbMess)
   @Column({

@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -9,6 +10,7 @@ import {
 import {Injectable} from '@nestjs/common';
 import {MessageModel} from '@/data/database/model/message.model';
 import {SubscriptionModel} from '@/data/database/model/subscription.model';
+import {UserModel} from '@/data/database/model/user.model';
 
 const uniqueSubscriptionMessage = 'unique_subscription_message_subscription_id_message_id';
 
@@ -18,8 +20,6 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -33,6 +33,9 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
   })
   public subscriptionId: number;
 
+  @BelongsTo(() => SubscriptionModel)
+  public subscription: SubscriptionModel;
+
   @Unique(uniqueSubscriptionMessage)
   @ForeignKey(() => MessageModel)
   @Column({
@@ -40,6 +43,9 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
     allowNull: false,
   })
   public messageId: number;
+
+  @BelongsTo(() => MessageModel)
+  public message: MessageModel;
 
   @Column({
     type: DataType.BOOLEAN,

@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -8,6 +9,7 @@ import {
 import {Injectable} from '@nestjs/common';
 import {config} from 'node-config-ts';
 import {MessageModel} from '@/data/database/model/message.model';
+import {UserModel} from '@/data/database/model/user.model';
 
 
 @Injectable()
@@ -15,9 +17,7 @@ import {MessageModel} from '@/data/database/model/message.model';
 export class MessageHistoryModel extends Model<MessageHistoryModel> {
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
-    unique: true,
     primaryKey: true,
   })
   public id: number;
@@ -30,15 +30,18 @@ export class MessageHistoryModel extends Model<MessageHistoryModel> {
   })
   public messageId: number;
 
+  @BelongsTo(() => MessageModel)
+  public message: MessageModel;
+
   @Column({
     allowNull: false,
-    type: DataType.DATE,
+    type: DataType.BIGINT,
   })
-  public time: Date;
+  public time: number;
 
   @Column({
     type: DataType.TEXT('long'),
-    allowNull: false,
+    allowNull: true, // idk but it contains null
   })
   public content: string;
 }

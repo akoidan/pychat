@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -15,11 +16,13 @@ export class UserProfileModel extends Model<UserProfileModel> {
   @ForeignKey(() => UserModel)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
+    autoIncrement: false,
     primaryKey: true,
   })
   public id: number;
+
+  @BelongsTo(() => UserModel)
+  public user: UserModel;
 
   @Column({
     type: DataType.STRING(30),

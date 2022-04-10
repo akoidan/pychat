@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -15,8 +16,6 @@ export class VerificationModel extends Model<VerificationModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -40,6 +39,9 @@ export class VerificationModel extends Model<VerificationModel> {
     allowNull: false,
   })
   public userId: number;
+
+  @BelongsTo(() => UserModel)
+  public user: UserModel;
 
   @Column({
     type: DataType.DATE,

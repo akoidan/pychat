@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -9,6 +10,7 @@ import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
 import {UploadedFileChoices} from '@/data/types/dto/dto';
 import {IpAddressModel} from '@/data/database/model/ip.address.model';
+import {MessageModel} from '@/data/database/model/message.model';
 
 @Injectable()
 @Table({tableName: 'subscription'})
@@ -16,8 +18,6 @@ export class SubscriptionModel extends Model<SubscriptionModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -30,8 +30,11 @@ export class SubscriptionModel extends Model<SubscriptionModel> {
   })
   public userId: number;
 
+  @BelongsTo(() => UserModel)
+  public user: UserModel;
+
   @Column({
-    type: DataType.STRING(255),
+    type: DataType.STRING,
     unique: true,
     allowNull: false,
   })
@@ -57,4 +60,7 @@ export class SubscriptionModel extends Model<SubscriptionModel> {
     allowNull: true,
   })
   public ipId: number;
+
+  @BelongsTo(() => IpAddressModel)
+  public ip: IpAddressModel;
 }

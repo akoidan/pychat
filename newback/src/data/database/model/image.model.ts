@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -24,8 +25,6 @@ export class ImageModel extends Model<ImageModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -51,6 +50,9 @@ export class ImageModel extends Model<ImageModel> {
     allowNull: false,
   })
   public messageId: number;
+
+  @BelongsTo(() => MessageModel)
+  public message: MessageModel;
 
   @Column({
     type: DataType.STRING,

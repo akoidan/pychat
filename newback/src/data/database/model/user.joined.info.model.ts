@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -18,8 +19,6 @@ export class UserJoinedInfoModel extends Model<UserJoinedInfoModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -33,6 +32,9 @@ export class UserJoinedInfoModel extends Model<UserJoinedInfoModel> {
   })
   public ipId: number;
 
+  @BelongsTo(() => IpAddressModel)
+  public ip: IpAddressModel;
+
   @Unique(uniqueUserJoinedInfoUserIdIpId)
   @ForeignKey(() => UserModel)
   @Column({
@@ -40,6 +42,9 @@ export class UserJoinedInfoModel extends Model<UserJoinedInfoModel> {
     allowNull: false,
   })
   public userId: number;
+
+  @BelongsTo(() => UserModel)
+  public user: UserModel;
 
   @Column({
     type: DataType.DATE,

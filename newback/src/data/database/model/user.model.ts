@@ -14,9 +14,7 @@ import {config} from 'node-config-ts';
 export class UserModel extends Model<UserModel> {
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
-    unique: true,
     primaryKey: true,
   })
   public id: number;

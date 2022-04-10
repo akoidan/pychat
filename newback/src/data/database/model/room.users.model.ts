@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -18,8 +19,6 @@ export class RoomUsersModel extends Model<RoomUsersModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -33,6 +32,9 @@ export class RoomUsersModel extends Model<RoomUsersModel> {
   })
   public roomId: number;
 
+  @BelongsTo(() => RoomModel)
+  public room: RoomModel;
+
   @Unique(uniqueRoomUser)
   @ForeignKey(() => UserModel)
   @Column({
@@ -40,6 +42,9 @@ export class RoomUsersModel extends Model<RoomUsersModel> {
     allowNull: false,
   })
   public userId: number;
+
+  @BelongsTo(() => UserModel)
+  public user: UserModel;
 
   @Column({
     type: DataType.INTEGER,

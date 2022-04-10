@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -17,9 +18,7 @@ export class MessageModel extends Model<MessageModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
-    unique: true,
     primaryKey: true,
   })
   public id: number;
@@ -32,6 +31,9 @@ export class MessageModel extends Model<MessageModel> {
   })
   public senderId: number;
 
+  @BelongsTo(() => UserModel)
+  public sender: UserModel;
+
   @ForeignKey(() => RoomModel)
   @Column({
     type: DataType.INTEGER,
@@ -39,23 +41,20 @@ export class MessageModel extends Model<MessageModel> {
   })
   public roomId: number;
 
+  @BelongsTo(() => RoomModel)
+  public room: RoomModel;
+
   @Column({
-    type: DataType.DATE,
+    type: DataType.BIGINT,
     allowNull: false,
   })
-  public time: Date;
+  public time: number;
 
   @Column({
     type: DataType.TEXT('long'),
     allowNull: true,
   })
   public content: string;
-
-  @Column({
-    type: DataType.STRING(255),
-    allowNull: true,
-  })
-  public giphy: string;
 
   @Column({
     type: DataType.STRING(1),
@@ -83,4 +82,7 @@ export class MessageModel extends Model<MessageModel> {
     allowNull: true,
   })
   public parentMessageId: number;
+
+  @BelongsTo(() => MessageModel)
+  public parentMessage: MessageModel;
 }

@@ -13,6 +13,9 @@ export function generateConfig(logging: ((sql: string) => void)): SequelizeModul
     password: config.mysql.password,
     database: config.mysql.database,
     autoLoadModels: true,
+    sync: {
+      force: true,
+    },
     define: {
       collate: 'utf8mb4_general_ci',
       charset: 'utf8mb4',

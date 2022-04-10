@@ -12,8 +12,6 @@ export class IpAddressModel extends Model<IpAddressModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -27,7 +25,7 @@ export class IpAddressModel extends Model<IpAddressModel> {
   public ip: string;
 
   @Column({
-    type: DataType.STRING(255),
+    type: DataType.STRING,
     allowNull: true,
   })
   public isp: string;

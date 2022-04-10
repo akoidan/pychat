@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -18,11 +19,8 @@ import {UserModel} from '@/data/database/model/user.model';
 @Table({tableName: 'uploaded_file'})
 export class UploadedFileModel extends Model<UploadedFileModel> {
 
-
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -46,6 +44,9 @@ export class UploadedFileModel extends Model<UploadedFileModel> {
     allowNull: false,
   })
   public userId: number;
+
+  @BelongsTo(() => UserModel)
+  public user: UserModel;
 
   @Column({
     type: DataType.STRING,

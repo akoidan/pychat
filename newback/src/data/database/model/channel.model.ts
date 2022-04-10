@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -14,9 +15,7 @@ import {UserModel} from '@/data/database/model/user.model';
 export class ChannelModel extends Model<ChannelModel> {
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
     autoIncrement: true,
-    unique: true,
     primaryKey: true,
   })
   public id: number;
@@ -33,4 +32,7 @@ export class ChannelModel extends Model<ChannelModel> {
     type: DataType.INTEGER,
   })
   public creatorId: number;
+
+  @BelongsTo(() => UserModel)
+  public creator: UserModel;
 }

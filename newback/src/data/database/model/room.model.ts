@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -10,28 +11,18 @@ import {UserModel} from '@/data/database/model/user.model';
 import {ChannelModel} from '@/data/database/model/channel.model';
 
 
-// constraints = [
-// 	CheckConstraint(
-// 		check=Q(Q(channel__isnull=True) & Q(name__isnull=True)) | Q(channel__isnull=False) & Q(name__isnull=False),
-// 		name='channel_should_exist_for_public_room_and_not_exist_for_private'
-// 	),
-// 	CheckConstraint(
-// 		check=Q(creator__isnull=True) | Q(name__isnull=False),
-// 		name='admin_should_not_be_define_for_private_rooms'
-// 	),
-// 	CheckConstraint(
-// 		check=Q(p2p=False) | Q(name__isnull=True),
-// 		name='p2p_only_if_private'
-// 	)
-// ]
+// 	constraint admin_should_not_be_define_for_private_rooms
+// 		check (`creator_id` is null or `name` is not null),
+// 	constraint channel_should_exist_for_public_room_and_not_exist_for_private
+// 		check (`channel_id` is null and `name` is null or `channel_id` is not n),
+// 	constraint p2p_only_if_private
+// 		check (`p2p` = 0x00 or `name` is null)
 @Injectable()
 @Table({ tableName: 'room'})
 export class RoomModel extends Model<RoomModel> {
 
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
     autoIncrement: true,
     primaryKey: true,
   })
@@ -66,6 +57,9 @@ export class RoomModel extends Model<RoomModel> {
   })
   public channelId: number;
 
+  @BelongsTo(() => ChannelModel)
+  public channel: ChannelModel;
+
   @ForeignKey(() => UserModel)
   @Column({
     type: DataType.INTEGER,
@@ -73,4 +67,7 @@ export class RoomModel extends Model<RoomModel> {
     defaultValue: null,
   })
   public creatorId: number;
+
+  @BelongsTo(() => UserModel)
+  public creator: UserModel;
 }
