@@ -12,7 +12,7 @@ import {RoomModel} from '@/data/database/model/room.model';
 import {config} from 'node-config-ts';
 
 @Injectable()
-@Table({paranoid: true, tableName: 'message', timestamps: true})
+@Table({ tableName: 'message'})
 export class MessageModel extends Model<MessageModel> {
 
   @Column({
@@ -46,10 +46,16 @@ export class MessageModel extends Model<MessageModel> {
   public time: Date;
 
   @Column({
-    type: DataType.STRING(config.frontend.maxMessageSize),
+    type: DataType.TEXT('long'),
     allowNull: true,
   })
   public content: string;
+
+  @Column({
+    type: DataType.STRING(255),
+    allowNull: true,
+  })
+  public giphy: string;
 
   @Column({
     type: DataType.STRING(1),

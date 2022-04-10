@@ -7,7 +7,7 @@ import {
 import {Injectable} from '@nestjs/common';
 
 @Injectable()
-@Table({paranoid: true, tableName: 'ip_address', timestamps: true})
+@Table({tableName: 'ip_address'})
 export class IpAddressModel extends Model<IpAddressModel> {
 
   @Column({
@@ -57,12 +57,12 @@ export class IpAddressModel extends Model<IpAddressModel> {
   public city: string;
 
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.DOUBLE,
     allowNull: true,
   })
   public lat: number;
   @Column({
-    type: DataType.FLOAT,
+    type: DataType.DOUBLE,
     allowNull: true,
   })
   public lon: number;

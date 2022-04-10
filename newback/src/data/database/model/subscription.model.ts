@@ -7,10 +7,11 @@ import {
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
-import {UploadedFileChoices} from '@/data/types/model/db';
+import {UploadedFileChoices} from '@/data/types/dto/dto';
+import {IpAddressModel} from '@/data/database/model/ip.address.model';
 
 @Injectable()
-@Table({paranoid: true, tableName: 'subscription', timestamps: true})
+@Table({tableName: 'subscription'})
 export class SubscriptionModel extends Model<SubscriptionModel> {
 
   @Column({
@@ -50,7 +51,7 @@ export class SubscriptionModel extends Model<SubscriptionModel> {
   })
   public isMobile: boolean;
 
-  @ForeignKey(() => IpAdressModel)
+  @ForeignKey(() => IpAddressModel)
   @Column({
     type: DataType.INTEGER,
     allowNull: true,

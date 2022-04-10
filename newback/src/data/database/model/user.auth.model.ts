@@ -9,7 +9,7 @@ import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
 
 @Injectable()
-@Table({paranoid: true, tableName: 'user_auth', timestamps: true})
+@Table({ tableName: 'user_auth'})
 export class UserAuthModel extends Model<UserAuthModel> {
 
   @ForeignKey(() => UserModel)

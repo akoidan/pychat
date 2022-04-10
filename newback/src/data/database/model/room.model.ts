@@ -25,7 +25,7 @@ import {ChannelModel} from '@/data/database/model/channel.model';
 // 	)
 // ]
 @Injectable()
-@Table({paranoid: true, tableName: 'room', timestamps: true})
+@Table({ tableName: 'room'})
 export class RoomModel extends Model<RoomModel> {
 
   @Column({
@@ -40,7 +40,7 @@ export class RoomModel extends Model<RoomModel> {
 
   @Column({
     type: DataType.STRING(16),
-    allowNull: false,
+    allowNull: true,
   })
   public name: string;
 

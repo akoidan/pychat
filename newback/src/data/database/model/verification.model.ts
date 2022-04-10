@@ -7,10 +7,10 @@ import {
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
-import {VerificationType} from '@/data/types/model/db';
+import {VerificationType} from '@/data/types/dto/dto';
 
 @Injectable()
-@Table({paranoid: true, tableName: 'verification', timestamps: true})
+@Table({ tableName: 'verification'})
 export class VerificationModel extends Model<VerificationModel> {
 
   @Column({
@@ -52,13 +52,12 @@ export class VerificationModel extends Model<VerificationModel> {
     allowNull: false,
     defaultValue: false,
   })
-  public verified: Date;
+  public verified: boolean;
 
   @Column({
     type: DataType.STRING(190),
     allowNull: true,
     unique: false,
-    defaultValue: false,
   })
   public email: string;
 }

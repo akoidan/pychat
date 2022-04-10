@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 
-import ormconfig from '@/data/database/ormconfig';
+import {ormconfig } from '@/data/database/ormconfig';
 import {ChannelModel} from '@/data/database/model/channel.model';
 import {ImageModel} from '@/data/database/model/image.model';
 import {IpAddressModel} from '@/data/database/model/ip.address.model';

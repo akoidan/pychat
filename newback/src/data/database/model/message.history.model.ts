@@ -11,7 +11,7 @@ import {MessageModel} from '@/data/database/model/message.model';
 
 
 @Injectable()
-@Table({paranoid: true, tableName: 'message_history', timestamps: true})
+@Table({tableName: 'message_history'})
 export class MessageHistoryModel extends Model<MessageHistoryModel> {
   @Column({
     type: DataType.INTEGER,
@@ -37,7 +37,7 @@ export class MessageHistoryModel extends Model<MessageHistoryModel> {
   public time: Date;
 
   @Column({
-    type: DataType.STRING(config.frontend.maxMessageSize),
+    type: DataType.TEXT('long'),
     allowNull: false,
   })
   public content: string;

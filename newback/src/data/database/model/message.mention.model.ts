@@ -4,15 +4,17 @@ import {
   ForeignKey,
   Model,
   Table,
+  Unique,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
+import {MessageModel} from '@/data/database/model/message.model';
+
+const uniqueUserIdSymbMess = 'unique_message_mention_user_id_symbol_message_id';
 
 @Injectable()
 @Table({
-  paranoid: true,
   tableName: 'message_mention',
-  timestamps: true,
 })
 export class MessageMentionModel extends Model<MessageMentionModel> {
 
@@ -25,33 +27,25 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
   public id: number;
 
   @ForeignKey(() => UserModel)
+  @Unique(uniqueUserIdSymbMess)
   @Column({
     type: DataType.INTEGER,
     allowNull: false
   })
   public userId: string;
 
+  @ForeignKey(() => MessageModel)
+  @Unique(uniqueUserIdSymbMess)
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false
+  })
+  public messageId: string;
+
+  @Unique(uniqueUserIdSymbMess)
   @Column({
     type: DataType.STRING(1),
     allowNull: false
   })
   public symbol: string;
-
-  @Column({
-    type: DataType.STRING(30),
-    allowNull: true
-  })
-  public surname: string;
-
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
-  public birthday: Date;
-
-  @Column({
-    type: DataType.STRING(100),
-    allowNull: true
-  })
-  public contacts: string;
 }

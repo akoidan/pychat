@@ -10,7 +10,7 @@ import {config} from 'node-config-ts';
 
 
 @Injectable()
-@Table({paranoid: true, tableName: 'user', timestamps: true})
+@Table({tableName: 'user'})
 export class UserModel extends Model<UserModel> {
   @Column({
     type: DataType.INTEGER,
@@ -25,7 +25,7 @@ export class UserModel extends Model<UserModel> {
     type: DataType.DATE,
     allowNull: false,
   })
-  public lastLogin: Date;
+  public lastTimeOnline: Date;
 
   @Column({
     allowNull: false,
@@ -37,12 +37,13 @@ export class UserModel extends Model<UserModel> {
   @Column({
     type: DataType.ENUM(...Object.keys(Gender)),
     allowNull: false,
-    defaultValue: Gender.OTHER,
+    defaultValue: Gender.OTHER.valueOf(),
   })
   public sex: Gender;
 
   @Column({
     allowNull: true,
+    type: DataType.STRING(100),
     defaultValue: null,
   })
   public thumbnail: string;

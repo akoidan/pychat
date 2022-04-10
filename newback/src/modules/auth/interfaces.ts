@@ -3,7 +3,7 @@ import {
   Length,
   Matches,
 } from 'class-validator';
-import {LoginRequest} from '@/types/frontend/dto';
+import {LoginRequest} from '@/data/types/dto/dto';
 import {config} from 'node-config-ts';
 
 export default class LoginRequestValidator implements LoginRequest {

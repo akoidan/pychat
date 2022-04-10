@@ -4,13 +4,16 @@ import {
   ForeignKey,
   Model,
   Table,
+  Unique,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {MessageModel} from '@/data/database/model/message.model';
 import {SubscriptionModel} from '@/data/database/model/subscription.model';
 
+const uniqueSubscriptionMessage = 'unique_subscription_message_subscription_id_message_id';
+
 @Injectable()
-@Table({paranoid: true, tableName: 'room_user', timestamps: true})
+@Table({tableName: 'subscription_message'})
 export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
 
   @Column({
@@ -22,6 +25,7 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
   })
   public id: number;
 
+  @Unique(uniqueSubscriptionMessage)
   @ForeignKey(() => SubscriptionModel)
   @Column({
     type: DataType.INTEGER,
@@ -29,6 +33,7 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
   })
   public subscriptionId: number;
 
+  @Unique(uniqueSubscriptionMessage)
   @ForeignKey(() => MessageModel)
   @Column({
     type: DataType.INTEGER,
@@ -37,18 +42,11 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
   public messageId: number;
 
   @Column({
-    type: DataType.INTEGER,
-    defaultValue: 2,
-    allowNull: false,
-  })
-  public volume: number;
-
-
-  @Column({
     type: DataType.BOOLEAN,
-    defaultValue: true,
+    defaultValue: false,
     allowNull: false,
   })
-  public notifications: boolean;
+  public received: boolean;
+
 
 }

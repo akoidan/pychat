@@ -10,7 +10,7 @@ import {UserModel} from '@/data/database/model/user.model';
 
 
 @Injectable()
-@Table({paranoid: true, tableName: 'channel', timestamps: true})
+@Table({tableName: 'channel'})
 export class ChannelModel extends Model<ChannelModel> {
   @Column({
     type: DataType.INTEGER,

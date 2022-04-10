@@ -4,14 +4,23 @@ import {
   ForeignKey,
   Model,
   Table,
+  Unique,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
-import {UploadedFileChoices} from '@/data/types/model/db';
+import {
+  ImageType,
+  UploadedFileChoices
+} from '@/data/types/dto/dto';
+import {MessageModel} from '@/data/database/model/message.model';
+
+const uniqueUserIdSymbMess = 'unique_image_symbol_message';
+
 
 @Injectable()
-@Table({paranoid: true, tableName: 'image', timestamps: true})
+@Table({ tableName: 'image'})
 export class ImageModel extends Model<ImageModel> {
+
 
   @Column({
     type: DataType.INTEGER,
@@ -23,27 +32,47 @@ export class ImageModel extends Model<ImageModel> {
   public id: number;
 
   @Column({
-    type: DataType.ENUM(...Object.keys(UploadedFileChoices)),
+    type: DataType.ENUM(...Object.keys(ImageType)),
     allowNull: false,
   })
-  public type: UploadedFileChoices;
+  public type: ImageType;
 
+  @Unique(uniqueUserIdSymbMess)
   @Column({
     type: DataType.STRING(1),
     allowNull: false,
   })
   public symbol: string;
 
-  @ForeignKey(() => UserModel)
+  @Unique(uniqueUserIdSymbMess)
+  @ForeignKey(() => MessageModel)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  public userId: number;
+  public messageId: number;
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
+    allowNull: true,
   })
-  public file: string;
+  public img: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public preview: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public absoluteUrl: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  public webpAsboluteUrl: string;
 }

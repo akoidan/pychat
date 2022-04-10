@@ -4,13 +4,16 @@ import {
   ForeignKey,
   Model,
   Table,
+  Unique,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
 import {RoomModel} from '@/data/database/model/room.model';
 
+const uniqueRoomUser = 'unique_room_user_room_id_user_id';
+
 @Injectable()
-@Table({paranoid: true, tableName: 'room_user', timestamps: true})
+@Table({tableName: 'room_user'})
 export class RoomUsersModel extends Model<RoomUsersModel> {
 
   @Column({
@@ -22,6 +25,7 @@ export class RoomUsersModel extends Model<RoomUsersModel> {
   })
   public id: number;
 
+  @Unique(uniqueRoomUser)
   @ForeignKey(() => RoomModel)
   @Column({
     type: DataType.INTEGER,
@@ -29,6 +33,7 @@ export class RoomUsersModel extends Model<RoomUsersModel> {
   })
   public roomId: number;
 
+  @Unique(uniqueRoomUser)
   @ForeignKey(() => UserModel)
   @Column({
     type: DataType.INTEGER,

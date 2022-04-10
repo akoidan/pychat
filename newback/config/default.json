@@ -36,10 +36,9 @@
     }
   },
   "mysql": {
-    "synchronize": false,
+    "synchronize": true,
     "logging": true,
     "host": "localhost",
-    "default-character-set": "utf8mb4",
     "port": 3306,
     "username": "pychat",
     "password": "pypass",

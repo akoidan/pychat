@@ -9,7 +9,10 @@ const {
 const logger = new ConsoleLogger('sql');
 export const ormconfig: SequelizeModuleOptions = {
   synchronize,
-  logging: logging ? (sql: string): void => logger.log(sql, 'sql') : false,
+  sync: {
+    force: true,
+  },
+  logging: logging ? (sql: string): void => logger.debug(sql) : false,
   dialect: 'mysql',
   host,
   port,
@@ -17,5 +20,12 @@ export const ormconfig: SequelizeModuleOptions = {
   password,
   database,
   autoLoadModels: true,
+  define: {
+    charset: 'utf8mb4',
+    paranoid: true,
+    timestamps: true,
+   freezeTableName: true,
+    underscored: true,
+  }
 };
 

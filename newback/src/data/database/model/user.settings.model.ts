@@ -14,7 +14,7 @@ import {
 } from 'lines-logger'
 
 @Injectable()
-@Table({paranoid: true, tableName: 'user_settings', timestamps: true})
+@Table({ tableName: 'user_settings'})
 export class UserSettingsModel extends Model<UserSettingsModel> {
 
   @ForeignKey(() => UserModel)
@@ -85,7 +85,7 @@ export class UserSettingsModel extends Model<UserSettingsModel> {
   @Column({
     type: DataType.ENUM(...Object.keys(Theme)),
     allowNull: false,
-    defaultValue: true,
+    defaultValue: Theme.COLOR_REG.valueOf(),
   })
-  public theme: boolean;
+  public theme: Theme;
 }
