@@ -12,9 +12,7 @@ declare module "node-config-ts" {
   interface Mysql {
     synchronize: boolean
     logging: boolean
-    dialect: string
     host: string
-    "default-character-set": string
     port: number
     username: string
     password: string

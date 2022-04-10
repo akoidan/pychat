@@ -20,7 +20,7 @@ export default class LoginRequestValidator implements LoginRequest {
   @Length(3, 128, {
     message: "Passwords should contain 3-64 symbols"
   })
-  @Matches(/^[^\S].*[^\S]$/, {
+  @Matches(/^\S+$/, {
     message: `Password can't contain whitespaces`
   })
   public password: string;

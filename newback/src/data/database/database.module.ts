@@ -1,7 +1,11 @@
-import { Module } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  Module
+} from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 
-import {ormconfig } from '@/data/database/ormconfig';
+import {generateConfig } from '@/data/database/ormconfig';
+import { Sequelize } from 'sequelize-typescript';
 import {ChannelModel} from '@/data/database/model/channel.model';
 import {ImageModel} from '@/data/database/model/image.model';
 import {IpAddressModel} from '@/data/database/model/ip.address.model';
@@ -19,14 +23,24 @@ import {UserModel} from '@/data/database/model/user.model';
 import {UserProfileModel} from '@/data/database/model/user.profile.model';
 import {UserSettingsModel} from '@/data/database/model/user.settings.model';
 import {VerificationModel} from '@/data/database/model/verification.model';
+import {
+  Logger,
+  LoggerService
+} from '@nestjs/common/services/logger.service';
+import {LoggerModule} from '@/modules/logger/logger.module';
 
 const repositories = [
 
 ];
 
+
 @Module({
   imports: [
-    SequelizeModule.forRoot(ormconfig),
+    SequelizeModule.forRootAsync({
+      inject: [Logger],
+      imports: [LoggerModule],
+      useFactory: (logger: Logger) => generateConfig((sql) => logger.debug(sql)),
+    }),
     SequelizeModule.forFeature([
      ChannelModel,
       ImageModel,
