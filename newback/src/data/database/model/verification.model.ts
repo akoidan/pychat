@@ -1,26 +1,16 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
-import {
-  Gender,
-  ThemeValues
-} from '@/data/types/dto/dto';
+import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
-import {
-  LogLevel,
-  logLevels
-} from 'lines-logger'
 import {VerificationType} from '@/data/types/model/db';
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'verification', timestamps: true })
+@Table({paranoid: true, tableName: 'verification', timestamps: true})
 export class VerificationModel extends Model<VerificationModel> {
 
   @Column({

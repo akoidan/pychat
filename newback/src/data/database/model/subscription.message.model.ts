@@ -1,33 +1,17 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
-import {
-  Gender,
-  ThemeValues
-} from '@/data/types/dto/dto';
-import {UserModel} from '@/data/database/model/user.model';
-import {
-  LogLevel,
-  logLevels
-} from 'lines-logger'
-import {
-  ImageType,
-  UploadedFileChoices,
-  VerificationType
-} from '@/data/types/model/db';
+import {Injectable} from '@nestjs/common';
 import {MessageModel} from '@/data/database/model/message.model';
-import {RoomModel} from '@/data/database/model/room.model';
+import {SubscriptionModel} from '@/data/database/model/subscription.model';
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'room_user', timestamps: true })
-export class UploadedFileModel extends Model<UploadedFileModel> {
+@Table({paranoid: true, tableName: 'room_user', timestamps: true})
+export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
 
   @Column({
     type: DataType.INTEGER,
@@ -38,7 +22,7 @@ export class UploadedFileModel extends Model<UploadedFileModel> {
   })
   public id: number;
 
-  @ForeignKey(() => SubscritionModel)
+  @ForeignKey(() => SubscriptionModel)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,

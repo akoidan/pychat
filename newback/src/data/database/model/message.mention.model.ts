@@ -1,31 +1,20 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
-import {
-  Gender,
-  ThemeValues
-} from '@/data/types/dto/dto';
+import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
-import {
-  LogLevel,
-  logLevels
-} from 'lines-logger'
 
 @Injectable()
 @Table({
   paranoid: true,
   tableName: 'message_mention',
   timestamps: true,
-  co
 })
-export class MessageMention extends Model<MessageMention> {
+export class MessageMentionModel extends Model<MessageMentionModel> {
 
   @Column({
     type: DataType.INTEGER,

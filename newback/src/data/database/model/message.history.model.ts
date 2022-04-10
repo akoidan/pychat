@@ -1,20 +1,17 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
-import {UserModel} from '@/data/database/model/user.model';
+import {Injectable} from '@nestjs/common';
 import {config} from 'node-config-ts';
 import {MessageModel} from '@/data/database/model/message.model';
 
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'message_history', timestamps: true })
+@Table({paranoid: true, tableName: 'message_history', timestamps: true})
 export class MessageHistoryModel extends Model<MessageHistoryModel> {
   @Column({
     type: DataType.INTEGER,

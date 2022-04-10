@@ -38,12 +38,11 @@
   "mysql": {
     "synchronize": false,
     "logging": true,
-    "dialect": "mysql",
     "host": "localhost",
     "default-character-set": "utf8mb4",
     "port": 3306,
     "username": "pychat",
     "password": "pypass",
-    "database": "pychat"
+    "database": "pychat2"
   }
 }

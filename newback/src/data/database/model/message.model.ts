@@ -1,27 +1,18 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
-import {
-  Gender,
-  MessageStatus,
-} from '@/data/types/dto/dto';
+import {Injectable} from '@nestjs/common';
+import {MessageStatus,} from '@/data/types/dto/dto';
 import {UserModel} from '@/data/database/model/user.model';
-import {
-  LogLevel,
-  logLevels
-} from 'lines-logger'
 import {RoomModel} from '@/data/database/model/room.model';
 import {config} from 'node-config-ts';
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'message', timestamps: true })
+@Table({paranoid: true, tableName: 'message', timestamps: true})
 export class MessageModel extends Model<MessageModel> {
 
   @Column({

@@ -1,19 +1,16 @@
 import {
-  BelongsTo,
   Column,
   DataType,
-  ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {Gender} from '@/data/types/dto/dto';
 import {config} from 'node-config-ts';
 
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'user', timestamps: true })
+@Table({paranoid: true, tableName: 'user', timestamps: true})
 export class UserModel extends Model<UserModel> {
   @Column({
     type: DataType.INTEGER,

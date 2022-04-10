@@ -1,18 +1,16 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
+import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
 
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'channel', timestamps: true })
+@Table({paranoid: true, tableName: 'channel', timestamps: true})
 export class ChannelModel extends Model<ChannelModel> {
   @Column({
     type: DataType.INTEGER,

@@ -1,16 +1,12 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
-import {
-  Theme,
-} from '@/data/types/dto/dto';
+import {Injectable} from '@nestjs/common';
+import {Theme,} from '@/data/types/dto/dto';
 import {UserModel} from '@/data/database/model/user.model';
 import {
   LogLevel,
@@ -18,7 +14,7 @@ import {
 } from 'lines-logger'
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'user_settings', timestamps: true })
+@Table({paranoid: true, tableName: 'user_settings', timestamps: true})
 export class UserSettingsModel extends Model<UserSettingsModel> {
 
   @ForeignKey(() => UserModel)

@@ -1,31 +1,16 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
-  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
-import { Injectable } from '@nestjs/common';
-import {
-  Gender,
-  ThemeValues
-} from '@/data/types/dto/dto';
-import {UserModel} from '@/data/database/model/user.model';
-import {
-  LogLevel,
-  logLevels
-} from 'lines-logger'
-import {
-  ImageType,
-  UploadedFileChoices,
-  VerificationType
-} from '@/data/types/model/db';
+import {Injectable} from '@nestjs/common';
+import {ImageType} from '@/data/types/model/db';
 import {MessageModel} from '@/data/database/model/message.model';
 
 @Injectable()
-@Table({ paranoid: true, tableName: 'uploaded_file', timestamps: true })
+@Table({paranoid: true, tableName: 'uploaded_file', timestamps: true})
 export class UploadedFileModel extends Model<UploadedFileModel> {
 
   @Column({
@@ -68,13 +53,13 @@ export class UploadedFileModel extends Model<UploadedFileModel> {
   })
   public preview: string;
 
-      @Column({
+  @Column({
     type: DataType.STRING,
     allowNull: true,
   })
   public absoluteUrl: string;
 
-    @Column({
+  @Column({
     type: DataType.STRING,
     allowNull: true,
   })

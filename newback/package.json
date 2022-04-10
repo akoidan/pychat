@@ -37,6 +37,7 @@
     "csv-parse": "^5.0.4",
     "i": "^0.3.7",
     "lines-logger": "^2.1.2",
+    "mysql2": "^2.3.3",
     "node-config-ts": "npm:node-config-ts-2",
     "npm": "^8.6.0",
     "pg": "^8.7.3",
