@@ -1,13 +1,8 @@
-const { config: sequelizeCliConfig } = require('node-config-ts');
+const {generateConfig} = require('../src/data/database/ormconfig');
 
-console.log('as')
 // fucking sequelize-cli hack
-const conf = {
-  ...sequelizeCliConfig.mysql,
-  dialect: 'mysql'
-}
+const conf = generateConfig((sql) => console.log(sql));
 module.exports = {
-
   development: conf
 };
 

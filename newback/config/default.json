@@ -3,7 +3,7 @@
   "application": {
     "env": "default",
     "port": 8889,
-    "logLevel": "log",
+    "logLevel": "debug",
     "logOutput": "text",
     "crtPath": "../frontend/build/certs/server.crt.pem",
     "keyPath": "../frontend/build/certs/private.key.pem"
@@ -20,7 +20,7 @@
     "clientNoServerPingCloseTimeout": 320000
   },
   "redis": {
-    "host": "localhos",
+    "host": "localhost",
     "port": 6379,
     "database": 0
   },
@@ -36,7 +36,7 @@
     }
   },
   "mysql": {
-    "synchronize": true,
+    "synchronize": false,
     "logging": true,
     "host": "localhost",
     "port": 3306,
