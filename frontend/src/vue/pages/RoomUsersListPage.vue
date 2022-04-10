@@ -47,6 +47,7 @@ import PickUser from "@/vue/parts/PickUser.vue";
 import UserFlagRow from "@/vue/chat/right/UserFlagRow.vue";
 
 @Component({
+  name: 'RoomUsersListPage',
   components: {
     UserFlagRow,
     AppSubmit,

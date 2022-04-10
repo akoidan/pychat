@@ -18,7 +18,9 @@ import {
   Vue,
 } from "vue-property-decorator";
 
-@Component({})
+@Component({
+  name: "AppSuspense",
+})
 export default class AppSuspense extends Vue {
   public currentRequest: XMLHttpRequest | null = null;
 

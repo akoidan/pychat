@@ -10,7 +10,7 @@
     "start:light": "VITE_LIGHT=true vite --config build/vite.config.ts",
     "cp-prod-files": "tar c dist/ | ssh http@pychat.org -p 8886 \"rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/\"",
     "serve": "node build/static-server.js",
-    "postinstall": "patch -p1 -i patches/vue-class-component+8.0.0-rc.1.patch",
+    "postinstall": "patch-package",
     "lint:es": "eslint --ext .ts,.vue --max-warnings=0 src",
     "lint:new": "eslint-find-rules -u ./.eslintrc.json",
     "lint:fix": "eslint --fix --ext .ts,.vue src"

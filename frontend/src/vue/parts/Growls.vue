@@ -18,6 +18,7 @@ import {State} from "@/ts/instances/storeInstance";
 import AppGrowl from "@/vue/ui/AppGrowl.vue";
 
 @Component({
+  name: "Growls",
   components: {AppGrowl},
 })
 export default class Growls extends Vue {
