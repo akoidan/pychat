@@ -5,6 +5,7 @@ declare module "node-config-ts" {
     name: string
     application: Application
     settings: Settings
+    email: Email
     redis: Redis
     frontend: Frontend
     mysql: Mysql
@@ -34,6 +35,21 @@ declare module "node-config-ts" {
     host: string
     port: number
     database: number
+  }
+  interface Email {
+    host: string
+    port: number
+    secure: boolean
+    tls: Tls
+    auth: Auth
+    from: string
+  }
+  interface Auth {
+    user: string
+    password: string
+  }
+  interface Tls {
+    ciphers: string
   }
   interface Settings {
     wsIdCharLength: number

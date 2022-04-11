@@ -11,7 +11,7 @@ import {UserModel} from '@/data/database/model/user.model';
 import {VerificationModel} from '@/data/database/model/verification.model';
 
 @Injectable()
-@Table({ tableName: 'user_auth'})
+@Table({tableName: 'user_auth'})
 export class UserAuthModel extends Model<UserAuthModel> {
 
   @ForeignKey(() => UserModel)

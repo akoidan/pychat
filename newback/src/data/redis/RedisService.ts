@@ -1,5 +1,4 @@
 import {Injectable} from '@nestjs/common';
-import {SignUpRequest} from '@/data/types/dto/dto';
 import {REDIS_SESSIONS_KEY} from '@/data/utils/consts';
 import {
   InjectRedis,

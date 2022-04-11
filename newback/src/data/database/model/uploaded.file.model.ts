@@ -5,14 +5,9 @@ import {
   ForeignKey,
   Model,
   Table,
-  Unique,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
-import {
-  ImageType,
-  UploadedFileChoices
-} from '@/data/types/dto/dto';
-import {MessageModel} from '@/data/database/model/message.model';
+import {UploadedFileChoices} from '@/data/types/dto/dto';
 import {UserModel} from '@/data/database/model/user.model';
 
 @Injectable()

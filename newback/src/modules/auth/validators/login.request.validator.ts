@@ -1,17 +1,8 @@
 import {
-  IsEmail,
-  IsEnum,
-  IsOptional,
   IsString,
-  Length,
   Matches,
 } from 'class-validator';
-import {
-  Gender,
-  LoginRequest,
-  SignUpRequest
-} from '@/data/types/dto/dto';
-import {config} from 'node-config-ts';
+import {LoginRequest} from '@/data/types/dto/dto';
 
 export class LoginRequestValidator implements LoginRequest {
   @IsString()

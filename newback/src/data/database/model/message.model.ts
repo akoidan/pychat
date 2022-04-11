@@ -10,10 +10,9 @@ import {Injectable} from '@nestjs/common';
 import {MessageStatus,} from '@/data/types/dto/dto';
 import {UserModel} from '@/data/database/model/user.model';
 import {RoomModel} from '@/data/database/model/room.model';
-import {config} from 'node-config-ts';
 
 @Injectable()
-@Table({ tableName: 'message'})
+@Table({tableName: 'message'})
 export class MessageModel extends Model<MessageModel> {
 
   @Column({

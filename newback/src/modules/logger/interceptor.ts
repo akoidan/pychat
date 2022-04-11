@@ -16,6 +16,7 @@ import {catchError} from 'rxjs/operators';
 export class LoggingInterceptor implements NestInterceptor {
 
   private id: number = 0;
+
   constructor(private readonly logger: Logger) {
 
   }

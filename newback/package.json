@@ -13,12 +13,14 @@
     "start:debug": "nest start --debug --watch"
   },
   "dependencies": {
+    "@nestjs-modules/mailer": "^1.6.1",
     "@nestjs/common": "^8.4.4",
     "@nestjs/core": "^8.4.4",
     "@nestjs/platform-express": "^8.4.4",
     "@nestjs/sequelize": "^8.0.0",
     "@nestjs/swagger": "^5.2.1",
     "@types/bcrypt": "^5.0.0",
+    "@types/nodemailer": "^6.4.4",
     "bcrypt": "^5.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
@@ -27,6 +29,7 @@
     "mysql2": "^2.3.3",
     "node-config-ts": "npm:node-config-ts-2",
     "node-db-migration": "^1.4.0",
+    "nodemailer": "^6.7.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7",
     "sequelize": "^6.18.0",

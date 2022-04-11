@@ -1,12 +1,8 @@
 import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/sequelize';
-import {UserModel} from '@/data/database/model/user.model';
-import {UserAuthModel} from '@/data/database/model/user.auth.model';
-import {SignUpRequest} from '@/data/types/dto/dto';
-import {UserProfileModel} from '@/data/database/model/user.profile.model';
-import {UserSettingsModel} from '@/data/database/model/user.settings.model';
 import {RoomModel} from '@/data/database/model/room.model';
 import {RoomUsersModel} from '@/data/database/model/room.users.model';
+import {Transaction} from 'sequelize';
 
 
 @Injectable()
@@ -17,11 +13,11 @@ export class RoomRepository {
   ) {
   }
 
-  public async createRoomUser(roomId: number, userId: number) {
+  public async createRoomUser(roomId: number, userId: number, transaction: Transaction) {
     await this.roomUsersModel.create({
       roomId,
       userId,
       notifications: false,
-    })
+    }, {transaction})
   }
 }

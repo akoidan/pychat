@@ -34,6 +34,7 @@ export enum MessageStatus {
   READ = 'READ',
   RECEIVED = 'RECEIVED', //sent
 }
+
 export enum Theme {
   COLOR_LOR = 'COLOR_LOR',
   COLOR_REG = 'COLOR_REG',
@@ -51,12 +52,13 @@ export enum VerificationType {
 export enum ImageType {
   VIDEO = 'VIDEO',
   IMAGE = 'IMAGE',
-  GIPHY=  'GIPHY'
+  GIPHY = 'GIPHY'
 }
-export enum  UploadedFileChoices {
+
+export enum UploadedFileChoices {
   VIDEO = 'VIDEO',
   FILE = 'FILE',
-  MEDIA_RECORD= 'MEDIA_RECORD',
+  MEDIA_RECORD = 'MEDIA_RECORD',
   AUDIO_RECORD = 'AUDIO_RECORD',
   IMAGE = 'IMAGE',
   PREVIEW = 'PREVIEW',

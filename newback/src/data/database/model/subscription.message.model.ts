@@ -10,7 +10,6 @@ import {
 import {Injectable} from '@nestjs/common';
 import {MessageModel} from '@/data/database/model/message.model';
 import {SubscriptionModel} from '@/data/database/model/subscription.model';
-import {UserModel} from '@/data/database/model/user.model';
 
 const uniqueSubscriptionMessage = 'unique_subscription_message_subscription_id_message_id';
 

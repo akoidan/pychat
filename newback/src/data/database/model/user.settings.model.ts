@@ -15,7 +15,7 @@ import {
 } from 'lines-logger'
 
 @Injectable()
-@Table({ tableName: 'user_settings'})
+@Table({tableName: 'user_settings'})
 export class UserSettingsModel extends Model<UserSettingsModel> {
 
   @ForeignKey(() => UserModel)

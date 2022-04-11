@@ -9,6 +9,7 @@ import {
 import {UserProfileModel} from '@/data/database/model/user.profile.model';
 import {UserSettingsModel} from '@/data/database/model/user.settings.model';
 import {VerificationModel} from '@/data/database/model/verification.model';
+import {Transaction} from 'sequelize';
 
 
 @Injectable()
@@ -22,47 +23,51 @@ export class UserRepository {
   ) {
   }
 
-  public async createUser(data: SignUpRequest): Promise<number> {
+  public async createUser(data: SignUpRequest, transaction: Transaction): Promise<number> {
     let userModel = await this.userModel.create({
       username: data.username,
       lastTimeOnline: new Date(),
       sex: data.sex
-    })
+    }, {transaction})
     await Promise.all([
       this.userProfileModel.create({
         id: userModel.id
-      }),
+      }, {transaction}),
       this.userAuthModel.create({
         password: data.password,
         email: data.email,
         id: userModel.id
-      }),
+      }, {transaction}),
       this.userSettingsModel.create({
         id: userModel.id
-      })
+      }, {transaction})
     ])
     return userModel.id;
   }
 
-  public async checkUserExistByUserName(username: string): Promise<boolean> {
+  public async checkUserExistByUserName(username: string, transaction?: Transaction): Promise<boolean> {
     return await this.userModel.findOne({
       where: {username},
+      transaction
     }) != null
   }
 
-   public async createVerification(email: string, userId: number, token: string): Promise<void> {
+  public async createVerification(email: string, userId: number, token: string, transaction?: Transaction): Promise<void> {
     let verification = await this.verificationModel.create({
       type: VerificationType.REGISTER,
       email,
       userId,
       token,
+    }, {
+      transaction
     });
-    await this.userAuthModel.update( {
+    await this.userAuthModel.update({
       emailVerificationId: verification.id,
     }, {
       where: {
         id: userId,
-      }
+      },
+      transaction
     })
   }
 

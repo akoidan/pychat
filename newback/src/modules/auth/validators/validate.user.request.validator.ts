@@ -1,17 +1,9 @@
 import {
-  IsEmail,
-  IsEnum,
-  IsOptional,
   IsString,
   Length,
   Matches,
 } from 'class-validator';
-import {
-  Gender,
-  LoginRequest,
-  SignUpRequest,
-  ValidateUserRequest
-} from '@/data/types/dto/dto';
+import {ValidateUserRequest} from '@/data/types/dto/dto';
 import {config} from 'node-config-ts';
 
 export class ValidateUserRequestValidator implements ValidateUserRequest {

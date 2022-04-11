@@ -85,7 +85,7 @@ describe('AuthModule', () => {
         "statusCode": 400,
       });
     });
-  it('should throw an error if user exists', async() => {
+    it('should throw an error if user exists', async() => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
 
       const {body} = await request()

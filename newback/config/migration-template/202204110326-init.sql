@@ -206,9 +206,8 @@ CREATE TABLE `verification`
 (
     `id`         INTEGER auto_increment,
     `type`       ENUM ('REGISTER', 'PASSWORD', 'EMAIL', 'CONFIRM_EMAIL') NOT NULL,
-    `token`      VARCHAR(17)                                             NOT NULL,
+    `token`      VARCHAR(32)                                             NOT NULL,
     `user_id`    INTEGER                                                 NOT NULL,
-    `time`       DATETIME                                                NOT NULL,
     `verified`   TINYINT(1)                                              NOT NULL DEFAULT false,
     `email`      VARCHAR(190),
     `created_at` DATETIME                                                NOT NULL,

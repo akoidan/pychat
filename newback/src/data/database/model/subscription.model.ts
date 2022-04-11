@@ -10,7 +10,6 @@ import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
 import {UploadedFileChoices} from '@/data/types/dto/dto';
 import {IpAddressModel} from '@/data/database/model/ip.address.model';
-import {MessageModel} from '@/data/database/model/message.model';
 
 @Injectable()
 @Table({tableName: 'subscription'})

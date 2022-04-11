@@ -8,18 +8,14 @@ import {
   Unique,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/database/model/user.model';
-import {
-  ImageType,
-  UploadedFileChoices
-} from '@/data/types/dto/dto';
+import {ImageType} from '@/data/types/dto/dto';
 import {MessageModel} from '@/data/database/model/message.model';
 
 const uniqueUserIdSymbMess = 'unique_image_symbol_message';
 
 
 @Injectable()
-@Table({ tableName: 'image'})
+@Table({tableName: 'image'})
 export class ImageModel extends Model<ImageModel> {
 
 

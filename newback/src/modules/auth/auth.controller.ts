@@ -1,7 +1,7 @@
 import {
   Body,
-  ConflictException,
   Controller,
+  Ip,
   Logger,
   Post
 } from '@nestjs/common';
@@ -16,7 +16,8 @@ export class AuthController {
   constructor(
     private readonly appService: AuthService,
     private readonly logger: Logger
-  ) {}
+  ) {
+  }
 
   @Post('/auth')
   public auth(@Body() body: LoginRequestValidator): string {
@@ -24,8 +25,8 @@ export class AuthController {
   }
 
   @Post('/register')
-  public register(@Body() body: SignUpRequestValidator): SignUpResponse {
-    return this.appService.registerUser(body);
+  public async register(@Body() body: SignUpRequestValidator, @Ip() ip): Promise<SignUpResponse> {
+    return this.appService.registerUser(body, ip);
   }
 
 

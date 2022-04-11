@@ -11,7 +11,7 @@ import {UserModel} from '@/data/database/model/user.model';
 import {VerificationType} from '@/data/types/dto/dto';
 
 @Injectable()
-@Table({ tableName: 'verification'})
+@Table({tableName: 'verification'})
 export class VerificationModel extends Model<VerificationModel> {
 
   @Column({
@@ -28,7 +28,7 @@ export class VerificationModel extends Model<VerificationModel> {
   public type: VerificationType;
 
   @Column({
-    type: DataType.STRING(17),
+    type: DataType.STRING(32),
     allowNull: false,
   })
   public token: string;

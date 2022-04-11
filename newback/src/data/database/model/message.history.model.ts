@@ -7,9 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
-import {config} from 'node-config-ts';
 import {MessageModel} from '@/data/database/model/message.model';
-import {UserModel} from '@/data/database/model/user.model';
 
 
 @Injectable()

@@ -18,7 +18,7 @@ import {ChannelModel} from '@/data/database/model/channel.model';
 // 	constraint p2p_only_if_private
 // 		check (`p2p` = 0x00 or `name` is null)
 @Injectable()
-@Table({ tableName: 'room'})
+@Table({tableName: 'room'})
 export class RoomModel extends Model<RoomModel> {
 
   @Column({
