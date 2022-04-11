@@ -3,6 +3,25 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface ValidateUserRequest {
+  username: string;
+}
+
+export interface ValidateUserResponse {
+  ok: boolean;
+}
+
+export interface SignUpRequest {
+  username: string;
+  password: string;
+  email?: string;
+  sex?: Gender;
+}
+
+export interface SignUpResponse {
+  session: string;
+}
+
 // ISO/IEC 5218 1 male, 2 - female
 export enum Gender {
   MALE = 'MALE',
@@ -24,7 +43,7 @@ export enum Theme {
 
 export enum VerificationType {
   REGISTER = 'REGISTER',
-  PASSWORD = '  PASSWORD = \'p\',\n',
+  PASSWORD = 'PASSWORD',
   EMAIL = 'EMAIL',
   CONFIRM_EMAIL = 'CONFIRM_EMAIL',
 }

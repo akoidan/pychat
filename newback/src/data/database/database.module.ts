@@ -1,11 +1,7 @@
-import {
-  ConsoleLogger,
-  Module
-} from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
+import {Module} from '@nestjs/common';
+import {SequelizeModule} from '@nestjs/sequelize';
 
-import {generateConfig } from '@/data/database/ormconfig';
-import { Sequelize } from 'sequelize-typescript';
+import {generateConfig} from '@/data/database/ormconfig';
 import {ChannelModel} from '@/data/database/model/channel.model';
 import {ImageModel} from '@/data/database/model/image.model';
 import {IpAddressModel} from '@/data/database/model/ip.address.model';
@@ -23,26 +19,23 @@ import {UserModel} from '@/data/database/model/user.model';
 import {UserProfileModel} from '@/data/database/model/user.profile.model';
 import {UserSettingsModel} from '@/data/database/model/user.settings.model';
 import {VerificationModel} from '@/data/database/model/verification.model';
-import {
-  Logger,
-  LoggerService
-} from '@nestjs/common/services/logger.service';
-import {LoggerModule} from '@/modules/logger/logger.module';
+import {Logger} from '@nestjs/common/services/logger.service';
+import {UserRepository} from '@/data/database/repository/user.repository';
+import {RoomRepository} from '@/data/database/repository/room.repository';
 
 const repositories = [
-
+  UserRepository,
+  RoomRepository,
 ];
-
 
 @Module({
   imports: [
     SequelizeModule.forRootAsync({
       inject: [Logger],
-      imports: [LoggerModule],
       useFactory: (logger: Logger) => generateConfig((sql) => logger.debug(sql)),
     }),
     SequelizeModule.forFeature([
-     ChannelModel,
+      ChannelModel,
       ImageModel,
       IpAddressModel,
       MessageHistoryModel,

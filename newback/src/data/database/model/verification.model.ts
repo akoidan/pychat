@@ -44,12 +44,6 @@ export class VerificationModel extends Model<VerificationModel> {
   public user: UserModel;
 
   @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
-  public time: Date;
-
-  @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false,

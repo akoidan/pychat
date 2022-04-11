@@ -36,7 +36,7 @@
     }
   },
   "mysql": {
-    "synchronize": true,
+    "synchronize": false,
     "logging": true,
     "host": "localhost",
     "port": 3306,

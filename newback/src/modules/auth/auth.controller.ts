@@ -1,35 +1,38 @@
 import {
   Body,
+  ConflictException,
   Controller,
-  Get,
+  Logger,
   Post
 } from '@nestjs/common';
-import { AuthService } from '@/modules/auth/auth.service';
-import LoginRequestValidator from '@/modules/auth/interfaces';
-import {Sequelize} from 'sequelize';
-import {UserModel} from '@/data/database/model/user.model';
-import {UserSettingsModel} from '@/data/database/model/user.settings.model';
-import {ImageModel} from '@/data/database/model/image.model';
-import {IpAddressModel} from '@/data/database/model/ip.address.model';
-import {MessageHistoryModel} from '@/data/database/model/message.history.model';
-import {MessageMentionModel} from '@/data/database/model/message.mention.model';
-import {MessageModel} from '@/data/database/model/message.model';
-import {RoomModel} from '@/data/database/model/room.model';
-import {RoomUsersModel} from '@/data/database/model/room.users.model';
-import {SubscriptionModel} from '@/data/database/model/subscription.model';
-import {SubscriptionMessageModel} from '@/data/database/model/subscription.message.model';
-import {UploadedFileModel} from '@/data/database/model/uploaded.file.model';
-import {UserAuthModel} from '@/data/database/model/user.auth.model';
-import {UserJoinedInfoModel} from '@/data/database/model/user.joined.info.model';
-import {UserProfileModel} from '@/data/database/model/user.profile.model';
-import {VerificationModel} from '@/data/database/model/verification.model';
+import {AuthService} from '@/modules/auth/auth.service';
+import {LoginRequestValidator} from '@/modules/auth/validators/login.request.validator';
+import {SignUpRequestValidator} from '@/modules/auth/validators/sign.up.request.validator';
+import {ValidateUserRequestValidator} from '@/modules/auth/validators/validate.user.request.validator';
+import {SignUpResponse} from '@/data/types/dto/dto';
 
 @Controller()
 export class AuthController {
-  constructor(private readonly appService: AuthService) {}
+  constructor(
+    private readonly appService: AuthService,
+    private readonly logger: Logger
+  ) {}
 
   @Post('/auth')
   public auth(@Body() body: LoginRequestValidator): string {
     return 'asd';
   }
+
+  @Post('/register')
+  public register(@Body() body: SignUpRequestValidator): SignUpResponse {
+    return this.appService.registerUser(body);
+  }
+
+
+  @Post('/validate_user')
+  public async validateUser(@Body() body: ValidateUserRequestValidator): Promise<void> {
+    await this.appService.validateUser(body.username);
+  }
+
+
 }

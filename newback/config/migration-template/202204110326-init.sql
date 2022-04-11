@@ -258,7 +258,7 @@ CREATE TABLE `user_profile`
     `name`       VARCHAR(30),
     `city`       VARCHAR(50),
     `surname`    VARCHAR(30),
-    `birthday`   DATETIME NOT NULL,
+    `birthday`   DATETIME NULL,
     `contacts`   VARCHAR(100),
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,

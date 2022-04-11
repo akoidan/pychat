@@ -14,7 +14,7 @@ export function generateConfig(logging: ((sql: string) => void)): Omit<Sequelize
     database: config.mysql.database,
     autoLoadModels: true,
     sync: {
-      force: true,
+      force: config.mysql.synchronize,
     },
     define: {
       collate: 'utf8mb4_general_ci',

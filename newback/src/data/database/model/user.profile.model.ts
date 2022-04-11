@@ -44,7 +44,7 @@ export class UserProfileModel extends Model<UserProfileModel> {
 
   @Column({
     type: DataType.DATE,
-    allowNull: false,
+    allowNull: true,
   })
   public birthday: Date;
 
