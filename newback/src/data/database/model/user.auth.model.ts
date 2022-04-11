@@ -54,10 +54,10 @@ export class UserAuthModel extends Model<UserAuthModel> {
 
   @ForeignKey(() => VerificationModel)
   @Column({
-    type: DataType.DATE,
+    type: DataType.INTEGER,
     allowNull: true,
   })
-  public emailVerificationId: string;
+  public emailVerificationId: number;
 
   @BelongsTo(() => VerificationModel)
   public emailVerification: VerificationModel;

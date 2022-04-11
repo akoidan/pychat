@@ -1,3 +1,8 @@
 node_modules
 yarn-error.log
 dist
+# exclude everything
+config/migration/*
+
+# exception to the rule
+!config/migration/.gitkeep

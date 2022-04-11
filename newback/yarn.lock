@@ -3222,10 +3222,10 @@ neo-async@^2.6.2:
     prettier "^1.19.1"
     ramda "^0.27.0"
 
-node-db-migration@^1.3.3:
-  version "1.3.3"
-  resolved "https://registry.yarnpkg.com/node-db-migration/-/node-db-migration-1.3.3.tgz#e930e39f352afefe90e98521169f4db30eba630c"
-  integrity sha512-OhiBy2+T5zGlenfaoNdh5raNEZEOunJwFAnK8cRZvj4m7Xu2PZrcekkyokhfD23/EC6tYK9IYOdzgFKMFejaoQ==
+node-db-migration@^1.4.0:
+  version "1.4.0"
+  resolved "https://registry.yarnpkg.com/node-db-migration/-/node-db-migration-1.4.0.tgz#5616cca04f315fcb15121d60616233adc86db3c6"
+  integrity sha512-g5XDC7gbr6nCcbzBYZj3TojUMxY9YP07k8n1B4Fcgc+/CSPA0SUjK4hUTOrInwB352uaiplg6ijX7J1k7GFE6A==
   dependencies:
     moment "*"
 

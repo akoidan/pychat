@@ -2,7 +2,7 @@ import type {SequelizeModuleOptions} from '@nestjs/sequelize';
 import {config} from 'node-config-ts';
 
 
-export function generateConfig(logging: ((sql: string) => void)): SequelizeModuleOptions {
+export function generateConfig(logging: ((sql: string) => void)): Omit<SequelizeModuleOptions, 'ssl'> {
   return {
     synchronize: config.mysql.synchronize,
     logging: config.mysql.logging ? logging : false,
