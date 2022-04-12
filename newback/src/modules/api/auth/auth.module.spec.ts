@@ -242,6 +242,23 @@ describe('AuthModule', () => {
         username: 'as'
       })
     });
+    it('should create a new user when email is new', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      redisService.saveSession = jest.fn().mockResolvedValue(undefined)
+      userRepository.getUserMyAuthGoogle = jest.fn().mockResolvedValue(null);
+      oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
+        getPayload: jest.fn().mockReturnValue(googleResponseFixture)
+      });
+      const {body} = await request
+        .post('/api/auth/google-sign-in').send({
+          token: 'aasdasd',
+        }).expect(201);
+      expect(body).toMatchObject({
+        session: expect.any(String),
+        isNewAccount: false,
+        username: 'as'
+      })
+    });
   });
 
   describe('sign-up', () => {

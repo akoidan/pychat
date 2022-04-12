@@ -15,13 +15,17 @@ import {
   SignUpResponse
 } from '@/data/types/dto/dto';
 import {RoomRepository} from '@/data/database/repository/room.repository';
-import {ALL_ROOM_ID} from '@/data/utils/consts';
+import {
+  ALL_ROOM_ID,
+  MAX_USERNAME_LENGTH
+} from '@/data/utils/consts';
 import {RedisService} from '@/data/redis/RedisService';
 import {EmailSenderService} from '@/modules/email.render/email.sender.service';
 import {Transaction} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
 import {TokenPayload} from 'google-auth-library';
+import {generateUserName} from '@/data/utils/helpers';
 
 @Injectable()
 export class AuthService {
@@ -38,6 +42,7 @@ export class AuthService {
   ) {
   }
 
+
   public async authorizeGoogle(body: GoogleAuthRequest): Promise<GoogleSignInResponse> {
     let a: TokenPayload = await this.googleAuthService.validate(body.token);
    return this.sequelize.transaction(async(t) => {
@@ -46,9 +51,13 @@ export class AuthService {
       let session = await this.createAndSaveSession(userAuth.id);
       return {session, isNewAccount: false, username: userAuth.user.username};
     } else {
-
+      let newUserName = generateUserName(a.email);
+      if (await this.userRepository.checkUserExistByUserName(newUserName)) {
+        newUserName = thi
+      }
     }
    });
+
 
     // let googleId = a.email;
     // 	response.get('given_name'),
