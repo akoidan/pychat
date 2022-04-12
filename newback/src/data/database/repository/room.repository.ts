@@ -18,6 +18,6 @@ export class RoomRepository {
       roomId,
       userId,
       notifications: false,
-    }, {transaction})
+    }, {transaction, raw: true})
   }
 }

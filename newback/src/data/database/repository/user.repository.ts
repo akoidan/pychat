@@ -28,19 +28,19 @@ export class UserRepository {
       username: data.username,
       lastTimeOnline: new Date(),
       sex: data.sex
-    }, {transaction})
+    }, {transaction, raw: true,})
     await Promise.all([
       this.userProfileModel.create({
         id: userModel.id
-      }, {transaction}),
+      }, {transaction, raw: true,}),
       this.userAuthModel.create({
         password: data.password,
         email: data.email,
         id: userModel.id
-      }, {transaction}),
+      }, {transaction, raw: true,}),
       this.userSettingsModel.create({
         id: userModel.id
-      }, {transaction})
+      }, {transaction, raw: true,})
     ])
     return userModel.id;
   }
@@ -48,6 +48,7 @@ export class UserRepository {
   public async checkUserExistByUserName(username: string, transaction?: Transaction): Promise<boolean> {
     return await this.userModel.findOne({
       where: {username},
+      raw: true,
       transaction
     }) != null
   }
@@ -59,6 +60,7 @@ export class UserRepository {
       userId,
       token,
     }, {
+      raw: true,
       transaction
     });
     await this.userAuthModel.update({
@@ -74,6 +76,7 @@ export class UserRepository {
   public async checkUserExistByEmail(email: string): Promise<boolean> {
     return await this.userAuthModel.findOne({
       where: {email},
+      raw: true,
     }) != null
   }
 
@@ -82,6 +85,15 @@ export class UserRepository {
       where: {email},
       include: [
         'user', // LEFT OUTER JOIN "id" = "user"."id"
+      ],
+    })
+  }
+
+  public async getUserByUserName(username: string): Promise<UserModel | null> {
+    return this.userModel.findOne({
+      where: {username},
+      include: [
+        'userAuth',
       ],
     })
   }

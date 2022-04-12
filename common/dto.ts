@@ -1,6 +1,7 @@
 export interface LoginRequest {
   username: string;
   password: string;
+  email: string;
 }
 
 export interface ValidateUserRequest {
@@ -18,8 +19,16 @@ export interface SignUpRequest {
   sex?: Gender;
 }
 
-export interface SignUpResponse {
+interface SessionResponse {
   session: string;
+}
+
+export interface SignInResponse extends SessionResponse {
+
+}
+
+export interface SignUpResponse extends SessionResponse{
+
 }
 
 // ISO/IEC 5218 1 male, 2 - female

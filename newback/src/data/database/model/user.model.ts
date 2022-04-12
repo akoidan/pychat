@@ -1,12 +1,15 @@
 import {
   Column,
   DataType,
+  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {Gender} from '@/data/types/dto/dto';
 import {config} from 'node-config-ts';
+import {UserSettingsModel} from '@/data/database/model/user.settings.model';
+import {UserAuthModel} from '@/data/database/model/user.auth.model';
 
 
 @Injectable()
@@ -31,6 +34,9 @@ export class UserModel extends Model<UserModel> {
     type: DataType.STRING(config.frontend.maxUserNameLength),
   })
   public username: string;
+
+  @HasOne(() => UserAuthModel, 'id')
+  public userAuth: UserAuthModel;
 
   @Column({
     type: DataType.ENUM(...Object.keys(Gender)),
