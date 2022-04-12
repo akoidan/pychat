@@ -1,4 +1,5 @@
 import type {LogLevel} from "lines-logger";
+import {Gender} from '@/ts/types/backend/dto';
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
@@ -37,7 +38,7 @@ export interface CurrentUserSettingsModel {
 }
 
 export interface GoogleCaptcha {
-  render(div: HTMLElement): void;
+  render(div: HTMLElement, options: any): void;
 
   reset(): void;
 }
@@ -63,18 +64,14 @@ export interface CurrentUserInfoWoImage {
   email: string;
   birthday: string;
   contacts: string;
-  sex: SexModelString;
+  sex: Gender;
 }
 
-export type SexModelString =
-  "Female"
-  | "Male"
-  | "Secret";
 
 export interface UserModel {
   user: string;
   id: number;
-  sex: SexModelString;
+  sex: Gender;
   image: string;
   lastTimeOnline: number;
   location: Location;

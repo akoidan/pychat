@@ -5,24 +5,13 @@ import type {
   CurrentUserSettingsModel,
   MessageStatus,
   RoomDictModel,
-  SexModelString,
   UserModel,
 } from "@/ts/types/model";
 
 export * from './backend/dto';
 
-export interface SessionResponse {
-  session: string;
-}
-
-
 import type {LogLevel} from "lines-logger";
-
-export type SexModelDto =
-  "Female"
-  | "Male"
-  | "Secret";
-
+import {Gender} from '@/ts/types/backend/dto';
 
 export interface RoomNoUsersDto {
   channelId: number | null;
@@ -33,13 +22,6 @@ export interface RoomNoUsersDto {
   roomId: number;
   name: string;
   roomCreatorId: number;
-}
-
-
-
-export interface OauthSessionResponse extends SessionResponse {
-  isNewAccount: boolean;
-  username: string;
 }
 
 export interface RoomDto extends RoomNoUsersDto {
@@ -63,7 +45,7 @@ export interface UserDto {
   userId: number;
   userImage: string;
   lastTimeOnline: number;
-  sex: SexModelString;
+  sex: Gender;
 }
 
 export interface LocationDto {
@@ -108,7 +90,7 @@ export interface UserProfileDtoWoImage {
   email: string;
   birthday: string;
   contacts: string;
-  sex: SexModelDto;
+  sex: Gender;
   userId: number;
 }
 

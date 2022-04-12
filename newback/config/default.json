@@ -2,7 +2,7 @@
   "name": "pychat",
   "application": {
     "env": "default",
-    "port": 8889,
+    "port": 8888,
     "logLevel": "debug",
     "logOutput": "text",
     "crtPath": "../frontend/build/certs/server.crt.pem",
@@ -18,6 +18,15 @@
     "pingCloseJsDelay": 10000,
     "pingInterval": 300000,
     "clientNoServerPingCloseTimeout": 320000
+  },
+  "auth": {
+    "google": {
+      "clientId": "620421656154-8boctt2h7h5meskhe7vh8aiargj0nae9.apps.googleusercontent.com"
+    }
+  },
+  "recaptcha": {
+    "publicKey": "6LchGhwTAAAAAJwCRgfNKraWrFtCdKPFo0Ri8DLt",
+    "privateKey": "6LchGhwTAAAAAIH_RuxyeJQn5Kv6XnHcLSc_68h_"
   },
   "email": {
     "host": "smtp.gmail.com",
@@ -36,7 +45,6 @@
   },
   "frontend": {
     "address": "https://localhost:8080",
-    "maxUserNameLength": 16,
     "jsConsoleLogs": "debug",
     "maxMessageSize": 100000,
     "issueReportLink": "https://github.com/akoidan/pychat/issues/new",

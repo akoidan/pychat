@@ -1,5 +1,6 @@
 import type {LogLevel} from "lines-logger";
 import type {MessageStatus} from "@/ts/types/model";
+import {Gender} from '@/ts/types/backend/dto';
 
 export interface UserDB {
   id: number;
@@ -14,10 +15,7 @@ export interface UserDB {
   city: string;
 }
 
-export type SexDB =
-  0
-  | 1
-  | 2;
+export type SexDB = Gender;
 export type BooleanDB =
   0
   | 1;

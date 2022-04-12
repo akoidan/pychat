@@ -15,6 +15,7 @@ import viteChecker from 'vite-plugin-checker'
 import {viteStaticCopy} from 'vite-plugin-static-copy'
 import viteCompression from 'vite-plugin-compression'
 import viteVisualizer from 'rollup-plugin-visualizer'
+import Inspector from "vite-plugin-vue-inspector";
 
 export default defineConfig(async({command, mode}) => {
   let key, cert, ca, gitHash;
@@ -47,6 +48,9 @@ export default defineConfig(async({command, mode}) => {
     },
     plugins: [
       vue(),
+      Inspector({
+        vue: 3,
+      }),
       ...(!process.env.VITE_LIGHT ? [
         viteChecker({
             typescript: !process.env.VITE_LIGHT,
@@ -128,7 +132,7 @@ export default defineConfig(async({command, mode}) => {
       },
     },
     server: {
-      port: 8080,
+      port: 443,
       https: {
         key,
         cert,

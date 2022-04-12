@@ -1,99 +1,97 @@
-import type {SessionHolder} from "@/ts/types/types";
+import type {
+  GetData,
+  PostData,
+  SessionHolder,
+} from "@/ts/types/types";
+import Http from "@/ts/classes/Http";
+import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
 
-/**
- * @param params : object dict of params or DOM form
- * @param callback : function calls on response
- * @param url : string url to post
- * @param formData : form in canse form is used
- *
- */
-
-export default class Fetch /* Extends Http*/ {
-  public constructor(apiUrl: string, sessionHolder: SessionHolder) {
-    // Super(apiUrl, sessionHolder);
+export default class Fetch extends Http {
+  public constructor(sessionHolder: SessionHolder) {
+    super(sessionHolder);
   }
 
-  //
-  // /**
-  //  * Loads file from server on runtime */
-  // Public doGet<T>(fileUrl: string, callback: ErrorCB<T>, isJsonDecoded: boolean = false) {
-  //   FileUrl = this.getUrl(fileUrl);
-  //   This.httpLogger.log('GET out {}', fileUrl)();
-  //   Let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
-  //   Let fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
-  //   Let xobj = new XMLHttpRequest();
-  //   // special for IE
-  //   If (xobj.overrideMimeType) {
-  //     Xobj.overrideMimeType('application/json');
-  //   }
-  //   Xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
-  //
-  //   Xobj.onreadystatechange = this.getOnreadystatechange<T>(
-  //       Xobj,
-  //       FileUrl,
-  //       IsJsonDecoded || fileType === 'json',
-  //       'GET',
-  //       Callback
-  //   );
-  //   Xobj.send(null);
-  // }
-  //
-  // Async asyncPost<T>(d: PostData<T>) {
-  //   Let config: RequestInit = {
-  //     Cache: 'no-cache',
-  //     Headers: {
-  //       'session-id': this.sessionHolder.session
-  //     },
-  //   };
-  //   If (d.isJsonEncoded) {
-  //     Config.headers['Content-Type'] = 'application/json';
-  //   } else {
-  //     Let body;
-  //     Let logOut: string = '';
-  //     Body = d.formData ? d.formData : new FormData();
-  //     If (d.params) {
-  //       For (let key in d.params) {
-  //         Body.append(key, d.params[key]);
-  //       }
-  //     }
-  //     If (body.entries) {
-  //       Let entries = body.entries();
-  //       If (entries && entries.next) {
-  //         Let d;
-  //         While (d = entries.next()) {
-  //           If (d.done) {
-  //             Break;
-  //           }
-  //           LogOut += `${d.value[0]}= ${d.value[1]};`;
-  //         }
-  //       }
-  //     }
-  //   }
-  //   Await fetch(d.url, config);
-  // }
-  //
-  // DoPost<T>(d: PostData<T>): XMLHttpRequest {
-  //   Let r: XMLHttpRequest = new XMLHttpRequest();
-  //   R.onreadystatechange = this.getOnreadystatechange(r, d.url, d.isJsonDecoded, 'POST', d.cb);
-  //
-  //   Let url = this.getUrl(d.url);
-  //
-  //   R.open('POST', url, true);
-  //   Let data;
-  //   Let logOut: String = '';
-  //   If (d.isJsonEncoded) {
-  //     Data = JSON.stringify(d.params);
-  //     R.setRequestHeader('Content-Type', 'application/json');
-  //   } else {
-  //     /*Firefox doesn't accept null*/
-  //
-  //   }
-  //
-  //   This.httpLogger.log('POST out {} ::: {} ::: {}', url, d.params, logOut)();
-  //   If (d.process) {
-  //     D.process(r);
-  //   }
-  //   R.send(data);
-  //   Return r;
-  // }
+  public async doGet<T>(url: string, d?: GetData): Promise<T> {
+    if (d?.process) {
+      debugger
+      throw Error("Unable to handle process");
+    }
+    if (d?.baseUrl) {
+      debugger
+      throw Error("Unable to handle baseUrl");
+    }
+    const fileUrl = `${d?.baseUrl ?? XHR_API_URL}${url}`;
+    let headers: Record<string, string> = {
+      'Content-Type': 'application/json'
+    };
+    if (!d?.baseUrl) {
+      headers['session_id'] = this.sessionHolder.session!;
+    }
+    try {
+      let response = await fetch(fileUrl, {
+        method: "GET",
+        mode: 'cors',
+        headers
+      });
+      let body = await response.json();
+      if (response.ok) {
+        return body as T;
+      }
+      if (typeof body.message === 'string') {
+        throw Error(body.message)
+      } else if (body?.message?.length && typeof  body.message[0] === 'string') {
+        throw Error(body.message[0])
+      } else if (typeof body.error === 'string') {
+        throw Error(body.error)
+      } else {
+        throw Error("Network error");
+      }
+    } catch (e) {
+      debugger
+      throw new Error(e as any);
+    }
+  }
+
+  public async doPost<T>(d: PostData): Promise<T> {
+    if (d?.process) {
+      debugger
+      throw Error("Unable to handle process");
+    }
+    const fileUrl = `${XHR_API_URL}${d.url}`;
+    let headers: Record<string, string> = {};
+    let signal = null;
+    if (d.onAbortController) {
+      const controller = new AbortController();
+      signal = controller.signal;
+      d.onAbortController(controller);
+    }
+    if (!d.formData) {
+      headers['Content-Type'] = 'application/json';
+      headers['session_id'] = this.sessionHolder.session!;
+    }
+    try {
+      let response = await fetch(fileUrl, {
+        method: "POST",
+        mode: 'cors',
+        signal,
+        body: d.params ? JSON.stringify(d.params) : d.formData,
+        headers
+      });
+      let body = await response.json();
+      if (response.ok) {
+        return body as T;
+      }
+      if (typeof body.message === 'string') {
+        throw Error(body.message)
+      } else if (body?.message?.length && typeof  body.message[0] === 'string') {
+        throw Error(body.message[0])
+      } else if (typeof body.error === 'string') {
+        throw Error(body.error)
+      } else {
+        throw Error("Network error");
+      }
+    } catch (e) {
+      throw new Error(e as any);
+    }
+  }
 }

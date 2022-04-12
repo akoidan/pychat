@@ -11,7 +11,6 @@ import ResetPassword from "@/vue/singup/ResetPassword.vue";
 import Login from "@/vue/singup/Login.vue";
 import SignUp from "@/vue/singup/SignUp.vue";
 import UserProfile from "@/vue/pages/UserProfile.vue";
-import ReportIssue from "@/vue/pages/ReportIssue.vue";
 import UserProfileChangePassword from "@/vue/pages/UserProfileChangePassword.vue";
 import UserProfileImage from "@/vue/pages/UserProfileImage.vue";
 import UserProfileInfo from "@/vue/pages/UserProfileInfo.vue";
@@ -150,10 +149,6 @@ export function routerFactory(sub: Subscription) {
           {
             component: CreatePrivateRoom,
             path: "/create-private-room",
-          },
-          {
-            component: ReportIssue,
-            path: "/report-issue",
           },
         ],
       }, {

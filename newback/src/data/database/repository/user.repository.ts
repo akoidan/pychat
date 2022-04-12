@@ -45,6 +45,16 @@ export class UserRepository {
     return userModel.id;
   }
 
+  public async getUserMyAuthGoogle(googleId: string, transaction: Transaction): Promise<UserAuthModel> {
+    return this.userAuthModel.findOne({
+      where: {
+        googleId
+      },
+      include: 'user',
+      transaction
+    })
+  }
+
   public async checkUserExistByUserName(username: string, transaction?: Transaction): Promise<boolean> {
     return await this.userModel.findOne({
       where: {username},

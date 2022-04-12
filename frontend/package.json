@@ -57,6 +57,7 @@
     "vite-plugin-checker": "^0.4.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-static-copy": "https://github.com/akoidan/vite-plugin-static-copy",
+    "vite-plugin-vue-inspector": "^0.3.0",
     "vue-tsc": "^0.33.9"
   },
   "dependencies": {

@@ -17,7 +17,6 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import sessionHolder from "@/ts/instances/sessionInstance";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {PlatformUtil} from "@/ts/types/model";
-import Xhr from "@/ts/classes/Xhr";
 import "@/assets/icon.png"; // eslint-disable-line import/no-unassigned-import
 import WsHandler from "@/ts/message_handlers/WsHandler";
 import WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
@@ -43,6 +42,7 @@ import {
 } from "@/ts/utils/directives";
 import Subscription from "@/ts/classes/Subscription";
 import type {Router} from "vue-router";
+import Fetch from '@/ts/classes/Fetch';
 
 
 const logger: Logger = loggerFactory.getLoggerColor("main", "#007a70");
@@ -80,9 +80,6 @@ function bootstrapVue(
      no-underscore-dangle
      */
     const message = `Error occurred in ${vm?.$options?.__file}:${err}:\n${info}`;
-    if (store?.userSettings?.sendLogs && api) {
-      void api.sendLogs(`${vm?.$options?.__file}:${err}:${info}`, browserVersion, constants.GIT_HASH);
-    }
     /* eslint-enable
      @typescript-eslint/restrict-template-expressions,
      @typescript-eslint/restrict-template-expressions,
@@ -116,7 +113,7 @@ function init(): void {
   });
 
   const sub = new Subscription();
-  const xhr: Http = /* Window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
+  const xhr: Http = new Fetch(sessionHolder);
   const api: Api = new Api(xhr, sub);
 
   let storage;
@@ -146,18 +143,10 @@ function init(): void {
 
   window.onerror = function onerror(msg, url, linenumber, column, errorObj): boolean {
     const message = `Error occurred in ${url!}:${linenumber!}\n${JSON.stringify(msg)}`;
-    if (store?.userSettings?.sendLogs && api) {
-      void api.sendLogs(
-        `${url!}:${linenumber!}:${column ?? "?"}\n${JSON.stringify(msg)}\n\nOBJ:  ${JSON.stringify(errorObj) ?? "?"}`,
-        browserVersion,
-        constants.GIT_HASH,
-      );
-    }
     void store.growlError(message);
 
     return false;
   };
-
 
   window.GIT_VERSION = constants.GIT_HASH;
   if (constants.IS_DEBUG) {

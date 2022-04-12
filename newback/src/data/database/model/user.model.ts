@@ -7,9 +7,8 @@ import {
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {Gender} from '@/data/types/dto/dto';
-import {config} from 'node-config-ts';
-import {UserSettingsModel} from '@/data/database/model/user.settings.model';
 import {UserAuthModel} from '@/data/database/model/user.auth.model';
+import {MAX_USERNAME_LENGTH} from '@/data/utils/consts';
 
 
 @Injectable()
@@ -31,7 +30,7 @@ export class UserModel extends Model<UserModel> {
   @Column({
     allowNull: false,
     unique: true,
-    type: DataType.STRING(config.frontend.maxUserNameLength),
+    type: DataType.STRING(MAX_USERNAME_LENGTH),
   })
   public username: string;
 

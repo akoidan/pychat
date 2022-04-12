@@ -7,7 +7,7 @@
           :src="ifIframeUrl"
         />
         <input
-          :value="value"
+          :value="token"
           name="g-recaptcha-response"
           type="hidden"
         />
@@ -16,9 +16,7 @@
       <div
         v-else
         ref="repactha"
-        :data-sitekey="captcha_key"
         class="g-recaptcha"
-        data-theme="dark"
       />
     </template>
   </div>
@@ -37,15 +35,19 @@ import {
   RECAPTCHA_PUBLIC_KEY,
 } from "@/ts/utils/consts";
 import type {GoogleCaptcha} from "@/ts/types/model";
+import {ref} from "vue";
 
-const captchaInited: boolean = false; // Don't init captcha again, if it was inited in another component
+const captchaInited = ref(false)
+
 let captchaId = 1; // Just random id to diff one comp fro another
+
+window.onloadrecaptcha = function () {
+  captchaInited.value = true;
+}
 
 @Component({name: "CaptchaComponent"})
 export default class CaptchaComponent extends Vue {
   public captcha_key: string = RECAPTCHA_PUBLIC_KEY || "";
-
-  public captchaInited: boolean = false; // If current component was initialized
 
   public resettingAllowed: boolean = false; // Prevent resetting on initial load
 
@@ -61,14 +63,16 @@ export default class CaptchaComponent extends Vue {
 
   public id = captchaId++;
 
-  @Prop() public value!: boolean;
+  @Prop() public loading!: boolean;
+
+  @Prop() public token!: string;
 
   public ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}` : "";
 
   private event: ((E: MessageEvent) => void) | null = null;
 
   public get grecaptcha(): GoogleCaptcha {
-    if (window.grecaptcha) {
+    if (window.grecaptcha && (window.grecaptcha as any).reset) {
       return window.grecaptcha;
     }
     return {
@@ -79,7 +83,7 @@ export default class CaptchaComponent extends Vue {
     };
   }
 
-  @Watch("value")
+  @Watch("loading")
   public onValueChange(newValue: boolean, oldValue: boolean) {
     if (!newValue && newValue != oldValue) {
       if (this.resettingAllowed) {
@@ -87,7 +91,7 @@ export default class CaptchaComponent extends Vue {
           this.$logger.log("Resetting captcha")();
           this.iframe.contentWindow!.postMessage("reset-captcha", "*");
         } else {
-          this.grecaptcha.reset && this.grecaptcha.reset();
+          this.grecaptcha.reset();
         }
       }
       this.resettingAllowed = true;
@@ -95,9 +99,16 @@ export default class CaptchaComponent extends Vue {
     this.skipInitReset = false;
   }
 
+
+
   public renderCaptcha() {
-    this.$emit("input", false);
-    this.captchaInited = true;
+    this.$emit("update:loading", false);
+    this.grecaptcha.render(this.repactha, {
+      sitekey: this.captcha_key,
+      theme: 'dark',
+      callback: (response: string) => this.$emit("update:token", response),
+    })
+    captchaInited.value = true
   }
 
   public destroyed(): void {
@@ -105,6 +116,17 @@ export default class CaptchaComponent extends Vue {
       this.$logger.log("Removing message listener {}", this.event)();
       window.removeEventListener("message", this.event);
       this.event = null;
+    }
+  }
+
+  get captchaInited() {
+    return captchaInited.value;
+  }
+
+  @Watch('captchaInited')
+  public async oncatpchaChange() {
+    if (captchaInited.value) {
+      this.renderCaptcha();
     }
   }
 
@@ -116,17 +138,17 @@ export default class CaptchaComponent extends Vue {
         this.event = (event: MessageEvent) => {
           this.$logger.log("On message {}", event)();
           if (event.data && event.data["g-recaptcha-response"]) {
-            this.captchaInited = true;
-            this.value = event.data["g-recaptcha-response"]; // TODO emitting prop
+            captchaInited.value = true;
+            this.$emit("update:loading", true);
+            this.$emit("update:token", event.data["g-recaptcha-response"]);
           }
         };
         window.addEventListener("message", this.event, false);
-      } else if (captchaInited) {
+      } else if (captchaInited.value) {
         this.renderCaptcha();
       } else {
-        this.$emit("input", true);
-        await this.$api.loadRecaptcha();
-        this.renderCaptcha();
+        this.$emit("update:loading", true);
+        await this.$api.loadRecaptcha('onloadrecaptcha');
       }
     }
   }

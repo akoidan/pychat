@@ -5,10 +5,10 @@ import {
 } from '@nestjs/common';
 import * as supertest from 'supertest';
 import {Test} from '@nestjs/testing';
-import {AuthService} from '@/modules/auth/auth.service';
-import {AuthController} from '@/modules/auth/auth.controller';
+import {AuthService} from '@/modules/api/auth/auth.service';
+import {AuthController} from '@/modules/api/auth/auth.controller';
 import {LoggerModule} from '@/modules/logger/logger.module';
-import {PasswordService} from '@/modules/password/password.service';
+import {PasswordService} from '@/modules/api/auth/password.service';
 import {UserRepository} from '@/data/database/repository/user.repository';
 import {RoomRepository} from '@/data/database/repository/room.repository';
 import {RedisService} from '@/data/redis/RedisService';
@@ -17,6 +17,16 @@ import {MailerService} from '@nestjs-modules/mailer';
 import {Sequelize} from 'sequelize-typescript';
 import {HtmlService} from '@/modules/html/html.service';
 import waitForExpect from "wait-for-expect";
+import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
+import {OAuth2Client} from 'google-auth-library';
+import {HttpService} from '@/modules/http/http.service';
+import fetch from 'node-fetch';
+import * as googleResponseFixture from '@/fixtures/google.response.fixture.json';
+import {ConfigService} from '@/modules/config/config.service';
+import {
+  config,
+  IConfig
+} from 'node-ts-config';
 
 describe('AuthModule', () => {
   let app: INestApplication;
@@ -26,15 +36,46 @@ describe('AuthModule', () => {
   let redisService: RedisService = {} as RedisService;
   let sequelize: Sequelize = {} as Sequelize;
   let mailerService: MailerService = {} as MailerService;
-
+  let oauth2Client: OAuth2Client = {} as OAuth2Client;
+  let nodeApply: (...args) => void = () => {
+  };
+  let configService: ConfigService = {} as ConfigService;
   beforeAll(async() => {
+    //required to compile Guards like CaptchaGuard
+    configService.getConfig = jest.fn().mockReturnValue(config)
     const moduleFixture = await Test.createTestingModule({
       imports: [
         LoggerModule,
       ],
       providers: [
-        {provide: MailerService, useValue: mailerService},
-        {provide: Sequelize, useValue: sequelize},
+        {
+          provide: ConfigService,
+          useValue: configService,
+        },
+        {
+          provide: MailerService,
+          useValue: mailerService
+        },
+        {
+          provide: Sequelize,
+          useValue: sequelize
+        },
+        {
+          provide: HttpService,
+          inject: [Logger],
+          useFactory: (logger) => new HttpService(logger, new Proxy(() => {
+          }, {
+            apply: function (target: {}, thisArg: any, argArray: any[]): any {
+              return nodeApply(...argArray)
+            }
+          }) as typeof fetch)
+        },
+        {
+          provide: GoogleAuthService,
+          inject: [Logger],
+          useFactory: (logger) => new GoogleAuthService(logger, oauth2Client)
+        },
+        PasswordService,
         AuthService,
         HtmlService,
         EmailSenderService,
@@ -54,16 +95,19 @@ describe('AuthModule', () => {
           provide: RoomRepository,
           useValue: roomRepository,
         },
-        Logger,
-        PasswordService,
       ],
       controllers: [AuthController]
-    }).compile();
+    })
+      .compile();
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
     request = supertest(app.getHttpServer());
   });
+
+  beforeEach(() => {
+    configService.getConfig = jest.fn().mockReturnValue(config)
+  })
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -72,17 +116,22 @@ describe('AuthModule', () => {
     Object.keys(redisService).forEach(key => delete redisService[key]);
     Object.keys(sequelize).forEach(key => delete sequelize[key]);
     Object.keys(mailerService).forEach(key => delete mailerService[key]);
+    Object.keys(oauth2Client).forEach(key => delete oauth2Client[key]);
+    nodeApply = () => {
+    };
+    Object.keys(configService).forEach(key => delete configService[key]);
+
   });
 
   afterAll(async() => {
     await app.close()
   });
 
-  describe('auth', () => {
+  describe('sign-in', () => {
     it('should throw if user not exists', async() => {
       userRepository.getUserByUserName = jest.fn().mockResolvedValue(null);
       await request
-        .post('/auth').send({
+        .post('/api/auth/sign-in').send({
           username: 'a',
           password: 'as$'
         }).expect(409, {
@@ -91,6 +140,49 @@ describe('AuthModule', () => {
           statusCode: 409
         });
     });
+    it('should throw exception that captcha missing', async() => {
+      configService.getConfig = jest.fn().mockReturnValue({
+        recaptcha: {
+          publicKey: "a",
+          privateKey: "a",
+        }
+      } as IConfig)
+      const {body} = await request
+        .post('/api/auth/sign-in').send({
+          username: 'a',
+          password: 'as$'
+        }).expect(400, {
+          statusCode: 400,
+          message: 'Captcha is missing',
+          error: 'Bad Request'
+        });
+    })
+    it('should go throw captcha when its presnt', async() => {
+      let passwordService = app.get(PasswordService);
+      redisService.saveSession = jest.fn().mockResolvedValue(undefined);
+      let password = await passwordService.createPassword("koko");
+      userRepository.getUserByUserName = jest.fn().mockResolvedValue({
+        userAuth: {
+          password: password
+        },
+        id: 3
+      })
+      configService.getConfig = jest.fn().mockReturnValue({
+        recaptcha: {
+          publicKey: "a",
+          privateKey: "a",
+        }
+      } as IConfig);
+      nodeApply = jest.fn().mockReturnValue({json: jest.fn().mockResolvedValue({success: true})});
+      const {body} = await request
+        .post('/api/auth/sign-in').send({
+          username: 'a',
+          password: 'koko',
+          captcha: 'asd'
+        });
+      expect(body).toMatchObject({session: expect.any(String)});
+    })
+
     it('should throw if password invalid', async() => {
       userRepository.getUserByUserName = jest.fn().mockResolvedValue({
         userAuth: {
@@ -99,7 +191,7 @@ describe('AuthModule', () => {
         id: 3
       })
       const {body} = await request
-        .post('/auth').send({
+        .post('/api/auth/sign-in').send({
           username: 'a',
           password: 'as$'
         }).expect(401, {
@@ -119,7 +211,7 @@ describe('AuthModule', () => {
         id: 3
       })
       const {body} = await request
-        .post('/auth').send({
+        .post('/api/auth/sign-in').send({
           username: 'a',
           password: 'koko'
         });
@@ -127,7 +219,32 @@ describe('AuthModule', () => {
     })
   });
 
-  describe('register', () => {
+  describe('google-sign-in', () => {
+    it('should login if user exists', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      redisService.saveSession = jest.fn().mockResolvedValue(undefined)
+      userRepository.getUserMyAuthGoogle = jest.fn().mockResolvedValue({
+        id: 1,
+        user: {
+          username: 'as'
+        }
+      });
+      oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
+        getPayload: jest.fn().mockReturnValue(googleResponseFixture)
+      });
+      const {body} = await request
+        .post('/api/auth/google-sign-in').send({
+          token: 'aasdasd',
+        }).expect(201);
+      expect(body).toMatchObject({
+        session: expect.any(String),
+        isNewAccount: false,
+        username: 'as'
+      })
+    });
+  });
+
+  describe('sign-up', () => {
     it('returns session', async() => {
       sequelize.transaction = (resolve) => resolve();
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
@@ -135,7 +252,7 @@ describe('AuthModule', () => {
       roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
       redisService.saveSession = jest.fn().mockResolvedValue(undefined)
       const {body} = await request
-        .post('/register').send({
+        .post('/api/auth/sign-up').send({
           username: 'a',
           password: 'as$'
         }).expect(201);
@@ -144,16 +261,16 @@ describe('AuthModule', () => {
     });
     it('sends an email', async() => {
       sequelize.transaction = (resolve) => resolve();
-      userRepository.createVerification =  jest.fn().mockResolvedValue(undefined);
+      userRepository.createVerification = jest.fn().mockResolvedValue(undefined);
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
       userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(false);
       userRepository.createUser = jest.fn().mockResolvedValue(3);
       roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
       mailerService.sendMail = jest.fn();
-      let spy =  jest.spyOn(mailerService, 'sendMail').mockResolvedValue(true);
+      let spy = jest.spyOn(mailerService, 'sendMail').mockResolvedValue(true);
       redisService.saveSession = jest.fn().mockResolvedValue(undefined)
       const {body} = await request
-        .post('/register').send({
+        .post('/api/auth/sign-up').send({
           username: 'a',
           password: 'as$',
           email: 'death@gmail.com'
@@ -170,7 +287,7 @@ describe('AuthModule', () => {
       sequelize.transaction = (resolve) => resolve();
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
       const {body} = await request
-        .post('/register').send({
+        .post('/api/auth/sign-up').send({
           username: 'a',
           password: 'as$'
         }).expect(409, {
@@ -184,7 +301,7 @@ describe('AuthModule', () => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
       userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(true);
       const {body} = await request
-        .post('/register').send({
+        .post('/api/auth/sign-up').send({
           username: 'a',
           password: 'as$',
           email: 'death@gmail.com'
@@ -195,19 +312,19 @@ describe('AuthModule', () => {
         });
     });
   });
-  describe('validate_user', () => {
+  describe('validate-user', () => {
 
     it('should return ok', async() => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
       await request
-        .post('/validate_user').send({
+        .post('/api/auth/validate-user').send({
           username: 'a',
-        }).expect(201, {});
+        }).expect(201, {ok: true});
     });
     it('should error if user exists', async() => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
       await request
-        .post('/validate_user').send({
+        .post('/api/auth/validate-user').send({
           username: 'a',
         }).expect(409, {
           "error": "Conflict",
@@ -217,7 +334,7 @@ describe('AuthModule', () => {
     });
     it('should give error on invalid character for username', async() => {
       await request
-        .post('/validate_user').send({
+        .post('/api/auth/validate-user').send({
           username: '%',
         }).expect(400, {
           "error": "Bad Request",
@@ -229,7 +346,7 @@ describe('AuthModule', () => {
     });
     it('should give error if username has great length', async() => {
       await request
-        .post('/validate_user').send({
+        .post('/api/auth/validate-user').send({
           username: '1234567890123456789',
         }).expect(400, {
           "error": "Bad Request",
@@ -242,7 +359,7 @@ describe('AuthModule', () => {
     it('should throw an error if user exists', async() => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
       await request
-        .post('/validate_user').send({
+        .post('/api/auth/validate-user').send({
           username: 'asd',
         }).expect(409, {
           "error": "Conflict",

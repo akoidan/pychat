@@ -24,6 +24,7 @@ declare global {
   interface Window {
     GIT_VERSION: string | undefined;
     vue: VueApp;
+    onloadrecaptcha: () => any;
     router: Router;
     api: Api;
     deferredPrompt: BeforeInstallPromptEvent;

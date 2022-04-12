@@ -121,7 +121,6 @@ import {
   Vue,
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
-import type {SexModelString} from "@/ts/types/model";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 import type {UserProfileDtoWoImage} from "@/ts/types/dto";
 
@@ -129,6 +128,7 @@ import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
 import type {SetUserProfileMessage} from "@/ts/types/messages/wsInMessages";
 import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
+import {Gender} from '@/ts/types/backend/dto';
 
 @Component({
   name: "UserProfileInfo",
@@ -143,7 +143,7 @@ export default class UserProfileInfo extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  public sex: SexModelString[] = ["Male", "Female", "Secret"];
+  public sex: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.OTHER];
 
   public model!: UserProfileDtoWoImage;
 

@@ -231,21 +231,12 @@ export interface PostData {
   url: string;
   params?: Record<string, Blob | boolean | number | string | null>;
   formData?: FormData;
-  isJsonEncoded?: boolean;
-  isJsonDecoded?: boolean;
-  checkOkString?: boolean;
-  errorDescription?: string;
-
+  onAbortController?: (controller: AbortController) => void;
   process?(R: XMLHttpRequest): void;
 }
 
 export interface GetData {
-  url: string;
-  isJsonDecoded?: boolean;
-  checkOkString?: boolean;
   baseUrl?: string;
-  skipAuth?: boolean;
-
   process?(R: XMLHttpRequest): void;
 }
 

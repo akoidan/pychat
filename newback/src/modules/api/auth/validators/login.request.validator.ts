@@ -4,16 +4,16 @@ import {
   Matches,
   ValidateIf,
 } from 'class-validator';
-import {LoginRequest} from '@/data/types/dto/dto';
+import {SignInRequest} from '@/data/types/dto/dto';
 
-export class LoginRequestValidator implements LoginRequest {
+export class LoginRequestValidator implements SignInRequest {
 
   @ValidateIf(o => !o.email || o.username)
   @IsString()
   @Matches(/^\S+$/, {
     message: `Username can't contain whitespaces`
   })
-  public username: string;
+  public username?: string;
 
   @ValidateIf(o => !o.username || o.email)
   @IsString()
@@ -21,7 +21,7 @@ export class LoginRequestValidator implements LoginRequest {
   @Matches(/^\S+$/, {
     message: `email can't contain whitespaces`
   })
-  public email: string;
+  public email?: string;
 
   @IsString()
   @Matches(/^\S+$/, {

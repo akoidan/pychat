@@ -1,10 +1,12 @@
 /* tslint:disable */
 /* eslint-disable */
-declare module "node-config-ts" {
+declare module "node-ts-config" {
   interface IConfig {
     name: string
     application: Application
     settings: Settings
+    auth: Auth
+    recaptcha: Recaptcha
     email: Email
     redis: Redis
     frontend: Frontend
@@ -21,7 +23,6 @@ declare module "node-config-ts" {
   }
   interface Frontend {
     address: string
-    maxUserNameLength: number
     jsConsoleLogs: string
     maxMessageSize: number
     issueReportLink: string
@@ -39,17 +40,23 @@ declare module "node-config-ts" {
   interface Email {
     host: string
     port: number
-    secure: boolean
-    tls: Tls
-    auth: Auth
+    auth: Auth2
     from: string
   }
-  interface Auth {
+  interface Auth2 {
+    type: string
     user: string
     password: string
   }
-  interface Tls {
-    ciphers: string
+  interface Recaptcha {
+    publicKey: string
+    privateKey: string
+  }
+  interface Auth {
+    google: Google
+  }
+  interface Google {
+    clientId: string
   }
   interface Settings {
     wsIdCharLength: number

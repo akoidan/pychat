@@ -1,7 +1,5 @@
 <template>
   <form
-    id="register-form"
-    ref="form"
     method="post"
     @submit.prevent="register"
   >
@@ -132,10 +130,10 @@ import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import RegisterFieldSet from "@/vue/singup/RegisterFieldSet.vue";
 import debounce from "lodash.debounce";
 import {IconColor} from "@/ts/types/types";
-import {SexModelString} from "@/ts/types/model";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import SocialAuthSignUp from "@/vue/singup/SocialAuthSignUp.vue";
 import {USERNAME_REGEX} from "@/ts/utils/consts";
+import {Gender} from '@/ts/types/backend/dto';
 
 @Component({
   name: "SignUp",
@@ -150,9 +148,6 @@ export default class SignUp extends Vue {
 
 
   running: boolean = false;
-
-  @Ref()
-  private form!: HTMLFormElement;
 
   created() {
     this.$store.setRegHeader("Create new account");
@@ -180,7 +175,7 @@ export default class SignUp extends Vue {
   debouncedValidateUserName!: Function;
 
 
-  private currentValidateUsernameRequest: XMLHttpRequest | null = null;
+  private currentValidateUsernameRequest: AbortController | null = null;
 
   async checkUserName(username: string) {
     if (this.currentValidateUsernameRequest) {
@@ -188,7 +183,7 @@ export default class SignUp extends Vue {
       this.currentValidateUsernameRequest = null;
     }
     try {
-      await this.$api.validateUsername(username, (r) => this.currentValidateUsernameRequest = r);
+      await this.$api.validateUsername(username, (r: AbortController) => this.currentValidateUsernameRequest = r);
       this.userCheckValue = IconColor.SUCCESS;
       this.userDescription = "Username is ok!";
       this.usernameValidity = "";
@@ -282,7 +277,7 @@ export default class SignUp extends Vue {
 
   debouncedValidateEmail!: Function;
 
-  private currentValidateEmailRequest: XMLHttpRequest | null = null;
+  private currentValidateEmailRequest: AbortController | null = null;
 
   async checkEmail(username: string) {
     if (this.currentValidateEmailRequest) {
@@ -290,7 +285,7 @@ export default class SignUp extends Vue {
       this.currentValidateEmailRequest = null;
     }
     try {
-      await this.$api.validateEmail(username, (r) => this.currentValidateEmailRequest = r);
+      await this.$api.validateEmail(username, (r:AbortController) => this.currentValidateEmailRequest = r);
       this.emailCheckValue = IconColor.SUCCESS;
       this.emailDescription = "Email is ok!";
       this.emailValidity = "";
@@ -339,8 +334,8 @@ export default class SignUp extends Vue {
   sexCheckValue: IconColor = IconColor.NOT_SET;
 
   @Watch("sex")
-  onSexChange(gender: SexModelString) {
-    if (gender == "Secret") {
+  onSexChange(gender: Gender) {
+    if (gender == Gender.OTHER) {
       this.sexDescription = "Need a help?";
       this.sexCheckValue = IconColor.WARN;
     } else {
@@ -349,13 +344,20 @@ export default class SignUp extends Vue {
     }
   }
 
-  @ApplyGrowlErr({runningProp: "running",
-    message: "Can't sign up"})
+  @ApplyGrowlErr({
+    runningProp: "running",
+    message: "Can't sign up"
+  })
   async register() {
-    const {session} = await this.$api.register(this.form);
-    const message: LoginMessage = {action: "login",
-                                   handler: "router",
-                                   session};
+    const {session} = await this.$api.register({
+      username: this.username,
+      password: this.password,
+    });
+    const message: LoginMessage = {
+      action: "login",
+      handler: "router",
+      session
+    };
     this.$messageBus.notify(message);
   }
 }

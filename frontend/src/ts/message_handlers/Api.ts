@@ -23,7 +23,8 @@ import type {
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
-import {LoginRequest} from '@/ts/types/dto';
+import {SignInRequest} from '@/ts/types/dto';
+import {ValidateUserResponse} from '@/ts/types/backend/dto';
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
@@ -43,24 +44,10 @@ export default class Api extends MessageHandler {
     this.xhr = xhr;
   }
 
-  public async login(body: LoginRequest): Promise<SessionResponse> {
+  public async login(body: SignInRequest): Promise<SessionResponse> {
     return this.xhr.doPost<SessionResponse>({
-      url: "/auth",
-      isJsonDecoded: true,
-      isJsonEncoded: true,
+      url: "/auth/sign-in",
       params: {...body}
-    });
-  }
-
-  public async sendLogs(issue: string, browser: string, version: string): Promise<void> {
-    const result: string = await this.xhr.doPost<string>({
-      url: "/report_issue",
-      params: {
-        issue,
-        browser,
-        version,
-      },
-      checkOkString: true,
     });
   }
 
@@ -71,7 +58,6 @@ export default class Api extends MessageHandler {
         old_password,
         password,
       },
-      checkOkString: true,
     });
   }
 
@@ -79,7 +65,6 @@ export default class Api extends MessageHandler {
     await this.xhr.doPost({
       url: "/logout",
       params: {registration_id},
-      errorDescription: "Error while logging out: ",
     });
   }
 
@@ -87,26 +72,13 @@ export default class Api extends MessageHandler {
     return this.xhr.doPost<void>({
       url: "/send_restore_password",
       formData: new FormData(form),
-      checkOkString: true,
     });
   }
 
-  public async register(form: HTMLFormElement): Promise<SessionResponse> {
+  public async register(data: SignInRequest): Promise<SessionResponse> {
     return this.xhr.doPost<SessionResponse>({
-      url: "/register",
-      isJsonDecoded: true,
-      formData: new FormData(form),
-    });
-  }
-
-  public async registerDict(password: string, username: string): Promise<SessionResponse> {
-    return this.xhr.doPost<SessionResponse>({
-      url: "/register",
-      isJsonDecoded: true,
-      params: {
-        username,
-        password,
-      },
+      url: "/auth/sign-up",
+      params: data as any,
     });
   }
 
@@ -118,20 +90,14 @@ export default class Api extends MessageHandler {
   ): Promise<MultiResponse> {
     let response!: MultiResponse;
     if ((/^\s*$/).exec(text)) {
-      response = await this.xhr.doGet<MultiResponse>({
-        isJsonDecoded: true,
-        skipAuth: true,
-        // https://developers.giphy.com/docs/api/endpoint#trending
-        url: `/gifs/trending?api_key=${GIPHY_API_KEY}&limit=${limit}&offset=${offset}`,
+      // https://developers.giphy.com/docs/api/endpoint#trending
+      response = await this.xhr.doGet<MultiResponse>(`/gifs/trending?api_key=${GIPHY_API_KEY}&limit=${limit}&offset=${offset}`, {
         baseUrl: GIPHY_URL,
         process,
       });
     } else {
-      response = await this.xhr.doGet<MultiResponse>({
-        isJsonDecoded: true,
-        skipAuth: true,
-        // https://developers.giphy.com/docs/api/endpoint#search
-        url: `/gifs/search?api_key=${GIPHY_API_KEY}&limit=12&q=${encodeURIComponent(text)}&offset=${offset}`,
+      // https://developers.giphy.com/docs/api/endpoint#search
+      response = await this.xhr.doGet<MultiResponse>(`/gifs/search?api_key=${GIPHY_API_KEY}&limit=12&q=${encodeURIComponent(text)}&offset=${offset}`, {
         baseUrl: GIPHY_URL,
         process,
       });
@@ -144,16 +110,12 @@ export default class Api extends MessageHandler {
   }
 
   public async getOauthStatus(): Promise<OauthStatus> {
-    return this.xhr.doGet<OauthStatus>({
-      url: "/oauth_status",
-      isJsonDecoded: true,
-    });
+    return this.xhr.doGet<OauthStatus>( "/oauth_status");
   }
 
   public async setGoogleOauth(token: string): Promise<void> {
     return this.xhr.doPost<void>({
       url: "/set_google_oauth",
-      checkOkString: true,
       params: {token},
     });
   }
@@ -161,15 +123,13 @@ export default class Api extends MessageHandler {
   public async setFacebookOauth(token: string): Promise<void> {
     return this.xhr.doPost<void>({
       url: "/set_facebook_oauth",
-      checkOkString: true,
       params: {token},
     });
   }
 
   public async googleAuth(token: string): Promise<OauthSessionResponse> {
     return this.xhr.doPost<OauthSessionResponse>({
-      url: "/google_auth",
-      isJsonDecoded: true,
+      url: "/auth/google-sign-in",
       params: {
         token,
       },
@@ -178,8 +138,7 @@ export default class Api extends MessageHandler {
 
   public async facebookAuth(token: string): Promise<OauthSessionResponse> {
     return this.xhr.doPost<OauthSessionResponse>({
-      url: "/facebook_auth",
-      isJsonDecoded: true,
+      url: "/api/facebook_sign_in",
       params: {
         token,
       },
@@ -194,8 +153,8 @@ export default class Api extends MessageHandler {
     await this.xhr.loadJs("https://connect.facebook.net/en_US/sdk.js");
   }
 
-  public async loadRecaptcha(): Promise<void> {
-    await this.xhr.loadJs("https://www.google.com/recaptcha/api.js");
+  public async loadRecaptcha(callbackId: string): Promise<void> {
+    await this.xhr.loadJs(`https://www.google.com/recaptcha/api.js?render=explicit&onload=${callbackId}`);
   }
 
   public async registerFCB(registration_id: string, agent: string, is_mobile: boolean): Promise<void> {
@@ -207,8 +166,6 @@ export default class Api extends MessageHandler {
           agent,
           is_mobile,
         },
-        isJsonEncoded: true,
-        checkOkString: true,
       });
       return;
     } catch (e) {
@@ -223,12 +180,11 @@ export default class Api extends MessageHandler {
     }
   }
 
-  public async validateUsername(username: string, process: (r: XMLHttpRequest) => void): Promise<void> {
+  public async validateUsername(username: string, onAbortController: (controller: AbortController) => void): Promise<ValidateUserResponse> {
     return this.xhr.doPost({
-      url: "/validate_user",
+      url: "/auth/validate-user",
       params: {username},
-      checkOkString: true,
-      process,
+      onAbortController,
     });
   }
 
@@ -239,27 +195,20 @@ export default class Api extends MessageHandler {
     return this.xhr.doPost<void>({
       url: "/upload_profile_image",
       formData: fd,
-      checkOkString: true,
     });
   }
 
   public async showProfile(id: number): Promise<ViewUserProfileDto> {
-    return this.xhr.doGet<ViewUserProfileDto>({
-      url: `/profile?id=${id}`,
-      isJsonDecoded: true,
-    });
+    return this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`);
   }
 
   public async changeEmail(token: string): Promise<string> {
-    return this.xhr.doGet<string>({
-      url: `/change_email?token=${token}`,
-    });
+    return this.xhr.doGet<string>(`/change_email?token=${token}`);
   }
 
   public async changeEmailLogin(email: string, password: string): Promise<void> {
     return this.xhr.doPost({
       url: "/change_email_login",
-      checkOkString: true,
       params: {
         email,
         password,
@@ -268,10 +217,7 @@ export default class Api extends MessageHandler {
   }
 
   public async confirmEmail(token: string): Promise<string> {
-    return this.xhr.doGet<string>({
-      url: `/confirm_email?token=${token}`,
-      checkOkString: true,
-    });
+    return this.xhr.doGet<string>(`/confirm_email?token=${token}`);
   }
 
   public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void, setXhr: (e: XMLHttpRequest) => void): Promise<SaveFileResponse> {
@@ -282,7 +228,6 @@ export default class Api extends MessageHandler {
 
     return this.xhr.doPost<SaveFileResponse>({
       url: "/upload_file",
-      isJsonDecoded: true,
       formData: fd,
       process: (r) => {
         setXhr(r);
@@ -291,19 +236,17 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async validateEmail(email: string, process: (r: XMLHttpRequest) => void): Promise<void> {
+  public async validateEmail(email: string, onAbortController: (controller: AbortController) => void): Promise<void> {
     return this.xhr.doPost({
-      url: "/validate_email",
+      url: "/auth/validate-email",
       params: {email},
-      checkOkString: true,
-      process,
+      onAbortController,
     });
   }
 
   public async verifyToken(token: string): Promise<string> {
     const value: {message: string; restoreUser: string} = await this.xhr.doPost<{message: string; restoreUser: string}>({
       url: "/verify_token",
-      isJsonDecoded: true,
       params: {token},
     });
     if (value && value.message === RESPONSE_SUCCESS) {
@@ -319,7 +262,6 @@ export default class Api extends MessageHandler {
         token,
         password,
       },
-      checkOkString: true,
     });
   }
 

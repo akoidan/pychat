@@ -36,7 +36,7 @@
     </router-link>
     <div>
       <social-auth-sign-up/>
-      <captcha-component v-model="running"/>
+      <captcha-component v-model:loading="running" v-model:token="captcha"/>
       <app-submit
         :running="running"
         class="submit-button"
@@ -73,6 +73,7 @@ export default class Login extends Vue {
 
   public username: string = '';
   public password: string = '';
+  public captcha: string = '';
   public running: boolean = false;
 
   public created() {
@@ -84,10 +85,21 @@ export default class Login extends Vue {
     message: "Can't log in",
   })
   public async login() {
-    const {session} = await this.$api.login({
-      username: this.username,
-      password: this.password,
-    });
+    let response;
+    if (this.username?.includes('@')) {
+      response = await this.$api.login({
+        email: this.username,
+        password: this.password,
+      });
+    } else {
+      response = await this.$api.login({
+        username: this.username,
+        password: this.password,
+        captcha: this.captcha,
+      });
+    }
+    const {session} = response;
+
     const message: LoginMessage = {
       action: "login",
       handler: "router",

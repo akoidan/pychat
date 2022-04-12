@@ -12,7 +12,7 @@ import type {
   PastingTextAreaElement,
   RoomDictModel,
   SendingFileTransfer,
-  SexModelString,
+
   UserDictModel,
 } from "@/ts/types/model";
 import {
@@ -79,6 +79,7 @@ import {
   Mutation,
   VuexModule,
 } from "vuex-module-decorators";
+import {Gender} from '@/ts/types/backend/dto';
 
 const logger = loggerFactory.getLogger("store");
 
@@ -885,7 +886,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setUser(user: {id: number; sex: SexModelString; user: string; image: string}) {
+  public setUser(user: {id: number; sex: Gender; user: string; image: string}) {
     this.allUsersDict[user.id].user = user.user;
     this.allUsersDict[user.id].sex = user.sex;
     this.allUsersDict[user.id].image = user.image;

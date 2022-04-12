@@ -1,15 +1,19 @@
-export interface LoginRequest {
-  username: string;
+export interface SignInRequest extends CaptchaRequest{
+  username?: string;
   password: string;
-  email: string;
+  email?: string;
+}
+
+export interface CaptchaRequest {
+  captcha?: string;
+}
+
+export interface GoogleAuthRequest {
+  token: string;
 }
 
 export interface ValidateUserRequest {
   username: string;
-}
-
-export interface ValidateUserResponse {
-  ok: boolean;
 }
 
 export interface SignUpRequest {
@@ -19,7 +23,7 @@ export interface SignUpRequest {
   sex?: Gender;
 }
 
-interface SessionResponse {
+export interface SessionResponse {
   session: string;
 }
 
@@ -27,8 +31,37 @@ export interface SignInResponse extends SessionResponse {
 
 }
 
+export interface OauthSessionResponse extends SessionResponse {
+  isNewAccount: boolean;
+  username: string;
+}
+
+export interface GoogleSignInResponse extends OauthSessionResponse {
+
+}
+
+export interface FacebookSignInResponse extends OauthSessionResponse {
+
+}
+
 export interface SignUpResponse extends SessionResponse{
 
+}
+
+export interface OkResponse {
+  ok: true;
+}
+
+export interface ValidateUserResponse extends OkResponse {
+
+}
+
+export interface ValidateEmailResponse extends OkResponse {
+
+}
+
+export interface ValidateUserEmailRequest {
+  email: string;
 }
 
 // ISO/IEC 5218 1 male, 2 - female

@@ -4,12 +4,12 @@ import {
   Matches,
 } from 'class-validator';
 import {ValidateUserRequest} from '@/data/types/dto/dto';
-import {config} from 'node-config-ts';
+import {MAX_USERNAME_LENGTH} from '@/data/utils/consts';
 
 export class ValidateUserRequestValidator implements ValidateUserRequest {
   @IsString()
-  @Length(1, config.frontend.maxUserNameLength, {
-    message: `Username should be 1-${config.frontend.maxUserNameLength} characters`
+  @Length(1, MAX_USERNAME_LENGTH, {
+    message: `Username should be 1-${MAX_USERNAME_LENGTH} characters`
   })
   @Matches(/[a-zA-Z-_0-9]+/, {
     message: `Username can only contain latin characters, numbers and symbols '-' '_'`

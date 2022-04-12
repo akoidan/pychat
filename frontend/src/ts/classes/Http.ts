@@ -16,7 +16,7 @@ export default abstract class Http {
     this.httpLogger = loggerFactory.getLogger("http");
   }
 
-  public abstract doGet<T>(d: GetData): Promise<T>;
+  public abstract doGet<T>(url: string, d?: GetData): Promise<T>;
 
   public abstract doPost<T>(d: PostData): Promise<T>;
 

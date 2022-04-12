@@ -9,7 +9,6 @@ import type {
   MessageStatus,
   RoomModel,
   RoomSettingsModel,
-  SexModelString,
   UserModel,
 } from "@/ts/types/model";
 import type {
@@ -19,7 +18,7 @@ import type {
   MessageModelDto,
   RoomDto,
   RoomNoUsersDto,
-  SexModelDto,
+  Gender,
   UserDto,
   UserProfileDtoWoImage,
   UserSettingsDto,
@@ -42,7 +41,7 @@ export function currentUserInfoModelToDto(userInfo: CurrentUserInfoModel): UserP
   return {...userInfo};
 }
 
-export function convertSex(dto: SexModelDto): SexModelString {
+export function convertSex(dto: Gender): Gender {
   return dto;
 }
 
@@ -56,17 +55,6 @@ export function convertLocation(dto: LocationDto | null): Location {
     };
   }
   return {...dto};
-}
-
-export function convertSexToNumber(m: SexModelString): number {
-  if (m === "Secret") {
-    return 0;
-  } else if (m === "Male") {
-    return 1;
-  } else if (m === "Female") {
-    return 2;
-  }
-  throw Error(`Unknown gender ${m}`);
 }
 
 export function getChannelDict(
@@ -155,39 +143,9 @@ export function getRoomsBaseDict(
   };
 }
 
-export function convertNumberToSex(m: SexDB): SexModelString {
-  const newVar: Record<number, SexModelString> = {
-    0: "Secret",
-    1: "Male",
-    2: "Female",
-  };
-
-  return newVar[m];
-}
-
-export function convertSexToString(m: SexDB): SexModelString {
-  const newVar: Record<SexDB, SexModelString> = {
-    0: "Secret",
-    1: "Male",
-    2: "Female",
-  };
-
-  return newVar[m];
-}
-
 export function convertToBoolean(value: BooleanDB): boolean {
   return value === 1;
 }
-
-export function convertStringSexToNumber(m: SexModelString): SexDB {
-  const newVar: Record<SexModelString, SexDB> = {
-    Secret: 0,
-    Male: 1,
-    Female: 2,
-  };
-  return newVar[m];
-}
-
 
 export function messageModelToP2p(m: MessageModel): MessageP2pDto {
   return {

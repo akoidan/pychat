@@ -1,5 +1,5 @@
 import type {SequelizeModuleOptions} from '@nestjs/sequelize';
-import {config} from 'node-config-ts';
+import {config} from 'node-ts-config';
 
 
 export function generateConfig(logging: ((sql: string) => void)): Omit<SequelizeModuleOptions, 'ssl'> {

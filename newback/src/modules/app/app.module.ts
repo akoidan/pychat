@@ -1,14 +1,17 @@
 import {Module} from '@nestjs/common';
-import {AuthModule} from '@/modules/auth/auth.module';
-import {DatabaseModule} from '@/data/database/database.module';
+import {AuthModule} from '@/modules/api/auth/auth.module';
 import {LoggingInterceptor} from '@/modules/logger/interceptor';
-import {APP_INTERCEPTOR} from '@nestjs/core';
+import {
+  APP_INTERCEPTOR,
+  RouterModule
+} from '@nestjs/core';
 import {LoggerModule} from '@/modules/logger/logger.module';
 import {RedisModule} from '@nestjs-modules/ioredis';
-import {config} from 'node-config-ts';
+import {config} from 'node-ts-config';
+import {ConfigModule} from '@/modules/config/config.module';
 
 @Module({
-  imports: [AuthModule, LoggerModule, RedisModule.forRoot({
+  imports: [AuthModule, LoggerModule, ConfigModule, RedisModule.forRoot({
     config: {
       host: config.redis.host,
       port: config.redis.port,
