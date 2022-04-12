@@ -12,6 +12,7 @@ import {LoginRequestValidator} from '@/modules/api/auth/validators/login.request
 import {SignUpRequestValidator} from '@/modules/api/auth/validators/sign.up.request.validator';
 import {ValidateUserRequestValidator} from '@/modules/api/auth/validators/validate.user.request.validator';
 import {
+  FacebookSignInResponse,
   GoogleSignInResponse,
   SignInResponse,
   SignUpResponse,
@@ -21,6 +22,7 @@ import {
 import {GoogleAuthRequestValidator} from '@/modules/api/auth/validators/google.auth.reques.validator';
 import {CaptchaGuard} from '@/modules/captcha';
 import {ValidateEmailRequestValidator} from '@/modules/api/auth/validators/validate.email.request.validator';
+import {FacebookAuthRequestValidator} from '@/modules/api/auth/validators/facebook.auth.request.validator';
 
 @Controller({
   path: '/api/auth'
@@ -41,6 +43,11 @@ export class AuthController {
   @Post('/google-sign-in')
   public async googleAuth(@Body() body: GoogleAuthRequestValidator): Promise<GoogleSignInResponse> {
     return this.authservice.authorizeGoogle(body);
+  }
+
+  @Post('/facebook-sign-in')
+  public async facebookAuh(@Body() body: FacebookAuthRequestValidator): Promise<FacebookSignInResponse> {
+    return this.authservice.authorizeFacebook(body);
   }
 
   @Post('/sign-up')

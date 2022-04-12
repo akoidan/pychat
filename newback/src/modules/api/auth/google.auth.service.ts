@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   Logger,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 
 @Injectable()
@@ -10,7 +11,7 @@ export class GoogleAuthService {
 
   public constructor(
     private readonly logger: Logger,
-    private readonly oauth2Client: OAuth2Client,
+    private readonly oauth2Client: OAuth2Client|null,
   ) {
 
   }
@@ -35,6 +36,9 @@ export class GoogleAuthService {
    * }
    * */
   public async validate(idToken: string): Promise<TokenPayload> {
+    if (!this.oauth2Client) {
+      throw new ServiceUnavailableException("google client id not specifed");
+    }
     const response = await this.oauth2Client.verifyIdToken({
       idToken,
     });

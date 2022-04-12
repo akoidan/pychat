@@ -22,11 +22,14 @@ import {OAuth2Client} from 'google-auth-library';
 import {HttpService} from '@/modules/http/http.service';
 import fetch from 'node-fetch';
 import * as googleResponseFixture from '@/fixtures/google.response.fixture.json';
+import * as facebookGetTokenResponseFixture from '@/fixtures/facebook.get.token.response.json';
+import * as facebookGetUserResponseFixture from '@/fixtures/facebook.get.user.response.json';
 import {ConfigService} from '@/modules/config/config.service';
 import {
   config,
   IConfig
 } from 'node-ts-config';
+import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
 
 describe('AuthModule', () => {
   let app: INestApplication;
@@ -79,6 +82,7 @@ describe('AuthModule', () => {
         AuthService,
         HtmlService,
         EmailSenderService,
+        FacebookAuthService,
         {
           provide: MailerService,
           useValue: mailerService,
@@ -263,14 +267,14 @@ describe('AuthModule', () => {
         username: 'death' // from fixture
       })
       expect(createUserSpy).toHaveBeenCalledWith(expect.objectContaining({
-       "email": "death@gmail.com",
-       "googleId": "death@gmail.com",
-       "name": "Andrew",
-       "password": expect.any(String),
-       "sex": "OTHER",
-       "surname": "Superman",
-       "thumbnail": "https://lh3.googleusercontent.com/a-/xxxxxxxxxxxx-xxxxxxxxxxxx",
-       "username": "death",
+        "email": "death@gmail.com",
+        "googleId": "death@gmail.com",
+        "name": "Andrew",
+        "password": expect.any(String),
+        "sex": "OTHER",
+        "surname": "Superman",
+        "thumbnail": "https://lh3.googleusercontent.com/a-/xxxxxxxxxxxx-xxxxxxxxxxxx",
+        "username": "death",
       }), 'transaction')
     });
     it('should throw an error if email exists', async() => {
@@ -294,6 +298,78 @@ describe('AuthModule', () => {
         message: "User with this email already exist, but has no connected google account." +
           " If this is you, please login as this user and connect this google profile in profile settings",
       })
+    });
+  });
+
+  describe('facebook-sign-in', () => {
+    it('should login if user exists', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      redisService.saveSession = jest.fn().mockResolvedValue(undefined);
+      nodeApply = jest.fn()
+        .mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetTokenResponseFixture)})
+        .mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetUserResponseFixture)});
+      configService.getConfig = jest.fn().mockReturnValue({
+        auth: {
+          facebook: {
+            accessToken: "test"
+          }
+        }
+      } as IConfig)
+      userRepository.getUserMyAuthFacebook = jest.fn().mockResolvedValue({
+        id: 1,
+        user: {
+          username: 'as'
+        }
+      });
+      const {body} = await request
+        .post('/api/auth/facebook-sign-in').send({
+          token: 'aasdasd',
+        }).expect(201);
+      expect(body).toMatchObject({
+        session: expect.any(String),
+        isNewAccount: false,
+      })
+    });
+    it('should create a new user when email is new and user with email not exist', async() => {
+      sequelize.transaction = (resolve) => resolve('transaction');
+      redisService.saveSession = jest.fn().mockResolvedValue(undefined)
+
+      nodeApply = jest.fn()
+        .mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetTokenResponseFixture)})
+        .mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetUserResponseFixture)});
+      configService.getConfig = jest.fn().mockReturnValue({
+        auth: {
+          facebook: {
+            accessToken: "test"
+          }
+        }
+      } as IConfig)
+      userRepository.getUserMyAuthFacebook = jest.fn().mockResolvedValue(null);
+
+      userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
+      userRepository.createUser = jest.fn().mockResolvedValue(3);
+      roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
+      let createUserSpy = jest.spyOn(userRepository, 'createUser');
+      oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
+        getPayload: jest.fn().mockReturnValue(googleResponseFixture)
+      });
+      const {body} = await request
+        .post('/api/auth/facebook-sign-in').send({
+          token: 'aasdasd',
+        }).expect(201);
+      expect(body).toMatchObject({
+        session: expect.any(String),
+        isNewAccount: true,
+        username: 'Andrew_Koidan' // from fixture
+      })
+      expect(createUserSpy).toHaveBeenCalledWith(expect.objectContaining({
+        "facebookId": "1096917160382471",
+        "name": "Andrew",
+        "password": expect.any(String),
+        "sex": "OTHER",
+        "surname": "Koidan",
+        "username": "Andrew_Koidan"
+      }), 'transaction')
     });
   });
 

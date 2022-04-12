@@ -5,12 +5,37 @@ declare module "node-ts-config" {
     name: string
     application: Application
     settings: Settings
-    auth: Auth
-    recaptcha: Recaptcha
-    email: Email
     redis: Redis
     frontend: Frontend
     mysql: Mysql
+    auth: Auth
+    recaptcha: Recaptcha
+    email: Email
+  }
+  interface Email {
+    host: string
+    port: number
+    auth: Auth2
+    from: string
+  }
+  interface Auth2 {
+    type: string
+    user: string
+    password: string
+  }
+  interface Recaptcha {
+    publicKey: string
+    privateKey: string
+  }
+  interface Auth {
+    google: Google
+    facebook: Facebook
+  }
+  interface Facebook {
+    accessToken: string
+  }
+  interface Google {
+    clientId: string
   }
   interface Mysql {
     synchronize: boolean
@@ -36,27 +61,6 @@ declare module "node-ts-config" {
     host: string
     port: number
     database: number
-  }
-  interface Email {
-    host: string
-    port: number
-    auth: Auth2
-    from: string
-  }
-  interface Auth2 {
-    type: string
-    user: string
-    password: string
-  }
-  interface Recaptcha {
-    publicKey: string
-    privateKey: string
-  }
-  interface Auth {
-    google: Google
-  }
-  interface Google {
-    clientId: string
   }
   interface Settings {
     wsIdCharLength: number

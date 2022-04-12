@@ -12,19 +12,27 @@ import {PasswordService} from '@/modules/api/auth/password.service';
 import {OAuth2Client} from 'google-auth-library';
 import {config} from 'node-ts-config';
 import {HttpModule} from '@/modules/http/http.module';
+import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
+import {ConfigService} from '@/modules/config/config.service';
 
 @Module({
   imports: [DatabaseModule, EmailModule, HttpModule],
   controllers: [AuthController],
-  providers: [AuthService, PasswordService, RedisService, {
-    provide: GoogleAuthService,
-    useFactory: (logger) => {
-      return new GoogleAuthService(logger, new OAuth2Client(
-        config.auth.google.clientId,
-      ))
+  providers: [
+    AuthService,
+    PasswordService,
+    RedisService,
+    FacebookAuthService,
+    {
+      provide: GoogleAuthService,
+      useFactory: (logger) => {
+        return new GoogleAuthService(logger, config.auth?.google?.clientId ? new OAuth2Client(
+          config.auth.google.clientId,
+        ): null)
+      },
+      inject: [Logger, ConfigService]
     },
-    inject: [Logger]
-  }],
+  ],
 })
 export class AuthModule {
 }

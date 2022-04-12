@@ -12,6 +12,10 @@ export interface GoogleAuthRequest {
   token: string;
 }
 
+export interface FaceBookAuthRequest {
+  token: string;
+}
+
 export interface ValidateUserRequest {
   username: string;
 }

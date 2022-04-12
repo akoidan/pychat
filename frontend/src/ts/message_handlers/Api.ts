@@ -141,7 +141,7 @@ export default class Api extends MessageHandler {
 
   public async facebookAuth(token: string): Promise<OauthSessionResponse> {
     return this.xhr.doPost<OauthSessionResponse>({
-      url: "/api/facebook_sign_in",
+      url: "/auth/facebook-sign-in",
       params: {
         token,
       },

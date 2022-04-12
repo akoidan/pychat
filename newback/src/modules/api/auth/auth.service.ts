@@ -7,6 +7,8 @@ import {
 import {UserRepository} from '@/data/database/repository/user.repository';
 import {PasswordService} from '@/modules/api/auth/password.service';
 import {
+  FaceBookAuthRequest,
+  FacebookSignInResponse,
   Gender,
   GoogleAuthRequest,
   GoogleSignInResponse,
@@ -27,6 +29,8 @@ import {Sequelize} from 'sequelize-typescript';
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
 import {TokenPayload} from 'google-auth-library';
 import {generateUserName} from '@/data/utils/helpers';
+import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
+import {FacebookGetUserResponse} from '@/data/types/api';
 
 @Injectable()
 export class AuthService {
@@ -38,9 +42,45 @@ export class AuthService {
     private readonly redisService: RedisService,
     private readonly emailService: EmailSenderService,
     private readonly googleAuthService: GoogleAuthService,
+    private readonly facebookService: FacebookAuthService,
     private readonly sequelize: Sequelize,
     private readonly logger: Logger,
   ) {
+  }
+
+
+  public async authorizeFacebook(body: FaceBookAuthRequest): Promise<FacebookSignInResponse> {
+    let fbResponse: FacebookGetUserResponse = await this.facebookService.validate(body.token);
+    return this.sequelize.transaction(async(t) => {
+      let userAuth = await this.userRepository.getUserMyAuthFacebook(fbResponse.id, t)
+      if (userAuth) {
+        let session = await this.createAndSaveSession(userAuth.id);
+        let response: GoogleSignInResponse = {session, isNewAccount: false};
+        return response;
+      } else {
+        let username = generateUserName(`${fbResponse.first_name}_${fbResponse.last_name}`);
+        if (await this.userRepository.checkUserExistByUserName(username)) {
+          // the chance that there will be a user with same id is insignificant
+          username = await this.passwordService.generateRandomString(MAX_USERNAME_LENGTH);
+        }
+        this.logger.log(`Generates username='${username}' for fbId ${fbResponse.id}`);
+        const password = await this.passwordService.createPassword(await this.passwordService.generateRandomString(16));
+
+        let userId = await this.userRepository.createUser({
+          password,
+          username,
+          name: fbResponse.first_name,
+          surname: fbResponse.last_name,
+          sex: Gender.OTHER,
+          facebookId: fbResponse.id
+        }, t)
+        await this.roomRepository.createRoomUser(ALL_ROOM_ID, userId, t);
+
+        let session = await this.createAndSaveSession(userId);
+        let response: GoogleSignInResponse = {session, isNewAccount: true, username};
+        return response;
+      }
+    });
   }
 
 

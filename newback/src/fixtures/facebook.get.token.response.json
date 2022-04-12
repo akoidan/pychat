@@ -1,0 +1,16 @@
+{
+  "data": {
+    "app_id": "894051850700207",
+    "type": "USER",
+    "application": "pychat",
+    "data_access_expires_at": 1657572316,
+    "expires_at": 1654980316,
+    "is_valid": true,
+    "issued_at": 1649796316,
+    "scopes": [
+      "email",
+      "public_profile"
+    ],
+    "user_id": "1096917160382471"
+  }
+}

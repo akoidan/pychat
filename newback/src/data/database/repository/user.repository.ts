@@ -32,6 +32,7 @@ export class UserRepository {
     surname?: string;
     thumbnail?: string;
     googleId?: string;
+    facebookId?: string;
   }, transaction: Transaction): Promise<number> {
     let userModel = await this.userModel.create({
       username: data.username,
@@ -48,6 +49,7 @@ export class UserRepository {
         email: data.email,
         id: userModel.id,
         googleId: data.googleId,
+        facebookId: data.facebookId,
       }, {transaction, raw: true,}),
       this.userSettingsModel.create({
         id: userModel.id
@@ -60,6 +62,15 @@ export class UserRepository {
     return this.userAuthModel.findOne({
       where: {
         googleId
+      },
+      transaction
+    })
+  }
+
+  public async getUserMyAuthFacebook(facebookId: string, transaction: Transaction): Promise<UserAuthModel> {
+    return this.userAuthModel.findOne({
+      where: {
+        facebookId
       },
       transaction
     })
