@@ -18,7 +18,6 @@ import {RedisService} from '@/data/redis/RedisService';
 import {EmailSenderService} from '@/modules/email.render/email.sender.service';
 import {Transaction} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
-import {LoginRequestValidator} from '@/modules/auth/validators/login.request.validator';
 
 @Injectable()
 export class AuthService {
@@ -38,11 +37,11 @@ export class AuthService {
     let password, userId;
     if (body.email) {
       const result = await this.userRepository.getUserByEmail(body.email);
-      userId = result.user.id;
+      userId = result?.user?.id;
       password = result?.password;
     } else {
       const result = await this.userRepository.getUserByUserName(body.username);
-      userId = result.id;
+      userId = result?.id;
       password = result?.userAuth?.password;
     }
     if (!password) {
@@ -58,8 +57,10 @@ export class AuthService {
 
   public async sendVerificationEmail(email: string, userId: number, username: string, ip: string) {
     try {
+      this.logger.debug(`Preparing for sending verification email to userId ${userId}`)
       await this.sequelize.transaction(async(t) => {
         let token = await this.passwordService.generateRandomString(32);
+        this.logger.log(`Generated token for userId ${userId}: ${token}`)
         await this.userRepository.createVerification(email, userId, token, t)
         await this.emailService.sendSignUpEmail(username, userId, email, token, ip, ip)
       });
@@ -83,6 +84,7 @@ export class AuthService {
 
   private async createAndSaveSession(userId: number) {
     let session = await this.passwordService.generateRandomString(32);
+    this.logger.log(`Generated session for userId ${userId}: ${session}`)
     await this.redisService.saveSession(session, userId);
     return session;
   }

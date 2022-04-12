@@ -7,19 +7,20 @@ import {
 import {LoginRequest} from '@/data/types/dto/dto';
 
 export class LoginRequestValidator implements LoginRequest {
+
+  @ValidateIf(o => !o.email || o.username)
   @IsString()
-  @ValidateIf(o => !o.email)
   @Matches(/^\S+$/, {
     message: `Username can't contain whitespaces`
   })
   public username: string;
 
+  @ValidateIf(o => !o.username || o.email)
   @IsString()
   @IsEmail()
   @Matches(/^\S+$/, {
     message: `email can't contain whitespaces`
   })
-  @ValidateIf(o => !o.username)
   public email: string;
 
   @IsString()
