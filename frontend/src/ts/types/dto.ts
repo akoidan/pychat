@@ -8,10 +8,10 @@ import type {
   UserModel,
 } from "@/ts/types/model";
 
-export * from './backend/dto';
+export * from '@/ts/types/backend';
 
 import type {LogLevel} from "lines-logger";
-import {Gender} from '@/ts/types/backend/dto';
+import {Gender} from '@/ts/types/backend';
 
 export interface RoomNoUsersDto {
   channelId: number | null;

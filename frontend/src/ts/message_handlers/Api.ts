@@ -24,7 +24,7 @@ import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
 import {SignInRequest} from '@/ts/types/dto';
-import {ValidateUserResponse} from '@/ts/types/backend/dto';
+import {ValidateUserResponse} from '@/ts/types/backend';
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {

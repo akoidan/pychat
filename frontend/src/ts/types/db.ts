@@ -1,6 +1,6 @@
 import type {LogLevel} from "lines-logger";
 import type {MessageStatus} from "@/ts/types/model";
-import {Gender} from '@/ts/types/backend/dto';
+import {Gender} from '@/ts/types/backend';
 
 export interface UserDB {
   id: number;

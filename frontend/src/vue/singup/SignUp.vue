@@ -133,7 +133,7 @@ import {IconColor} from "@/ts/types/types";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import SocialAuthSignUp from "@/vue/singup/SocialAuthSignUp.vue";
 import {USERNAME_REGEX} from "@/ts/utils/consts";
-import {Gender} from '@/ts/types/backend/dto';
+import {Gender} from '@/ts/types/backend';
 
 @Component({
   name: "SignUp",

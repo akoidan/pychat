@@ -1,5 +1,5 @@
 import type {LogLevel} from "lines-logger";
-import {Gender} from '@/ts/types/backend/dto';
+import {Gender} from '@/ts/types/backend';
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
