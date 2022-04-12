@@ -17,7 +17,7 @@ import {
   SignUpResponse,
   ValidateUserEmailRequest,
   ValidateUserResponse
-} from '@/data/types/dto/dto';
+} from '@/data/types/frontend';
 import {GoogleAuthRequestValidator} from '@/modules/api/auth/validators/google.auth.reques.validator';
 import {CaptchaGuard} from '@/modules/captcha';
 import {ValidateEmailRequestValidator} from '@/modules/api/auth/validators/validate.email.request.validator';

@@ -31,18 +31,21 @@ export interface SignInResponse extends SessionResponse {
 
 }
 
-export interface OauthSessionResponse extends SessionResponse {
-  isNewAccount: boolean;
+
+interface TypeGeneratorForOauth1 extends SessionResponse{
+  isNewAccount: true;
   username: string;
 }
 
-export interface GoogleSignInResponse extends OauthSessionResponse {
-
+interface TypeGeneratorForOauth2 extends SessionResponse{
+  isNewAccount: false
 }
 
-export interface FacebookSignInResponse extends OauthSessionResponse {
+export type OauthSessionResponse = TypeGeneratorForOauth1 | TypeGeneratorForOauth2;
 
-}
+
+export type GoogleSignInResponse = OauthSessionResponse;
+export type FacebookSignInResponse = OauthSessionResponse;
 
 export interface SignUpResponse extends SessionResponse{
 

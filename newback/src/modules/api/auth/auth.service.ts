@@ -7,13 +7,14 @@ import {
 import {UserRepository} from '@/data/database/repository/user.repository';
 import {PasswordService} from '@/modules/api/auth/password.service';
 import {
+  Gender,
   GoogleAuthRequest,
   GoogleSignInResponse,
   SignInRequest,
   SignInResponse,
   SignUpRequest,
   SignUpResponse
-} from '@/data/types/dto/dto';
+} from '@/data/types/frontend';
 import {RoomRepository} from '@/data/database/repository/room.repository';
 import {
   ALL_ROOM_ID,
@@ -44,34 +45,43 @@ export class AuthService {
 
 
   public async authorizeGoogle(body: GoogleAuthRequest): Promise<GoogleSignInResponse> {
-    let a: TokenPayload = await this.googleAuthService.validate(body.token);
-   return this.sequelize.transaction(async(t) => {
-    let userAuth = await this.userRepository.getUserMyAuthGoogle(a.email, t)
-    if (userAuth) {
-      let session = await this.createAndSaveSession(userAuth.id);
-      return {session, isNewAccount: false, username: userAuth.user.username};
-    } else {
-      let newUserName = generateUserName(a.email);
-      if (await this.userRepository.checkUserExistByUserName(newUserName)) {
-        newUserName = thi
+    let googleResponse: TokenPayload = await this.googleAuthService.validate(body.token);
+    return this.sequelize.transaction(async(t) => {
+      let userAuth = await this.userRepository.getUserMyAuthGoogle(googleResponse.email, t)
+      if (userAuth) {
+        let session = await this.createAndSaveSession(userAuth.id);
+        let response: GoogleSignInResponse = {session, isNewAccount: false};
+        return response;
+      } else {
+        let username = generateUserName(googleResponse.email);
+        if (await this.userRepository.checkUserExistByEmail(googleResponse.email)) {
+          throw new ConflictException("User with this email already exist, but has no connected google account." +
+            " If this is you, please login as this user and connect this google profile in profile settings")
+        }
+        if (await this.userRepository.checkUserExistByUserName(username)) {
+          // the chance that there will be a user with same id is insignificant
+          username = await this.passwordService.generateRandomString(MAX_USERNAME_LENGTH);
+        }
+        this.logger.log(`Generates username='${username}' for email ${googleResponse.email}`);
+        const password = await this.passwordService.createPassword(await this.passwordService.generateRandomString(16));
+
+        let userId = await this.userRepository.createUser({
+          googleId: googleResponse.email,
+          password,
+          email: googleResponse.email,
+          username,
+          thumbnail: googleResponse.picture,
+          name: googleResponse.given_name,
+          surname: googleResponse.family_name,
+          sex: Gender.OTHER,
+        }, t)
+        await this.roomRepository.createRoomUser(ALL_ROOM_ID, userId, t);
+
+        let session = await this.createAndSaveSession(userId);
+        let response: GoogleSignInResponse = {session, isNewAccount: true, username};
+        return response;
       }
-    }
-   });
-
-
-    // let googleId = a.email;
-    // 	response.get('given_name'),
-		// 	response.get('family_name'),
-		// 	email=response.get('email'),
-		// 	picture=response.get('picture'),
-		// 	google_id=response.get('id')
-
-    // username = re.sub('[^0-9a-zA-Z-_]+', '-', email.rsplit('@')[0])[:15]
-    // if email:
-		// 		username = re.sub('[^0-9a-zA-Z-_]+', '-', email.rsplit('@')[0])[:15]
-		// 	else:
-		// 		username = f'{name}_{surname}'
-    return undefined as any;
+    });
   }
 
   public async authorize(body: SignInRequest): Promise<SignInResponse> {
@@ -86,7 +96,7 @@ export class AuthService {
       password = result?.userAuth?.password;
     }
     if (!password) {
-       throw new ConflictException("User with login doesn't exists");
+      throw new ConflictException("User with login doesn't exists");
     }
     let matches = await this.passwordService.checkPassword(body.password, password);
     if (!matches) {

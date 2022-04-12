@@ -10,7 +10,7 @@ import {
 import {
   Gender,
   SignUpRequest,
-} from '@/data/types/dto/dto';
+} from '@/data/types/frontend';
 import {MAX_USERNAME_LENGTH} from '@/data/utils/consts';
 
 export class SignUpRequestValidator implements SignUpRequest {

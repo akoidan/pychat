@@ -3,7 +3,7 @@ import {
   Length,
   Matches,
 } from 'class-validator';
-import {ValidateUserRequest} from '@/data/types/dto/dto';
+import {ValidateUserRequest} from '@/data/types/frontend';
 import {MAX_USERNAME_LENGTH} from '@/data/utils/consts';
 
 export class ValidateUserRequestValidator implements ValidateUserRequest {

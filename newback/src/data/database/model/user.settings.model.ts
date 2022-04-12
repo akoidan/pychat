@@ -7,7 +7,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
-import {Theme,} from '@/data/types/dto/dto';
+import {Theme,} from '@/data/types/frontend';
 import {UserModel} from '@/data/database/model/user.model';
 import {
   LogLevel,

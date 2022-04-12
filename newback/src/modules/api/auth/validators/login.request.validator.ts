@@ -4,7 +4,7 @@ import {
   Matches,
   ValidateIf,
 } from 'class-validator';
-import {SignInRequest} from '@/data/types/dto/dto';
+import {SignInRequest} from '@/data/types/frontend';
 
 export class LoginRequestValidator implements SignInRequest {
 

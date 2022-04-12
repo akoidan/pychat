@@ -3,9 +3,9 @@ import {InjectModel} from '@nestjs/sequelize';
 import {UserModel} from '@/data/database/model/user.model';
 import {UserAuthModel} from '@/data/database/model/user.auth.model';
 import {
-  SignUpRequest,
+  Gender,
   VerificationType
-} from '@/data/types/dto/dto';
+} from '@/data/types/frontend';
 import {UserProfileModel} from '@/data/database/model/user.profile.model';
 import {UserSettingsModel} from '@/data/database/model/user.settings.model';
 import {VerificationModel} from '@/data/database/model/verification.model';
@@ -23,20 +23,31 @@ export class UserRepository {
   ) {
   }
 
-  public async createUser(data: SignUpRequest, transaction: Transaction): Promise<number> {
+  public async createUser(data: {
+    username: string;
+    password: string;
+    email?: string;
+    sex?: Gender;
+    name?: string;
+    surname?: string;
+    thumbnail?: string;
+    googleId?: string;
+  }, transaction: Transaction): Promise<number> {
     let userModel = await this.userModel.create({
       username: data.username,
       lastTimeOnline: new Date(),
-      sex: data.sex
+      sex: data.sex,
+      thumbnail: data.thumbnail
     }, {transaction, raw: true,})
     await Promise.all([
       this.userProfileModel.create({
-        id: userModel.id
+        id: userModel.id,
       }, {transaction, raw: true,}),
       this.userAuthModel.create({
         password: data.password,
         email: data.email,
-        id: userModel.id
+        id: userModel.id,
+        googleId: data.googleId,
       }, {transaction, raw: true,}),
       this.userSettingsModel.create({
         id: userModel.id
@@ -50,7 +61,6 @@ export class UserRepository {
       where: {
         googleId
       },
-      include: 'user',
       transaction
     })
   }

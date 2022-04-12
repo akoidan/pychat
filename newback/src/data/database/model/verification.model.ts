@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
-import {VerificationType} from '@/data/types/dto/dto';
+import {VerificationType} from '@/data/types/frontend';
 
 @Injectable()
 @Table({tableName: 'verification'})

@@ -46,7 +46,7 @@ export class UserAuthModel extends Model<UserAuthModel> {
   public facebookId: string;
 
   @Column({
-    type: DataType.DATE,
+    type: DataType.STRING,
     allowNull: true,
     unique: true,
   })

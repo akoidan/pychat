@@ -224,7 +224,7 @@ CREATE TABLE `user_auth`
     `password`              VARCHAR(255) NOT NULL,
     `email`                 VARCHAR(255) UNIQUE,
     `facebook_id`           VARCHAR(255) UNIQUE,
-    `google_id`             DATETIME UNIQUE,
+    `google_id`             VARCHAR(255) UNIQUE,
     `email_verification_id` INTEGER,
     `created_at`            DATETIME     NOT NULL,
     `updated_at`            DATETIME     NOT NULL,

@@ -8,7 +8,7 @@ import {
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/database/model/user.model';
-import {UploadedFileChoices} from '@/data/types/dto/dto';
+import {UploadedFileChoices} from '@/data/types/frontend';
 import {IpAddressModel} from '@/data/database/model/ip.address.model';
 
 @Injectable()

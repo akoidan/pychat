@@ -6,7 +6,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
-import {Gender} from '@/data/types/dto/dto';
+import {Gender} from '@/data/types/frontend';
 import {UserAuthModel} from '@/data/database/model/user.auth.model';
 import {MAX_USERNAME_LENGTH} from '@/data/utils/consts';
 
