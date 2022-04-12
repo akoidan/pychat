@@ -13,7 +13,7 @@ export class RoomRepository {
   ) {
   }
 
-  public async createRoomUser(roomId: number, userId: number, transaction: Transaction) {
+  public async createRoomUser(roomId: number, userId: number, transaction: Transaction): Promise<void> {
     await this.roomUsersModel.create({
       roomId,
       userId,

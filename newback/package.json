@@ -9,6 +9,7 @@
     "migrate": "ts-node  -r tsconfig-paths/register ./src/migration.runner.ts ",
     "build": "nest build",
     "start": "nest start",
+    "test": "jest --coverage --runInBand --detectOpenHandles --testTimeout=10000 --passWithNoTests",
     "start:dev": "node --inspect=0.0.0.0 dist/src/main",
     "start:debug": "nest start --debug --watch"
   },

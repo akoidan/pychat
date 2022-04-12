@@ -10,21 +10,56 @@ import {AuthController} from '@/modules/auth/auth.controller';
 import {LoggerModule} from '@/modules/logger/logger.module';
 import {PasswordService} from '@/modules/password/password.service';
 import {UserRepository} from '@/data/database/repository/user.repository';
+import {RoomRepository} from '@/data/database/repository/room.repository';
+import {RedisService} from '@/data/redis/RedisService';
+import {EmailSenderService} from '@/modules/email.render/email.sender.service';
+import {
+  MailerModule,
+  MailerService
+} from '@nestjs-modules/mailer';
+import {Sequelize} from 'sequelize-typescript';
+import {HtmlService} from '@/modules/html/html.service';
 
 describe('AuthModule', () => {
   let app: INestApplication;
   let request: () => supertest.SuperTest<supertest.Test>;
   let userRepository: UserRepository;
+  let roomRepository: RoomRepository;
+  let redisService: RedisService;
+  let sequelize: Sequelize;
+  let mailerService: MailerService;
   beforeEach(async() => {
 
     userRepository = {} as UserRepository;
+    roomRepository = {} as RoomRepository;
+    redisService = {} as RedisService;
+    sequelize = {} as Sequelize;
+    mailerService = {} as MailerService;
     const moduleFixture = await Test.createTestingModule({
-      imports: [LoggerModule],
+      imports: [
+        LoggerModule,
+      ],
       providers: [
+        {provide: MailerService, useValue: mailerService},
+        {provide: Sequelize, useValue: sequelize},
         AuthService,
+        HtmlService,
+        EmailSenderService,
+        {
+          provide: MailerService,
+          useValue: mailerService,
+        },
+        {
+          provide: RedisService,
+          useValue: redisService,
+        },
         {
           provide: UserRepository,
           useValue: userRepository,
+        },
+        {
+          provide: RoomRepository,
+          useValue: roomRepository,
         },
         Logger,
         PasswordService,
@@ -47,13 +82,18 @@ describe('AuthModule', () => {
 
   describe('signup', () => {
     it('validate request', async() => {
+     sequelize.transaction = (resolve) =>resolve();
+     userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
+     userRepository.createUser = jest.fn().mockResolvedValue(3);
+     roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
+     redisService.saveSession = jest.fn().mockResolvedValue(undefined)
       const {body} = await request()
         .post('/register').send({
           username: 'a',
           password: 'as$'
         });
 
-      await expect(body).toStrictEqual({'a': 3});
+      await expect(body).toMatchObject({session: expect.any(String)});
     });
   });
   describe('validate user', () => {
@@ -95,7 +135,7 @@ describe('AuthModule', () => {
 
       await expect(body).toStrictEqual({
         "error": "Conflict",
-        "message": "This user already exist",
+        "message": "User with this username already exist",
         "statusCode": 409,
       });
     });

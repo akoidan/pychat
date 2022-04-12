@@ -8,14 +8,13 @@ import {RedisModule} from '@nestjs-modules/ioredis';
 import {config} from 'node-config-ts';
 
 @Module({
-  imports: [AuthModule, DatabaseModule, LoggerModule, RedisModule.forRoot({
+  imports: [AuthModule, LoggerModule, RedisModule.forRoot({
     config: {
       host: config.redis.host,
       port: config.redis.port,
       db: config.redis.database,
     }
   })],
-  exports: [DatabaseModule],
   providers: [
     {
       provide: APP_INTERCEPTOR,

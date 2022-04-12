@@ -14,7 +14,7 @@ export class RedisService {
   }
 
 
-  public async saveSession(session: string, userId: number) {
+  public async saveSession(session: string, userId: number): Promise<void> {
     await this.redis.hset(REDIS_SESSIONS_KEY, session, userId);
   }
 

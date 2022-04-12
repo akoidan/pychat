@@ -22,6 +22,7 @@ import {VerificationModel} from '@/data/database/model/verification.model';
 import {Logger} from '@nestjs/common/services/logger.service';
 import {UserRepository} from '@/data/database/repository/user.repository';
 import {RoomRepository} from '@/data/database/repository/room.repository';
+import {Sequelize} from 'sequelize-typescript';
 
 const repositories = [
   UserRepository,
@@ -32,7 +33,7 @@ const repositories = [
   imports: [
     SequelizeModule.forRootAsync({
       inject: [Logger],
-      useFactory: (logger: Logger) => generateConfig((sql) => logger.debug(sql)),
+      useFactory: (logger: Logger) => generateConfig((sql) => logger.debug(sql, 'sql')),
     }),
     SequelizeModule.forFeature([
       ChannelModel,

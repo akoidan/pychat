@@ -3,6 +3,6 @@ yarn-error.log
 dist
 # exclude everything
 config/migration/*
-
+coverage
 # exception to the rule
 !config/migration/.gitkeep

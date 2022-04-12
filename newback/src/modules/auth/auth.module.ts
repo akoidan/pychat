@@ -5,10 +5,9 @@ import {DatabaseModule} from '@/data/database/database.module';
 import {PasswordService} from '@/modules/password/password.service';
 import {RedisService} from '@/data/redis/RedisService';
 import {EmailModule} from '@/modules/email.render/email.module';
-import {SequelizeModule} from '@nestjs/sequelize';
 
 @Module({
-  imports: [DatabaseModule, EmailModule, SequelizeModule],
+  imports: [DatabaseModule, EmailModule],
   controllers: [AuthController],
   providers: [AuthService, PasswordService, RedisService],
 })
