@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpCode,
   Ip,
   Logger,
   Post
@@ -37,6 +38,5 @@ export class AuthController {
   public async validateUser(@Body() body: ValidateUserRequestValidator): Promise<void> {
     await this.authservice.validateUser(body.username);
   }
-
 
 }

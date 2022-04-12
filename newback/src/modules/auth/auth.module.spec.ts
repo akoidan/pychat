@@ -14,7 +14,6 @@ import {RoomRepository} from '@/data/database/repository/room.repository';
 import {RedisService} from '@/data/redis/RedisService';
 import {EmailSenderService} from '@/modules/email.render/email.sender.service';
 import {
-  MailerModule,
   MailerService
 } from '@nestjs-modules/mailer';
 import {Sequelize} from 'sequelize-typescript';
@@ -22,19 +21,14 @@ import {HtmlService} from '@/modules/html/html.service';
 
 describe('AuthModule', () => {
   let app: INestApplication;
-  let request: () => supertest.SuperTest<supertest.Test>;
-  let userRepository: UserRepository;
-  let roomRepository: RoomRepository;
-  let redisService: RedisService;
-  let sequelize: Sequelize;
-  let mailerService: MailerService;
-  beforeEach(async() => {
+  let request: supertest.SuperTest<supertest.Test>;
+  let userRepository: UserRepository = {} as UserRepository;
+  let roomRepository: RoomRepository = {} as RoomRepository;
+  let redisService: RedisService = {} as RedisService;
+  let sequelize: Sequelize = {} as Sequelize;
+  let mailerService: MailerService = {} as MailerService;
 
-    userRepository = {} as UserRepository;
-    roomRepository = {} as RoomRepository;
-    redisService = {} as RedisService;
-    sequelize = {} as Sequelize;
-    mailerService = {} as MailerService;
+  beforeAll(async() => {
     const moduleFixture = await Test.createTestingModule({
       imports: [
         LoggerModule,
@@ -69,41 +63,91 @@ describe('AuthModule', () => {
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());
     await app.init();
-
-    const requestToServer = supertest(app.getHttpServer());
-    request = (): supertest.SuperTest<supertest.Test> => requestToServer;
+    request = supertest(app.getHttpServer());
   });
 
   afterEach(() => {
     jest.clearAllMocks();
+    Object.keys(userRepository).forEach(key => delete userRepository[key]);
+    Object.keys(roomRepository).forEach(key => delete roomRepository[key]);
+    Object.keys(redisService).forEach(key => delete redisService[key]);
+    Object.keys(sequelize).forEach(key => delete sequelize[key]);
+    Object.keys(mailerService).forEach(key => delete mailerService[key]);
   });
 
-  afterAll(() => app.close());
+  afterAll(async() => {
+   await app.close()
+  });
 
   describe('signup', () => {
-    it('validate request', async() => {
+    it('returns session', async() => {
      sequelize.transaction = (resolve) =>resolve();
      userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
      userRepository.createUser = jest.fn().mockResolvedValue(3);
      roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
      redisService.saveSession = jest.fn().mockResolvedValue(undefined)
-      const {body} = await request()
+      const {body} = await request
         .post('/register').send({
           username: 'a',
           password: 'as$'
-        });
+        }).expect(201);
 
-      await expect(body).toMatchObject({session: expect.any(String)});
+      expect(body).toMatchObject({session: expect.any(String)});
+    });
+    it('throws an error if user exists', async() => {
+     sequelize.transaction = (resolve) =>resolve();
+     userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
+      const {body} = await request
+        .post('/register').send({
+          username: 'a',
+          password: 'as$'
+        }).expect(409,{
+        error: "Conflict",
+        message: "User with this username already exist",
+        statusCode: 409
+      });
+    });
+    it('throws an error if email exists', async() => {
+     sequelize.transaction = (resolve) =>resolve();
+     userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
+     userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(true);
+      const {body} = await request
+        .post('/register').send({
+          username: 'a',
+          password: 'as$',
+          email: 'death@gmail.com'
+        }).expect(409, {
+        error: "Conflict",
+        message: "User with this email already exist",
+        statusCode: 409
+      });
     });
   });
   describe('validate user', () => {
+
+    it('should return ok', async() => {
+      userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
+      await request
+        .post('/validate_user').send({
+          username: 'a',
+        }).expect(201,{});
+    });
+   it('should error if user exists', async() => {
+      userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
+      await request
+        .post('/validate_user').send({
+          username: 'a',
+        }).expect(409,{
+        "error": "Conflict",
+        "message": "User with this username already exist",
+        "statusCode": 409,
+      });
+    });
     it('should give error on invalid character for username', async() => {
-      const {body} = await request()
+      await request
         .post('/validate_user').send({
           username: '%',
-        });
-
-      await expect(body).toStrictEqual({
+        }).expect(400,{
         "error": "Bad Request",
         "message": [
           "Username can only contain latin characters, numbers and symbols '-' '_'",
@@ -112,12 +156,10 @@ describe('AuthModule', () => {
       });
     });
     it('should give error if username has great length', async() => {
-      const {body} = await request()
+      await request
         .post('/validate_user').send({
           username: '1234567890123456789',
-        });
-
-      await expect(body).toStrictEqual({
+        }).expect(400, {
         "error": "Bad Request",
         "message": [
           "Username should be 1-16 characters",
@@ -127,13 +169,10 @@ describe('AuthModule', () => {
     });
     it('should throw an error if user exists', async() => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
-
-      const {body} = await request()
+      await request
         .post('/validate_user').send({
           username: 'asd',
-        });
-
-      await expect(body).toStrictEqual({
+        }).expect(409, {
         "error": "Conflict",
         "message": "User with this username already exist",
         "statusCode": 409,
