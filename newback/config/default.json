@@ -19,25 +19,6 @@
     "pingInterval": 300000,
     "clientNoServerPingCloseTimeout": 320000
   },
-  "auth": {
-    "google": {
-      "clientId": "620421656154-8boctt2h7h5meskhe7vh8aiargj0nae9.apps.googleusercontent.com"
-    }
-  },
-  "recaptcha": {
-    "publicKey": "6LchGhwTAAAAAJwCRgfNKraWrFtCdKPFo0Ri8DLt",
-    "privateKey": "6LchGhwTAAAAAIH_RuxyeJQn5Kv6XnHcLSc_68h_"
-  },
-  "email": {
-    "host": "smtp.gmail.com",
-    "port": 587,
-    "auth": {
-      "type": "login",
-      "user": "chat.django@gmail.com",
-      "password": "Ilovepython"
-    },
-    "from": "root@pychat.org"
-  },
   "redis": {
     "host": "localhost",
     "port": 6379,

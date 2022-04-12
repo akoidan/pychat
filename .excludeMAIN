@@ -21,3 +21,4 @@ backend/chat/settings.py
 backend/photos/*
 !backend/photos/.gitkeep
 frontend/build/production.json
+newback/config/env/default.json
