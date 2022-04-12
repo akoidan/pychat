@@ -239,13 +239,17 @@ describe('AuthModule', () => {
       expect(body).toMatchObject({
         session: expect.any(String),
         isNewAccount: false,
-        username: 'as'
       })
     });
-    it('should create a new user when email is new', async() => {
-      sequelize.transaction = (resolve) => resolve();
+    it('should create a new user when email is new and user with email not exist', async() => {
+      sequelize.transaction = (resolve) => resolve('transaction');
       redisService.saveSession = jest.fn().mockResolvedValue(undefined)
       userRepository.getUserMyAuthGoogle = jest.fn().mockResolvedValue(null);
+      userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(false);
+      userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
+      userRepository.createUser = jest.fn().mockResolvedValue(3);
+      roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
+      let createUserSpy = jest.spyOn(userRepository, 'createUser');
       oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
         getPayload: jest.fn().mockReturnValue(googleResponseFixture)
       });
@@ -255,8 +259,40 @@ describe('AuthModule', () => {
         }).expect(201);
       expect(body).toMatchObject({
         session: expect.any(String),
-        isNewAccount: false,
-        username: 'as'
+        isNewAccount: true,
+        username: 'death' // from fixture
+      })
+      expect(createUserSpy).toHaveBeenCalledWith(expect.objectContaining({
+       "email": "death@gmail.com",
+       "googleId": "death@gmail.com",
+       "name": "Andrew",
+       "password": expect.any(String),
+       "sex": "OTHER",
+       "surname": "Superman",
+       "thumbnail": "https://lh3.googleusercontent.com/a-/xxxxxxxxxxxx-xxxxxxxxxxxx",
+       "username": "death",
+      }), 'transaction')
+    });
+    it('should throw an error if email exists', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      redisService.saveSession = jest.fn().mockResolvedValue(undefined)
+      userRepository.getUserMyAuthGoogle = jest.fn().mockResolvedValue(null);
+      userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(true);
+      // userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
+      // userRepository.createUser = jest.fn().mockResolvedValue(3);
+      // roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
+      oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
+        getPayload: jest.fn().mockReturnValue(googleResponseFixture)
+      });
+      const {body} = await request
+        .post('/api/auth/google-sign-in').send({
+          token: 'aasdasd',
+        }).expect(409);
+      expect(body).toMatchObject({
+        error: "Conflict",
+        statusCode: 409,
+        message: "User with this email already exist, but has no connected google account." +
+          " If this is you, please login as this user and connect this google profile in profile settings",
       })
     });
   });
@@ -329,6 +365,40 @@ describe('AuthModule', () => {
         });
     });
   });
+
+  describe('validate-email', () => {
+
+    it('should return ok', async() => {
+      userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(false);
+      await request
+        .post('/api/auth/validate-email').send({
+          email: 'blah@gmail.com',
+        }).expect(201, {ok: true});
+    });
+    it('should error if email exists', async() => {
+      userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(true);
+      await request
+        .post('/api/auth/validate-email').send({
+          email: 'exist@gmail.com',
+        }).expect(409, {
+          "error": "Conflict",
+          "message": "User with this email already exist",
+          "statusCode": 409,
+        });
+    });
+    it('should give error on invalid email', async() => {
+      await request
+        .post('/api/auth/validate-email').send({
+          email: 'invalidemail',
+        }).expect(400, {
+          "error": "Bad Request",
+          "message": [
+            'email must be an email',
+          ],
+          "statusCode": 400,
+        });
+    });
+  });
   describe('validate-user', () => {
 
     it('should return ok', async() => {
@@ -371,17 +441,6 @@ describe('AuthModule', () => {
             "Username should be 1-16 characters",
           ],
           "statusCode": 400,
-        });
-    });
-    it('should throw an error if user exists', async() => {
-      userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
-      await request
-        .post('/api/auth/validate-user').send({
-          username: 'asd',
-        }).expect(409, {
-          "error": "Conflict",
-          "message": "User with this username already exist",
-          "statusCode": 409,
         });
     });
   });
