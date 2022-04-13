@@ -2,7 +2,7 @@ name: NEWBE:pychat.org
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, nestjs ]
     paths:
       - 'newback/**'
 
