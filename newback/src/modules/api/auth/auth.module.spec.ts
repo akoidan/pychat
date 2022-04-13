@@ -8,7 +8,7 @@ import {Test} from '@nestjs/testing';
 import {AuthService} from '@/modules/api/auth/auth.service';
 import {AuthController} from '@/modules/api/auth/auth.controller';
 import {LoggerModule} from '@/modules/rest/logger/logger.module';
-import {PasswordService} from '@/modules/api/auth/password.service';
+import {PasswordService} from '@/modules/rest/password/password.service';
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
 import {RedisService} from '@/modules/rest/redis/redis.service';
@@ -36,6 +36,7 @@ import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 import {IpAddressModel} from '@/data/model/ip.address.model';
 import {VerificationRepository} from '@/modules/rest/database/repository/verification.repository';
 import {VerificationType} from '@/data/types/frontend';
+import {SessionService} from '@/modules/rest/session/session.service';
 
 describe('AuthModule', () => {
   let app: INestApplication;
@@ -59,6 +60,14 @@ describe('AuthModule', () => {
         LoggerModule,
       ],
       providers: [
+        PasswordService,
+        AuthService,
+        HtmlService,
+        EmailService,
+        SessionService,
+        IpCacheService,
+        IpService,
+        FacebookAuthService,
         {
           provide: ConfigService,
           useValue: configService,
@@ -71,28 +80,6 @@ describe('AuthModule', () => {
           provide: Sequelize,
           useValue: sequelize
         },
-        {
-          provide: HttpService,
-          inject: [Logger],
-          useFactory: (logger) => new HttpService(logger, new Proxy(() => {
-          }, {
-            apply: function (target: {}, thisArg: any, argArray: any[]): any {
-              return nodeApply(...argArray)
-            }
-          }) as typeof fetch)
-        },
-        {
-          provide: GoogleAuthService,
-          inject: [Logger],
-          useFactory: (logger) => new GoogleAuthService(logger, oauth2Client)
-        },
-        PasswordService,
-        AuthService,
-        HtmlService,
-        EmailService,
-        IpCacheService,
-        IpService,
-        FacebookAuthService,
         {
           provide: MailerService,
           useValue: mailerService,
@@ -116,6 +103,21 @@ describe('AuthModule', () => {
         {
           provide: RoomRepository,
           useValue: roomRepository,
+        },
+        {
+          provide: GoogleAuthService,
+          inject: [Logger],
+          useFactory: (logger) => new GoogleAuthService(logger, oauth2Client)
+        },
+        {
+          provide: HttpService,
+          inject: [Logger],
+          useFactory: (logger) => new HttpService(logger, new Proxy(() => {
+          }, {
+            apply: function (target: {}, thisArg: any, argArray: any[]): any {
+              return nodeApply(...argArray)
+            }
+          }) as typeof fetch)
         },
       ],
       controllers: [AuthController]
@@ -555,159 +557,6 @@ describe('AuthModule', () => {
           ],
           "statusCode": 400,
         });
-    });
-  });
-  describe('send-restore-password', () => {
-    it('sends password when by username', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      userRepository.getUserByUserName = jest.fn().mockResolvedValue({
-        userAuth: {
-          email: 'asd'
-        },
-        id: 3,
-        username: 'forpassword'
-      })
-      verificationRepository.createVerification = jest.fn().mockResolvedValue(undefined);
-      mailerService.sendMail = jest.fn();
-      let spy = jest.spyOn(mailerService, 'sendMail');
-      ipRepository.getIp = jest.fn().mockResolvedValue({
-        country: 'Ukraine',
-        city: 'Mariupol',
-        isp: 'AZOV',
-      } as IpAddressModel)
-
-      await request
-        .post('/api/auth/send-restore-password').send({
-          username: 'a',
-        }).expect(201, {ok: true});
-      expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: expect.stringContaining('You have requested to change password on')}))
-    });
-    it('sends password when by email', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      userRepository.getUserByEmail = jest.fn().mockResolvedValue({
-        email: 'asd',
-        user: {
-          id: 3,
-          username: 'forpassword'
-        }
-      })
-      verificationRepository.createVerification = jest.fn().mockResolvedValue(undefined);
-      mailerService.sendMail = jest.fn();
-      let spy = jest.spyOn(mailerService, 'sendMail');
-      ipRepository.getIp = jest.fn().mockResolvedValue({
-        country: 'Ukraine',
-        city: 'Mariupol',
-        isp: 'AZOV',
-      } as IpAddressModel)
-
-      await request
-        .post('/api/auth/send-restore-password').send({
-          email: 'a@gmail.com',
-        }).expect(201, {ok: true});
-      expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: expect.stringContaining('You have requested to change password on')}))
-    });
-    it('throws an error if user doesnt exists', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      userRepository.getUserByUserName = jest.fn().mockResolvedValue(null);
-      await request
-        .post('/api/auth/send-restore-password').send({
-          username: 'a@gmail.com',
-        }).expect(400, {statusCode: 400, message: 'User with this username doesnt exit', error: 'Bad Request'});
-    });
-  });
-  describe('verify-token', () => {
-    it('should return error when token doesnt exist', async() => {
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
-
-      await request
-        .post('/api/auth/verify-token').send({
-          token: 'a',
-        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
-    });
-    it('should return ok when token valid', async() => {
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
-        type: VerificationType.PASSWORD,
-        createdAt: new Date(),
-        user: {
-          username: 'a'
-        }
-      });
-
-      await request
-        .post('/api/auth/verify-token').send({
-          token: 'a',
-        }).expect(201, { ok: true, username: 'a'});
-    });
-    it('throws an error if user doesnt exists', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      userRepository.getUserByUserName = jest.fn().mockResolvedValue(null);
-      await request
-        .post('/api/auth/send-restore-password').send({
-          username: 'a@gmail.com',
-        }).expect(400, {statusCode: 400, message: 'User with this username doesnt exit', error: 'Bad Request'});
-    });
-  });
-
-   describe('confirm-email', () => {
-    it('should return error when token doesnt exist', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
-
-      await request
-        .post('/api/auth/confirm-email').send({
-          token: 'a',
-        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
-    });
-    it('should set email confirmed', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      verificationRepository.markVerificationVerified = jest.fn().mockResolvedValue(undefined)
-      verificationRepository.setUserVerification = jest.fn().mockResolvedValue(undefined)
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
-        type: VerificationType.REGISTER,
-        createdAt: new Date(),
-        user: {
-          username: 'a'
-        }
-      });
-
-      await request
-        .post('/api/auth/confirm-email').send({
-          token: 'a',
-        }).expect(201, {ok: true});
-    });
-  });
-   describe('accept-token', () => {
-    it('should return error when token doesnt exist', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
-
-      await request
-        .post('/api/auth/accept-token').send({
-          token: 'a',
-          password: 'asd',
-        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
-    });
-    it('should set email confirmed', async() => {
-      sequelize.transaction = (resolve) => resolve();
-      userRepository.updateUserPassword = jest.fn().mockResolvedValue(undefined);
-      verificationRepository.markVerificationVerified = jest.fn().mockResolvedValue(undefined)
-      verificationRepository.setUserVerification = jest.fn().mockResolvedValue(undefined)
-      redisService.saveSession = jest.fn().mockResolvedValue(undefined);
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
-        type: VerificationType.PASSWORD,
-        createdAt: new Date(),
-        user: {
-          username: 'a',
-          password: 'asd',
-        }
-      });
-
-      const {body} = await request
-        .post('/api/auth/accept-token').send({
-          token: 'a',
-          password: 'asd',
-        }).expect(201);
-      expect(body).toMatchObject({session: expect.any(String)});
     });
   });
 });

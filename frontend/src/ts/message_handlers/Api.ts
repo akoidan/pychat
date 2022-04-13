@@ -87,7 +87,7 @@ export default class Api extends MessageHandler {
 
   public async sendRestorePassword(params: SendRestorePasswordRequest): Promise<OkResponse> {
     return this.xhr.doPost<OkResponse>({
-      url: "/auth/send-restore-password",
+      url: "/verify/send-restore-password",
       params: params as any,
     });
   }
@@ -235,7 +235,7 @@ export default class Api extends MessageHandler {
 
   public async confirmEmail(params: ConfirmEmailRequest): Promise<ConfirmEmailResponse> {
     return this.xhr.doPost({
-      url: '/auth/confirm-email',
+      url: '/verify/confirm-email',
       params
     });
   }
@@ -266,14 +266,14 @@ export default class Api extends MessageHandler {
 
   public async verifyToken(params: VerifyTokenRequest): Promise<VerifyTokenResponse> {
     return this.xhr.doPost<VerifyTokenResponse>({
-      url: "/auth/verify-token",
+      url: "/verify/verify-token",
       params,
     });
   }
 
   public async acceptToken(params: AcceptTokenRequest): Promise<AcceptTokenResponse> {
     return this.xhr.doPost({
-      url: "/auth/accept-token",
+      url: "/verify/accept-token",
       params,
     });
   }
