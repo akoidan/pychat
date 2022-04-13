@@ -34,5 +34,5 @@ jobs:
           cd newback
           ls ./codecov ||  curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x ./codecov
-          ./codecov -t 92ec2a69-f993-41ba-b6b7-60da24082d05 -f ./coverage/coverage-final.json 
+          ./codecov -t $CODECOV_TOKEN -f ./coverage/coverage-final.json 
 
