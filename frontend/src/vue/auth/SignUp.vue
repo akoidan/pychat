@@ -282,13 +282,13 @@ export default class SignUp extends Vue {
 
   private currentValidateEmailRequest: AbortController | null = null;
 
-  async checkEmail(username: string) {
+  async checkEmail(email: string) {
     if (this.currentValidateEmailRequest) {
       this.currentValidateEmailRequest.abort();
       this.currentValidateEmailRequest = null;
     }
     try {
-      await this.$api.validateEmail(username, (r:AbortController) => this.currentValidateEmailRequest = r);
+      await this.$api.validateEmail({email}, (r:AbortController) => this.currentValidateEmailRequest = r);
       this.emailCheckValue = IconColor.SUCCESS;
       this.emailDescription = "Email is ok!";
       this.emailValidity = "";

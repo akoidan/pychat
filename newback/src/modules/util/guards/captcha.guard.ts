@@ -12,8 +12,8 @@ import {
 	Recaptcha
 } from 'node-ts-config';
 
-import {ConfigService} from '@/modules/config/config.service';
-import {HttpService} from '@/modules/http/http.service';
+import {ConfigService} from '@/modules/util/config/config.service';
+import {HttpService} from '@/modules/util/http/http.service';
 @Injectable()
 export class CaptchaGuard implements CanActivate {
   constructor(

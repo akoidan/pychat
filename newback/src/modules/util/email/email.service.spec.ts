@@ -1,12 +1,12 @@
-import {HtmlService} from '@/modules/html/html.service';
-import {EmailService} from '@/modules/email/email.service';
+import {HtmlService} from '@/modules/util/html/html.service';
+import {EmailService} from '@/modules/util/email/email.service';
 import {
   Test,
   TestingModule
 } from '@nestjs/testing';
-import {LoggerModule} from '@/modules/logger/logger.module';
+import {LoggerModule} from '@/modules/util/logger/logger.module';
 import {MailerService} from '@nestjs-modules/mailer';
-import {ConfigModule} from '@/modules/config/config.module';
+import {ConfigModule} from '@/modules/util/config/config.module';
 import {promisify} from 'util';
 import {readFile} from 'fs';
 import {resolve} from 'path';

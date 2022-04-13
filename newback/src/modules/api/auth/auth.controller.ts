@@ -13,22 +13,25 @@ import {SignUpRequestValidator} from '@/modules/api/auth/validators/sign.up.requ
 import {ValidateUserRequestValidator} from '@/modules/api/auth/validators/validate.user.request.validator';
 import {
   AcceptTokenResponse,
+  ConfirmEmailResponse,
   FacebookSignInResponse,
   GoogleSignInResponse,
   SendRestorePasswordResponse,
   SignInResponse,
   SignUpResponse,
+  ValidateEmailResponse,
   ValidateUserEmailRequest,
   ValidateUserResponse
 } from '@/data/types/frontend';
 import {GoogleAuthRequestValidator} from '@/modules/api/auth/validators/google.auth.reques.validator';
-import {CaptchaGuard} from '@/modules/captcha';
+import {CaptchaGuard} from '@/modules/util/guards/captcha.guard';
 import {ValidateEmailRequestValidator} from '@/modules/api/auth/validators/validate.email.request.validator';
 import {FacebookAuthRequestValidator} from '@/modules/api/auth/validators/facebook.auth.request.validator';
 import {SendRestorePasswordValidator} from '@/modules/api/auth/validators/send.restore.password.validator';
 import {VerifyTokenRequestValidator} from '@/modules/api/auth/validators/verify.token.request.validator';
 import {VerifyTokenResponse} from '@/data/types/frontend';
 import {AcceptTokenRequestValidator} from '@/modules/api/auth/validators/accept.token.request.validator';
+import {ConfirmEmailRequestValidator} from '@/modules/api/auth/validators/confirm.email.request.validator';
 
 @Controller({
   path: '/api/auth'
@@ -62,7 +65,7 @@ export class AuthController {
   }
 
   @Post('/validate-email')
-  public async validateEmail(@Body() body: ValidateEmailRequestValidator): Promise<ValidateUserResponse> {
+  public async validateEmail(@Body() body: ValidateEmailRequestValidator): Promise<ValidateEmailResponse> {
     await this.authservice.validateEmail(body.email);
     return {
       ok: true
@@ -83,9 +86,17 @@ export class AuthController {
     return  this.authservice.verifyToken(body.token);
   }
 
+  @Post('/confirm-email')
+  public async confirmEmail(@Body() body: ConfirmEmailRequestValidator): Promise<ConfirmEmailResponse> {
+    await this.authservice.confirmEmail(body);
+    return {
+      ok: true,
+    }
+  }
+
  @Post('/accept-token')
   public async acceptToken(@Body() body: AcceptTokenRequestValidator): Promise<AcceptTokenResponse> {
-    return  this.authservice.acceptToken(body);
+    return this.authservice.acceptToken(body);
   }
 
   @Post('/validate-user')

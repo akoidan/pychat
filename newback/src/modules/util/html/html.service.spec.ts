@@ -1,4 +1,4 @@
-import {HtmlService} from '@/modules/html/html.service';
+import {HtmlService} from '@/modules/util/html/html.service';
 
 describe('HtmlService', () => {
 

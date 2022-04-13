@@ -229,7 +229,7 @@ export interface IStorage {
 
 export interface PostData {
   url: string;
-  params?: Record<string, Blob | boolean | number | string | null>;
+  params?: any;
   formData?: FormData;
   onAbortController?: (controller: AbortController) => void;
   process?(R: XMLHttpRequest): void;

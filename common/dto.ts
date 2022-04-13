@@ -52,6 +52,12 @@ export interface SignUpRequest {
   sex?: Gender;
 }
 
+export interface ConfirmEmailRequest {
+  token: string;
+}
+
+export interface ConfirmEmailResponse extends OkResponse {}
+
 export interface SessionResponse {
   session: string;
 }
@@ -117,10 +123,9 @@ export enum Theme {
 
 
 export enum VerificationType {
-  REGISTER = 'REGISTER',
-  PASSWORD = 'PASSWORD',
-  EMAIL = 'EMAIL',
-  CONFIRM_EMAIL = 'CONFIRM_EMAIL',
+  REGISTER = 'REGISTER', // when user sign up with email, we want to confirm that it's his/her email
+  PASSWORD = 'PASSWORD', // when user request a pasword change
+  EMAIL = 'EMAIL', // when user changes an email
 }
 
 export enum ImageType {

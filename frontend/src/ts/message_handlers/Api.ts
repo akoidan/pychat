@@ -27,13 +27,17 @@ import {
   OkResponse,
   SendRestorePasswordRequest,
   SignInRequest,
-  SignUpRequest
+  SignUpRequest,
+  ValidateEmailResponse
 } from '@/ts/types/dto';
 import {
   AcceptTokenRequest,
   AcceptTokenResponse,
+  ConfirmEmailRequest,
+  ConfirmEmailResponse,
   GoogleSignInResponse,
   SignUpResponse,
+  ValidateUserEmailRequest,
   ValidateUserResponse,
   VerifyTokenRequest,
   VerifyTokenResponse
@@ -229,8 +233,11 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async confirmEmail(token: string): Promise<string> {
-    return this.xhr.doGet<string>(`/confirm_email?token=${token}`);
+  public async confirmEmail(params: ConfirmEmailRequest): Promise<ConfirmEmailResponse> {
+    return this.xhr.doPost({
+      url: '/auth/confirm-email',
+      params
+    });
   }
 
   public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void, setXhr: (e: XMLHttpRequest) => void): Promise<SaveFileResponse> {
@@ -249,10 +256,10 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async validateEmail(email: string, onAbortController: (controller: AbortController) => void): Promise<void> {
+  public async validateEmail(params: ValidateUserEmailRequest, onAbortController: (controller: AbortController) => void): Promise<ValidateEmailResponse> {
     return this.xhr.doPost({
       url: "/auth/validate-email",
-      params: {email},
+      params,
       onAbortController,
     });
   }
@@ -260,14 +267,14 @@ export default class Api extends MessageHandler {
   public async verifyToken(params: VerifyTokenRequest): Promise<VerifyTokenResponse> {
     return this.xhr.doPost<VerifyTokenResponse>({
       url: "/auth/verify-token",
-      params: params as any,
+      params,
     });
   }
 
   public async acceptToken(params: AcceptTokenRequest): Promise<AcceptTokenResponse> {
     return this.xhr.doPost({
       url: "/auth/accept-token",
-      params: params as any,
+      params,
     });
   }
 

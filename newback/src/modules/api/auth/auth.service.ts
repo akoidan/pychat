@@ -10,6 +10,8 @@ import {PasswordService} from '@/modules/api/auth/password.service';
 import {
   AcceptTokenRequest,
   AcceptTokenResponse,
+  ConfirmEmailRequest,
+  ConfirmEmailResponse,
   FaceBookAuthRequest,
   FacebookSignInResponse,
   Gender,
@@ -29,7 +31,7 @@ import {
   MAX_USERNAME_LENGTH
 } from '@/data/utils/consts';
 import {RedisService} from '@/data/redis/RedisService';
-import {EmailService} from '@/modules/email/email.service';
+import {EmailService} from '@/modules/util/email/email.service';
 import {Transaction} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
@@ -212,11 +214,11 @@ export class AuthService {
     return userId;
   }
 
-  private doTokenVerification(data: VerificationModel): void {
+  private doTokenVerification(data: VerificationModel, typ: VerificationType): void {
     if (!data) {
       throw new BadRequestException("Invalid token");
     }
-    if (data.type != VerificationType.PASSWORD) {
+    if (data.type != typ) {
       throw new BadRequestException("Invalid operation");
     }
     if (data.verified) {
@@ -230,7 +232,7 @@ export class AuthService {
   public async verifyToken(token: string): Promise<VerifyTokenResponse> {
     let verificationModel: VerificationModel = await this.userRepository.getVerification(token);
     //https://pychat.org/#/auth/proceed-reset-password?token=evhv0zum3l8gavzql4xk5u16q2h9gqd2
-    this.doTokenVerification(verificationModel)
+    this.doTokenVerification(verificationModel, VerificationType.PASSWORD)
     return {
       ok: true,
       username: verificationModel.user.username
@@ -270,7 +272,7 @@ export class AuthService {
   public async acceptToken(body: AcceptTokenRequest): Promise<AcceptTokenResponse> {
     return this.sequelize.transaction(async(t) => {
       let verificationModel: VerificationModel = await this.userRepository.getVerification(body.token, t);
-      this.doTokenVerification(verificationModel);
+      this.doTokenVerification(verificationModel, VerificationType.PASSWORD);
       let password = await this.passwordService.createPassword(body.password);
       this.logger.log(`Generated newPassword='${password}' for verification='${verificationModel.id}' for userId=${verificationModel.userId}`);
       await this.userRepository.updateUserPassword(verificationModel.userId, password, t)
@@ -280,6 +282,15 @@ export class AuthService {
         session
       }
       return result;
+    })
+  }
+
+  public async confirmEmail(body: ConfirmEmailRequest): Promise<void> {
+     this.sequelize.transaction(async(t) => {
+      let verificationModel: VerificationModel = await this.userRepository.getVerification(body.token, t);
+      this.doTokenVerification(verificationModel, VerificationType.REGISTER);
+      await this.userRepository.markVerificationVerified(verificationModel.id , t);
+      await this.userRepository.setUserVerification(verificationModel.userId, verificationModel.id , t);
     })
   }
 }

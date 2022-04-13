@@ -37,6 +37,13 @@ export class UserRepository {
     })
   }
 
+  public async setUserVerification(userId: number, emailVerificationId: number, transaction: Transaction) {
+    await this.userAuthModel.update({emailVerificationId}, {
+      where: {id: userId},
+      transaction
+    })
+  }
+
   public async createUser(data: {
     username: string;
     password: string;

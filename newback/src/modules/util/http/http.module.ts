@@ -3,7 +3,7 @@ import {
   Logger,
   Module
 } from '@nestjs/common';
-import {HttpService} from '@/modules/http/http.service';
+import {HttpService} from '@/modules/util/http/http.service';
 import fetch from 'node-fetch';
 
 @Global()

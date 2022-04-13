@@ -2,7 +2,7 @@ import {
   Global,
   Module
 } from '@nestjs/common';
-import {ConfigService} from '@/modules/config/config.service';
+import {ConfigService} from '@/modules/util/config/config.service';
 import {config} from 'node-ts-config';
 
 @Global()

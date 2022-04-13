@@ -177,7 +177,7 @@ export function routerFactory(sub: Subscription) {
           },
         ],
       }, {
-        path: "/confirm_email",
+        path: "/confirm-email",
         component: ConfirmMail,
       }, {
         path: "/:catchAll(.*)",

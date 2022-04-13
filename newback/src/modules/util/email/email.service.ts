@@ -2,9 +2,9 @@ import {
   Injectable,
   Logger
 } from '@nestjs/common';
-import {HtmlService} from '@/modules/html/html.service';
+import {HtmlService} from '@/modules/util/html/html.service';
 import {MailerService} from '@nestjs-modules/mailer';
-import {ConfigService} from '@/modules/config/config.service';
+import {ConfigService} from '@/modules/util/config/config.service';
 
 @Injectable()
 export class EmailService {
@@ -25,7 +25,7 @@ export class EmailService {
       site: this.configService.getConfig().frontend.address,
       ipInfo
     };
-    await this.sendEmail('change_password_start', userId, email, 'Confirm pychat registration', context);
+    await this.sendEmail('change.password.start', userId, email, 'Reset pychat password', context);
   }
 
   private async sendEmail(templateName: string, userId, email, subject: string, context: Record<string, string>) {
@@ -47,13 +47,13 @@ export class EmailService {
   public async sendSignUpEmail(username: string, userId: number, email: string, token, ip: string, ipInfo: string) {
     let context: Record<string, string> = {
       issueReportLink: this.configService.getConfig().frontend.issueReportLink,
-      magicLink: `${this.configService.getConfig().frontend.address}/#/confirm_email?token=${token}`,
+      magicLink: `${this.configService.getConfig().frontend.address}/#/confirm-email?token=${token}`,
       username,
       ip,
       timeCreated: (new Date() as any).toGMTString(),
       ipInfo
     };
-    await this.sendEmail('sign_up_email', userId, email, 'Confirm pychat registration', context);
+    await this.sendEmail('sign.up.email', userId, email, 'Confirm Pychat registration', context);
   }
 
 }
