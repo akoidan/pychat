@@ -4,7 +4,7 @@ import {
   Matches,
 } from 'class-validator';
 import {ValidateUserRequest} from '@/data/types/frontend';
-import {MAX_USERNAME_LENGTH} from '@/data/utils/consts';
+import {MAX_USERNAME_LENGTH} from '@/utils/consts';
 
 export class ValidateUserRequestValidator implements ValidateUserRequest {
   @IsString()

@@ -5,7 +5,7 @@ import {
   Logger,
   UnauthorizedException
 } from '@nestjs/common';
-import {UserRepository} from '@/data/database/repository/user.repository';
+import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 import {PasswordService} from '@/modules/api/auth/password.service';
 import {
   AcceptTokenRequest,
@@ -25,21 +25,21 @@ import {
   VerificationType,
   VerifyTokenResponse
 } from '@/data/types/frontend';
-import {RoomRepository} from '@/data/database/repository/room.repository';
+import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
 import {
   ALL_ROOM_ID,
   MAX_USERNAME_LENGTH
-} from '@/data/utils/consts';
-import {RedisService} from '@/data/redis/RedisService';
-import {EmailService} from '@/modules/util/email/email.service';
+} from '@/utils/consts';
+import {RedisService} from '@/modules/rest/redis/RedisService';
+import {EmailService} from '@/modules/rest/email/email.service';
 import {Transaction} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
 import {TokenPayload} from 'google-auth-library';
-import {generateUserName} from '@/data/utils/helpers';
+import {generateUserName} from '@/utils/helpers';
 import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
 import {FacebookGetUserResponse} from '@/data/types/api';
-import {VerificationModel} from '@/data/database/model/verification.model';
+import {VerificationModel} from '@/data/model/verification.model';
 
 @Injectable()
 export class AuthService {

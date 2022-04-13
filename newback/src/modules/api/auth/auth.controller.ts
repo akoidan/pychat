@@ -24,7 +24,7 @@ import {
   ValidateUserResponse
 } from '@/data/types/frontend';
 import {GoogleAuthRequestValidator} from '@/modules/api/auth/validators/google.auth.reques.validator';
-import {CaptchaGuard} from '@/modules/util/guards/captcha.guard';
+import {CaptchaGuard} from '@/modules/app/guards/captcha.guard';
 import {ValidateEmailRequestValidator} from '@/modules/api/auth/validators/validate.email.request.validator';
 import {FacebookAuthRequestValidator} from '@/modules/api/auth/validators/facebook.auth.request.validator';
 import {SendRestorePasswordValidator} from '@/modules/api/auth/validators/send.restore.password.validator';

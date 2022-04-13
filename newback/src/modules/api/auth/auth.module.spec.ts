@@ -7,24 +7,24 @@ import * as supertest from 'supertest';
 import {Test} from '@nestjs/testing';
 import {AuthService} from '@/modules/api/auth/auth.service';
 import {AuthController} from '@/modules/api/auth/auth.controller';
-import {LoggerModule} from '@/modules/util/logger/logger.module';
+import {LoggerModule} from '@/modules/rest/logger/logger.module';
 import {PasswordService} from '@/modules/api/auth/password.service';
-import {UserRepository} from '@/data/database/repository/user.repository';
-import {RoomRepository} from '@/data/database/repository/room.repository';
-import {RedisService} from '@/data/redis/RedisService';
-import {EmailService} from '@/modules/util/email/email.service';
+import {UserRepository} from '@/modules/rest/database/repository/user.repository';
+import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
+import {RedisService} from '@/modules/rest/redis/RedisService';
+import {EmailService} from '@/modules/rest/email/email.service';
 import {MailerService} from '@nestjs-modules/mailer';
 import {Sequelize} from 'sequelize-typescript';
-import {HtmlService} from '@/modules/util/html/html.service';
+import {HtmlService} from '@/modules/rest/html/html.service';
 import waitForExpect from "wait-for-expect";
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
 import {OAuth2Client} from 'google-auth-library';
-import {HttpService} from '@/modules/util/http/http.service';
+import {HttpService} from '@/modules/rest/http/http.service';
 import fetch from 'node-fetch';
 import * as googleResponseFixture from '@/fixtures/google.response.fixture.json';
 import * as facebookGetTokenResponseFixture from '@/fixtures/facebook.get.token.response.json';
 import * as facebookGetUserResponseFixture from '@/fixtures/facebook.get.user.response.json';
-import {ConfigService} from '@/modules/util/config/config.service';
+import {ConfigService} from '@/modules/rest/config/config.service';
 import {
   config,
   IConfig

@@ -6,7 +6,7 @@
   "license": "MIT",
   "scripts": {
     "generate-configs": "node-ts-config",
-    "migrate": "ts-node  -r tsconfig-paths/register ./src/migration.runner.ts ",
+    "migrate": "ts-node  -r tsconfig-paths/register ./src/utils/migration.runner.ts ",
     "build": "nest build",
     "start": "nest start",
     "test:debug": "jest --runInBand --coverage --detectOpenHandles --testTimeout=100000 --coverageReporters html",
