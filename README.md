@@ -3,7 +3,7 @@
 [![Upload Frontend pychat.org](https://github.com/akoidan/pychat/workflows/FE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3AFE%3Apychat.org)
 [![Refresh backend pychat.org](https://github.com/akoidan/pychat/workflows/BE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3ABE%3Apychat.org)
 [![Github actions](https://github.com/akoidan/pychat/workflows/NEWBE:pychat.org/badge.svg)](https://github.com/akoidan/pychat/actions)
-[![codecov](https://codecov.io/gh/akoidan/pychat/branch/master/graph/badge.svg?token=aQlNwbpTIw)](https://codecov.io/gh/akoidan/pychat)
+[![codecov](https://codecov.io/gh/akoidan/pychat/branch/nestjs/graph/badge.svg?token=aQlNwbpTIw)](https://codecov.io/gh/akoidan/pychat)
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 <span>pychat.org is not available due to server location in Ukraine because of war ;(. Please support Ukraine. Russian invaders suffer in hell!</span>
 
