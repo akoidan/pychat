@@ -45,6 +45,12 @@ describe('EmailSenderService', () => {
   })
 
   describe('sendRestorePasswordEmail', () => {
+     it('time should always be UTC', () => { // https://stackoverflow.com/a/56482581/3872976
+       // test below depends on new date to return specific time
+       // we mock it with jest, but it still depends on machine timezone so we need to ensure tz is same
+       // jest.setup.js fixes it
+       expect(new Date().getTimezoneOffset()).toBe(0);
+    });
     it('should render', async () => {
       let spy = jest.spyOn(mailer, 'sendMail');
       jest.useFakeTimers('modern');
