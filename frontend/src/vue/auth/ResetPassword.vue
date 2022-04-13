@@ -34,7 +34,7 @@ import {
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
-import CaptchaComponent from "@/vue/singup/CaptchaComponent.vue";
+import CaptchaComponent from "@/vue/auth/CaptchaComponent.vue";
 
 @Component({
   name: "ResetPassword",

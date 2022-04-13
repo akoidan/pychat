@@ -6,10 +6,10 @@ import sessionHolder from "@/ts/instances/sessionInstance";
 import {store} from "@/ts/instances/storeInstance";
 import MainPage from "@/vue/pages/MainPage.vue";
 import ChannelsPage from "@/vue/pages/ChannelsPage.vue";
-import AuthPage from "@/vue/singup/AuthPage.vue";
-import ResetPassword from "@/vue/singup/ResetPassword.vue";
-import SignIn from "@/vue/singup/SignIn.vue";
-import SignUp from "@/vue/singup/SignUp.vue";
+import AuthPage from "@/vue/auth/AuthPage.vue";
+import ResetPassword from "@/vue/auth/ResetPassword.vue";
+import SignIn from "@/vue/auth/SignIn.vue";
+import SignUp from "@/vue/auth/SignUp.vue";
 import UserProfile from "@/vue/pages/UserProfile.vue";
 import UserProfileChangePassword from "@/vue/pages/UserProfileChangePassword.vue";
 import UserProfileImage from "@/vue/pages/UserProfileImage.vue";
@@ -18,7 +18,7 @@ import UserProfileSettings from "@/vue/pages/UserProfileSettings.vue";
 import CreatePrivateRoom from "@/vue/pages/CreatePrivateRoom.vue";
 import ViewProfilePage from "@/vue/pages/ViewProfilePage.vue";
 import RoomSettings from "@/vue/pages/RoomSettings.vue";
-import ApplyResetPassword from "@/vue/singup/ApplyResetPassword.vue";
+import ApplyResetPassword from "@/vue/auth/ApplyResetPassword.vue";
 import {
   ACTIVE_ROOM_ID_LS_NAME,
   ALL_ROOM_ID,

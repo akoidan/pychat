@@ -127,11 +127,11 @@ import {
 } from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
-import RegisterFieldSet from "@/vue/singup/RegisterFieldSet.vue";
+import RegisterFieldSet from "@/vue/auth/RegisterFieldSet.vue";
 import debounce from "lodash.debounce";
 import {IconColor} from "@/ts/types/types";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
-import SocialAuthSignUp from "@/vue/singup/SocialAuthSignUp.vue";
+import SocialAuthSignUp from "@/vue/auth/SocialAuthSignUp.vue";
 import {USERNAME_REGEX} from "@/ts/utils/consts";
 import {Gender} from '@/ts/types/backend';
 

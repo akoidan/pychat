@@ -11,8 +11,8 @@ import {
   Vue,
 } from "vue-property-decorator";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
-import FacebookAuth from "@/vue/singup/FacebookAuth.vue";
-import GoogleAuth from "@/vue/singup/GoogleAuth.vue";
+import FacebookAuth from "@/vue/auth/FacebookAuth.vue";
+import GoogleAuth from "@/vue/auth/GoogleAuth.vue";
 import {
   FACEBOOK_APP_ID,
   GOOGLE_OAUTH_2_CLIENT_ID,
