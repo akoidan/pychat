@@ -30,11 +30,16 @@ import {
   IConfig
 } from 'node-ts-config';
 import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
+import {IpCacheService} from '@/modules/rest/ip/ip.cache.service';
+import {IpService} from '@/modules/rest/ip/ip.service';
+import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
+import {IpAddressModel} from '@/data/model/ip.address.model';
 
 describe('AuthModule', () => {
   let app: INestApplication;
   let request: supertest.SuperTest<supertest.Test>;
   let userRepository: UserRepository = {} as UserRepository;
+  let ipRepository: IpRepository = {} as IpRepository;
   let roomRepository: RoomRepository = {} as RoomRepository;
   let redisService: RedisService = {} as RedisService;
   let sequelize: Sequelize = {} as Sequelize;
@@ -82,6 +87,8 @@ describe('AuthModule', () => {
         AuthService,
         HtmlService,
         EmailService,
+        IpCacheService,
+        IpService,
         FacebookAuthService,
         {
           provide: MailerService,
@@ -94,6 +101,10 @@ describe('AuthModule', () => {
         {
           provide: UserRepository,
           useValue: userRepository,
+        },
+        {
+          provide: IpRepository,
+          useValue: ipRepository,
         },
         {
           provide: RoomRepository,
@@ -121,6 +132,7 @@ describe('AuthModule', () => {
     Object.keys(sequelize).forEach(key => delete sequelize[key]);
     Object.keys(mailerService).forEach(key => delete mailerService[key]);
     Object.keys(oauth2Client).forEach(key => delete oauth2Client[key]);
+    Object.keys(ipRepository).forEach(key => delete ipRepository[key]);
     nodeApply = () => {
     };
     Object.keys(configService).forEach(key => delete configService[key]);
@@ -396,6 +408,11 @@ describe('AuthModule', () => {
       userRepository.createUser = jest.fn().mockResolvedValue(3);
       roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
       mailerService.sendMail = jest.fn();
+      ipRepository.getIp = jest.fn().mockResolvedValue({
+        country: 'Ukraine',
+        city: 'Mariupol',
+        isp: 'AZOV',
+      } as IpAddressModel)
       let spy = jest.spyOn(mailerService, 'sendMail').mockResolvedValue(true);
       redisService.saveSession = jest.fn().mockResolvedValue(undefined)
       const {body} = await request
