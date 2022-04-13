@@ -4,6 +4,31 @@ export interface SignInRequest extends CaptchaRequest{
   email?: string;
 }
 
+export interface SendRestorePasswordRequest extends CaptchaRequest {
+  username?: string;
+  email?: string;
+}
+
+export interface VerifyTokenRequest {
+  token: string;
+}
+
+export interface AcceptTokenRequest {
+  token: string;
+  password: string;
+}
+
+export interface AcceptTokenResponse extends SessionResponse {
+
+}
+
+export interface VerifyTokenResponse extends OkResponse {
+  username: string;
+}
+
+export interface SendRestorePasswordResponse extends OkResponse {
+}
+
 export interface CaptchaRequest {
   captcha?: string;
 }

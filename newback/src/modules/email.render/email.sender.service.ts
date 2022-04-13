@@ -1,6 +1,6 @@
 import {
-	Injectable,
-	Logger
+  Injectable,
+  Logger
 } from '@nestjs/common';
 import {HtmlService} from '@/modules/html/html.service';
 import {MailerService} from '@nestjs-modules/mailer';
@@ -16,37 +16,44 @@ export class EmailSenderService {
   ) {
   }
 
-  public async sendSignUpEmail(username: string, userId: number, email: string, token, ip: string, ipInfo: string) {
-    if (!this.configService.getConfig().email) {
-        this.loggerService.warn(`Email to userId ${userId} ${email} won't be sent since email settings is not set in config`);
-        return
-    }
-    const magicLink = `${this.configService.getConfig().frontend.address}/#/confirm_email?token=${token}`;
-    let issueReportLink = this.configService.getConfig().frontend.issueReportLink;
-    const text = `Hi ${username}, you have registered pychat` +
-      `\nTo complete your registration please click on the url bellow: ${magicLink}` +
-      `\n\nIf you find any bugs or propositions you can post them ${issueReportLink}`;
-
-    let signUpEmail = await this.htmlService.renderTemplate('sign_up_email', {
-      issueReportLink,
-      magicLink,
+  public async sendRestorePasswordEmail(username: string, userId: number, email: string, token, ip: string, ipInfo: string) {
+    let context = {
       username,
-      btnText: "Confirm chat registration",
-    })
-    const html = await this.htmlService.renderTemplate('token_email', {
-      signUpEmail,
+      timeCreated: (new Date() as any).toGMTString(),
+      magicLink: `${this.configService.getConfig().frontend.address}/#/auth/proceed-reset-password?token=${token}`,
       ip,
-      timeCreated: new Date().getTime(),
+      site: this.configService.getConfig().frontend.address,
       ipInfo
-    })
-    this.loggerService.log(`Sending verification email to userId ${userId} ${email}`)
-    await this.mailerService.sendMail({
-      to: email,
-      html,
-      text,
-      subject: 'Confirm pychat registration'
-    })
+    };
+    await this.sendEmail('change_password_start', userId, email, 'Confirm pychat registration', context);
+  }
 
+  private async sendEmail(templateName: string, userId, email, subject: string, context: Record<string, string>) {
+    if (!this.configService.getConfig().email) {
+      this.loggerService.warn(`Email to userId ${userId} ${email} won't be sent since email settings is not set in config`);
+      return
+    }
+    let html = await this.htmlService.renderTemplate(`${templateName}.html`, context);
+    let text = await this.htmlService.renderTemplate(`${templateName}.txt`, context);
+    this.loggerService.log(`Sending email to userId ${userId} ${email}`)
+    // await this.mailerService.sendMail({
+    //   to: email,
+    //   html,
+    //   text,
+    //   subject
+    // })
+  }
+
+  public async sendSignUpEmail(username: string, userId: number, email: string, token, ip: string, ipInfo: string) {
+    let context: Record<string, string> = {
+      issueReportLink: this.configService.getConfig().frontend.issueReportLink,
+      magicLink: `${this.configService.getConfig().frontend.address}/#/confirm_email?token=${token}`,
+      username,
+      ip,
+      timeCreated: (new Date() as any).toGMTString(),
+      ipInfo
+    };
+    await this.sendEmail('sign_up_email', userId, email, 'Confirm pychat registration', context);
   }
 
 }

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -7,15 +8,20 @@ import {
 import {UserRepository} from '@/data/database/repository/user.repository';
 import {PasswordService} from '@/modules/api/auth/password.service';
 import {
+  AcceptTokenRequest,
+  AcceptTokenResponse,
   FaceBookAuthRequest,
   FacebookSignInResponse,
   Gender,
   GoogleAuthRequest,
   GoogleSignInResponse,
+  SendRestorePasswordRequest,
   SignInRequest,
   SignInResponse,
   SignUpRequest,
-  SignUpResponse
+  SignUpResponse,
+  VerificationType,
+  VerifyTokenResponse
 } from '@/data/types/frontend';
 import {RoomRepository} from '@/data/database/repository/room.repository';
 import {
@@ -31,6 +37,7 @@ import {TokenPayload} from 'google-auth-library';
 import {generateUserName} from '@/data/utils/helpers';
 import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
 import {FacebookGetUserResponse} from '@/data/types/api';
+import {VerificationModel} from '@/data/database/model/verification.model';
 
 @Injectable()
 export class AuthService {
@@ -131,7 +138,7 @@ export class AuthService {
       userId = result?.user?.id;
       password = result?.password;
     } else {
-      const result = await this.userRepository.getUserByUserName(body.username);
+      const result = await this.userRepository.getUserByUserName(body.username, ['userAuth']);
       userId = result?.id;
       password = result?.userAuth?.password;
     }
@@ -152,7 +159,7 @@ export class AuthService {
       await this.sequelize.transaction(async(t) => {
         let token = await this.passwordService.generateRandomString(32);
         this.logger.log(`Generated token for userId ${userId}: ${token}`)
-        await this.userRepository.createVerification(email, userId, token, t)
+        await this.userRepository.createVerification(email, userId, token, VerificationType.REGISTER, t)
         await this.emailService.sendSignUpEmail(username, userId, email, token, ip, ip)
       });
     } catch (e) {
@@ -203,5 +210,76 @@ export class AuthService {
     let userId = await this.userRepository.createUser({...data, password}, transaction)
     await this.roomRepository.createRoomUser(ALL_ROOM_ID, userId, transaction);
     return userId;
+  }
+
+  private doTokenVerification(data: VerificationModel): void {
+    if (!data) {
+      throw new BadRequestException("Invalid token");
+    }
+    if (data.type != VerificationType.PASSWORD) {
+      throw new BadRequestException("Invalid operation");
+    }
+    if (data.verified) {
+      throw new BadRequestException("This token is already used");
+    }
+    if (Date.now() - data.createdAt.getTime() > 24 * 3600 * 1000) { // 24 hours
+      throw new BadRequestException("This token is already expired");
+    }
+  }
+
+  public async verifyToken(token: string): Promise<VerifyTokenResponse> {
+    let verificationModel: VerificationModel = await this.userRepository.getVerification(token);
+    //https://pychat.org/#/auth/proceed-reset-password?token=evhv0zum3l8gavzql4xk5u16q2h9gqd2
+    this.doTokenVerification(verificationModel)
+    return {
+      ok: true,
+      username: verificationModel.user.username
+    }
+  }
+
+  public async sendRestorePassword(body: SendRestorePasswordRequest, ip: string): Promise<void> {
+    return this.sequelize.transaction(async(t) => {
+      let email, userId, username;
+      if (body.email) {
+        const user = await this.userRepository.getUserByEmail(body.email, t);
+        if (!user) {
+          throw new BadRequestException("User with this email doesnt exit");
+        }
+        username = user.user.username;
+        userId = user.id;
+        email = body.email;
+      } else if (body.username) {
+        const user = await this.userRepository.getUserByUserName(body.username, ['userAuth'], t);
+        if (!user) {
+          throw new BadRequestException("User with this username doesnt exit");
+        }
+        if (!user.userAuth.email) {
+          throw new BadRequestException("This user didnt specify an email");
+        }
+        email = user.userAuth.email;
+        username = user.username;
+        userId = user.id;
+      }
+      let token: string = await this.passwordService.generateRandomString(32);
+      this.logger.log(`Generated token='${token}' to restore user email='${email}'`);
+      await this.userRepository.createVerification(email, userId, token, VerificationType.PASSWORD, t)
+      await this.emailService.sendRestorePasswordEmail(username, userId, email, token, ip, ip)
+    });
+  }
+
+  public async acceptToken(body: AcceptTokenRequest): Promise<AcceptTokenResponse> {
+    return this.sequelize.transaction(async(t) => {
+      let verificationModel: VerificationModel = await this.userRepository.getVerification(body.token, t);
+      this.doTokenVerification(verificationModel);
+      let password = await this.passwordService.createPassword(body.password);
+      this.logger.log(`Generated newPassword='${password}' for verification='${verificationModel.id}' for userId=${verificationModel.userId}`);
+      await this.userRepository.updateUserPassword(verificationModel.userId, password, t)
+      await this.userRepository.markVerificationVerified(verificationModel.id, t);
+      let session = await this.createAndSaveSession(verificationModel.userId);
+      let result: AcceptTokenResponse = {
+        session
+      }
+      return result;
+    })
   }
 }

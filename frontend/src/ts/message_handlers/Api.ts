@@ -23,10 +23,18 @@ import type {
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
-import {SignInRequest} from '@/ts/types/dto';
 import {
+  OkResponse,
+  SendRestorePasswordRequest,
+  SignInRequest
+} from '@/ts/types/dto';
+import {
+  AcceptTokenRequest,
+  AcceptTokenResponse,
   GoogleSignInResponse,
-  ValidateUserResponse
+  ValidateUserResponse,
+  VerifyTokenRequest,
+  VerifyTokenResponse
 } from '@/ts/types/backend';
 
 export default class Api extends MessageHandler {
@@ -71,10 +79,10 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async sendRestorePassword(form: HTMLFormElement): Promise<void> {
-    return this.xhr.doPost<void>({
-      url: "/send_restore_password",
-      formData: new FormData(form),
+  public async sendRestorePassword(params: SendRestorePasswordRequest): Promise<OkResponse> {
+    return this.xhr.doPost<OkResponse>({
+      url: "/auth/send-restore-password",
+      params: params as any,
     });
   }
 
@@ -247,24 +255,17 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async verifyToken(token: string): Promise<string> {
-    const value: {message: string; restoreUser: string} = await this.xhr.doPost<{message: string; restoreUser: string}>({
-      url: "/verify_token",
-      params: {token},
+  public async verifyToken(params: VerifyTokenRequest): Promise<VerifyTokenResponse> {
+    return this.xhr.doPost<VerifyTokenResponse>({
+      url: "/auth/verify-token",
+      params: params as any,
     });
-    if (value && value.message === RESPONSE_SUCCESS) {
-      return value.restoreUser;
-    }
-    throw value.message;
   }
 
-  public async acceptToken(token: string, password: string): Promise<void> {
+  public async acceptToken(params: AcceptTokenRequest): Promise<AcceptTokenResponse> {
     return this.xhr.doPost({
-      url: "/accept_token",
-      params: {
-        token,
-        password,
-      },
+      url: "/auth/accept-token",
+      params
     });
   }
 

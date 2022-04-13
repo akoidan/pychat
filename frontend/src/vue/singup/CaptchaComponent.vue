@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template v-if="captcha_key">
+    <template v-if="captchaKey">
       <template v-if="isIframe">
         <iframe
           ref="iframe"
@@ -47,7 +47,7 @@ window.onloadrecaptcha = function () {
 
 @Component({name: "CaptchaComponent"})
 export default class CaptchaComponent extends Vue {
-  public captcha_key: string = RECAPTCHA_PUBLIC_KEY || "";
+  public captchaKey: string = RECAPTCHA_PUBLIC_KEY || "";
 
   public resettingAllowed: boolean = false; // Prevent resetting on initial load
 
@@ -104,7 +104,7 @@ export default class CaptchaComponent extends Vue {
   public renderCaptcha() {
     this.$emit("update:loading", false);
     this.grecaptcha.render(this.repactha, {
-      sitekey: this.captcha_key,
+      sitekey: this.captchaKey,
       theme: 'dark',
       callback: (response: string) => this.$emit("update:token", response),
     })
@@ -130,9 +130,9 @@ export default class CaptchaComponent extends Vue {
     }
   }
 
-  public async created() {
-    this.$logger.debug("initing captcha with key {}", RECAPTCHA_PUBLIC_KEY)();
-    if (this.captcha_key) {
+  public async mounted() { // should be mounted thus div to render recaptcha exists
+    this.$logger.debug("initing captcha with key {}", this.captchaKey)();
+    if (this.captchaKey) {
       if (this.isIframe) {
         this.$logger.log("Adding message listener")();
         this.event = (event: MessageEvent) => {

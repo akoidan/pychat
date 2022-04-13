@@ -23,6 +23,20 @@ export class UserRepository {
   ) {
   }
 
+  public async updateUserPassword(userId: number, password: string, transaction: Transaction) {
+    await this.userAuthModel.update({password}, {
+      where: {id: userId},
+      transaction
+    })
+  }
+
+ public async markVerificationVerified(id: number, transaction: Transaction) {
+    await this.verificationModel.update({verified: true}, {
+      where: {id},
+      transaction
+    })
+  }
+
   public async createUser(data: {
     username: string;
     password: string;
@@ -84,9 +98,17 @@ export class UserRepository {
     }) != null
   }
 
-  public async createVerification(email: string, userId: number, token: string, transaction?: Transaction): Promise<void> {
+  public async getVerification(token: string, transaction?: Transaction): Promise<VerificationModel> {
+    return await this.verificationModel.findOne({
+      where: {token},
+      include: ['user'],
+      transaction
+    });
+  }
+
+  public async createVerification(email: string, userId: number, token: string, type: VerificationType, transaction: Transaction): Promise<void> {
     let verification = await this.verificationModel.create({
-      type: VerificationType.REGISTER,
+      type,
       email,
       userId,
       token,
@@ -111,21 +133,21 @@ export class UserRepository {
     }) != null
   }
 
-  public async getUserByEmail(email: string): Promise<UserAuthModel | null> {
+  public async getUserByEmail(email: string, transaction?: Transaction): Promise<UserAuthModel | null> {
     return this.userAuthModel.findOne({
       where: {email},
+      transaction,
       include: [
         'user', // LEFT OUTER JOIN "id" = "user"."id"
       ],
     })
   }
 
-  public async getUserByUserName(username: string): Promise<UserModel | null> {
+  public async getUserByUserName(username: string, includeFields: ('userAuth'|'userProfile')[], transaction?: Transaction): Promise<UserModel | null> {
     return this.userModel.findOne({
       where: {username},
-      include: [
-        'userAuth',
-      ],
+      transaction,
+      include: includeFields,
     })
   }
 

@@ -1,6 +1,5 @@
 <template>
   <form
-    ref="form"
     @submit.prevent="restorePassword"
   >
     <div>
@@ -10,13 +9,13 @@
         placeholder="Username or email"
         required
         type="text"
-        value=""
+        v-model="userNameOrEmail"
       />
       <div class="slider">
         Enter your username or email
       </div>
     </div>
-    <captcha-component v-model="running"/>
+     <captcha-component v-model:loading="running" v-model:token="captcha"/>
     <div>
       <app-submit
         :running="running"
@@ -45,13 +44,13 @@ import CaptchaComponent from "@/vue/singup/CaptchaComponent.vue";
   },
 })
 export default class ResetPassword extends Vue {
-  @Ref()
-  public form!: HTMLFormElement;
 
   @Ref()
   public repactha!: HTMLElement;
 
   public running: boolean = false;
+  public captcha: string = '';
+  public userNameOrEmail: string = '';
 
   public created() {
     this.$store.setRegHeader("Restore password");
@@ -62,7 +61,11 @@ export default class ResetPassword extends Vue {
     message: "Can't reset password",
   })
   public async restorePassword(event: Event) {
-    await this.$api.sendRestorePassword(this.form);
+    await this.$api.sendRestorePassword({
+      captcha: this.captcha,
+      email: this.userNameOrEmail.includes('@') ? this.userNameOrEmail : undefined,
+      username: !this.userNameOrEmail.includes('@') ? this.userNameOrEmail: undefined,
+    });
     this.$store.growlSuccess("A reset email has been sent to your email address, please follow the instruction in it");
   }
 }

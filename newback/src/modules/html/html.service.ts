@@ -18,7 +18,7 @@ export class HtmlService {
   }
 
   public async renderTemplate(template: string, params: Record<string, string | number>) {
-    let filePath = ['src', 'templates', `${template}.html`].join(sep);
+    let filePath = ['src', 'templates', `${template}`].join(sep);
     const content = await promisify(readFile)(filePath, 'utf-8');
     return this.replaceTemplate(content, params);
   }

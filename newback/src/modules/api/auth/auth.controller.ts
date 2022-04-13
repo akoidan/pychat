@@ -12,8 +12,10 @@ import {LoginRequestValidator} from '@/modules/api/auth/validators/login.request
 import {SignUpRequestValidator} from '@/modules/api/auth/validators/sign.up.request.validator';
 import {ValidateUserRequestValidator} from '@/modules/api/auth/validators/validate.user.request.validator';
 import {
+  AcceptTokenResponse,
   FacebookSignInResponse,
   GoogleSignInResponse,
+  SendRestorePasswordResponse,
   SignInResponse,
   SignUpResponse,
   ValidateUserEmailRequest,
@@ -23,6 +25,10 @@ import {GoogleAuthRequestValidator} from '@/modules/api/auth/validators/google.a
 import {CaptchaGuard} from '@/modules/captcha';
 import {ValidateEmailRequestValidator} from '@/modules/api/auth/validators/validate.email.request.validator';
 import {FacebookAuthRequestValidator} from '@/modules/api/auth/validators/facebook.auth.request.validator';
+import {SendRestorePasswordValidator} from '@/modules/api/auth/validators/send.restore.password.validator';
+import {VerifyTokenRequestValidator} from '@/modules/api/auth/validators/verify.token.request.validator';
+import {VerifyTokenResponse} from '@/data/types/frontend';
+import {AcceptTokenRequestValidator} from '@/modules/api/auth/validators/accept.token.request.validator';
 
 @Controller({
   path: '/api/auth'
@@ -61,6 +67,25 @@ export class AuthController {
     return {
       ok: true
     }
+  }
+
+ @UseGuards(CaptchaGuard)
+ @Post('/send-restore-password')
+  public async sendRestorePassword(@Body() body: SendRestorePasswordValidator, @Ip() ip: string): Promise<SendRestorePasswordResponse> {
+    await this.authservice.sendRestorePassword(body, ip);
+    return {
+      ok: true
+    }
+  }
+
+ @Post('/verify-token')
+  public async verifyToken(@Body() body: VerifyTokenRequestValidator): Promise<VerifyTokenResponse> {
+    return  this.authservice.verifyToken(body.token);
+  }
+
+ @Post('/accept-token')
+  public async acceptToken(@Body() body: AcceptTokenRequestValidator): Promise<AcceptTokenResponse> {
+    return  this.authservice.acceptToken(body);
   }
 
   @Post('/validate-user')

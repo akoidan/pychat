@@ -47,6 +47,7 @@ import {
 } from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
+import {LoginMessage} from '@/ts/types/messages/innerMessages';
 
 @Component({
   name: "ApplyResetPassword",
@@ -70,7 +71,8 @@ export default class ApplyResetPassword extends Vue {
     vueProperty: "error",
   })
   async created() {
-    this.restoreUser = await this.$api.verifyToken((this.$route.query.token) as string);
+    let data = await this.$api.verifyToken({token: (this.$route.query.token) as string});
+    this.restoreUser = data.username;
   }
 
   @ApplyGrowlErr({
@@ -82,9 +84,17 @@ export default class ApplyResetPassword extends Vue {
     if (this.password !== this.repeatPassword) {
       this.$store.growlError("Passords don't match");
     } else {
-      await this.$api.acceptToken(this.$route.query.token as string, this.password);
-      this.$store.growlSuccess("Password has been reset");
-      this.$router.replace("/auth/login");
+      let response = await this.$api.acceptToken({
+        token: this.$route.query.token as string,
+        password: this.password
+      });
+      const {session} = response;
+      const message: LoginMessage = {
+        action: "login",
+        handler: "router",
+        session,
+      };
+      this.$messageBus.notify(message);
     }
   }
 }
