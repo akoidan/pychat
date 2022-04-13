@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Opensource chat",
   "scripts": {
-    "start": "vite --config build/vite.config.ts",
+    "start": "vite --config build/vite.config.ts --force",
     "build": "VITE_LIGHT=true vite --config build/vite.config.ts build",
     "build:light": "VITE_LIGHT=true vite --config build/vite.config.ts build",
     "start:lint": "VITE_LINT=true vite --config build/vite.config.ts",

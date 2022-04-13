@@ -11,7 +11,7 @@ export class ValidateUserRequestValidator implements ValidateUserRequest {
   @Length(1, MAX_USERNAME_LENGTH, {
     message: `Username should be 1-${MAX_USERNAME_LENGTH} characters`
   })
-  @Matches(/[a-zA-Z-_0-9]+/, {
+  @Matches(/^[a-zA-Z-_0-9]+$/, {
     message: `Username can only contain latin characters, numbers and symbols '-' '_'`
   })
   public username: string;

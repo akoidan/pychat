@@ -92,17 +92,17 @@
         @blur="sexFoc = true"
       >
         <option
-          value="Secret"
+          :value="signUpSexOther"
           disabled
           selected
           hidden
         >
           Gender
         </option>
-        <option value="Male">
+        <option :value="signUpSexMale">
           Male
         </option>
-        <option value="Female">
+        <option :value="signUpSexFemale">
           Female
         </option>
       </select>
@@ -146,6 +146,9 @@ export default class SignUp extends Vue {
 
   @Prop() public fb_app_id!: string;
 
+  signUpSexMale = Gender.MALE;
+  signUpSexFemale = Gender.FEMALE;
+  signUpSexOther = Gender.OTHER;
 
   running: boolean = false;
 
@@ -327,7 +330,7 @@ export default class SignUp extends Vue {
 
   sexFoc: boolean = true;
 
-  sex: string = "";
+  sex: string = Gender.OTHER;
 
   sexDescription: string = "Need a help?";
 
@@ -349,9 +352,11 @@ export default class SignUp extends Vue {
     message: "Can't sign up"
   })
   async register() {
-    const {session} = await this.$api.register({
+    const {session} = await this.$api.signUp({
       username: this.username,
       password: this.password,
+      email: this.email,
+
     });
     const message: LoginMessage = {
       action: "login",

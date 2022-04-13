@@ -36,12 +36,12 @@ export class EmailSenderService {
     let html = await this.htmlService.renderTemplate(`${templateName}.html`, context);
     let text = await this.htmlService.renderTemplate(`${templateName}.txt`, context);
     this.loggerService.log(`Sending email to userId ${userId} ${email}`)
-    // await this.mailerService.sendMail({
-    //   to: email,
-    //   html,
-    //   text,
-    //   subject
-    // })
+    await this.mailerService.sendMail({
+      to: email,
+      html,
+      text,
+      subject
+    })
   }
 
   public async sendSignUpEmail(username: string, userId: number, email: string, token, ip: string, ipInfo: string) {

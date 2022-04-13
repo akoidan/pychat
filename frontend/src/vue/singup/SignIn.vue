@@ -60,14 +60,14 @@ import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import SocialAuthSignUp from "@/vue/singup/SocialAuthSignUp.vue";
 
 @Component({
-  name: "Login",
+  name: "SignIn",
   components: {
     SocialAuthSignUp,
     CaptchaComponent,
     AppSubmit,
   },
 })
-export default class Login extends Vue {
+export default class SignIn extends Vue {
   @Ref()
   public form!: HTMLFormElement;
 
@@ -87,12 +87,12 @@ export default class Login extends Vue {
   public async login() {
     let response;
     if (this.username?.includes('@')) {
-      response = await this.$api.login({
+      response = await this.$api.signIn({
         email: this.username,
         password: this.password,
       });
     } else {
-      response = await this.$api.login({
+      response = await this.$api.signIn({
         username: this.username,
         password: this.password,
         captcha: this.captcha,

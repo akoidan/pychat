@@ -8,7 +8,7 @@ import MainPage from "@/vue/pages/MainPage.vue";
 import ChannelsPage from "@/vue/pages/ChannelsPage.vue";
 import AuthPage from "@/vue/singup/AuthPage.vue";
 import ResetPassword from "@/vue/singup/ResetPassword.vue";
-import Login from "@/vue/singup/Login.vue";
+import SignIn from "@/vue/singup/SignIn.vue";
 import SignUp from "@/vue/singup/SignUp.vue";
 import UserProfile from "@/vue/pages/UserProfile.vue";
 import UserProfileChangePassword from "@/vue/pages/UserProfileChangePassword.vue";
@@ -56,7 +56,7 @@ export function routerFactory(sub: Subscription) {
         component: MainPage,
         beforeEnter: (to, from) => {
           if (!sessionHolder.session) {
-            return "/auth/login";
+            return "/auth/sign-in";
           }
         },
         children: [
@@ -157,11 +157,11 @@ export function routerFactory(sub: Subscription) {
         children: [
           {
             path: "",
-            redirect: "/auth/login",
+            redirect: "/auth/sign-in",
           },
           {
-            path: "login",
-            component: Login,
+            path: "sign-in",
+            component: SignIn,
           },
           {
             path: "reset-password",
@@ -188,7 +188,7 @@ export function routerFactory(sub: Subscription) {
 
   router.beforeEach((to, from, next) => {
     if (to.matched[0]?.meta?.loginRequired && !sessionHolder.session) {
-      next("/auth/login");
+      next("/auth/sign-in");
     } else {
       if (to?.meta?.beforeEnter) {
         (to.meta.beforeEnter as any)(to, from, next);
@@ -207,7 +207,7 @@ export function routerFactory(sub: Subscription) {
     };
 
     logout(a: LogoutMessage) {
-      router.replace("/auth/login");
+      router.replace("/auth/sign-in");
     }
 
     navigate(a: RouterNavigateMessage) {

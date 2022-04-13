@@ -4,7 +4,7 @@
       <router-link to="/auth/sign-up">
         Sign Up
       </router-link>
-      <router-link to="/auth/login">
+      <router-link to="/auth/sign-in">
         Log In
       </router-link>
     </div>
@@ -38,7 +38,7 @@ export default class AuthPage extends Vue {
   @ApplyGrowlErr({message: "Auto-registration error"})
   public async created() {
     if (AUTO_REGISTRATION) {
-      const {session} = await this.$api.register({
+      const {session} = await this.$api.signUp({
         username: this.getRandom(),
         password: this.getRandom(),
       });

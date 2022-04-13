@@ -507,6 +507,18 @@ describe('AuthModule', () => {
           "statusCode": 400,
         });
     });
+    it('should give error on invalid and also correct ones', async() => {
+      await request
+        .post('/api/auth/validate-user').send({
+          username: '%asfasdf',
+        }).expect(400, {
+          "error": "Bad Request",
+          "message": [
+            "Username can only contain latin characters, numbers and symbols '-' '_'",
+          ],
+          "statusCode": 400,
+        });
+    });
     it('should give error if username has great length', async() => {
       await request
         .post('/api/auth/validate-user').send({

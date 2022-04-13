@@ -26,12 +26,14 @@ import type Subscription from "@/ts/classes/Subscription";
 import {
   OkResponse,
   SendRestorePasswordRequest,
-  SignInRequest
+  SignInRequest,
+  SignUpRequest
 } from '@/ts/types/dto';
 import {
   AcceptTokenRequest,
   AcceptTokenResponse,
   GoogleSignInResponse,
+  SignUpResponse,
   ValidateUserResponse,
   VerifyTokenRequest,
   VerifyTokenResponse
@@ -55,7 +57,7 @@ export default class Api extends MessageHandler {
     this.xhr = xhr;
   }
 
-  public async login(body: SignInRequest): Promise<SessionResponse> {
+  public async signIn(body: SignInRequest): Promise<SessionResponse> {
     return this.xhr.doPost<SessionResponse>({
       url: "/auth/sign-in",
       params: {...body}
@@ -86,7 +88,7 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async register(data: SignInRequest): Promise<SessionResponse> {
+  public async signUp(data: SignUpRequest): Promise<SignUpResponse> {
     return this.xhr.doPost<SessionResponse>({
       url: "/auth/sign-up",
       params: data as any,
@@ -265,7 +267,7 @@ export default class Api extends MessageHandler {
   public async acceptToken(params: AcceptTokenRequest): Promise<AcceptTokenResponse> {
     return this.xhr.doPost({
       url: "/auth/accept-token",
-      params
+      params: params as any,
     });
   }
 
