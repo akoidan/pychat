@@ -7,12 +7,14 @@ import {HttpModule} from '@/modules/rest/http/http.module';
 import {IpModule} from '@/modules/rest/ip/ip.module';
 import {VerifyController} from '@/modules/api/verify/verify.controller';
 import {SessionService} from '@/modules/rest/session/session.service';
+import {VerifyService} from '@/modules/api/verify/verify.service';
 
 @Module({
   imports: [DatabaseModule, EmailModule, HttpModule, IpModule],
   controllers: [VerifyController],
   providers: [
     SessionService,
+    VerifyService,
     PasswordService,
     RedisService,
   ],
