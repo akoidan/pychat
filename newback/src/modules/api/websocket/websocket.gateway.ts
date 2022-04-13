@@ -8,12 +8,13 @@ import {
 import {Server} from 'ws';
 
 @WebSocketGateway({path: '/ws'})
-export class EventsGateway implements OnGatewayConnection {
+export class WebsocketGateway implements OnGatewayConnection {
   @WebSocketServer()
   server!: Server;
 
   async handleConnection(socket: WebSocket) {
     console.log('socket.OPEN', socket.OPEN);
+    socket.send(JSON.stringify({a: 3}))
   }
 
   @SubscribeMessage('events')

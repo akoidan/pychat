@@ -7,6 +7,7 @@ import {RedisModule} from '@nestjs-modules/ioredis';
 import {config} from 'node-ts-config';
 import {ConfigModule} from '@/modules/rest/config/config.module';
 import {VerifyModule} from '@/modules/api/verify/verify.module';
+import {WebsocketGateway} from '@/modules/api/websocket/websocket.gateway';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import {VerifyModule} from '@/modules/api/verify/verify.module';
     LoggerModule,
     ConfigModule,
     VerifyModule,
+    WebsocketGateway,
     RedisModule.forRoot({
       config: {
         host: config.redis.host,

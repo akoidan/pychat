@@ -12,6 +12,9 @@
     "test:html:coverage": "jest --runInBand --coverage --detectOpenHandles --testTimeout=100000 --coverageReporters html",
     "test": "jest --runInBand --coverage --coverageReporters text"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",
     "@nestjs/common": "^8.4.4",
