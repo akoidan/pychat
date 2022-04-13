@@ -50,8 +50,8 @@ describe('EmailSenderService', () => {
       jest.useFakeTimers('modern');
       jest.setSystemTime(new Date(2020, 3, 1));
       await sender.sendRestorePasswordEmail('a', 3 , 'a@a', 'sfsd', '192.168.1.1', 'Chernihiv');
-      const content = await promisify(readFile)(resolve(__dirname, '..', '..', 'fixtures', 'rendered.send.restore.password.html'), 'utf-8');
-      expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: content,  "subject": "Confirm pychat registration", "text": expect.any(String)}))
+      const content = await promisify(readFile)(resolve(__dirname, '..', '..', '..', 'fixtures', 'rendered.send.restore.password.html'), 'utf-8');
+      expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: content,  "subject": "Reset pychat password", "text": expect.any(String)}))
     });
   });
 
@@ -61,8 +61,8 @@ describe('EmailSenderService', () => {
       jest.useFakeTimers('modern');
       jest.setSystemTime(new Date(2020, 3, 1));
       await sender.sendSignUpEmail('a', 3 , 'a@a', 'sfsd', '192.168.1.1', 'Chernihiv');
-      const content = await promisify(readFile)(resolve(__dirname, '..', '..', 'fixtures', 'send.sign.up.email.html'), 'utf-8');
-      expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: content,  "subject": "Confirm pychat registration", "text": expect.any(String)}))
+      const content = await promisify(readFile)(resolve(__dirname, '..', '..', '..', 'fixtures', 'send.sign.up.email.html'), 'utf-8');
+      expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: content,  "subject": "Confirm Pychat registration", "text": expect.any(String)}))
     });
   });
 });
