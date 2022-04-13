@@ -90,6 +90,7 @@ export default class SignIn extends Vue {
       response = await this.$api.signIn({
         email: this.username,
         password: this.password,
+        captcha: this.captcha,
       });
     } else {
       response = await this.$api.signIn({
