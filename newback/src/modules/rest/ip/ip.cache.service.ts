@@ -1,20 +1,12 @@
 import {
-  BadRequestException,
   Injectable,
   Logger
 } from '@nestjs/common';
-import {HtmlService} from '@/modules/rest/html/html.service';
-import {MailerService} from '@nestjs-modules/mailer';
-import {ConfigService} from '@/modules/rest/config/config.service';
-import {HttpService} from '@/modules/rest/http/http.service';
-import {
-  IP_FAIL,
-  IpInfoResponse,
-  IpSuccessInfoResponse
-} from '@/data/types/api';
+import {IP_FAIL} from '@/data/types/api';
 import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 import {IpService} from '@/modules/rest/ip/ip.service';
 import {IpAddressModel} from '@/data/model/ip.address.model';
+import {InvalidIpException} from '@/modules/rest/ip/invalid.ip.exception';
 
 @Injectable()
 export class IpCacheService {
@@ -55,12 +47,12 @@ export class IpCacheService {
       };
       await this.ipRepository.saveIP(model)
       return model;
-    } catch (e) {
-      if (e.error == IP_FAIL) {
+    } catch (e: any) {
+       this.logger.error(`Unable to get Ip Address Info ${ip}`, e.stack, e.error)
+      if (!(e as InvalidIpException).networkError) {
         await this.ipRepository.saveIP({ip, status: false})
         return null;
       }
-      this.logger.error(`Unable to get Ip Address Info ${ip}`, e.stack, e.error)
       return null;
     }
   }

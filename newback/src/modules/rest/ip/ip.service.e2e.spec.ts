@@ -17,7 +17,6 @@ describe('IpService', () => {
 
     moduleFixture = await Test.createTestingModule({
       imports: [
-        LoggerModule,
         HttpModule
       ],
       providers: [
