@@ -11,7 +11,7 @@ import {promisify} from 'util';
 
 async function bootstrap() {
   const key  = await promisify(readFile)(config.application.keyPath, 'utf-8');
-  const cert =await promisify(readFile)(config.application.crtPath, 'utf-8');
+  const cert = await promisify(readFile)(config.application.crtPath, 'utf-8');
 
   const app = await NestFactory.create(AppModule, {
     logger: new ConsoleLogger(),
