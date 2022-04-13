@@ -25,6 +25,13 @@ export class IpAddressModel extends Model<IpAddressModel> {
   public ip: string;
 
   @Column({
+    type: DataType.BOOLEAN,
+    defaultValue: true,
+    allowNull: false,
+  })
+  public status: boolean;
+
+  @Column({
     type: DataType.STRING,
     allowNull: true,
   })

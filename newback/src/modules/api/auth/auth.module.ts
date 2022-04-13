@@ -5,7 +5,7 @@ import {
 import {AuthController} from '@/modules/api/auth/auth.controller';
 import {AuthService} from '@/modules/api/auth/auth.service';
 import {DatabaseModule} from '@/modules/rest/database/database.module';
-import {RedisService} from '@/modules/rest/redis/RedisService';
+import {RedisService} from '@/modules/rest/redis/redis.service';
 import {EmailModule} from '@/modules/rest/email/email.module';
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
 import {PasswordService} from '@/modules/api/auth/password.service';
@@ -14,9 +14,10 @@ import {config} from 'node-ts-config';
 import {HttpModule} from '@/modules/rest/http/http.module';
 import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
 import {ConfigService} from '@/modules/rest/config/config.service';
+import {IpModule} from '@/modules/rest/ip/ip.module';
 
 @Module({
-  imports: [DatabaseModule, EmailModule, HttpModule],
+  imports: [DatabaseModule, EmailModule, HttpModule, IpModule],
   controllers: [AuthController],
   providers: [
     AuthService,

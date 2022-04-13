@@ -30,7 +30,7 @@ import {
   ALL_ROOM_ID,
   MAX_USERNAME_LENGTH
 } from '@/utils/consts';
-import {RedisService} from '@/modules/rest/redis/RedisService';
+import {RedisService} from '@/modules/rest/redis/redis.service';
 import {EmailService} from '@/modules/rest/email/email.service';
 import {Transaction} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
@@ -40,6 +40,8 @@ import {generateUserName} from '@/utils/helpers';
 import {FacebookAuthService} from '@/modules/api/auth/facebook.auth.service';
 import {FacebookGetUserResponse} from '@/data/types/api';
 import {VerificationModel} from '@/data/model/verification.model';
+import {IpService} from '@/modules/rest/ip/ip.service';
+import {IpCacheService} from '@/modules/rest/ip/ip.cache.service';
 
 @Injectable()
 export class AuthService {
@@ -51,6 +53,7 @@ export class AuthService {
     private readonly redisService: RedisService,
     private readonly emailService: EmailService,
     private readonly googleAuthService: GoogleAuthService,
+    private readonly ipCacheService: IpCacheService,
     private readonly facebookService: FacebookAuthService,
     private readonly sequelize: Sequelize,
     private readonly logger: Logger,
@@ -162,7 +165,8 @@ export class AuthService {
         let token = await this.passwordService.generateRandomString(32);
         this.logger.log(`Generated token for userId ${userId}: ${token}`)
         await this.userRepository.createVerification(email, userId, token, VerificationType.REGISTER, t)
-        await this.emailService.sendSignUpEmail(username, userId, email, token, ip, ip)
+        let ipInfo = await this.ipCacheService.getIpString(ip)
+        await this.emailService.sendSignUpEmail(username, userId, email, token, ip, ipInfo)
       });
     } catch (e) {
       this.logger.error(`Can't send email to userid ${userId} ${email} because ${e.message}`, e.stack, 'Mail')
@@ -265,7 +269,8 @@ export class AuthService {
       let token: string = await this.passwordService.generateRandomString(32);
       this.logger.log(`Generated token='${token}' to restore user email='${email}'`);
       await this.userRepository.createVerification(email, userId, token, VerificationType.PASSWORD, t)
-      await this.emailService.sendRestorePasswordEmail(username, userId, email, token, ip, ip)
+      let ipInfo = await this.ipCacheService.getIpString(ip);
+      await this.emailService.sendRestorePasswordEmail(username, userId, email, token, ip, ipInfo)
     });
   }
 

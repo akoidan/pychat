@@ -22,10 +22,12 @@ import {VerificationModel} from '@/data/model/verification.model';
 import {Logger} from '@nestjs/common/services/logger.service';
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
+import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 
 const repositories = [
   UserRepository,
   RoomRepository,
+  IpRepository,
 ];
 
 @Module({

@@ -7,9 +7,10 @@ export function generateUserName(email: string) {
   return email.split('@')[0].replace(/[^0-9a-zA-Z-_]+/g, '-').substring(0, MAX_USERNAME_LENGTH);
 }
 export function generateOrmConfig(logging: ((sql: string) => void)): Omit<SequelizeModuleOptions, 'ssl'> {
+  const sync = false;
   return {
-    synchronize: config.mysql.synchronize,
-    logging: config.mysql.logging ? logging : false,
+    synchronize: sync,
+    logging: logging,
     dialect: 'mysql',
     host: config.mysql.host,
     port: config.mysql.port,
@@ -18,7 +19,7 @@ export function generateOrmConfig(logging: ((sql: string) => void)): Omit<Sequel
     database: config.mysql.database,
     autoLoadModels: true,
     sync: {
-      force: config.mysql.synchronize,
+      force: sync,
     },
     define: {
       collate: 'utf8mb4_general_ci',

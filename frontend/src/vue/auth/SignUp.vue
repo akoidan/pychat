@@ -330,7 +330,7 @@ export default class SignUp extends Vue {
 
   sexFoc: boolean = true;
 
-  sex: string = Gender.OTHER;
+  sex: Gender = Gender.OTHER;
 
   sexDescription: string = "Need a help?";
 
@@ -355,8 +355,8 @@ export default class SignUp extends Vue {
     const {session} = await this.$api.signUp({
       username: this.username,
       password: this.password,
-      email: this.email,
-
+      email: this.email || undefined, // undefined is not sending via json.stringify
+      sex: this.sex,
     });
     const message: LoginMessage = {
       action: "login",

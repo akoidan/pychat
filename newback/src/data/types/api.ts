@@ -3,3 +3,27 @@ export interface FacebookGetUserResponse {
   last_name: string;
   id: string;
 }
+
+export interface IpFailedInfoResponse {
+  message: string;
+  status: 'fail';
+}
+export const IP_FAIL = 'fail';
+
+export interface IpSuccessInfoResponse  {
+  status: 'success';
+  country: string;
+  countryCode: string;
+  region: string;
+  regionName: string;
+  city: string;
+  zip: string;
+  lat: number;
+  lon: number;
+  timezone: string;
+  isp: string;
+  org: string;
+  as: string;
+  query: string;
+}
+export type IpInfoResponse = IpFailedInfoResponse | IpSuccessInfoResponse;

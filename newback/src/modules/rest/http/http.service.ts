@@ -48,7 +48,7 @@ export class HttpService {
     return this.post<T>(url, body, {})
   }
 
-  public async getUrlEncoded<T = Record<string, any>>(url: string, data: Record<string, any>): Promise<T> {
+  public async getUrlEncoded<T = Record<string, any>>(url: string, data: Record<string, any> = {}): Promise<T> {
     const params = new URLSearchParams();
     Object.entries(data).forEach(([k,v]) => {
       params.append(k, v);

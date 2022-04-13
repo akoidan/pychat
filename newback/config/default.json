@@ -14,7 +14,6 @@
     "allRoomId": 1,
     "showCountryCode": false,
     "firebaseUrl": "https://fcm.googleapis.com/fcm/send",
-    "ipApiUrl": "http://ip-api.com/json/%s",
     "pingCloseJsDelay": 10000,
     "pingInterval": 300000,
     "clientNoServerPingCloseTimeout": 320000
@@ -35,8 +34,6 @@
     }
   },
   "mysql": {
-    "synchronize": false,
-    "logging": true,
     "host": "localhost",
     "port": 3306,
     "username": "pychat",

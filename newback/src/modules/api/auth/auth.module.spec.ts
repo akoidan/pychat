@@ -11,7 +11,7 @@ import {LoggerModule} from '@/modules/rest/logger/logger.module';
 import {PasswordService} from '@/modules/api/auth/password.service';
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
-import {RedisService} from '@/modules/rest/redis/RedisService';
+import {RedisService} from '@/modules/rest/redis/redis.service';
 import {EmailService} from '@/modules/rest/email/email.service';
 import {MailerService} from '@nestjs-modules/mailer';
 import {Sequelize} from 'sequelize-typescript';

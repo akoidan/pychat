@@ -23,8 +23,9 @@ const connection = createConnection({
 connection.connect(async function (err) {
   let migrations = new CommandsRunner({
     driver: new MysqlDriver(connection),
-    directoryWithScripts: `${__dirname}/../config/migration/`,
+    directoryWithScripts: `${__dirname}/../../config/migration/`,
   });
   await migrations.run('init')
   await migrations.run('migrate')
+  await new Promise((resolve, reject) => connection.end((err) =>err ? reject() : resolve(undefined)));
 });

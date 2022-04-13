@@ -28,7 +28,7 @@ export class ChannelModel extends Model<ChannelModel> {
 
   @ForeignKey(() => UserModel)
   @Column({
-    allowNull: true, // main room no id
+    allowNull: false,
     type: DataType.INTEGER,
   })
   public creatorId: number;

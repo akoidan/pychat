@@ -15,13 +15,12 @@ declare module "node-ts-config" {
   interface Email {
     host: string
     port: number
+    secure: boolean
     auth: Auth2
-    from: string
   }
   interface Auth2 {
-    type: string
     user: string
-    password: string
+    pass: string
   }
   interface Recaptcha {
     publicKey: string
@@ -38,13 +37,13 @@ declare module "node-ts-config" {
     clientId: string
   }
   interface Mysql {
-    synchronize: boolean
-    logging: boolean
     host: string
     port: number
     username: string
     password: string
     database: string
+    synchronize: boolean
+    logging: boolean
   }
   interface Frontend {
     address: string
@@ -68,7 +67,6 @@ declare module "node-ts-config" {
     allRoomId: number
     showCountryCode: boolean
     firebaseUrl: string
-    ipApiUrl: string
     pingCloseJsDelay: number
     pingInterval: number
     clientNoServerPingCloseTimeout: number
