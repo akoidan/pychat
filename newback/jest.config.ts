@@ -14,6 +14,9 @@ export default async(): Promise<Config.InitialOptions> => {
       "json",
       "ts"
     ],
+    "modulePathIgnorePatterns": [
+      "e2e.spec.ts"
+    ],
     "testRegex": ".*\\.spec\\.ts$",
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
