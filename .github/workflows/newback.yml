@@ -20,6 +20,7 @@ jobs:
           path: |
             newback/node_modules
             newback/yarn-cache
+            newback/codecov
           key: ${{ runner.os }}-${{ hashFiles('newback/yarn.lock') }}
       - name: Install npm dependencies
         run: |
@@ -27,4 +28,11 @@ jobs:
           yarn config set cache-folder `pwd`/yarn-cache
           yarn install --frozen-lockfile
       - name: Run tests
-        run: cd newback && yarn test
+        run: cd newback && yarn jest --runInBand --coverage --detectOpenHandles --coverageReporters json text
+      - name: Coverage
+        run: |
+          cd newback
+          ls ./codecov ||  curl -Os https://uploader.codecov.io/latest/linux/codecov
+          chmod +x ./codecov
+          ./codecov -t 92ec2a69-f993-41ba-b6b7-60da24082d05 -f ./coverage/coverage-final.json 
+
