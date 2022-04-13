@@ -2,13 +2,9 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/sequelize';
 import {UserModel} from '@/data/model/user.model';
 import {UserAuthModel} from '@/data/model/user.auth.model';
-import {
-  Gender,
-  VerificationType
-} from '@/data/types/frontend';
+import {Gender} from '@/data/types/frontend';
 import {UserProfileModel} from '@/data/model/user.profile.model';
 import {UserSettingsModel} from '@/data/model/user.settings.model';
-import {VerificationModel} from '@/data/model/verification.model';
 import {Transaction} from 'sequelize';
 
 
@@ -19,26 +15,11 @@ export class UserRepository {
     @InjectModel(UserAuthModel) private readonly userAuthModel: typeof UserAuthModel,
     @InjectModel(UserProfileModel) private readonly userProfileModel: typeof UserProfileModel,
     @InjectModel(UserSettingsModel) private readonly userSettingsModel: typeof UserSettingsModel,
-    @InjectModel(VerificationModel) private readonly verificationModel: typeof VerificationModel,
   ) {
   }
 
   public async updateUserPassword(userId: number, password: string, transaction: Transaction) {
     await this.userAuthModel.update({password}, {
-      where: {id: userId},
-      transaction
-    })
-  }
-
- public async markVerificationVerified(id: number, transaction: Transaction) {
-    await this.verificationModel.update({verified: true}, {
-      where: {id},
-      transaction
-    })
-  }
-
-  public async setUserVerification(userId: number, emailVerificationId: number, transaction: Transaction) {
-    await this.userAuthModel.update({emailVerificationId}, {
       where: {id: userId},
       transaction
     })
@@ -103,34 +84,6 @@ export class UserRepository {
       raw: true,
       transaction
     }) != null
-  }
-
-  public async getVerification(token: string, transaction?: Transaction): Promise<VerificationModel> {
-    return await this.verificationModel.findOne({
-      where: {token},
-      include: ['user'],
-      transaction
-    });
-  }
-
-  public async createVerification(email: string, userId: number, token: string, type: VerificationType, transaction: Transaction): Promise<void> {
-    let verification = await this.verificationModel.create({
-      type,
-      email,
-      userId,
-      token,
-    }, {
-      raw: true,
-      transaction
-    });
-    await this.userAuthModel.update({
-      emailVerificationId: verification.id,
-    }, {
-      where: {
-        id: userId,
-      },
-      transaction
-    })
   }
 
   public async checkUserExistByEmail(email: string): Promise<boolean> {
