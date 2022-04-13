@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import {readFile} from 'fs';
 import {promisify} from 'util';
-import {WsAdapter} from '@nestjs/platform-ws';
+import {WsAdapter} from '@/modules/rest/ws.adapter/ws.adapter';
 
 async function bootstrap() {
   const key = await promisify(readFile)(config.application.keyPath, 'utf-8');
@@ -26,9 +26,10 @@ async function bootstrap() {
       cert
     }
   });
-  app.useWebSocketAdapter(new WsAdapter(app));
+  let logger = app.get(Logger);
+  app.useLogger(logger)
+  app.useWebSocketAdapter(new WsAdapter((app as any).getUnderlyingHttpServer(), logger));
   app.useGlobalPipes(new ValidationPipe());
-  app.useLogger(app.get(Logger))
   await app.listen(config.application.port);
 }
 
