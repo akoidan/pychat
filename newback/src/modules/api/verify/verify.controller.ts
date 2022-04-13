@@ -28,8 +28,8 @@ export class VerifyController {
   ) {
   }
 
-@UseGuards(CaptchaGuard)
- @Post('/send-restore-password')
+  @UseGuards(CaptchaGuard)
+  @Post('/send-restore-password')
   public async sendRestorePassword(@Body() body: SendRestorePasswordValidator, @Ip() ip: string): Promise<SendRestorePasswordResponse> {
     await this.verifyService.sendRestorePassword(body, ip);
     return {
@@ -37,9 +37,9 @@ export class VerifyController {
     }
   }
 
- @Post('/verify-token')
+  @Post('/verify-token')
   public async verifyToken(@Body() body: VerifyTokenRequestValidator): Promise<VerifyTokenResponse> {
-    return  this.verifyService.verifyToken(body.token);
+    return this.verifyService.verifyToken(body.token);
   }
 
   @Post('/confirm-email')
@@ -50,7 +50,7 @@ export class VerifyController {
     }
   }
 
- @Post('/accept-token')
+  @Post('/accept-token')
   public async acceptToken(@Body() body: AcceptTokenRequestValidator): Promise<AcceptTokenResponse> {
     return this.verifyService.acceptToken(body);
   }

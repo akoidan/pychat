@@ -103,7 +103,7 @@ export class UserRepository {
     })
   }
 
-  public async getUserByUserName(username: string, includeFields: ('userAuth'|'userProfile')[], transaction?: Transaction): Promise<UserModel | null> {
+  public async getUserByUserName(username: string, includeFields: ('userAuth' | 'userProfile')[], transaction?: Transaction): Promise<UserModel | null> {
     return this.userModel.findOne({
       where: {username},
       transaction,

@@ -1,5 +1,3 @@
-
-
 import {IsString,} from 'class-validator';
 import {GoogleAuthRequest} from '@/data/types/frontend';
 

@@ -1,4 +1,4 @@
-export interface SignInRequest extends CaptchaRequest{
+export interface SignInRequest extends CaptchaRequest {
   username?: string;
   password: string;
   email?: string;
@@ -56,7 +56,8 @@ export interface ConfirmEmailRequest {
   token: string;
 }
 
-export interface ConfirmEmailResponse extends OkResponse {}
+export interface ConfirmEmailResponse extends OkResponse {
+}
 
 export interface SessionResponse {
   session: string;
@@ -67,22 +68,24 @@ export interface SignInResponse extends SessionResponse {
 }
 
 
-interface TypeGeneratorForOauth1 extends SessionResponse{
+interface TypeGeneratorForOauth1 extends SessionResponse {
   isNewAccount: true;
   username: string;
 }
 
-interface TypeGeneratorForOauth2 extends SessionResponse{
+interface TypeGeneratorForOauth2 extends SessionResponse {
   isNewAccount: false
 }
 
-export type OauthSessionResponse = TypeGeneratorForOauth1 | TypeGeneratorForOauth2;
+export type OauthSessionResponse =
+  TypeGeneratorForOauth1
+  | TypeGeneratorForOauth2;
 
 
 export type GoogleSignInResponse = OauthSessionResponse;
 export type FacebookSignInResponse = OauthSessionResponse;
 
-export interface SignUpResponse extends SessionResponse{
+export interface SignUpResponse extends SessionResponse {
 
 }
 

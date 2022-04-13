@@ -14,7 +14,7 @@ export class VerificationRepository {
   ) {
   }
 
- public async markVerificationVerified(id: number, transaction: Transaction) {
+  public async markVerificationVerified(id: number, transaction: Transaction) {
     await this.verificationModel.update({verified: true}, {
       where: {id},
       transaction

@@ -4,7 +4,7 @@ describe('helper', () => {
 
   describe('generateUserName', () => {
     it('should remove email domain', () => {
-        expect(generateUserName('deathangel@gmail.com')).toEqual('deathangel')
+      expect(generateUserName('deathangel@gmail.com')).toEqual('deathangel')
     });
 
     it('should cut to 16 symbolx', () => {

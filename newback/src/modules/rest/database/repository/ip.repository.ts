@@ -1,8 +1,5 @@
 import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/sequelize';
-import {RoomModel} from '@/data/model/room.model';
-import {RoomUsersModel} from '@/data/model/room.users.model';
-import {Transaction} from 'sequelize';
 import {IpAddressModel} from '@/data/model/ip.address.model';
 
 

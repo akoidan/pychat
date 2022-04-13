@@ -1,9 +1,7 @@
 import {
   Body,
   Controller,
-  HttpCode,
   Ip,
-  Logger,
   Post,
   UseGuards
 } from '@nestjs/common';
@@ -12,15 +10,11 @@ import {LoginRequestValidator} from '@/modules/api/auth/validators/login.request
 import {SignUpRequestValidator} from '@/modules/api/auth/validators/sign.up.request.validator';
 import {ValidateUserRequestValidator} from '@/modules/api/auth/validators/validate.user.request.validator';
 import {
-  AcceptTokenResponse,
-  ConfirmEmailResponse,
   FacebookSignInResponse,
   GoogleSignInResponse,
-  SendRestorePasswordResponse,
   SignInResponse,
   SignUpResponse,
   ValidateEmailResponse,
-  ValidateUserEmailRequest,
   ValidateUserResponse
 } from '@/data/types/frontend';
 import {GoogleAuthRequestValidator} from '@/modules/api/auth/validators/google.auth.reques.validator';

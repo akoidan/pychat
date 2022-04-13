@@ -28,6 +28,18 @@ export class EmailService {
     await this.sendEmail('change.password.start', userId, email, 'Reset pychat password', context);
   }
 
+  public async sendSignUpEmail(username: string, userId: number, email: string, token, ip: string, ipInfo: string) {
+    let context: Record<string, string> = {
+      issueReportLink: this.configService.getConfig().frontend.issueReportLink,
+      magicLink: `${this.configService.getConfig().frontend.address}/#/confirm-email?token=${token}`,
+      username,
+      ip,
+      timeCreated: (new Date() as any).toGMTString(),
+      ipInfo
+    };
+    await this.sendEmail('sign.up.email', userId, email, 'Confirm Pychat registration', context);
+  }
+
   private async sendEmail(templateName: string, userId, email, subject: string, context: Record<string, string>) {
     if (!this.configService.getConfig().email) {
       this.loggerService.warn(`Email to userId ${userId} ${email} won't be sent since email settings is not set in config`);
@@ -42,18 +54,6 @@ export class EmailService {
       text,
       subject
     })
-  }
-
-  public async sendSignUpEmail(username: string, userId: number, email: string, token, ip: string, ipInfo: string) {
-    let context: Record<string, string> = {
-      issueReportLink: this.configService.getConfig().frontend.issueReportLink,
-      magicLink: `${this.configService.getConfig().frontend.address}/#/confirm-email?token=${token}`,
-      username,
-      ip,
-      timeCreated: (new Date() as any).toGMTString(),
-      ipInfo
-    };
-    await this.sendEmail('sign.up.email', userId, email, 'Confirm Pychat registration', context);
   }
 
 }

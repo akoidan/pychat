@@ -27,5 +27,5 @@ connection.connect(async function (err) {
   });
   await migrations.run('init')
   await migrations.run('migrate')
-  await new Promise((resolve, reject) => connection.end((err) =>err ? reject() : resolve(undefined)));
+  await new Promise((resolve, reject) => connection.end((err) => err ? reject() : resolve(undefined)));
 });

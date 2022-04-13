@@ -34,22 +34,6 @@ export class VerifyService {
   ) {
   }
 
-
-  private doTokenVerification(data: VerificationModel, typ: VerificationType): void {
-    if (!data) {
-      throw new BadRequestException("Invalid token");
-    }
-    if (data.type != typ) {
-      throw new BadRequestException("Invalid operation");
-    }
-    if (data.verified) {
-      throw new BadRequestException("This token is already used");
-    }
-    if (Date.now() - data.createdAt.getTime() > 24 * 3600 * 1000) { // 24 hours
-      throw new BadRequestException("This token is already expired");
-    }
-  }
-
   public async verifyToken(token: string): Promise<VerifyTokenResponse> {
     let verificationModel: VerificationModel = await this.verificationRepository.getVerification(token);
     //https://pychat.org/#/auth/proceed-reset-password?token=evhv0zum3l8gavzql4xk5u16q2h9gqd2
@@ -108,11 +92,26 @@ export class VerifyService {
   }
 
   public async confirmEmail(body: ConfirmEmailRequest): Promise<void> {
-     await this.sequelize.transaction(async(t) => {
+    await this.sequelize.transaction(async(t) => {
       let verificationModel: VerificationModel = await this.verificationRepository.getVerification(body.token, t);
       this.doTokenVerification(verificationModel, VerificationType.REGISTER);
-      await this.verificationRepository.markVerificationVerified(verificationModel.id , t);
-      await this.verificationRepository.setUserVerification(verificationModel.userId, verificationModel.id , t);
+      await this.verificationRepository.markVerificationVerified(verificationModel.id, t);
+      await this.verificationRepository.setUserVerification(verificationModel.userId, verificationModel.id, t);
     })
+  }
+
+  private doTokenVerification(data: VerificationModel, typ: VerificationType): void {
+    if (!data) {
+      throw new BadRequestException("Invalid token");
+    }
+    if (data.type != typ) {
+      throw new BadRequestException("Invalid operation");
+    }
+    if (data.verified) {
+      throw new BadRequestException("This token is already used");
+    }
+    if (Date.now() - data.createdAt.getTime() > 24 * 3600 * 1000) { // 24 hours
+      throw new BadRequestException("This token is already expired");
+    }
   }
 }

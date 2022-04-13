@@ -31,7 +31,7 @@ import {SessionService} from '@/modules/rest/session/session.service';
       useFactory: (logger) => {
         return new GoogleAuthService(logger, config.auth?.google?.clientId ? new OAuth2Client(
           config.auth.google.clientId,
-        ): null)
+        ) : null)
       },
       inject: [Logger, ConfigService]
     },

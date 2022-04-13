@@ -15,7 +15,7 @@ export class SessionService {
   ) {
   }
 
-   public async createAndSaveSession(userId: number) {
+  public async createAndSaveSession(userId: number) {
     let session = await this.passwordService.generateRandomString(32);
     this.logger.log(`Generated session for userId ${userId}: ${session}`)
     await this.redisService.saveSession(session, userId);

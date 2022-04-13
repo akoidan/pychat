@@ -35,7 +35,6 @@ import {IpService} from '@/modules/rest/ip/ip.service';
 import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 import {IpAddressModel} from '@/data/model/ip.address.model';
 import {VerificationRepository} from '@/modules/rest/database/repository/verification.repository';
-import {VerificationType} from '@/data/types/frontend';
 import {SessionService} from '@/modules/rest/session/session.service';
 
 describe('AuthModule', () => {

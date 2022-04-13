@@ -19,7 +19,7 @@ export class IpService {
       throw new InvalidIpException(ip, response.message, false);
     }
     if (response.status !== 'success') {
-        throw new InvalidIpException(ip, 'Unknown', true);
+      throw new InvalidIpException(ip, 'Unknown', true);
     }
     return response;
   }

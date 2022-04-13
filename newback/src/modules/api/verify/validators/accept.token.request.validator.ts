@@ -1,14 +1,9 @@
 import {
-  IsEmail,
   IsString,
   Length,
   Matches,
-  ValidateIf,
 } from 'class-validator';
-import {
-  AcceptTokenRequest,
-  VerifyTokenRequest
-} from '@/data/types/frontend';
+import {AcceptTokenRequest} from '@/data/types/frontend';
 
 
 export class AcceptTokenRequestValidator implements AcceptTokenRequest {

@@ -1,4 +1,7 @@
-import { OAuth2Client, TokenPayload } from 'google-auth-library';
+import {
+  OAuth2Client,
+  TokenPayload
+} from 'google-auth-library';
 import {
   ForbiddenException,
   Injectable,
@@ -11,7 +14,7 @@ export class GoogleAuthService {
 
   public constructor(
     private readonly logger: Logger,
-    private readonly oauth2Client: OAuth2Client|null,
+    private readonly oauth2Client: OAuth2Client | null,
   ) {
 
   }

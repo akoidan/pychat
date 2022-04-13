@@ -11,7 +11,7 @@ import {promisify} from 'util';
 import {WsAdapter} from '@nestjs/platform-ws';
 
 async function bootstrap() {
-  const key  = await promisify(readFile)(config.application.keyPath, 'utf-8');
+  const key = await promisify(readFile)(config.application.keyPath, 'utf-8');
   const cert = await promisify(readFile)(config.application.crtPath, 'utf-8');
 
   const app = await NestFactory.create(AppModule, {
@@ -22,8 +22,8 @@ async function bootstrap() {
       origin: "*"
     },
     httpsOptions: {
-       key,
-       cert
+      key,
+      cert
     }
   });
   app.useWebSocketAdapter(new WsAdapter(app));

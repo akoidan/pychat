@@ -92,7 +92,7 @@ describe('VerifyModule', () => {
           useFactory: (logger) => new HttpService(logger, new Proxy(() => {
           }, {
             apply: function (target: {}, thisArg: any, argArray: any[]): any {
-               throw Error("Unsupported");
+              throw Error("Unsupported");
             }
           }) as typeof fetch)
         },
@@ -187,15 +187,15 @@ describe('VerifyModule', () => {
   });
   describe('verify-token', () => {
     it('should return error when token doesnt exist', async() => {
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
+      verificationRepository.getVerification = jest.fn().mockResolvedValue(undefined);
 
       await request
         .post('/api/verify/verify-token').send({
           token: 'a',
-        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
+        }).expect(400, {statusCode: 400, message: 'Invalid token', error: 'Bad Request'});
     });
     it('should return ok when token valid', async() => {
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
+      verificationRepository.getVerification = jest.fn().mockResolvedValue({
         type: VerificationType.PASSWORD,
         createdAt: new Date(),
         user: {
@@ -206,7 +206,7 @@ describe('VerifyModule', () => {
       await request
         .post('/api/verify/verify-token').send({
           token: 'a',
-        }).expect(201, { ok: true, username: 'a'});
+        }).expect(201, {ok: true, username: 'a'});
     });
     it('throws an error if user doesnt exists', async() => {
       sequelize.transaction = (resolve) => resolve();
@@ -218,21 +218,21 @@ describe('VerifyModule', () => {
     });
   });
 
-   describe('confirm-email', () => {
+  describe('confirm-email', () => {
     it('should return error when token doesnt exist', async() => {
       sequelize.transaction = (resolve) => resolve();
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
+      verificationRepository.getVerification = jest.fn().mockResolvedValue(undefined);
 
       await request
         .post('/api/verify/confirm-email').send({
           token: 'a',
-        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
+        }).expect(400, {statusCode: 400, message: 'Invalid token', error: 'Bad Request'});
     });
     it('should set email confirmed', async() => {
       sequelize.transaction = (resolve) => resolve();
       verificationRepository.markVerificationVerified = jest.fn().mockResolvedValue(undefined)
       verificationRepository.setUserVerification = jest.fn().mockResolvedValue(undefined)
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
+      verificationRepository.getVerification = jest.fn().mockResolvedValue({
         type: VerificationType.REGISTER,
         createdAt: new Date(),
         user: {
@@ -246,16 +246,16 @@ describe('VerifyModule', () => {
         }).expect(201, {ok: true});
     });
   });
-   describe('accept-token', () => {
+  describe('accept-token', () => {
     it('should return error when token doesnt exist', async() => {
       sequelize.transaction = (resolve) => resolve();
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
+      verificationRepository.getVerification = jest.fn().mockResolvedValue(undefined);
 
       await request
         .post('/api/verify/accept-token').send({
           token: 'a',
           password: 'asd',
-        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
+        }).expect(400, {statusCode: 400, message: 'Invalid token', error: 'Bad Request'});
     });
     it('should set email confirmed', async() => {
       sequelize.transaction = (resolve) => resolve();
@@ -263,7 +263,7 @@ describe('VerifyModule', () => {
       verificationRepository.markVerificationVerified = jest.fn().mockResolvedValue(undefined)
       verificationRepository.setUserVerification = jest.fn().mockResolvedValue(undefined)
       redisService.saveSession = jest.fn().mockResolvedValue(undefined);
-      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
+      verificationRepository.getVerification = jest.fn().mockResolvedValue({
         type: VerificationType.PASSWORD,
         createdAt: new Date(),
         user: {

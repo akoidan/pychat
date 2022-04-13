@@ -15,12 +15,12 @@ import {VerifyModule} from '@/modules/api/verify/verify.module';
     ConfigModule,
     VerifyModule,
     RedisModule.forRoot({
-    config: {
-      host: config.redis.host,
-      port: config.redis.port,
-      db: config.redis.database,
-    }
-  })],
+      config: {
+        host: config.redis.host,
+        port: config.redis.port,
+        db: config.redis.database,
+      }
+    })],
   providers: [
     {
       provide: APP_INTERCEPTOR,

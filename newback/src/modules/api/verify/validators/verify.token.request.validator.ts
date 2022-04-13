@@ -1,9 +1,4 @@
-import {
-  IsEmail,
-  IsString,
-  Matches,
-  ValidateIf,
-} from 'class-validator';
+import {IsString,} from 'class-validator';
 import {VerifyTokenRequest} from '@/data/types/frontend';
 
 

@@ -66,8 +66,8 @@ export class RoomModel extends Model<RoomModel> {
     allowNull: true,
     defaultValue: null,
   })
-  public creatorId: number|null;
+  public creatorId: number | null;
 
   @BelongsTo(() => UserModel)
-  public creator: UserModel|null;
+  public creator: UserModel | null;
 }

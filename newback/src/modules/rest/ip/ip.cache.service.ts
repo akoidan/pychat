@@ -2,7 +2,6 @@ import {
   Injectable,
   Logger
 } from '@nestjs/common';
-import {IP_FAIL} from '@/data/types/api';
 import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 import {IpService} from '@/modules/rest/ip/ip.service';
 import {IpAddressModel} from '@/data/model/ip.address.model';
@@ -48,7 +47,7 @@ export class IpCacheService {
       await this.ipRepository.saveIP(model)
       return model;
     } catch (e: any) {
-       this.logger.error(`Unable to get Ip Address Info ${ip}`, e.stack, e.error)
+      this.logger.error(`Unable to get Ip Address Info ${ip}`, e.stack, e.error)
       if (!(e as InvalidIpException).networkError) {
         await this.ipRepository.saveIP({ip, status: false})
         return null;

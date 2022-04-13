@@ -5,9 +5,9 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { Server } from 'ws';
+import {Server} from 'ws';
 
-@WebSocketGateway({ path: '/ws' })
+@WebSocketGateway({path: '/ws'})
 export class EventsGateway implements OnGatewayConnection {
   @WebSocketServer()
   server!: Server;
@@ -20,7 +20,7 @@ export class EventsGateway implements OnGatewayConnection {
   handleEvent(@MessageBody() data: string): any {
     const event = 'events';
     this.server.clients.forEach((client) => {
-      client.send(JSON.stringify({ event, data }));
+      client.send(JSON.stringify({event, data}));
     });
   }
 }

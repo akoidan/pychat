@@ -1,6 +1,5 @@
 import {
   Global,
-  Logger,
   Module
 } from '@nestjs/common';
 import {IpService} from '@/modules/rest/ip/ip.service';

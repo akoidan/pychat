@@ -8,9 +8,10 @@ export interface IpFailedInfoResponse {
   message: string;
   status: 'fail';
 }
+
 export const IP_FAIL = 'fail';
 
-export interface IpSuccessInfoResponse  {
+export interface IpSuccessInfoResponse {
   status: 'success';
   country: string;
   countryCode: string;
@@ -26,4 +27,7 @@ export interface IpSuccessInfoResponse  {
   as: string;
   query: string;
 }
-export type IpInfoResponse = IpFailedInfoResponse | IpSuccessInfoResponse;
+
+export type IpInfoResponse =
+  IpFailedInfoResponse
+  | IpSuccessInfoResponse;
