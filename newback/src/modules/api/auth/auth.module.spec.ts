@@ -647,4 +647,67 @@ describe('AuthModule', () => {
         }).expect(400, {statusCode: 400, message: 'User with this username doesnt exit', error: 'Bad Request'});
     });
   });
+
+   describe('confirm-email', () => {
+    it('should return error when token doesnt exist', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
+
+      await request
+        .post('/api/auth/confirm-email').send({
+          token: 'a',
+        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
+    });
+    it('should set email confirmed', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      verificationRepository.markVerificationVerified = jest.fn().mockResolvedValue(undefined)
+      verificationRepository.setUserVerification = jest.fn().mockResolvedValue(undefined)
+      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
+        type: VerificationType.REGISTER,
+        createdAt: new Date(),
+        user: {
+          username: 'a'
+        }
+      });
+
+      await request
+        .post('/api/auth/confirm-email').send({
+          token: 'a',
+        }).expect(201, {ok: true});
+    });
+  });
+   describe('accept-token', () => {
+    it('should return error when token doesnt exist', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      verificationRepository.getVerification =  jest.fn().mockResolvedValue(undefined);
+
+      await request
+        .post('/api/auth/accept-token').send({
+          token: 'a',
+          password: 'asd',
+        }).expect(400, { statusCode: 400, message: 'Invalid token', error: 'Bad Request' });
+    });
+    it('should set email confirmed', async() => {
+      sequelize.transaction = (resolve) => resolve();
+      userRepository.updateUserPassword = jest.fn().mockResolvedValue(undefined);
+      verificationRepository.markVerificationVerified = jest.fn().mockResolvedValue(undefined)
+      verificationRepository.setUserVerification = jest.fn().mockResolvedValue(undefined)
+      redisService.saveSession = jest.fn().mockResolvedValue(undefined);
+      verificationRepository.getVerification =  jest.fn().mockResolvedValue({
+        type: VerificationType.PASSWORD,
+        createdAt: new Date(),
+        user: {
+          username: 'a',
+          password: 'asd',
+        }
+      });
+
+      const {body} = await request
+        .post('/api/auth/accept-token').send({
+          token: 'a',
+          password: 'asd',
+        }).expect(201);
+      expect(body).toMatchObject({session: expect.any(String)});
+    });
+  });
 });

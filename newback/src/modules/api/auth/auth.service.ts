@@ -293,7 +293,7 @@ export class AuthService {
   }
 
   public async confirmEmail(body: ConfirmEmailRequest): Promise<void> {
-     this.sequelize.transaction(async(t) => {
+     await this.sequelize.transaction(async(t) => {
       let verificationModel: VerificationModel = await this.verificationRepository.getVerification(body.token, t);
       this.doTokenVerification(verificationModel, VerificationType.REGISTER);
       await this.verificationRepository.markVerificationVerified(verificationModel.id , t);
