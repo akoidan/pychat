@@ -6,7 +6,7 @@ import {AuthController} from '@/modules/api/auth/auth.controller';
 import {AuthService} from '@/modules/api/auth/auth.service';
 import {DatabaseModule} from '@/data/database/database.module';
 import {RedisService} from '@/data/redis/RedisService';
-import {EmailModule} from '@/modules/email.render/email.module';
+import {EmailModule} from '@/modules/email/email.module';
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
 import {PasswordService} from '@/modules/api/auth/password.service';
 import {OAuth2Client} from 'google-auth-library';

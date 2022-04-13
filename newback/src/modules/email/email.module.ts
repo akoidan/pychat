@@ -1,7 +1,7 @@
 import {Module} from '@nestjs/common';
 import {MailerModule} from '@nestjs-modules/mailer';
 import {config} from 'node-ts-config';
-import {EmailSenderService} from '@/modules/email.render/email.sender.service';
+import {EmailService} from '@/modules/email/email.service';
 import {HtmlService} from '@/modules/html/html.service';
 
 
@@ -12,11 +12,11 @@ import {HtmlService} from '@/modules/html/html.service';
     })
   ],
   providers: [
-    EmailSenderService,
+    EmailService,
     HtmlService
   ],
   exports: [
-    EmailSenderService
+    EmailService
   ]
 })
 export class EmailModule {

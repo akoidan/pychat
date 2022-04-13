@@ -7,7 +7,7 @@ import {MailerService} from '@nestjs-modules/mailer';
 import {ConfigService} from '@/modules/config/config.service';
 
 @Injectable()
-export class EmailSenderService {
+export class EmailService {
   public constructor(
     private readonly htmlService: HtmlService,
     private readonly loggerService: Logger,

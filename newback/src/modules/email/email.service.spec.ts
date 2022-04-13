@@ -1,5 +1,5 @@
 import {HtmlService} from '@/modules/html/html.service';
-import {EmailSenderService} from '@/modules/email.render/email.sender.service';
+import {EmailService} from '@/modules/email/email.service';
 import {
   Test,
   TestingModule
@@ -13,7 +13,7 @@ import {resolve} from 'path';
 
 describe('EmailSenderService', () => {
 
-  let sender: EmailSenderService;
+  let sender: EmailService;
   let moduleFixture: TestingModule;
   let mailer: MailerService;
   beforeAll(
@@ -27,13 +27,13 @@ describe('EmailSenderService', () => {
       providers: [
         {
           provide: MailerService,
-          useValue: { sendMail: (a) => console.log(a)}
+          useValue: { sendMail: () => jest.fn().mockResolvedValue(undefined)}
         },
         HtmlService,
-        EmailSenderService,
+        EmailService,
       ]
     }).compile();
-    sender = moduleFixture.get(EmailSenderService);
+    sender = moduleFixture.get(EmailService);
     mailer = moduleFixture.get(MailerService);
   })
   afterAll(async () => {

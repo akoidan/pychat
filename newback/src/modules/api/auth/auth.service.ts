@@ -29,7 +29,7 @@ import {
   MAX_USERNAME_LENGTH
 } from '@/data/utils/consts';
 import {RedisService} from '@/data/redis/RedisService';
-import {EmailSenderService} from '@/modules/email.render/email.sender.service';
+import {EmailService} from '@/modules/email/email.service';
 import {Transaction} from 'sequelize';
 import {Sequelize} from 'sequelize-typescript';
 import {GoogleAuthService} from '@/modules/api/auth/google.auth.service';
@@ -47,7 +47,7 @@ export class AuthService {
     private readonly roomRepository: RoomRepository,
     private readonly passwordService: PasswordService,
     private readonly redisService: RedisService,
-    private readonly emailService: EmailSenderService,
+    private readonly emailService: EmailService,
     private readonly googleAuthService: GoogleAuthService,
     private readonly facebookService: FacebookAuthService,
     private readonly sequelize: Sequelize,

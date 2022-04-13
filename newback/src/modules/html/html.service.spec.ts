@@ -26,25 +26,4 @@ describe('HtmlService', () => {
       expect(() => service.replaceTemplate('aa {{ adas }}', {blah: 4})).toThrow(Error("Unable to render template. 'adas' is missing in {\"blah\":4}"))
     });
   });
-  describe('renderTemplate', () => {
-    it('should replace single param', async() => {
-      let service = new HtmlService();
-      let result = await service.renderTemplate('token_email', {
-        signUpEmail: 'include',
-        timeCreated: 'now',
-        ip: 'localhost',
-        ipInfo: 'Chernihiv'
-      })
-      expect(result).toEqual(`include
-<p>
-  <b>Note</b>: Your magic link will expire in 1 day, and can only be used one time. <br>
-</p>
-<p>
-  Link was generated now <br/>
-  IP: localhost<br/>
-  Chernihiv
-</p>
-`);
-    });
-  });
 });

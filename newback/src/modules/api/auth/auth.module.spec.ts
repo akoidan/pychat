@@ -12,7 +12,7 @@ import {PasswordService} from '@/modules/api/auth/password.service';
 import {UserRepository} from '@/data/database/repository/user.repository';
 import {RoomRepository} from '@/data/database/repository/room.repository';
 import {RedisService} from '@/data/redis/RedisService';
-import {EmailSenderService} from '@/modules/email.render/email.sender.service';
+import {EmailService} from '@/modules/email/email.service';
 import {MailerService} from '@nestjs-modules/mailer';
 import {Sequelize} from 'sequelize-typescript';
 import {HtmlService} from '@/modules/html/html.service';
@@ -81,7 +81,7 @@ describe('AuthModule', () => {
         PasswordService,
         AuthService,
         HtmlService,
-        EmailSenderService,
+        EmailService,
         FacebookAuthService,
         {
           provide: MailerService,

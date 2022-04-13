@@ -9,9 +9,8 @@
     "migrate": "ts-node  -r tsconfig-paths/register ./src/migration.runner.ts ",
     "build": "nest build",
     "start": "nest start",
-    "test": "jest --coverage --runInBand --detectOpenHandles --testTimeout=10000 --passWithNoTests",
-    "start:dev": "node --inspect=0.0.0.0 dist/src/main",
-    "start:debug": "nest start --debug --watch"
+    "test:debug": "jest --runInBand --coverage --detectOpenHandles --testTimeout=100000",
+    "test": "jest --runInBand --coverage --coverageReporters text"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",
