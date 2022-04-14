@@ -6,26 +6,32 @@ import {
 } from '@nestjs/testing';
 import {LoggerModule} from '@/modules/rest/logger/logger.module';
 import {MailerService} from '@nestjs-modules/mailer';
-import {ConfigModule} from '@/modules/rest/config/config.module';
+
 import {promisify} from 'util';
 import {readFile} from 'fs';
 import {resolve} from 'path';
 import {ConsoleLogger} from '@nestjs/common';
+import {ConfigService} from '@/modules/rest/config/config.service';
+import {config} from 'node-ts-config';
 
 describe('EmailSenderService', () => {
 
   let sender: EmailService;
   let moduleFixture: TestingModule;
   let mailer: MailerService;
+  let configService: ConfigService = {} as ConfigService;
   beforeAll(
     async() => {
 
       moduleFixture = await Test.createTestingModule({
         imports: [
           LoggerModule,
-          ConfigModule
         ],
         providers: [
+           {
+          provide: ConfigService,
+          useValue: configService,
+        },
           {
             provide: MailerService,
             useValue: {sendMail: () => jest.fn().mockResolvedValue(undefined)}
@@ -43,6 +49,7 @@ describe('EmailSenderService', () => {
   })
 
   beforeAll(() => {
+    configService.getConfig = jest.fn().mockReturnValue(config)
     jest.clearAllMocks();
   })
 
@@ -53,7 +60,8 @@ describe('EmailSenderService', () => {
       // jest.setup.js fixes it
       expect(new Date().getTimezoneOffset()).toBe(0);
     });
-    it('should render', async() => {
+    it('should render an email', async() => {
+       configService.getConfig = jest.fn().mockReturnValue({...config, email: {}})
       let spy = jest.spyOn(mailer, 'sendMail');
       jest.useFakeTimers('modern');
       jest.setSystemTime(new Date(2020, 3, 1));

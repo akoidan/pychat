@@ -130,6 +130,7 @@ describe('VerifyModule', () => {
 
   describe('send-restore-password', () => {
     it('sends password when by username', async() => {
+      configService.getConfig = jest.fn().mockReturnValue({...config, email: {}})
       sequelize.transaction = (resolve) => resolve();
       userRepository.getUserByUserName = jest.fn().mockResolvedValue({
         userAuth: {
@@ -154,6 +155,7 @@ describe('VerifyModule', () => {
       expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: expect.stringContaining('You have requested to change password on')}))
     });
     it('sends password when by email', async() => {
+      configService.getConfig = jest.fn().mockReturnValue({...config, email: {}})
       sequelize.transaction = (resolve) => resolve();
       userRepository.getUserByEmail = jest.fn().mockResolvedValue({
         email: 'asd',

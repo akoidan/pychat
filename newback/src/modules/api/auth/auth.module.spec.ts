@@ -411,6 +411,7 @@ describe('AuthModule', () => {
       expect(body).toMatchObject({session: expect.any(String)});
     });
     it('sends an email', async() => {
+      configService.getConfig = jest.fn().mockReturnValue({...config, email: {}})
       sequelize.transaction = (resolve) => resolve();
       verificationRepository.createVerification = jest.fn().mockResolvedValue(undefined);
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
