@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Logger,
   WebSocketAdapter
 } from '@nestjs/common';
@@ -17,6 +18,7 @@ import {
   WebSocket,
   WebSocketServer
 } from "ws";
+import {processErrors} from '@/utils/decorators';
 
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
@@ -31,11 +33,11 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
   }
 
   public bindClientConnect(server: BaseWsInstance, callback: Function) {
-    server.on(CONNECTION_EVENT, async (...args) => {
-     let ws: WebSocket =  args.find(a => a instanceof WebSocket)
-     if ((ws as any).context) {
-       throw Error("WTF");
-     }
+    server.on(CONNECTION_EVENT, async(...args) => {
+      let ws: WebSocket = args.find(a => a instanceof WebSocket)
+      if ((ws as any).context) {
+        throw Error("WTF");
+      }
       (ws as any).context = {};
       await callback(...args, (ws as any).context)
     });
@@ -80,15 +82,23 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
     handlers: MessageMappingProperties[],
   ) {
     client.on(MESSAGE_METADATA, (data) => {
-      if (client.readyState !== client.OPEN) {
-        throw Error('asd')
-      }
-      const parsed = JSON.parse(data as any);
-      if (!parsed.action) {
-        throw Error("invalid message")
+      try {
+        if (client.readyState !== client.OPEN) {
+          throw new BadRequestException('Cannot process new messages, while opening a connection')
+        }
+        const parsed = JSON.parse(data as any);
+        if (!parsed.action) {
+          throw new BadRequestException('Invalid message structure, "action" property is not defined')
+        }
+        let handler = handlers.find(handler => handler.message === parsed.action)
+        if (!handler) {
+          throw new BadRequestException(`Unknown handler ${parsed.action}`);
+        }
+        handler.callback(parsed);
+      } catch (e) {
+        processErrors(e, client, this.logger);
       }
 
-      handlers.find(handler => handler.message === parsed.action).callback(parsed);
     });
 
   }

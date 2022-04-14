@@ -13,6 +13,7 @@ import {SessionService} from '@/modules/rest/session/session.service';
 import {PasswordService} from '@/modules/rest/password/password.service';
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 import {DatabaseModule} from '@/modules/rest/database/database.module';
+import {PubsubService} from '@/modules/rest/pubsub/pubsub.service';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import {DatabaseModule} from '@/modules/rest/database/database.module';
       imports: [DatabaseModule],
       providers: [
         RedisService,
+        PubsubService,
         SessionService,
         PasswordService,
       ]

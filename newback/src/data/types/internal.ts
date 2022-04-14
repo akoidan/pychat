@@ -1,5 +1,9 @@
+import {WebSocket} from 'ws';
+
 export interface WebSocketContextData {
   userId: number;
+  id: number;
+  socket: WebSocket;
 }
 export type UserOnlineData = Record<string, string[]>
 

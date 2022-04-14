@@ -1,15 +1,20 @@
 import {
+  ConnectedSocket,
   MessageBody,
   OnGatewayConnection,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
 import {IncomingMessage} from 'http';
 import {
   CatchWsErrors,
   UserId
 } from '@/utils/decorators';
-import {WebSocket} from 'ws';
+import {
+  Server,
+  WebSocket
+} from 'ws';
 import {WebSocketContextData} from '@/data/types/internal';
 import {RedisService} from '@/modules/rest/redis/redis.service';
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
@@ -19,6 +24,15 @@ import {PasswordService} from '@/modules/rest/password/password.service';
 import {IpCacheService} from '@/modules/rest/ip/ip.cache.service';
 import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
 import {transformSetWsId} from '@/modules/api/websocket/ws.transformer';
+import {Logger} from '@nestjs/common';
+import {
+  AddOnlineUserMessage,
+  SyncHistoryOutMessage
+} from '@/data/types/frontend';
+import {
+  PubsubService,
+  Subscribe
+} from '@/modules/rest/pubsub/pubsub.service';
 
 
 @WebSocketGateway({
@@ -26,19 +40,25 @@ import {transformSetWsId} from '@/modules/api/websocket/ws.transformer';
 })
 export class WebsocketGateway implements OnGatewayConnection {
 
+  @WebSocketServer()
+  public readonly server!: Server;
+
   constructor(
+    public readonly logger: Logger,
     private readonly sessionService: SessionService,
     private readonly passwordService: PasswordService,
     private readonly ipCacheService: IpCacheService,
     private readonly redisService: RedisService,
     private readonly roomRepository: RoomRepository,
     private readonly userRepository: UserRepository,
+    private readonly pubsubService: PubsubService,
   ) {
   }
 
 
   @CatchWsErrors
   async handleConnection(socket: WebSocket, message: IncomingMessage, context: WebSocketContextData) {
+    context.socket = socket;
     let url = new URLSearchParams(message.url);
     let user: UserModel = await this.sessionService.getUserById(url.get('sessionId'));
     let id = await this.passwordService.createWsId(user.id, url.get('id'));
@@ -65,32 +85,47 @@ export class WebsocketGateway implements OnGatewayConnection {
         time: Date.now()
       }
     )
+    context.userId = user.id;
+    context.id = user.id;
+
+    let channelsToListen = [...myRooms.map(r => String(r.id)), id, `u${user.id}`, '*'];
+    this.logger.log(`User #${user.id} ${user.username} subscribed to ${JSON.stringify(channelsToListen)}`);
     socket.send(JSON.stringify(response));
-
+    this.pubsubService.subscribe(context, ...channelsToListen)
+    this.pubsubService.emit(
+      'addOnlineUser',
+      {
+        online: response.online,
+        userId: user.id,
+        lastTimeOnline: user.lastTimeOnline,
+        time: Date.now(),
+        opponentWsId: '0002:lMKO'
+      },
+      '*'
+    )
   }
 
-  @SubscribeMessage('hello') //ws.ws.send(JSON.stringify({action: 'hello'}))
-  handleEvent(@MessageBody()
-                data: string, @UserId()
-                user
-  ):
-    any {
+  @Subscribe('addOnlineUser')
+  public onLogin(ctx: WebSocketContextData, data: any) {
+    let message: AddOnlineUserMessage = {
+      action: 'addOnlineUser',
+      handler: 'room',
+      online: data.online,
+      lastTimeOnline: data.lastTimeOnline,
+      userId: data.userId,
+      time: data.time,
+      opponentWsId: data.opponentWsId,
+    }
+    ctx.socket.send(JSON.stringify(message))
+  }
+
+  @SubscribeMessage('syncHistory') //ws.ws.send(JSON.stringify({action: 'hello'}))
+  syncHistory(@MessageBody() data: SyncHistoryOutMessage, @ConnectedSocket() a, @UserId() user): any {
     console.log(user);
-    // const event = 'events';
-    // this.server.clients.forEach((client) => {
-    //   client.send(JSON.stringify({event, data}));
-    // });
-    return "asda";
   }
 
-  @SubscribeMessage('hey') //ws.ws.send(JSON.stringify({action: 'hello'}))
-  handleHey(@MessageBody()
-              data: string
-  ) {
-    console.log('asd2');
-    // const event = 'events';
-    // this.server.clients.forEach((client) => {
-    //   client.send(JSON.stringify({event, data}));
-    // });
+  @SubscribeMessage('getCountryCode') //ws.ws.send(JSON.stringify({action: 'hello'}))
+  getCountryCode(@MessageBody() data: SyncHistoryOutMessage, @ConnectedSocket() a, @UserId() user): any {
+    console.log(user);
   }
 }

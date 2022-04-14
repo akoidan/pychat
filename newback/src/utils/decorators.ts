@@ -1,6 +1,7 @@
 import {
   createParamDecorator,
   ExecutionContext,
+  Logger,
   UnauthorizedException
 } from '@nestjs/common';
 import {WebSocket} from "ws";
@@ -22,12 +23,26 @@ export const WebsocketContext = createParamDecorator(
 export const UserId = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     let handler =  ctx.getArgs().find(a => a instanceof WebSocket)
-    return (handler.context as WebSocketContextData);
+    return (handler.context as WebSocketContextData).userId;
   },
 );
 
 
-export function CatchWsErrors(target: OnGatewayConnection, memberName: 'handleConnection', propertyDescriptor: PropertyDescriptor) {
+export function processErrors(e, socket, logger: Logger) {
+  logger.error(`Ws error ${e.message}`, e.stack,  'ws')
+  if (e instanceof UnauthorizedException) {
+    socket.close(WS_SESSION_EXPIRED_CODE, e.message || 'Invalid session')
+  } else if (e?.status >= 400 && e?.status < 500) {  // Invalid frame payload data
+    socket.close(1007, `Error during creating a connection ${e.message}`);
+  } else { // Internal Error
+    socket.close(1011, `Error during opening a socket ${e.message}`);
+  }
+}
+interface TargetCatchErrors extends OnGatewayConnection{
+  logger: Logger;
+}
+
+export function CatchWsErrors(target: TargetCatchErrors, memberName: 'handleConnection', propertyDescriptor: PropertyDescriptor) {
   return {
     get() {
       const wrapperFn = async function (socket, ...args) {
@@ -35,13 +50,7 @@ export function CatchWsErrors(target: OnGatewayConnection, memberName: 'handleCo
           let result = await propertyDescriptor.value.apply(this, [socket, ...args]);
           return result;
         } catch (e) { // need to catch , otherwise node process crashes
-          if (e instanceof UnauthorizedException) {
-            socket.close(WS_SESSION_EXPIRED_CODE, e.message || 'Invalid session')
-          } else if (e?.status >= 400 && e?.status < 500) {  // Invalid frame payload data
-            socket.close(1007, `Error during creating a connection ${e.message}`);
-          } else { // Internal Error
-            socket.close(1011, `Error during opening a socket ${e.message}`);
-          }
+          processErrors(e, socket, this.logger);
         }
       }
 

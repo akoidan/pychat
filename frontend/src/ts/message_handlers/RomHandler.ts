@@ -135,10 +135,10 @@ export class RoomHandler extends MessageHandler {
   }
 
   public removeOnlineUser(message: RemoveOnlineUserMessage) {
-    if (message.content[message.userId].length === 0) {
+    if (message.online[message.userId].length === 0) {
       this.addChangeOnlineEntry(message.userId, message.time, "gone offline");
     }
-    this.store.setOnline(message.content);
+    this.store.setOnline(message.online);
   }
 
   public addChannel(message: AddChannelMessage) {
@@ -190,11 +190,11 @@ export class RoomHandler extends MessageHandler {
   }
 
   public addOnlineUser(message: AddOnlineUserMessage) {
-    if (message.content[message.userId].length === 1) {
+    if (message.online[message.userId].length === 1) {
       // Exactly 1 device is now offline, so that new that appeared is the first one
       this.addChangeOnlineEntry(message.userId, message.time, "appeared online");
     }
-    this.store.setOnline({...message.content}); // Prevent modifying original object
+    this.store.setOnline({...message.online}); // Prevent modifying original object
     const payload: ChangeUserOnlineInfoMessage = {
       handler: "webrtc",
       allowZeroSubscribers: true,

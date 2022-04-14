@@ -61,7 +61,7 @@ export default class DatabaseWrapper implements IStorage {
     if (!window.openDatabase) {
       throw Error("DatabaseWrapper not supported");
     }
-    this.db = window.openDatabase("v159", "", "Messages database", 10 * 1024 * 1024);
+    this.db = window.openDatabase("v163", "", "Messages database", 10 * 1024 * 1024);
     this.logger = loggerFactory.getLoggerColor("db", "#753e01");
   }
 
@@ -77,8 +77,8 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, "CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), edited integer, room_id integer REFERENCES room(id), user_id integer REFERENCES user(id), status text, parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, thread_messages_count INTEGER)");
       t = await this.runSql(t, "CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, server_id integer UNIQUE, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)");
       t = await this.runSql(t, "CREATE TABLE tag (id integer primary key, user_id INTEGER REFERENCES user(id), message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, symbol text)");
-      t = await this.runSql(t, "CREATE TABLE settings (user_id integer primary key, embedded_youtube boolean NOT NULL CHECK (embedded_youtube IN (0,1)), highlight_code boolean NOT NULL CHECK (highlight_code IN (0,1)), incoming_file_call_sound boolean NOT NULL CHECK (incoming_file_call_sound IN (0,1)), message_sound boolean NOT NULL CHECK (message_sound IN (0,1)), online_change_sound boolean NOT NULL CHECK (online_change_sound IN (0,1)), send_logs boolean NOT NULL CHECK (send_logs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text, show_when_i_typing boolean NOT NULL CHECK (show_when_i_typing IN (0,1)))");
-      t = await this.runSql(t, "CREATE TABLE profile (user_id integer primary key, username text, name text, city text, surname text, email text, birthday text, contacts text, thumbnail text, sex integer NOT NULL CHECK (sex IN (0,1,2)))");
+      t = await this.runSql(t, "CREATE TABLE settings (user_id integer primary key, embedded_youtube boolean NOT NULL CHECK (embedded_youtube IN (0,1)), highlight_code boolean NOT NULL CHECK (highlight_code IN (0,1)), incoming_file_call_sound boolean NOT NULL CHECK (incoming_file_call_sound IN (0,1)), message_sound boolean NOT NULL CHECK (message_sound IN (0,1)), online_change_sound boolean NOT NULL CHECK (online_change_sound IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text, show_when_i_typing boolean NOT NULL CHECK (show_when_i_typing IN (0,1)))");
+      t = await this.runSql(t, "CREATE TABLE profile (user_id integer primary key, username text, name text, city text, surname text, email text, birthday text, contacts text, thumbnail text, sex text NOT NULL CHECK (sex IN ('MALE','FEMALE','OTHER')))");
       t = await this.runSql(t, "CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))");
       this.logger.log("DatabaseWrapper has been initialized")();
       return null;
@@ -277,7 +277,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public setUserSettings(settings: CurrentUserSettingsModel) {
     this.write((t) => {
-      this.executeSql(t, "insert or replace into settings (user_id, embedded_youtube, highlight_code, incoming_file_call_sound, message_sound, online_change_sound, suggestions, theme, logs, show_when_i_typing) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs, settings.showWhenITyping ? 1 : 0])();
+      this.executeSql(t, "insert or replace into settings (user_id, embedded_youtube, highlight_code, incoming_file_call_sound, message_sound, online_change_sound, suggestions, theme, logs, show_when_i_typing) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs, settings.showWhenITyping ? 1 : 0])();
     });
   }
 

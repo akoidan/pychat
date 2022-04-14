@@ -148,6 +148,24 @@ export enum UploadedFileChoices {
   ISSUE = 'ISSUE'
 }
 
+/** CODE THAT I PUT HERE MANUALLY */
+
+export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A> {
+  cbId?: number;
+}
+
+export interface DefaultMessage<A extends string> {
+  action: A;
+}
+
+
+export interface SyncHistoryOutMessage extends DefaultWsOutMessage<"syncHistory"> {
+  roomIds: number[];
+  messagesIds: number[];
+  onServerMessageIds: number[];
+  receivedMessageIds: number[];
+  lastSynced: number;
+}
 
 
 
@@ -155,7 +173,7 @@ export enum UploadedFileChoices {
 
 
 export interface ChangeUserOnlineBase {
-  content: Record<number, string[]>;
+  online: Record<number, string[]>;
   userId: number;
   lastTimeOnline: number;
   time: number;
@@ -242,9 +260,7 @@ export interface CallBackMessage {
   cbId?: number;
 }
 
-export interface DefaultMessage<A extends string> {
-  action: A;
-}
+
 
 export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {
   handler: H;
@@ -507,17 +523,7 @@ export interface DestroyFileConnectionMessage extends DefaultWsInMessage<"destro
 
 // import type {DefaultMessage} from "@/ts/types/backend";
 
-export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A> {
-  cbId?: number;
-}
 
-export interface SyncHistoryOutMessage extends DefaultWsOutMessage<"syncHistory"> {
-  roomIds: number[];
-  messagesIds: number[];
-  onServerMessageIds: number[];
-  receivedMessageIds: number[];
-  lastSynced: number;
-}
 
 
 
