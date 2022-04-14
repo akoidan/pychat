@@ -6,7 +6,7 @@
         v-for="currentUser in valueUsers"
         :key="currentUser.id"
         class="spann"
-      >{{ currentUser.user }}
+      >{{ currentUser.username }}
         <i
           class="icon-cancel"
           @click="removeUser(currentUser.id)"
@@ -77,7 +77,7 @@ export default class PickUser extends Vue {
     this.$logger.debug("Reeval filter CreatePrivateRoom")();
     const s = this.search.toLowerCase();
 
-    return this.displayedUsers.filter((u) => u.user.toLowerCase().includes(s));
+    return this.displayedUsers.filter((u) => u.username.toLowerCase().includes(s));
   }
 
   public removeUser(id: number) {

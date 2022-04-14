@@ -42,7 +42,7 @@
             />
           </td>
           <td v-else-if="oldAdmin">
-            {{ oldAdmin.user }}
+            {{ oldAdmin.username }}
           </td>
           <td v-else>
             This room doesn't have an admin
@@ -195,11 +195,11 @@ export default class RoomSettings extends Vue {
       return null;
     }
     const uId = this.privateRoomsUsersIds.roomUsers[this.room.id];
-    return this.allUsersDict[uId].user;
+    return this.allUsersDict[uId].username;
   }
 
   public get isAdmin(): boolean {
-    return this.room.creator === this.myId;
+    return this.room.creatorId === this.myId;
   }
 
   public get showInviteUsers() {
@@ -207,7 +207,7 @@ export default class RoomSettings extends Vue {
   }
 
   public get canChangeAdmin() {
-    return this.isPublic && (!this.room.creator || this.myId === this.room.creator);
+    return this.isPublic && (!this.room.creatorId || this.myId === this.room.creatorId);
   }
 
   public get userIds(): number[] {
@@ -215,8 +215,8 @@ export default class RoomSettings extends Vue {
   }
 
   public get oldAdmin(): UserModel | null {
-    if (this.room.creator) {
-      return this.allUsersDict[this.room.creator];
+    if (this.room.creatorId) {
+      return this.allUsersDict[this.room.creatorId];
     }
     return null;
   }
@@ -229,7 +229,7 @@ export default class RoomSettings extends Vue {
     if (this.admin.length > 0) {
       return this.admin[0];
     }
-    return this.room.creator;
+    return this.room.creatorId;
   }
 
   public created() {
@@ -261,12 +261,12 @@ export default class RoomSettings extends Vue {
   public async apply() {
     this.$logger.log("Applying room {} settings", this.roomId)();
     await this.$ws.sendRoomSettings({
-      roomCreatorId: this.singleAdmin,
+      creatorId: this.singleAdmin,
       volume: this.sound,
       notifications: this.notifications,
       name: this.roomName,
       isMainInChannel: this.room.isMainInChannel,
-      roomId: this.roomId,
+      id: this.roomId,
       p2p: this.p2p,
       channelId: this.channelId,
     });
@@ -283,8 +283,8 @@ export default class RoomSettings extends Vue {
       this.notifications = this.room.notifications;
       this.p2p = this.room.p2p;
       this.channelId = this.room.channelId;
-      if (this.room.creator) {
-        this.admin = [this.room.creator];
+      if (this.room.creatorId) {
+        this.admin = [this.room.creatorId];
       } else {
         this.admin = [];
       }

@@ -56,7 +56,7 @@
               />
             </td>
             <td v-else-if="currentAdmin">
-              {{ currentAdmin.user }}
+              {{ currentAdmin.username }}
             </td>
             <!-- TODO remove fallback in future-->
             <td v-else>
@@ -165,7 +165,7 @@ export default class ChannelSettings extends Vue {
     if (this.admin.length > 0) {
       return this.admin[0];
     }
-    return this.channel.creator;
+    return this.channel.creatorId;
   }
 
   public get noRooms(): boolean {
@@ -173,7 +173,7 @@ export default class ChannelSettings extends Vue {
   }
 
   public get isAdmin(): boolean {
-    return this.channel.creator === this.userInfo.userId;
+    return this.channel.creatorId === this.userInfo.id;
   }
 
   public get userIds(): number[] {
@@ -181,7 +181,7 @@ export default class ChannelSettings extends Vue {
   }
 
   public get currentAdmin(): UserModel {
-    return this.allUsersDict[this.channel.creator];
+    return this.allUsersDict[this.channel.creatorId];
   }
 
   public get channelId(): number {
@@ -230,7 +230,7 @@ export default class ChannelSettings extends Vue {
   created() {
     this.$logger.log("Updated for channel settings {} ", this.channel)();
     this.channelName = this.channel.name;
-    this.admin = [this.channel.creator];
+    this.admin = [this.channel.creatorId];
     this.sound = this.channel.mainRoom.volume;
     this.notifications = this.channel.mainRoom.notifications;
   }

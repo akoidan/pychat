@@ -10,6 +10,7 @@ import {
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/model/user.model';
 import {RoomModel} from '@/data/model/room.model';
+import {MysqlBool} from '@/data/types/internal';
 
 const uniqueRoomUser = 'unique_room_user_room_id_user_id';
 
@@ -59,6 +60,6 @@ export class RoomUsersModel extends Model<RoomUsersModel> {
     defaultValue: true,
     allowNull: false,
   })
-  public notifications: boolean;
+  public notifications: MysqlBool;
 
 }

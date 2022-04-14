@@ -13,6 +13,7 @@ import {
   LogLevel,
   logLevels
 } from 'lines-logger'
+import {MysqlBool} from '@/data/types/internal';
 
 @Injectable()
 @Table({tableName: 'user_settings'})
@@ -33,49 +34,49 @@ export class UserSettingsModel extends Model<UserSettingsModel> {
     allowNull: false,
     defaultValue: true,
   })
-  public suggestions: boolean;
+  public suggestions: MysqlBool;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: true,
   })
-  public showWhenITyping: boolean;
+  public showWhenITyping: MysqlBool;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: true,
   })
-  public embeddedYoutube: boolean;
+  public embeddedYoutube: MysqlBool;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: true,
   })
-  public highlightCode: boolean;
+  public highlightCode: MysqlBool;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   })
-  public messageSound: boolean;
+  public messageSound: MysqlBool;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   })
-  public incomingFileCallSound: boolean;
+  public incomingFileCallSound: MysqlBool;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   })
-  public onlineChangeSound: boolean;
+  public onlineChangeSound: MysqlBool;
 
   @Column({
     type: DataType.ENUM(...Object.keys(logLevels)),

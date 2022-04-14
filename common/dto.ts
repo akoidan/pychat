@@ -340,6 +340,7 @@ export interface AddOnlineUserMessage extends DefaultWsInMessage<"addOnlineUser"
 }
 
 export interface CreateNewUsedMessage extends DefaultWsInMessage<"createNewUser", "room">, UserDto {
+  id: number;
   rooms: {
     roomId: number;
     users: number[];
@@ -625,3 +626,5 @@ export type BlobType =
   | "i"
   | "m"
   | "v";
+
+export const WS_SESSION_EXPIRED_CODE = 4001;

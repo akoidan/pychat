@@ -10,6 +10,7 @@ import {
 import {Injectable} from '@nestjs/common';
 import {MessageModel} from '@/data/model/message.model';
 import {SubscriptionModel} from '@/data/model/subscription.model';
+import {MysqlBool} from '@/data/types/internal';
 
 const uniqueSubscriptionMessage = 'unique_subscription_message_subscription_id_message_id';
 
@@ -51,7 +52,7 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
     defaultValue: false,
     allowNull: false,
   })
-  public received: boolean;
+  public received: MysqlBool;
 
 
 }

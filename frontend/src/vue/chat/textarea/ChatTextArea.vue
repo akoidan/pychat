@@ -256,7 +256,7 @@ export default class ChatTextArea extends Vue {
     const user = this.allUsersDict[message.userId];
     oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
     // TODO refactor quote
-    this.userMessage.innerHTML = `${encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + await encodeP(message, this.$store, this.$smileyApi) + encodeHTML(" >>>") + String.fromCharCode(13)} ${oldValue}`;
+    this.userMessage.innerHTML = `${encodeHTML(`(${timeToString(message.time)}) ${user.username}: `) + await encodeP(message, this.$store, this.$smileyApi) + encodeHTML(" >>>") + String.fromCharCode(13)} ${oldValue}`;
     placeCaretAtEnd(this.userMessage);
   }
 

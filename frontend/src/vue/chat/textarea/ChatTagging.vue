@@ -8,7 +8,7 @@
       :class="{'tag-selected': user.id === currentSelected}"
       @mousedown.prevent="emitName(user)"
     >
-      {{ user.user }}
+      {{ user.username }}
     </div>
   </div>
 </template>
@@ -45,7 +45,7 @@ export default class ChatTagging extends Vue {
   }
 
   public get userList(): UserModel[] {
-    return this.userIds.map((id) => this.allUsersDict[id]).filter((u) => u.user.toLowerCase().includes(this.onlyUserName.toLowerCase()));
+    return this.userIds.map((id) => this.allUsersDict[id]).filter((u) => u.username.toLowerCase().includes(this.onlyUserName.toLowerCase()));
   }
 
   @Watch("name")

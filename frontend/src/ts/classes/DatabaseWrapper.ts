@@ -6,14 +6,13 @@ import type {
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type {
-  BlobType,
   ChannelModel,
   ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
   MessageModel,
-  MessageStatus,
+  MessageStatusModel,
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
@@ -37,6 +36,11 @@ import type {
 } from "@/ts/types/db";
 import type {SetStateFromStorage} from "@/ts/types/dto";
 import type {MainWindow} from "@/ts/classes/MainWindow";
+import {
+  BlobType,
+  MessageStatus
+} from '@/ts/types/backend';
+import {MessageStatusInner} from '@/ts/types/model';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];
@@ -57,7 +61,7 @@ export default class DatabaseWrapper implements IStorage {
     if (!window.openDatabase) {
       throw Error("DatabaseWrapper not supported");
     }
-    this.db = window.openDatabase("v158", "", "Messages database", 10 * 1024 * 1024);
+    this.db = window.openDatabase("v159", "", "Messages database", 10 * 1024 * 1024);
     this.logger = loggerFactory.getLoggerColor("db", "#753e01");
   }
 
@@ -67,14 +71,14 @@ export default class DatabaseWrapper implements IStorage {
       let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
         this.db.changeVersion(this.db.version, "1.0", resolve, reject);
       });
-      t = await this.runSql(t, "CREATE TABLE user (id integer primary key, user text, sex text NOT NULL CHECK (sex IN ('MALE', 'FEMALE','OTHER')), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, thumbnail text, last_time_online integer)");
-      t = await this.runSql(t, "CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))");
-      t = await this.runSql(t, "CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), is_main_in_channel boolean NOT NULL CHECK (is_main_in_channel IN (0,1)), creator INTEGER REFERENCES user(id))");
+      t = await this.runSql(t, "CREATE TABLE user (id integer primary key, username text, sex text NOT NULL CHECK (sex IN ('MALE', 'FEMALE','OTHER')), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text, thumbnail text, last_time_online integer)");
+      t = await this.runSql(t, "CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator_id INTEGER REFERENCES user(id))");
+      t = await this.runSql(t, "CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), is_main_in_channel boolean NOT NULL CHECK (is_main_in_channel IN (0,1)), creator_id INTEGER REFERENCES user(id))");
       t = await this.runSql(t, "CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), edited integer, room_id integer REFERENCES room(id), user_id integer REFERENCES user(id), status text, parent_message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, thread_messages_count INTEGER)");
       t = await this.runSql(t, "CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, server_id integer UNIQUE, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)");
       t = await this.runSql(t, "CREATE TABLE tag (id integer primary key, user_id INTEGER REFERENCES user(id), message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE, symbol text)");
       t = await this.runSql(t, "CREATE TABLE settings (user_id integer primary key, embedded_youtube boolean NOT NULL CHECK (embedded_youtube IN (0,1)), highlight_code boolean NOT NULL CHECK (highlight_code IN (0,1)), incoming_file_call_sound boolean NOT NULL CHECK (incoming_file_call_sound IN (0,1)), message_sound boolean NOT NULL CHECK (message_sound IN (0,1)), online_change_sound boolean NOT NULL CHECK (online_change_sound IN (0,1)), send_logs boolean NOT NULL CHECK (send_logs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text, show_when_i_typing boolean NOT NULL CHECK (show_when_i_typing IN (0,1)))");
-      t = await this.runSql(t, "CREATE TABLE profile (user_id integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, image text, sex integer NOT NULL CHECK (sex IN (0,1,2)))");
+      t = await this.runSql(t, "CREATE TABLE profile (user_id integer primary key, username text, name text, city text, surname text, email text, birthday text, contacts text, thumbnail text, sex integer NOT NULL CHECK (sex IN (0,1,2)))");
       t = await this.runSql(t, "CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))");
       this.logger.log("DatabaseWrapper has been initialized")();
       return null;
@@ -117,7 +121,7 @@ export default class DatabaseWrapper implements IStorage {
       t,
       "insert or replace into message (id, time, content, symbol, deleted, edited, room_id, user_id, status, parent_message_id, thread_messages_count) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.edited, message.roomId, message.userId, message.status, message.parentMessage || null, message.threadMessagesCount],
-      (t, d) => {
+      (t) => {
         for (const k in message.files) {
           const f = message.files[k];
           this.executeSql(t, "insert or replace into file (server_id, file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [f.serverId, f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
@@ -241,8 +245,8 @@ export default class DatabaseWrapper implements IStorage {
 
   public getInsertUser(user: UserModel): QueryObject {
     return [
-      "insert or replace into user (id, user, sex, deleted, country_code, country, region, city, last_time_online, thumbnail) values (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)",
-      [user.id, user.user, user.sex, user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline, user.image],
+      "insert or replace into user (id, username, sex, deleted, country_code, country, region, city, last_time_online, thumbnail) values (?, ?, ?, 0, ?, ?, ?, ?, ?, ?)",
+      [user.id, user.username, user.sex, user.location.countryCode, user.location.country, user.location.region, user.location.city, user.lastTimeOnline, user.thumbnail],
     ];
   }
 
@@ -259,7 +263,7 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-  public setMessagesStatus(messagesIds: number[], status: MessageStatus): void {
+  public setMessagesStatus(messagesIds: number[], status: MessageStatusModel): void {
     this.write((t) => {
       this.executeSql(t, `update message set status = ? where id in ${this.idsToString(messagesIds)}`, [status])();
     });
@@ -267,13 +271,13 @@ export default class DatabaseWrapper implements IStorage {
 
   public setUserProfile(user: CurrentUserInfoModel) {
     this.write((t) => {
-      this.executeSql(t, "insert or replace into profile (user_id, user, name, city, surname, email, birthday, contacts, sex, image) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, user.sex, user.image])();
+      this.executeSql(t, "insert or replace into profile (user_id, username, name, city, surname, email, birthday, contacts, sex, thumbnail) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [user.id, user.username, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, user.sex, user.thumbnail])();
     });
   }
 
   public setUserSettings(settings: CurrentUserSettingsModel) {
     this.write((t) => {
-      this.executeSql(t, "insert or replace into settings (user_id, embedded_youtube, highlight_code, incoming_file_call_sound, message_sound, online_change_sound, send_logs, suggestions, theme, logs, show_when_i_typing) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs, settings.showWhenITyping ? 1 : 0])();
+      this.executeSql(t, "insert or replace into settings (user_id, embedded_youtube, highlight_code, incoming_file_call_sound, message_sound, online_change_sound, suggestions, theme, logs, show_when_i_typing) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs, settings.showWhenITyping ? 1 : 0])();
     });
   }
 
@@ -316,7 +320,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public updateRoom(r: RoomSettingsModel) {
     this.write((t) => {
-      this.executeSql(t, "update room set name = ?, volume = ?, notifications = ?, p2p = ?, creator = ?, is_main_in_channel = ?, channel_id = ? where id = ? ", [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.creator, r.isMainInChannel ? 1 : 0, r.channelId, r.id])();
+      this.executeSql(t, "update room set name = ?, volume = ?, notifications = ?, p2p = ?, creator_id = ?, is_main_in_channel = ?, channel_id = ? where id = ? ", [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.creatorId, r.isMainInChannel ? 1 : 0, r.channelId, r.id])();
     });
   }
 
@@ -427,13 +431,13 @@ export default class DatabaseWrapper implements IStorage {
     const roomsDict: RoomDictModel = {};
     dbRooms.forEach((r: RoomDB) => {
       const rm: RoomModel = getRoomsBaseDict({
-        roomId: r.id,
+        id: r.id,
         p2p: convertToBoolean(r.p2p),
         notifications: convertToBoolean(r.notifications),
         isMainInChannel: convertToBoolean(r.is_main_in_channel),
         name: r.name,
         channelId: r.channel_id,
-        roomCreatorId: r.creator,
+        creatorId: r.creator_id,
         users: [],
         volume: r.volume,
       });
@@ -465,7 +469,7 @@ export default class DatabaseWrapper implements IStorage {
         threadMessagesCount: m.thread_messages_count,
         deleted: convertToBoolean(m.deleted),
         tags,
-        transfer: m.status === "sending" ? {
+        transfer: m.status === MessageStatusInner.SENDING ? {
           error: null,
           xhr: null,
           upload: null,
@@ -514,8 +518,8 @@ export default class DatabaseWrapper implements IStorage {
         id: u.id,
         lastTimeOnline: u.last_time_online,
         sex: u.sex,
-        image: u.thumbnail,
-        user: u.user,
+        thumbnail: u.thumbnail,
+        username: u.username,
         location: {
           region: u.region,
           city: u.city,
@@ -532,9 +536,9 @@ export default class DatabaseWrapper implements IStorage {
     const channelsDict: ChannelsDictModel = {};
     dbChannels.forEach((c: ChannelDB) => {
       const chm: ChannelModel = getChannelDict({
-        channelId: c.id,
-        channelName: c.name,
-        channelCreatorId: c.creator,
+        id: c.id,
+        name: c.name,
+        creatorId: c.creator_id,
       });
       channelsDict[c.id] = chm;
     });
@@ -549,7 +553,6 @@ export default class DatabaseWrapper implements IStorage {
       messageSound: convertToBoolean(dbSettings.message_sound),
       showWhenITyping: convertToBoolean(dbSettings.show_when_i_typing),
       onlineChangeSound: convertToBoolean(dbSettings.online_change_sound),
-      sendLogs: convertToBoolean(dbSettings.send_logs),
       suggestions: convertToBoolean(dbSettings.suggestions),
       theme: dbSettings.theme,
       logs: dbSettings.logs,
@@ -560,14 +563,14 @@ export default class DatabaseWrapper implements IStorage {
     return {
       sex: dbProfile.sex,
       contacts: dbProfile.contacts,
-      image: dbProfile.image,
+      thumbnail: dbProfile.thumbnail,
       birthday: dbProfile.birthday,
       email: dbProfile.email,
       surname: dbProfile.surname,
       city: dbProfile.city,
       name: dbProfile.name,
-      userId: dbProfile.user_id,
-      user: dbProfile.user,
+      id: dbProfile.user_id,
+      username: dbProfile.username,
     };
   }
 
@@ -659,10 +662,10 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   private getSetRoomQuery(t: SQLTransaction, room: RoomSettingsModel): QueryObject {
-    return ["insert or replace into room (id, name, notifications, volume, deleted, channel_id, p2p, creator, is_main_in_channel) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0, room.channelId, room.p2p ? 1 : 0, room.creator, room.isMainInChannel ? 1 : 0]];
+    return ["insert or replace into room (id, name, notifications, volume, deleted, channel_id, p2p, creator_id, is_main_in_channel) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0, room.channelId, room.p2p ? 1 : 0, room.creatorId, room.isMainInChannel ? 1 : 0]];
   }
 
   private setChannel(t: SQLTransaction, channel: ChannelModel) {
-    this.executeSql(t, "insert or replace into channel (id, name, deleted, creator) values (?, ?, ?, ?)", [channel.id, channel.name, 0, channel.creator])();
+    this.executeSql(t, "insert or replace into channel (id, name, deleted, creator_id) values (?, ?, ?, ?)", [channel.id, channel.name, 0, channel.creatorId])();
   }
 }

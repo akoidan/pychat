@@ -6,7 +6,6 @@ import {
 } from "@/ts/utils/consts";
 import type {MessageDataEncode} from "@/ts/types/types";
 import type {
-  BlobType,
   CurrentUserSettingsModel,
   FileModel,
   MessageModel,
@@ -26,6 +25,7 @@ import {
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
+import {BlobType} from '@/ts/types/backend';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -223,7 +223,7 @@ function encodeTags(html: string, tags: Record<string, number> | null, store: De
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = tags[s];
       if (v) {
-        return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].user}</span>`;
+        return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].username}</span>`;
       }
 
       return s; // If it's absent in files, it could be also in tags so return it. (don't replace )
@@ -274,7 +274,7 @@ export function createTag(user: UserModel) {
   const style = document.createElement("style");
   style.type = "text/css";
   const id = `usertag${getUniqueTagId()}`;
-  style.innerHTML = ` #${id}:after { content: '@${user.user}'}`;
+  style.innerHTML = ` #${id}:after { content: '@${user.username}'}`;
   document.getElementsByTagName("head")[0].appendChild(style);
   a.id = id;
 

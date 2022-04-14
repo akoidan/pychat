@@ -15,6 +15,7 @@ import type {
   SyncP2PMessage,
 } from "@/ts/types/messages/innerMessages";
 import type {HandlerTypes} from "@/ts/types/backend";
+import {MessageStatus} from '@/ts/types/backend';
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 
 /**
@@ -185,7 +186,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         action: "sendSetMessagesStatus",
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
         messageIds,
-        status: "read",
+        status: MessageStatus.READ,
         allowZeroSubscribers: true,
       };
       this.sub.notify(payload);

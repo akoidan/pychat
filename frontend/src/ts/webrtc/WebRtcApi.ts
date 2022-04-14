@@ -263,10 +263,10 @@ export default class WebRtcApi extends MessageHandler {
         total: message.content.size,
       },
     };
-    this.notifier.showNotification(this.store.allUsersDict[message.userId].user, {
+    this.notifier.showNotification(this.store.allUsersDict[message.userId].username, {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
-      icon: resolveMediaUrl(this.store.allUsersDict[message.userId].image) || faviconUrl,
+      icon: resolveMediaUrl(this.store.allUsersDict[message.userId].thumbnail) || faviconUrl,
       replaced: 1,
     });
     this.store.addReceivingFile(payload);

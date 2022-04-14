@@ -10,6 +10,7 @@ import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/model/user.model';
 import {UploadedFileChoices} from '@/data/types/frontend';
 import {IpAddressModel} from '@/data/model/ip.address.model';
+import {MysqlBool} from '@/data/types/internal';
 
 @Injectable()
 @Table({tableName: 'subscription'})
@@ -51,7 +52,7 @@ export class SubscriptionModel extends Model<SubscriptionModel> {
     defaultValue: false,
     allowNull: false,
   })
-  public isMobile: boolean;
+  public isMobile: MysqlBool;
 
   @ForeignKey(() => IpAddressModel)
   @Column({

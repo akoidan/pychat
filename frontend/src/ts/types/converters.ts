@@ -6,7 +6,6 @@ import type {
   FileModel,
   Location,
   MessageModel,
-  MessageStatus,
   RoomModel,
   RoomSettingsModel,
   UserModel,
@@ -28,6 +27,7 @@ import type {
   SexDB,
 } from "@/ts/types/db";
 import type {MessageP2pDto} from "@/ts/types/messages/p2pDto";
+import {MessageStatus} from '@/ts/types/backend';
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
   return {...userInfo};
@@ -59,16 +59,16 @@ export function convertLocation(dto: LocationDto | null): Location {
 
 export function getChannelDict(
   {
-    channelName,
-    channelCreatorId,
-    channelId,
+    name,
+    creatorId,
+    id,
   }: ChannelDto,
   oldChannel: ChannelModel | null = null,
 ): ChannelModel {
   return {
-    name: channelName,
-    id: channelId,
-    creator: channelCreatorId,
+    name,
+    id,
+    creatorId,
     expanded: oldChannel?.expanded ?? false,
   };
 }
@@ -77,23 +77,23 @@ export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
   return {
     channelId: r.channelId,
     p2p: r.p2p,
-    id: r.roomId,
+    id: r.id,
     name: r.name,
     isMainInChannel: r.isMainInChannel,
     notifications: r.notifications,
     volume: r.volume,
-    creator: r.roomCreatorId,
+    creatorId: r.creatorId,
   };
 }
 
 export function getRoomsBaseDict(
   {
-    roomId,
+    id,
     volume,
     channelId,
     isMainInChannel,
     notifications,
-    roomCreatorId,
+    creatorId,
     p2p,
     name,
     users,
@@ -101,7 +101,7 @@ export function getRoomsBaseDict(
   databaseRestoredRoom: RoomModel | null = null,
 ): RoomModel {
   return {
-    id: roomId,
+    id,
     receivingFiles: databaseRestoredRoom ? databaseRestoredRoom.receivingFiles : {},
     sendingFiles: databaseRestoredRoom ? databaseRestoredRoom.sendingFiles : {},
     channelId,
@@ -128,7 +128,7 @@ export function getRoomsBaseDict(
     },
     notifications,
     name,
-    creator: roomCreatorId,
+    creatorId,
     messages: databaseRestoredRoom ? databaseRestoredRoom.messages : {},
     roomLog: databaseRestoredRoom ? databaseRestoredRoom.roomLog : [],
     changeName: databaseRestoredRoom ? databaseRestoredRoom.changeName : [],
@@ -206,9 +206,9 @@ export function convertMessageModelDtoToModel(message: MessageModelDto, oldMessa
 }
 
 export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageModel {
-  let status: MessageStatus = "received";
-  if (m.status === "read") {
-    status = "read";
+  let status: MessageStatus = MessageStatus.RECEIVED;
+  if (m.status === MessageStatus.READ) {
+    status = MessageStatus.READ;
   }
   return {
     content: m.content,
@@ -233,9 +233,9 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
 
 export function convertUser(u: UserDto, location: LocationDto | null): UserModel {
   return {
-    user: u.user,
-    id: u.userId,
-    image: u.userImage,
+    username: u.username,
+    id: u.id,
+    thumbnail: u.thumbnail,
     lastTimeOnline: u.lastTimeOnline,
     sex: convertSex(u.sex),
     location: convertLocation(location),

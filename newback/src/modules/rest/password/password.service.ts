@@ -24,7 +24,8 @@ export class PasswordService {
     if (!random) {
       random = await this.generateRandomString(4);
     }
-    return `${userId}:${random}`
+    let userIdString = ('0000' + String(userId)) // make userId be always 4 characters
+    return `${userIdString.substring(userIdString.length - 4, userIdString.length)}:${random}`
   }
 
   public async generateRandomString(length: number): Promise<string> {

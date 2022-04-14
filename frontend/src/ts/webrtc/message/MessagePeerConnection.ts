@@ -8,6 +8,7 @@ import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/backend";
+import {MessageStatus} from '@/ts/types/backend';
 import type {
   ConfirmReceivedP2pMessage,
   ConfirmSetMessageStatusRequest,
@@ -25,6 +26,7 @@ import type {
   MessageModel,
   RoomModel,
 } from "@/ts/types/model";
+import {MessageStatusInner} from '@/ts/types/model';
 import type {
   MessageP2pDto,
   MessagesInfo,
@@ -104,12 +106,12 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     const responseToRequest: SetMessageStatusRequest = {
       action: "setMessageStatus",
       messagesIds: payload.messageIds,
-      status: "read",
+      status: MessageStatus.READ,
     };
     await this.messageProc.sendToServerAndAwait(responseToRequest);
     this.store.setMessagesStatus({
       roomId: this.roomId,
-      status: "read",
+      status: MessageStatus.READ,
       messagesIds: payload.messageIds,
     });
   }
@@ -156,7 +158,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     if (payload.message.userId !== this.store.myId) {
       const isRead = this.store.isCurrentWindowActive && this.store.activeRoomId === this.roomId;
       if (isRead) {
-        response.status = "read";
+        response.status = MessageStatus.READ;
       }
     }
     this.messageProc.sendToServer(response);
@@ -352,7 +354,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   private markAsReadSentMessages(responseMessages: MessageP2pDto[]) {
     if (!this.isConnectedToMyAnotherDevices) {
-      const isNotRead: number[] = responseMessages.map((m) => m.id).filter((id) => this.room.messages[id].status === "sending");
+      const isNotRead: number[] = responseMessages.map((m) => m.id).filter((id) => this.room.messages[id].status === MessageStatusInner.SENDING);
       if (isNotRead.length > 0) {
         this.store.markMessageAsSent({
           messagesId: isNotRead,

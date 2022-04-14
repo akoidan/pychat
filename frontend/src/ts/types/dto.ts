@@ -1,9 +1,8 @@
 import type {
-  BlobType,
   ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
-  MessageStatus,
+  MessageStatusModel,
   RoomDictModel,
   UserModel,
 } from "@/ts/types/model";
@@ -11,7 +10,10 @@ import type {
 export * from '@/ts/types/backend';
 
 import type {LogLevel} from "lines-logger";
-import {Gender} from '@/ts/types/backend';
+import {
+  Gender,
+  UserProfileDto
+} from '@/ts/types/backend';
 
 
 
@@ -55,6 +57,6 @@ export interface OauthStatus {
 }
 
 
-export interface WebRtcMessageModelDto extends Omit<MessageModelDto, "roomId" | "time" | "userId"> {
+export interface WebRtcMessageModelDto extends Omit<MessageStatusModel, "roomId" | "time" | "userId"> {
   timeDiff: number;
 }

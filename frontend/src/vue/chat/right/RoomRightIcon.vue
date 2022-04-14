@@ -33,6 +33,7 @@ import {
 } from "vue-property-decorator";
 import type {MessageModel} from "@/ts/types/model";
 import {RoomModel} from "@/ts/types/model";
+import {MessageStatus} from '@/ts/types/backend';
 
 @Component({name: "RoomRightIcon"})
 export default class RoomRightIcon extends Vue {
@@ -45,7 +46,7 @@ export default class RoomRightIcon extends Vue {
        * On_server is not really required, since all received messages are gonna be 'received'
        * But it's an additional failsafe check, in case of a bug in another place
        */
-      (m.status === "received" || m.status === "on_server") &&
+      (m.status === MessageStatus.RECEIVED || m.status === MessageStatus.ON_SERVER) &&
       m.userId !== this.$store.myId).length;
   }
 }

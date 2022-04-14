@@ -97,7 +97,7 @@ export default class RoomUsersListPage extends Vue {
   async add() {
     if (this.userdToAdd.length > 0) {
       const e = await this.$ws.inviteUser(this.roomId, this.userdToAdd);
-      this.$router.replace(`/chat/${e.roomId}`);
+      this.$router.replace(`/chat/${e.id}`);
     } else {
       this.$store.growlError("Please select at least one user");
     }

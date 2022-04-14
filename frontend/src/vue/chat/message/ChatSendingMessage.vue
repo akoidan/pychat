@@ -26,16 +26,16 @@
         class="message-tooltip"
       />
       <i
-        v-if="isSelf && message.status === 'read'"
+        v-if="isSelf && message.status === 'READ'"
         class="icon-ok message-status-read"
         title="This message has been read by at least one user"
       />
       <i
-        v-if="isSelf && message.status === 'received'"
+        v-if="isSelf && message.status === 'RECEIVED'"
         class="icon-ok message-status-received"
         title="At least one user in this room has received this message"
       />
-      <div v-if="message.status === 'sending'" class="spinner"/>
+      <div v-if="message.status === 'SENDING'" class="spinner"/>
     </div>
   </div>
 </template>
@@ -55,6 +55,7 @@ import type {EditingMessage} from "@/ts/types/model";
 import {
   CurrentUserInfoModel,
   MessageModel,
+  MessageStatusInner,
   RoomDictModel,
 } from "@/ts/types/model";
 import ChatMessageToolTip from "@/vue/chat/message/ChatMessageToolTip.vue";
@@ -97,14 +98,14 @@ export default class ChatSendingMessage extends Vue {
       "message-self": this.isSelf,
       "message-others": !this.isSelf,
       "message-wrapper": true,
-      "message-is-being-sent": this.message.status === "sending",
+      "message-is-being-sent": this.message.status === MessageStatusInner.SENDING,
       "removed-message": this.message.deleted,
       "unread-message": this.message.isHighlighted,
     };
   }
 
   public get isSelf() {
-    return this.message.userId === this.userInfo.userId;
+    return this.message.userId === this.userInfo.id;
   }
 
   cancelTransfer() {

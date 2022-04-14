@@ -142,6 +142,7 @@ export class RoomHandler extends MessageHandler {
   }
 
   public addChannel(message: AddChannelMessage) {
+    // @ts-expect-error
     this.mutateRoomAddition(message, "room_created");
   }
 
@@ -181,7 +182,7 @@ export class RoomHandler extends MessageHandler {
         roomLog: {
           action: "joined this room",
           time: Date.now(),
-          userId: message.userId,
+          userId: message.id,
         },
       });
       this.notifyDevicesChanged(null, roomId, "someone_joined");
@@ -206,8 +207,8 @@ export class RoomHandler extends MessageHandler {
   }
 
   public saveChannelSettings(message: SaveChannelSettingsMessage) {
-    if (!this.store.channelsDict[message.channelId]) {
-      this.logger.error("Unable to find channel to edit {} to kick user, available are {}", message.channelId, Object.keys(this.store.channelsDict))();
+    if (!this.store.channelsDict[message.id]) {
+      this.logger.error("Unable to find channel to edit {} to kick user, available are {}", message.id, Object.keys(this.store.channelsDict))();
     } else {
       const c: ChannelModel = getChannelDict(message);
       this.store.addChannel(c);
@@ -237,15 +238,15 @@ export class RoomHandler extends MessageHandler {
   }
 
   public saveRoomSettings(message: SaveRoomSettingsMessage) {
-    const oldRoom = this.store.roomsDict[message.roomId];
+    const oldRoom = this.store.roomsDict[message.id];
     if (!oldRoom) {
-      this.logger.error("Unable to find channel to edit {} to kick user, available are {}", message.roomId, Object.keys(this.store.roomsDict))();
+      this.logger.error("Unable to find channel to edit {} to kick user, available are {}", message.id, Object.keys(this.store.roomsDict))();
     } else {
       const r: RoomSettingsModel = getRoom(message);
       const oldRoomP2p: boolean = oldRoom.p2p;
       this.store.setRoomSettings(r);
       if (oldRoomP2p !== message.p2p) {
-        this.notifyDevicesChanged(null, message.roomId, message.p2p ? "room_created" : "i_deleted");
+        this.notifyDevicesChanged(null, message.id, message.p2p ? "room_created" : "i_deleted");
       }
     }
   }
@@ -272,14 +273,14 @@ export class RoomHandler extends MessageHandler {
     this.logger.debug("set users {}", users)();
     const um: UserDictModel = {};
     users.forEach((u) => {
-      um[u.userId] = convertUser(u, null);
+      um[u.id] = convertUser(u, null);
     });
 
     this.logger.debug("Setting rooms")();
     const storeRooms: RoomDictModel = {};
     const {roomsDict} = this.store;
     rooms.forEach((newRoom: RoomDto) => {
-      const oldRoom = roomsDict[newRoom.roomId];
+      const oldRoom = roomsDict[newRoom.id];
       const rm: RoomModel = getRoomsBaseDict(newRoom, oldRoom);
       storeRooms[rm.id] = rm;
     });
@@ -287,7 +288,7 @@ export class RoomHandler extends MessageHandler {
     this.logger.debug("Setting channels")();
     const {channelsDict} = this.store;
     const storeChannel: ChannelsDictModel = channels.reduce((dict: ChannelsDictModel, newChannel: ChannelDto) => {
-      const oldChannel = channelsDict[newChannel.channelId];
+      const oldChannel = channelsDict[newChannel.id];
       const cm: ChannelModel = getChannelDict(newChannel, oldChannel);
       dict[cm.id] = cm;
       return dict;
@@ -370,6 +371,6 @@ export class RoomHandler extends MessageHandler {
       },
     });
     // Eiher I created this room, either I was invited to this room
-    this.notifyDevicesChanged(null, message.roomId, type); // TODO messageTransferhandler should be created or should id?
+    this.notifyDevicesChanged(null, message.id, type); // TODO messageTransferhandler should be created or should id?
   }
 }

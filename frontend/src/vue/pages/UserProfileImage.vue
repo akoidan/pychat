@@ -50,7 +50,7 @@ export default class UserProfileImage extends Vue {
   }
 
   public created() {
-    this.srcImg = resolveMediaUrl(this.userInfo.image) || "";
+    this.srcImg = resolveMediaUrl(this.userInfo.thumbnail) || "";
   }
 
   @ApplyGrowlErr({

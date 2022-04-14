@@ -8,11 +8,10 @@ import type {
   CurrentUserInfoModel,
   IncomingCallModel,
   Location,
-  MessageStatus,
+  MessageStatusModel,
   PastingTextAreaElement,
   RoomDictModel,
   SendingFileTransfer,
-
   UserDictModel,
 } from "@/ts/types/model";
 import {
@@ -23,6 +22,7 @@ import {
   GrowlModel,
   GrowlType,
   MessageModel,
+  MessageStatusInner,
   ReceivingFile,
   RoomModel,
   RoomSettingsModel,
@@ -64,6 +64,7 @@ import {
   StringIdentifier,
 } from "@/ts/types/types";
 import {
+  MessageStatus,
   SetStateFromStorage,
   SetStateFromWS,
 } from "@/ts/types/dto";
@@ -167,7 +168,7 @@ export class DefaultStore extends VuexModule {
   }
 
   get userName(): (id: number) => string {
-    return (id: number): string => this.allUsersDict[id].user;
+    return (id: number): string => this.allUsersDict[id].username;
   }
 
   get privateRooms(): RoomModel[] {
@@ -282,7 +283,7 @@ export class DefaultStore extends VuexModule {
             rooms: [],
             mainRoom: null!,
             name: channel.name,
-            creator: channel.creator,
+            creatorId: channel.creatorId,
           };
         }
         if (current.isMainInChannel) {
@@ -314,7 +315,7 @@ export class DefaultStore extends VuexModule {
   }
 
   get myId(): number | null {
-    return this.userInfo?.userId ?? null;
+    return this.userInfo?.id ?? null;
   }
 
   get privateRoomsUsersIds(): PrivateRoomsIds {
@@ -599,7 +600,7 @@ export class DefaultStore extends VuexModule {
     }: {
       roomId: number;
       messagesIds: number[];
-      status: MessageStatus;
+      status: MessageStatusModel;
     },
   ) {
     const ids = Object.values(this.roomsDict[roomId].messages).filter((m) => messagesIds.includes(m.id)).
@@ -654,7 +655,7 @@ export class DefaultStore extends VuexModule {
      */
     if (m.parentMessage && om[m.parentMessage] && !om[m.id] &&
       // And this message is not from us (otherwise we already increased message count when sending it and storing in store)
-      !(m.userId === this.userInfo?.userId && m.id > 0)) {
+      !(m.userId === this.userInfo?.id && m.id > 0)) {
       om[m.parentMessage].threadMessagesCount++;
       this.storage.setThreadMessageCount(m.parentMessage, om[m.parentMessage].threadMessagesCount);
     }
@@ -702,8 +703,8 @@ export class DefaultStore extends VuexModule {
     const markSendingIds: number[] = [];
     m.messagesId.forEach((messageId) => {
       const message = this.roomsDict[m.roomId].messages[messageId];
-      if (message.status === "sending") {
-        message.status = "on_server";
+      if (message.status === MessageStatusInner.SENDING) {
+        message.status = MessageStatus.ON_SERVER;
         markSendingIds.push(messageId);
       }
     });
@@ -886,19 +887,19 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setUser(user: {id: number; sex: Gender; user: string; image: string}) {
-    this.allUsersDict[user.id].user = user.user;
+  public setUser(user: {id: number; sex: Gender; username: string; thumbnail: string}) {
+    this.allUsersDict[user.id].username = user.username;
     this.allUsersDict[user.id].sex = user.sex;
-    this.allUsersDict[user.id].image = user.image;
+    this.allUsersDict[user.id].thumbnail = user.thumbnail;
     this.storage.saveUser(this.allUsersDict[user.id]);
   }
 
   @Mutation
   public setUserInfo(userInfo: CurrentUserInfoWoImage) {
-    const image: string | null = this.userInfo?.image || null;
+    const thumbnail: string | null = this.userInfo?.thumbnail || null;
     const newUserInfo: CurrentUserInfoModel = {
       ...userInfo,
-      image,
+      thumbnail,
     };
     this.userInfo = newUserInfo;
     this.storage.setUserProfile(this.userInfo);
@@ -911,8 +912,8 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setUserImage(image: string) {
-    this.userInfo!.image = image;
+  public setUserImage(thumbnail: string) {
+    this.userInfo!.thumbnail = thumbnail;
     this.storage.setUserProfile(this.userInfo!);
   }
 

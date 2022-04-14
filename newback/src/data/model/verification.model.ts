@@ -9,6 +9,7 @@ import {
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/model/user.model';
 import {VerificationType} from '@/data/types/frontend';
+import {MysqlBool} from '@/data/types/internal';
 
 @Injectable()
 @Table({tableName: 'verification'})
@@ -48,7 +49,7 @@ export class VerificationModel extends Model<VerificationModel> {
     allowNull: false,
     defaultValue: false,
   })
-  public verified: boolean;
+  public verified: MysqlBool;
 
   @Column({
     type: DataType.STRING(190),

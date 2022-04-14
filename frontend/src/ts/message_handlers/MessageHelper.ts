@@ -51,9 +51,9 @@ export class MessageHelper {
     const room = this.store.roomsDict[message.roomId];
 
     if (room.notifications) {
-      const title = this.store.allUsersDict[message.userId].user;
+      const title = this.store.allUsersDict[message.userId].username;
 
-      let icon: string = resolveMediaUrl(this.store.allUsersDict[message.userId].image) || faviconUrl;
+      let icon: string = resolveMediaUrl(this.store.allUsersDict[message.userId].thumbnail) || faviconUrl;
       if (message.files) {
         const fff: FileModel = Object.values(message.files)[0];
         if (fff?.url) {

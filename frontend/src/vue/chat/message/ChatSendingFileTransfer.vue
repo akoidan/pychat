@@ -74,7 +74,7 @@ export default class ChatSendingFileTransfer extends Vue {
   }
 
   public get user() {
-    return this.allUsersDict[this.transfer.userId].user;
+    return this.allUsersDict[this.transfer.userId].username;
   }
 
   public get status() {

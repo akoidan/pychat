@@ -81,7 +81,7 @@ export default class ChatNavBar extends Vue {
       return this.channelsDictUI[this.activeRoom.channelId!].name;
     }
     if (this.user) {
-      return this.user.user;
+      return this.user.username;
     }
     throw Error("Invalid structure");
   }

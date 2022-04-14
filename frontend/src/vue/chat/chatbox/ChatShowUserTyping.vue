@@ -26,7 +26,7 @@ export default class ChatShowUserTyping extends Vue {
   }
 
   public get stringifiedTypes() {
-    return this.users.map((u) => u.user).join(", ");
+    return this.users.map((u) => u.username).join(", ");
   }
 }
 </script>

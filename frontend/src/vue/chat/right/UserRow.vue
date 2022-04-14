@@ -4,7 +4,7 @@
   >
     <div class="user-name-sex">
       <user-image-icon :user="user"/>
-      <span>{{ user.user }}</span>
+      <span>{{ user.username }}</span>
     </div>
     <slot/>
   </div>

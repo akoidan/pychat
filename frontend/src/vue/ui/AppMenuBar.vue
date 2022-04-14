@@ -4,7 +4,7 @@
       <div class="app-header">
         <span class="username">
           <img v-if="imgSrc" :src="imgSrc"/>
-          <div class="user-name">{{ userInfo.user }}</div>
+          <div class="user-name">{{ userInfo.username }}</div>
         </span>
       </div>
       <div class="app-section">
@@ -69,7 +69,7 @@ export default class AppMenuBar extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
 
   public get imgSrc() {
-    return resolveMediaUrl(this.userInfo.image);
+    return resolveMediaUrl(this.userInfo.thumbnail);
   }
 
   public get consts() {

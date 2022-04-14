@@ -32,12 +32,12 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
 
   public bindClientConnect(server: BaseWsInstance, callback: Function) {
     server.on(CONNECTION_EVENT, async (...args) => {
-     let handler =  args.find(a => a instanceof WebSocket)
-     if (handler.context) {
+     let ws: WebSocket =  args.find(a => a instanceof WebSocket)
+     if ((ws as any).context) {
        throw Error("WTF");
      }
-     handler.context = {};
-     await callback(...args, handler.context)
+      (ws as any).context = {};
+      await callback(...args, (ws as any).context)
     });
   }
 

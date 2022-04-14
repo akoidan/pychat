@@ -15,7 +15,6 @@ import type {
   CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
   Location,
-  MessageStatus,
 } from "@/ts/types/model";
 import type {
   MessageSupplier,
@@ -65,6 +64,10 @@ import type {
   HandlerTypes,
 } from "@/ts/types/backend";
 import type Subscription from "@/ts/classes/Subscription";
+import {
+  MessageStatus,
+  WS_SESSION_EXPIRED_CODE
+} from '@/ts/types/backend';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
@@ -541,7 +544,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   public setUserProfile(m: SetUserProfileMessage) {
     const a: CurrentUserInfoWoImage = currentUserInfoDtoToModel(m.content);
-    a.userId = this.store.userInfo!.userId; // This could came only when we logged in
+    a.id = this.store.userInfo!.id; // This could came only when we logged in
     this.store.setUserInfo(a);
   }
 
@@ -555,9 +558,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   public async setWsId(message: SetWsIdMessage) {
     this.wsConnectionId = message.opponentWsId;
-    this.setUserInfo(message.userInfo);
-    this.setUserSettings(message.userSettings);
-    this.setUserImage(message.userInfo.userImage);
+    this.setUserInfo(message.profile);
+    this.setUserSettings(message.settings);
+    this.setUserImage(message.profile.thumbnail);
     this.timeDiffWithServer = Date.now() - message.time;
     const pubSetRooms: PubSetRooms = {
       action: "init",
@@ -587,9 +590,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   public userProfileChanged(message: UserProfileChangedMessage) {
     this.store.setUser({
-      id: message.userId,
-      user: message.user,
-      image: message.userImage,
+      id: message.id,
+      username: message.username,
+      thumbnail: message.thumbnail,
       sex: message.sex,
     });
   }
@@ -706,7 +709,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       this.noServerPingTimeout = null;
     }
     const reason = e.reason || e;
-    if (e.code === 403) {
+    if (e.code === WS_SESSION_EXPIRED_CODE) {
       const message = `Server has forbidden request because '${reason}'. Logging out...`;
       this.logger.error("onWsClose {}", message)();
       this.store.growlError(message);

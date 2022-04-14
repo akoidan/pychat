@@ -5,6 +5,7 @@ import {
   Table,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
+import {MysqlBool} from '@/data/types/internal';
 
 @Injectable()
 @Table({tableName: 'ip_address'})
@@ -29,7 +30,7 @@ export class IpAddressModel extends Model<IpAddressModel> {
     defaultValue: true,
     allowNull: false,
   })
-  public status: boolean;
+  public status: MysqlBool;
 
   @Column({
     type: DataType.STRING,

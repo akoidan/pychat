@@ -9,11 +9,11 @@ import type {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   MessageModel,
-  MessageStatus,
   RoomSettingsModel,
   UserModel,
 } from "@/ts/types/model";
 import type {Logger} from "lines-logger";
+import {MessageStatusModel} from '@/ts/types/model';
 
 interface LocalStorageMessage {
   f: number;
@@ -108,7 +108,7 @@ export default class LocalStorage implements IStorage {
   public setUsers(users: UserModel[]) {
   }
 
-  public setMessagesStatus(messagesIds: number[], status: MessageStatus) {
+  public setMessagesStatus(messagesIds: number[], status: MessageStatusModel) {
   }
 
   public saveUser(users: UserModel) {

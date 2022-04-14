@@ -1,10 +1,11 @@
 import type {LogLevel} from "lines-logger";
-import type {MessageStatus} from "@/ts/types/model";
+import type {MessageStatus} from "@/ts/types/backend";
 import {Gender} from '@/ts/types/backend';
+import {MessageStatusInner} from '@/ts/types/model';
 
 export interface UserDB {
   id: number;
-  user: string;
+  username: string;
   sex: SexDB;
   last_time_online: number;
   deleted: BooleanDB;
@@ -29,13 +30,13 @@ export interface RoomDB {
   channel_id: number;
   is_main_in_channel: BooleanDB;
   deleted: BooleanDB;
-  creator: number;
+  creator_id: number;
 }
 
 export interface ChannelDB {
   id: number;
   name: string;
-  creator: number;
+  creator_id: number;
 }
 
 export interface TagDB {
@@ -56,7 +57,7 @@ export interface MessageDB {
   edited: number;
   room_id: number;
   user_id: number;
-  status: MessageStatus;
+  status: MessageStatusInner;
 }
 
 export interface FileDB {
@@ -88,13 +89,13 @@ export interface SettingsDB {
 
 export interface ProfileDB {
   user_id: number;
-  user: string;
+  username: string;
   name: string;
   city: string;
-  image: string;
+  thumbnail: string;
   surname: string;
   email: string;
-  birthday: string;
+  birthday: Date;
   contacts: string;
   sex: SexDB;
 }

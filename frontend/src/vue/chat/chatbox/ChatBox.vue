@@ -125,6 +125,7 @@ import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/backend";
+import {MessageStatus} from '@/ts/types/backend';
 
 
 @Component({
@@ -238,7 +239,7 @@ export default class ChatBox extends Vue {
 
   public markMessagesInCurrentRoomAsRead() {
     this.$logger.debug("Checking if we can set some messages to status read")();
-    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).
+    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === MessageStatus.RECEIVED || m.status === MessageStatus.ON_SERVER)).
       map((m) => m.id);
     if (messagesIds.length > 0) {
       this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);

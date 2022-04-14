@@ -13,9 +13,9 @@ import type {
 import type {
   FileModel,
   MessageModel,
-  MessageStatus,
   RoomModel,
 } from "@/ts/types/model";
+import {MessageStatusInner} from '@/ts/types/model';
 import type {Logger} from "lines-logger";
 
 import type {
@@ -23,18 +23,17 @@ import type {
   MessageModelDto,
   SaveFileResponse,
 } from "@/ts/types/dto";
+import {MessageStatus} from '@/ts/types/dto';
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {
+  DeleteMessage,
+  EditMessage,
   HandlerName,
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/backend";
-import type {
-  DeleteMessage,
-  EditMessage,
   MessagesResponseMessage,
   PrintMessage,
   SetMessageStatusMessage,
@@ -98,7 +97,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     await this.ws.setMessageStatus(
       messagesIds,
       roomId,
-      "read",
+      MessageStatus.READ,
     );
   }
 
@@ -114,7 +113,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         if (room.p2p) {
           continue;
         }
-        const messages = Object.values(room.messages).filter((m) => m.status === "sending");
+        const messages = Object.values(room.messages).filter((m) => m.status === MessageStatusInner.SENDING);
         // Sync messages w/o parent thread first
         messages.sort((a, b) => {
           if (a.parentMessage && !b.parentMessage) {
@@ -323,7 +322,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         symbol: message.symbol || null,
         threadMessagesCount: message.threadMessagesCount,
         isHighlighted: false,
-        status: message.status === "sending" ? "on_server" : message.status,
+        status: message.status === MessageStatusInner.SENDING ? MessageStatus.ON_SERVER: message.status,
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,
@@ -357,7 +356,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       this.ws.setMessageStatus(
         [inMessage.id],
         inMessage.roomId,
-        isRead ? "read" : "received",
+        isRead ? MessageStatus.READ : MessageStatus.RECEIVED,
       );
     }
     if (checkIfIdIsMissing(message, this.store)) {
@@ -467,8 +466,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       let roomMessage = Object.values(r.messages).filter((m) => m.id > 0);
       messagesIds.push(...roomMessage.map((m) => m.id));
       roomMessage = roomMessage.filter((u) => u.userId === this.store.myId);
-      receivedMessageIds.push(...roomMessage.filter((m) => m.status === "received").map((m) => m.id));
-      onServerMessageIds.push(...roomMessage.filter((m) => m.status === "on_server").map((m) => m.id));
+      receivedMessageIds.push(...roomMessage.filter((m) => m.status === MessageStatus.RECEIVED).map((m) => m.id));
+      onServerMessageIds.push(...roomMessage.filter((m) => m.status === MessageStatus.ON_SERVER).map((m) => m.id));
       return r.id;
     });
 
@@ -489,8 +488,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     );
 
     // Updating information if message that I sent were received/read
-    this.setAllMessagesStatus(result.readMessageIds, "read");
-    this.setAllMessagesStatus(result.receivedMessageIds, "received");
+    this.setAllMessagesStatus(result.readMessageIds, MessageStatus.READ);
+    this.setAllMessagesStatus(result.receivedMessageIds, MessageStatus.RECEIVED);
 
     const messagesByStatus = this.groupMessagesIdsByStatus(result.content, () => true);
     Object.entries(messagesByStatus).forEach(([k, messagesInGroup]) => {
@@ -529,11 +528,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
          * If we received a message from the server from our second device
          * We still don't need to mark those messages as received
          */
-        filter((m) => m.userId !== this.store.myId && (m.status === "received" || m.status === "on_server")).map((m) => m.id);
-      messageStatus = "read";
+        filter((m) => m.userId !== this.store.myId && (m.status === MessageStatus.RECEIVED || m.status === MessageStatus.ON_SERVER)).map((m) => m.id);
+      messageStatus = MessageStatus.READ;
     } else {
-      ids = inMessages.filter((m) => m.status === "on_server").map((m) => m.id);
-      messageStatus = "received";
+      ids = inMessages.filter((m) => m.status === MessageStatus.ON_SERVER).map((m) => m.id);
+      messageStatus = MessageStatus.RECEIVED;
     }
     if (ids.length > 0) {
       this.ws.setMessageStatus(

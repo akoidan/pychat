@@ -6,7 +6,6 @@ import type {
   FileModel,
   FileTransferStatus,
   MessageModel,
-  MessageStatus,
   RoomLog,
   RoomModel,
   RoomSettingsModel,
@@ -18,6 +17,10 @@ import type {
   SaveFileResponse,
   SetStateFromStorage,
 } from "@/ts/types/dto";
+import {
+  MessageStatusInner,
+  MessageStatusModel
+} from '@/ts/types/model';
 
 
 export interface UploadFile {
@@ -211,7 +214,7 @@ export interface IStorage {
 
   setUsers(users: UserModel[]): void;
 
-  setMessagesStatus(messagesIds: number[], status: MessageStatus): void;
+  setMessagesStatus(messagesIds: number[], status: MessageStatusModel): void;
 
   saveUser(users: UserModel): void;
 

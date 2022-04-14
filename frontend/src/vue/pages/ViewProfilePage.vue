@@ -85,7 +85,7 @@ export default class ViewProfilePage extends Vue {
   }
 
   public get username(): string {
-    return this.allUsersDict[this.id].user;
+    return this.allUsersDict[this.id].username;
   }
 
   public resolveMediaUrl(src: string) {

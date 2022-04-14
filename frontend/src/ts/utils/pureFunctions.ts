@@ -5,6 +5,8 @@ import type {
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {MessageSender} from "@/ts/types/types";
 import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from "@/ts/utils/consts";
+import {MessageStatus} from '@/ts/types/backend';
+import {MessageStatusInner} from '@/ts/types/model';
 
 export function bytesToSize(bytes: number): string {
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -123,12 +125,12 @@ export function editMessageWs(
     isEditingActive: oldMessage ? oldMessage.isEditingActive : false,
     isThreadOpened: oldMessage ? oldMessage.isThreadOpened : false,
     parentMessage,
-    status: shouldBeSynced ? "sending" : "on_server",
+    status: shouldBeSynced ? MessageStatusInner.SENDING : MessageStatus.ON_SERVER,
     content: messageContent,
     symbol,
     edited,
     files,
-    userId: store.userInfo?.userId!,
+    userId: store.userInfo?.id!,
   };
   store.addMessage(mm);
   if (shouldBeSynced) { // Message hasn't been sync to server and was deleted localy

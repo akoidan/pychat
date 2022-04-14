@@ -97,7 +97,7 @@ export default class UserProfileChangePassword extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
 
   public get username(): string {
-    return this.userInfo.user;
+    return this.userInfo.username;
   }
 
   @ApplyGrowlErr({

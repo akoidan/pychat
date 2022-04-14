@@ -1,5 +1,9 @@
 import type {LogLevel} from "lines-logger";
-import {Gender} from '@/ts/types/backend';
+import {
+  BlobType,
+  Gender,
+  MessageStatus
+} from '@/ts/types/backend';
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
@@ -30,7 +34,6 @@ export interface CurrentUserSettingsModel {
   incomingFileCallSound: boolean;
   messageSound: boolean;
   onlineChangeSound: boolean;
-  sendLogs: boolean;
   showWhenITyping: boolean;
   suggestions: boolean;
   theme: string;
@@ -52,27 +55,27 @@ export interface PastingTextAreaElement {
 }
 
 export interface CurrentUserInfoModel extends CurrentUserInfoWoImage {
-  image: string | null;
+  thumbnail: string | null;
 }
 
 export interface CurrentUserInfoWoImage {
-  userId: number;
-  user: string;
+  id: number;
+  username: string;
   name: string;
   city: string;
   surname: string;
   email: string;
-  birthday: string;
+  birthday: Date;
   contacts: string;
   sex: Gender;
 }
 
 
 export interface UserModel {
-  user: string;
+  username: string;
   id: number;
   sex: Gender;
-  image: string;
+  thumbnail: string;
   lastTimeOnline: number;
   location: Location;
 }
@@ -114,12 +117,6 @@ export interface MessageTransferInfo {
   xhr: XMLHttpRequest | null;
 }
 
-export type MessageStatus =
-  "on_server"
-  | "read"
-  | "received"
-  | "sending";
-
 export interface MessageModel {
   id: number;
   time: number;
@@ -133,12 +130,18 @@ export interface MessageModel {
   symbol: string | null;
   threadMessagesCount: number;
   deleted: boolean;
-  status: MessageStatus;
+  status: MessageStatusModel;
   edited: number;
   roomId: number;
   userId: number;
   transfer: MessageTransferInfo | null;
 }
+
+export enum MessageStatusInner {
+  SENDING = 'SENDING'
+}
+export type MessageStatusModel = MessageStatus | MessageStatusInner;
+
 
 export interface RoomSettingsModel {
   id: number;
@@ -148,7 +151,7 @@ export interface RoomSettingsModel {
   isMainInChannel: boolean;
   notifications: boolean;
   volume: number;
-  creator: number;
+  creatorId: number;
 }
 
 export type UserDictModel = Record<string, UserModel>;
@@ -243,7 +246,7 @@ export interface ChannelModel {
   expanded: boolean;
   id: number;
   name: string;
-  creator: number;
+  creatorId: number;
 }
 
 export interface ChannelUIModel extends ChannelModel {

@@ -10,7 +10,7 @@
           <th>Username:</th>
           <td>
             <input
-              v-model="model.user"
+              v-model="model.username"
               class="input"
               maxlength="30"
               type="text"

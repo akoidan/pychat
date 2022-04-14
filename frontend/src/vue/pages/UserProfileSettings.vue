@@ -56,12 +56,6 @@
           </td>
         </tr>
         <tr>
-          <th>Automatical error report:</th>
-          <td>
-            <app-checkbox v-model="model.sendLogs"/>
-          </td>
-        </tr>
-        <tr>
           <th>Theme:</th>
           <td>
             <select

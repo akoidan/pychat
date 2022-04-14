@@ -11,6 +11,7 @@ import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/model/user.model';
 import {ChannelModel} from '@/data/model/channel.model';
 import {RoomUsersModel} from '@/data/model/room.users.model';
+import {MysqlBool} from '@/data/types/internal';
 
 
 // 	constraint admin_should_not_be_define_for_private_rooms
@@ -42,14 +43,14 @@ export class RoomModel extends Model<RoomModel> {
     allowNull: false,
     defaultValue: false,
   })
-  public isMainInChannel: boolean;
+  public isMainInChannel: MysqlBool;
 
   @Column({
     type: DataType.BOOLEAN,
     allowNull: false,
     defaultValue: false,
   })
-  public p2p: boolean;
+  public p2p: MysqlBool;
 
   @ForeignKey(() => ChannelModel)
   @Column({

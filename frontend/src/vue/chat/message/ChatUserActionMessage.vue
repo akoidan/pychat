@@ -43,7 +43,7 @@ export default class ChatUserActionMessage extends Vue {
   }
 
   public get user() {
-    return this.isMe ? "You" : this.allUsersDict[this.userId].user;
+    return this.isMe ? "You" : this.allUsersDict[this.userId].username;
   }
 
   public get isMe() {
