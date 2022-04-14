@@ -13,6 +13,20 @@ export class PasswordService {
     return hash(password, 10);
   }
 
+  public async createWsId(userId: number, oldId: string): Promise<string> {
+    let random;
+    if (oldId) {
+      let [userId, oldRandom] = oldId.split(':');
+      if (oldRandom?.length === 4) {
+        random = oldRandom;
+      }
+    }
+    if (!random) {
+      random = await this.generateRandomString(4);
+    }
+    return `${userId}:${random}`
+  }
+
   public async generateRandomString(length: number): Promise<string> {
     let result = '';
     const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';

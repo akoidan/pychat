@@ -25,12 +25,12 @@ import type {
   OfferFile,
   OfferMessage,
   WebRtcSetConnectionIdMessage,
-} from "@/ts/types/messages/wsInMessages";
+} from "@/ts/types/backend";
 import type {
   HandlerName,
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {VideoType} from "@/ts/types/types";
 import type {
   ChangeP2pRoomInfoMessage,

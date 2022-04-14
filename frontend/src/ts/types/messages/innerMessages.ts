@@ -13,7 +13,7 @@ import type {
   ChangeOnlineType,
   DefaultInMessage,
   HandlerName,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {MessageStatus} from "@/ts/types/model";
 
 

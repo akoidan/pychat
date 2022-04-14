@@ -1,4 +1,5 @@
 import {
+  ConsoleLogger,
   INestApplication,
   Logger,
   ValidationPipe
@@ -98,7 +99,7 @@ describe('VerifyModule', () => {
         },
       ],
       controllers: [VerifyController]
-    })
+    }).setLogger(new ConsoleLogger())
       .compile();
     app = moduleFixture.createNestApplication();
     app.useGlobalPipes(new ValidationPipe());

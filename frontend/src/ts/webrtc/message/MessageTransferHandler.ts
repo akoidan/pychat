@@ -14,7 +14,7 @@ import type {
   SendSetMessagesStatusMessage,
   SyncP2PMessage,
 } from "@/ts/types/messages/innerMessages";
-import type {HandlerTypes} from "@/ts/types/messages/baseMessagesInterfaces";
+import type {HandlerTypes} from "@/ts/types/backend";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 
 /**

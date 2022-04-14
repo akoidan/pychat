@@ -13,7 +13,7 @@ import {
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {MainWindow} from "@/ts/classes/MainWindow";

@@ -126,7 +126,7 @@ import type {UserProfileDtoWoImage} from "@/ts/types/dto";
 
 import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
-import type {SetUserProfileMessage} from "@/ts/types/messages/wsInMessages";
+import type {SetUserProfileMessage} from "@/ts/types/backend";
 import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
 import {Gender} from '@/ts/types/backend';
 

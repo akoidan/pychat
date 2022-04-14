@@ -4,7 +4,7 @@ import type {
   DefaultInMessage,
   HandlerName,
   IMessageHandler,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {DefaultInnerSystemMessage} from "@/ts/types/messages/innerMessages";
 
 export default class Subscription {

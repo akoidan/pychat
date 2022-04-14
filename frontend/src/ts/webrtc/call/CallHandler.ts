@@ -35,13 +35,13 @@ import type {
   CallStatus,
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 
 import type {
   AcceptCallMessage,
   OfferCall,
   ReplyCallMessage,
-} from "@/ts/types/messages/wsInMessages";
+} from "@/ts/types/backend";
 import type {
   ChangeStreamMessage,
   CheckTransferDestroy,

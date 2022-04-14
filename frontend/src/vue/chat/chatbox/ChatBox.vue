@@ -124,7 +124,7 @@ import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 
 
 @Component({

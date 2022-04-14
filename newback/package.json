@@ -6,9 +6,9 @@
   "license": "MIT",
   "scripts": {
     "generate-configs": "node-ts-config",
-    "migrate": "ts-node  -r tsconfig-paths/register ./src/utils/migration.runner.ts ",
-    "build": "nest build",
-    "start": "nest start",
+    "migrate": "ts-node --compiler ttypescript ./src/utils/migration.runner.ts ",
+    "build": "ttsc",
+    "start": "ts-node --compiler ttypescript src/main.ts",
     "test:html:coverage": "jest --runInBand --coverage --detectOpenHandles --testTimeout=100000 --coverageReporters html",
     "test": "jest --runInBand --coverage --coverageReporters text"
   },
@@ -43,6 +43,10 @@
     "sequelize": "^6.18.0",
     "sequelize-typescript": "^2.1.3",
     "swagger-ui-express": "^4.3.0",
+    "tsruntime": "^3.0.0-beta.1",
+    "ttypescript": "^1.5.13",
+    "typend": "^1.1.1",
+    "typescript-transform-paths": "^3.3.1",
     "ws": "^8.5.0"
   },
   "devDependencies": {
@@ -64,7 +68,6 @@
     "ts-jest": "^27.1.4",
     "ts-loader": "^9.2.8",
     "ts-node": "^10.7.0",
-    "tsconfig-paths-jest": "^0.0.1",
     "typescript": "^4.6.3",
     "wait-for-expect": "^3.0.2"
   }

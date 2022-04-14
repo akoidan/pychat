@@ -7,7 +7,7 @@ import type {
   CallBackMessage,
   DefaultMessage,
   ResolveCallbackId,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {
   MessageP2pDto,
   MessagesInfo,

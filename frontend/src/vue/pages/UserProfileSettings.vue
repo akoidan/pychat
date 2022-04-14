@@ -134,7 +134,7 @@ import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {userSettingsDtoToModel} from "@/ts/types/converters";
 import type {UserSettingsDto} from "@/ts/types/dto";
-import type {SetSettingsMessage} from "@/ts/types/messages/wsInMessages";
+import type {SetSettingsMessage} from "@/ts/types/backend";
 import type {LogLevel} from "lines-logger";
 import {logLevels} from "lines-logger";
 import {

@@ -11,8 +11,8 @@ export class EmailService {
   public constructor(
     private readonly htmlService: HtmlService,
     private readonly loggerService: Logger,
-    private readonly mailerService: MailerService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly mailerService?: MailerService,
   ) {
   }
 

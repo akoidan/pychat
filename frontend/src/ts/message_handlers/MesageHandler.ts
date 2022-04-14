@@ -5,7 +5,7 @@ import type {
   HandlerType,
   HandlerTypes,
   IMessageHandler,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 
 
 export default abstract class MessageHandler implements IMessageHandler {

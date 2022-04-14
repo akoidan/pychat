@@ -1,6 +1,4 @@
 import type {Config} from '@jest/types';
-const tsconfig = require("./tsconfig.json")
-const moduleNameMapper = require("tsconfig-paths-jest")(tsconfig)
 
 // Sync object
 const config: Config.InitialOptions = {
@@ -9,6 +7,11 @@ const config: Config.InitialOptions = {
 
 export default async(): Promise<Config.InitialOptions> => {
   return {
+    globals: {
+      'ts-jest': {
+        compiler: 'ttypescript'
+      },
+    },
     "moduleFileExtensions": [
       "js",
       "json",
@@ -36,6 +39,5 @@ export default async(): Promise<Config.InitialOptions> => {
     ],
     "coverageDirectory": "./coverage",
     "testEnvironment": "node",
-    moduleNameMapper,
   }
 };

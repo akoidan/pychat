@@ -2,8 +2,8 @@ import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProce
 import type {
   DefaultWsInMessage,
   GrowlMessage,
-} from "@/ts/types/messages/wsInMessages";
-import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
+import type {HandlerName} from "@/ts/types/backend";
 import type Subscription from "@/ts/classes/Subscription";
 import type {MessageSupplier} from "@/ts/types/types";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";

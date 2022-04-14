@@ -31,7 +31,7 @@ import type {
   HandlerName,
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {
   DeleteMessage,
   EditMessage,
@@ -39,7 +39,7 @@ import type {
   PrintMessage,
   SetMessageStatusMessage,
   SyncHistoryResponseMessage,
-} from "@/ts/types/messages/wsInMessages";
+} from "@/ts/types/backend";
 import {savedFiles} from "@/ts/utils/htmlApi";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import {

@@ -33,7 +33,7 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {
   LoginMessage,
   LogoutMessage,

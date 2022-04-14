@@ -8,7 +8,7 @@ import type {
   ChangeDeviceType,
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {
   ChangeP2pRoomInfoMessage,
   ChangeUserOnlineInfoMessage,
@@ -50,7 +50,7 @@ import type {
   SaveChannelSettingsMessage,
   SaveRoomSettingsMessage,
   ShowITypeMessage,
-} from "@/ts/types/messages/wsInMessages";
+} from "@/ts/types/backend";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import type {Logger} from "lines-logger";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";

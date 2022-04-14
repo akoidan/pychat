@@ -19,7 +19,7 @@ import type Http from "@/ts/classes/Http";
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";

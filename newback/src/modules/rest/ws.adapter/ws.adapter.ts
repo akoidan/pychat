@@ -1,49 +1,44 @@
 import {
-  INestApplicationContext,
-  Logger
+  Logger,
+  WebSocketAdapter
 } from '@nestjs/common';
+import {BaseWsInstance} from '@nestjs/websockets';
 import {
-  AbstractWsAdapter,
-  BaseWsInstance
-} from '@nestjs/websockets';
-import {
-  CLOSE_EVENT,
   CONNECTION_EVENT,
+  DISCONNECT_EVENT,
   ERROR_EVENT,
-  MESSAGE_METADATA,
-  DISCONNECT_EVENT
+  MESSAGE_METADATA
 } from '@nestjs/websockets/constants';
 import {MessageMappingProperties} from '@nestjs/websockets/gateway-metadata-explorer';
-import {Observable} from 'rxjs';
-import { isFunction } from '@nestjs/common/utils/shared.utils';
+import {isFunction} from '@nestjs/common/utils/shared.utils';
 import {
+  Server,
+  ServerOptions,
   WebSocket,
   WebSocketServer
 } from "ws";
-import {NestApplication} from '@nestjs/core';
 
 
-enum READY_STATE {
-  CONNECTING_STATE = 0,
-  OPEN_STATE = 1,
-  CLOSING_STATE = 2,
-  CLOSED_STATE = 3,
-}
-
-
-export class WsAdapter  {
+export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
 
   private wsServer: WebSocketServer;
 
   constructor(
-    private httpServer: any,
+    private readonly httpServer: any,
     private readonly logger: Logger
   ) {
 
   }
 
   public bindClientConnect(server: BaseWsInstance, callback: Function) {
-    server.on(CONNECTION_EVENT, callback);
+    server.on(CONNECTION_EVENT, async (...args) => {
+     let handler =  args.find(a => a instanceof WebSocket)
+     if (handler.context) {
+       throw Error("WTF");
+     }
+     handler.context = {};
+     await callback(...args, handler.context)
+    });
   }
 
   public bindClientDisconnect(client: BaseWsInstance, callback: Function) {
@@ -57,14 +52,14 @@ export class WsAdapter  {
 
   public create(
     port: number,
-    {path}: {path: string},
+    options,
   ) {
-    if (port !== 0 || !this.httpServer || !path) {
+    if (port !== 0 || !this.httpServer || !options.path) {
       throw Error("Unsupported server configuration");
     }
     this.wsServer = new WebSocketServer({
       noServer: true,
-      path,
+      ...options,
     });
 
     this.httpServer.on('upgrade', (request, socket, head) => {
@@ -83,16 +78,16 @@ export class WsAdapter  {
   public bindMessageHandlers(
     client: WebSocket,
     handlers: MessageMappingProperties[],
-    transform: (data: any) => Observable<any>,
   ) {
     client.on(MESSAGE_METADATA, (data) => {
-      if (client.readyState !== READY_STATE.OPEN_STATE) {
+      if (client.readyState !== client.OPEN) {
         throw Error('asd')
       }
       const parsed = JSON.parse(data as any);
       if (!parsed.action) {
         throw Error("invalid message")
       }
+
       handlers.find(handler => handler.message === parsed.action).callback(parsed);
     });
 

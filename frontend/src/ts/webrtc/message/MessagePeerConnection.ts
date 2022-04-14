@@ -7,7 +7,7 @@ import {P2PMessageProcessor} from "@/ts/message_handlers/P2PMessageProcessor";
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {
   ConfirmReceivedP2pMessage,
   ConfirmSetMessageStatusRequest,

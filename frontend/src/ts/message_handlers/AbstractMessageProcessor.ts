@@ -2,12 +2,14 @@ import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {MessageSupplier} from "@/ts/types/types";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {DefaultWsOutMessage} from "@/ts/types/messages/wsOutMessages";
-import type {DefaultWsInMessage} from "@/ts/types/messages/wsInMessages";
+import type {
+  DefaultWsInMessage,
+  DefaultWsOutMessage
+} from "@/ts/types/backend";
 import type {
   DefaultMessage,
   HandlerName,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 
 export default class AbstractMessageProcessor {
   protected readonly callBacks: Record<number, {resolve: Function; reject: Function}> = {};

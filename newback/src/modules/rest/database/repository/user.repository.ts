@@ -5,7 +5,10 @@ import {UserAuthModel} from '@/data/model/user.auth.model';
 import {Gender} from '@/data/types/frontend';
 import {UserProfileModel} from '@/data/model/user.profile.model';
 import {UserSettingsModel} from '@/data/model/user.settings.model';
-import {Transaction} from 'sequelize';
+import {
+  Op,
+  Transaction
+} from 'sequelize';
 
 
 @Injectable()
@@ -21,7 +24,7 @@ export class UserRepository {
   public async updateUserPassword(userId: number, password: string, transaction: Transaction) {
     await this.userAuthModel.update({password}, {
       where: {id: userId},
-      transaction
+      transaction,
     })
   }
 
@@ -38,7 +41,7 @@ export class UserRepository {
   }, transaction: Transaction): Promise<number> {
     let userModel = await this.userModel.create({
       username: data.username,
-      lastTimeOnline: new Date(),
+      lastTimeOnline: Date.now(),
       sex: data.sex,
       thumbnail: data.thumbnail
     }, {transaction, raw: true,})
@@ -65,6 +68,7 @@ export class UserRepository {
       where: {
         googleId
       },
+      raw: true,
       transaction
     })
   }
@@ -74,6 +78,7 @@ export class UserRepository {
       where: {
         facebookId
       },
+      raw: true,
       transaction
     })
   }
@@ -96,6 +101,7 @@ export class UserRepository {
   public async getUserByEmail(email: string, transaction?: Transaction): Promise<UserAuthModel | null> {
     return this.userAuthModel.findOne({
       where: {email},
+      raw: true,
       transaction,
       include: [
         'user', // LEFT OUTER JOIN "id" = "user"."id"
@@ -103,10 +109,32 @@ export class UserRepository {
     })
   }
 
-  public async getUserByUserName(username: string, includeFields: ('userAuth' | 'userProfile')[], transaction?: Transaction): Promise<UserModel | null> {
+  public async getUserByUserName(username: string, includeFields: ('userAuth' | 'userProfile')[] = [], transaction?: Transaction): Promise<UserModel | null> {
     return this.userModel.findOne({
       where: {username},
       transaction,
+      raw: true,
+      include: includeFields,
+    })
+  }
+
+  public async getById(id: number, includeFields: ('userAuth' | 'userProfile'| 'userSettings')[] = [], transaction?: Transaction): Promise<UserModel | null> {
+    return this.userModel.findOne({
+      where: {id},
+      transaction,
+      raw: true,
+      include: includeFields,
+    })
+  }
+
+  public async getUsersById(ids: number[], includeFields: ('userAuth' | 'userProfile' | 'userSettings')[] = []) {
+    return this.userModel.findAll({
+      where: {
+        id: {
+          [Op.in]: ids,
+        },
+      },
+      raw: true,
       include: includeFields,
     })
   }

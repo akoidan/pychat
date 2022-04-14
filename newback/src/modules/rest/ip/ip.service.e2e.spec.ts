@@ -7,6 +7,7 @@ import {HttpModule} from '@/modules/rest/http/http.module';
 import * as pychatIpAddressFixture from '@/fixtures/ip.134.249.113.11.json';
 import {LoggerModule} from '@/modules/rest/logger/logger.module';
 import {InvalidIpException} from '@/modules/rest/ip/invalid.ip.exception';
+import {ConsoleLogger} from '@nestjs/common';
 
 describe('IpService', () => {
 
@@ -23,7 +24,8 @@ describe('IpService', () => {
         providers: [
           IpService,
         ]
-      }).compile();
+      }).setLogger(new ConsoleLogger())
+        .compile();
       ipservice = moduleFixture.get(IpService);
     })
 

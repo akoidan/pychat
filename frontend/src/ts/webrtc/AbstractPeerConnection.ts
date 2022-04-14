@@ -6,12 +6,12 @@ import {bytesToSize} from "@/ts/utils/pureFunctions";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
+import type {HandlerName} from "@/ts/types/backend";
 import type {
   CheckTransferDestroy,
   ConnectToRemoteMessage,
 } from "@/ts/types/messages/innerMessages";
-import type {SendRtcDataMessage} from "@/ts/types/messages/wsInMessages";
+import type {SendRtcDataMessage} from "@/ts/types/backend";
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
 
 

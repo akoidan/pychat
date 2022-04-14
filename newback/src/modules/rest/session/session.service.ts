@@ -1,9 +1,13 @@
 import {
   Injectable,
-  Logger
+  InternalServerErrorException,
+  Logger,
+  UnauthorizedException
 } from '@nestjs/common';
 import {PasswordService} from '@/modules/rest/password/password.service';
 import {RedisService} from '@/modules/rest/redis/redis.service';
+import {UserRepository} from '@/modules/rest/database/repository/user.repository';
+import {UserModel} from '@/data/model/user.model';
 
 @Injectable()
 export class SessionService {
@@ -11,6 +15,7 @@ export class SessionService {
   constructor(
     private readonly passwordService: PasswordService,
     private readonly redisService: RedisService,
+    private readonly userRepository: UserRepository,
     private readonly logger: Logger,
   ) {
   }
@@ -20,5 +25,21 @@ export class SessionService {
     this.logger.log(`Generated session for userId ${userId}: ${session}`)
     await this.redisService.saveSession(session, userId);
     return session;
+  }
+
+  public async getUserById(sessionId: string): Promise<UserModel> {
+    if (!sessionId) {
+      throw new UnauthorizedException("sessionId is missing");
+    }
+    let userId = await this.redisService.getSession(sessionId);
+    if (!userId) {
+      throw new UnauthorizedException("Session id expired");
+    }
+    let user = await this.userRepository.getById(userId, ['userProfile', 'userAuth', 'userSettings'])
+    if (!user) {
+      await this.redisService.removeSession(sessionId);
+      throw new InternalServerErrorException("Database has been cleared this user is removed");
+    }
+    return user;
   }
 }

@@ -7,8 +7,8 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import type {ReplyFileMessage} from "@/ts/types/messages/wsInMessages";
+} from "@/ts/types/backend";
+import type {ReplyFileMessage} from "@/ts/types/backend";
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 
 

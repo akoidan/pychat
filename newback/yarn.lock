@@ -347,6 +347,13 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@eveble/helpers@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@eveble/helpers/-/helpers-1.0.3.tgz#4cedc4df777dfd2a7bac2387a7537bc22abbd3a1"
+  integrity sha512-gR/PKgh8yGIu6pHNrgaqb/Rgf9di6+rKQXXxofnRWVgP1pgQOpAb4TcqYJS/QV4JVSne5P0mc1oFo98jXbmprw==
+  dependencies:
+    reflect-metadata "^0.1.13"
+
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.5"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.9.5.tgz#2cbaf9a89460da24b5ca6531b8bbfc23e1df50c7"
@@ -2237,6 +2244,11 @@ dedent@^0.7.0:
   resolved "https://registry.yarnpkg.com/dedent/-/dedent-0.7.0.tgz#2495ddbaf6eb874abb0e1be9df22d2e5a544326c"
   integrity sha1-JJXduvbrh0q7Dhvp3yLS5aVEMmw=
 
+deep-diff@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/deep-diff/-/deep-diff-1.0.2.tgz#afd3d1f749115be965e89c63edc7abb1506b9c26"
+  integrity sha512-aWS3UIVH+NPGCD1kki+DCU9Dua032iSsO43LqQpcs4R3+dVv7tX0qBGjiVHJHjplsoUM2XRO/KB92glqc68awg==
+
 deep-is@^0.1.3, deep-is@~0.1.3:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.4.tgz#a6f2dce612fadd2ef1f519b73551f17e85199831"
@@ -2574,6 +2586,11 @@ es-to-primitive@^1.2.1:
     is-callable "^1.1.4"
     is-date-object "^1.0.1"
     is-symbol "^1.0.2"
+
+es6-error@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/es6-error/-/es6-error-4.1.1.tgz#9e3af407459deed47e9a91f9b885a84eb05c561d"
+  integrity sha512-Um/+FxMr9CISWh0bi5Zv0iOD+4cFh5qLeks1qhAopKVAJw3drgKbKySikp7wGhDL0HPeaja0P5ULZrxLkniUVg==
 
 es7-shim@^6.0.0:
   version "6.0.0"
@@ -4651,7 +4668,7 @@ lodash.some@^4.4.0:
   resolved "https://registry.yarnpkg.com/lodash.some/-/lodash.some-4.6.0.tgz#1bb9f314ef6b8baded13b549169b2a945eb68e4d"
   integrity sha1-G7nzFO9ri63tE7VJFpsqlF62jk0=
 
-lodash@4.17.21, lodash@^4.17.19, lodash@^4.17.21, lodash@^4.7.0:
+lodash@4.17.21, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.21, lodash@^4.7.0:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
@@ -5380,6 +5397,11 @@ pluralize@^3.1.0:
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-3.1.0.tgz#84213d0a12356069daa84060c559242633161368"
   integrity sha1-hCE9ChI1YGnaqEBgxVkkJjMWE2g=
 
+polytype@^0.9.4:
+  version "0.9.4"
+  resolved "https://registry.yarnpkg.com/polytype/-/polytype-0.9.4.tgz#38082d6e345670ca1963a0ef58f72d564290fae1"
+  integrity sha512-pkS84YcAEPHkIWEYKd9/QDmYPIhlmQeOUYwEO7IQRGEvlIkNIKCs6r4zhFSdTCNAEiCnfCgINHQNDfShlS2snw==
+
 prelude-ls@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
@@ -5776,7 +5798,7 @@ resolve.exports@^1.1.0:
   resolved "https://registry.yarnpkg.com/resolve.exports/-/resolve.exports-1.1.0.tgz#5ce842b94b05146c0e03076985d1d0e7e48c90c9"
   integrity sha512-J1l+Zxxp4XK3LUDZ9m60LRJF/mAe4z6a4xyabPHk7pvK5t35dACV32iIjJDFeWZFfZlO29w6SZ67knR0tHzJtQ==
 
-resolve@^1.1.6, resolve@^1.15.1, resolve@^1.20.0:
+resolve@>=1.9.0, resolve@^1.1.6, resolve@^1.15.1, resolve@^1.20.0:
   version "1.22.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.22.0.tgz#5e0b8c67c15df57a89bdbabe603a002f21731198"
   integrity sha512-Hhtrw0nLeSrFQ7phPp4OOcVjLPIeMnRlr5mcnVuMe7M/7eBn98A3hmFRLoFo3DLZkivSYwhRUJTyPyWAk56WLw==
@@ -6527,11 +6549,6 @@ ts-node@^10.7.0:
     v8-compile-cache-lib "^3.0.0"
     yn "3.1.1"
 
-tsconfig-paths-jest@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/tsconfig-paths-jest/-/tsconfig-paths-jest-0.0.1.tgz#a977a5648c434037b69884e644ce1b82bf025b68"
-  integrity sha1-qXelZIxDQDe2mITmRM4bgr8CW2g=
-
 tsconfig-paths-webpack-plugin@3.5.2:
   version "3.5.2"
   resolved "https://registry.yarnpkg.com/tsconfig-paths-webpack-plugin/-/tsconfig-paths-webpack-plugin-3.5.2.tgz#01aafff59130c04a8c4ebc96a3045c43c376449a"
@@ -6561,12 +6578,24 @@ tslib@^1.8.1, tslib@^1.9.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
+tsruntime@^3.0.0-beta.1:
+  version "3.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/tsruntime/-/tsruntime-3.0.0-beta.1.tgz#3e3dd8239f328fb9b106933fcb00d67dc103afcc"
+  integrity sha512-volvVq4rMMPyS3LcuXagPpEepSqSgnAWqi8D/RDDDAbc4NSxY4HAcI5tOoWztGhW3LFA+xbmzlLGPYJeniJfag==
+
 tsutils@^3.21.0:
   version "3.21.0"
   resolved "https://registry.yarnpkg.com/tsutils/-/tsutils-3.21.0.tgz#b48717d394cea6c1e096983eed58e9d61715b623"
   integrity sha512-mHKK3iUXL+3UF6xL5k0PEhKRUBKPBCv/+RkEOpjRWxxx27KKRBmmA60A9pgOUvMi8GKhRMPEmjBRPzs2W7O1OA==
   dependencies:
     tslib "^1.8.1"
+
+ttypescript@^1.5.10, ttypescript@^1.5.13:
+  version "1.5.13"
+  resolved "https://registry.yarnpkg.com/ttypescript/-/ttypescript-1.5.13.tgz#c3bcb760599fe49157d30c5d5895a0023cbb7f30"
+  integrity sha512-KT/RBfGGlVJFqEI8cVvI3nMsmYcFvPSZh8bU0qX+pAwbi7/ABmYkzn7l/K8skw0xmYjVCoyaV6WLsBQxdadybQ==
+  dependencies:
+    resolve ">=1.9.0"
 
 type-check@^0.4.0, type-check@~0.4.0:
   version "0.4.0"
@@ -6616,6 +6645,28 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
+
+typend@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/typend/-/typend-1.1.1.tgz#1159c090239c9b1b82249660f07a0d5be99de096"
+  integrity sha512-oSme4CVDzhv8IsSHPgm1B61wM6mZuj+i8ITcOnTP4jeg1S1q3eL3cfN247eMZmxOtC4cvdWUAoecIk1Y879qBA==
+  dependencies:
+    "@eveble/helpers" "^1.0.3"
+    deep-diff "^1.0.2"
+    deepmerge "^4.2.2"
+    es6-error "^4.1.1"
+    lodash "^4.17.15"
+    polytype "^0.9.4"
+    reflect-metadata "^0.1.13"
+    tsruntime "^3.0.0-beta.1"
+    ttypescript "^1.5.10"
+
+typescript-transform-paths@^3.3.1:
+  version "3.3.1"
+  resolved "https://registry.yarnpkg.com/typescript-transform-paths/-/typescript-transform-paths-3.3.1.tgz#74526bc1b6dc575ffe269cc81833db7bd81763e1"
+  integrity sha512-c+8Cqd2rsRtTU68rJI0NX/OtqgBDddNs1fIxm1nCNyhn0WpoyqtpUxc1w9Ke5c5kgE4/OT5xYbKf2cf694RYEg==
+  dependencies:
+    minimatch "^3.0.4"
 
 typescript@4.6.2:
   version "4.6.2"

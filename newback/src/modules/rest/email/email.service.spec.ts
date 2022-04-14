@@ -10,6 +10,7 @@ import {ConfigModule} from '@/modules/rest/config/config.module';
 import {promisify} from 'util';
 import {readFile} from 'fs';
 import {resolve} from 'path';
+import {ConsoleLogger} from '@nestjs/common';
 
 describe('EmailSenderService', () => {
 
@@ -32,7 +33,8 @@ describe('EmailSenderService', () => {
           HtmlService,
           EmailService,
         ]
-      }).compile();
+      }).setLogger(new ConsoleLogger())
+        .compile();
       sender = moduleFixture.get(EmailService);
       mailer = moduleFixture.get(MailerService);
     })

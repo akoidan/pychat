@@ -92,13 +92,6 @@ export interface Location {
  * a - audio
  * m - media (same as video, but you need to click on image, in order to load video)
  */
-export type BlobType =
-  "a"
-  | "f"
-  | "g"
-  | "i"
-  | "m"
-  | "v";
 
 export interface FileModel {
   url: string | null;

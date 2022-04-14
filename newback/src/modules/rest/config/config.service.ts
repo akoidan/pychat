@@ -1,13 +1,13 @@
 import {Injectable} from '@nestjs/common';
-import type {IConfig} from 'node-ts-config';
+import type {config as Blah} from 'node-ts-config';
 
 @Injectable()
 export class ConfigService {
 
-  constructor(private readonly config: IConfig) {
+  constructor(private readonly config: typeof Blah) {
   }
 
-  public getConfig(): IConfig {
+  public getConfig(): typeof Blah {
     return this.config;
   }
 

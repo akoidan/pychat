@@ -6,6 +6,7 @@ import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 import {IpService} from '@/modules/rest/ip/ip.service';
 import {IpAddressModel} from '@/data/model/ip.address.model';
 import {InvalidIpException} from '@/modules/rest/ip/invalid.ip.exception';
+import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 
 @Injectable()
 export class IpCacheService {
@@ -22,6 +23,13 @@ export class IpCacheService {
       return "Unknown";
     } else {
       return `${data.country} ${data.city} ${data.isp}`;
+    }
+  }
+
+  public async saveIp(userId: number, ip: string) {
+    let ipModel = await this.getIpInfo(ip);
+    if (ipModel) {
+      await this.ipRepository.saveIpToUser(userId, ipModel.id)
     }
   }
 

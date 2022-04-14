@@ -8,6 +8,11 @@ import {config} from 'node-ts-config';
 import {ConfigModule} from '@/modules/rest/config/config.module';
 import {VerifyModule} from '@/modules/api/verify/verify.module';
 import {WebsocketGateway} from '@/modules/api/websocket/websocket.gateway';
+import {RedisService} from '@/modules/rest/redis/redis.service';
+import {SessionService} from '@/modules/rest/session/session.service';
+import {PasswordService} from '@/modules/rest/password/password.service';
+import {UserRepository} from '@/modules/rest/database/repository/user.repository';
+import {DatabaseModule} from '@/modules/rest/database/database.module';
 
 @Module({
   imports: [
@@ -15,7 +20,16 @@ import {WebsocketGateway} from '@/modules/api/websocket/websocket.gateway';
     LoggerModule,
     ConfigModule,
     VerifyModule,
-    WebsocketGateway,
+    DatabaseModule,
+    {
+      module: WebsocketGateway,
+      imports: [DatabaseModule],
+      providers: [
+        RedisService,
+        SessionService,
+        PasswordService,
+      ]
+    },
     RedisModule.forRoot({
       config: {
         host: config.redis.host,

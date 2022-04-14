@@ -33,6 +33,7 @@ export class VerificationRepository {
     return await this.verificationModel.findOne({
       where: {token},
       include: ['user'],
+      raw: true,
       transaction
     });
   }

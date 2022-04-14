@@ -17,11 +17,11 @@ import type {
   ConnectToRemoteMessage,
   DestroyPeerConnectionMessage,
 } from "@/ts/types/messages/innerMessages";
-import type {DestroyCallConnection} from "@/ts/types/messages/wsInMessages";
+import type {DestroyCallConnection} from "@/ts/types/backend";
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import {
   getStreamLog,
   getTrackLog,

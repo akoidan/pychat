@@ -193,7 +193,7 @@ export class AuthService {
     }
   }
 
-  private async createUser(data: SignUpRequest, transaction: Transaction) {
+  public async createUser(data: SignUpRequest, transaction?: Transaction): Promise<number>{
     await this.validateUser(data.username, transaction);
     if (data.email) {
       await this.validateEmail(data.email)

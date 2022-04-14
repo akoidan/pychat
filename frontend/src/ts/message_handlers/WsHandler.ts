@@ -39,6 +39,7 @@ import type {
   AddChannelMessage,
   AddInviteMessage,
   AddRoomMessage,
+  DefaultWsOutMessage,
   GetCountryCodeMessage,
   MessagesResponseMessage,
   PingMessage,
@@ -49,10 +50,11 @@ import type {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
+  SyncHistoryOutMessage,
   SyncHistoryResponseMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
-} from "@/ts/types/messages/wsInMessages";
+} from "@/ts/types/backend";
 import type {
   InternetAppearMessage,
   LogoutMessage,
@@ -61,11 +63,7 @@ import type {
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import type {
-  DefaultWsOutMessage,
-  SyncHistoryOutMessage,
-} from "@/ts/types/messages/wsOutMessages";
+} from "@/ts/types/backend";
 import type Subscription from "@/ts/classes/Subscription";
 
 enum WsState {

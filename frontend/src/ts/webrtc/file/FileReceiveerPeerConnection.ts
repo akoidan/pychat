@@ -16,11 +16,11 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   HandlerType,
   HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from "@/ts/types/backend";
 import type {
   DestroyFileConnectionMessage,
   RetryFileMessage,
-} from "@/ts/types/messages/wsInMessages";
+} from "@/ts/types/backend";
 import type Subscription from "@/ts/classes/Subscription";
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {

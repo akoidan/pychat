@@ -3,6 +3,13 @@
      "paths": {
       "@/*": ["src/*"]
     },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      {
+        "transform": "tsruntime/dist/transform/transformer.js",
+        "type": "program"
+      }
+    ],
     "module": "commonjs",
     "declaration": true,
     "removeComments": true,
