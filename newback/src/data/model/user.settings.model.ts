@@ -40,7 +40,7 @@ export class UserSettingsModel extends Model<UserSettingsModel> {
     allowNull: false,
     defaultValue: true,
   })
-  public showWhenImTyping: boolean;
+  public showWhenITyping: boolean;
 
   @Column({
     type: DataType.BOOLEAN,
@@ -75,14 +75,14 @@ export class UserSettingsModel extends Model<UserSettingsModel> {
     allowNull: false,
     defaultValue: false,
   })
-  public onlineChangeMessages: boolean;
+  public onlineChangeSound: boolean;
 
   @Column({
     type: DataType.ENUM(...Object.keys(logLevels)),
     allowNull: false,
     defaultValue: 'error',
   })
-  public devtoolsLogs: LogLevel;
+  public logs: LogLevel;
 
   @Column({
     type: DataType.ENUM(...Object.keys(Theme)),

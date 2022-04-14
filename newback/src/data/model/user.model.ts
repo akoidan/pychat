@@ -9,6 +9,8 @@ import {Injectable} from '@nestjs/common';
 import {Gender} from '@/data/types/frontend';
 import {UserAuthModel} from '@/data/model/user.auth.model';
 import {MAX_USERNAME_LENGTH} from '@/utils/consts';
+import {UserProfileModel} from '@/data/model/user.profile.model';
+import {UserSettingsModel} from '@/data/model/user.settings.model';
 
 
 @Injectable()
@@ -22,10 +24,10 @@ export class UserModel extends Model<UserModel> {
   public id: number;
 
   @Column({
-    type: DataType.DATE,
+    type: DataType.BIGINT,
     allowNull: false,
   })
-  public lastTimeOnline: Date;
+  public lastTimeOnline: number;
 
   @Column({
     allowNull: false,
@@ -36,6 +38,12 @@ export class UserModel extends Model<UserModel> {
 
   @HasOne(() => UserAuthModel, 'id')
   public userAuth: UserAuthModel;
+
+  @HasOne(() => UserProfileModel, 'id')
+  public userProfile: UserProfileModel;
+
+  @HasOne(() => UserSettingsModel, 'id')
+  public userSettings: UserSettingsModel;
 
   @Column({
     type: DataType.ENUM(...Object.keys(Gender)),

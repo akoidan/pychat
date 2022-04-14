@@ -3,12 +3,14 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript';
 import {Injectable} from '@nestjs/common';
 import {UserModel} from '@/data/model/user.model';
 import {ChannelModel} from '@/data/model/channel.model';
+import {RoomUsersModel} from '@/data/model/room.users.model';
 
 
 // 	constraint admin_should_not_be_define_for_private_rooms
@@ -59,6 +61,9 @@ export class RoomModel extends Model<RoomModel> {
 
   @BelongsTo(() => ChannelModel)
   public channel: ChannelModel;
+
+  @HasMany(() => RoomUsersModel)
+  public roomUsers: RoomUsersModel[];
 
   @ForeignKey(() => UserModel)
   @Column({
