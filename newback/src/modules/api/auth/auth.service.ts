@@ -68,7 +68,7 @@ export class AuthService {
           // the chance that there will be a user with same id is insignificant
           username = await this.passwordService.generateRandomString(MAX_USERNAME_LENGTH);
         }
-        this.logger.log(`Generates username='${username}' for fbId ${fbResponse.id}`);
+        this.logger.log(`Generates username='${username}' for fbId ${fbResponse.id}`, 'auth.service');
         const password = await this.passwordService.createPassword(await this.passwordService.generateRandomString(16));
 
         let userId = await this.userRepository.createUser({
@@ -107,7 +107,7 @@ export class AuthService {
           // the chance that there will be a user with same id is insignificant
           username = await this.passwordService.generateRandomString(MAX_USERNAME_LENGTH);
         }
-        this.logger.log(`Generates username='${username}' for email ${googleResponse.email}`);
+        this.logger.log(`Generates username='${username}' for email ${googleResponse.email}`, 'auth.service');
         const password = await this.passwordService.createPassword(await this.passwordService.generateRandomString(16));
 
         let userId = await this.userRepository.createUser({
@@ -153,16 +153,16 @@ export class AuthService {
 
   public async sendVerificationEmail(email: string, userId: number, username: string, ip: string) {
     try {
-      this.logger.debug(`Preparing for sending verification email to userId ${userId}`)
+      this.logger.debug(`Preparing for sending verification email to userId ${userId}`, 'auth.service')
       await this.sequelize.transaction(async(t) => {
         let token = await this.passwordService.generateRandomString(32);
-        this.logger.log(`Generated token for userId ${userId}: ${token}`)
+        this.logger.log(`Generated token for userId ${userId}: ${token}`, 'auth.service')
         await this.verificationRepository.createVerification(email, userId, token, VerificationType.REGISTER, t)
         let ipInfo = await this.ipCacheService.getIpString(ip)
         await this.emailService.sendSignUpEmail(username, userId, email, token, ip, ipInfo)
       });
     } catch (e) {
-      this.logger.error(`Can't send email to userid ${userId} ${email} because ${e.message}`, e.stack, 'Mail')
+      this.logger.error(`Can't send email to userid ${userId} ${email} because ${e.message}`, e.stack, 'auth.service')
     }
 
   }

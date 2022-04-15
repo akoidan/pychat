@@ -55,7 +55,7 @@ export class IpCacheService {
       await this.ipRepository.saveIP(model)
       return model;
     } catch (e: any) {
-      this.logger.error(`Unable to get Ip Address Info ${ip}`, e.stack, e.error)
+      this.logger.error(`Unable to get Ip Address Info ${ip} ${e.error}`, e.stack, 'ip.cache.service')
       if (!(e as InvalidIpException).networkError) {
         await this.ipRepository.saveIP({ip, status: false})
         return null;

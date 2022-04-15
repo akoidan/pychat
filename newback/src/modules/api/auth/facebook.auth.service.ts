@@ -43,7 +43,7 @@ export class FacebookAuthService {
       }
     }
     let userId = response.data.user_id;
-    this.logger.log(`got userId='${userId}' for facebookToken='${idToken}'`);
+    this.logger.log(`got userId='${userId}' for facebookToken='${idToken}'`, 'facebook.auth.service');
     if (!userId) {
       throw new InternalServerErrorException("invalid facebook response, userId is missing")
     }
@@ -56,7 +56,7 @@ export class FacebookAuthService {
     if (!facebookUser.id) {
       throw new InternalServerErrorException("invalid facebook response, id is missing")
     }
-    this.logger.log(`got userid='${facebookUser.id}' for facebookToken='${idToken}'`);
+    this.logger.log(`got userid='${facebookUser.id}' for facebookToken='${idToken}'`, 'facebook.auth.service');
     return facebookUser;
   }
 }

@@ -39,26 +39,26 @@ export class HttpService {
 
   private async post<T = Record<string, any>>(url, body: any, headers: Record<string, string>): Promise<T> {
     let requestId = ++this.requestId;
-    this.logger.debug(`POST[${requestId}]: url='${url}'; data=${body}; headers=${JSON.stringify(headers)} `)
+    this.logger.debug(`POST[${requestId}]: url='${url}'; data=${body}; headers=${JSON.stringify(headers)}`, 'api')
     const response = await this.nodeFetch(url, {
       method: 'post',
       body,
       headers
     });
     const responseBody = await response.json();
-    this.logger.debug(`POST[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`)
+    this.logger.debug(`POST[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`, 'api')
     return responseBody;
   }
 
   private async get<T = Record<string, any>>(url, headers: Record<string, string>): Promise<T> {
     let requestId = ++this.requestId;
-    this.logger.debug(`GET[${requestId}]: url='${url}'; headers=${JSON.stringify(headers)} `)
+    this.logger.debug(`GET[${requestId}]: url='${url}'; headers=${JSON.stringify(headers)}`, 'api')
     const response = await this.nodeFetch(url, {
       method: 'get',
       headers
     });
     const responseBody = await response.json();
-    this.logger.debug(`GET[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`)
+    this.logger.debug(`GET[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`, 'api')
     return responseBody;
   }
 

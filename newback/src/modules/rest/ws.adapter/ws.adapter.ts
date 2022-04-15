@@ -71,9 +71,9 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
     });
 
     this.httpServer.on(CONNECTION_EVENT, (ws: any) =>
-      ws.on(ERROR_EVENT, (err: any) => this.logger.error(err)),
+      ws.on(ERROR_EVENT, (err: any) => this.logger.error(err, err?.stack, 'ws')),
     );
-    this.httpServer.on(ERROR_EVENT, (err: any) => this.logger.error(err));
+    this.httpServer.on(ERROR_EVENT, (err: any) => this.logger.error(err, err?.stack, 'ws'));
     return this.wsServer;
   }
 

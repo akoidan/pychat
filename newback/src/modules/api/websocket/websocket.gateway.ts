@@ -89,7 +89,7 @@ export class WebsocketGateway implements OnGatewayConnection {
     context.id = user.id;
 
     let channelsToListen = [...myRooms.map(r => String(r.id)), id, `u${user.id}`, '*'];
-    this.logger.log(`User #${user.id} ${user.username} subscribed to ${JSON.stringify(channelsToListen)}`);
+    this.logger.log(`User #${user.id} ${user.username} subscribed to ${JSON.stringify(channelsToListen)}`, 'ws');
     socket.send(JSON.stringify(response));
     this.pubsubService.subscribe(context, ...channelsToListen)
     this.pubsubService.emit(

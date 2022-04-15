@@ -80,7 +80,7 @@ export class VerifyService {
       let verificationModel: VerificationModel = await this.verificationRepository.getVerification(body.token, t);
       this.doTokenVerification(verificationModel, VerificationType.PASSWORD);
       let password = await this.passwordService.createPassword(body.password);
-      this.logger.log(`Generated newPassword='${password}' for verification='${verificationModel.id}' for userId=${verificationModel.userId}`);
+      this.logger.log(`Generated newPassword='${password}' for verification='${verificationModel.id}' for userId=${verificationModel.userId}`, 'verify.service');
       await this.userRepository.updateUserPassword(verificationModel.userId, password, t)
       await this.verificationRepository.markVerificationVerified(verificationModel.id, t);
       let session = await this.sessionService.createAndSaveSession(verificationModel.userId);
