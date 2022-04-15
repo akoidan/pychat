@@ -43,7 +43,7 @@ export class UserProfileModel extends Model<UserProfileModel> {
   public surname: string;
 
   @Column({
-    type: DataType.DATE,
+    type: DataType.DATEONLY,
     allowNull: true,
   })
   public birthday: Date;

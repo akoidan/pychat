@@ -32,7 +32,7 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  public userId: string;
+  public userId: number;
 
   @BelongsTo(() => UserModel)
   public user: UserModel;
@@ -43,7 +43,7 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
     type: DataType.INTEGER,
     allowNull: false
   })
-  public messageId: string;
+  public messageId: number;
 
   @BelongsTo(() => MessageModel)
   public message: MessageModel;

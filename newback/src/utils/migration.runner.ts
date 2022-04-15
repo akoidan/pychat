@@ -23,7 +23,7 @@ const connection = createConnection({
 connection.connect(async function (err) {
   let migrations = new CommandsRunner({
     driver: new MysqlDriver(connection),
-    directoryWithScripts: `${__dirname}/../../config/migration/`,
+    directoryWithScripts: `${__dirname}/../data/migration/`,
   });
   await migrations.run('init')
   await migrations.run('migrate')

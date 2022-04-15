@@ -134,18 +134,18 @@ export enum VerificationType {
 
 export enum ImageType {
   VIDEO = 'VIDEO',
-  IMAGE = 'IMAGE',
-  GIPHY = 'GIPHY'
-}
-
-export enum UploadedFileChoices {
-  VIDEO = 'VIDEO',
   FILE = 'FILE',
   MEDIA_RECORD = 'MEDIA_RECORD',
   AUDIO_RECORD = 'AUDIO_RECORD',
   IMAGE = 'IMAGE',
   PREVIEW = 'PREVIEW',
-  ISSUE = 'ISSUE'
+  GIPHY = 'GIPHY'
+}
+
+export enum UploadedFileChoices {
+  VIDEO = 'VIDEO',
+  IMAGE = 'IMAGE',
+  FILE = 'FILE',
 }
 
 /** CODE THAT I PUT HERE MANUALLY */

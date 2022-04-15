@@ -46,10 +46,4 @@ export class UserJoinedInfoModel extends Model<UserJoinedInfoModel> {
   @BelongsTo(() => UserModel)
   public user: UserModel;
 
-  @Column({
-    type: DataType.DATE,
-    allowNull: false,
-  })
-  public time: Date;
-
 }

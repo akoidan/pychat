@@ -33,28 +33,7 @@ import {SendToClientPubSubMessage} from '@/modules/api/websocket/interfaces/pubs
 import {WebsocketService} from '@/modules/api/websocket/websocket.service';
 import {OnWsClose} from '@/modules/api/websocket/interfaces/utils';
 import {WsDataService} from '@/modules/api/websocket/ws.data.service';
-
-
-
-@Catch(Error)  // if we provide it on module Websocket it will also affect http,so fuck it
-// since we can't decouple this from WebSocketGateway, it should be in this file
-export class WsExceptionFilter implements ExceptionFilter {
-  catch(exception: HttpException, host: ArgumentsHost) {
-    let cbId = host.getArgByIndex(1)?.cbId;
-    if (cbId) {
-      let response: GrowlMessage = {
-          cbId: cbId,
-          action: 'growlError',
-          content: exception.message,
-          handler: 'void',
-        }
-      let websocket: WebSocket = host.getArgByIndex(0);
-      websocket.send(response);
-    } else {
-      throw exception;
-    }
-  }
-}
+import {WsExceptionFilter} from '@/modules/api/websocket/ws.exception.filter';
 
 @WebSocketGateway({
   path: '/ws'

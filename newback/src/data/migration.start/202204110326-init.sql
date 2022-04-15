@@ -70,7 +70,7 @@ CREATE TABLE `message`
 CREATE TABLE `image`
 (
     `id`                INTEGER auto_increment,
-    `type`              ENUM ('VIDEO', 'IMAGE', 'GIPHY') NOT NULL,
+    `type`              ENUM('VIDEO', 'FILE', 'MEDIA_RECORD', 'AUDIO_RECORD', 'IMAGE', 'PREVIEW', 'GIPHY') NOT NULL,
     `symbol`            VARCHAR(1)                       NOT NULL,
     `message_id`        INTEGER                          NOT NULL,
     `img`               VARCHAR(255),
@@ -190,7 +190,7 @@ CREATE TABLE `subscription_message`
 CREATE TABLE `uploaded_file`
 (
     `id`         INTEGER auto_increment,
-    `type`       ENUM ('VIDEO', 'FILE', 'MEDIA_RECORD', 'AUDIO_RECORD', 'IMAGE', 'PREVIEW', 'ISSUE') NOT NULL,
+    `type`       ENUM('VIDEO', 'IMAGE', 'FILE') NOT NULL,
     `symbol`     VARCHAR(1)                                                                          NOT NULL,
     `user_id`    INTEGER                                                                             NOT NULL,
     `file`       VARCHAR(255)                                                                        NOT NULL,
@@ -240,7 +240,6 @@ CREATE TABLE `user_joined_info`
     `id`         INTEGER auto_increment,
     `ip_id`      INTEGER  NOT NULL,
     `user_id`    INTEGER  NOT NULL,
-    `time`       DATETIME NOT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME,
@@ -257,7 +256,7 @@ CREATE TABLE `user_profile`
     `name`       VARCHAR(30),
     `city`       VARCHAR(50),
     `surname`    VARCHAR(30),
-    `birthday`   DATETIME,
+    `birthday`   DATE,
     `contacts`   VARCHAR(100),
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
@@ -288,10 +287,10 @@ CREATE TABLE `user_settings`
   DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_general_ci;
 
-INSERT INTO user (id, last_time_online, username, sex, thumbnail, created_at, updated_at, deleted_at) VALUES (1, 1649949638861, '1', 'OTHER', null, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
-INSERT INTO channel (id, name, creator_id, created_at, updated_at, deleted_at) VALUES (1, 'all', 1, '2022-04-13 16:32:11', '2022-04-13 16:32:09', null);
-INSERT INTO room (id, name, is_main_in_channel, p2p, channel_id, creator_id, created_at, updated_at, deleted_at) VALUES (1, 'all', 1, DEFAULT, 1, 1, '2022-04-13 16:35:16', '2022-04-13 16:35:20', null);
-INSERT INTO user_profile (id, name, city, surname, birthday, contacts, created_at, updated_at, deleted_at) VALUES (1, null, null, null, null, null, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
-INSERT INTO user_auth (id, password, email, facebook_id, google_id, email_verification_id, created_at, updated_at, deleted_at) VALUES (1, '$2b$10$8RTcHp1.oCEYGiPgLbTHH.Fk8MC6YUySzJ8AxGFxnjFqb.zsdlH7m', 'deathangel908@gmail.com', null, null, null, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
-INSERT INTO user_settings (id, suggestions, show_when_i_typing, embedded_youtube, highlight_code, message_sound, incoming_file_call_sound, online_change_sound, logs, theme, created_at, updated_at, deleted_at) VALUES (1, 1, 1, 1, 1, 0, 0, 0, 'error', 'COLOR_REG', '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
-INSERT INTO room_user (id, room_id, user_id, volume, notifications, created_at, updated_at, deleted_at) VALUES (1, 1, 1, 2, 0, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
+-- INSERT INTO user (id, last_time_online, username, sex, thumbnail, created_at, updated_at, deleted_at) VALUES (1, 1649949638861, '1', 'OTHER', null, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
+-- INSERT INTO channel (id, name, creator_id, created_at, updated_at, deleted_at) VALUES (1, 'all', 1, '2022-04-13 16:32:11', '2022-04-13 16:32:09', null);
+-- INSERT INTO room (id, name, is_main_in_channel, p2p, channel_id, creator_id, created_at, updated_at, deleted_at) VALUES (1, 'all', 1, DEFAULT, 1, 1, '2022-04-13 16:35:16', '2022-04-13 16:35:20', null);
+-- INSERT INTO user_profile (id, name, city, surname, birthday, contacts, created_at, updated_at, deleted_at) VALUES (1, null, null, null, null, null, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
+-- INSERT INTO user_auth (id, password, email, facebook_id, google_id, email_verification_id, created_at, updated_at, deleted_at) VALUES (1, '$2b$10$8RTcHp1.oCEYGiPgLbTHH.Fk8MC6YUySzJ8AxGFxnjFqb.zsdlH7m', 'deathangel908@gmail.com', null, null, null, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
+-- INSERT INTO user_settings (id, suggestions, show_when_i_typing, embedded_youtube, highlight_code, message_sound, incoming_file_call_sound, online_change_sound, logs, theme, created_at, updated_at, deleted_at) VALUES (1, 1, 1, 1, 1, 0, 0, 0, 'error', 'COLOR_REG', '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);
+-- INSERT INTO room_user (id, room_id, user_id, volume, notifications, created_at, updated_at, deleted_at) VALUES (1, 1, 1, 2, 0, '2022-04-13 13:37:37', '2022-04-13 13:37:37', null);

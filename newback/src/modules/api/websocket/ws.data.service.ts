@@ -36,7 +36,7 @@ export class WsDataService {
   }
 
   public async getCountryCodes(context: WebSocketContextData): Promise<Omit<GetCountryCodeResponseMessage, 'handler'| 'action'>> {
-    if (this.configService.getConfig().settings.flags) {
+    if (!this.configService.getConfig().settings.flags) {
       throw new ValidationException('Flags api is not enabled');
     }
     let usersId: number[] = await this.roomRepository.usersForUser(context.userId);

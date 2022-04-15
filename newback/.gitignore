@@ -2,8 +2,9 @@ node_modules
 yarn-error.log
 dist
 # exclude everything
-config/migration/*
+src/data/migration/*
 coverage
 # exception to the rule
-!config/migration/.gitkeep
+!src/data/migration/.gitkeep
 codecov
+src/fixtures/prod
