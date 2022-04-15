@@ -60,7 +60,7 @@ export class AuthService {
       let userAuth = await this.userRepository.getUserMyAuthFacebook(fbResponse.id, t)
       if (userAuth) {
         let session = await this.sessionService.createAndSaveSession(userAuth.id);
-        let response: GoogleSignInResponse = {session, isNewAccount: false};
+        let response: FacebookSignInResponse = {session, isNewAccount: false};
         return response;
       } else {
         let username = generateUserName(`${fbResponse.first_name}_${fbResponse.last_name}`);
@@ -82,7 +82,7 @@ export class AuthService {
         await this.roomRepository.createRoomUser(ALL_ROOM_ID, userId, t);
 
         let session = await this.sessionService.createAndSaveSession(userId);
-        let response: GoogleSignInResponse = {session, isNewAccount: true, username};
+        let response: FacebookSignInResponse = {session, isNewAccount: true, username};
         return response;
       }
     });

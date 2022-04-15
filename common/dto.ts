@@ -166,19 +166,7 @@ export interface SyncHistoryOutMessage extends DefaultWsOutMessage<"syncHistory"
   receivedMessageIds: number[];
   lastSynced: number;
 }
-
-
-
-/** BasemessagesInterfaces.ts */
-
-
-export interface ChangeUserOnlineBase {
-  online: Record<number, string[]>;
-  userId: number;
-  lastTimeOnline: number;
-  time: number;
-}
-
+/** CODE I PUT HERE MANUALLY WS IN */
 /*
  * Any means that every every registered subscriber will be called with this handler if it exists
  * this means, that handler that registered this event will be called
@@ -197,9 +185,28 @@ export type HandlerName =
   | "webrtcTransfer:*"
   | "ws-message"
   | "ws";
-export type CallHandlerName =
-  HandlerName
-  | "dummyCall";
+
+export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {
+  handler: H;
+}
+
+export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H>, CallBackMessage {
+  cbBySender?: string;
+  cbId?: number;
+}
+
+
+/** BasemessagesInterfaces.ts */
+
+
+export interface ChangeUserOnlineBase {
+  online: Record<number, string[]>;
+  userId: number;
+  lastTimeOnline: number;
+  time: number;
+}
+
+
 
 export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | "*">) => Promise<void> | void;
 
@@ -261,11 +268,6 @@ export interface CallBackMessage {
 }
 
 
-
-export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {
-  handler: H;
-}
-
 export interface ResolveCallbackId {
   resolveCbId?: number; // If this callback id is present, resolve it
 }
@@ -319,10 +321,7 @@ export type CallStatus =
 // } from "@/ts/types/backend";
 // import type {MessageStatus} from "@/ts/types/model";
 
-export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H>, CallBackMessage {
-  cbBySender?: string;
-  cbId?: number;
-}
+
 
 export interface MessagesResponseMessage {
   content: MessageModelDto[];

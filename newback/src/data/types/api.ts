@@ -9,8 +9,6 @@ export interface IpFailedInfoResponse {
   status: 'fail';
 }
 
-export const IP_FAIL = 'fail';
-
 export interface IpSuccessInfoResponse {
   status: 'success';
   country: string;

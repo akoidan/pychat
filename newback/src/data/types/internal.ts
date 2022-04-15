@@ -1,9 +1,9 @@
-import {WebSocket} from 'ws';
+import {DefaultWsInMessage} from '@/data/types/frontend';
 
 export interface WebSocketContextData {
   userId: number;
   id: number;
-  socket: WebSocket;
+  sendToClient(data: DefaultWsInMessage<any, any>);
 }
 export type UserOnlineData = Record<string, string[]>
 

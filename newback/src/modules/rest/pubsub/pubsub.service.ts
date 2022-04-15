@@ -4,6 +4,8 @@ import {
   Logger
 } from '@nestjs/common';
 import {WebSocketContextData} from '@/data/types/internal';
+import {PubSubMessage} from '@/modules/api/websocket/interfaces/pubsub';
+import {DefaultWsInMessage, HandlerName} from '@/data/types/frontend';
 
 
 interface HandlerType {
@@ -21,8 +23,8 @@ let handlers: HandlerType[] = [];
 //   return <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
 //   (vueComponent: TCT, fileName: TPN):
 //
-export function Subscribe(handler: string) {
-  return (target: WebsocketGateway, memberName: keyof WebsocketGateway, propertyDescriptor: PropertyDescriptor) => {
+export function SubscribePuBSub<T extends keyof WebsocketGateway>(handler: T) {
+  return (target: WebsocketGateway, memberName: T, propertyDescriptor: PropertyDescriptor) => {
     handlers.push({
       handler,
       memberName,
@@ -41,7 +43,9 @@ export class PubsubService {
   ) {
   }
 
-  public emit(handler: string, data: any, ...channel: string[]) {
+  // A extends string,H extends HandlerName
+
+  public emit<PS extends PubSubMessage<A,H>, A extends string,H extends HandlerName>(handler: keyof WebsocketGateway, data: PS, ...channel: string[]) {
     channel.forEach(channel => {
       if (receivers[channel]) {
         receivers[channel].forEach(receiver => {

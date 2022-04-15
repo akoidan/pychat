@@ -19,6 +19,8 @@ import {
   WebSocketServer
 } from "ws";
 import {processErrors} from '@/utils/decorators';
+import {WebSocketContextData} from '@/data/types/internal';
+import {DefaultWsInMessage} from '@/data/types/frontend';
 
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
@@ -38,7 +40,19 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
       if ((ws as any).context) {
         throw Error("WTF");
       }
-      (ws as any).context = {};
+      (ws as any).context = {
+        sendToClient: (data: DefaultWsInMessage<any, any>) => {
+          let message;
+          try {
+            message = JSON.stringify(data)
+          } catch (e) {
+            processErrors(e, ws, this.logger)
+            return
+          }
+          this.logger.debug(`WS:OUT ${message}`, 'ws')
+          ws.send(message)
+        }
+      };
       await callback(...args, (ws as any).context)
     });
   }
@@ -83,10 +97,12 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
   ) {
     client.on(MESSAGE_METADATA, (data) => {
       try {
+        let s = String(data);
+        this.logger.debug(`WS:IN ${s}`, 'ws')
         if (client.readyState !== client.OPEN) {
           throw new BadRequestException('Cannot process new messages, while opening a connection')
         }
-        const parsed = JSON.parse(data as any);
+        const parsed = JSON.parse(s);
         if (!parsed.action) {
           throw new BadRequestException('Invalid message structure, "action" property is not defined')
         }

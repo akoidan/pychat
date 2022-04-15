@@ -14,6 +14,7 @@ import {PasswordService} from '@/modules/rest/password/password.service';
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 import {DatabaseModule} from '@/modules/rest/database/database.module';
 import {PubsubService} from '@/modules/rest/pubsub/pubsub.service';
+import {WebsocketService} from '@/modules/api/websocket/websocket.service';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import {PubsubService} from '@/modules/rest/pubsub/pubsub.service';
       module: WebsocketGateway,
       imports: [DatabaseModule],
       providers: [
+        WebsocketService,
         RedisService,
         PubsubService,
         SessionService,
