@@ -1,4 +1,4 @@
-#!./node_modules/.bin/ts-node --compiler ttypescript src/migration.ts
+#!/usr/bin/yarn ts-node --compiler ttypescript ./src/utils/migration.old.ts
 
 import {DatabaseModule} from '@/modules/rest/database/database.module';
 import {ConsoleLogger} from '@nestjs/common';
@@ -91,6 +91,7 @@ async function bootstrap() {
       let result: ChannelModel = {
         id: key.id,
         name: key.name,
+        deletedAt: key.disabled ?new Date(): null,
         creatorId: key.creator_id,
       } as any;
       return result;
@@ -122,7 +123,7 @@ async function bootstrap() {
       let result: RoomModel = {
         id: key.id,
         name: key.name,
-        deletedAt: new Date(),
+        deletedAt: key.disabled ?new Date(): null,
         channelId: key.channel_id,
         creatorId: key.creator_id,
         isMainInChannel: key.is_main_in_channel,

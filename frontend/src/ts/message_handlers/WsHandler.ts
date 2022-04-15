@@ -53,6 +53,7 @@ import type {
   SyncHistoryResponseMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
+  ShowITypeRequestMessage,
 } from "@/ts/types/backend";
 import type {
   InternetAppearMessage,
@@ -278,10 +279,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public showIType(roomId: number): void {
-    this.sendToServer({
+    let request: ShowITypeRequestMessage = {
       roomId,
       action: "showIType",
-    });
+    }
+    this.sendToServer(request);
   }
 
   public async saveUser(content: UserProfileDtoWoImage): Promise<SetUserProfileMessage | unknown> {

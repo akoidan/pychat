@@ -16,16 +16,21 @@ import {
 } from 'ws';
 import {WebSocketContextData} from '@/data/types/internal';
 import {
+  ArgumentMetadata,
   ArgumentsHost,
+  BadRequestException,
   Catch,
   ExceptionFilter,
   HttpException,
+  Injectable,
   Logger,
+  PipeTransform,
   UseFilters
 } from '@nestjs/common';
 import {
   GetCountryCodeResponseMessage,
   GrowlMessage,
+  ShowITypeRequestMessage,
   SyncHistoryOutMessage
 } from '@/data/types/frontend';
 import {SubscribePuBSub} from '@/modules/rest/pubsub/pubsub.service';
@@ -34,6 +39,22 @@ import {WebsocketService} from '@/modules/api/websocket/websocket.service';
 import {OnWsClose} from '@/modules/api/websocket/interfaces/utils';
 import {WsDataService} from '@/modules/api/websocket/ws.data.service';
 import {WsExceptionFilter} from '@/modules/api/websocket/ws.exception.filter';
+import {check} from 'typend';
+
+
+@Injectable()
+export class ValidationPipe implements PipeTransform<any, any> {
+
+
+  constructor(private checker: (v: any) => void ) {
+
+  }
+  transform(value: string, metadata: ArgumentMetadata): any {
+    this.checker(value);
+    return value;
+  }
+}
+
 
 @WebSocketGateway({
   path: '/ws'
@@ -73,6 +94,12 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
   @SubscribeMessage('printMessage')
   printMessage(@MessageBody() data: SyncHistoryOutMessage, @WsContext() context): any {
   }
+
+  @SubscribeMessage('showIType')
+  showIType(@MessageBody(new ValidationPipe((v) => check<ShowITypeRequestMessage>(v))) data: SyncHistoryOutMessage, @WsContext() context): any {
+    // return this.
+  }
+
 
   @SubscribeMessage('getCountryCode')
   async getCountryCode(@MessageBody() data: GetCountryCodeResponseMessage, @WsContext() context): Promise<Omit<GetCountryCodeResponseMessage, 'handler'|'action'>> {

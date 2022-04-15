@@ -16,6 +16,7 @@ import {PubsubService} from '@/modules/rest/pubsub/pubsub.service';
 import {WebsocketService} from '@/modules/api/websocket/websocket.service';
 import {WsDataService} from '@/modules/api/websocket/ws.data.service';
 import {APP_FILTER} from '@nestjs/core';
+import {MessageService} from '@/modules/api/websocket/message.service';
 
 
 
@@ -28,6 +29,7 @@ import {APP_FILTER} from '@nestjs/core';
         WebsocketService,
         RedisService,
         PubsubService,
+        MessageService,
         SessionService,
         WsDataService,
         PasswordService,

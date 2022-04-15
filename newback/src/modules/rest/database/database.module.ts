@@ -36,7 +36,7 @@ const repositories = [
   imports: [
     SequelizeModule.forRootAsync({
       inject: [Logger],
-      useFactory: (logger: Logger) => generateOrmConfig((sql) => logger.debug(sql, 'sql')),
+      useFactory: (logger: Logger) => generateOrmConfig((sql) => logger.verbose(sql, 'sql')),
     }),
     SequelizeModule.forFeature([
       ChannelModel,

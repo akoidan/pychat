@@ -7,7 +7,7 @@
   "scripts": {
     "generate-configs": "node-ts-config",
     "migrate": "ts-node --compiler ttypescript ./src/utils/migration.runner.ts ",
-    "build": "ttsc",
+    "build": "ttsc && cp -r ./src/config ./dist/src/",
     "start": "ts-node --compiler ttypescript src/main.ts",
     "start:old": "ts-node --compiler ttypescript src/utils/migration.old.ts",
     "test:html:coverage": "jest --runInBand --coverage --detectOpenHandles --testTimeout=100000 --coverageReporters html",
@@ -37,7 +37,7 @@
     "lines-logger": "^2.1.2",
     "mysql2": "^2.3.3",
     "node-db-migration": "^1.4.0",
-    "node-ts-config": "^1.0.4",
+    "node-ts-config": "^1.0.5",
     "nodemailer": "^6.7.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7",

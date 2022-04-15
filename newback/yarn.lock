@@ -5029,10 +5029,10 @@ node-releases@^2.0.2:
   resolved "https://registry.yarnpkg.com/node-releases/-/node-releases-2.0.2.tgz#7139fe71e2f4f11b47d4d2986aaf8c48699e0c01"
   integrity sha512-XxYDdcQ6eKqp/YjI+tb2C5WM2LgjnZrfYg4vgQt49EK268b6gYCHsBLrK2qvJo4FmCtqmKezb0WZFK4fkrZNsg==
 
-node-ts-config@^1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/node-ts-config/-/node-ts-config-1.0.4.tgz#32f9ce6dca832ec73a2c1fc5da80cffcc93e73d2"
-  integrity sha512-2fFgqfDr8GICONUGBUvn8dniVWRon/Q6tbWZcZHfNsCsThY+rSAoLiHw9AbXQVHvSm2cPchfFJMqYsOrsgQmMA==
+node-ts-config@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/node-ts-config/-/node-ts-config-1.0.5.tgz#6eb6b5760dc80e55c3df1ea53a4ac26794b51cf1"
+  integrity sha512-w7aSkwKsS52k+3xAZr4BRRs30lkmkJjNViPaxH3G1gqs2ZCJq7FVonazAyP388qwOgLiSxSrTJm3c7/DGWzaSw==
   dependencies:
     json-to-ts "^1.6.0"
     minimist "^1.2.0"

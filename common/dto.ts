@@ -415,6 +415,10 @@ export interface ShowITypeMessage extends DefaultWsInMessage<"showIType", "room"
   userId: number;
 }
 
+export interface ShowITypeRequestMessage extends DefaultWsOutMessage<'showIType'> {
+  roomId: number;
+}
+
 export interface SetWsIdMessage extends DefaultWsInMessage<"setWsId", "ws">, OpponentWsId {
   rooms: RoomDto[];
   channels: ChannelDto[];
