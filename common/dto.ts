@@ -369,7 +369,11 @@ export interface DeleteRoomMessage extends DefaultWsInMessage<"deleteRoom", "roo
   roomId: number;
 }
 
-export interface GetCountryCodeMessage extends DefaultInMessage<"getCountryCode", "void"> {
+export interface GetCountryCodeRequestMessage extends DefaultWsOutMessage<"getCountryCode"> {
+}
+
+
+export interface GetCountryCodeResponseMessage extends DefaultInMessage<"getCountryCode", "void"> {
   content: Record<string, LocationDto>;
 }
 
@@ -477,7 +481,7 @@ export interface UserProfileChangedMessage extends DefaultWsInMessage<"userProfi
 
 }
 
-export interface GrowlMessage {
+export interface GrowlMessage extends DefaultWsInMessage<'growlError', 'void'> {
   content: string;
   action: "growlError";
 }

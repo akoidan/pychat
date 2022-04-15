@@ -20,10 +20,10 @@ export const WebsocketContext = createParamDecorator(
   },
 );
 
-export const UserId = createParamDecorator(
+export const WsContext = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     let handler =  ctx.getArgs().find(a => a instanceof WebSocket)
-    return (handler.context as WebSocketContextData).userId;
+    return (handler.context as WebSocketContextData);
   },
 );
 
@@ -31,11 +31,11 @@ export const UserId = createParamDecorator(
 export function processErrors(e, socket, logger: Logger) {
   logger.error(`Ws error ${e.message}`, e.stack,  'ws')
   if (e instanceof UnauthorizedException) {
-    socket.close(WS_SESSION_EXPIRED_CODE, e.message || 'Invalid session')
+    socket.close(WS_SESSION_EXPIRED_CODE, (e.message || 'Invalid session').substr(0, 123))
   } else if (e?.status >= 400 && e?.status < 500) {  // Invalid frame payload data
-    socket.close(1007, `Error during creating a connection ${e.message}`);
+    socket.close(1007, `Error during creating a connection ${e.message}`.substr(0, 123));
   } else { // Internal Error
-    socket.close(1011, `Error during opening a socket ${e.message}`);
+    socket.close(1011, `Error during opening a socket ${e.message}`.substr(0, 123)); // message cannot be greather 123 bytes
   }
 }
 interface TargetCatchErrors extends OnGatewayConnection{

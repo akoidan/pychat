@@ -1,10 +1,12 @@
 import {
   BadRequestException,
+  InternalServerErrorException,
   Logger,
   WebSocketAdapter
 } from '@nestjs/common';
 import {BaseWsInstance} from '@nestjs/websockets';
 import {
+  CLOSE_EVENT,
   CONNECTION_EVENT,
   DISCONNECT_EVENT,
   ERROR_EVENT,
@@ -19,8 +21,11 @@ import {
   WebSocketServer
 } from "ws";
 import {processErrors} from '@/utils/decorators';
-import {WebSocketContextData} from '@/data/types/internal';
-import {DefaultWsInMessage} from '@/data/types/frontend';
+import {
+  DefaultWsInMessage,
+  DefaultWsOutMessage,
+  GrowlMessage
+} from '@/data/types/frontend';
 
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
@@ -37,9 +42,7 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
   public bindClientConnect(server: BaseWsInstance, callback: Function) {
     server.on(CONNECTION_EVENT, async(...args) => {
       let ws: WebSocket = args.find(a => a instanceof WebSocket)
-      if ((ws as any).context) {
-        throw Error("WTF");
-      }
+      let oldSend: WebSocket['send'] = ws.send.bind(ws);
       (ws as any).context = {
         sendToClient: (data: DefaultWsInMessage<any, any>) => {
           let message;
@@ -50,15 +53,19 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
             return
           }
           this.logger.debug(`WS:OUT ${message}`, 'ws')
-          ws.send(message)
+          oldSend(message)
         }
       };
+      ws.send = (ws as any).context.sendToClient
       await callback(...args, (ws as any).context)
     });
   }
 
   public bindClientDisconnect(client: BaseWsInstance, callback: Function) {
-    client.on(DISCONNECT_EVENT, callback);
+    client.on(DISCONNECT_EVENT, (...arg) => {
+      this.logger.log(`Closing connection ${(client as any)?.context?.id}`, 'ws')
+      callback(...arg)
+    });
   }
 
   public async close(server: BaseWsInstance) {
@@ -95,14 +102,15 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
     client: WebSocket,
     handlers: MessageMappingProperties[],
   ) {
-    client.on(MESSAGE_METADATA, (data) => {
+    client.on(MESSAGE_METADATA, async(data) => {
+      let parsed: DefaultWsOutMessage<any>;
       try {
         let s = String(data);
         this.logger.debug(`WS:IN ${s}`, 'ws')
         if (client.readyState !== client.OPEN) {
           throw new BadRequestException('Cannot process new messages, while opening a connection')
         }
-        const parsed = JSON.parse(s);
+        parsed = JSON.parse(s);
         if (!parsed.action) {
           throw new BadRequestException('Invalid message structure, "action" property is not defined')
         }
@@ -110,11 +118,28 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
         if (!handler) {
           throw new BadRequestException(`Unknown handler ${parsed.action}`);
         }
-        handler.callback(parsed);
+        let result = await handler.callback(parsed);
+        if (result) {
+          if (!parsed.cbId) {
+            throw new InternalServerErrorException(`Gateway ${parsed.action} returned result ${result}, without having cbId`)
+          }
+          let response: DefaultWsInMessage<any, any> = {
+            cbBySender: (client as any).context.id,
+            cbId: parsed.cbId,
+            handler: 'void',
+            ...result,
+          }
+          client.send(response)
+        }
       } catch (e) {
         processErrors(e, client, this.logger);
       }
 
+    });
+
+    client.on(CLOSE_EVENT, (...arg) => {
+      this.logger.log(`Closing connection ${(client as any)?.context?.id}`, 'ws');
+      handlers.find(handler => handler.message === 'closeConnection').callback()
     });
 
   }

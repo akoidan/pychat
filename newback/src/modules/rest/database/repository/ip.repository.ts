@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {InjectModel} from '@nestjs/sequelize';
 import {IpAddressModel} from '@/data/model/ip.address.model';
 import {UserJoinedInfoModel} from '@/data/model/user.joined.info.model';
+import {Op} from 'sequelize';
 
 
 @Injectable()
@@ -27,5 +28,17 @@ export class IpRepository {
       },
       raw: true
     });
+  }
+
+  public async getIpInfosForUsers(userIds: number[]): Promise<UserJoinedInfoModel[]> {
+     return this.userJoinedInfoModel.findAll({
+        where: {
+          userId: {
+            [Op.in]: userIds,
+          }
+        },
+        raw: true,
+        include: ['ip']
+      })
   }
 }

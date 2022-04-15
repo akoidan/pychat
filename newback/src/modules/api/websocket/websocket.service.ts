@@ -10,12 +10,14 @@ import {IpCacheService} from '@/modules/rest/ip/ip.cache.service';
 import {SessionService} from '@/modules/rest/session/session.service';
 import {UserModel} from '@/data/model/user.model';
 import {
+  getLogoutMessage,
   transformAddUserOnline,
   transformSetWsId
 } from '@/modules/api/websocket/transformers/ws.transformer';
 import {WebSocketContextData} from '@/data/types/internal';
 import {RedisService} from '@/modules/rest/redis/redis.service';
 import {PubsubService} from '@/modules/rest/pubsub/pubsub.service';
+
 
 @Injectable()
 export class WebsocketService {
@@ -36,15 +38,17 @@ export class WebsocketService {
     let url = new URLSearchParams(urlString);
     let user: UserModel = await this.sessionService.getUserById(url.get('sessionId'));
     let id = await this.passwordService.createWsId(user.id, url.get('id'));
+    context.userId = user.id;
+    context.id = id;
     await this.ipCacheService.saveIp(user.id, ip);
     await this.redisService.addOnline(id)
     let online = await this.redisService.getOnline();
 
     let myRooms = await this.roomRepository.getRoomsForUser(user.id);
     let channelIds = myRooms.map(r => r.channelId).filter(c => c)
-    let channels = await this.roomRepository.getAllChannels(channelIds);
     let allUsersInTheseRooms = await this.roomRepository.getRoomUsers(myRooms.map(r => r.id));
     let userIds: number[] = [...new Set(allUsersInTheseRooms.map(r => r.userId))];
+    let channels = await this.roomRepository.getAllChannels(channelIds);
     let users: UserModel[] = await this.userRepository.getUsersById(userIds);
     let response = transformSetWsId(
       {
@@ -58,8 +62,6 @@ export class WebsocketService {
         time: Date.now()
       }
     )
-    context.userId = user.id;
-    context.id = user.id;
 
     let channelsToListen = [...myRooms.map(r => String(r.id)), id, `u${user.id}`, '*'];
     this.logger.log(`User #${user.id} ${user.username} subscribed to ${JSON.stringify(channelsToListen)}`, 'ws');
@@ -73,5 +75,24 @@ export class WebsocketService {
       },
       '*'
     )
+  }
+
+  public async closeConnection(context: WebSocketContextData) {
+    this.pubsubService.unsubscribe(context);
+    if (context.id) {
+      await this.redisService.removeOnline(context.id)
+    }
+    let online = await this.redisService.getOnline();
+    if (context.userId && !online[context.userId]) {
+      let lastTimeOnline: number = Date.now();
+      await this.userRepository.setLastTimeOnline(context.userId, lastTimeOnline);
+      this.pubsubService.emit(
+        'sendToClient',
+        {
+          content: getLogoutMessage(online, lastTimeOnline, context, lastTimeOnline),
+        },
+        '*'
+      )
+    }
   }
 }

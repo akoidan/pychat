@@ -4,7 +4,7 @@ import {
   IpInfoResponse,
   IpSuccessInfoResponse
 } from '@/data/types/api';
-import {InvalidIpException} from '@/modules/rest/ip/invalid.ip.exception';
+import {InvalidIpException} from '@/data/exceptions/invalid.ip.exception';
 
 @Injectable()
 export class IpService {

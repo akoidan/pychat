@@ -139,4 +139,13 @@ export class UserRepository {
     })
   }
 
+  public async setLastTimeOnline(userId: number, lastTimeOnline: number) {
+    await this.userModel.update({
+      lastTimeOnline
+    }, {
+      where: {
+        id: userId
+      }
+    })
+  }
 }

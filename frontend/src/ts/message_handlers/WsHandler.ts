@@ -39,7 +39,7 @@ import type {
   AddInviteMessage,
   AddRoomMessage,
   DefaultWsOutMessage,
-  GetCountryCodeMessage,
+  GetCountryCodeResponseMessage,
   MessagesResponseMessage,
   PingMessage,
   PongMessage,
@@ -68,6 +68,7 @@ import {
   MessageStatus,
   WS_SESSION_EXPIRED_CODE
 } from '@/ts/types/backend';
+import {GetCountryCodeRequestMessage} from '@/ts/types/dto';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
@@ -151,10 +152,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.wsConnectionId;
   }
 
-  public async getCountryCode(): Promise<GetCountryCodeMessage> {
-    return this.messageProc.sendToServerAndAwait({
+  public async getCountryCode(): Promise<GetCountryCodeResponseMessage> {
+    let body: GetCountryCodeRequestMessage = {
       action: "getCountryCode",
-    });
+    }
+    return this.messageProc.sendToServerAndAwait(body);
   }
 
   public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number | null): Promise<WebRtcSetConnectionIdMessage> {

@@ -1,7 +1,17 @@
-import {Module} from '@nestjs/common';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpException,
+  Module,
+  UseFilters
+} from '@nestjs/common';
 import {AuthModule} from '@/modules/api/auth/auth.module';
 import {LoggingInterceptor} from '@/modules/app/interceptors/logging.interceptor';
-import {APP_INTERCEPTOR} from '@nestjs/core';
+import {
+  APP_FILTER,
+  APP_INTERCEPTOR
+} from '@nestjs/core';
 import {LoggerModule} from '@/modules/rest/logger/logger.module';
 import {RedisModule} from '@nestjs-modules/ioredis';
 import {config} from 'node-ts-config';
@@ -15,6 +25,24 @@ import {UserRepository} from '@/modules/rest/database/repository/user.repository
 import {DatabaseModule} from '@/modules/rest/database/database.module';
 import {PubsubService} from '@/modules/rest/pubsub/pubsub.service';
 import {WebsocketService} from '@/modules/api/websocket/websocket.service';
+import {WebsocketModule} from '@/modules/api/websocket/websocket.module';
+
+
+// import {
+//   ArgumentsHost,
+//   Catch,
+//   ExceptionFilter,
+//   HttpException
+// } from '@nestjs/common';
+//
+// @Catch(Error)
+// export class HttpExceptionFilter implements ExceptionFilter {
+//   catch(exception: HttpException, host: ArgumentsHost) {
+//     throw  exception;
+//   }
+// }
+
+
 
 @Module({
   imports: [
@@ -23,17 +51,7 @@ import {WebsocketService} from '@/modules/api/websocket/websocket.service';
     ConfigModule,
     VerifyModule,
     DatabaseModule,
-    {
-      module: WebsocketGateway,
-      imports: [DatabaseModule],
-      providers: [
-        WebsocketService,
-        RedisService,
-        PubsubService,
-        SessionService,
-        PasswordService,
-      ]
-    },
+    WebsocketModule,
     RedisModule.forRoot({
       config: {
         host: config.redis.host,

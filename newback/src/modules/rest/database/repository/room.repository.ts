@@ -9,6 +9,7 @@ import {
 import {ChannelModel} from '@/data/model/channel.model';
 
 type RoomSingleRoomUser = Omit<RoomModel, 'roomUsers'>;
+
 export interface GetRoomsForUser extends RoomSingleRoomUser {
   roomUsers: RoomUsersModel;
 }
@@ -40,29 +41,46 @@ export class RoomRepository {
     });
   }
 
-    public async getRoomUsers(roomIds: number[]): Promise<Pick<RoomUsersModel, 'roomId'|'userId'>[]> {
-     // we should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
-     return  this.roomUsersModel.findAll({
-       where: {
-         roomId: {
-           [Op.in]: roomIds,
-         }
-       },
-       raw: true,
-       attributes: ['userId', 'roomId']
-     });
+  public async usersForUser(userId: number): Promise<number[]> {
+    let myRoomIds = await this.roomUsersModel.findAll({
+      where: {
+        userId
+      },
+      attributes: ['roomId']
+    });
+    let ru = await this.roomUsersModel.findAll({
+      where: {
+        roomId: {
+          [Op.in]: myRoomIds.map(r => r.roomId)
+        }
+      },
+      attributes: ['userId']
+    });
+    return ru.map(ru => ru.userId);
+  }
+
+  public async getRoomUsers(roomIds: number[]): Promise<Pick<RoomUsersModel, 'roomId' | 'userId'>[]> {
+    // we should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
+    return this.roomUsersModel.findAll({
+      where: {
+        roomId: {
+          [Op.in]: roomIds,
+        }
+      },
+      raw: true,
+      attributes: ['userId', 'roomId']
+    });
   }
 
 
-
   public async getRoomsForUser(userId: number): Promise<GetRoomsForUser[]> {
-     // we should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
-     return await this.roomModel.findAll({
+    // we should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
+    return await this.roomModel.findAll({
       raw: true,
       include: [{
         association: 'roomUsers',
         where: {
-           userId: userId
+          userId: userId
         }
       }],
     }) as any as GetRoomsForUser[];

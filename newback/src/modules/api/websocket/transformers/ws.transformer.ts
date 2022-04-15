@@ -5,10 +5,14 @@ import {
   SetWsIdMessage,
   UserDto,
   UserProfileDto,
-  UserSettingsDto
+  UserSettingsDto,
+  RemoveOnlineUserMessage
 } from '@/data/types/frontend';
 import {UserModel} from '@/data/model/user.model';
-import {UserOnlineData} from '@/data/types/internal';
+import {
+  UserOnlineData,
+  WebSocketContextData
+} from '@/data/types/internal';
 import {ChannelModel} from '@/data/model/channel.model';
 import {RoomUsersModel} from '@/data/model/room.users.model';
 import {GetRoomsForUser} from '@/modules/rest/database/repository/room.repository';
@@ -136,5 +140,17 @@ export function transformAddUserOnline(online:  Record<number, string[]>, user: 
     lastTimeOnline: user.lastTimeOnline,
     time: Date.now(),
     opponentWsId
+  };
+}
+
+
+export function getLogoutMessage(online: UserOnlineData, lastTimeOnline: number, context: WebSocketContextData, time: number): RemoveOnlineUserMessage  {
+  return {
+    online: online,
+    action: 'removeOnlineUser',
+    lastTimeOnline,
+    time,
+    handler: 'room',
+    userId: context.userId,
   };
 }

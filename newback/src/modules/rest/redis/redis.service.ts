@@ -45,6 +45,11 @@ export class RedisService {
     this.redis.sadd(REDIS_KEYS.REDIS_ONLINE_KEY, id)
   }
 
+   public async removeOnline(id: string): Promise<void> {
+    this.logger.debug(`srem ${REDIS_KEYS.REDIS_ONLINE_KEY}=${id}` ,'redis')
+    this.redis.srem(REDIS_KEYS.REDIS_ONLINE_KEY, id)
+  }
+
   public async getOnline(): Promise<UserOnlineData> {
     let data = await this.redis.smembers(REDIS_KEYS.REDIS_ONLINE_KEY);
     this.logger.debug(`smembers ${REDIS_KEYS.REDIS_ONLINE_KEY}=${data}` ,'redis')

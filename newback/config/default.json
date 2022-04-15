@@ -12,7 +12,7 @@
     "wsIdCharLength": 4,
     "allRedisRoom": "all",
     "allRoomId": 1,
-    "showCountryCode": false,
+    "flags": true,
     "firebaseUrl": "https://fcm.googleapis.com/fcm/send",
     "pingCloseJsDelay": 10000,
     "pingInterval": 300000,

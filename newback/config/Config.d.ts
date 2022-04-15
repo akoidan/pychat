@@ -65,7 +65,7 @@ declare module "node-ts-config" {
     wsIdCharLength: number
     allRedisRoom: string
     allRoomId: number
-    showCountryCode: boolean
+    flags: boolean
     firebaseUrl: string
     pingCloseJsDelay: number
     pingInterval: number

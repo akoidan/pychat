@@ -5,8 +5,9 @@ import {
 import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 import {IpService} from '@/modules/rest/ip/ip.service';
 import {IpAddressModel} from '@/data/model/ip.address.model';
-import {InvalidIpException} from '@/modules/rest/ip/invalid.ip.exception';
+
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
+import {InvalidIpException} from '@/data/exceptions/invalid.ip.exception';
 
 @Injectable()
 export class IpCacheService {
