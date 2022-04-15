@@ -7,11 +7,10 @@
   "scripts": {
     "generate-configs": "node-ts-config",
     "migrate": "ts-node --compiler ttypescript ./src/utils/migration.runner.ts ",
-    "build": "ttsc && cp -r ./src/config ./dist/src/",
+    "build": "rm -rf ./dist && ttsc",
     "start": "ts-node --compiler ttypescript src/main.ts",
-    "start:old": "ts-node --compiler ttypescript src/utils/migration.old.ts",
-    "test:html:coverage": "jest --runInBand --coverage --detectOpenHandles --testTimeout=100000 --coverageReporters html",
-    "test": "jest --runInBand --coverage --coverageReporters text"
+    "test:html:coverage": "jest --config ./src/jest.config.ts --runInBand --coverage --detectOpenHandles --testTimeout=100000 --coverageReporters html",
+    "test": "jest --config ./src/jest.config.ts --runInBand --coverage --coverageReporters text"
   },
   "engines": {
     "node": ">=16.0.0"
