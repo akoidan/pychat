@@ -41,7 +41,7 @@ const captchaInited = ref(false);
 
 let captchaId = 1; // Just random id to diff one comp from another
 
-window.onloadrecaptcha = function () {
+window.onloadrecaptcha = function() {
   captchaInited.value = true;
 };
 
@@ -83,16 +83,16 @@ export default class CaptchaComponent extends Vue {
             }
           };
           window.addEventListener("message", this.event, false);
-        } else if ((window as any).grecaptcha?.render) {
-          this.grecaptcha.render(...args);
+        } else if (window.grecaptcha?.render) {
+          window.grecaptcha.render(...args);
         }
       },
       reset: (...args) => {
         if (this.isIframe && this.iframe) {
           this.$logger.log("Resetting captcha")();
           this.iframe.contentWindow!.postMessage("reset-captcha", "*");
-        } else if ((window as any).grecaptcha?.reset) {
-          this.grecaptcha.reset(...args);
+        } else if (window.grecaptcha?.reset) {
+          window.grecaptcha.reset(...args);
         }
       },
     };
