@@ -50,7 +50,7 @@ export class ImageModel extends Model<ImageModel> {
 
   @Column({
     type: DataType.STRING,
-    allowNull: true,
+    allowNull: false,
   })
   public img: string;
 
@@ -59,16 +59,4 @@ export class ImageModel extends Model<ImageModel> {
     allowNull: true,
   })
   public preview: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public absoluteUrl: string;
-
-  @Column({
-    type: DataType.STRING,
-    allowNull: true,
-  })
-  public webpAsboluteUrl: string;
 }

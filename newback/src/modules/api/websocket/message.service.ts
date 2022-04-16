@@ -8,6 +8,11 @@ import type {
   ShowITypeWsInMessage,
   ShowITypeWsOutMessage,
   SyncHistoryOutMessage,
+  SyncHistoryResponseMessage,
+} from "@/data/types/frontend";
+import {
+  ImageType,
+  MessageStatus,
 } from "@/data/types/frontend";
 import {RoomRepository} from "@/modules/rest/database/repository/room.repository";
 import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
@@ -50,10 +55,26 @@ export class MessageService {
   }
 
   public async syncHistory(data: SyncHistoryOutMessage, context: WebSocketContextData) {
-    const messagesIds = await this.messageRepository.getNewMessagesAfterSync(data.roomIds, data.messagesIds, data.lastSynced);
+    // MessageStatus.ON_SERVER
+    const messages = await this.messageRepository.getNewOnServerMessages(data.roomIds, data.messagesIds, data.lastSynced);
+
+    let receivedMessageIds = [];
     if (data.onServerMessageIds) {
-      this.messageRepository.getMessages2(data.roomIds, data.onServerMessageIds,);
+      receivedMessageIds = await this.messageRepository.getMessagesByIdsAndStatus(data.roomIds, data.onServerMessageIds, MessageStatus.RECEIVED);
     }
+
+    let readmesageIds = [];
+    if (data.receivedMessageIds) {
+      const ids = [...data.receivedMessageIds, ...data.onServerMessageIds];
+      readmesageIds = await this.messageRepository.getMessagesByIdsAndStatus(data.roomIds, ids, MessageStatus.READ);
+    }
+
+    const messageIdsWithSymbol: number[] = messages.filter((m) => m.symbol).map((m) => m.id);
+    const images = await this.messageRepository.getImagesByMessagesId(messageIdsWithSymbol);
+    const mentions = await this.messageRepository.getTagsByMessagesId(messageIdsWithSymbol);
+
+
+    const dtso: any = messages.map((m) => transformMessage(m, mentions, images));
 
   /*
    *

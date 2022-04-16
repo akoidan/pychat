@@ -36,11 +36,11 @@ import type {
 } from "@/ts/types/db";
 import type {SetStateFromStorage} from "@/ts/types/dto";
 import type {MainWindow} from "@/ts/classes/MainWindow";
+import type {ImageType} from "@/ts/types/backend";
 import {
-  BlobType,
-  MessageStatus
-} from '@/ts/types/backend';
-import {MessageStatusInner} from '@/ts/types/model';
+  MessageStatus,
+} from "@/ts/types/backend";
+import {MessageStatusInner} from "@/ts/types/model";
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];
@@ -501,7 +501,7 @@ export default class DatabaseWrapper implements IStorage {
           serverId: f.server_id,
           previewFileId: f.preview_file_id,
           sending: convertToBoolean(f.sending),
-          type: f.type as BlobType,
+          type: f.type as ImageType,
           preview: f.preview,
 
         };

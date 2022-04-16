@@ -69,17 +69,15 @@ CREATE TABLE `message`
   COLLATE utf8mb4_general_ci;
 CREATE TABLE `image`
 (
-    `id`                INTEGER auto_increment,
-    `type`              ENUM('VIDEO', 'FILE', 'MEDIA_RECORD', 'AUDIO_RECORD', 'IMAGE', 'PREVIEW', 'GIPHY') NOT NULL,
-    `symbol`            VARCHAR(1)                       NOT NULL,
-    `message_id`        INTEGER                          NOT NULL,
-    `img`               VARCHAR(255),
-    `preview`           VARCHAR(255),
-    `absolute_url`      VARCHAR(255),
-    `webp_asbolute_url` VARCHAR(255),
-    `created_at`        DATETIME                         NOT NULL,
-    `updated_at`        DATETIME                         NOT NULL,
-    `deleted_at`        DATETIME,
+    `id`         INTEGER auto_increment,
+    `type`       ENUM ('VIDEO', 'FILE', 'MEDIA_RECORD', 'AUDIO_RECORD', 'IMAGE', 'PREVIEW', 'GIPHY') NOT NULL,
+    `symbol`     VARCHAR(1)                                                                          NOT NULL,
+    `message_id` INTEGER                                                                             NOT NULL,
+    `img`        VARCHAR(255)                                                                        NOT NULL,
+    `preview`    VARCHAR(255),
+    `created_at` DATETIME                                                                            NOT NULL,
+    `updated_at` DATETIME                                                                            NOT NULL,
+    `deleted_at` DATETIME,
     UNIQUE `unique_image_symbol_message` (`symbol`, `message_id`),
     PRIMARY KEY (`id`),
     FOREIGN KEY (`message_id`) REFERENCES `message` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE

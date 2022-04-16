@@ -7,6 +7,8 @@ import type {
   UserProfileDto,
   UserSettingsDto,
   RemoveOnlineUserMessage,
+  MessageModelDto,
+  FileModelDto,
 } from "@/data/types/frontend";
 import type {UserModel} from "@/data/model/user.model";
 import type {
@@ -16,6 +18,9 @@ import type {
 import type {ChannelModel} from "@/data/model/channel.model";
 import type {RoomUsersModel} from "@/data/model/room.users.model";
 import type {GetRoomsForUser} from "@/modules/rest/database/repository/room.repository";
+import type {MessageModel} from "@/data/model/message.model";
+import type {MessageMentionModel} from "@/data/model/message.mention.model";
+import type {ImageModel} from "@/data/model/image.model";
 
 export interface TransformSetWsIdDataParams {
   myRooms: GetRoomsForUser[];
@@ -153,5 +158,42 @@ export function getLogoutMessage(online: UserOnlineData, lastTimeOnline: number,
     time,
     handler: "room",
     userId: context.userId,
+  };
+}
+
+
+function getTags(mentions: MessageMentionModel[], m: MessageModel) {
+  return mentions.filter((mention) => mention.messageId == m.id).reduce((mentions, mention) => {
+    mentions[mention.symbol] = mention.userId;
+    return mentions;
+  }, {});
+}
+
+function getFiles(images: ImageModel[], m: MessageModel): Record<number, FileModelDto> {
+  return Object.fromEntries(images.filter((i) => i.messageId === m.id).map((i) => [
+    i.symbol, {
+      url: i.img,
+      type: i.type,
+      preview: i.preview,
+      id: i.id,
+    },
+  ]));
+}
+
+function getMessage(m: MessageModel, mentions: MessageMentionModel[], images: ImageModel[]): MessageModelDto {
+  return {
+    id: m.id,
+    content: m.content,
+    tags: getTags(mentions, m),
+    roomId: m.roomId,
+    userId: m.senderId,
+    parentMessage: m.parentMessageId,
+    deleted: Boolean(m.deletedAt),
+    threadMessagesCount: m.threadMessageCount,
+    symbol: m.symbol,
+    status: m.messageStatus,
+    time: m.time,
+    edited: m.updatedAt,
+    files: getFiles(images, m),
   };
 }

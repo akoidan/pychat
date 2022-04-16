@@ -25,7 +25,7 @@ import {
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
-import {BlobType} from '@/ts/types/backend';
+import type {ImageType} from "@/ts/types/backend";
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -606,7 +606,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     const serverId = parseInt(img.getAttribute("serverId")!);
     const asGiphy = img.className.includes(PASTED_GIPHY_CLASS) ? img.getAttribute("url") : null;
     const asGiphyPreview = img.className.includes(PASTED_GIPHY_CLASS) ? img.getAttribute("webp") : null;
-    const videoType: BlobType = img.getAttribute("videoType")! as BlobType;
+    const videoType: ImageType = img.getAttribute("videoType")! as ImageType;
 
     let elSymbol = oldSymbol;
     if (!elSymbol) {
@@ -624,7 +624,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
         return;
       }
     }
-    let type: BlobType;
+    let type: ImageType;
     if (videoType) {
       type = videoType;
     } else if (assAudio) {

@@ -1,14 +1,11 @@
 import {DatabaseModule} from "@/modules/rest/database/database.module";
 import {ConsoleLogger} from "@nestjs/common";
-import type {
-  TestingModule,
-} from "@nestjs/testing";
-import {
-  Test,
-} from "@nestjs/testing";
+import type {TestingModule} from "@nestjs/testing";
+import {Test} from "@nestjs/testing";
 import {LoggerModule} from "@/modules/rest/logger/logger.module";
 import {ConfigModule} from "@/modules/rest/config/config.module";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
+import {MessageStatus} from "../common/dto";
 
 describe("MessageRepository", () => {
   let app: TestingModule;
@@ -31,13 +28,13 @@ describe("MessageRepository", () => {
   describe("getNewMessagesFromRoom", () => {
     it("should produce correct sql", async() => {
       const mr: MessageRepository = app.get(MessageRepository);
-      const result = await mr.getNewMessagesAfterSync([1, 2], [3, 4], 3600000);
+      const result = await mr.getNewOnServerMessages([1, 2], [3, 4], 3600000);
     });
   });
   describe("getMessages2", () => {
     it("should produce correct sql", async() => {
       const mr: MessageRepository = app.get(MessageRepository);
-      const result = await mr.getMessages2([1, 2], [3, 4]);
+      const result = await mr.getMessagesByIdsAndStatus([1, 2], [3, 4], MessageStatus.READ);
     });
   });
 });

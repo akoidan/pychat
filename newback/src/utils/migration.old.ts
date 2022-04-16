@@ -54,8 +54,7 @@ async function bootstrap() {
       },
 
     ],
-  }).setLogger(new ConsoleLogger()).
-    compile();
+  }).setLogger(new ConsoleLogger()).compile();
 
   const userModel: typeof UserModel = app.get(getModelToken(UserModel));
   const userJoinedInfoModel: typeof UserJoinedInfoModel = app.get(getModelToken(UserJoinedInfoModel));
@@ -140,9 +139,11 @@ async function bootstrap() {
         time: key.time,
         content: key.content,
         symbol: key.symbol,
-        messageStatus: {u: "ON_SERVER",
+        messageStatus: {
+          u: "ON_SERVER",
           r: "READ",
-          s: "RECEIVED"}[key.message_status],
+          s: "RECEIVED"
+        }[key.message_status],
         threadMessageCount: key.thread_messages_count,
         parentMessageId: key.parent_message_id,
         updatedAt: new Date(key.updated_at),
@@ -183,9 +184,11 @@ async function bootstrap() {
     const uploadedFIles = pychat_chat_uploadedfile.map((key) => {
       const result: UploadedFileModel = {
         id: key.id,
-        type: {v: "VIDEO",
+        type: {
+          v: "VIDEO",
           i: "IMAGE",
-          f: "FILE"}[key.type],
+          f: "FILE"
+        }[key.type],
         symbol: key.symbol,
         userId: key.user_id,
         file: key.file,
@@ -224,8 +227,10 @@ async function bootstrap() {
     });
     await verificationModel.bulkCreate(verifications, {transaction});
 
-    const auth = pychat_chat_userprofile.map((u) => ({...u,
-      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id)})).map((key) => {
+    const auth = pychat_chat_userprofile.map((u) => ({
+      ...u,
+      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id)
+    })).map((key) => {
       const result: UserAuthModel = {
         id: key.id,
         password: key.password,
@@ -239,8 +244,10 @@ async function bootstrap() {
     await userAuthModel.bulkCreate(auth, {transaction});
 
 
-    const userProf = pychat_chat_userprofile.map((u) => ({...u,
-      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id)})).map((key) => {
+    const userProf = pychat_chat_userprofile.map((u) => ({
+      ...u,
+      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id)
+    })).map((key) => {
       const result: UserProfileModel = {
         id: key.id,
         name: key.name,
@@ -289,10 +296,8 @@ async function bootstrap() {
         }[key.type],
         symbol: key.symbol,
         messageId: key.message_id,
-        img: key.img,
-        preview: key.preview,
-        absoluteUrl: key.absolute_url,
-        webpAsboluteUrl: key.webp_absolute_url,
+        img: key.type === 'g' ? key.absolute_url : key.img,
+        preview: key.type === 'g' ? key.webp_absolute_url : key.preview,
       } as any;
       return result;
     });

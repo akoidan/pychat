@@ -613,16 +613,9 @@ export interface RoomDto extends RoomNoUsersDto {
 export interface FileModelDto {
   url: string;
   id: number;
-  type: BlobType;
+  type: ImageType;
   preview: string;
 }
 
-export type BlobType =
-  "a"
-  | "f"
-  | "g"
-  | "i"
-  | "m"
-  | "v";
 
 export const WS_SESSION_EXPIRED_CODE = 4001;

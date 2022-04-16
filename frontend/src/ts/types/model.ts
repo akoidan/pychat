@@ -1,9 +1,9 @@
 import type {LogLevel} from "lines-logger";
-import {
-  BlobType,
+import type {
+  ImageType,
   Gender,
-  MessageStatus
-} from '@/ts/types/backend';
+  MessageStatus,
+} from "@/ts/types/backend";
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
@@ -98,7 +98,7 @@ export interface Location {
 
 export interface FileModel {
   url: string | null;
-  type: BlobType;
+  type: ImageType;
   serverId: number | null;
   previewFileId: number | null;
   fileId: number | null;
@@ -138,7 +138,7 @@ export interface MessageModel {
 }
 
 export enum MessageStatusInner {
-  SENDING = 'SENDING'
+  SENDING = "SENDING",
 }
 export type MessageStatusModel = MessageStatus | MessageStatusInner;
 
