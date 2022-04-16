@@ -25,7 +25,7 @@ import {
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
-import type {ImageType} from "@/ts/types/backend";
+import {ImageType} from "@/ts/types/backend";
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -238,17 +238,17 @@ function encodeFiles(html: string, files: Record<string, FileModel> | null) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];
       if (v) {
-        if (v.type === "i") {
+        if (v.type === ImageType.IMAGE) {
           return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}' serverId="${v.serverId}"/>`;
-        } else if (v.type === "v" || v.type === "m") {
-          const className = v.type === "v" ? "video-player" : "video-player video-record";
+        } else if (v.type === ImageType.VIDEO || v.type === ImageType.MEDIA_RECORD) {
+          const className = v.type === ImageType.VIDEO ? "video-player" : "video-player video-record";
 
           return `<div class='${className}' serverId="${v.serverId}" associatedVideo='${v.url}'><div><img ${v.preview ? `src="${resolveMediaUrl(v.preview)}"` : ""} symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
-        } else if (v.type === "a") {
+        } else if (v.type === ImageType.AUDIO_RECORD) {
           return `<img src='${recordIcon}' serverId="${v.serverId}" symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
-        } else if (v.type === "f") {
+        } else if (v.type === ImageType.FILE) {
           return `<a href="${resolveMediaUrl(v.url!)}" serverId="${v.serverId}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
-        } else if (v.type === "g") {
+        } else if (v.type === ImageType.GIPHY) {
           // Giphy api sometimes doesn't contain webp, so it can be null
           return `<img serverId="${v.serverId}" src='${webpSupported && v.preview ? v.preview : v.url}' ${v.preview ? `webp="${v.preview}"` : ""} url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
         }
@@ -573,7 +573,7 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
     const img = blobToImg(file);
     pasteNodeAtCaret(img, textArea);
   } else if (file.type.includes("video")) {
-    pasteBlobVideoToTextArea(file, textArea, "v", errCb);
+    pasteBlobVideoToTextArea(file, textArea, ImageType.VIDEO, errCb);
   } else {
     errCb(`Pasted file type ${file.type}, which is not an image`);
   }
@@ -628,13 +628,13 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     if (videoType) {
       type = videoType;
     } else if (assAudio) {
-      type = "a";
+      type = ImageType.AUDIO_RECORD;
     } else if (assFile) {
-      type = "f";
+      type = ImageType.FILE;
     } else if (asGiphy) {
-      type = "g";
+      type = ImageType.GIPHY;
     } else {
-      type = "i";
+      type = ImageType.IMAGE;
     }
 
     let url: string;

@@ -15,7 +15,7 @@ import type {
   MessageModel,
   RoomModel,
 } from "@/ts/types/model";
-import {MessageStatusInner} from '@/ts/types/model';
+import {MessageStatusInner} from "@/ts/types/model";
 import type {Logger} from "lines-logger";
 
 import type {
@@ -23,7 +23,7 @@ import type {
   MessageModelDto,
   SaveFileResponse,
 } from "@/ts/types/dto";
-import {MessageStatus} from '@/ts/types/dto';
+import {MessageStatus} from "@/ts/types/dto";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
@@ -37,7 +37,7 @@ import type {
   MessagesResponseMessage,
   PrintMessage,
   SetMessageStatusMessage,
-  SyncHistoryResponseMessage,
+  SyncHistoryWsInMessage,
 } from "@/ts/types/backend";
 import {savedFiles} from "@/ts/utils/htmlApi";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
@@ -51,6 +51,7 @@ import {
   getMissingIds,
 } from "@/ts/utils/pureFunctions";
 import type Subscription from "@/ts/classes/Subscription";
+import {ImageType} from "@/ts/types/backend";
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
   protected readonly logger: Logger;
@@ -322,7 +323,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
         symbol: message.symbol || null,
         threadMessagesCount: message.threadMessagesCount,
         isHighlighted: false,
-        status: message.status === MessageStatusInner.SENDING ? MessageStatus.ON_SERVER: message.status,
+        status: message.status === MessageStatusInner.SENDING ? MessageStatus.ON_SERVER : message.status,
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,
@@ -381,7 +382,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     if (!storeMessage.files) {
       return [];
     }
-    return Object.entries(storeMessage.files).filter(([k, v]) => v.type === "g" && !v.serverId).
+    return Object.entries(storeMessage.files).filter(([k, v]) => v.type === ImageType.GIPHY && !v.serverId).
       map(([k, v]) => ({
         url: v.url!,
         symbol: k,
@@ -396,7 +397,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       if (fileValues.find((f) => !f.fileId && f.sending)) {
         throw Error("New files were added during upload"); // TODO
       }
-      fileValues.filter((fv) => fv.type !== "g").forEach((fv) => {
+      fileValues.filter((fv) => fv.type !== ImageType.GIPHY).forEach((fv) => {
         files.push(fv.fileId!);
         if (fv.previewFileId) {
           files.push(fv.previewFileId);
@@ -479,7 +480,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
     joined = parseInt(joined);
 
-    const result: SyncHistoryResponseMessage = await this.ws.syncHistory(
+    const result: SyncHistoryWsInMessage = await this.ws.syncHistory(
       roomIds,
       messagesIds,
       receivedMessageIds,

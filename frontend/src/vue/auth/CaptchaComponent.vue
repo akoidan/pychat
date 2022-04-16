@@ -37,13 +37,13 @@ import {
 import type {GoogleCaptcha} from "@/ts/types/model";
 import {ref} from "vue";
 
-const captchaInited = ref(false)
+const captchaInited = ref(false);
 
-let captchaId = 1; // Just random id to diff one comp fro another
+let captchaId = 1; // Just random id to diff one comp from another
 
 window.onloadrecaptcha = function () {
   captchaInited.value = true;
-}
+};
 
 @Component({name: "CaptchaComponent"})
 export default class CaptchaComponent extends Vue {
@@ -59,8 +59,6 @@ export default class CaptchaComponent extends Vue {
   @Ref()
   public iframe!: HTMLIFrameElement;
 
-  public skipInitReset: boolean = true;
-
   public id = captchaId++;
 
   @Prop() public loading!: boolean;
@@ -72,46 +70,65 @@ export default class CaptchaComponent extends Vue {
   private event: ((E: MessageEvent) => void) | null = null;
 
   public get grecaptcha(): GoogleCaptcha {
-    if (window.grecaptcha && (window.grecaptcha as any).reset) {
-      return window.grecaptcha;
-    }
     return {
-      render: () => {
+      render: (...args) => {
+        if (this.isIframe && this.iframe) {
+          this.$logger.log("Adding message listener")();
+          this.event = (event: MessageEvent) => {
+            this.$logger.log("On message {}", event)();
+            if (event.data && event.data["g-recaptcha-response"]) {
+              captchaInited.value = true;
+              this.$emit("update:loading", true);
+              this.$emit("update:token", event.data["g-recaptcha-response"]);
+            }
+          };
+          window.addEventListener("message", this.event, false);
+        } else if ((window as any).grecaptcha?.render) {
+          this.grecaptcha.render(...args);
+        }
       },
-      reset: () => {
+      reset: (...args) => {
+        if (this.isIframe && this.iframe) {
+          this.$logger.log("Resetting captcha")();
+          this.iframe.contentWindow!.postMessage("reset-captcha", "*");
+        } else if ((window as any).grecaptcha?.reset) {
+          this.grecaptcha.reset(...args);
+        }
       },
     };
   }
 
   @Watch("loading")
   public onValueChange(newValue: boolean, oldValue: boolean) {
+    this.$logger.log("loading change {}", {
+      newValue,
+      oldValue,
+      resettingAllowed: this.resettingAllowed,
+    })();
     if (!newValue && newValue != oldValue) {
       if (this.resettingAllowed) {
-        if (this.isIframe && this.iframe) {
-          this.$logger.log("Resetting captcha")();
-          this.iframe.contentWindow!.postMessage("reset-captcha", "*");
-        } else {
-          this.grecaptcha.reset();
-        }
+        this.grecaptcha.reset();
       }
       this.resettingAllowed = true;
     }
-    this.skipInitReset = false;
   }
-
 
 
   public renderCaptcha() {
     this.$emit("update:loading", false);
     this.grecaptcha.render(this.repactha, {
       sitekey: this.captchaKey,
-      theme: 'dark',
-      callback: (response: string) => this.$emit("update:token", response),
-    })
-    captchaInited.value = true
+      theme: "dark",
+      callback: (response: string) => {
+        this.$emit("update:token", response);
+      },
+    });
+    captchaInited.value = true;
   }
 
   public destroyed(): void {
+    // Always reset captcha, otherwise next component which assumes that captcha is not confirmed will fail
+    this.grecaptcha.reset();
     if (this.event) {
       this.$logger.log("Removing message listener {}", this.event)();
       window.removeEventListener("message", this.event);
@@ -123,32 +140,21 @@ export default class CaptchaComponent extends Vue {
     return captchaInited.value;
   }
 
-  @Watch('captchaInited')
+  @Watch("captchaInited")
   public async oncatpchaChange() {
     if (captchaInited.value) {
       this.renderCaptcha();
     }
   }
 
-  public async mounted() { // should be mounted thus div to render recaptcha exists
+  public async mounted() { // Should be mounted thus div to render recaptcha exists
     this.$logger.debug("initing captcha with key {}", this.captchaKey)();
     if (this.captchaKey) {
-      if (this.isIframe) {
-        this.$logger.log("Adding message listener")();
-        this.event = (event: MessageEvent) => {
-          this.$logger.log("On message {}", event)();
-          if (event.data && event.data["g-recaptcha-response"]) {
-            captchaInited.value = true;
-            this.$emit("update:loading", true);
-            this.$emit("update:token", event.data["g-recaptcha-response"]);
-          }
-        };
-        window.addEventListener("message", this.event, false);
-      } else if (captchaInited.value) {
+      if (this.isIframe || captchaInited.value) {
         this.renderCaptcha();
       } else {
         this.$emit("update:loading", true);
-        await this.$api.loadRecaptcha('onloadrecaptcha');
+        await this.$api.loadRecaptcha("onloadrecaptcha");
       }
     }
   }

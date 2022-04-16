@@ -147,7 +147,7 @@ export interface DefaultMessage<A extends string> {
 }
 
 
-export interface SyncHistoryOutMessage extends DefaultWsOutMessage<"syncHistory"> {
+export interface SyncHistoryWsOutMessage extends DefaultWsOutMessage<"syncHistory"> {
   roomIds: number[];
   messagesIds: number[];
   onServerMessageIds: number[];
@@ -324,7 +324,7 @@ export interface MessagesResponseMessage {
   content: MessageModelDto[];
 }
 
-export interface SyncHistoryResponseMessage extends MessagesResponseMessage {
+export interface SyncHistoryWsInMessage extends MessagesResponseMessage {
   readMessageIds: number[];
   receivedMessageIds: number[];
 }

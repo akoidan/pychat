@@ -7,8 +7,8 @@ import {PasswordService} from "@/modules/rest/password/password.service";
 import type {
   ShowITypeWsInMessage,
   ShowITypeWsOutMessage,
-  SyncHistoryOutMessage,
-  SyncHistoryResponseMessage,
+  SyncHistoryWsOutMessage,
+  SyncHistoryWsInMessage,
 } from "@/data/types/frontend";
 import {
   ImageType,
@@ -21,6 +21,7 @@ import {RedisService} from "@/modules/rest/redis/redis.service";
 import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
 import type {WebSocketContextData} from "@/data/types/internal";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
+import {getSyncMessage} from "@/modules/api/websocket/transformers/ws.transformer";
 
 
 @Injectable()
@@ -54,7 +55,7 @@ export class MessageService {
     );
   }
 
-  public async syncHistory(data: SyncHistoryOutMessage, context: WebSocketContextData) {
+  public async syncHistory(data: SyncHistoryWsOutMessage, context: WebSocketContextData) {
     // MessageStatus.ON_SERVER
     const messages = await this.messageRepository.getNewOnServerMessages(data.roomIds, data.messagesIds, data.lastSynced);
 
@@ -73,8 +74,7 @@ export class MessageService {
     const images = await this.messageRepository.getImagesByMessagesId(messageIdsWithSymbol);
     const mentions = await this.messageRepository.getTagsByMessagesId(messageIdsWithSymbol);
 
-
-    const dtso: any = messages.map((m) => transformMessage(m, mentions, images));
+    return getSyncMessage(readmesageIds, receivedMessageIds, messages, mentions, images);
 
   /*
    *

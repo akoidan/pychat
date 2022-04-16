@@ -19,12 +19,14 @@ import {
   Logger,
   UseFilters,
 } from "@nestjs/common";
-import type {GetCountryCodeWsInMessage} from "@/data/types/frontend";
+import type {
+  GetCountryCodeWsInMessage,
+  SyncHistoryWsInMessage,
+} from "@/data/types/frontend";
 import {
   GetCountryCodeWsOutMessage,
-  ShowITypeWsInMessage,
   ShowITypeWsOutMessage,
-  SyncHistoryOutMessage,
+  SyncHistoryWsOutMessage,
 } from "@/data/types/frontend";
 import {SubscribePuBSub} from "@/modules/rest/pubsub/pubsub.service";
 import {SendToClientPubSubMessage} from "@/modules/api/websocket/interfaces/pubsub";
@@ -66,19 +68,21 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
   }
 
   @SubscribeMessage("syncHistory")
-  public async syncHistory(@MessageBody() data: SyncHistoryOutMessage, @WsContext() context: WebSocketContextData): Promise<any> {
-    await this.messageService.syncHistory(data, context);
+  public async syncHistory(
+    @MessageBody() data: SyncHistoryWsOutMessage,
+      @WsContext() context: WebSocketContextData
+  ): Promise<SyncHistoryWsInMessage> {
+    return this.messageService.syncHistory(data, context);
   }
 
   @SubscribeMessage("printMessage")
-  public async printMessage(@MessageBody() data: SyncHistoryOutMessage, @WsContext() context: WebSocketContextData): Promise<any> {
+  public async printMessage(@MessageBody() data: SyncHistoryWsOutMessage, @WsContext() context: WebSocketContextData): Promise<any> {
   }
 
   @SubscribeMessage("showIType")
   public async showIType(@MessageBody() data: ShowITypeWsOutMessage, @WsContext() context: WebSocketContextData): Promise<void> {
     await this.messageService.showIType(data, context);
   }
-
 
   @SubscribeMessage("getCountryCode")
   async getCountryCode(@MessageBody() data: GetCountryCodeWsOutMessage, @WsContext() context: WebSocketContextData): Promise<Omit<GetCountryCodeWsInMessage, "action" | "handler">> {

@@ -25,17 +25,15 @@ import {
   currentUserInfoDtoToModel,
   userSettingsDtoToModel,
 } from "@/ts/types/converters";
-import type {
-  GiphyDto,
+import type {GiphyDto,
   RoomNoUsersDto,
   UserProfileDto,
   UserProfileDtoWoImage,
   UserSettingsDto,
-} from "@/ts/types/dto";
+  GetCountryCodeWsOutMessage} from "@/ts/types/dto";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
-import type {
-  AddChannelMessage,
+import type {AddChannelMessage,
   AddInviteMessage,
   AddRoomMessage,
   DefaultWsOutMessage,
@@ -49,27 +47,25 @@ import type {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
-  SyncHistoryOutMessage,
-  SyncHistoryResponseMessage,
+  SyncHistoryWsOutMessage,
+  SyncHistoryWsInMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
   ShowITypeWsOutMessage,
-} from "@/ts/types/backend";
+
+  HandlerType,
+  HandlerTypes,
+
+  MessageStatus} from "@/ts/types/backend";
 import type {
   InternetAppearMessage,
   LogoutMessage,
   PubSetRooms,
 } from "@/ts/types/messages/innerMessages";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
 import type Subscription from "@/ts/classes/Subscription";
 import {
-  MessageStatus,
-  WS_SESSION_EXPIRED_CODE
-} from '@/ts/types/backend';
-import {GetCountryCodeWsOutMessage} from '@/ts/types/dto';
+  WS_SESSION_EXPIRED_CODE,
+} from "@/ts/types/backend";
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
@@ -154,9 +150,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async getCountryCode(): Promise<GetCountryCodeWsInMessage> {
-    let body: GetCountryCodeWsOutMessage = {
+    const body: GetCountryCodeWsOutMessage = {
       action: "getCountryCode",
-    }
+    };
     return this.messageProc.sendToServerAndAwait(body);
   }
 
@@ -279,10 +275,10 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public showIType(roomId: number): void {
-    let request: ShowITypeWsOutMessage = {
+    const request: ShowITypeWsOutMessage = {
       roomId,
       action: "showIType",
-    }
+    };
     this.sendToServer(request);
   }
 
@@ -311,8 +307,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     receivedMessageIds: number[],
     onServerMessageIds: number[],
     lastSynced: number,
-  ): Promise<SyncHistoryResponseMessage> {
-    const payload: SyncHistoryOutMessage = {
+  ): Promise<SyncHistoryWsInMessage> {
+    const payload: SyncHistoryWsOutMessage = {
       messagesIds,
       receivedMessageIds,
       onServerMessageIds,

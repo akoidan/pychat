@@ -1,14 +1,15 @@
 import type {
   AddOnlineUserMessage,
   ChannelDto,
+  FileModelDto,
+  MessageModelDto,
+  RemoveOnlineUserMessage,
   RoomDto,
   SetWsIdMessage,
+  SyncHistoryWsInMessage,
   UserDto,
   UserProfileDto,
   UserSettingsDto,
-  RemoveOnlineUserMessage,
-  MessageModelDto,
-  FileModelDto,
 } from "@/data/types/frontend";
 import type {UserModel} from "@/data/model/user.model";
 import type {
@@ -162,38 +163,52 @@ export function getLogoutMessage(online: UserOnlineData, lastTimeOnline: number,
 }
 
 
-function getTags(mentions: MessageMentionModel[], m: MessageModel) {
-  return mentions.filter((mention) => mention.messageId == m.id).reduce((mentions, mention) => {
+export function getTags(mentions: MessageMentionModel[], m: MessageModel): Record<string, number> {
+  return mentions.filter((mention) => mention.messageId === m.id).reduce((mentions, mention) => {
     mentions[mention.symbol] = mention.userId;
     return mentions;
   }, {});
 }
 
-function getFiles(images: ImageModel[], m: MessageModel): Record<number, FileModelDto> {
-  return Object.fromEntries(images.filter((i) => i.messageId === m.id).map((i) => [
-    i.symbol, {
-      url: i.img,
-      type: i.type,
-      preview: i.preview,
-      id: i.id,
+export function getFiles(images: ImageModel[], mess: MessageModel): Record<number, FileModelDto> {
+  return Object.fromEntries(images.filter((img) => img.messageId === mess.id).map((img) => [
+    img.symbol, {
+      url: img.img,
+      type: img.type,
+      preview: img.preview,
+      id: img.id,
     },
   ]));
 }
 
-function getMessage(m: MessageModel, mentions: MessageMentionModel[], images: ImageModel[]): MessageModelDto {
+export function getMessage(message: MessageModel, mentions: MessageMentionModel[], images: ImageModel[]): MessageModelDto {
   return {
-    id: m.id,
-    content: m.content,
-    tags: getTags(mentions, m),
-    roomId: m.roomId,
-    userId: m.senderId,
-    parentMessage: m.parentMessageId,
-    deleted: Boolean(m.deletedAt),
-    threadMessagesCount: m.threadMessageCount,
-    symbol: m.symbol,
-    status: m.messageStatus,
-    time: m.time,
-    edited: m.updatedAt,
-    files: getFiles(images, m),
+    id: message.id,
+    content: message.content,
+    tags: getTags(mentions, message),
+    roomId: message.roomId,
+    userId: message.senderId,
+    parentMessage: message.parentMessageId,
+    deleted: Boolean(message.deletedAt),
+    threadMessagesCount: message.threadMessageCount,
+    symbol: message.symbol,
+    status: message.messageStatus,
+    time: message.time,
+    edited: message.updatedAt.getTime(),
+    files: getFiles(images, message),
+  };
+}
+
+export function getSyncMessage(
+  readMessageIds: number[],
+  receivedMessageIds: number[],
+  messages: MessageModel[],
+  mentions: MessageMentionModel[],
+  images: ImageModel[]
+): SyncHistoryWsInMessage {
+  return {
+    readMessageIds,
+    receivedMessageIds,
+    content: messages.map((m) => getMessage(m, mentions, images)),
   };
 }

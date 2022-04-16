@@ -125,7 +125,7 @@ import type {
   HandlerType,
   HandlerTypes,
 } from "@/ts/types/backend";
-import {MessageStatus} from '@/ts/types/backend';
+import {MessageStatus} from "@/ts/types/backend";
 
 
 @Component({

@@ -116,6 +116,7 @@ import ChatTagging from "@/vue/chat/textarea/ChatTagging.vue";
 import {Throttle} from "@/ts/classes/Throttle";
 import GiphySearch from "@/vue/chat/textarea/GiphySearch.vue";
 import type {GIFObject} from "giphy-api";
+import {ImageType} from "@/ts/types/backend";
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -433,7 +434,7 @@ export default class ChatTextArea extends Vue {
 
   public handleAddVideo(file: Blob) {
     if (file) {
-      pasteBlobVideoToTextArea(file, this.userMessage, "m", (e: string) => {
+      pasteBlobVideoToTextArea(file, this.userMessage, ImageType.MEDIA_RECORD, (e: string) => {
         this.$store.growlError(e);
       });
     }
