@@ -49,7 +49,7 @@ import type {
   RemoveOnlineUserMessage,
   SaveChannelSettingsMessage,
   SaveRoomSettingsMessage,
-  ShowITypeMessage,
+  ShowITypeWsInMessage,
 } from "@/ts/types/backend";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import type {Logger} from "lines-logger";
@@ -228,7 +228,7 @@ export class RoomHandler extends MessageHandler {
     });
   }
 
-  public async showIType(message: ShowITypeMessage) {
+  public async showIType(message: ShowITypeWsInMessage) {
     if (this.store.myId !== message.userId) {
       await this.store.showUserIsTyping({
         userId: message.userId,

@@ -166,6 +166,16 @@ export interface SyncHistoryOutMessage extends DefaultWsOutMessage<"syncHistory"
   receivedMessageIds: number[];
   lastSynced: number;
 }
+
+export interface ShowITypeWsInMessage extends DefaultWsInMessage<"showIType", "room"> {
+  roomId: number;
+  userId: number;
+}
+
+export interface ShowITypeWsOutMessage extends DefaultWsOutMessage<'showIType'> {
+  roomId: number;
+}
+
 /** CODE I PUT HERE MANUALLY WS IN */
 /*
  * Any means that every every registered subscriber will be called with this handler if it exists
@@ -369,11 +379,11 @@ export interface DeleteRoomMessage extends DefaultWsInMessage<"deleteRoom", "roo
   roomId: number;
 }
 
-export interface GetCountryCodeRequestMessage extends DefaultWsOutMessage<"getCountryCode"> {
+export interface GetCountryCodeWsOutMessage extends DefaultWsOutMessage<"getCountryCode"> {
 }
 
 
-export interface GetCountryCodeResponseMessage extends DefaultInMessage<"getCountryCode", "void"> {
+export interface GetCountryCodeWsInMessage extends DefaultInMessage<"getCountryCode", "void"> {
   content: Record<string, LocationDto>;
 }
 
@@ -410,14 +420,6 @@ export interface DeleteChannelMessage extends DefaultWsInMessage<"deleteChannel"
 export interface SaveRoomSettingsMessage extends DefaultWsInMessage<"saveRoomSettings", "room">, RoomNoUsersDto {
 }
 
-export interface ShowITypeMessage extends DefaultWsInMessage<"showIType", "room"> {
-  roomId: number;
-  userId: number;
-}
-
-export interface ShowITypeRequestMessage extends DefaultWsOutMessage<'showIType'> {
-  roomId: number;
-}
 
 export interface SetWsIdMessage extends DefaultWsInMessage<"setWsId", "ws">, OpponentWsId {
   rooms: RoomDto[];

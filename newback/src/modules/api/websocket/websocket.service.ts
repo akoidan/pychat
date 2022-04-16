@@ -71,7 +71,7 @@ export class WebsocketService {
     this.pubsubService.emit(
       'sendToClient',
       {
-        content: data,
+        body: data,
       },
       '*'
     )
@@ -89,7 +89,7 @@ export class WebsocketService {
       this.pubsubService.emit(
         'sendToClient',
         {
-          content: getLogoutMessage(online, lastTimeOnline, context, lastTimeOnline),
+          body: getLogoutMessage(online, lastTimeOnline, context, lastTimeOnline),
         },
         '*'
       )

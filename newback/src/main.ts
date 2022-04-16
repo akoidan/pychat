@@ -15,7 +15,7 @@ async function bootstrap() {
   const cert = await promisify(readFile)(config.application.crtPath, 'utf-8');
 
   const app = await NestFactory.create(AppModule, {
-    logger: new ConsoleLogger(),
+    logger: [ 'log' , 'error' , 'warn' , 'debug'],
     cors: {
       allowedHeaders: ["x-requested-with", "session_id", "Content-Type"],
       methods: ["POST", "GET", "OPTIONS"],

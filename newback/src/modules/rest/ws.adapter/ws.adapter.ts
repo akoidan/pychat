@@ -52,7 +52,11 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
             processErrors(e, ws, this.logger)
             return
           }
-          this.logger.debug(`WS:OUT ${message}`, 'ws')
+          if (message.length > 2000) {
+            this.logger.verbose(`WS:OUT ${message}`, 'ws')
+          } else {
+            this.logger.debug(`WS:OUT ${message}`, 'ws')
+          }
           oldSend(message)
         }
       };

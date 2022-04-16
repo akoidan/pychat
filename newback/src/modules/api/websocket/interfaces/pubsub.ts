@@ -6,7 +6,7 @@ import {
 import {WebsocketGateway} from '@/modules/api/websocket/websocket.gateway';
 
 export interface PubSubMessage<A extends string, H extends HandlerName> {
-  content: DefaultWsInMessage<A, H>;
+  body: DefaultWsInMessage<A, H>;
 }
 
 // export interface SendToClientPubSubMessage<A extends string, H extends HandlerName> extends PubSubMessage<A, H>{

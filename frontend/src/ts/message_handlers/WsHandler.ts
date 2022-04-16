@@ -39,7 +39,7 @@ import type {
   AddInviteMessage,
   AddRoomMessage,
   DefaultWsOutMessage,
-  GetCountryCodeResponseMessage,
+  GetCountryCodeWsInMessage,
   MessagesResponseMessage,
   PingMessage,
   PongMessage,
@@ -53,7 +53,7 @@ import type {
   SyncHistoryResponseMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
-  ShowITypeRequestMessage,
+  ShowITypeWsOutMessage,
 } from "@/ts/types/backend";
 import type {
   InternetAppearMessage,
@@ -69,7 +69,7 @@ import {
   MessageStatus,
   WS_SESSION_EXPIRED_CODE
 } from '@/ts/types/backend';
-import {GetCountryCodeRequestMessage} from '@/ts/types/dto';
+import {GetCountryCodeWsOutMessage} from '@/ts/types/dto';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
@@ -153,8 +153,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.wsConnectionId;
   }
 
-  public async getCountryCode(): Promise<GetCountryCodeResponseMessage> {
-    let body: GetCountryCodeRequestMessage = {
+  public async getCountryCode(): Promise<GetCountryCodeWsInMessage> {
+    let body: GetCountryCodeWsOutMessage = {
       action: "getCountryCode",
     }
     return this.messageProc.sendToServerAndAwait(body);
@@ -279,7 +279,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public showIType(roomId: number): void {
-    let request: ShowITypeRequestMessage = {
+    let request: ShowITypeWsOutMessage = {
       roomId,
       action: "showIType",
     }

@@ -5,7 +5,7 @@ import {
 import {UserRepository} from '@/modules/rest/database/repository/user.repository';
 import {PasswordService} from '@/modules/rest/password/password.service';
 import {
-  GetCountryCodeResponseMessage,
+  GetCountryCodeWsInMessage,
   LocationDto
 } from '@/data/types/frontend';
 import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
@@ -35,13 +35,13 @@ export class WsDataService {
   ) {
   }
 
-  public async getCountryCodes(context: WebSocketContextData): Promise<Omit<GetCountryCodeResponseMessage, 'handler'| 'action'>> {
+  public async getCountryCodes(context: WebSocketContextData): Promise<Omit<GetCountryCodeWsInMessage, 'handler'| 'action'>> {
     if (!this.configService.getConfig().settings.flags) {
       throw new ValidationException('Flags api is not enabled');
     }
     let usersId: number[] = await this.roomRepository.usersForUser(context.userId);
     let userInfo: UserJoinedInfoModel[] = await this.ipRepository.getIpInfosForUsers(usersId);
-    let content: GetCountryCodeResponseMessage['content'] =userInfo.reduce((previousValue, currentValue) => {
+    let content: GetCountryCodeWsInMessage['content'] =userInfo.reduce((previousValue, currentValue) => {
       if (currentValue.ip) {
         let value: LocationDto = {
           country: currentValue.ip.country,

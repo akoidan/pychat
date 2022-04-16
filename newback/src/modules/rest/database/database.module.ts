@@ -24,19 +24,21 @@ import {UserRepository} from '@/modules/rest/database/repository/user.repository
 import {RoomRepository} from '@/modules/rest/database/repository/room.repository';
 import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
 import {VerificationRepository} from '@/modules/rest/database/repository/verification.repository';
+import {MessageRepository} from '@/modules/rest/database/repository/messages.repository';
 
 const repositories = [
   UserRepository,
   RoomRepository,
   IpRepository,
   VerificationRepository,
+  MessageRepository,
 ];
 
 @Module({
   imports: [
     SequelizeModule.forRootAsync({
       inject: [Logger],
-      useFactory: (logger: Logger) => generateOrmConfig((sql) => logger.verbose(sql, 'sql')),
+      useFactory: (logger: Logger) => generateOrmConfig((sql) => sql.length > 2000 ? logger.verbose(sql, 'sql'): logger.debug(sql, 'sql')),
     }),
     SequelizeModule.forFeature([
       ChannelModel,

@@ -16,21 +16,14 @@ import {
 } from 'ws';
 import {WebSocketContextData} from '@/data/types/internal';
 import {
-  ArgumentMetadata,
-  ArgumentsHost,
-  BadRequestException,
-  Catch,
-  ExceptionFilter,
-  HttpException,
-  Injectable,
   Logger,
-  PipeTransform,
   UseFilters
 } from '@nestjs/common';
 import {
-  GetCountryCodeResponseMessage,
-  GrowlMessage,
-  ShowITypeRequestMessage,
+  GetCountryCodeWsOutMessage,
+  GetCountryCodeWsInMessage,
+  ShowITypeWsInMessage,
+  ShowITypeWsOutMessage,
   SyncHistoryOutMessage
 } from '@/data/types/frontend';
 import {SubscribePuBSub} from '@/modules/rest/pubsub/pubsub.service';
@@ -39,22 +32,7 @@ import {WebsocketService} from '@/modules/api/websocket/websocket.service';
 import {OnWsClose} from '@/modules/api/websocket/interfaces/utils';
 import {WsDataService} from '@/modules/api/websocket/ws.data.service';
 import {WsExceptionFilter} from '@/modules/api/websocket/ws.exception.filter';
-import {check} from 'typend';
-
-
-@Injectable()
-export class ValidationPipe implements PipeTransform<any, any> {
-
-
-  constructor(private checker: (v: any) => void ) {
-
-  }
-  transform(value: string, metadata: ArgumentMetadata): any {
-    this.checker(value);
-    return value;
-  }
-}
-
+import {MessageService} from '@/modules/api/websocket/message.service';
 
 @WebSocketGateway({
   path: '/ws'
@@ -69,6 +47,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
     public readonly logger: Logger,
     public readonly websocketService: WebsocketService,
     public readonly wsDataService: WsDataService,
+    public readonly messageService: MessageService,
   ) {
   }
 
@@ -84,25 +63,26 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
 
   @SubscribePuBSub('sendToClient')
   public sendToClient(ctx: WebSocketContextData, data: SendToClientPubSubMessage<any, any, any>) {
-    ctx.sendToClient(data.content);
+    ctx.sendToClient(data.body);
   }
 
   @SubscribeMessage('syncHistory')
-  syncHistory(@MessageBody() data: SyncHistoryOutMessage, /*@ConnectedSocket() a*/ @WsContext() context): any {
+ public async  syncHistory(@MessageBody() data: SyncHistoryOutMessage, @WsContext() context: WebSocketContextData): Promise<any> {
+    await this.messageService.syncHistory(data, context);
   }
 
   @SubscribeMessage('printMessage')
-  printMessage(@MessageBody() data: SyncHistoryOutMessage, @WsContext() context): any {
+  public async  printMessage(@MessageBody() data: SyncHistoryOutMessage, @WsContext()  context: WebSocketContextData): Promise<any> {
   }
 
   @SubscribeMessage('showIType')
-  showIType(@MessageBody(new ValidationPipe((v) => check<ShowITypeRequestMessage>(v))) data: SyncHistoryOutMessage, @WsContext() context): any {
-    // return this.
+  public async showIType(@MessageBody() data: ShowITypeWsOutMessage, @WsContext()  context: WebSocketContextData): Promise<void> {
+    await this.messageService.showIType(data, context);
   }
 
 
   @SubscribeMessage('getCountryCode')
-  async getCountryCode(@MessageBody() data: GetCountryCodeResponseMessage, @WsContext() context): Promise<Omit<GetCountryCodeResponseMessage, 'handler'|'action'>> {
+  async getCountryCode(@MessageBody() data: GetCountryCodeWsOutMessage, @WsContext()  context: WebSocketContextData): Promise<Omit<GetCountryCodeWsInMessage, 'handler'|'action'>> {
     return this.wsDataService.getCountryCodes(context);
   }
 
