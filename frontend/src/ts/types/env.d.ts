@@ -13,24 +13,24 @@ import type {
 } from "@/ts/types/types";
 import type WebRtcApi from "@/ts/webrtc/WebRtcApi";
 import type Subscription from "@/ts/classes/Subscription";
-import type Http from "@/ts/classes/Http";
 import type {Router} from "vue-router";
 import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
 import type {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {SmileysApi} from "@/ts/utils/smileys";
+import type Fetch from "@/ts/classes/Fetch";
 
 declare global {
   interface Window {
     GIT_VERSION: string | undefined;
     vue: VueApp;
-    onloadrecaptcha: () => any;
+    onloadrecaptcha(): any;
     router: Router;
     api: Api;
     deferredPrompt: BeforeInstallPromptEvent;
     wsMessageHandler: WsMessageHandler;
     roomHandler: RoomHandler;
-    xhr: Http;
+    xhr: Fetch;
     ws: WsHandler;
     storage: IStorage;
     store: DefaultStore;

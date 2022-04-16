@@ -86,7 +86,7 @@ export interface SetUploadProgress {
 }
 
 export interface SetUploadXHR {
-  xhr: XMLHttpRequest;
+  abortFunction: () => void;
   roomId: number;
   messageId: number;
 }
@@ -232,15 +232,8 @@ export interface IStorage {
 
 export interface PostData {
   url: string;
-  params?: any;
-  formData?: FormData;
-  onAbortController?: (controller: AbortController) => void;
-  process?(R: XMLHttpRequest): void;
-}
-
-export interface GetData {
-  baseUrl?: string;
-  process?(R: XMLHttpRequest): void;
+  params: any;
+  onSetAbortFunction?: (c: () => void) => void;
 }
 
 export interface AddSendingFileTransfer {

@@ -76,8 +76,8 @@ export default class ChatMessageToolTip extends Vue {
       return;
     }
     // TODO, check if opened is the only status with abor request
-    if (this.message?.transfer?.xhr?.readyState === XMLHttpRequest.OPENED) {
-      this.message.transfer.xhr.abort();
+    if (this.message?.transfer?.abortFn) {
+      this.message.transfer.abortFn();
     }
     editMessageWs(
       null,

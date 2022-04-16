@@ -471,7 +471,7 @@ export default class DatabaseWrapper implements IStorage {
         tags,
         transfer: m.status === MessageStatusInner.SENDING ? {
           error: null,
-          xhr: null,
+          abortFn: null,
           upload: null,
         } : null,
         files: {},

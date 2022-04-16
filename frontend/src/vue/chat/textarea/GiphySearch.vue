@@ -20,7 +20,7 @@
       class="giphy-content"
       @scroll.passive="loadMore"
     >
-      <div v-if="images.length === 0 && search && !request">
+      <div v-if="images.length === 0 && search && !abortFn">
         Nothing found
       </div>
       <app-loading-image
@@ -62,7 +62,7 @@ import AppLoadingImage from "@/vue/ui/AppLoadingImage.vue";
 import {LOAD_GIPHIES_PER_REQUEST} from "@/ts/utils/consts";
 
 @Component({
-  name: 'GiphySearch',
+  name: "GiphySearch",
   components: {
     AppLoadingImage,
     AppSuspense,
@@ -82,7 +82,7 @@ export default class GiphySearch extends Vue {
 
   public images: GIFObject[] = [];
 
-  public request: XMLHttpRequest | null = null;
+  public abortFn: (() => void) | null = null;
 
   @Ref()
   private readonly suspense!: AppSuspense;
@@ -93,7 +93,7 @@ export default class GiphySearch extends Vue {
   private webpSupported: boolean = webpSupported;
 
   public get showLoadMoreBtn() {
-    return !this.request && this.images.length > 0 && this.pagination.count === LOAD_GIPHIES_PER_REQUEST;
+    return !this.abortFn && this.images.length > 0 && this.pagination.count === LOAD_GIPHIES_PER_REQUEST;
   }
 
   async mounted() {
@@ -121,13 +121,13 @@ export default class GiphySearch extends Vue {
     runningProp: "moreLoading",
   })
   async onSearchChange() {
-    if (this.request) {
-      this.request.abort();
-      this.request = null;
+    if (this.abortFn) {
+      this.abortFn();
+      this.abortFn = null;
     }
-    const response = await this.$api.searchGiphys(this.search, 0, LOAD_GIPHIES_PER_REQUEST, (r) => this.request = r);
+    const response = await this.$api.searchGiphys(this.search, 0, LOAD_GIPHIES_PER_REQUEST, (r) => this.abortFn = r);
     this.pagination = response.pagination;
-    this.request = null;
+    this.abortFn = null;
     this.images = response.data;
   }
 
@@ -149,7 +149,7 @@ export default class GiphySearch extends Vue {
      * W/0 +1, it returns duplicate id
      * the weird thing docs say, that pagination start with 0, but it seems like with 1
      */
-    const response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, LOAD_GIPHIES_PER_REQUEST, (r) => this.request = r);
+    const response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, LOAD_GIPHIES_PER_REQUEST, (r) => this.abortFn = r);
     this.pagination = response.pagination;
     this.images.push(...response.data.filter((n) => !this.images.find((o) => o.id === n.id)));
   }

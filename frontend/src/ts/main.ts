@@ -24,7 +24,6 @@ import DatabaseWrapper from "@/ts/classes/DatabaseWrapper";
 import LocalStorage from "@/ts/classes/LocalStorage";
 import Api from "@/ts/message_handlers/Api";
 import NotifierHandler from "@/ts/classes/NotificationHandler";
-import type Http from "@/ts/classes/Http";
 import WebRtcApi from "@/ts/webrtc/WebRtcApi";
 import {routerFactory} from "@/ts/instances/routerInstance";
 import {AudioPlayer} from "@/ts/classes/AudioPlayer";
@@ -113,7 +112,7 @@ function init(): void {
   });
 
   const sub = new Subscription();
-  const xhr: Http = new Fetch(sessionHolder);
+  const xhr: Fetch = new Fetch(sessionHolder);
   const api: Api = new Api(xhr, sub);
 
   let storage;

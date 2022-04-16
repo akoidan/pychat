@@ -229,8 +229,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     roomId: number,
     files: UploadFile[],
   ): Promise<SaveFileResponse> {
-    let size: number = 0;
-    files.forEach((f) => size += f.file.size);
+    const size = files.reduce((summ, f) => summ + f.file.size, 0);
     const sup: SetUploadProgress = {
       upload: {
         total: size,
@@ -243,19 +242,17 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     try {
       const res: SaveFileResponse = await this.api.uploadFiles(
         files,
-        (evt) => {
-          if (evt.lengthComputable) {
-            const payload: SetMessageProgress = {
-              messageId,
-              roomId,
-              uploaded: evt.loaded,
-            };
-            this.store.setMessageProgress(payload);
-          }
+        (uploaded) => {
+          const payload: SetMessageProgress = {
+            messageId,
+            roomId,
+            uploaded,
+          };
+          this.store.setMessageProgress(payload);
         },
-        (xhr) => {
+        (abortFunction) => {
           this.store.setUploadXHR({
-            xhr,
+            abortFunction,
             messageId,
             roomId,
           });

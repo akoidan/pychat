@@ -117,7 +117,7 @@ export function editMessageWs(
     transfer: Boolean(messageContent) || messageId > 0 ? { // TODO can this be simplified?
       error: null,
       upload: null,
-      xhr: null,
+      abortFn: null,
     } : null,
     time,
     tags,

@@ -114,7 +114,7 @@ export interface UploadProgressModel {
 export interface MessageTransferInfo {
   upload: UploadProgressModel | null;
   error: string | null;
-  xhr: XMLHttpRequest | null;
+  abortFn: (() => void) | null;
 }
 
 export interface MessageModel {

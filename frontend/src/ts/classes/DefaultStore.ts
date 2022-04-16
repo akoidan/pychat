@@ -403,7 +403,7 @@ export class DefaultStore extends VuexModule {
   public setUploadXHR(payload: SetUploadXHR) {
     const message = this.roomsDict[payload.roomId].messages[payload.messageId];
     if (message.transfer) {
-      message.transfer.xhr = payload.xhr;
+      message.transfer.abortFn = payload.abortFunction;
     } else {
       throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
     }

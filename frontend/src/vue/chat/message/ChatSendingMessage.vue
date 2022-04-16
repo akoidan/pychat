@@ -109,7 +109,9 @@ export default class ChatSendingMessage extends Vue {
   }
 
   cancelTransfer() {
-    this.message.transfer?.xhr?.abort();
+    if (this.message.transfer?.abortFn) {
+      this.message.transfer.abortFn();
+    }
   }
 
   closeThread() {

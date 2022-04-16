@@ -178,15 +178,15 @@ export default class SignUp extends Vue {
   debouncedValidateUserName!: Function;
 
 
-  private currentValidateUsernameRequest: AbortController | null = null;
+  private abortUsernameValidation: (() => void)|null = null;
 
   async checkUserName(username: string) {
-    if (this.currentValidateUsernameRequest) {
-      this.currentValidateUsernameRequest.abort();
-      this.currentValidateUsernameRequest = null;
+    if (this.abortUsernameValidation) {
+      this.abortUsernameValidation();
+      this.abortUsernameValidation = null;
     }
     try {
-      await this.$api.validateUsername(username, (r: AbortController) => this.currentValidateUsernameRequest = r);
+      await this.$api.validateUsername(username, (r: () => void) => this.abortUsernameValidation = r);
       this.userCheckValue = IconColor.SUCCESS;
       this.userDescription = "Username is ok!";
       this.usernameValidity = "";
@@ -195,7 +195,7 @@ export default class SignUp extends Vue {
       this.usernameValidity = errors;
       this.userDescription = errors;
     } finally {
-      this.currentValidateUsernameRequest = null;
+      this.abortUsernameValidation = null;
     }
   }
 
@@ -280,15 +280,15 @@ export default class SignUp extends Vue {
 
   debouncedValidateEmail!: Function;
 
-  private currentValidateEmailRequest: AbortController | null = null;
+  private abortEmailValidation: (() => void)| null = null;
 
   async checkEmail(email: string) {
-    if (this.currentValidateEmailRequest) {
-      this.currentValidateEmailRequest.abort();
-      this.currentValidateEmailRequest = null;
+    if (this.abortEmailValidation) {
+      this.abortEmailValidation();
+      this.abortEmailValidation = null;
     }
     try {
-      await this.$api.validateEmail({email}, (r:AbortController) => this.currentValidateEmailRequest = r);
+      await this.$api.validateEmail({email}, (r: () => void) => this.abortEmailValidation = r);
       this.emailCheckValue = IconColor.SUCCESS;
       this.emailDescription = "Email is ok!";
       this.emailValidity = "";
@@ -297,19 +297,19 @@ export default class SignUp extends Vue {
       this.emailValidity = errors;
       this.emailDescription = errors;
     } finally {
-      this.currentValidateEmailRequest = null;
+      this.abortEmailValidation = null;
     }
   }
 
 
   destroyed(): void {
-    if (this.currentValidateEmailRequest) {
-      this.currentValidateEmailRequest.abort();
-      this.currentValidateEmailRequest = null;
+    if (this.abortEmailValidation) {
+      this.abortEmailValidation();
+      this.abortEmailValidation = null;
     }
-    if (this.currentValidateUsernameRequest) {
-      this.currentValidateUsernameRequest.abort();
-      this.currentValidateUsernameRequest = null;
+    if (this.abortUsernameValidation) {
+      this.abortUsernameValidation();
+      this.abortUsernameValidation = null;
     }
   }
 

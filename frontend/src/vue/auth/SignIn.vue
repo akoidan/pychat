@@ -6,9 +6,9 @@
     <div>
       <i class="icon-user"/>
       <input
+        v-model="username"
         autocomplete="username"
         class="input"
-        v-model="username"
         maxlength="254"
         name="username"
         placeholder="Username/Email"
@@ -19,9 +19,9 @@
     <div>
       <i class="icon-key"/>
       <input
+        v-model="password"
         autocomplete="password"
         class="input"
-        v-model="password"
         name="password"
         placeholder="Password"
         required

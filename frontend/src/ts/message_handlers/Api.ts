@@ -2,46 +2,41 @@ import {
   CONNECTION_ERROR,
   GIPHY_API_KEY,
   GIPHY_URL,
-  RESPONSE_SUCCESS,
 } from "@/ts/utils/consts";
 import type {UploadFile} from "@/ts/types/types";
 import type {
   OauthSessionResponse,
   OauthStatus,
+  OkResponse,
   SaveFileResponse,
+  SendRestorePasswordRequest,
   SessionResponse,
+  SignInRequest,
+  SignUpRequest,
+  ValidateEmailResponse,
   ViewUserProfileDto,
 } from "@/ts/types/dto";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
-import type Http from "@/ts/classes/Http";
 import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
-import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
-import type {MultiResponse} from "giphy-api";
-import type Subscription from "@/ts/classes/Subscription";
-import {
-  OkResponse,
-  SendRestorePasswordRequest,
-  SignInRequest,
-  SignUpRequest,
-  ValidateEmailResponse
-} from '@/ts/types/dto';
-import {
   AcceptTokenRequest,
   AcceptTokenResponse,
   ConfirmEmailRequest,
   ConfirmEmailResponse,
   GoogleSignInResponse,
+  HandlerType,
+  HandlerTypes,
   SignUpResponse,
   ValidateUserEmailRequest,
   ValidateUserResponse,
   VerifyTokenRequest,
-  VerifyTokenResponse
-} from '@/ts/types/backend';
+  VerifyTokenResponse,
+} from "@/ts/types/backend";
+import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
+import type {MultiResponse} from "giphy-api";
+import type Subscription from "@/ts/classes/Subscription";
+import type Fetch from "@/ts/classes/Fetch";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
@@ -50,26 +45,26 @@ export default class Api extends MessageHandler {
 
   protected readonly logger: Logger;
 
-  private readonly xhr: Http;
+  private readonly fetch: Fetch;
 
   private retryFcb: Function | null = null;
 
-  public constructor(xhr: Http, sub: Subscription) {
+  public constructor(fetch: Fetch, sub: Subscription) {
     super();
     sub.subscribe("*", this);
     this.logger = loggerFactory.getLogger("api");
-    this.xhr = xhr;
+    this.fetch = fetch;
   }
 
   public async signIn(body: SignInRequest): Promise<SessionResponse> {
-    return this.xhr.doPost<SessionResponse>({
+    return this.fetch.doPost<SessionResponse>({
       url: "/auth/sign-in",
-      params: {...body}
+      params: {...body},
     });
   }
 
   public async changePassword(old_password: string, password: string): Promise<void> {
-    return this.xhr.doPost<void>({
+    return this.fetch.doPost<void>({
       url: "/change_password",
       params: {
         old_password,
@@ -79,21 +74,21 @@ export default class Api extends MessageHandler {
   }
 
   public async logout(registration_id: string | null = null): Promise<void> {
-    await this.xhr.doPost({
+    await this.fetch.doPost({
       url: "/logout",
       params: {registration_id},
     });
   }
 
   public async sendRestorePassword(params: SendRestorePasswordRequest): Promise<OkResponse> {
-    return this.xhr.doPost<OkResponse>({
+    return this.fetch.doPost<OkResponse>({
       url: "/verify/send-restore-password",
       params: params as any,
     });
   }
 
   public async signUp(data: SignUpRequest): Promise<SignUpResponse> {
-    return this.xhr.doPost<SessionResponse>({
+    return this.fetch.doPost<SessionResponse>({
       url: "/auth/sign-up",
       params: data as any,
     });
@@ -103,21 +98,21 @@ export default class Api extends MessageHandler {
     text: string,
     offset: number,
     limit: number,
-    process?: (R: XMLHttpRequest) => void,
+    onSetAbortFunction:  (c: () => void) => void,
   ): Promise<MultiResponse> {
     let response!: MultiResponse;
     if ((/^\s*$/).exec(text)) {
       // https://developers.giphy.com/docs/api/endpoint#trending
-      response = await this.xhr.doGet<MultiResponse>(`/gifs/trending?api_key=${GIPHY_API_KEY}&limit=${limit}&offset=${offset}`, {
-        baseUrl: GIPHY_URL,
-        process,
-      });
+      response = await this.fetch.doGet<MultiResponse>(
+        `${GIPHY_URL}/gifs/trending?api_key=${GIPHY_API_KEY}&limit=${limit}&offset=${offset}`,
+        onSetAbortFunction,
+      );
     } else {
       // https://developers.giphy.com/docs/api/endpoint#search
-      response = await this.xhr.doGet<MultiResponse>(`/gifs/search?api_key=${GIPHY_API_KEY}&limit=12&q=${encodeURIComponent(text)}&offset=${offset}`, {
-        baseUrl: GIPHY_URL,
-        process,
-      });
+      response = await this.fetch.doGet<MultiResponse>(
+        `${GIPHY_URL}/gifs/search?api_key=${GIPHY_API_KEY}&limit=12&q=${encodeURIComponent(text)}&offset=${offset}`,
+        onSetAbortFunction,
+      );
     }
 
     if (response?.meta?.msg === "OK") {
@@ -127,25 +122,25 @@ export default class Api extends MessageHandler {
   }
 
   public async getOauthStatus(): Promise<OauthStatus> {
-    return this.xhr.doGet<OauthStatus>( "/oauth_status");
+    return this.fetch.doGet<OauthStatus>("/oauth_status");
   }
 
   public async setGoogleOauth(token: string): Promise<void> {
-    return this.xhr.doPost<void>({
+    return this.fetch.doPost<void>({
       url: "/set_google_oauth",
       params: {token},
     });
   }
 
   public async setFacebookOauth(token: string): Promise<void> {
-    return this.xhr.doPost<void>({
+    return this.fetch.doPost<void>({
       url: "/set_facebook_oauth",
       params: {token},
     });
   }
 
   public async googleAuth(token: string): Promise<GoogleSignInResponse> {
-    return this.xhr.doPost<OauthSessionResponse>({
+    return this.fetch.doPost<OauthSessionResponse>({
       url: "/auth/google-sign-in",
       params: {
         token,
@@ -154,7 +149,7 @@ export default class Api extends MessageHandler {
   }
 
   public async facebookAuth(token: string): Promise<OauthSessionResponse> {
-    return this.xhr.doPost<OauthSessionResponse>({
+    return this.fetch.doPost<OauthSessionResponse>({
       url: "/auth/facebook-sign-in",
       params: {
         token,
@@ -163,20 +158,20 @@ export default class Api extends MessageHandler {
   }
 
   public async loadGoogle(): Promise<void> {
-    await this.xhr.loadJs("https://apis.google.com/js/platform.js");
+    await this.fetch.loadJs("https://apis.google.com/js/platform.js");
   }
 
   public async loadFacebook(): Promise<void> {
-    await this.xhr.loadJs("https://connect.facebook.net/en_US/sdk.js");
+    await this.fetch.loadJs("https://connect.facebook.net/en_US/sdk.js");
   }
 
   public async loadRecaptcha(callbackId: string): Promise<void> {
-    await this.xhr.loadJs(`https://www.google.com/recaptcha/api.js?render=explicit&onload=${callbackId}`);
+    await this.fetch.loadJs(`https://www.google.com/recaptcha/api.js?render=explicit&onload=${callbackId}`);
   }
 
   public async registerFCB(registration_id: string, agent: string, is_mobile: boolean): Promise<void> {
     try {
-      await this.xhr.doPost({
+      await this.fetch.doPost({
         url: "/register_fcb",
         params: {
           registration_id,
@@ -197,34 +192,30 @@ export default class Api extends MessageHandler {
     }
   }
 
-  public async validateUsername(username: string, onAbortController: (controller: AbortController) => void): Promise<ValidateUserResponse> {
-    return this.xhr.doPost({
+  public async validateUsername(username: string, onSetAbortFunction:  (c: () => void) => void): Promise<ValidateUserResponse> {
+    return this.fetch.doPost({
       url: "/auth/validate-user",
       params: {username},
-      onAbortController,
+      onSetAbortFunction: onSetAbortFunction,
     });
   }
 
   public async uploadProfileImage(file: Blob): Promise<void> {
     const fd = new FormData();
     fd.append("file", file);
-
-    return this.xhr.doPost<void>({
-      url: "/upload_profile_image",
-      formData: fd,
-    });
+    await this.fetch.upload<void>("/upload_profile_image", fd);
   }
 
   public async showProfile(id: number): Promise<ViewUserProfileDto> {
-    return this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`);
+    return this.fetch.doGet<ViewUserProfileDto>(`/profile?id=${id}`);
   }
 
   public async changeEmail(token: string): Promise<string> {
-    return this.xhr.doGet<string>(`/change_email?token=${token}`);
+    return this.fetch.doGet<string>(`/change_email?token=${token}`);
   }
 
   public async changeEmailLogin(email: string, password: string): Promise<void> {
-    return this.xhr.doPost({
+    return this.fetch.doPost({
       url: "/change_email_login",
       params: {
         email,
@@ -234,45 +225,43 @@ export default class Api extends MessageHandler {
   }
 
   public async confirmEmail(params: ConfirmEmailRequest): Promise<ConfirmEmailResponse> {
-    return this.xhr.doPost({
-      url: '/verify/confirm-email',
-      params
+    return this.fetch.doPost({
+      url: "/verify/confirm-email",
+      params,
     });
   }
 
-  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void, setXhr: (e: XMLHttpRequest) => void): Promise<SaveFileResponse> {
-    const fd = new FormData();
-    files.forEach((sd) => {
-      fd.append(sd.key, sd.file, sd.file.name);
-    });
-
-    return this.xhr.doPost<SaveFileResponse>({
-      url: "/upload_file",
-      formData: fd,
-      process: (r) => {
-        setXhr(r);
-        r.upload.addEventListener("progress", progress);
-      },
-    });
+  // @ts-expect-error
+  public async uploadFiles(files: UploadFile[], onProgress: (i: number) => void, setAbortEvent: (e: () => void) => void): Promise<SaveFileResponse> {
+    let totalLength = 0;
+    for (let index = 0; index < files.length; index++) {
+      const fd = new FormData();
+      fd.append('file', files[index].file);
+      fd.append('symbol', files[index].key);
+      const response = await this.fetch.upload<SaveFileResponse>("/files/upload-file", fd, setAbortEvent, (bytes) => {
+        totalLength += bytes;
+        onProgress(totalLength);
+      });
+    }
   }
 
-  public async validateEmail(params: ValidateUserEmailRequest, onAbortController: (controller: AbortController) => void): Promise<ValidateEmailResponse> {
-    return this.xhr.doPost({
+  public async validateEmail(params: ValidateUserEmailRequest,onSetAbortFunction: (c: () => void) => void): Promise<ValidateEmailResponse> {
+    return this.fetch.doPost({
       url: "/auth/validate-email",
       params,
-      onAbortController,
+      onSetAbortFunction,
     });
   }
 
   public async verifyToken(params: VerifyTokenRequest): Promise<VerifyTokenResponse> {
-    return this.xhr.doPost<VerifyTokenResponse>({
+    return this.fetch.doPost<VerifyTokenResponse>({
       url: "/verify/verify-token",
       params,
     });
   }
 
   public async acceptToken(params: AcceptTokenRequest): Promise<AcceptTokenResponse> {
-    return this.xhr.doPost({
+    return this.fetch.doPost({
       url: "/verify/accept-token",
       params,
     });
