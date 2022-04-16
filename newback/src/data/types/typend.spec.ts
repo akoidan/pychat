@@ -1,11 +1,10 @@
-import {check} from 'typend'
+import {check} from "typend";
 
 
-describe('typend', () => {
-
-  describe('simple', () => {
+describe("typend", () => {
+  describe("simple", () => {
     interface Message {
-      roomId: 3
+      roomId: 3;
     }
 
     interface Room {
@@ -13,30 +12,29 @@ describe('typend', () => {
       messages: Message[];
     }
 
-    it('should replace single param', () => {
-      expect(() => check<Message>({})).toThrow()
+    it("should replace single param", () => {
+      expect(() => check<Message>({})).toThrow();
     });
-    it('complex', () => {
-      let room: Room = {
-        name: 'asd',
+    it("complex", () => {
+      const room: Room = {
+        name: "asd",
         messages: [
           {
             roomId: 3,
-          }
-        ]
-      }
-      check<Room>(room)
+          },
+        ],
+      };
+      check<Room>(room);
     });
-    it('complex3', () => {
+    it("complex3", () => {
       interface A<T> {
         b: T;
         d: string;
       }
 
       check<A<number>>({
-        b4: 'sf'
-      })
-
+        b4: "sf",
+      });
     });
   });
 });

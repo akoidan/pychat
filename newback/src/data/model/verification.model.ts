@@ -5,16 +5,15 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
-import {VerificationType} from '@/data/types/frontend';
-import {MysqlBool} from '@/data/types/internal';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
+import {VerificationType} from "@/data/types/frontend";
+import {MysqlBool} from "@/data/types/internal";
 
 @Injectable()
-@Table({tableName: 'verification'})
+@Table({tableName: "verification"})
 export class VerificationModel extends Model<VerificationModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,

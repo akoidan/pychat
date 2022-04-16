@@ -5,14 +5,13 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
 
 @Injectable()
-@Table({tableName: 'user_profile'})
+@Table({tableName: "user_profile"})
 export class UserProfileModel extends Model<UserProfileModel> {
-
   @ForeignKey(() => UserModel)
   @Column({
     type: DataType.INTEGER,
@@ -26,19 +25,19 @@ export class UserProfileModel extends Model<UserProfileModel> {
 
   @Column({
     type: DataType.STRING(30),
-    allowNull: true
+    allowNull: true,
   })
   public name: string;
 
   @Column({
     type: DataType.STRING(50),
-    allowNull: true
+    allowNull: true,
   })
   public city: string;
 
   @Column({
     type: DataType.STRING(30),
-    allowNull: true
+    allowNull: true,
   })
   public surname: string;
 
@@ -50,7 +49,7 @@ export class UserProfileModel extends Model<UserProfileModel> {
 
   @Column({
     type: DataType.STRING(100),
-    allowNull: true
+    allowNull: true,
   })
   public contacts: string;
 }

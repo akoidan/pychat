@@ -1,17 +1,16 @@
-import {
+import type {
   OAuth2Client,
-  TokenPayload
-} from 'google-auth-library';
+  TokenPayload,
+} from "google-auth-library";
 import {
   ForbiddenException,
   Injectable,
   Logger,
   ServiceUnavailableException,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
 @Injectable()
 export class GoogleAuthService {
-
   public constructor(
     private readonly logger: Logger,
     private readonly oauth2Client: OAuth2Client | null,
@@ -37,7 +36,8 @@ export class GoogleAuthService {
    *    "exp": 1649759247,
    *    "jti": "xxxxxxxxxxxxxxxxxxxxxxxxx"
    * }
-   * */
+   *
+   */
   public async validate(idToken: string): Promise<TokenPayload> {
     if (!this.oauth2Client) {
       throw new ServiceUnavailableException("google client id not specifed");
@@ -47,7 +47,7 @@ export class GoogleAuthService {
     });
     const payload = response.getPayload()!;
     if (!payload) {
-      throw new ForbiddenException('Invalid google credentials')
+      throw new ForbiddenException("Invalid google credentials");
     }
     return payload;
   }

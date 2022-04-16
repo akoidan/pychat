@@ -1,9 +1,7 @@
-import {IsString,} from 'class-validator';
-import {GoogleAuthRequest} from '@/data/types/frontend';
+import {IsString} from "class-validator";
+import type {GoogleAuthRequest} from "@/data/types/frontend";
 
 export class GoogleAuthRequestValidator implements GoogleAuthRequest {
-
   @IsString()
   public token: string;
-
 }

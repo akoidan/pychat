@@ -6,11 +6,11 @@ export interface FacebookGetUserResponse {
 
 export interface IpFailedInfoResponse {
   message: string;
-  status: 'fail';
+  status: "fail";
 }
 
 export interface IpSuccessInfoResponse {
-  status: 'success';
+  status: "success";
   country: string;
   countryCode: string;
   region: string;

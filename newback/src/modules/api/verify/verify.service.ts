@@ -1,24 +1,26 @@
 import {
   BadRequestException,
   Injectable,
-  Logger
-} from '@nestjs/common';
-import {UserRepository} from '@/modules/rest/database/repository/user.repository';
-import {PasswordService} from '@/modules/rest/password/password.service';
-import {
+  Logger,
+} from "@nestjs/common";
+import {UserRepository} from "@/modules/rest/database/repository/user.repository";
+import {PasswordService} from "@/modules/rest/password/password.service";
+import type {
   AcceptTokenRequest,
   AcceptTokenResponse,
   ConfirmEmailRequest,
   SendRestorePasswordRequest,
+  VerifyTokenResponse,
+} from "@/data/types/frontend";
+import {
   VerificationType,
-  VerifyTokenResponse
-} from '@/data/types/frontend';
-import {EmailService} from '@/modules/rest/email/email.service';
-import {Sequelize} from 'sequelize-typescript';
-import {VerificationModel} from '@/data/model/verification.model';
-import {IpCacheService} from '@/modules/rest/ip/ip.cache.service';
-import {VerificationRepository} from '@/modules/rest/database/repository/verification.repository';
-import {SessionService} from '@/modules/rest/session/session.service';
+} from "@/data/types/frontend";
+import {EmailService} from "@/modules/rest/email/email.service";
+import {Sequelize} from "sequelize-typescript";
+import type {VerificationModel} from "@/data/model/verification.model";
+import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
+import {VerificationRepository} from "@/modules/rest/database/repository/verification.repository";
+import {SessionService} from "@/modules/rest/session/session.service";
 
 @Injectable()
 export class VerifyService {
@@ -35,13 +37,13 @@ export class VerifyService {
   }
 
   public async verifyToken(token: string): Promise<VerifyTokenResponse> {
-    let verificationModel: VerificationModel = await this.verificationRepository.getVerification(token);
-    //https://pychat.org/#/auth/proceed-reset-password?token=evhv0zum3l8gavzql4xk5u16q2h9gqd2
-    this.doTokenVerification(verificationModel, VerificationType.PASSWORD)
+    const verificationModel: VerificationModel = await this.verificationRepository.getVerification(token);
+    // https://pychat.org/#/auth/proceed-reset-password?token=evhv0zum3l8gavzql4xk5u16q2h9gqd2
+    this.doTokenVerification(verificationModel, VerificationType.PASSWORD);
     return {
       ok: true,
-      username: verificationModel.user.username
-    }
+      username: verificationModel.user.username,
+    };
   }
 
   public async sendRestorePassword(body: SendRestorePasswordRequest, ip: string): Promise<void> {
@@ -56,7 +58,7 @@ export class VerifyService {
         userId = user.id;
         email = body.email;
       } else if (body.username) {
-        const user = await this.userRepository.getUserByUserName(body.username, ['userAuth'], t);
+        const user = await this.userRepository.getUserByUserName(body.username, ["userAuth"], t);
         if (!user) {
           throw new BadRequestException("User with this username doesnt exit");
         }
@@ -67,37 +69,37 @@ export class VerifyService {
         username = user.username;
         userId = user.id;
       }
-      let token: string = await this.passwordService.generateRandomString(32);
+      const token: string = await this.passwordService.generateRandomString(32);
       this.logger.log(`Generated token='${token}' to restore user email='${email}'`);
-      await this.verificationRepository.createVerification(email, userId, token, VerificationType.PASSWORD, t)
-      let ipInfo = await this.ipCacheService.getIpString(ip);
-      await this.emailService.sendRestorePasswordEmail(username, userId, email, token, ip, ipInfo)
+      await this.verificationRepository.createVerification(email, userId, token, VerificationType.PASSWORD, t);
+      const ipInfo = await this.ipCacheService.getIpString(ip);
+      await this.emailService.sendRestorePasswordEmail(username, userId, email, token, ip, ipInfo);
     });
   }
 
   public async acceptToken(body: AcceptTokenRequest): Promise<AcceptTokenResponse> {
     return this.sequelize.transaction(async(t) => {
-      let verificationModel: VerificationModel = await this.verificationRepository.getVerification(body.token, t);
+      const verificationModel: VerificationModel = await this.verificationRepository.getVerification(body.token, t);
       this.doTokenVerification(verificationModel, VerificationType.PASSWORD);
-      let password = await this.passwordService.createPassword(body.password);
-      this.logger.log(`Generated newPassword='${password}' for verification='${verificationModel.id}' for userId=${verificationModel.userId}`, 'verify.service');
-      await this.userRepository.updateUserPassword(verificationModel.userId, password, t)
+      const password = await this.passwordService.createPassword(body.password);
+      this.logger.log(`Generated newPassword='${password}' for verification='${verificationModel.id}' for userId=${verificationModel.userId}`, "verify.service");
+      await this.userRepository.updateUserPassword(verificationModel.userId, password, t);
       await this.verificationRepository.markVerificationVerified(verificationModel.id, t);
-      let session = await this.sessionService.createAndSaveSession(verificationModel.userId);
-      let result: AcceptTokenResponse = {
-        session
-      }
+      const session = await this.sessionService.createAndSaveSession(verificationModel.userId);
+      const result: AcceptTokenResponse = {
+        session,
+      };
       return result;
-    })
+    });
   }
 
   public async confirmEmail(body: ConfirmEmailRequest): Promise<void> {
     await this.sequelize.transaction(async(t) => {
-      let verificationModel: VerificationModel = await this.verificationRepository.getVerification(body.token, t);
+      const verificationModel: VerificationModel = await this.verificationRepository.getVerification(body.token, t);
       this.doTokenVerification(verificationModel, VerificationType.REGISTER);
       await this.verificationRepository.markVerificationVerified(verificationModel.id, t);
       await this.verificationRepository.setUserVerification(verificationModel.userId, verificationModel.id, t);
-    })
+    });
   }
 
   private doTokenVerification(data: VerificationModel, typ: VerificationType): void {

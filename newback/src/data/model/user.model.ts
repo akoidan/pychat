@@ -4,17 +4,17 @@ import {
   HasOne,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {Gender} from '@/data/types/frontend';
-import {UserAuthModel} from '@/data/model/user.auth.model';
-import {MAX_USERNAME_LENGTH} from '@/utils/consts';
-import {UserProfileModel} from '@/data/model/user.profile.model';
-import {UserSettingsModel} from '@/data/model/user.settings.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {Gender} from "@/data/types/frontend";
+import {UserAuthModel} from "@/data/model/user.auth.model";
+import {MAX_USERNAME_LENGTH} from "@/utils/consts";
+import {UserProfileModel} from "@/data/model/user.profile.model";
+import {UserSettingsModel} from "@/data/model/user.settings.model";
 
 
 @Injectable()
-@Table({tableName: 'user'})
+@Table({tableName: "user"})
 export class UserModel extends Model<UserModel> {
   @Column({
     type: DataType.INTEGER,
@@ -36,13 +36,13 @@ export class UserModel extends Model<UserModel> {
   })
   public username: string;
 
-  @HasOne(() => UserAuthModel, 'id')
+  @HasOne(() => UserAuthModel, "id")
   public userAuth: UserAuthModel;
 
-  @HasOne(() => UserProfileModel, 'id')
+  @HasOne(() => UserProfileModel, "id")
   public userProfile: UserProfileModel;
 
-  @HasOne(() => UserSettingsModel, 'id')
+  @HasOne(() => UserSettingsModel, "id")
   public userSettings: UserSettingsModel;
 
   @Column({

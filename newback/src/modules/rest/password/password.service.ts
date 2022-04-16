@@ -1,8 +1,8 @@
-import {Injectable} from '@nestjs/common';
+import {Injectable} from "@nestjs/common";
 import {
   compare,
-  hash
-} from 'bcrypt';
+  hash,
+} from "bcrypt";
 
 @Injectable()
 export class PasswordService {
@@ -16,7 +16,7 @@ export class PasswordService {
   public async createWsId(userId: number, oldId: string): Promise<string> {
     let random;
     if (oldId) {
-      let [userId, oldRandom] = oldId.split(':');
+      const [userId, oldRandom] = oldId.split(":");
       if (oldRandom?.length === 4) {
         random = oldRandom;
       }
@@ -24,13 +24,13 @@ export class PasswordService {
     if (!random) {
       random = await this.generateRandomString(4);
     }
-    let userIdString = ('0000' + String(userId)) // make userId be always 4 characters
-    return `${userIdString.substring(userIdString.length - 4, userIdString.length)}:${random}`
+    const userIdString = `0000${String(userId)}`; // Make userId be always 4 characters
+    return `${userIdString.substring(userIdString.length - 4, userIdString.length)}:${random}`;
   }
 
   public async generateRandomString(length: number): Promise<string> {
-    let result = '';
-    const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+    let result = "";
+    const characters = "abcdefghijklmnopqrstuvwxyz0123456789";
     for (let i = 0; i < length; i++) {
       result += characters.charAt(Math.floor(Math.random() *
         characters.length));

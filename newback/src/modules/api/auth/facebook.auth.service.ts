@@ -4,14 +4,13 @@ import {
   InternalServerErrorException,
   Logger,
   ServiceUnavailableException,
-} from '@nestjs/common';
-import {HttpService} from '@/modules/rest/http/http.service';
-import {ConfigService} from '@/modules/rest/config/config.service';
-import {FacebookGetUserResponse} from '@/data/types/api';
+} from "@nestjs/common";
+import {HttpService} from "@/modules/rest/http/http.service";
+import {ConfigService} from "@/modules/rest/config/config.service";
+import type {FacebookGetUserResponse} from "@/data/types/api";
 
 @Injectable()
 export class FacebookAuthService {
-
   public constructor(
     private readonly logger: Logger,
     private readonly httpService: HttpService,
@@ -21,42 +20,41 @@ export class FacebookAuthService {
   }
 
   public async validate(idToken: string): Promise<FacebookGetUserResponse> {
-    let accessToken = this.configService.getConfig().auth?.facebook?.accessToken;
+    const accessToken = this.configService.getConfig().auth?.facebook?.accessToken;
     if (!accessToken) {
       throw new ServiceUnavailableException("facebook access token is not specified");
     }
     const response = await this.httpService.getUrlEncoded(
-      'https://graph.facebook.com/debug_token',
+      "https://graph.facebook.com/debug_token",
       {
         input_token: idToken,
-        access_token: accessToken
+        access_token: accessToken,
       }
     );
     if (!response?.data) {
-      throw new InternalServerErrorException("facebook api is down")
+      throw new InternalServerErrorException("facebook api is down");
     }
     if (!response.data.is_valid) {
       if (response.data.error) {
-        throw new BadRequestException(`facebook api error down error=${response.data.error.message} code=${response.data.error.code}`)
+        throw new BadRequestException(`facebook api error down error=${response.data.error.message} code=${response.data.error.code}`);
       } else {
-        throw new InternalServerErrorException("invalid facebook response")
+        throw new InternalServerErrorException("invalid facebook response");
       }
     }
-    let userId = response.data.user_id;
-    this.logger.log(`got userId='${userId}' for facebookToken='${idToken}'`, 'facebook.auth.service');
+    const userId = response.data.user_id;
+    this.logger.log(`got userId='${userId}' for facebookToken='${idToken}'`, "facebook.auth.service");
     if (!userId) {
-      throw new InternalServerErrorException("invalid facebook response, userId is missing")
+      throw new InternalServerErrorException("invalid facebook response, userId is missing");
     }
-    let facebookUser: FacebookGetUserResponse = await this.httpService.getUrlEncoded(`https://graph.facebook.com/${userId}`,
+    const facebookUser: FacebookGetUserResponse = await this.httpService.getUrlEncoded(`https://graph.facebook.com/${userId}`,
       {
-        'access_token': accessToken,
-        'fields': ['email', 'first_name', 'last_name'].join(',')
-      }
-    )
+        access_token: accessToken,
+        fields: ["email", "first_name", "last_name"].join(","),
+      });
     if (!facebookUser.id) {
-      throw new InternalServerErrorException("invalid facebook response, id is missing")
+      throw new InternalServerErrorException("invalid facebook response, id is missing");
     }
-    this.logger.log(`got userid='${facebookUser.id}' for facebookToken='${idToken}'`, 'facebook.auth.service');
+    this.logger.log(`got userid='${facebookUser.id}' for facebookToken='${idToken}'`, "facebook.auth.service");
     return facebookUser;
   }
 }

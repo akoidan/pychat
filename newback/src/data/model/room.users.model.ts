@@ -6,18 +6,17 @@ import {
   Model,
   Table,
   Unique,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
-import {RoomModel} from '@/data/model/room.model';
-import {MysqlBool} from '@/data/types/internal';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
+import {RoomModel} from "@/data/model/room.model";
+import {MysqlBool} from "@/data/types/internal";
 
-const uniqueRoomUser = 'unique_room_user_room_id_user_id';
+const uniqueRoomUser = "unique_room_user_room_id_user_id";
 
 @Injectable()
-@Table({tableName: 'room_user'})
+@Table({tableName: "room_user"})
 export class RoomUsersModel extends Model<RoomUsersModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -61,5 +60,4 @@ export class RoomUsersModel extends Model<RoomUsersModel> {
     allowNull: false,
   })
   public notifications: MysqlBool;
-
 }

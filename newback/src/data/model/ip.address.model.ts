@@ -3,14 +3,13 @@ import {
   DataType,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {MysqlBool} from '@/data/types/internal';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {MysqlBool} from "@/data/types/internal";
 
 @Injectable()
-@Table({tableName: 'ip_address'})
+@Table({tableName: "ip_address"})
 export class IpAddressModel extends Model<IpAddressModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -67,6 +66,7 @@ export class IpAddressModel extends Model<IpAddressModel> {
     allowNull: true,
   })
   public lat: number;
+
   @Column({
     type: DataType.DOUBLE,
     allowNull: true,
@@ -84,6 +84,4 @@ export class IpAddressModel extends Model<IpAddressModel> {
     allowNull: true,
   })
   public timezone: string;
-
-
 }

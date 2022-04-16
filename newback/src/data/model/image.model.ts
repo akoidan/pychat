@@ -6,19 +6,17 @@ import {
   Model,
   Table,
   Unique,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {ImageType} from '@/data/types/frontend';
-import {MessageModel} from '@/data/model/message.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {ImageType} from "@/data/types/frontend";
+import {MessageModel} from "@/data/model/message.model";
 
-const uniqueUserIdSymbMess = 'unique_image_symbol_message';
+const uniqueUserIdSymbMess = "unique_image_symbol_message";
 
 
 @Injectable()
-@Table({tableName: 'image'})
+@Table({tableName: "image"})
 export class ImageModel extends Model<ImageModel> {
-
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,

@@ -1,4 +1,4 @@
-import {
+import type {
   AddOnlineUserMessage,
   ChannelDto,
   RoomDto,
@@ -6,20 +6,20 @@ import {
   UserDto,
   UserProfileDto,
   UserSettingsDto,
-  RemoveOnlineUserMessage
-} from '@/data/types/frontend';
-import {UserModel} from '@/data/model/user.model';
-import {
+  RemoveOnlineUserMessage,
+} from "@/data/types/frontend";
+import type {UserModel} from "@/data/model/user.model";
+import type {
   UserOnlineData,
-  WebSocketContextData
-} from '@/data/types/internal';
-import {ChannelModel} from '@/data/model/channel.model';
-import {RoomUsersModel} from '@/data/model/room.users.model';
-import {GetRoomsForUser} from '@/modules/rest/database/repository/room.repository';
+  WebSocketContextData,
+} from "@/data/types/internal";
+import type {ChannelModel} from "@/data/model/channel.model";
+import type {RoomUsersModel} from "@/data/model/room.users.model";
+import type {GetRoomsForUser} from "@/modules/rest/database/repository/room.repository";
 
 export interface TransformSetWsIdDataParams {
   myRooms: GetRoomsForUser[];
-  allUsersInTheseRooms: Pick<RoomUsersModel, 'roomId' | 'userId'>[];
+  allUsersInTheseRooms: Pick<RoomUsersModel, "roomId" | "userId">[];
   channels: ChannelModel[];
   users: UserModel[];
   online: UserOnlineData;
@@ -28,12 +28,14 @@ export interface TransformSetWsIdDataParams {
   user: UserModel;
 }
 
-// function transformUserSettings(db: UserSettingsModel): UserSettingsDto {
-//   return Object.keys(convert<UserSettingsDto>()).reduce((previousValue, currentValue) => {
-//     previousValue[currentValue] = db[currentValue];
-//     return previousValue;
-//   }, {} as UserSettingsDto)
-// }
+/*
+ * Function transformUserSettings(db: UserSettingsModel): UserSettingsDto {
+ *   return Object.keys(convert<UserSettingsDto>()).reduce((previousValue, currentValue) => {
+ *     previousValue[currentValue] = db[currentValue];
+ *     return previousValue;
+ *   }, {} as UserSettingsDto)
+ * }
+ */
 
 function transformProfile(user: UserModel): UserProfileDto {
   return {
@@ -46,21 +48,21 @@ function transformProfile(user: UserModel): UserProfileDto {
     birthday: user.userProfile.birthday,
     contacts: user.userProfile.contacts,
     surname: user.userProfile.surname,
-    thumbnail: user.thumbnail
+    thumbnail: user.thumbnail,
   };
 }
 
 function transformSettings(user: UserModel): UserSettingsDto {
   return {
-    embeddedYoutube: !!user.userSettings.embeddedYoutube,
-    highlightCode: !!user.userSettings.highlightCode,
-    incomingFileCallSound: !!user.userSettings.incomingFileCallSound,
-    messageSound: !!user.userSettings.messageSound,
-    onlineChangeSound: !!user.userSettings.onlineChangeSound,
-    showWhenITyping: !!user.userSettings.showWhenITyping,
-    suggestions: !!user.userSettings.suggestions,
+    embeddedYoutube: Boolean(user.userSettings.embeddedYoutube),
+    highlightCode: Boolean(user.userSettings.highlightCode),
+    incomingFileCallSound: Boolean(user.userSettings.incomingFileCallSound),
+    messageSound: Boolean(user.userSettings.messageSound),
+    onlineChangeSound: Boolean(user.userSettings.onlineChangeSound),
+    showWhenITyping: Boolean(user.userSettings.showWhenITyping),
+    suggestions: Boolean(user.userSettings.suggestions),
     theme: user.userSettings.theme,
-    logs: user.userSettings.logs
+    logs: user.userSettings.logs,
   };
 }
 
@@ -70,7 +72,7 @@ function transformUserDto(u: UserModel): UserDto {
     id: u.id,
     thumbnail: u.thumbnail,
     sex: u.sex,
-    lastTimeOnline: u.lastTimeOnline
+    lastTimeOnline: u.lastTimeOnline,
   };
 }
 
@@ -78,31 +80,29 @@ function transformChannelsDto(c: ChannelModel): ChannelDto {
   return {
     name: c.name,
     id: c.id,
-    creatorId: c.creatorId
+    creatorId: c.creatorId,
   };
 }
 
-function getTransformRoomFn(allUsersInTheseRooms: Pick<RoomUsersModel, 'roomId' | 'userId'>[]): (r: GetRoomsForUser) => RoomDto {
-  let roomUsersIdInfoDict: Record<string, number[]> = allUsersInTheseRooms.reduce((previousValue, currentValue) => {
+function getTransformRoomFn(allUsersInTheseRooms: Pick<RoomUsersModel, "roomId" | "userId">[]): (r: GetRoomsForUser) => RoomDto {
+  const roomUsersIdInfoDict: Record<string, number[]> = allUsersInTheseRooms.reduce<Record<string, number[]>>((previousValue, currentValue) => {
     if (!previousValue[currentValue.roomId]) {
-      previousValue[currentValue.roomId] = []
+      previousValue[currentValue.roomId] = [];
     }
     previousValue[currentValue.roomId].push(currentValue.userId);
     return previousValue;
-  }, {} as Record<string, number[]>);
-  return (room: GetRoomsForUser) => {
-    return {
-      name: room.name,
-      id: room.id,
-      channelId: room.channelId,
-      p2p: !!room.p2p,
-      notifications: !!room.roomUsers.notifications,
-      users: roomUsersIdInfoDict[room.id],
-      isMainInChannel: !!room.isMainInChannel,
-      creatorId: room.creatorId,
-      volume: room.roomUsers.volume,
-    };
-  }
+  }, {});
+  return (room: GetRoomsForUser) => ({
+    name: room.name,
+    id: room.id,
+    channelId: room.channelId,
+    p2p: Boolean(room.p2p),
+    notifications: Boolean(room.roomUsers.notifications),
+    users: roomUsersIdInfoDict[room.id],
+    isMainInChannel: Boolean(room.isMainInChannel),
+    creatorId: room.creatorId,
+    volume: room.roomUsers.volume,
+  });
 }
 
 
@@ -115,8 +115,9 @@ export function transformSetWsId(
     online,
     id,
     user,
-    time
-  }: TransformSetWsIdDataParams): SetWsIdMessage {
+    time,
+  }: TransformSetWsIdDataParams
+): SetWsIdMessage {
   return {
     action: "setWsId",
     channels: channels.map(transformChannelsDto),
@@ -124,14 +125,14 @@ export function transformSetWsId(
     handler: "ws",
     time,
     users: users.map(transformUserDto),
-    online: online,
+    online,
     opponentWsId: id,
     profile: transformProfile(user),
     settings: transformSettings(user),
-  }
+  };
 }
 
-export function transformAddUserOnline(online:  Record<number, string[]>, user: UserModel, opponentWsId: string): AddOnlineUserMessage {
+export function transformAddUserOnline(online: Record<number, string[]>, user: UserModel, opponentWsId: string): AddOnlineUserMessage {
   return {
     action: "addOnlineUser",
     handler: "room",
@@ -139,18 +140,18 @@ export function transformAddUserOnline(online:  Record<number, string[]>, user: 
     userId: user.id,
     lastTimeOnline: user.lastTimeOnline,
     time: Date.now(),
-    opponentWsId
+    opponentWsId,
   };
 }
 
 
-export function getLogoutMessage(online: UserOnlineData, lastTimeOnline: number, context: WebSocketContextData, time: number): RemoveOnlineUserMessage  {
+export function getLogoutMessage(online: UserOnlineData, lastTimeOnline: number, context: WebSocketContextData, time: number): RemoveOnlineUserMessage {
   return {
-    online: online,
-    action: 'removeOnlineUser',
+    online,
+    action: "removeOnlineUser",
     lastTimeOnline,
     time,
-    handler: 'room',
+    handler: "room",
     userId: context.userId,
   };
 }

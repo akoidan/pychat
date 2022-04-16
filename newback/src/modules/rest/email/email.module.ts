@@ -1,30 +1,32 @@
-import {Module} from '@nestjs/common';
+import {Module} from "@nestjs/common";
 import {
   MailerModule,
-  MailerService
-} from '@nestjs-modules/mailer';
-import {config} from 'node-ts-config';
-import {EmailService} from '@/modules/rest/email/email.service';
-import {HtmlService} from '@/modules/rest/html/html.service';
+  MailerService,
+} from "@nestjs-modules/mailer";
+import {config} from "node-ts-config";
+import {EmailService} from "@/modules/rest/email/email.service";
+import {HtmlService} from "@/modules/rest/html/html.service";
 
 
 @Module({
   imports: [
-    ...(config.email ? [MailerModule.forRoot({
-      transport: config.email as any
-    })] : [])
+    ...config.email ? [
+      MailerModule.forRoot({
+        transport: config.email as any,
+      }),
+    ] : [],
   ],
   providers: [
-    ...(!config.email ? [{
-      provide: MailerService,
-      useValue: null
-    }]: []),
+    ...!config.email ? [
+      {
+        provide: MailerService,
+        useValue: null,
+      },
+    ] : [],
     EmailService,
-    HtmlService
+    HtmlService,
   ],
-  exports: [
-    EmailService
-  ]
+  exports: [EmailService],
 })
 export class EmailModule {
 }

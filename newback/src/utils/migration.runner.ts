@@ -1,11 +1,13 @@
-import {createConnection} from 'mysql2';
-import {generateOrmConfig} from '@/utils/helpers';
+import {createConnection} from "mysql2";
+import {generateOrmConfig} from "@/utils/helpers";
 import {
   CommandsRunner,
-  MysqlDriver
-} from 'node-db-migration';
+  MysqlDriver,
+} from "node-db-migration";
 
-const {database, host, password, port, username, define} = generateOrmConfig((sql) => console.log(sql))
+const {database, host, password, port, username, define} = generateOrmConfig((sql) => {
+  console.log(sql);
+});
 
 const connection = createConnection({
   database,
@@ -16,16 +18,20 @@ const connection = createConnection({
   multipleStatements: true,
   charset: define.charset,
   connectAttributes: {
-    'collate': define.collate
-  }
+    collate: define.collate,
+  },
 });
 
-connection.connect(async function (err) {
-  let migrations = new CommandsRunner({
+connection.connect(async(err) => {
+  const migrations = new CommandsRunner({
     driver: new MysqlDriver(connection),
     directoryWithScripts: `${__dirname}/../data/migration/`,
   });
-  await migrations.run('init')
-  await migrations.run('migrate')
-  await new Promise((resolve, reject) => connection.end((err) => err ? reject() : resolve(undefined)));
+  await migrations.run("init");
+  await migrations.run("migrate");
+  await new Promise((resolve, reject) => {
+    connection.end((err) => {
+      err ? reject() : resolve(undefined);
+    });
+  });
 });

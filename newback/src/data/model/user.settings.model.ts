@@ -5,20 +5,19 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {Theme,} from '@/data/types/frontend';
-import {UserModel} from '@/data/model/user.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {Theme} from "@/data/types/frontend";
+import {UserModel} from "@/data/model/user.model";
 import {
   LogLevel,
-  logLevels
-} from 'lines-logger'
-import {MysqlBool} from '@/data/types/internal';
+  logLevels,
+} from "lines-logger";
+import {MysqlBool} from "@/data/types/internal";
 
 @Injectable()
-@Table({tableName: 'user_settings'})
+@Table({tableName: "user_settings"})
 export class UserSettingsModel extends Model<UserSettingsModel> {
-
   @ForeignKey(() => UserModel)
   @Column({
     type: DataType.INTEGER,
@@ -81,7 +80,7 @@ export class UserSettingsModel extends Model<UserSettingsModel> {
   @Column({
     type: DataType.ENUM(...Object.keys(logLevels)),
     allowNull: false,
-    defaultValue: 'error',
+    defaultValue: "error",
   })
   public logs: LogLevel;
 

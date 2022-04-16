@@ -6,19 +6,18 @@ import {
   Model,
   Table,
   Unique,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
-import {MessageModel} from '@/data/model/message.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
+import {MessageModel} from "@/data/model/message.model";
 
-const uniqueUserIdSymbMess = 'unique_message_mention_user_id_symbol_message_id';
+const uniqueUserIdSymbMess = "unique_message_mention_user_id_symbol_message_id";
 
 @Injectable()
 @Table({
-  tableName: 'message_mention',
+  tableName: "message_mention",
 })
 export class MessageMentionModel extends Model<MessageMentionModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -30,7 +29,7 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
   @Unique(uniqueUserIdSymbMess)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
+    allowNull: false,
   })
   public userId: number;
 
@@ -41,7 +40,7 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
   @Unique(uniqueUserIdSymbMess)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false
+    allowNull: false,
   })
   public messageId: number;
 
@@ -51,7 +50,7 @@ export class MessageMentionModel extends Model<MessageMentionModel> {
   @Unique(uniqueUserIdSymbMess)
   @Column({
     type: DataType.STRING(1),
-    allowNull: false
+    allowNull: false,
   })
   public symbol: string;
 }

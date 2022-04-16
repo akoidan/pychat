@@ -1,4 +1,4 @@
-import {WebSocketContextData} from '@/data/types/internal';
+import type {WebSocketContextData} from "@/data/types/internal";
 
 export interface OnWsClose {
   closeConnection(context: WebSocketContextData);

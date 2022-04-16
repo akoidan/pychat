@@ -5,16 +5,15 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {MessageStatus,} from '@/data/types/frontend';
-import {UserModel} from '@/data/model/user.model';
-import {RoomModel} from '@/data/model/room.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {MessageStatus} from "@/data/types/frontend";
+import {UserModel} from "@/data/model/user.model";
+import {RoomModel} from "@/data/model/room.model";
 
 @Injectable()
-@Table({tableName: 'message'})
+@Table({tableName: "message"})
 export class MessageModel extends Model<MessageModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -50,7 +49,7 @@ export class MessageModel extends Model<MessageModel> {
   public time: number;
 
   @Column({
-    type: DataType.TEXT('long'),
+    type: DataType.TEXT("long"),
     allowNull: true,
   })
   public content: string;
@@ -70,7 +69,7 @@ export class MessageModel extends Model<MessageModel> {
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
-    defaultValue: 0
+    defaultValue: 0,
   })
   public threadMessageCount: number;
 

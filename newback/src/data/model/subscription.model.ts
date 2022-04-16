@@ -5,17 +5,16 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
-import {UploadedFileChoices} from '@/data/types/frontend';
-import {IpAddressModel} from '@/data/model/ip.address.model';
-import {MysqlBool} from '@/data/types/internal';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
+import {UploadedFileChoices} from "@/data/types/frontend";
+import {IpAddressModel} from "@/data/model/ip.address.model";
+import {MysqlBool} from "@/data/types/internal";
 
 @Injectable()
-@Table({tableName: 'subscription'})
+@Table({tableName: "subscription"})
 export class SubscriptionModel extends Model<SubscriptionModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,

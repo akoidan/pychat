@@ -19,16 +19,13 @@ export interface AcceptTokenRequest {
   password: string;
 }
 
-export interface AcceptTokenResponse extends SessionResponse {
-
-}
+export type AcceptTokenResponse = SessionResponse;
 
 export interface VerifyTokenResponse extends OkResponse {
   username: string;
 }
 
-export interface SendRestorePasswordResponse extends OkResponse {
-}
+export type SendRestorePasswordResponse = OkResponse;
 
 export interface CaptchaRequest {
   captcha?: string;
@@ -57,16 +54,13 @@ export interface ConfirmEmailRequest {
   token: string;
 }
 
-export interface ConfirmEmailResponse extends OkResponse {
-}
+export type ConfirmEmailResponse = OkResponse;
 
 export interface SessionResponse {
   session: string;
 }
 
-export interface SignInResponse extends SessionResponse {
-
-}
+export type SignInResponse = SessionResponse;
 
 
 interface TypeGeneratorForOauth1 extends SessionResponse {
@@ -75,7 +69,7 @@ interface TypeGeneratorForOauth1 extends SessionResponse {
 }
 
 interface TypeGeneratorForOauth2 extends SessionResponse {
-  isNewAccount: false
+  isNewAccount: false;
 }
 
 export type OauthSessionResponse =
@@ -86,21 +80,15 @@ export type OauthSessionResponse =
 export type GoogleSignInResponse = OauthSessionResponse;
 export type FacebookSignInResponse = OauthSessionResponse;
 
-export interface SignUpResponse extends SessionResponse {
-
-}
+export type SignUpResponse = SessionResponse;
 
 export interface OkResponse {
   ok: true;
 }
 
-export interface ValidateUserResponse extends OkResponse {
+export type ValidateUserResponse = OkResponse;
 
-}
-
-export interface ValidateEmailResponse extends OkResponse {
-
-}
+export type ValidateEmailResponse = OkResponse;
 
 export interface ValidateUserEmailRequest {
   email: string;
@@ -108,44 +96,44 @@ export interface ValidateUserEmailRequest {
 
 // ISO/IEC 5218 1 male, 2 - female
 export enum Gender {
-  MALE = 'MALE',
-  FEMALE = 'FEMALE',
-  OTHER = 'OTHER',
+  MALE = "MALE",
+  FEMALE = "FEMALE",
+  OTHER = "OTHER",
 }
 
 export enum MessageStatus {
-  ON_SERVER = 'ON_SERVER',  // uploaded to server
-  READ = 'READ',
-  RECEIVED = 'RECEIVED', //sent
+  ON_SERVER = "ON_SERVER", // Uploaded to server
+  READ = "READ",
+  RECEIVED = "RECEIVED", // Sent
 }
 
 export enum Theme {
-  COLOR_LOR = 'COLOR_LOR',
-  COLOR_REG = 'COLOR_REG',
-  COLOR_WHITE = 'COLOR_WHITE'
+  COLOR_LOR = "COLOR_LOR",
+  COLOR_REG = "COLOR_REG",
+  COLOR_WHITE = "COLOR_WHITE",
 }
 
 
 export enum VerificationType {
-  REGISTER = 'REGISTER', // when user sign up with email, we want to confirm that it's his/her email
-  PASSWORD = 'PASSWORD', // when user request a pasword change
-  EMAIL = 'EMAIL', // when user changes an email
+  REGISTER = "REGISTER", // When user sign up with email, we want to confirm that it's his/her email
+  PASSWORD = "PASSWORD", // When user request a pasword change
+  EMAIL = "EMAIL", // When user changes an email
 }
 
 export enum ImageType {
-  VIDEO = 'VIDEO',
-  FILE = 'FILE',
-  MEDIA_RECORD = 'MEDIA_RECORD',
-  AUDIO_RECORD = 'AUDIO_RECORD',
-  IMAGE = 'IMAGE',
-  PREVIEW = 'PREVIEW',
-  GIPHY = 'GIPHY'
+  VIDEO = "VIDEO",
+  FILE = "FILE",
+  MEDIA_RECORD = "MEDIA_RECORD",
+  AUDIO_RECORD = "AUDIO_RECORD",
+  IMAGE = "IMAGE",
+  PREVIEW = "PREVIEW",
+  GIPHY = "GIPHY",
 }
 
 export enum UploadedFileChoices {
-  VIDEO = 'VIDEO',
-  IMAGE = 'IMAGE',
-  FILE = 'FILE',
+  VIDEO = "VIDEO",
+  IMAGE = "IMAGE",
+  FILE = "FILE",
 }
 
 /** CODE THAT I PUT HERE MANUALLY */
@@ -172,7 +160,7 @@ export interface ShowITypeWsInMessage extends DefaultWsInMessage<"showIType", "r
   userId: number;
 }
 
-export interface ShowITypeWsOutMessage extends DefaultWsOutMessage<'showIType'> {
+export interface ShowITypeWsOutMessage extends DefaultWsOutMessage<"showIType"> {
   roomId: number;
 }
 
@@ -215,7 +203,6 @@ export interface ChangeUserOnlineBase {
   lastTimeOnline: number;
   time: number;
 }
-
 
 
 export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | "*">) => Promise<void> | void;
@@ -295,42 +282,42 @@ export type CallStatus =
   | "sent_offer";
 
 
-
-/** wsInMessages.ts */
+/** WsInMessages.ts */
 /**
  * This file should only contain structures created by server. Only BE -> FE by websockets
  * and processed by MessageHandler
  */
 
-// import type {
-//   ChannelDto,
-//   LocationDto,
-//   MessageModelDto,
-//   RoomDto,
-//   RoomNoUsersDto,
-//   UserDto,
-//   UserProfileDto,
-//   UserProfileDtoWoImage,
-//   UserSettingsDto,
-// } from "@/ts/types/dto";
-//
-// import type {
-//   AcceptFileContent,
-//   AddRoomBase,
-//   BrowserBase,
-//   CallBackMessage,
-//   ChangeUserOnlineBase,
-//   DefaultInMessage,
-//   HandlerName,
-//   NewRoom,
-//   OfferFileContent,
-//   OpponentWsId,
-//   ReplyWebRtc,
-//   RoomExistedBefore,
-//   WebRtcDefaultMessage,
-// } from "@/ts/types/backend";
-// import type {MessageStatus} from "@/ts/types/model";
-
+/*
+ * Import type {
+ *   ChannelDto,
+ *   LocationDto,
+ *   MessageModelDto,
+ *   RoomDto,
+ *   RoomNoUsersDto,
+ *   UserDto,
+ *   UserProfileDto,
+ *   UserProfileDtoWoImage,
+ *   UserSettingsDto,
+ * } from "@/ts/types/dto";
+ *
+ * import type {
+ *   AcceptFileContent,
+ *   AddRoomBase,
+ *   BrowserBase,
+ *   CallBackMessage,
+ *   ChangeUserOnlineBase,
+ *   DefaultInMessage,
+ *   HandlerName,
+ *   NewRoom,
+ *   OfferFileContent,
+ *   OpponentWsId,
+ *   ReplyWebRtc,
+ *   RoomExistedBefore,
+ *   WebRtcDefaultMessage,
+ * } from "@/ts/types/backend";
+ * import type {MessageStatus} from "@/ts/types/model";
+ */
 
 
 export interface MessagesResponseMessage {
@@ -379,8 +366,7 @@ export interface DeleteRoomMessage extends DefaultWsInMessage<"deleteRoom", "roo
   roomId: number;
 }
 
-export interface GetCountryCodeWsOutMessage extends DefaultWsOutMessage<"getCountryCode"> {
-}
+export type GetCountryCodeWsOutMessage = DefaultWsOutMessage<"getCountryCode">;
 
 
 export interface GetCountryCodeWsInMessage extends DefaultInMessage<"getCountryCode", "void"> {
@@ -487,7 +473,7 @@ export interface UserProfileChangedMessage extends DefaultWsInMessage<"userProfi
 
 }
 
-export interface GrowlMessage extends DefaultWsInMessage<'growlError', 'void'> {
+export interface GrowlMessage extends DefaultWsInMessage<"growlError", "void"> {
   content: string;
   action: "growlError";
 }
@@ -525,18 +511,15 @@ export interface DestroyFileConnectionMessage extends DefaultWsInMessage<"destro
   content: "decline" | "success";
 }
 
-/** wsOutMEssages */
+/** WsOutMEssages */
 /**
  * This file only contains messages that sent to backend api. FE -> BE by websockets
  */
 
-// import type {DefaultMessage} from "@/ts/types/backend";
+// Import type {DefaultMessage} from "@/ts/types/backend";
 
 
-
-
-
-/// IMPORTED FROM OTHERS
+// / IMPORTED FROM OTHERS
 
 
 export interface MessageModelDto {
@@ -577,7 +560,7 @@ export interface UserProfileDtoWoImage {
   id: number;
 }
 
-export declare type LogLevel = 'log_raise_error' | 'log_with_warnings' | 'trace' | 'debug' | 'info' | 'warn' | 'error' | 'disable';
+export declare type LogLevel = "debug" | "disable" | "error" | "info" | "log_raise_error" | "log_with_warnings" | "trace" | "warn";
 
 export interface UserSettingsDto {
   embeddedYoutube: boolean;

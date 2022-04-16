@@ -1,9 +1,9 @@
 import {
   Injectable,
-  Logger
-} from '@nestjs/common';
+  Logger,
+} from "@nestjs/common";
 
-import type fetch from 'node-fetch';
+import type fetch from "node-fetch";
 
 @Injectable()
 export class HttpService {
@@ -19,47 +19,46 @@ export class HttpService {
     const body = new URLSearchParams();
     Object.entries(data).forEach(([k, v]) => {
       body.append(k, v);
-    })
-    return this.post<T>(url, body, {})
+    });
+    return this.post<T>(url, body, {});
   }
 
   public async getUrlEncoded<T = Record<string, any>>(url: string, data: Record<string, any> = {}): Promise<T> {
     const params = new URLSearchParams();
     Object.entries(data).forEach(([k, v]) => {
       params.append(k, v);
-    })
-    return this.get<T>(`${url}?${params.toString()}`, {})
+    });
+    return this.get<T>(`${url}?${params.toString()}`, {});
   }
 
   public async postData<T = Record<string, any>>(url: string, data: Record<string, any>): Promise<T> {
-    let body = JSON.stringify(data);
-    let headers = {'Content-Type': 'application/json'};
+    const body = JSON.stringify(data);
+    const headers = {"Content-Type": "application/json"};
     return this.post<T>(url, body, headers);
   }
 
   private async post<T = Record<string, any>>(url, body: any, headers: Record<string, string>): Promise<T> {
-    let requestId = ++this.requestId;
-    this.logger.debug(`POST[${requestId}]: url='${url}'; data=${body}; headers=${JSON.stringify(headers)}`, 'api')
+    const requestId = ++this.requestId;
+    this.logger.debug(`POST[${requestId}]: url='${url}'; data=${body}; headers=${JSON.stringify(headers)}`, "api");
     const response = await this.nodeFetch(url, {
-      method: 'post',
+      method: "post",
       body,
-      headers
+      headers,
     });
     const responseBody = await response.json();
-    this.logger.debug(`POST[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`, 'api')
+    this.logger.debug(`POST[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`, "api");
     return responseBody;
   }
 
   private async get<T = Record<string, any>>(url, headers: Record<string, string>): Promise<T> {
-    let requestId = ++this.requestId;
-    this.logger.debug(`GET[${requestId}]: url='${url}'; headers=${JSON.stringify(headers)}`, 'api')
+    const requestId = ++this.requestId;
+    this.logger.debug(`GET[${requestId}]: url='${url}'; headers=${JSON.stringify(headers)}`, "api");
     const response = await this.nodeFetch(url, {
-      method: 'get',
-      headers
+      method: "get",
+      headers,
     });
     const responseBody = await response.json();
-    this.logger.debug(`GET[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`, 'api')
+    this.logger.debug(`GET[${requestId}]: url='${url}'; status='${response.status}' data=${JSON.stringify(responseBody)};`, "api");
     return responseBody;
   }
-
 }

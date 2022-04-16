@@ -2,8 +2,8 @@ import {
   IsString,
   Length,
   Matches,
-} from 'class-validator';
-import {AcceptTokenRequest} from '@/data/types/frontend';
+} from "class-validator";
+import type {AcceptTokenRequest} from "@/data/types/frontend";
 
 
 export class AcceptTokenRequestValidator implements AcceptTokenRequest {
@@ -12,10 +12,10 @@ export class AcceptTokenRequestValidator implements AcceptTokenRequest {
 
   @IsString()
   @Length(3, 128, {
-    message: "Passwords should contain 3-64 symbols"
+    message: "Passwords should contain 3-64 symbols",
   })
   @Matches(/^\S+$/, {
-    message: `Password can't contain whitespaces`
+    message: "Password can't contain whitespaces",
   })
   public password: string;
 }

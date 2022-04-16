@@ -5,15 +5,14 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UploadedFileChoices} from '@/data/types/frontend';
-import {UserModel} from '@/data/model/user.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UploadedFileChoices} from "@/data/types/frontend";
+import {UserModel} from "@/data/model/user.model";
 
 @Injectable()
-@Table({tableName: 'uploaded_file'})
+@Table({tableName: "uploaded_file"})
 export class UploadedFileModel extends Model<UploadedFileModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,

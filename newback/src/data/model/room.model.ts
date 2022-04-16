@@ -6,24 +6,25 @@ import {
   HasMany,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
-import {ChannelModel} from '@/data/model/channel.model';
-import {RoomUsersModel} from '@/data/model/room.users.model';
-import {MysqlBool} from '@/data/types/internal';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
+import {ChannelModel} from "@/data/model/channel.model";
+import {RoomUsersModel} from "@/data/model/room.users.model";
+import {MysqlBool} from "@/data/types/internal";
 
 
-// 	constraint admin_should_not_be_define_for_private_rooms
-// 		check (`creator_id` is null or `name` is not null),
-// 	constraint channel_should_exist_for_public_room_and_not_exist_for_private
-// 		check (`channel_id` is null and `name` is null or `channel_id` is not n),
-// 	constraint p2p_only_if_private
-// 		check (`p2p` = 0x00 or `name` is null)
+/*
+ * 	Constraint admin_should_not_be_define_for_private_rooms
+ * 		check (`creator_id` is null or `name` is not null),
+ * 	constraint channel_should_exist_for_public_room_and_not_exist_for_private
+ * 		check (`channel_id` is null and `name` is null or `channel_id` is not n),
+ * 	constraint p2p_only_if_private
+ * 		check (`p2p` = 0x00 or `name` is null)
+ */
 @Injectable()
-@Table({tableName: 'room'})
+@Table({tableName: "room"})
 export class RoomModel extends Model<RoomModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,

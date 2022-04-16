@@ -1,19 +1,19 @@
-import type {SequelizeModuleOptions} from '@nestjs/sequelize';
+import type {SequelizeModuleOptions} from "@nestjs/sequelize";
 
-import {MAX_USERNAME_LENGTH} from '@/utils/consts';
-import {config} from 'node-ts-config';
+import {MAX_USERNAME_LENGTH} from "@/utils/consts";
+import {config} from "node-ts-config";
 
 export function generateUserName(email: string) {
-  return email.split('@')[0].replace(/[^0-9a-zA-Z-_]+/g, '-').substring(0, MAX_USERNAME_LENGTH);
+  return email.split("@")[0].replace(/[^0-9a-zA-Z-_]+/g, "-").substring(0, MAX_USERNAME_LENGTH);
 }
 
-export function generateOrmConfig(logging: ((sql: string) => void)): Omit<SequelizeModuleOptions, 'ssl'> {
+export function generateOrmConfig(logging: ((sql: string) => void)): Omit<SequelizeModuleOptions, "ssl"> {
   const sync = false;
-  // drop database pychat2; create database pychat2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; GRANT ALL ON pychat2.* TO 'pychat'@'localhost';
+  // Drop database pychat2; create database pychat2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; GRANT ALL ON pychat2.* TO 'pychat'@'localhost';
   return {
     synchronize: sync,
-    logging: logging,
-    dialect: 'mysql',
+    logging,
+    dialect: "mysql",
     host: config.mysql.host,
     port: config.mysql.port,
     username: config.mysql.username,
@@ -25,15 +25,15 @@ export function generateOrmConfig(logging: ((sql: string) => void)): Omit<Sequel
     },
     query: {
       nest: !sync,
-      // raw: true,
+      // Raw: true,
     },
     define: {
-      collate: 'utf8mb4_general_ci',
-      charset: 'utf8mb4',
+      collate: "utf8mb4_general_ci",
+      charset: "utf8mb4",
       paranoid: true,
       timestamps: true,
       underscored: true,
-    }
+    },
   };
 }
 

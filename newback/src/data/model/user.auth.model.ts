@@ -5,15 +5,14 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
-import {VerificationModel} from '@/data/model/verification.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
+import {VerificationModel} from "@/data/model/verification.model";
 
 @Injectable()
-@Table({tableName: 'user_auth'})
+@Table({tableName: "user_auth"})
 export class UserAuthModel extends Model<UserAuthModel> {
-
   @ForeignKey(() => UserModel)
   @Column({
     type: DataType.INTEGER,
@@ -27,7 +26,7 @@ export class UserAuthModel extends Model<UserAuthModel> {
 
   @Column({
     type: DataType.STRING,
-    allowNull: false
+    allowNull: false,
   })
   public password: string;
 

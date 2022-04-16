@@ -1,14 +1,16 @@
-import {Injectable} from '@nestjs/common';
-import {InjectModel} from '@nestjs/sequelize';
-import {RoomModel} from '@/data/model/room.model';
-import {RoomUsersModel} from '@/data/model/room.users.model';
+import {Injectable} from "@nestjs/common";
+import {InjectModel} from "@nestjs/sequelize";
+import {RoomModel} from "@/data/model/room.model";
+import {RoomUsersModel} from "@/data/model/room.users.model";
+import type {
+  Transaction,
+} from "sequelize";
 import {
   Op,
-  Transaction
-} from 'sequelize';
-import {ChannelModel} from '@/data/model/channel.model';
+} from "sequelize";
+import {ChannelModel} from "@/data/model/channel.model";
 
-type RoomSingleRoomUser = Omit<RoomModel, 'roomUsers'>;
+type RoomSingleRoomUser = Omit<RoomModel, "roomUsers">;
 
 export interface GetRoomsForUser extends RoomSingleRoomUser {
   roomUsers: RoomUsersModel;
@@ -28,65 +30,71 @@ export class RoomRepository {
       roomId,
       userId,
       notifications: false,
-    }, {transaction, raw: true})
+    }, {transaction,
+      raw: true});
   }
 
   public async getAllChannels(ids: number[]): Promise<ChannelModel[]> {
-    return await this.channelsModel.findAll({
+    return this.channelsModel.findAll({
       where: {
         id: {
           [Op.in]: ids,
-        }
-      }
+        },
+      },
     });
   }
 
   public async usersForUser(userId: number): Promise<number[]> {
-    let myRoomIds = await this.roomUsersModel.findAll({
+    const myRoomIds = await this.roomUsersModel.findAll({
       where: {
-        userId
+        userId,
       },
-      attributes: ['roomId']
+      attributes: ["roomId"],
     });
-    let ru = await this.roomUsersModel.findAll({
+    const ru = await this.roomUsersModel.findAll({
       where: {
         roomId: {
-          [Op.in]: myRoomIds.map(r => r.roomId)
-        }
+          [Op.in]: myRoomIds.map((r) => r.roomId),
+        },
       },
-      attributes: ['userId']
+      attributes: ["userId"],
     });
-    return ru.map(ru => ru.userId);
+    return ru.map((ru) => ru.userId);
   }
 
-  public async getRoomUsers(roomIds: number[]): Promise<Pick<RoomUsersModel, 'roomId' | 'userId'>[]> {
-    // we should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
+  public async getRoomUsers(roomIds: number[]): Promise<Pick<RoomUsersModel, "roomId" | "userId">[]> {
+    // We should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
     return this.roomUsersModel.findAll({
       where: {
         roomId: {
           [Op.in]: roomIds,
-        }
+        },
       },
       raw: true,
-      attributes: ['userId', 'roomId']
+      attributes: ["userId", "roomId"],
     });
   }
 
 
   public async getRoomsForUser(userId: number): Promise<GetRoomsForUser[]> {
-    // we should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
+    // We should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel
     return await this.roomModel.findAll({
       raw: true,
-      include: [{
-        association: 'roomUsers',
-        where: {
-          userId: userId
-        }
-      }],
+      include: [
+        {
+          association: "roomUsers",
+          where: {
+            userId,
+          },
+        },
+      ],
     }) as any as GetRoomsForUser[];
-    //     FROM `room` AS `RoomModel`
-    //          INNER JOIN `room_user` AS `roomUsers` ON `RoomModel`.`id` = `roomUsers`.`room_id` AND
-    //                                                   (`roomUsers`.`deleted_at` IS NULL AND `roomUsers`.`user_id` = 2)
-    // WHERE (`RoomModel`.`deleted_at` IS NULL);
+
+    /*
+     *     FROM `room` AS `RoomModel`
+     *          INNER JOIN `room_user` AS `roomUsers` ON `RoomModel`.`id` = `roomUsers`.`room_id` AND
+     *                                                   (`roomUsers`.`deleted_at` IS NULL AND `roomUsers`.`user_id` = 2)
+     * WHERE (`RoomModel`.`deleted_at` IS NULL);
+     */
   }
 }

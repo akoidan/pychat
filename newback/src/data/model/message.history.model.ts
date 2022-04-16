@@ -5,13 +5,13 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {MessageModel} from '@/data/model/message.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {MessageModel} from "@/data/model/message.model";
 
 
 @Injectable()
-@Table({tableName: 'message_history'})
+@Table({tableName: "message_history"})
 export class MessageHistoryModel extends Model<MessageHistoryModel> {
   @Column({
     type: DataType.INTEGER,
@@ -38,8 +38,8 @@ export class MessageHistoryModel extends Model<MessageHistoryModel> {
   public time: number;
 
   @Column({
-    type: DataType.TEXT('long'),
-    allowNull: true, // idk but it contains null
+    type: DataType.TEXT("long"),
+    allowNull: true, // Idk but it contains null
   })
   public content: string;
 }

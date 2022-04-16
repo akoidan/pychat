@@ -1,10 +1,10 @@
-import {Injectable} from '@nestjs/common';
-import {HttpService} from '@/modules/rest/http/http.service';
-import {
+import {Injectable} from "@nestjs/common";
+import {HttpService} from "@/modules/rest/http/http.service";
+import type {
   IpInfoResponse,
-  IpSuccessInfoResponse
-} from '@/data/types/api';
-import {InvalidIpException} from '@/data/exceptions/invalid.ip.exception';
+  IpSuccessInfoResponse,
+} from "@/data/types/api";
+import {InvalidIpException} from "@/data/exceptions/invalid.ip.exception";
 
 @Injectable()
 export class IpService {
@@ -14,14 +14,13 @@ export class IpService {
   }
 
   public async getIpInfo(ip: string): Promise<IpSuccessInfoResponse> {
-    let response = await this.httpService.getUrlEncoded<IpInfoResponse>(`http://ip-api.com/json/${ip}`);
-    if (response?.status === 'fail') {
+    const response = await this.httpService.getUrlEncoded<IpInfoResponse>(`http://ip-api.com/json/${ip}`);
+    if (response?.status === "fail") {
       throw new InvalidIpException(ip, response.message, false);
     }
-    if (response.status !== 'success') {
-      throw new InvalidIpException(ip, 'Unknown', true);
+    if (response.status !== "success") {
+      throw new InvalidIpException(ip, "Unknown", true);
     }
     return response;
   }
-
 }

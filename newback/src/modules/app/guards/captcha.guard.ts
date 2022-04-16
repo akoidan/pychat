@@ -1,14 +1,14 @@
+import type {CanActivate,
+  ExecutionContext} from "@nestjs/common";
 import {
   BadRequestException,
-  CanActivate,
-  ExecutionContext,
   Injectable,
   Logger,
   UnauthorizedException,
-} from '@nestjs/common';
+} from "@nestjs/common";
 
-import {ConfigService} from '@/modules/rest/config/config.service';
-import {HttpService} from '@/modules/rest/http/http.service';
+import {ConfigService} from "@/modules/rest/config/config.service";
+import {HttpService} from "@/modules/rest/http/http.service";
 
 @Injectable()
 export class CaptchaGuard implements CanActivate {
@@ -25,19 +25,19 @@ export class CaptchaGuard implements CanActivate {
     if (!this.configService.getConfig().recaptcha) {
       return true;
     }
-    let captcha = context.switchToHttp().getRequest()?.body?.captcha;
-    let ip = context.switchToHttp().getRequest()?.ip
+    const captcha = context.switchToHttp().getRequest()?.body?.captcha;
+    const ip = context.switchToHttp().getRequest()?.ip;
     if (!captcha) {
       throw new BadRequestException("Captcha is missing");
     }
 
-    let response = await this.httpService.postUrlEncoded("https://www.google.com/recaptcha/api/siteverify", {
+    const response = await this.httpService.postUrlEncoded("https://www.google.com/recaptcha/api/siteverify", {
       secret: this.configService.getConfig().recaptcha.privateKey,
       response: captcha,
-      remoteip: ip
+      remoteip: ip,
     });
     if (!response.success) {
-      throw new UnauthorizedException(response && response['error-codes'] ? `Captcha error: ${response['error-codes'][0]}` : 'Unable to validate captcha');
+      throw new UnauthorizedException(response && response["error-codes"] ? `Captcha error: ${response["error-codes"][0]}` : "Unable to validate captcha");
     }
     return true;
   }

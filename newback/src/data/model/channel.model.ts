@@ -5,13 +5,13 @@ import {
   ForeignKey,
   Model,
   Table,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
 
 
 @Injectable()
-@Table({tableName: 'channel'})
+@Table({tableName: "channel"})
 export class ChannelModel extends Model<ChannelModel> {
   @Column({
     type: DataType.INTEGER,

@@ -6,18 +6,17 @@ import {
   Model,
   Table,
   Unique,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {MessageModel} from '@/data/model/message.model';
-import {SubscriptionModel} from '@/data/model/subscription.model';
-import {MysqlBool} from '@/data/types/internal';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {MessageModel} from "@/data/model/message.model";
+import {SubscriptionModel} from "@/data/model/subscription.model";
+import {MysqlBool} from "@/data/types/internal";
 
-const uniqueSubscriptionMessage = 'unique_subscription_message_subscription_id_message_id';
+const uniqueSubscriptionMessage = "unique_subscription_message_subscription_id_message_id";
 
 @Injectable()
-@Table({tableName: 'subscription_message'})
+@Table({tableName: "subscription_message"})
 export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -53,6 +52,4 @@ export class SubscriptionMessageModel extends Model<SubscriptionMessageModel> {
     allowNull: false,
   })
   public received: MysqlBool;
-
-
 }

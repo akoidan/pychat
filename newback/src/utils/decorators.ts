@@ -1,18 +1,18 @@
+import type {ExecutionContext,
+  Logger} from "@nestjs/common";
 import {
   createParamDecorator,
-  ExecutionContext,
-  Logger,
-  UnauthorizedException
-} from '@nestjs/common';
+  UnauthorizedException,
+} from "@nestjs/common";
 import {WebSocket} from "ws";
-import {WebSocketContextData} from '@/data/types/internal';
-import {OnGatewayConnection} from '@nestjs/websockets';
-import {WS_SESSION_EXPIRED_CODE} from '@/data/types/frontend';
+import type {WebSocketContextData} from "@/data/types/internal";
+import type {OnGatewayConnection} from "@nestjs/websockets";
+import {WS_SESSION_EXPIRED_CODE} from "@/data/types/frontend";
 
 
 export const WebsocketContext = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
-    let handler =  ctx.getArgs().find(a => a instanceof WebSocket)
+    const handler = ctx.getArgs().find((a) => a instanceof WebSocket);
     if (!handler.context) {
       handler.context = {userId: Date.now()} as WebSocketContextData;
     }
@@ -22,44 +22,43 @@ export const WebsocketContext = createParamDecorator(
 
 export const WsContext = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
-    let handler =  ctx.getArgs().find(a => a instanceof WebSocket)
-    return (handler.context as WebSocketContextData);
+    const handler = ctx.getArgs().find((a) => a instanceof WebSocket);
+    return handler.context as WebSocketContextData;
   },
 );
 
 
 export function processErrors(e, socket, logger: Logger) {
-  logger.error(`Ws error ${e.message}`, e.stack,  'ws')
+  logger.error(`Ws error ${e.message}`, e.stack, "ws");
   if (e instanceof UnauthorizedException) {
-    socket.close(WS_SESSION_EXPIRED_CODE, (e.message || 'Invalid session').substr(0, 123))
-  } else if (e?.status >= 400 && e?.status < 500) {  // Invalid frame payload data
+    socket.close(WS_SESSION_EXPIRED_CODE, (e.message || "Invalid session").substr(0, 123));
+  } else if (e?.status >= 400 && e?.status < 500) { // Invalid frame payload data
     socket.close(1007, `Error during creating a connection ${e.message}`.substr(0, 123));
   } else { // Internal Error
-    socket.close(1011, `Error during opening a socket ${e.message}`.substr(0, 123)); // message cannot be greather 123 bytes
+    socket.close(1011, `Error during opening a socket ${e.message}`.substr(0, 123)); // Message cannot be greather 123 bytes
   }
 }
-interface TargetCatchErrors extends OnGatewayConnection{
+interface TargetCatchErrors extends OnGatewayConnection {
   logger: Logger;
 }
 
-export function CatchWsErrors(target: TargetCatchErrors, memberName: 'handleConnection', propertyDescriptor: PropertyDescriptor) {
+export function CatchWsErrors(target: TargetCatchErrors, memberName: "handleConnection", propertyDescriptor: PropertyDescriptor) {
   return {
     get() {
-      const wrapperFn = async function (socket, ...args) {
+      const wrapperFn = async function(socket, ...args) {
         try {
-          let result = await propertyDescriptor.value.apply(this, [socket, ...args]);
-          return result;
-        } catch (e) { // need to catch , otherwise node process crashes
+          return await propertyDescriptor.value.apply(this, [socket, ...args]);
+        } catch (e) { // Need to catch , otherwise node process crashes
           processErrors(e, socket, this.logger);
         }
-      }
+      };
 
       Object.defineProperty(this, memberName, {
         value: wrapperFn,
         configurable: true,
-        writable: true
+        writable: true,
       });
       return wrapperFn;
-    }
-  }
+    },
+  };
 }

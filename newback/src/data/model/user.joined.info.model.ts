@@ -6,17 +6,16 @@ import {
   Model,
   Table,
   Unique,
-} from 'sequelize-typescript';
-import {Injectable} from '@nestjs/common';
-import {UserModel} from '@/data/model/user.model';
-import {IpAddressModel} from '@/data/model/ip.address.model';
+} from "sequelize-typescript";
+import {Injectable} from "@nestjs/common";
+import {UserModel} from "@/data/model/user.model";
+import {IpAddressModel} from "@/data/model/ip.address.model";
 
-const uniqueUserJoinedInfoUserIdIpId = 'unique_user_joined_info_user_id_ip_id';
+const uniqueUserJoinedInfoUserIdIpId = "unique_user_joined_info_user_id_ip_id";
 
 @Injectable()
-@Table({tableName: 'user_joined_info'})
+@Table({tableName: "user_joined_info"})
 export class UserJoinedInfoModel extends Model<UserJoinedInfoModel> {
-
   @Column({
     type: DataType.INTEGER,
     autoIncrement: true,
@@ -45,5 +44,4 @@ export class UserJoinedInfoModel extends Model<UserJoinedInfoModel> {
 
   @BelongsTo(() => UserModel)
   public user: UserModel;
-
 }

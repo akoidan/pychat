@@ -1,13 +1,13 @@
 import {
   Injectable,
-  Logger
-} from '@nestjs/common';
-import {IpRepository} from '@/modules/rest/database/repository/ip.repository';
-import {IpService} from '@/modules/rest/ip/ip.service';
-import {IpAddressModel} from '@/data/model/ip.address.model';
+  Logger,
+} from "@nestjs/common";
+import {IpRepository} from "@/modules/rest/database/repository/ip.repository";
+import {IpService} from "@/modules/rest/ip/ip.service";
+import type {IpAddressModel} from "@/data/model/ip.address.model";
 
-import {UserRepository} from '@/modules/rest/database/repository/user.repository';
-import {InvalidIpException} from '@/data/exceptions/invalid.ip.exception';
+import {UserRepository} from "@/modules/rest/database/repository/user.repository";
+import type {InvalidIpException} from "@/data/exceptions/invalid.ip.exception";
 
 @Injectable()
 export class IpCacheService {
@@ -19,30 +19,29 @@ export class IpCacheService {
   }
 
   public async getIpString(ip: string): Promise<string> {
-    let data = await this.getIpInfo(ip);
+    const data = await this.getIpInfo(ip);
     if (!data) {
       return "Unknown";
-    } else {
-      return `${data.country} ${data.city} ${data.isp}`;
     }
+    return `${data.country} ${data.city} ${data.isp}`;
   }
 
   public async saveIp(userId: number, ip: string) {
-    let ipModel = await this.getIpInfo(ip);
+    const ipModel = await this.getIpInfo(ip);
     if (ipModel) {
-      await this.ipRepository.saveIpToUser(userId, ipModel.id)
+      await this.ipRepository.saveIpToUser(userId, ipModel.id);
     }
   }
 
   public async getIpInfo(ip: string): Promise<Partial<IpAddressModel>> {
-    let response = await this.ipRepository.getIp(ip);
+    const response = await this.ipRepository.getIp(ip);
     if (response && !response.status) {
       return null;
     }
     try {
-      let ipInfo = await this.ipService.getIpInfo(ip)
-      let model: Partial<IpAddressModel> = {
-        ip: ip,
+      const ipInfo = await this.ipService.getIpInfo(ip);
+      const model: Partial<IpAddressModel> = {
+        ip,
         status: true,
         isp: ipInfo.isp,
         country: ipInfo.country,
@@ -51,18 +50,18 @@ export class IpCacheService {
         lat: ipInfo.lat,
         lon: ipInfo.lon,
         zip: ipInfo.zip,
-        timezone: ipInfo.timezone
+        timezone: ipInfo.timezone,
       };
-      await this.ipRepository.saveIP(model)
+      await this.ipRepository.saveIP(model);
       return model;
     } catch (e: any) {
-      this.logger.error(`Unable to get Ip Address Info ${ip} ${e.error}`, e.stack, 'ip.cache.service')
+      this.logger.error(`Unable to get Ip Address Info ${ip} ${e.error}`, e.stack, "ip.cache.service");
       if (!(e as InvalidIpException).networkError) {
-        await this.ipRepository.saveIP({ip, status: false})
+        await this.ipRepository.saveIP({ip,
+          status: false});
         return null;
       }
       return null;
     }
   }
-
 }
