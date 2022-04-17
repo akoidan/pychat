@@ -525,7 +525,12 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
             } else {
               const url = URL.createObjectURL(blob);
               savedFiles[url] = blob;
-              blob.name = ".jpg";
+              if (file.name) {
+                blob.name = `${file.name}.jpg`;
+              } else {
+                blob.name = '.jpg';
+              }
+
               img.src = url;
             }
             img.className = PASTED_IMG_CLASS;

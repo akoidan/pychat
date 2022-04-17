@@ -36,7 +36,7 @@ import {WsContext} from "@/modules/app/decorators/ws.context.decorator";
 import {CatchWsErrors} from "@/modules/app/decorators/catch.ws.errors";
 import {
   MessagesFromMyRoomGuard,
-  OwnMessageGuardMixin
+  OwnMessageGuardMixin,
 } from "@/modules/app/guards/own.message.guard";
 
 @WebSocketGateway({

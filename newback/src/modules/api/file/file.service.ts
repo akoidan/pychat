@@ -30,7 +30,7 @@ export class FileService {
     file: Express.Multer.File,
     symbol: string,
     type: ImageType,
-    name: string
+    name?: string
   ): Promise<SaveFileResponse> {
     return this.sequelize.transaction(async(transaction) => {
       const fileSaveResponse: FileSaveResponse = await this.imageService.saveFile(userId, file, symbol, type, name);

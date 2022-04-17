@@ -20,18 +20,10 @@ import type {Logger} from "lines-logger";
 import type {
   GiphyDto,
   MessageModelDto,
-  SaveFileResponse,
-
   SaveFileRequest,
+  SaveFileResponse,
 } from "@/ts/types/dto";
-import {
-  ImageType,
-  MessageStatus,
-} from "@/ts/types/backend";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
-import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {
   DeleteMessage,
   EditMessage,
@@ -43,6 +35,14 @@ import type {
   SetMessageStatusWsInMessage,
   SyncHistoryWsInMessage,
 } from "@/ts/types/backend";
+import {
+  ImageType,
+  MessageStatus,
+} from "@/ts/types/backend";
+import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
+
+import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import {savedFiles} from "@/ts/utils/htmlApi";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import {
@@ -242,7 +242,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       roomId,
     };
     this.store.setUploadProgress(sup);
-    let responses: SaveFileResponse[] = [];
+    const responses: SaveFileResponse[] = [];
     try {
       let total = 0;
       for (let i = 0; i < files.length; i++) {
@@ -425,12 +425,16 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
           };
           uploadFiles.push(items);
           if (file.preview) {
-            uploadFiles.push({
-              file: savedFiles[file.preview],
-              name: savedFiles[file.url!].name!,
-              type: file.type,
+            const previewFile = savedFiles[file.preview];
+            const payload: SaveFileRequest = {
+              file: previewFile,
+              type: ImageType.PREVIEW,
               symbol: key,
-            });
+            };
+            if (previewFile.name) {
+              payload.name = previewFile.name;
+            }
+            uploadFiles.push(payload);
           }
         });
       if (uploadFiles.length > 0) {

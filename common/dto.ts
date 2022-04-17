@@ -137,7 +137,7 @@ export interface SaveFileResponse {
 
 export interface SaveFileRequest {
   file: Blob;
-  name: string;
+  name?: string;
   symbol: string;
   type: ImageType;
 }

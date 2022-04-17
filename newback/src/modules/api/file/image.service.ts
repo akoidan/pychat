@@ -8,9 +8,9 @@ import {
 import type {Metadata} from "sharp";
 import * as sharp from "sharp";
 import {PasswordService} from "@/modules/rest/password/password.service";
-import {join} from "path";
-import {writeFile} from "fs/promises";
-import {FileSaveResponse} from '@/data/types/internal';
+import {join, sep} from "path";
+import {writeFile, stat, unlink} from "fs/promises";
+import type {FileSaveResponse} from "@/data/types/internal";
 
 @Injectable()
 export class ImageService {
@@ -23,16 +23,27 @@ export class ImageService {
 
   }
 
-  private async getName(origin: string, extension: string = "") {
-    let namUrl = origin;
-    if (namUrl?.endsWith(`.${extension}`)) { // exclude blah.jpeg.jpeg
-      namUrl = namUrl.substring(0, namUrl.length - extension.length -1)
+  public async getName(origin: string, newExtension: string) {
+    let ext = "";
+    let newName = origin || "";
+    if (newName) {
+      const res = (/\.([0-9a-z]+)$/i).exec(newName);
+      if (res) {
+        ext = res[1];
+        newName = newName.substring(0, newName.length - res[0].length);
+      }
     }
-    if (namUrl) {
-      namUrl = origin.replace(/[^0-9a-zA-Z-_]+/g, "-").substring(0, 20);
+    if (newName) {
+      newName = newName.replace(/[^0-9a-zA-Z-_\.]+/g, "-").substring(0, 20);
     }
-    let id = await this.passwordService.generateRandomString(8);
-    return `${id}_${namUrl}${extension ?? `.${extension}`}`;
+    const id = await this.passwordService.generateRandomString(8);
+    if (newExtension) {
+      return `${id}_${newName}.${newExtension}`;
+    }
+    if (ext) {
+      return `${id}_${newName}.${ext}`;
+    }
+    return `${id}_${newName}`;
   }
 
   public async saveFile(
@@ -40,43 +51,54 @@ export class ImageService {
     file: Express.Multer.File,
     symbol: string,
     type: ImageType,
-    name: string
+    name?: string
   ): Promise<FileSaveResponse> {
     let originFileName = null;
     let previewFileName = null;
+    let ext = "";
     if (type === ImageType.IMAGE) {
-      let saveRes = await this.saveImageFiles(file, name);
-      originFileName = saveRes.originFileName;
-      previewFileName = saveRes.previewFileName;
-    } else {
-      originFileName = await this.getName(name);
-      await writeFile(`${this.savePath}${originFileName}`, file.buffer, "binary");
+      const origin = await sharp(file.buffer);
+      const meta: Metadata = await origin.metadata();
+      ext = meta.format;
+      previewFileName = await this.savePreviewIfNeeded(meta, name, origin, file);
     }
+    originFileName = await this.getName(name, ext);
+    await writeFile(join(this.savePath, originFileName), file.buffer, "binary");
     this.logger.log(`Saved userId ${userId} ${type} to ${originFileName} ${previewFileName}`, "file");
-    return {originFileName, previewFileName};
-  }
-
-  private async saveImageFiles(
-    file: Express.Multer.File,
-    name: string,
-  ): Promise<FileSaveResponse> {
-    const origin = await sharp(file.buffer);
-    const meta: Metadata = await origin.metadata();
-    const proportion = Math.max(meta.width / 600, meta.height / 400); // Max 400x600
-    let previewFileName = null;
-    if (proportion > 1 || meta.format !== "webp") {
-      previewFileName = await this.getName(name, "webp");
-      await origin.
-        clone().
-        resize(Math.round(meta.width / proportion)).
-        webp().
-        toFile(`${this.savePath}${previewFileName}`);
-    }
-    const originFileName = await this.getName(name, meta.format);
-    await origin.toFile(`${this.savePath}${originFileName}`);
     return {
       originFileName,
       previewFileName,
     };
+  }
+
+
+  private async savePreviewIfNeeded(meta: sharp.Metadata, name: string, origin: sharp.Sharp, file: Express.Multer.File) {
+    const proportion = Math.max(meta.width / 600, meta.height / 400); // Max 400x600
+    // If webp 30% bigger, dgaf
+    if (proportion < 1.3 && meta.format === "webp") {
+      return null;
+    }
+    const previewFileName = await this.getName(name, meta.format === "gif" ? "gif" : "webp");
+    let cloned = origin.clone();
+    if (proportion > 1) {
+      cloned = cloned.resize(Math.round(meta.width / proportion));
+    }
+    const webpPath = join(this.savePath, previewFileName);
+    if (meta.format === "gif") {
+      if (proportion < 1) {
+        return null;
+      }
+      await cloned.toFile(webpPath);
+    } else {
+      await cloned.webp().toFile(webpPath);
+    }
+
+    const {size} = await stat(webpPath);
+    // Don't waste space, if the difference is small, revert
+    if (size > file.size / 1.5) {
+      await unlink(webpPath);
+      return null;
+    }
+    return previewFileName;
   }
 }
