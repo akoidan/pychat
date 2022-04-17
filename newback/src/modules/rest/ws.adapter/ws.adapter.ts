@@ -22,12 +22,12 @@ import {
   WebSocket,
   WebSocketServer,
 } from "ws";
-import {processErrors} from "@/utils/decorators";
 import type {DefaultWsInMessage,
   DefaultWsOutMessage} from "@/data/types/frontend";
 import {
   GrowlMessage,
 } from "@/data/types/frontend";
+import {processErrors} from "@/modules/app/decorators/catch.ws.errors";
 
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
@@ -54,9 +54,9 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
             return;
           }
           if (message.length > 2000) {
-            this.logger.verbose(`WS:OUT ${message}`, "ws");
+            this.logger.verbose(message, `ws:out:${(ws as any)?.context?.id}`);
           } else {
-            this.logger.debug(`WS:OUT ${message}`, "ws");
+            this.logger.debug(message, `ws:out:${(ws as any)?.context?.id}`);
           }
           oldSend(message);
         },
@@ -113,7 +113,11 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
       let parsed: DefaultWsOutMessage<any>;
       try {
         const s = String(data);
-        this.logger.debug(`WS:IN ${s}`, "ws");
+        if (s.length > 2000) {
+          this.logger.verbose(s, `ws:in:${(client as any)?.context?.id}`);
+        } else {
+          this.logger.debug(s, `ws:in:${(client as any)?.context?.id}`);
+        }
         if (client.readyState !== client.OPEN) {
           throw new BadRequestException("Cannot process new messages, while opening a connection");
         }

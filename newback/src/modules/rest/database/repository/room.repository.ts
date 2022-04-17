@@ -30,8 +30,10 @@ export class RoomRepository {
       roomId,
       userId,
       notifications: false,
-    }, {transaction,
-      raw: true});
+    }, {
+      transaction,
+      raw: true,
+    });
   }
 
   public async getAllChannels(ids: number[]): Promise<ChannelModel[]> {
@@ -75,6 +77,15 @@ export class RoomRepository {
     });
   }
 
+  public async getUserRooms(userId: number): Promise<Pick<RoomUsersModel, "roomId" | "userId">[]> {
+    return this.roomUsersModel.findAll({
+      where: {
+        userId,
+      },
+      raw: true,
+      attributes: ["userId", "roomId"],
+    });
+  }
 
   public async getRoomsForUser(userId: number): Promise<GetRoomsForUser[]> {
     // We should select roomModel instead of romUserModel, otherwise it will ignore deletedAt from roomModel

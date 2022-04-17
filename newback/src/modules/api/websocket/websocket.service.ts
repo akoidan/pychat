@@ -35,7 +35,7 @@ export class WebsocketService {
 
   public async handleConnection(urlString: string, context: WebSocketContextData, ip: any) {
     const url = new URLSearchParams(urlString);
-    const user: UserModel = await this.sessionService.getUserById(url.get("sessionId"));
+    const user: UserModel = await this.sessionService.getUserBySessionId(url.get("sessionId"));
     const id = await this.passwordService.createWsId(user.id, url.get("id"));
     context.userId = user.id;
     context.id = id;
@@ -77,7 +77,7 @@ export class WebsocketService {
   }
 
   public async closeConnection(context: WebSocketContextData) {
-    this.pubsubService.unsubscribe(context);
+    this.pubsubService.unsubscribeAll(context);
     if (context.id) {
       await this.redisService.removeOnline(context.id);
     }

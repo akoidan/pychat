@@ -1,22 +1,12 @@
 {
   "name": "pychat",
   "application": {
-    "env": "default",
     "port": 8888,
-    "logLevel": "debug",
-    "logOutput": "text",
     "crtPath": "../frontend/build/certs/server.crt.pem",
     "keyPath": "../frontend/build/certs/private.key.pem"
   },
   "settings": {
-    "wsIdCharLength": 4,
-    "allRedisRoom": "all",
-    "allRoomId": 1,
-    "flags": true,
-    "firebaseUrl": "https://fcm.googleapis.com/fcm/send",
-    "pingCloseJsDelay": 10000,
-    "pingInterval": 300000,
-    "clientNoServerPingCloseTimeout": 320000
+    "flags": true
   },
   "redis": {
     "host": "localhost",
@@ -25,19 +15,13 @@
   },
   "frontend": {
     "address": "https://localhost:8080",
-    "jsConsoleLogs": "debug",
-    "maxMessageSize": 100000,
-    "issueReportLink": "https://github.com/akoidan/pychat/issues/new",
-    "chromeExtension": {
-      "id" : "cnlplcfdldebgdlcmpkafcialnbopedn",
-      "url" : "https://chrome.google.com/webstore/detail/pychat-screensharing-exte/cnlplcfdldebgdlcmpkafcialnbopedn"
-    }
+    "issueReportLink": "https://github.com/akoidan/pychat/issues/new"
   },
   "mysql": {
     "host": "localhost",
     "port": 3306,
     "username": "pychat",
     "password": "pypass",
-    "database": "pychat2"
+    "database": "pychat"
   }
 }

@@ -1,32 +1,9 @@
-import type {ExecutionContext,
-  Logger} from "@nestjs/common";
+import type {Logger} from "@nestjs/common";
 import {
-  createParamDecorator,
   UnauthorizedException,
 } from "@nestjs/common";
-import {WebSocket} from "ws";
-import type {WebSocketContextData} from "@/data/types/internal";
-import type {OnGatewayConnection} from "@nestjs/websockets";
 import {WS_SESSION_EXPIRED_CODE} from "@/data/types/frontend";
-
-
-export const WebsocketContext = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const handler = ctx.getArgs().find((a) => a instanceof WebSocket);
-    if (!handler.context) {
-      handler.context = {userId: Date.now()} as WebSocketContextData;
-    }
-    return handler.context;
-  },
-);
-
-export const WsContext = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext) => {
-    const handler = ctx.getArgs().find((a) => a instanceof WebSocket);
-    return handler.context as WebSocketContextData;
-  },
-);
-
+import type {OnGatewayConnection} from "@nestjs/websockets";
 
 export function processErrors(e, socket, logger: Logger) {
   logger.error(`Ws error ${e.message}`, e.stack, "ws");

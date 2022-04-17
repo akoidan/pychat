@@ -25,9 +25,6 @@ export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
 }
 
-export type SaveFileResponse = Record<string, {fileId: number; previewFileId?: number}>;
-
-
 
 export interface SetStateFromWS {
   roomsDict: RoomDictModel;
@@ -43,13 +40,6 @@ export interface SetStateFromStorage {
   allUsersDict: Record<number, UserModel>;
 }
 
-
-
-export interface GiphyDto {
-  webp: string;
-  url: string;
-  symbol: string;
-}
 
 export interface OauthStatus {
   google: boolean;

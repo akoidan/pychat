@@ -4,12 +4,12 @@ import {
 } from "@nestjs/common";
 import {UserRepository} from "@/modules/rest/database/repository/user.repository";
 import {PasswordService} from "@/modules/rest/password/password.service";
-import type {
-  ShowITypeWsInMessage,
+import type {ShowITypeWsInMessage,
   ShowITypeWsOutMessage,
   SyncHistoryWsOutMessage,
   SyncHistoryWsInMessage,
-} from "@/data/types/frontend";
+
+  PrintMessageWsOutMessage} from "@/data/types/frontend";
 import {
   ImageType,
   MessageStatus,
@@ -22,6 +22,8 @@ import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
 import type {WebSocketContextData} from "@/data/types/internal";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
 import {getSyncMessage} from "@/modules/api/websocket/transformers/ws.transformer";
+import {Sequelize} from "sequelize-typescript";
+import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 
 
 @Injectable()
@@ -36,6 +38,7 @@ export class MessageService {
     private readonly userRepository: UserRepository,
     private readonly pubsubService: PubsubService,
     private readonly messageRepository: MessageRepository,
+    private readonly sequelize: Sequelize,
   ) {
   }
 
@@ -57,11 +60,19 @@ export class MessageService {
 
   public async syncHistory(data: SyncHistoryWsOutMessage, context: WebSocketContextData) {
     // MessageStatus.ON_SERVER
-    const messages = await this.messageRepository.getNewOnServerMessages(data.roomIds, data.messagesIds, data.lastSynced);
+    const messages = await this.messageRepository.getNewOnServerMessages(
+      data.roomIds,
+      data.messagesIds,
+      data.lastSynced
+    );
 
     let receivedMessageIds = [];
     if (data.onServerMessageIds) {
-      receivedMessageIds = await this.messageRepository.getMessagesByIdsAndStatus(data.roomIds, data.onServerMessageIds, MessageStatus.RECEIVED);
+      receivedMessageIds = await this.messageRepository.getMessagesByIdsAndStatus(
+        data.roomIds,
+        data.onServerMessageIds,
+        MessageStatus.RECEIVED
+      );
     }
 
     let readmesageIds = [];
@@ -75,36 +86,20 @@ export class MessageService {
     const mentions = await this.messageRepository.getTagsByMessagesId(messageIdsWithSymbol);
 
     return getSyncMessage(readmesageIds, receivedMessageIds, messages, mentions, images);
+  }
 
-  /*
-   *
-   * If in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
-   * 	on_server_to_received_ids = list(Message.objects.filter(
-   * 		Q(room_id__in=room_ids)
-   * 		& Q(id__in=in_message[VarNames.ON_SERVER_MESSAGE_IDS])
-   * 		& Q(message_status=Message.MessageStatus.received.value)
-   * 	).values_list('id', flat=True))
-   * else:
-   * 	on_server_to_received_ids = []
-   *
-   * if in_message[VarNames.RECEIVED_MESSAGE_IDS] or in_message[VarNames.ON_SERVER_MESSAGE_IDS]:
-   * 	ids_to_search = in_message[VarNames.RECEIVED_MESSAGE_IDS] + in_message[VarNames.ON_SERVER_MESSAGE_IDS]
-   * 	read_ids = list(Message.objects.filter(
-   * 		Q(room_id__in=room_ids)
-   * 		& Q(id__in=ids_to_search)
-   * 		& Q(message_status=Message.MessageStatus.read.value)
-   * 	).values_list('id', flat=True))
-   * else:
-   * 	read_ids = []
-   *
-   * content = MessagesCreator.message_models_to_dtos(messages)
-   * self.ws_write({
-   * 	VarNames.CONTENT: content,
-   * 	VarNames.RECEIVED_MESSAGE_IDS: on_server_to_received_ids,
-   * 	VarNames.READ_MESSAGE_IDS: read_ids,
-   * 	VarNames.JS_MESSAGE_ID: in_message[VarNames.JS_MESSAGE_ID],
-   * 	VarNames.HANDLER_NAME: HandlerNames.NULL
-   * })
-   */
+  public async printMessage(data: PrintMessageWsOutMessage, context: WebSocketContextData) {
+    return this.sequelize.transaction(async(transaction) => {
+      const files: UploadedFileModel[] = await this.messageRepository.getUploadedFiles(data.files, context.userId, transaction);
+      let symbol: number|null = Math.max(
+        0,
+        ...files.map((f) => f.symbol.charCodeAt(0)),
+        ...Object.keys(data.tags).map((k) => k.charCodeAt(0)),
+        ...data.giphies.map((g) => g.symbol.charCodeAt(0))
+      );
+      if (symbol === 0) {
+        symbol = null;
+      }
+    });
   }
 }

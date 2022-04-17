@@ -3,11 +3,11 @@ import {
   GIPHY_API_KEY,
   GIPHY_URL,
 } from "@/ts/utils/consts";
-import type {UploadFile} from "@/ts/types/types";
 import type {
   OauthSessionResponse,
   OauthStatus,
   OkResponse,
+  SaveFileRequest,
   SaveFileResponse,
   SendRestorePasswordRequest,
   SessionResponse,
@@ -98,7 +98,7 @@ export default class Api extends MessageHandler {
     text: string,
     offset: number,
     limit: number,
-    onSetAbortFunction:  (c: () => void) => void,
+    onSetAbortFunction: (c: () => void) => void,
   ): Promise<MultiResponse> {
     let response!: MultiResponse;
     if ((/^\s*$/).exec(text)) {
@@ -192,18 +192,19 @@ export default class Api extends MessageHandler {
     }
   }
 
-  public async validateUsername(username: string, onSetAbortFunction:  (c: () => void) => void): Promise<ValidateUserResponse> {
+  public async validateUsername(username: string, onSetAbortFunction: (c: () => void) => void): Promise<ValidateUserResponse> {
     return this.fetch.doPost({
       url: "/auth/validate-user",
       params: {username},
-      onSetAbortFunction: onSetAbortFunction,
+      onSetAbortFunction,
     });
   }
 
   public async uploadProfileImage(file: Blob): Promise<void> {
-    const fd = new FormData();
-    fd.append("file", file);
-    await this.fetch.upload<void>("/upload_profile_image", fd);
+    await this.fetch.upload<void>({
+      url:"/upload_profile_image",
+      data: {file}
+    });
   }
 
   public async showProfile(id: number): Promise<ViewUserProfileDto> {
@@ -231,21 +232,16 @@ export default class Api extends MessageHandler {
     });
   }
 
-  // @ts-expect-error
-  public async uploadFiles(files: UploadFile[], onProgress: (i: number) => void, setAbortEvent: (e: () => void) => void): Promise<SaveFileResponse> {
-    let totalLength = 0;
-    for (let index = 0; index < files.length; index++) {
-      const fd = new FormData();
-      fd.append('file', files[index].file);
-      fd.append('symbol', files[index].key);
-      const response = await this.fetch.upload<SaveFileResponse>("/files/upload-file", fd, setAbortEvent, (bytes) => {
-        totalLength += bytes;
-        onProgress(totalLength);
-      });
-    }
+  public async uploadFile(data: SaveFileRequest, onProgress: (i: number) => void, onSetAbortFunction: (e: () => void) => void): Promise<SaveFileResponse> {
+    return this.fetch.upload<SaveFileResponse>({
+      url: "/file/upload-file",
+      data,
+      onSetAbortFunction,
+      onProgress,
+    });
   }
 
-  public async validateEmail(params: ValidateUserEmailRequest,onSetAbortFunction: (c: () => void) => void): Promise<ValidateEmailResponse> {
+  public async validateEmail(params: ValidateUserEmailRequest, onSetAbortFunction: (c: () => void) => void): Promise<ValidateEmailResponse> {
     return this.fetch.doPost({
       url: "/auth/validate-email",
       params,

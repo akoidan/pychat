@@ -26,7 +26,17 @@ export class SessionService {
     return session;
   }
 
-  public async getUserById(sessionId: string): Promise<UserModel> {
+  public async getUserBySessionId(sessionId: string): Promise<UserModel> {
+    const userId = await this.getUserIdBySession(sessionId);
+    const user = await this.userRepository.getById(userId, ["userProfile", "userAuth", "userSettings"]);
+    if (!user) {
+      await this.redisService.removeSession(sessionId);
+      throw new InternalServerErrorException("Database has been cleared this user is removed");
+    }
+    return user;
+  }
+
+  public async getUserIdBySession(sessionId: string): Promise<number> {
     if (!sessionId) {
       throw new UnauthorizedException("sessionId is missing");
     }
@@ -34,11 +44,6 @@ export class SessionService {
     if (!userId) {
       throw new UnauthorizedException("Session id expired");
     }
-    const user = await this.userRepository.getById(userId, ["userProfile", "userAuth", "userSettings"]);
-    if (!user) {
-      await this.redisService.removeSession(sessionId);
-      throw new InternalServerErrorException("Database has been cleared this user is removed");
-    }
-    return user;
+    return userId;
   }
 }

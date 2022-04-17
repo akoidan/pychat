@@ -6,7 +6,6 @@ import {
 import type {WebSocketContextData} from "@/data/types/internal";
 import type {PubSubMessage} from "@/modules/api/websocket/interfaces/pubsub";
 import type {HandlerName} from "@/data/types/frontend";
-import {DefaultWsInMessage} from "@/data/types/frontend";
 
 
 interface HandlerType {
@@ -69,8 +68,17 @@ export class PubsubService {
     });
   }
 
-  public unsubscribe(context: WebSocketContextData, ...channel: string[]) {
-    channel.forEach((channel) => {
+  public unsubscribeAll(context: WebSocketContextData) {
+    Object.values(receivers).forEach(contexts => {
+      const index = contexts.findIndex((c) => c.ctx = context);
+      if (index >= 0) {
+        contexts.splice(index, 1);
+      }
+    });
+  }
+
+  public unsubscribe(context: WebSocketContextData, ...channels: [string, ...string[]]) {
+    channels.forEach((channel) => {
       if (receivers[channel]) {
         const index = receivers[channel].findIndex((c) => c.ctx = context);
         if (index >= 0) {

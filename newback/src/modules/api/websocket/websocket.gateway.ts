@@ -7,10 +7,6 @@ import {
 } from "@nestjs/websockets";
 import {IncomingMessage} from "http";
 import {
-  CatchWsErrors,
-  WsContext,
-} from "@/utils/decorators";
-import {
   Server,
   WebSocket,
 } from "ws";
@@ -18,16 +14,17 @@ import {WebSocketContextData} from "@/data/types/internal";
 import {
   Logger,
   UseFilters,
+  UseGuards,
 } from "@nestjs/common";
 import type {
   GetCountryCodeWsInMessage,
   SyncHistoryWsInMessage,
 } from "@/data/types/frontend";
-import {
-  GetCountryCodeWsOutMessage,
+import {GetCountryCodeWsOutMessage,
   ShowITypeWsOutMessage,
   SyncHistoryWsOutMessage,
-} from "@/data/types/frontend";
+
+  PrintMessageWsOutMessage} from "@/data/types/frontend";
 import {SubscribePuBSub} from "@/modules/rest/pubsub/pubsub.service";
 import {SendToClientPubSubMessage} from "@/modules/api/websocket/interfaces/pubsub";
 import {WebsocketService} from "@/modules/api/websocket/websocket.service";
@@ -35,6 +32,12 @@ import type {OnWsClose} from "@/modules/api/websocket/interfaces/utils";
 import {WsDataService} from "@/modules/api/websocket/ws.data.service";
 import {WsExceptionFilter} from "@/modules/api/websocket/ws.exception.filter";
 import {MessageService} from "@/modules/api/websocket/message.service";
+import {WsContext} from "@/modules/app/decorators/ws.context.decorator";
+import {CatchWsErrors} from "@/modules/app/decorators/catch.ws.errors";
+import {
+  MessagesFromMyRoomGuard,
+  OwnMessageGuardMixin
+} from "@/modules/app/guards/own.message.guard";
 
 @WebSocketGateway({
   path: "/ws",
@@ -75,17 +78,37 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
     return this.messageService.syncHistory(data, context);
   }
 
+  @SubscribeMessage("setMessageStatus")
+  public async setMessageStatus(
+
+  ): Promise<void> {
+    // This.messageService.setStatus
+  }
+
+
+  @UseGuards(OwnMessageGuardMixin)
   @SubscribeMessage("printMessage")
-  public async printMessage(@MessageBody() data: SyncHistoryWsOutMessage, @WsContext() context: WebSocketContextData): Promise<any> {
+  // @UseGuards(MessagesFromMyRoomGuard((data: PrintMessageWsOutMessage) => [data.parentMessage]))
+  public async printMessage(
+    @MessageBody() data: PrintMessageWsOutMessage,
+      @WsContext() context: WebSocketContextData
+  ): Promise<any> {
+    await this.messageService.printMessage(data, context);
   }
 
   @SubscribeMessage("showIType")
-  public async showIType(@MessageBody() data: ShowITypeWsOutMessage, @WsContext() context: WebSocketContextData): Promise<void> {
+  public async showIType(
+    @MessageBody() data: ShowITypeWsOutMessage,
+      @WsContext() context: WebSocketContextData
+  ): Promise<void> {
     await this.messageService.showIType(data, context);
   }
 
   @SubscribeMessage("getCountryCode")
-  async getCountryCode(@MessageBody() data: GetCountryCodeWsOutMessage, @WsContext() context: WebSocketContextData): Promise<Omit<GetCountryCodeWsInMessage, "action" | "handler">> {
+  public async getCountryCode(
+    @MessageBody() data: GetCountryCodeWsOutMessage,
+      @WsContext() context: WebSocketContextData
+  ): Promise<Omit<GetCountryCodeWsInMessage, "action" | "handler">> {
     return this.wsDataService.getCountryCodes(context);
   }
 }

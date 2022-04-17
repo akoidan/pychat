@@ -87,18 +87,10 @@ export interface Location {
   region: string | null;
 }
 
-/*
- * F - file
- * g - giphy
- * i - image
- * v - video
- * a - audio
- * m - media (same as video, but you need to click on image, in order to load video)
- */
-
 export interface FileModel {
   url: string | null;
   type: ImageType;
+  name?: string; // TODO
   serverId: number | null;
   previewFileId: number | null;
   fileId: number | null;

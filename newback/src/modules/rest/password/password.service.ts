@@ -6,8 +6,6 @@ import {
 
 @Injectable()
 export class PasswordService {
-  public constructor() {
-  }
 
   public async createPassword(password: string): Promise<string> {
     return hash(password, 10);

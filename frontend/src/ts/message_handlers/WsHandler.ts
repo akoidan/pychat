@@ -25,12 +25,10 @@ import {
   currentUserInfoDtoToModel,
   userSettingsDtoToModel,
 } from "@/ts/types/converters";
-import type {GiphyDto,
-  RoomNoUsersDto,
-  UserProfileDto,
-  UserProfileDtoWoImage,
-  UserSettingsDto,
-  GetCountryCodeWsOutMessage} from "@/ts/types/dto";
+import type {
+  GiphyDto,
+  PrintMessageWsOutMessage
+} from "@/ts/types/dto";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
 import type {AddChannelMessage,
@@ -41,7 +39,7 @@ import type {AddChannelMessage,
   MessagesResponseMessage,
   PingMessage,
   PongMessage,
-  PrintMessage,
+  PrintMessageWsInMessage,
   SaveChannelSettingsMessage,
   SetProfileImageMessage,
   SetSettingsMessage,
@@ -52,11 +50,16 @@ import type {AddChannelMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
   ShowITypeWsOutMessage,
-
-  HandlerType,
+  RoomNoUsersDto,
+  UserProfileDto,
+  UserProfileDtoWoImage,
+  UserSettingsDto,
+  GetCountryCodeWsOutMessage,
+  SetMessageStatusWsOutMessage,
   HandlerTypes,
-
-  MessageStatus} from "@/ts/types/backend";
+  HandlerType,
+  MessageStatus
+} from "@/ts/types/backend";
 import type {
   InternetAppearMessage,
   LogoutMessage,
@@ -150,10 +153,9 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async getCountryCode(): Promise<GetCountryCodeWsInMessage> {
-    const body: GetCountryCodeWsOutMessage = {
+    return this.messageProc.sendToServerAndAwait<GetCountryCodeWsOutMessage, "getCountryCode">({
       action: "getCountryCode",
-    };
-    return this.messageProc.sendToServerAndAwait(body);
+    });
   }
 
   public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number | null): Promise<WebRtcSetConnectionIdMessage> {
@@ -252,8 +254,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     parentMessage: number | null,
     tags: Record<string, number>,
     giphies: GiphyDto[],
-  ): Promise<PrintMessage> {
-    const newVar = {
+  ): Promise<PrintMessageWsInMessage> {
+    return this.messageProc.sendToServerAndAwait<PrintMessageWsOutMessage, "printMessage">({
       files,
       id,
       timeDiff,
@@ -263,8 +265,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       parentMessage,
       roomId,
       giphies,
-    };
-    return this.messageProc.sendToServerAndAwait(newVar);
+    });
   }
 
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage | unknown> {
@@ -308,15 +309,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     onServerMessageIds: number[],
     lastSynced: number,
   ): Promise<SyncHistoryWsInMessage> {
-    const payload: SyncHistoryWsOutMessage = {
+    return this.messageProc.sendToServerAndAwait<SyncHistoryWsOutMessage, "syncHistory">({
       messagesIds,
       receivedMessageIds,
       onServerMessageIds,
       roomIds,
       lastSynced,
       action: "syncHistory",
-    };
-    return this.messageProc.sendToServerAndAwait(payload);
+    });
   }
 
   public async sendAddChannel(channelName: string, users: number[]): Promise<AddChannelMessage> {
@@ -443,7 +443,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     roomId: number,
     status: MessageStatus,
   ) {
-    return this.messageProc.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait<SetMessageStatusWsOutMessage, "setMessageStatus">({
       messagesIds,
       action: "setMessageStatus",
       status,

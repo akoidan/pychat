@@ -110,7 +110,7 @@
     "import/no-named-default": 1,
     "import/no-named-export":0, // we want them
     "import/no-namespace": 0,
-    "import/no-nodejs-modules":1,
+    "import/no-nodejs-modules":0,
     "import/no-restricted-paths": 1,
     "import/no-self-import":1,
     "import/no-unassigned-import": [1,  {"allow": ["**/*.sass", "**/*.css"]}],

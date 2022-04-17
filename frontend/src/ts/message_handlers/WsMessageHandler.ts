@@ -8,7 +8,6 @@ import type {
   SetMessageProgress,
   SetMessageProgressError,
   SetUploadProgress,
-  UploadFile,
 } from "@/ts/types/types";
 import type {
   FileModel,
@@ -22,8 +21,13 @@ import type {
   GiphyDto,
   MessageModelDto,
   SaveFileResponse,
+
+  SaveFileRequest,
 } from "@/ts/types/dto";
-import {MessageStatus} from "@/ts/types/dto";
+import {
+  ImageType,
+  MessageStatus,
+} from "@/ts/types/backend";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
@@ -35,8 +39,8 @@ import type {
   HandlerType,
   HandlerTypes,
   MessagesResponseMessage,
-  PrintMessage,
-  SetMessageStatusMessage,
+  PrintMessageWsInMessage,
+  SetMessageStatusWsInMessage,
   SyncHistoryWsInMessage,
 } from "@/ts/types/backend";
 import {savedFiles} from "@/ts/utils/htmlApi";
@@ -51,7 +55,6 @@ import {
   getMissingIds,
 } from "@/ts/utils/pureFunctions";
 import type Subscription from "@/ts/classes/Subscription";
-import {ImageType} from "@/ts/types/backend";
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
   protected readonly logger: Logger;
@@ -201,7 +204,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     const fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
     const giphies: GiphyDto[] = this.getGiphiesFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
-      const a: PrintMessage = await this.ws.sendPrintMessage(
+      const a: PrintMessageWsInMessage = await this.ws.sendPrintMessage(
         storeMessage.content,
         roomId,
         fileIds,
@@ -227,8 +230,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   public async uploadFiles(
     messageId: number,
     roomId: number,
-    files: UploadFile[],
-  ): Promise<SaveFileResponse> {
+    files: SaveFileRequest[],
+  ): Promise<SaveFileResponse[]> {
     const size = files.reduce((summ, f) => summ + f.file.size, 0);
     const sup: SetUploadProgress = {
       upload: {
@@ -239,35 +242,39 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       roomId,
     };
     this.store.setUploadProgress(sup);
+    let responses: SaveFileResponse[] = [];
     try {
-      const res: SaveFileResponse = await this.api.uploadFiles(
-        files,
-        (uploaded) => {
-          const payload: SetMessageProgress = {
-            messageId,
-            roomId,
-            uploaded,
-          };
-          this.store.setMessageProgress(payload);
-        },
-        (abortFunction) => {
-          this.store.setUploadXHR({
-            abortFunction,
-            messageId,
-            roomId,
-          });
-        },
-      );
+      let total = 0;
+      for (let i = 0; i < files.length; i++) {
+        const res: SaveFileResponse = await this.api.uploadFile(
+          files[i],
+          (uploaded) => {
+            const payload: SetMessageProgress = {
+              messageId,
+              roomId,
+              uploaded: total + uploaded,
+            };
+            this.store.setMessageProgress(payload);
+          },
+          (abortFunction) => {
+            this.store.setUploadXHR({
+              abortFunction,
+              messageId,
+              roomId,
+            });
+          },
+        );
+        total += files[i].file.size;
+        responses.push(res);
+      }
+
       const newVar: RemoveMessageProgress = {
         messageId,
         roomId,
       };
       this.store.removeMessageProgress(newVar);
-      if (!res || Object.keys(res).length === 0) {
-        throw Error("Missing files uploads");
-      }
 
-      return res;
+      return responses;
     } catch (error: any) {
       const newVar: SetMessageProgressError = {
         messageId,
@@ -346,7 +353,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     }
   }
 
-  public async printMessage(inMessage: PrintMessage) {
+  public async printMessage(inMessage: PrintMessageWsInMessage) {
     const message: MessageModel = convertMessageModelDtoToModel(inMessage, null, (time) => this.ws.convertServerTimeToPC(time));
     this.messageHelper.processUnknownP2pMessage(message);
     if (inMessage.userId !== this.store.myId) {
@@ -367,7 +374,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.syncHistory(); // If some messages were sent during offline
   }
 
-  public async setMessageStatus(m: SetMessageStatusMessage) {
+  public async setMessageStatus(m: SetMessageStatusWsInMessage) {
     this.store.setMessagesStatus({
       roomId: m.roomId,
       status: m.status,
@@ -406,27 +413,32 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   private async uploadFilesForMessages(storeMessage: MessageModel) {
     if (storeMessage.files) {
-      const uploadFiles: UploadFile[] = [];
+      const uploadFiles: SaveFileRequest[] = [];
       Object.keys(storeMessage.files).filter((k) => !storeMessage.files![k].fileId && storeMessage.files![k].sending).
-        forEach((k) => {
-          const file: FileModel = storeMessage.files![k];
-          uploadFiles.push({
-            file: savedFiles[file.url!], // TODO why null?
-            key: file.type + k,
-          });
+        forEach((key) => {
+          const file: FileModel = storeMessage.files![key];
+          const items: SaveFileRequest = {
+            file: savedFiles[file.url!],
+            symbol: key,
+            name: savedFiles[file.url!].name!,
+            type: file.type,
+          };
+          uploadFiles.push(items);
           if (file.preview) {
             uploadFiles.push({
               file: savedFiles[file.preview],
-              key: `p${k}`,
+              name: savedFiles[file.url!].name!,
+              type: file.type,
+              symbol: key,
             });
           }
         });
       if (uploadFiles.length > 0) {
-        const fileIds = await this.uploadFiles(storeMessage.id, storeMessage.roomId, uploadFiles);
+        const files: SaveFileResponse[] = await this.uploadFiles(storeMessage.id, storeMessage.roomId, uploadFiles);
         this.store.setMessageFileIds({
           roomId: storeMessage.roomId,
           messageId: storeMessage.id,
-          fileIds,
+          files,
         });
       }
     }

@@ -1,4 +1,3 @@
-
 export interface SignInRequest extends CaptchaRequest {
   username?: string;
   password: string;
@@ -130,10 +129,17 @@ export enum ImageType {
   GIPHY = "GIPHY",
 }
 
-export enum UploadedFileChoices {
-  VIDEO = "VIDEO",
-  IMAGE = "IMAGE",
-  FILE = "FILE",
+export interface SaveFileResponse {
+  id: number;
+  previewId?: number;
+  symbol: string;
+}
+
+export interface SaveFileRequest {
+  file: Blob;
+  name: string;
+  symbol: string;
+  type: ImageType;
 }
 
 /** CODE THAT I PUT HERE MANUALLY */
@@ -335,7 +341,13 @@ export interface DeleteMessage extends DefaultWsInMessage<"deleteMessage", "ws-m
   edited: number;
 }
 
-export interface SetMessageStatusMessage extends DefaultWsInMessage<"setMessageStatus", "ws-message"> {
+export interface SetMessageStatusWsOutMessage extends DefaultWsOutMessage<"setMessageStatus"> {
+  messagesIds: number[];
+  status: MessageStatus;
+  roomId: number;
+}
+
+export interface SetMessageStatusWsInMessage extends DefaultWsInMessage<"setMessageStatus", "ws-message"> {
   roomId: number;
   status: MessageStatus;
   messagesIds: number[];
@@ -344,7 +356,24 @@ export interface SetMessageStatusMessage extends DefaultWsInMessage<"setMessageS
 export interface EditMessage extends DefaultWsInMessage<"editMessage", "ws-message">, MessageModelDto {
 }
 
-export interface PrintMessage extends DefaultWsInMessage<"printMessage", "ws-message">, MessageModelDto {
+export interface GiphyDto {
+  webp: string;
+  url: string;
+  symbol: string;
+}
+
+export interface PrintMessageWsOutMessage extends DefaultMessage<"printMessage"> {
+  content: string;
+  roomId: number;
+  files: number[];
+  id: number;
+  timeDiff: number;
+  parentMessage: number | null;
+  tags: Record<string, number>;
+  giphies: GiphyDto[];
+}
+
+export interface PrintMessageWsInMessage extends DefaultWsInMessage<"printMessage", "ws-message">, MessageModelDto {
 }
 
 export interface AddOnlineUserMessage extends DefaultWsInMessage<"addOnlineUser", "room">, ChangeUserOnlineBase {

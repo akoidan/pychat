@@ -52,4 +52,11 @@ export class UserProfileModel extends Model<UserProfileModel> {
     allowNull: true,
   })
   public contacts: string;
+
+  @Column({
+    allowNull: true,
+    type: DataType.STRING(100),
+    defaultValue: null,
+  })
+  public image: string;
 }

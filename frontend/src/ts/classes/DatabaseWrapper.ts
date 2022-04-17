@@ -132,7 +132,7 @@ export default class DatabaseWrapper implements IStorage {
         for (const k in message.tags) {
           const userId = message.tags[k];
           this.executeSql(t, "insert into tag (user_id, message_id, symbol) values (?, ?, ?)", [userId, message.id, k])();
-          // This.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+          // This.executeSql(t,G 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
 
           // })();
         }
@@ -342,9 +342,9 @@ export default class DatabaseWrapper implements IStorage {
     this.write((t) => {
       this.executeMultiple(
         t,
-        Object.keys(m.fileIds).map((symb) => [
+        m.files.map(file => [
           "update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?",
-          [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId],
+          [file.id, file.previewId ?? null, file.symbol, m.messageId],
         ]),
       )();
     });

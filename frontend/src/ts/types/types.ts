@@ -21,12 +21,7 @@ import {
   MessageStatusInner,
   MessageStatusModel
 } from '@/ts/types/model';
-
-
-export interface UploadFile {
-  key: string;
-  file: Blob | File;
-}
+import {ImageType} from '@/ts/types/dto';
 
 export type ValueFilterForKey<T extends object, U> = {
   [K in keyof T]: U extends T[K] ? K : never;
@@ -160,7 +155,7 @@ export interface SetMessageProgressError {
 export interface SetFileIdsForMessage {
   messageId: number;
   roomId: number;
-  fileIds: SaveFileResponse;
+  files: SaveFileResponse[];
 }
 
 export interface RoomMessageIds {
@@ -234,6 +229,13 @@ export interface PostData {
   url: string;
   params: any;
   onSetAbortFunction?: (c: () => void) => void;
+}
+
+export interface UploadData {
+  url: string;
+  data: Record<string, any>;
+  onSetAbortFunction?: (e: () => void) => void;
+  onProgress?: (i: number) => void;
 }
 
 export interface AddSendingFileTransfer {

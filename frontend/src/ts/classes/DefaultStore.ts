@@ -637,9 +637,9 @@ export class DefaultStore extends VuexModule {
     if (!mm.files) {
       throw Error(`Message ${payload.messageId} in room ${payload.roomId} doesn't have files`);
     }
-    Object.keys(payload.fileIds).forEach((symb) => {
-      mm.files![symb].fileId = payload.fileIds[symb].fileId || null;
-      mm.files![symb].previewFileId = payload.fileIds[symb].previewFileId || null;
+    payload.files.forEach(file => {
+      mm.files![file.symbol].fileId = file.id || null;
+      mm.files![file.symbol].previewFileId = file.previewId || null;
     });
     this.storage.updateFileIds(payload);
   }

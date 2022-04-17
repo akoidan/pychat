@@ -5,7 +5,11 @@ import type {
 import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import {SetMessageProgress} from '@/ts/types/types';
+import {
+  SetMessageProgress,
+  UploadData
+} from "@/ts/types/types";
+import {SaveFileRequest} from "@/ts/types/backend";
 
 export default class Fetch {
   protected httpLogger: Logger;
@@ -43,16 +47,16 @@ export default class Fetch {
   }
 
 
-  public async upload<T>(url: string, form: FormData, onSetAbortFunction?: (e: () => void) => void, onProgress?: (i: number) => void) {
+  public async upload<T>({url, data, onSetAbortFunction, onProgress}: UploadData): Promise<T> {
      /*
-     * https://ilikekillnerds.com/2020/09/file-upload-progress-with-the-fetch-api-is-coming/
-     * https://chromestatus.com/feature/5274139738767360
-     * fetch api doesnt support progress api yet
-     */
+      * https://ilikekillnerds.com/2020/09/file-upload-progress-with-the-fetch-api-is-coming/
+      * https://chromestatus.com/feature/5274139738767360
+      * fetch api doesnt support progress api yet
+      */
     return new Promise((resolve, reject) => {
       const r = new XMLHttpRequest();
       r.addEventListener("load", () => {
-        let response = r.response;
+        let {response} = r;
         try {
           response = JSON.parse(r.response);
           if (r.status < 200 || r.status >= 300) {
@@ -71,7 +75,9 @@ export default class Fetch {
         reject("Network Error");
       });
       if (onSetAbortFunction) {
-        onSetAbortFunction(() => r.abort());
+        onSetAbortFunction(() => {
+          r.abort();
+        });
       }
       if (onProgress) {
         r.upload.addEventListener("progress", (evt) => {
@@ -80,9 +86,13 @@ export default class Fetch {
           }
         });
       }
-      r.open("GET", `${XHR_API_URL}${url}`);
+      r.open("POST", `${XHR_API_URL}${url}`);
       r.setRequestHeader("session-id", this.sessionHolder.session!);
-      r.send();
+      const form = new FormData();
+      Object.entries(data).forEach(([key, value]) => {
+        form.append(key, value);
+      });
+      r.send(form);
     });
   }
 
@@ -125,7 +135,9 @@ export default class Fetch {
     if (onSetAbortFunction) {
       const controller = new AbortController();
       signal = controller.signal;
-      onSetAbortFunction(() => controller.abort());
+      onSetAbortFunction(() => {
+        controller.abort();
+      });
     }
     const is3rdPartyApi = (/^https?:\/\//u).test(url);
     const fetchUrl = is3rdPartyApi ? url : `${XHR_API_URL}${url}`;

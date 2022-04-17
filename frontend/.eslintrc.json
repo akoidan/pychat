@@ -23,6 +23,7 @@
   "rules": {
     "no-warning-comments": 0,
     "object-curly-spacing": 0,
+    "sort-keys": 0,
     "init-declarations": 0, // poor choice
     "func-style": [1, "declaration"],
     "one-var": 0, // poor choice

@@ -62,6 +62,7 @@ export interface MessageDB {
 
 export interface FileDB {
   id: number;
+  name: string;
   preview_file_id: number; //  So this is UploadFile.id for "preview" File
   file_id: number; // So this is UploadFile.id for "url" File
   server_id: number; // If we saved this file on backend, it would have its id

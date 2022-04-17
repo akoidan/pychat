@@ -188,7 +188,7 @@ CREATE TABLE `subscription_message`
 CREATE TABLE `uploaded_file`
 (
     `id`         INTEGER auto_increment,
-    `type`       ENUM('VIDEO', 'IMAGE', 'FILE') NOT NULL,
+    `type`       ENUM ('VIDEO', 'FILE', 'MEDIA_RECORD', 'AUDIO_RECORD', 'IMAGE', 'PREVIEW', 'GIPHY') NOT NULL,
     `symbol`     VARCHAR(1)                                                                          NOT NULL,
     `user_id`    INTEGER                                                                             NOT NULL,
     `file`       VARCHAR(255)                                                                        NOT NULL,
@@ -256,6 +256,7 @@ CREATE TABLE `user_profile`
     `surname`    VARCHAR(30),
     `birthday`   DATE,
     `contacts`   VARCHAR(100),
+    `image`      VARCHAR(100) DEFAULT NULL,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME,

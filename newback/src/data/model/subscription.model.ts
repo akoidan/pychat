@@ -8,7 +8,6 @@ import {
 } from "sequelize-typescript";
 import {Injectable} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
-import {UploadedFileChoices} from "@/data/types/frontend";
 import {IpAddressModel} from "@/data/model/ip.address.model";
 import {MysqlBool} from "@/data/types/internal";
 
@@ -37,14 +36,13 @@ export class SubscriptionModel extends Model<SubscriptionModel> {
     unique: true,
     allowNull: false,
   })
-  public registrationId: UploadedFileChoices;
+  public registrationId: string;
 
   @Column({
     type: DataType.STRING(64),
     allowNull: true,
   })
   public agent: string;
-
 
   @Column({
     type: DataType.BOOLEAN,

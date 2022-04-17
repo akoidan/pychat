@@ -7,7 +7,7 @@ import {
   Table,
 } from "sequelize-typescript";
 import {Injectable} from "@nestjs/common";
-import {UploadedFileChoices} from "@/data/types/frontend";
+import {ImageType} from "@/data/types/frontend";
 import {UserModel} from "@/data/model/user.model";
 
 @Injectable()
@@ -21,10 +21,10 @@ export class UploadedFileModel extends Model<UploadedFileModel> {
   public id: number;
 
   @Column({
-    type: DataType.ENUM(...Object.keys(UploadedFileChoices)),
+    type: DataType.ENUM(...Object.keys(ImageType)),
     allowNull: false,
   })
-  public type: UploadedFileChoices;
+  public type: ImageType;
 
   @Column({
     type: DataType.STRING(1),

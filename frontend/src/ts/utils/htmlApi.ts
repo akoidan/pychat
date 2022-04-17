@@ -501,37 +501,46 @@ export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
 
 export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType: string, errCb: Function) {
   const video = document.createElement("video");
+  video.style.opacity = '0';
+  video.style.width = '0';
+  video.style.height = '0';
+  video.style.position = 'absolute'
+  document.body.appendChild(video);
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
     const src = URL.createObjectURL(file);
     video.loop = false;
-    video.addEventListener("loadeddata", () => {
+    video.addEventListener("loadedmetadata", () => {
       tmpCanvasContext.canvas.width = video.videoWidth;
       tmpCanvasContext.canvas.height = video.videoHeight;
-      tmpCanvasContext.drawImage(video, 0, 0);
-      tmpCanvasContext.canvas.toBlob(
-        (blob) => {
-          const img = document.createElement("img");
-          if (!blob) {
-            logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
-            img.src = videoIcon;
-          } else {
-            const url = URL.createObjectURL(blob);
-            savedFiles[url] = blob;
-            blob.name = ".jpg";
-            img.src = url;
-          }
-          img.className = PASTED_IMG_CLASS;
-          img.setAttribute("videoType", videoType);
-          img.setAttribute("associatedVideo", src);
-          savedFiles[src] = file;
-          pasteNodeAtCaret(img, textArea);
-        },
-        "image/jpeg",
-        0.95,
-      );
+      logger.log(`Loaded video metadata ${video.videoWidth}x${video.videoHeight}`)();
+      setTimeout(() => {
+        tmpCanvasContext.drawImage(video, 0, 0);
+        tmpCanvasContext.canvas.toBlob(
+          (blob) => {
+            const img = document.createElement("img");
+            if (!blob) {
+              logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
+              img.src = videoIcon;
+            } else {
+              const url = URL.createObjectURL(blob);
+              savedFiles[url] = blob;
+              blob.name = ".jpg";
+              img.src = url;
+            }
+            img.className = PASTED_IMG_CLASS;
+            img.setAttribute("videoType", videoType);
+            img.setAttribute("associatedVideo", src);
+            savedFiles[src] = file;
+            pasteNodeAtCaret(img, textArea);
+          },
+          "image/jpeg",
+          0.95,
+        );
+      }, 100); // https://stackoverflow.com/a/71900837/3872976
     }, false);
     video.src = src;
+    video.load()
   } else {
     errCb(`Browser doesn't support playing ${file.type}`);
   }

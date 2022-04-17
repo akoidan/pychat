@@ -9,6 +9,7 @@ import {ConfigModule} from "@/modules/rest/config/config.module";
 import {VerifyModule} from "@/modules/api/verify/verify.module";
 import {DatabaseModule} from "@/modules/rest/database/database.module";
 import {WebsocketModule} from "@/modules/api/websocket/websocket.module";
+import {FileModule} from '@/modules/api/file/file.module';
 
 
 /*
@@ -34,6 +35,7 @@ import {WebsocketModule} from "@/modules/api/websocket/websocket.module";
     LoggerModule,
     ConfigModule,
     VerifyModule,
+    FileModule,
     DatabaseModule,
     WebsocketModule,
     RedisModule.forRoot({
