@@ -5,13 +5,12 @@ import {
   Logger,
   ValidationPipe,
 } from "@nestjs/common";
-import {readFile} from "fs";
-import {promisify} from "util";
+import {readFile} from "fs/promises";
 import {WsAdapter} from "@/modules/rest/ws.adapter/ws.adapter";
 
 async function bootstrap() {
-  const key = await promisify(readFile)(config.application.keyPath, "utf-8");
-  const cert = await promisify(readFile)(config.application.crtPath, "utf-8");
+  const key = await readFile(config.application.keyPath, "utf-8");
+  const cert = await readFile(config.application.crtPath, "utf-8");
 
   const app = await NestFactory.create(AppModule, {
     logger: ["log", "error", "warn", "debug"],

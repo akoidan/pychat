@@ -9,8 +9,7 @@ import {
 import {LoggerModule} from "@/modules/rest/logger/logger.module";
 import {MailerService} from "@nestjs-modules/mailer";
 
-import {promisify} from "util";
-import {readFile} from "fs";
+import {readFile} from "fs/promises";
 import {resolve} from "path";
 import {ConsoleLogger} from "@nestjs/common";
 import {ConfigService} from "@/modules/rest/config/config.service";
@@ -68,7 +67,7 @@ describe("EmailSenderService", () => {
       jest.useFakeTimers("modern");
       jest.setSystemTime(new Date(2020, 3, 1));
       await sender.sendRestorePasswordEmail("a", 3, "a@a", "sfsd", "192.168.1.1", "Chernihiv");
-      const content = await promisify(readFile)(resolve(__dirname, "..", "..", "..", "fixtures", "rendered.send.restore.password.html"), "utf-8");
+      const content = await readFile(resolve(__dirname, "..", "..", "..", "fixtures", "rendered.send.restore.password.html"), "utf-8");
       expect(spy).toHaveBeenCalledWith(expect.objectContaining({
         html: content,
         subject: "Reset pychat password",
@@ -83,7 +82,7 @@ describe("EmailSenderService", () => {
       jest.useFakeTimers("modern");
       jest.setSystemTime(new Date(2020, 3, 1));
       await sender.sendSignUpEmail("a", 3, "a@a", "sfsd", "192.168.1.1", "Chernihiv");
-      const content = await promisify(readFile)(resolve(__dirname, "..", "..", "..", "fixtures", "send.sign.up.email.html"), "utf-8");
+      const content = await readFile(resolve(__dirname, "..", "..", "..", "fixtures", "send.sign.up.email.html"), "utf-8");
       expect(spy).toHaveBeenCalledWith(expect.objectContaining({
         html: content,
         subject: "Confirm Pychat registration",
