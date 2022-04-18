@@ -9,7 +9,7 @@ import type {WebSocketContextData} from "@/data/types/internal";
 import {ConfigService} from "@/modules/rest/config/config.service";
 import {ValidationException} from "@/data/exceptions/validation.exception";
 import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
-import {transformUserCountries} from '@/modules/api/websocket/transformers/get.user.contries.transformer';
+import {transformUserCountries} from '@/modules/api/websocket/transformers/out.message/get.user.contries.transformer';
 
 
 @Injectable()

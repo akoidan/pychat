@@ -19,14 +19,14 @@ import {Sequelize} from "sequelize-typescript";
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
+import {getMaxSymbol} from "@/utils/helpers";
+import {getSyncMessage} from '@/modules/api/websocket/transformers/out.message/sync.message.transformer';
 import {
   getMentionsFromTags,
   getUploadedGiphies,
-  groupUploadedFileToImages,
-} from "@/modules/api/websocket/transformers/inner.transformer";
-import {getMaxSymbol} from "@/utils/helpers";
-import {getSyncMessage} from "@/modules/api/websocket/transformers/sync.message.transformer";
-import {transformPrintMessage} from "@/modules/api/websocket/transformers/print.message.transformer";
+  groupUploadedFileToImages
+} from '@/modules/api/websocket/transformers/out.message/inner.transformer';
+import {transformPrintMessage} from '@/modules/api/websocket/transformers/out.message/print.message.transformer';
 
 @Injectable()
 export class MessageService {

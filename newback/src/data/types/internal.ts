@@ -55,4 +55,8 @@ export type PureModel<T> = {
   [P in keyof Omit<T, "isNewRecord" | "version"> as T[P] extends Date | number[] | boolean | number | string | undefined ? P : never]: T[P]
 };
 
+export type PickByType<T, Value> = {
+  [P in keyof T as T[P] extends Value | undefined ? P : never]: T[P]
+};
+
 export type CreateModel<T> = Omit<PureModel<T>, "createdAt" | "deletedAt" | "id" | "updatedAt">;

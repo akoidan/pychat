@@ -1,7 +1,7 @@
 import {UserModel} from '@/data/model/user.model';
 import {UserProfileDto} from '@/data/types/frontend';
 
-export function transformProfile(user: UserModel): UserProfileDto {
+export function transformProfileDto(user: UserModel): UserProfileDto {
   return {
     username: user.username,
     name: user.userProfile.name,

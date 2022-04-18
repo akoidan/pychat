@@ -12,9 +12,9 @@ import type {UserModel} from "@/data/model/user.model";
 import type {WebSocketContextData} from "@/data/types/internal";
 import {RedisService} from "@/modules/rest/redis/redis.service";
 import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
-import {transformSetWsId} from '@/modules/api/websocket/transformers/set.ws.id.transformer';
-import {transformAddUserOnline} from '@/modules/api/websocket/transformers/add.online.user.transformer';
-import {getLogoutMessage} from '@/modules/api/websocket/transformers/remove.online.user.transformer';
+import {transformSetWsId} from "@/modules/api/websocket/transformers/out.message/set.ws.id.transformer";
+import {transformAddUserOnline} from "@/modules/api/websocket/transformers/out.message/add.online.user.transformer";
+import {getLogoutMessage} from "@/modules/api/websocket/transformers/out.message/remove.online.user.transformer";
 
 
 @Injectable()

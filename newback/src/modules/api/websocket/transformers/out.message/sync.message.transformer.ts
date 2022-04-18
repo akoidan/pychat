@@ -2,7 +2,7 @@ import {MessageModel} from '@/data/model/message.model';
 import {MessageMentionModel} from '@/data/model/message.mention.model';
 import {ImageModel} from '@/data/model/image.model';
 import {SyncHistoryWsInMessage} from '@/data/types/frontend';
-import {getMessage} from '@/modules/api/websocket/transformers/message.transformer';
+import {transformMessageDto} from '@/modules/api/websocket/transformers/model/message.transformer';
 
 export function getSyncMessage(
   readMessageIds: number[],
@@ -14,6 +14,6 @@ export function getSyncMessage(
   return {
     readMessageIds,
     receivedMessageIds,
-    content: messages.map((m) => getMessage(m, mentions, images)),
+    content: messages.map((m) => transformMessageDto(m, mentions, images)),
   };
 }

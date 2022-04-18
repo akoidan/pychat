@@ -6,7 +6,7 @@ import type {
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {PrintMessageWsInMessage} from "@/data/types/frontend";
 import type {MessageModel} from "@/data/model/message.model";
-import {getMessage} from "@/modules/api/websocket/transformers/message.transformer";
+import {transformMessageDto} from '@/modules/api/websocket/transformers/model/message.transformer';
 
 export function transformPrintMessage(
   message: PureModel<MessageModel>,
@@ -16,6 +16,6 @@ export function transformPrintMessage(
   return {
     action: "printMessage",
     handler: "ws-message",
-    message: getMessage(message, mentions, images),
+    message: transformMessageDto(message, mentions, images),
   };
 }

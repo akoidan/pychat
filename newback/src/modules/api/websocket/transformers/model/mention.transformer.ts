@@ -5,14 +5,14 @@ import type {
   PureModel
 } from "@/data/types/internal";
 
-export function getTags(mentions: CreateModel<MessageMentionModel>[], m: PureModel<MessageModel>): Record<string, number> {
+export function transformMentionByPickingDto(mentions: CreateModel<MessageMentionModel>[], m: PureModel<MessageModel>): Record<string, number> {
   return mentions.filter((mention) => mention.messageId === m.id).reduce((mentions, mention) => {
     mentions[mention.symbol] = mention.userId;
     return mentions;
   }, {});
 }
 
-export function transformTags(mentions: CreateModel<MessageMentionModel>[]): Record<string, number> {
+export function transformMentionDto(mentions: CreateModel<MessageMentionModel>[]): Record<string, number> {
   return mentions.reduce<Record<string, number>>((previousValue, currentValue) => {
     previousValue[currentValue.symbol] = currentValue.userId;
     return previousValue;

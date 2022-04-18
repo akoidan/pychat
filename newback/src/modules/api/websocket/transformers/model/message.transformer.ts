@@ -2,18 +2,18 @@ import type {MessageModel} from "@/data/model/message.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
 import type {MessageModelDto} from "@/data/types/frontend";
-import {getTags} from "@/modules/api/websocket/transformers/mention.transformer";
-import {getFiles} from "@/modules/api/websocket/transformers/image.transformer";
 import type {
   CreateModel,
   PureModel,
 } from "@/data/types/internal";
+import {transformMentionByPickingDto} from '@/modules/api/websocket/transformers/model/mention.transformer';
+import {transformImageByPickingDto} from '@/modules/api/websocket/transformers/model/image.transformer';
 
-export function getMessage(message: PureModel<MessageModel>, mentions: CreateModel<MessageMentionModel>[], images: PureModel<ImageModel>[]): MessageModelDto {
+export function transformMessageDto(message: PureModel<MessageModel>, mentions: CreateModel<MessageMentionModel>[], images: PureModel<ImageModel>[]): MessageModelDto {
   return {
     id: message.id,
     content: message.content,
-    tags: getTags(mentions, message),
+    tags: transformMentionByPickingDto(mentions, message),
     roomId: message.roomId,
     userId: message.senderId,
     parentMessage: message.parentMessageId,
@@ -23,6 +23,6 @@ export function getMessage(message: PureModel<MessageModel>, mentions: CreateMod
     status: message.messageStatus,
     time: message.time,
     edited: message.updatedAt.getTime(),
-    files: getFiles(images, message),
+    files: transformImageByPickingDto(images, message),
   };
 }
