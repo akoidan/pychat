@@ -26,7 +26,6 @@ export default async(): Promise<Config.InitialOptions> => ({
   coveragePathIgnorePatterns: [
     "/node_modules/",
     "/coverage/",
-    "/ormconfig.ts",
     "/jest.config.ts",
     "/dist/",
     ".module.ts$",

@@ -30,21 +30,33 @@ describe("ImageService", () => {
   describe("getName", () => {
     it("remove old ext", async() => {
       passwordService.generateRandomString = jest.fn().mockResolvedValue("test");
-      await expect(imgService.getName("name.jpeg", "webp", "jpeg")).
+      await expect(imgService.getName("name.jpeg", "webp")).
         resolves.
         toEqual("test_name.webp");
     });
     it("keep origin extension", async() => {
       passwordService.generateRandomString = jest.fn().mockResolvedValue("test");
-      await expect(imgService.getName("name.jpeg", "", "")).
+      await expect(imgService.getName("name.jpeg", "")).
         resolves.
         toEqual("test_name.jpeg");
     });
     it("keep origin esxtension", async() => {
       passwordService.generateRandomString = jest.fn().mockResolvedValue("test");
-      await expect(imgService.getName("name.jpeg", "jpeg", "jpeg")).
+      await expect(imgService.getName("name.jpeg", "jpeg")).
         resolves.
         toEqual("test_name.jpeg");
+    });
+    it("works with undefined", async() => {
+      passwordService.generateRandomString = jest.fn().mockResolvedValue("test");
+      await expect(imgService.getName(undefined, "jpeg")).
+        resolves.
+        toEqual("test_.jpeg");
+    });
+    it("works with 2 undefined", async() => {
+      passwordService.generateRandomString = jest.fn().mockResolvedValue("test");
+      await expect(imgService.getName(undefined, undefined)).
+        resolves.
+        toEqual("test_");
     });
   });
 });
