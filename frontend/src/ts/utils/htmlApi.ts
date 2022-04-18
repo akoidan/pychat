@@ -238,7 +238,13 @@ function encodeFiles(html: string, files: Record<string, FileModel> | null) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];
       if (v) {
-        if (v.type === ImageType.IMAGE) {
+        if (v.type === ImageType.IMAGE && v.preview) {
+          return `<picture symbol='${s}' class='${PASTED_IMG_CLASS}' serverId="${v.serverId}">
+            <source srcset="${resolveMediaUrl(v.preview!)}" type="image/webp">
+            <source srcset="${resolveMediaUrl(v.url!)}"> 
+            <img src="${resolveMediaUrl(v.url!)}">
+          </picture>`;
+        } else if (v.type === ImageType.IMAGE) {
           return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}' serverId="${v.serverId}"/>`;
         } else if (v.type === ImageType.VIDEO || v.type === ImageType.MEDIA_RECORD) {
           const className = v.type === ImageType.VIDEO ? "video-player" : "video-player video-record";
@@ -501,10 +507,10 @@ export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
 
 export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType: string, errCb: Function) {
   const video = document.createElement("video");
-  video.style.opacity = '0';
-  video.style.width = '0';
-  video.style.height = '0';
-  video.style.position = 'absolute'
+  video.style.opacity = "0";
+  video.style.width = "0";
+  video.style.height = "0";
+  video.style.position = "absolute";
   document.body.appendChild(video);
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
@@ -528,7 +534,7 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
               if (file.name) {
                 blob.name = `${file.name}.jpg`;
               } else {
-                blob.name = '.jpg';
+                blob.name = ".jpg";
               }
 
               img.src = url;
@@ -545,7 +551,7 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
       }, 100); // https://stackoverflow.com/a/71900837/3872976
     }, false);
     video.src = src;
-    video.load()
+    video.load();
   } else {
     errCb(`Browser doesn't support playing ${file.type}`);
   }

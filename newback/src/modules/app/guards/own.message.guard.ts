@@ -11,7 +11,7 @@ import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
 import type {DefaultWsOutMessage} from "@/data/types/frontend";
 
 
-export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>) => number[]) => {
+export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>) => number[]): any => {
   @Injectable()
   class OwnMessageGuardMixin implements CanActivate {
     constructor(

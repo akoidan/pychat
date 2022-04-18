@@ -13,8 +13,8 @@ import {FileService} from "@/modules/api/file/file.service";
   imports: [
     DatabaseModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, "..", "..", "..", "photos"),
-      serveRoot: "photo",
+      rootPath: join(__dirname, "..", "..", "..", "..", "photos"),
+      serveRoot: "/photo",
     }),
   ],
   controllers: [FileController],

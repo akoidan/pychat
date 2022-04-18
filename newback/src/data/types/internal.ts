@@ -1,4 +1,7 @@
-import type {DefaultWsInMessage} from "@/data/types/frontend";
+import type {
+  DefaultWsInMessage,
+  HandlerName
+} from "@/data/types/frontend";
 import type {RoomModel} from "@/data/model/room.model";
 import type {RoomUsersModel} from "@/data/model/room.users.model";
 import type {ChannelModel} from "@/data/model/channel.model";
@@ -24,6 +27,21 @@ export interface FileSaveResponse {
   originFileName: string;
   previewFileName: string;
 }
+
+export interface OnWsClose {
+  closeConnection(context: WebSocketContextData);
+}
+
+export interface PubSubMessage<A extends string, H extends HandlerName> {
+  body: DefaultWsInMessage<A, H>;
+}
+
+/*
+ * Export interface SendToClientPubSubMessage<A extends string, H extends HandlerName> extends PubSubMessage<A, H>{
+ * }
+ */
+export type SendToClientPubSubMessage<DATA extends DefaultWsInMessage<A, H>, A extends string, H extends HandlerName> = PubSubMessage<A, H>;
+
 
 export interface TransformSetWsIdDataParams {
   myRooms: GetRoomsForUser[];

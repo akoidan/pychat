@@ -548,13 +548,21 @@ export default class ChatTextArea extends Vue {
   overflow-y: auto
   white-space: pre-wrap
 
-  :deep(.B4j2ContentEditableImg), :deep(.giphy-img)
+  :deep(img.B4j2ContentEditableImg), :deep(.giphy-img)
     max-height: 200px
     max-width: 400px
 
     &.failed
       min-width: 200px
       min-height: 100px
+
+  :deep(picture.B4j2ContentEditableImg)
+    img
+      max-height: 200px
+      max-width: 400px
+      &.failed
+        min-width: 200px
+        min-height: 100px
 
   :deep(.audio-record)
     height: 50px

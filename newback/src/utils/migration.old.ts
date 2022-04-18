@@ -21,25 +21,31 @@ import {SubscriptionModel} from "@/data/model/subscription.model";
 import {SubscriptionMessageModel} from "@/data/model/subscription.message.model";
 import {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import {VerificationModel} from "@/data/model/verification.model";
-import * as pychat_chat_channel from "@/fixtures/prod/pychat_chat_channel.json";
-import * as pychat_chat_image from "@/fixtures/prod/pychat_chat_image.json";
-import * as pychat_chat_ip_address from "@/fixtures/prod/pychat_chat_ip_address.json";
-import * as pychat_chat_message from "@/fixtures/prod/pychat_chat_message.json";
-import * as pychat_chat_messagehistory from "@/fixtures/prod/pychat_chat_messagehistory.json";
-import * as pychat_chat_messagemention from "@/fixtures/prod/pychat_chat_messagemention.json";
-import * as pychat_chat_room from "@/fixtures/prod/pychat_chat_room.json";
-import * as pychat_chat_room_users from "@/fixtures/prod/pychat_chat_room_users.json";
-import * as pychat_chat_subscription from "@/fixtures/prod/pychat_chat_subscription.json";
-import * as pychat_chat_subscription_message from "@/fixtures/prod/pychat_chat_subscription_message.json";
-import * as pychat_chat_uploadedfile from "@/fixtures/prod/pychat_chat_uploadedfile.json";
-import * as pychat_chat_user_joined_info from "@/fixtures/prod/pychat_chat_user_joined_info.json";
-import * as pychat_chat_user from "@/fixtures/prod/pychat_chat_user.json";
-import * as pychat_chat_userprofile from "@/fixtures/prod/pychat_chat_userprofile.json";
-import * as pychat_chat_verification from "@/fixtures/prod/pychat_chat_verification.json";
 import {IpAddressModel} from "@/data/model/ip.address.model";
 
 
 async function bootstrap() {
+
+  // we should use require, since these files are not commited in git,
+  // and thus compilation for this file will fail if these are absent
+  // which will fail the whole build. require doesn't check types during compile but import does
+  const pychat_chat_channel = require("@/fixtures/prod/pychat_chat_channel.json");
+  const pychat_chat_image = require("@/fixtures/prod/pychat_chat_image.json");
+  const pychat_chat_ip_address = require("@/fixtures/prod/pychat_chat_ip_address.json");
+  const pychat_chat_message = require("@/fixtures/prod/pychat_chat_message.json");
+  const pychat_chat_messagehistory = require("@/fixtures/prod/pychat_chat_messagehistory.json");
+  const pychat_chat_messagemention = require("@/fixtures/prod/pychat_chat_messagemention.json");
+  const pychat_chat_room = require("@/fixtures/prod/pychat_chat_room.json");
+  const pychat_chat_room_users = require("@/fixtures/prod/pychat_chat_room_users.json");
+  const pychat_chat_subscription = require("@/fixtures/prod/pychat_chat_subscription.json");
+  const pychat_chat_subscription_message = require("@/fixtures/prod/pychat_chat_subscription_message.json");
+  const pychat_chat_uploadedfile = require("@/fixtures/prod/pychat_chat_uploadedfile.json");
+  const pychat_chat_user_joined_info = require("@/fixtures/prod/pychat_chat_user_joined_info.json");
+  const pychat_chat_user = require("@/fixtures/prod/pychat_chat_user.json");
+  const pychat_chat_userprofile = require("@/fixtures/prod/pychat_chat_userprofile.json");
+  const pychat_chat_verification = require("@/fixtures/prod/pychat_chat_verification.json");
+
+
   const app = await Test.createTestingModule({
     imports: [
       {
@@ -162,7 +168,7 @@ async function bootstrap() {
     });
     await roomModel.bulkCreate(rooms, {transaction});
 
-    const messaggs = pychat_chat_message.map((key) => {
+    const messaggs = (pychat_chat_message as any[]).map((key) => {
       const result: MessageModel = {
         id: key.id,
         senderId: key.sender_id,

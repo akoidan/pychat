@@ -3,8 +3,10 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import type {WebSocketContextData} from "@/data/types/internal";
-import type {PubSubMessage} from "@/modules/api/websocket/interfaces/pubsub";
+import type {
+  PubSubMessage,
+  WebSocketContextData
+} from "@/data/types/internal";
 import type {HandlerName} from "@/data/types/frontend";
 
 

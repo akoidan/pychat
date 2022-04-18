@@ -10,7 +10,11 @@ import {
   Server,
   WebSocket,
 } from "ws";
-import {WebSocketContextData} from "@/data/types/internal";
+import {
+  OnWsClose,
+  SendToClientPubSubMessage,
+  WebSocketContextData
+} from "@/data/types/internal";
 import {
   Logger,
   UseFilters,
@@ -27,9 +31,7 @@ import {
   SyncHistoryWsOutMessage,
 } from "@/data/types/frontend";
 import {SubscribePuBSub} from "@/modules/rest/pubsub/pubsub.service";
-import {SendToClientPubSubMessage} from "@/modules/api/websocket/interfaces/pubsub";
 import {WebsocketService} from "@/modules/api/websocket/websocket.service";
-import type {OnWsClose} from "@/modules/api/websocket/interfaces/utils";
 import {WsDataService} from "@/modules/api/websocket/ws.data.service";
 import {WsExceptionFilter} from "@/modules/api/websocket/ws.exception.filter";
 import {MessageService} from "@/modules/api/websocket/message.service";
