@@ -23,7 +23,7 @@ import {
 })
 export class FileController {
   public constructor(
-    // private readonly fileService: FileService,
+    private readonly fileService: FileService,
   ) {
   }
 
@@ -35,8 +35,6 @@ export class FileController {
       @Body() body: SaveFileRequest,
       @UserId() userId: number,
   ): Promise<SaveFileResponse> {
-    console.log('asd');
-    return {} as any;
-    // return this.fileService.saveFile(userId, file, body.symbol, body.type, body.name);
+    return this.fileService.saveFile(userId, file, body.symbol, body.type, body.name);
   }
 }

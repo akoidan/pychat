@@ -75,6 +75,7 @@ export class VerifyService {
         email,
         userId,
         token,
+        verified: false,
         type: VerificationType.PASSWORD,
       }, t);
       const ipInfo = await this.ipCacheService.getIpString(ip);

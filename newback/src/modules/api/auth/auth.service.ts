@@ -164,6 +164,7 @@ export class AuthService {
           email,
           userId,
           token,
+          verified: false,
           type: VerificationType.REGISTER,
         }, t);
         const ipInfo = await this.ipCacheService.getIpString(ip);

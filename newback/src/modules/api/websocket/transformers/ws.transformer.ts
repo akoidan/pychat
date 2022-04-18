@@ -1,5 +1,4 @@
-import type {
-  AddOnlineUserMessage,
+import type {AddOnlineUserMessage,
   ChannelDto,
   FileModelDto,
   MessageModelDto,
@@ -13,32 +12,26 @@ import type {
 
   PrintMessageWsInMessage,
   PrintMessageWsOutMessage,
-} from "@/data/types/frontend";
+
+  GetCountryCodeWsInMessage,
+  LocationDto} from "@/data/types/frontend";
 import type {UserModel} from "@/data/model/user.model";
 import type {
+  CreateModel,
+  GetRoomsForUser,
+  TransformSetWsIdDataParams,
   UserOnlineData,
   WebSocketContextData,
 } from "@/data/types/internal";
 import type {ChannelModel} from "@/data/model/channel.model";
 import type {RoomUsersModel} from "@/data/model/room.users.model";
-import type {GetRoomsForUser} from "@/modules/rest/database/repository/room.repository";
 import type {MessageModel} from "@/data/model/message.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
 import {
   MessageStatus,
 } from "@/data/types/frontend";
-
-export interface TransformSetWsIdDataParams {
-  myRooms: GetRoomsForUser[];
-  allUsersInTheseRooms: Pick<RoomUsersModel, "roomId" | "userId">[];
-  channels: ChannelModel[];
-  users: UserModel[];
-  online: UserOnlineData;
-  id: string;
-  time: number;
-  user: UserModel;
-}
+import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 
 /*
  * Function transformUserSettings(db: UserSettingsModel): UserSettingsDto {
@@ -219,9 +212,9 @@ export function getSyncMessage(
   };
 }
 
-function transformGetImages(resImages: Record<string, Partial<ImageModel>>): Record<number, FileModelDto> {
-  return Object.fromEntries(Object.entries(resImages).map(([symbol, value]) => [
-    symbol, {
+function transformGetImages(resImages: ImageModel[]): Record<number, FileModelDto> {
+  return Object.fromEntries(resImages.map((value) => [
+    value.symbol, {
       id: value.id,
       type: value.type,
       url: value.img,
@@ -230,7 +223,7 @@ function transformGetImages(resImages: Record<string, Partial<ImageModel>>): Rec
   ]));
 }
 
-function transformTags(tagsData: Partial<MessageMentionModel>[]): Record<string, number> {
+function transformTags(tagsData: CreateModel<MessageMentionModel>[]): Record<string, number> {
   return tagsData.reduce<Record<string, number>>((previousValue, currentValue) => {
     previousValue[currentValue.symbol] = currentValue.userId;
     return previousValue;
@@ -238,17 +231,17 @@ function transformTags(tagsData: Partial<MessageMentionModel>[]): Record<string,
 }
 
 export function transformPrintMessage(
-  resImages: Record<string, Partial<ImageModel>>,
+  resImages: ImageModel[],
   data: {content: string; roomId: number; parentMessage: number | null},
   symbol: string,
   userId: number,
   time: number,
   messageId: number,
-  tagsData: Partial<MessageMentionModel>[]
-) {
+  tagsData: CreateModel<MessageMentionModel>[]
+): PrintMessageWsInMessage {
   const files = transformGetImages(resImages);
   const tags: Record<string, number> = transformTags(tagsData);
-  const response: PrintMessageWsInMessage = {
+  return {
     content: data.content,
     tags,
     files,
@@ -265,5 +258,20 @@ export function transformPrintMessage(
     edited: 0,
     deleted: false,
   };
-  return response;
+}
+
+export function transformUserCountries(userInfo: UserJoinedInfoModel[]): Omit<GetCountryCodeWsInMessage, "action" | "handler"> {
+  const content: GetCountryCodeWsInMessage["content"] = userInfo.reduce((previousValue, currentValue) => {
+    if (currentValue.ip) {
+      const value: LocationDto = {
+        country: currentValue.ip.country,
+        region: currentValue.ip.region,
+        city: currentValue.ip.city,
+        countryCode: currentValue.ip.countryCode,
+      };
+      previousValue[currentValue.userId] = value;
+    }
+    return previousValue;
+  }, {});
+  return {content};
 }

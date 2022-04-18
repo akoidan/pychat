@@ -2,14 +2,13 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import {
-  REDIS_KEYS,
-} from "@/utils/consts";
+import {REDIS_KEYS} from "@/utils/consts";
 import {
   InjectRedis,
   Redis,
 } from "@nestjs-modules/ioredis";
 import type {UserOnlineData} from "@/data/types/internal";
+import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 
 @Injectable()
 export class RedisService {
@@ -23,6 +22,21 @@ export class RedisService {
   public async saveSession(session: string, userId: number): Promise<void> {
     this.logger.debug(`hset ${REDIS_KEYS.REDIS_SESSIONS_KEY}[${session}]=${userId}`, "redis");
     await this.redis.hset(REDIS_KEYS.REDIS_SESSIONS_KEY, session, userId);
+  }
+
+  public async getIps(): Promise<UserJoinedInfoModel[]> {
+    const newNow = await this.redis.get(REDIS_KEYS.REDIS_IPS_KEY);
+    if (newNow) {
+      try {
+        return JSON.parse(newNow);
+      } catch (e) {
+      }
+    }
+    return null;
+  }
+
+  public async setIps(value: UserJoinedInfoModel[]): Promise<void> {
+    await this.redis.set(REDIS_KEYS.REDIS_IPS_KEY, JSON.stringify(value));
   }
 
   public async removeSession(session: string) {

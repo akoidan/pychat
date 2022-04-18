@@ -2,10 +2,8 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import type {
-  SaveFileResponse,
-  ImageType,
-} from "@/data/types/frontend";
+import type {SaveFileResponse} from "@/data/types/frontend";
+import {ImageType} from "@/data/types/frontend";
 import {join} from "path";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
 import type {FileSaveResponse} from "@/data/types/internal";
@@ -46,7 +44,7 @@ export class FileService {
       };
       if (fileSaveResponse.previewFileName) {
         response.previewId = await this.messageRepository.saveUploadFile({
-          type,
+          type: ImageType.PREVIEW,
           file: fileSaveResponse.originFileName,
           symbol,
           userId,

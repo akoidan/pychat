@@ -4,7 +4,10 @@ import {UserAuthModel} from "@/data/model/user.auth.model";
 import type {VerificationType} from "@/data/types/frontend";
 import {VerificationModel} from "@/data/model/verification.model";
 import type {Transaction} from "sequelize";
-import {RequireAtLeastOne} from '@/data/types/internal';
+import {
+  CreateModel,
+  RequireAtLeastOne
+} from '@/data/types/internal';
 
 
 @Injectable()
@@ -39,7 +42,7 @@ export class VerificationRepository {
     });
   }
 
-  public async createVerification(data: RequireAtLeastOne<Partial<VerificationModel>, 'userId'>, transaction: Transaction): Promise<void> {
+  public async createVerification(data: RequireAtLeastOne<CreateModel<VerificationModel>, 'userId'>, transaction: Transaction): Promise<void> {
     const verification = await this.verificationModel.create(data, {
       raw: true,
       transaction,

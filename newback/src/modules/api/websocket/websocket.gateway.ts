@@ -105,14 +105,6 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
     await this.messageService.printMessage(data, context);
   }
 
-  @SubscribePuBSub("printPubSubMessage")
-  public printPubSubMessage(
-    ctx: WebSocketContextData,
-    data: SendToClientPubSubMessage<PrintMessageWsInMessage, "printMessage", "ws-message">
-  ): void {
-    ctx.sendToClient(data.body);
-  }
-
   @SubscribeMessage("showIType")
   @UseGuards(
     OwnRoomGuard((data: ShowITypeWsOutMessage) => [data.roomId])

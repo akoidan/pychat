@@ -1,5 +1,3 @@
-#!/usr/bin/yarn ts-node --compiler ttypescript ./src/utils/migration.old.ts
-
 import {DatabaseModule} from "@/modules/rest/database/database.module";
 import {ConsoleLogger} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
@@ -54,7 +52,8 @@ async function bootstrap() {
       },
 
     ],
-  }).setLogger(new ConsoleLogger()).compile();
+  }).setLogger(new ConsoleLogger()).
+    compile();
 
   const userModel: typeof UserModel = app.get(getModelToken(UserModel));
   const userJoinedInfoModel: typeof UserJoinedInfoModel = app.get(getModelToken(UserJoinedInfoModel));
@@ -74,6 +73,22 @@ async function bootstrap() {
   const ipAddressModel: typeof IpAddressModel = app.get(getModelToken(IpAddressModel));
   const sequelize = app.get(Sequelize);
   await sequelize.transaction(async(transaction) => {
+    await messageHistoryModel.destroy({where: {}, truncate: true,});
+    await imageModel.destroy({where: {}, truncate: true,});
+    await subscriptionMessageModel.destroy({where: {}, truncate: true,});
+    await messageMentionModel.destroy({where: {}, truncate: true,});
+    await userProfileModel.destroy({where: {}, truncate: true,});
+    await userAuthModel.destroy({where: {}, truncate: true,});
+    await verificationModel.destroy({where: {}, truncate: true,});
+    await userJoinedInfoModel.destroy({where: {}, truncate: true,});
+    await uploadedFileModel.destroy({where: {}, truncate: true,});
+    await subscriptionModel.destroy({where: {}, truncate: true,});
+    await roomUsersModel.destroy({where: {}, truncate: true,});
+    await messageModel.destroy({where: {}, truncate: true,});
+    await roomModel.destroy({where: {}, truncate: true,});
+    await ipAddressModel.destroy({where: {}, truncate: true,});
+    await channelModel.destroy({where: {}, truncate: true,});
+    await userModel.destroy({where: {}, truncate: true,});
     const users: UserModel[] = pychat_chat_user.map((a) => {
       const b: UserModel = {
         lastTimeOnline: a.last_time_online,
@@ -142,7 +157,7 @@ async function bootstrap() {
         messageStatus: {
           u: "ON_SERVER",
           r: "READ",
-          s: "RECEIVED"
+          s: "RECEIVED",
         }[key.message_status],
         threadMessageCount: key.thread_messages_count,
         parentMessageId: key.parent_message_id,
@@ -187,7 +202,7 @@ async function bootstrap() {
         type: {
           v: "VIDEO",
           i: "IMAGE",
-          f: "FILE"
+          f: "FILE",
         }[key.type],
         symbol: key.symbol,
         userId: key.user_id,
@@ -229,7 +244,7 @@ async function bootstrap() {
 
     const auth = pychat_chat_userprofile.map((u) => ({
       ...u,
-      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id)
+      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id),
     })).map((key) => {
       const result: UserAuthModel = {
         id: key.id,
@@ -246,7 +261,7 @@ async function bootstrap() {
 
     const userProf = pychat_chat_userprofile.map((u) => ({
       ...u,
-      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id)
+      ...pychat_chat_user.find((us) => us.id == u.user_ptr_id),
     })).map((key) => {
       const result: UserProfileModel = {
         id: key.id,
@@ -296,8 +311,8 @@ async function bootstrap() {
         }[key.type],
         symbol: key.symbol,
         messageId: key.message_id,
-        img: key.type === 'g' ? key.absolute_url : key.img,
-        preview: key.type === 'g' ? key.webp_absolute_url : key.preview,
+        img: key.type === "g" ? key.absolute_url : key.img,
+        preview: key.type === "g" ? key.webp_absolute_url : key.preview,
       } as any;
       return result;
     });

@@ -94,14 +94,14 @@ export class UserRepository {
       where: {username},
       raw: true,
       transaction,
-    }) != null;
+    }) !== null;
   }
 
   public async checkUserExistByEmail(email: string): Promise<boolean> {
     return await this.userAuthModel.findOne({
       where: {email},
       raw: true,
-    }) != null;
+    }) !== null;
   }
 
   public async getUserByEmail(email: string, transaction?: Transaction): Promise<UserAuthModel | null> {
@@ -109,12 +109,15 @@ export class UserRepository {
       where: {email},
       raw: true,
       transaction,
-      include: ["user", // LEFT OUTER JOIN "id" = "user"."id"
-      ],
+      // LEFT OUTER JOIN "id" = "user"."id"
+      include: ["user"],
     });
   }
 
-  public async getUserByUserName(username: string, includeFields: ("userAuth" | "userProfile")[] = [], transaction?: Transaction): Promise<UserModel | null> {
+  public async getUserByUserName(
+    username: string,
+    includeFields: ("userAuth" | "userProfile")[] = [], transaction?: Transaction
+  ): Promise<UserModel | null> {
     return this.userModel.findOne({
       where: {username},
       transaction,
@@ -123,7 +126,11 @@ export class UserRepository {
     });
   }
 
-  public async getById(id: number, includeFields: ("userAuth" | "userProfile" | "userSettings")[] = [], transaction?: Transaction): Promise<UserModel | null> {
+  public async getById(
+    id: number,
+    includeFields: ("userAuth" | "userProfile" | "userSettings")[] = [],
+    transaction?: Transaction
+  ): Promise<UserModel | null> {
     return this.userModel.findOne({
       where: {id},
       transaction,

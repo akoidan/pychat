@@ -13,7 +13,10 @@
     "test": "jest --config ./src/jest.config.ts --runInBand --coverage --coverageReporters text",
     "lint": "eslint --ext .ts --max-warnings=0 src",
     "lint:new": "eslint-find-rules -u ./.eslintrc.json",
-    "lint:fix": "eslint --fix --ext .ts src"
+    "lint:fix": "eslint --fix --ext .ts src",
+    "create:database": "echo \"drop database pychat2; create database pychat2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; GRANT ALL ON pychat2.* TO 'pychat'@'localhost';\" |sudo mysql -u root\n",
+    "create:migrate:prod": "ts-node --compiler ttypescript ./src/utils/migration.old.ts",
+    "db:flush:all": "yarn create:database && yarn migrate && yarn create:migrate:prod"
   },
   "engines": {
     "node": ">=16.0.0"

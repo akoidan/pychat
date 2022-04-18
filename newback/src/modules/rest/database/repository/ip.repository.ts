@@ -3,6 +3,7 @@ import {InjectModel} from "@nestjs/sequelize";
 import {IpAddressModel} from "@/data/model/ip.address.model";
 import {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 import {Op} from "sequelize";
+import {CreateModel} from '@/data/types/internal';
 
 
 @Injectable()
@@ -14,12 +15,23 @@ export class IpRepository {
   }
 
   public async saveIpToUser(userId: number, ipId: number) {
-    await this.userJoinedInfoModel.upsert({userId,
-      ipId},);
+    await this.userJoinedInfoModel.upsert({
+      userId,
+      ipId,
+    });
   }
 
-  public async saveIP(model: Partial<IpAddressModel>) {
-    return this.ipAddressModel.upsert(model);
+  public connectCreateHook(cb: () => Promise<void>) {
+    this.ipAddressModel.afterBulkCreate(cb);
+    this.ipAddressModel.afterCreate(cb);
+    this.userJoinedInfoModel.afterBulkCreate(cb);
+    this.userJoinedInfoModel.afterBulkCreate(cb);
+    this.userJoinedInfoModel.afterUpdate(cb);
+    this.userJoinedInfoModel.afterBulkUpdate(cb);
+  }
+
+  public saveIP(model: CreateModel<IpAddressModel>): Promise<IpAddressModel> {
+    return this.ipAddressModel.upsert(model)[0];
   }
 
   public async getIp(ip: string): Promise<IpAddressModel> {
@@ -28,6 +40,13 @@ export class IpRepository {
         ip,
       },
       raw: true,
+    });
+  }
+
+  public async getAllIps(): Promise<UserJoinedInfoModel[]> {
+    return this.userJoinedInfoModel.findAll({
+      raw: true,
+      include: ["ip"],
     });
   }
 

@@ -9,12 +9,7 @@ import {
   Op,
 } from "sequelize";
 import {ChannelModel} from "@/data/model/channel.model";
-
-type RoomSingleRoomUser = Omit<RoomModel, "roomUsers">;
-
-export interface GetRoomsForUser extends RoomSingleRoomUser {
-  roomUsers: RoomUsersModel;
-}
+import {GetRoomsForUser} from '@/data/types/internal';
 
 @Injectable()
 export class RoomRepository {

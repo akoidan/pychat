@@ -35,53 +35,53 @@ export class IpAddressModel extends Model<IpAddressModel> {
     type: DataType.STRING,
     allowNull: true,
   })
-  public isp: string;
+  public isp: string | null;
 
   @Column({
     type: DataType.STRING(16),
     allowNull: true,
   })
-  public countryCode: string;
+  public countryCode: string | null;
 
   @Column({
     type: DataType.STRING(64),
     allowNull: true,
   })
-  public country: string;
+  public country: string | null;
 
   @Column({
     type: DataType.STRING(64),
     allowNull: true,
   })
-  public region: string;
+  public region: string | null;
 
   @Column({
     type: DataType.STRING(64),
     allowNull: true,
   })
-  public city: string;
+  public city: string | null;
 
   @Column({
     type: DataType.DOUBLE,
     allowNull: true,
   })
-  public lat: number;
+  public lat: number | null;
 
   @Column({
     type: DataType.DOUBLE,
     allowNull: true,
   })
-  public lon: number;
+  public lon: number | null;
 
   @Column({
     type: DataType.STRING(32),
     allowNull: true,
   })
-  public zip: string;
+  public zip: string | null;
 
   @Column({
     type: DataType.STRING(32),
     allowNull: true,
   })
-  public timezone: string;
+  public timezone: string | null;
 }

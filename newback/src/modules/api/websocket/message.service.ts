@@ -5,34 +5,39 @@ import {
 import {UserRepository} from "@/modules/rest/database/repository/user.repository";
 import {PasswordService} from "@/modules/rest/password/password.service";
 import type {
-  GiphyDto,
-  PrintMessageWsInMessage,
   PrintMessageWsOutMessage,
   ShowITypeWsInMessage,
   ShowITypeWsOutMessage,
   SyncHistoryWsOutMessage,
 } from "@/data/types/frontend";
-import {MessageStatus} from "@/data/types/frontend";
+import {
+  ImageType,
+  MessageStatus,
+} from "@/data/types/frontend";
 import {RoomRepository} from "@/modules/rest/database/repository/room.repository";
 import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
 import {SessionService} from "@/modules/rest/session/session.service";
 import {RedisService} from "@/modules/rest/redis/redis.service";
 import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
-import type {WebSocketContextData} from "@/data/types/internal";
+import type {
+  CreateModel,
+  WebSocketContextData
+} from "@/data/types/internal";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
 import {
   getSyncMessage,
-  transformPrintMessage
+  transformPrintMessage,
 } from "@/modules/api/websocket/transformers/ws.transformer";
 import {Sequelize} from "sequelize-typescript";
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
-import {groupUploadedFileToImages} from "@/modules/api/websocket/transformers/inner.transformer";
-import {getMaxSymbol} from '@/utils/helpers';
-
-
-
+import {
+  getMentionsFromTags,
+  getUploadedGiphies,
+  groupUploadedFileToImages,
+} from "@/modules/api/websocket/transformers/inner.transformer";
+import {getMaxSymbol} from "@/utils/helpers";
 
 @Injectable()
 export class MessageService {
@@ -48,6 +53,7 @@ export class MessageService {
     private readonly messageRepository: MessageRepository,
     private readonly sequelize: Sequelize,
   ) {
+    this.messageRepository.attachHooks();
   }
 
   public showIType(data: ShowITypeWsOutMessage, context: WebSocketContextData): void {
@@ -118,24 +124,24 @@ export class MessageService {
         symbol,
         parentMessageId: data.parentMessage,
         content: data.content,
+        threadMessageCount: 0,
       }, transaction);
-      let tagsData: Partial<MessageMentionModel>[] = [];
-      if (data.tags && Object.keys(data.tags).length) {
-        tagsData = Object.entries(data.tags).map(([symbol, userId]) => ({
-          messageId,
-          userId,
-          symbol,
-        }));
-        await this.messageRepository.createMessageMentions(tagsData, transaction);
+      const tagsData: CreateModel<MessageMentionModel>[] = getMentionsFromTags(data, messageId);
+      await this.messageRepository.createMessageMentions(tagsData, transaction);
+      const images: CreateModel<ImageModel>[] = groupUploadedFileToImages(files, messageId);
+      const giphies: CreateModel<ImageModel>[] = getUploadedGiphies(data.giphies, messageId);
+      const totalMedia = [...images, ...giphies];
+      let media: ImageModel[] = [];
+      if (totalMedia.length) {
+        await this.messageRepository.createImages(totalMedia, transaction);
+        // We need to fetch images again, since on bulkCreate mysql doesnt return ids
+        media = await this.messageRepository.getImagesByMessagesId([messageId], transaction);
       }
-      let resImages: Record<string, Partial<ImageModel>> = {};
       if (files.length) {
-        const images: Partial<ImageModel>[] = groupUploadedFileToImages(files, messageId);
-        await this.messageRepository.createImages(images, transaction);
-        resImages = Object.fromEntries(images.map((i) => [i.symbol, i]));
+        await this.messageRepository.deleteUploadedFiles(files.map((f) => f.id), transaction);
       }
-      const response = transformPrintMessage(resImages, data, symbol, context.userId, time, messageId, tagsData);
-      this.pubsubService.emit("printPubSubMessage", {
+      const response = transformPrintMessage(media, data, symbol, context.userId, time, messageId, tagsData);
+      this.pubsubService.emit("sendToClient", {
         body: response,
       }, data.roomId);
     });
