@@ -42,6 +42,7 @@ describe("AuthModule", () => {
   const userRepository: UserRepository = {} as UserRepository;
   const verificationRepository: VerificationRepository = {} as VerificationRepository;
   const ipRepository: IpRepository = {} as IpRepository;
+  ipRepository.connectCreateHook = jest.fn().mockReturnValue(undefined);
   const roomRepository: RoomRepository = {} as RoomRepository;
   const redisService: RedisService = {} as RedisService;
   const sequelize: Sequelize = {} as Sequelize;
@@ -140,6 +141,7 @@ describe("AuthModule", () => {
     Object.keys(ipRepository).forEach((key) => delete ipRepository[key]);
     nodeApply = () => {
     };
+    ipRepository.connectCreateHook = jest.fn().mockReturnValue(undefined);
     Object.keys(configService).forEach((key) => delete configService[key]);
     Object.keys(verificationRepository).forEach((key) => delete configService[key]);
   });
