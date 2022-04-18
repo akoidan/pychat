@@ -1,12 +1,12 @@
 import {Module} from "@nestjs/common";
-import {DatabaseModule} from "@/modules/rest/database/database.module";
-import {RedisService} from "@/modules/rest/redis/redis.service";
-import {EmailModule} from "@/modules/rest/email/email.module";
-import {PasswordService} from "@/modules/rest/password/password.service";
-import {HttpModule} from "@/modules/rest/http/http.module";
-import {IpModule} from "@/modules/rest/ip/ip.module";
+import {DatabaseModule} from "@/modules/shared/database/database.module";
+import {RedisService} from "@/modules/shared/redis/redis.service";
+import {EmailModule} from "@/modules/shared/email/email.module";
+import {PasswordService} from "@/modules/shared/password/password.service";
+import {HttpModule} from "@/modules/shared/http/http.module";
+import {IpModule} from "@/modules/shared/ip/ip.module";
 import {VerifyController} from "@/modules/api/verify/verify.controller";
-import {SessionService} from "@/modules/rest/session/session.service";
+import {SessionService} from "@/modules/shared/session/session.service";
 import {VerifyService} from "@/modules/api/verify/verify.service";
 
 @Module({

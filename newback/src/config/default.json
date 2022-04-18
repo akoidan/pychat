@@ -2,8 +2,10 @@
   "name": "pychat",
   "application": {
     "port": 8888,
-    "crtPath": "../frontend/build/certs/server.crt.pem",
-    "keyPath": "../frontend/build/certs/private.key.pem"
+    "ssl" : {
+      "crtPath": "../frontend/build/certs/server.crt.pem",
+      "keyPath": "../frontend/build/certs/private.key.pem"
+    }
   },
   "settings": {
     "flags": true

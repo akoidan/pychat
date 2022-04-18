@@ -3,8 +3,8 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import {UserRepository} from "@/modules/rest/database/repository/user.repository";
-import {PasswordService} from "@/modules/rest/password/password.service";
+import {UserRepository} from "@/modules/shared/database/repository/user.repository";
+import {PasswordService} from "@/modules/shared/password/password.service";
 import type {
   AcceptTokenRequest,
   AcceptTokenResponse,
@@ -13,12 +13,12 @@ import type {
   VerifyTokenResponse,
 } from "@/data/types/frontend";
 import {VerificationType} from "@/data/types/frontend";
-import {EmailService} from "@/modules/rest/email/email.service";
+import {EmailService} from "@/modules/shared/email/email.service";
 import {Sequelize} from "sequelize-typescript";
 import type {VerificationModel} from "@/data/model/verification.model";
-import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
-import {VerificationRepository} from "@/modules/rest/database/repository/verification.repository";
-import {SessionService} from "@/modules/rest/session/session.service";
+import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
+import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
+import {SessionService} from "@/modules/shared/session/session.service";
 
 @Injectable()
 export class VerifyService {

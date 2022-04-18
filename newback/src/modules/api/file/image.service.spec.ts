@@ -1,8 +1,8 @@
 import {Test} from "@nestjs/testing";
-import {LoggerModule} from "@/modules/rest/logger/logger.module";
+import {LoggerModule} from "@/modules/shared/logger/logger.module";
 import {ConsoleLogger} from "@nestjs/common";
 import {ImageService} from "@/modules/api/file/image.service";
-import {PasswordService} from "@/modules/rest/password/password.service";
+import {PasswordService} from "@/modules/shared/password/password.service";
 
 describe("ImageService", () => {
   let imgService: ImageService;

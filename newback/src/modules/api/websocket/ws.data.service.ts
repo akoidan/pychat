@@ -3,13 +3,13 @@ import {
   Logger,
 } from "@nestjs/common";
 import type {GetCountryCodeWsInMessage} from "@/data/types/frontend";
-import {RoomRepository} from "@/modules/rest/database/repository/room.repository";
-import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
+import {RoomRepository} from "@/modules/shared/database/repository/room.repository";
+import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import type {WebSocketContextData} from "@/data/types/internal";
-import {ConfigService} from "@/modules/rest/config/config.service";
+import {ConfigService} from "@/modules/shared/config/config.service";
 import {ValidationException} from "@/data/exceptions/validation.exception";
 import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
-import {transformUserCountries} from '@/modules/api/websocket/transformers/out.message/get.user.contries.transformer';
+import {transformUserCountries} from '@/data/transformers/out.message/get.user.contries.transformer';
 
 
 @Injectable()

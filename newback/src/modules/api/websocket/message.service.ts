@@ -9,24 +9,24 @@ import type {
   SyncHistoryWsOutMessage,
 } from "@/data/types/frontend";
 import {MessageStatus} from "@/data/types/frontend";
-import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
+import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import type {
   CreateModel,
   WebSocketContextData,
 } from "@/data/types/internal";
-import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
+import {MessageRepository} from "@/modules/shared/database/repository/messages.repository";
 import {Sequelize} from "sequelize-typescript";
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
-import {getMaxSymbol} from "@/utils/helpers";
-import {getSyncMessage} from '@/modules/api/websocket/transformers/out.message/sync.message.transformer';
+import {getSyncMessage} from '@/data/transformers/out.message/sync.message.transformer';
 import {
   getMentionsFromTags,
   getUploadedGiphies,
   groupUploadedFileToImages
-} from '@/modules/api/websocket/transformers/out.message/inner.transformer';
-import {transformPrintMessage} from '@/modules/api/websocket/transformers/out.message/print.message.transformer';
+} from '@/data/transformers/out.message/inner.transformer';
+import {transformPrintMessage} from '@/data/transformers/out.message/print.message.transformer';
+import {getMaxSymbol} from '@/data/transformers/helper/get.max.symbol';
 
 @Injectable()
 export class MessageService {

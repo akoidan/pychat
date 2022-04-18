@@ -6,8 +6,8 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import {HttpService} from "@/modules/rest/http/http.service";
-import {SessionService} from "@/modules/rest/session/session.service";
+import {HttpService} from "@/modules/shared/http/http.service";
+import {SessionService} from "@/modules/shared/session/session.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

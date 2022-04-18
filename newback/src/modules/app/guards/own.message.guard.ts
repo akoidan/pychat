@@ -6,8 +6,8 @@ import {
   Injectable,
   mixin,
 } from "@nestjs/common";
-import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
-import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
+import {MessageRepository} from "@/modules/shared/database/repository/messages.repository";
+import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import type {DefaultWsOutMessage} from "@/data/types/frontend";
 
 

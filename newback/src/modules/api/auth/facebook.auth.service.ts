@@ -5,8 +5,8 @@ import {
   Logger,
   ServiceUnavailableException,
 } from "@nestjs/common";
-import {HttpService} from "@/modules/rest/http/http.service";
-import {ConfigService} from "@/modules/rest/config/config.service";
+import {HttpService} from "@/modules/shared/http/http.service";
+import {ConfigService} from "@/modules/shared/config/config.service";
 import type {FacebookGetUserResponse} from "@/data/types/api";
 
 @Injectable()

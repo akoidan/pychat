@@ -5,7 +5,7 @@ import {
 import {ImageType} from "@/data/types/frontend";
 import type {Metadata} from "sharp";
 import * as sharp from "sharp";
-import {PasswordService} from "@/modules/rest/password/password.service";
+import {PasswordService} from "@/modules/shared/password/password.service";
 import {join} from "path";
 import {
   stat,

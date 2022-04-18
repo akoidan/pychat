@@ -2,12 +2,12 @@ import {Module} from "@nestjs/common";
 import {AuthModule} from "@/modules/api/auth/auth.module";
 import {LoggingInterceptor} from "@/modules/app/interceptors/logging.interceptor";
 import {APP_INTERCEPTOR} from "@nestjs/core";
-import {LoggerModule} from "@/modules/rest/logger/logger.module";
+import {LoggerModule} from "@/modules/shared/logger/logger.module";
 import {RedisModule} from "@nestjs-modules/ioredis";
 import {config} from "node-ts-config";
-import {ConfigModule} from "@/modules/rest/config/config.module";
+import {ConfigModule} from "@/modules/shared/config/config.module";
 import {VerifyModule} from "@/modules/api/verify/verify.module";
-import {DatabaseModule} from "@/modules/rest/database/database.module";
+import {DatabaseModule} from "@/modules/shared/database/database.module";
 import {WebsocketModule} from "@/modules/api/websocket/websocket.module";
 import {FileModule} from "@/modules/api/file/file.module";
 

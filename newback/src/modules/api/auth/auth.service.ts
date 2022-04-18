@@ -4,8 +4,8 @@ import {
   Logger,
   UnauthorizedException,
 } from "@nestjs/common";
-import {UserRepository} from "@/modules/rest/database/repository/user.repository";
-import {PasswordService} from "@/modules/rest/password/password.service";
+import {UserRepository} from "@/modules/shared/database/repository/user.repository";
+import {PasswordService} from "@/modules/shared/password/password.service";
 import type {
   FaceBookAuthRequest,
   FacebookSignInResponse,
@@ -20,22 +20,22 @@ import {
   Gender,
   VerificationType,
 } from "@/data/types/frontend";
-import {RoomRepository} from "@/modules/rest/database/repository/room.repository";
-import {
-  ALL_ROOM_ID,
-  MAX_USERNAME_LENGTH,
-} from "@/utils/consts";
-import {EmailService} from "@/modules/rest/email/email.service";
+import {RoomRepository} from "@/modules/shared/database/repository/room.repository";
+import {EmailService} from "@/modules/shared/email/email.service";
 import type {Transaction} from "sequelize";
 import {Sequelize} from "sequelize-typescript";
 import {GoogleAuthService} from "@/modules/api/auth/google.auth.service";
 import type {TokenPayload} from "google-auth-library";
-import {generateUserName} from "@/utils/helpers";
 import {FacebookAuthService} from "@/modules/api/auth/facebook.auth.service";
 import type {FacebookGetUserResponse} from "@/data/types/api";
-import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
-import {VerificationRepository} from "@/modules/rest/database/repository/verification.repository";
-import {SessionService} from "@/modules/rest/session/session.service";
+import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
+import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
+import {SessionService} from "@/modules/shared/session/session.service";
+import {generateUserName} from '@/data/transformers/helper/generate.user.name';
+import {
+  ALL_ROOM_ID,
+  MAX_USERNAME_LENGTH
+} from '@/data/consts';
 
 @Injectable()
 export class AuthService {

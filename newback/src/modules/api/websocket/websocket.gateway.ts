@@ -30,7 +30,7 @@ import {
   ShowITypeWsOutMessage,
   SyncHistoryWsOutMessage,
 } from "@/data/types/frontend";
-import {SubscribePuBSub} from "@/modules/rest/pubsub/pubsub.service";
+import {SubscribePuBSub} from "@/modules/shared/pubsub/pubsub.service";
 import {WebsocketService} from "@/modules/api/websocket/websocket.service";
 import {WsDataService} from "@/modules/api/websocket/ws.data.service";
 import {WsExceptionFilter} from "@/modules/api/websocket/ws.exception.filter";

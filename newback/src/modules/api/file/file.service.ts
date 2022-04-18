@@ -5,7 +5,7 @@ import {
 import type {SaveFileResponse} from "@/data/types/frontend";
 import {ImageType} from "@/data/types/frontend";
 import {join} from "path";
-import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
+import {MessageRepository} from "@/modules/shared/database/repository/messages.repository";
 import type {FileSaveResponse} from "@/data/types/internal";
 import {Sequelize} from "sequelize-typescript";
 import {ImageService} from "@/modules/api/file/image.service";

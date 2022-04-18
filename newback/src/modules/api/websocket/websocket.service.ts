@@ -2,19 +2,20 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import {UserRepository} from "@/modules/rest/database/repository/user.repository";
-import {PasswordService} from "@/modules/rest/password/password.service";
+import {UserRepository} from "@/modules/shared/database/repository/user.repository";
+import {PasswordService} from "@/modules/shared/password/password.service";
 import type {AddOnlineUserMessage} from "@/data/types/frontend";
-import {RoomRepository} from "@/modules/rest/database/repository/room.repository";
-import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
-import {SessionService} from "@/modules/rest/session/session.service";
+import {RoomRepository} from "@/modules/shared/database/repository/room.repository";
+import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
+import {SessionService} from "@/modules/shared/session/session.service";
 import type {UserModel} from "@/data/model/user.model";
 import type {WebSocketContextData} from "@/data/types/internal";
-import {RedisService} from "@/modules/rest/redis/redis.service";
-import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
-import {transformSetWsId} from "@/modules/api/websocket/transformers/out.message/set.ws.id.transformer";
-import {transformAddUserOnline} from "@/modules/api/websocket/transformers/out.message/add.online.user.transformer";
-import {getLogoutMessage} from "@/modules/api/websocket/transformers/out.message/remove.online.user.transformer";
+import {RedisService} from "@/modules/shared/redis/redis.service";
+import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
+import {transformSetWsId} from "@/data/transformers/out.message/set.ws.id.transformer";
+import {transformAddUserOnline} from '@/data/transformers/out.message/add.online.user.transformer';
+import {getLogoutMessage} from '@/data/transformers/out.message/remove.online.user.transformer';
+
 
 
 @Injectable()

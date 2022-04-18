@@ -1,9 +1,9 @@
-import {DatabaseModule} from "@/modules/rest/database/database.module";
+import {DatabaseModule} from "@/modules/shared/database/database.module";
 import {ConsoleLogger} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
 import {Test} from "@nestjs/testing";
-import {LoggerModule} from "@/modules/rest/logger/logger.module";
-import {ConfigModule} from "@/modules/rest/config/config.module";
+import {LoggerModule} from "@/modules/shared/logger/logger.module";
+import {ConfigModule} from "@/modules/shared/config/config.module";
 import {getModelToken} from "@nestjs/sequelize";
 import {Sequelize} from "sequelize-typescript";
 import {Gender} from "@/data/types/frontend";
@@ -26,9 +26,11 @@ import {IpAddressModel} from "@/data/model/ip.address.model";
 
 async function bootstrap() {
 
-  // we should use require, since these files are not commited in git,
-  // and thus compilation for this file will fail if these are absent
-  // which will fail the whole build. require doesn't check types during compile but import does
+  /*
+   * We should use require, since these files are not commited in git,
+   * and thus compilation for this file will fail if these are absent
+   * which will fail the whole build. require doesn't check types during compile but import does
+   */
   const pychat_chat_channel = require("@/fixtures/prod/pychat_chat_channel.json");
   const pychat_chat_image = require("@/fixtures/prod/pychat_chat_image.json");
   const pychat_chat_ip_address = require("@/fixtures/prod/pychat_chat_ip_address.json");

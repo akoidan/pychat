@@ -6,23 +6,25 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import {readFile} from "fs/promises";
-import {WsAdapter} from "@/modules/rest/ws.adapter/ws.adapter";
+import {WsAdapter} from "@/modules/shared/ws.adapter/ws.adapter";
+import type {HttpsOptions} from "@nestjs/common/interfaces/external/https-options.interface";
 
 async function bootstrap() {
-  const key = await readFile(config.application.keyPath, "utf-8");
-  const cert = await readFile(config.application.crtPath, "utf-8");
+  let httpsOptions: HttpsOptions = null;
+  if (config.application.ssl) {
+    httpsOptions = {};
+    httpsOptions.key = await readFile(config.application.ssl.keyPath, "utf-8");
+    httpsOptions.cert = await readFile(config.application.ssl.crtPath, "utf-8");
+  }
 
   const app = await NestFactory.create(AppModule, {
     logger: ["log", "error", "warn", "debug"],
     cors: {
-      allowedHeaders: ["x-requested-with", "session-id", "Content-Type"],
+      allowedHeaders: ["session-id", "Content-Type"],
       methods: ["POST", "GET", "OPTIONS"],
       origin: "*",
     },
-    httpsOptions: {
-      key,
-      cert,
-    },
+    httpsOptions,
   });
   const logger = app.get(Logger);
   app.useLogger(logger);
