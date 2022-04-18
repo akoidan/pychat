@@ -5,6 +5,8 @@ import {sep} from "path";
 
 @Injectable()
 export class HtmlService {
+  private cache: Record<string, string> = {};
+
   public replaceTemplate(content: string, params: Record<string, number | string>): string {
     const replaceHtmlRegex = /\{\{\s?(\w+)\s?\}\}/g;
     return content.replace(replaceHtmlRegex, (_, v) => {
@@ -17,7 +19,9 @@ export class HtmlService {
 
   public async renderTemplate(template: string, params: Record<string, number | string>) {
     const filePath = ["src", "templates", `${template}`].join(sep);
-    const content = await promisify(readFile)(filePath, "utf-8");
-    return this.replaceTemplate(content, params);
+    if (!this.cache[filePath]) {
+      this.cache[filePath] = await promisify(readFile)(filePath, "utf-8");
+    }
+    return this.replaceTemplate(this.cache[filePath], params);
   }
 }
