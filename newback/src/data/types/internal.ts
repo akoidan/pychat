@@ -1,4 +1,4 @@
-import type {DefaultWsInMessage} from "@/data/types/frontend";
+import type {DefaultWsInMessage, MessageStatus} from "@/data/types/frontend";
 
 export interface WebSocketContextData {
   userId: number;
@@ -14,3 +14,9 @@ export interface FileSaveResponse {
   originFileName: string;
   previewFileName: string;
 }
+
+// https://stackoverflow.com/a/49725198/3872976
+export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> =
+    {
+      [K in Keys]-?: Partial<Pick<T, Exclude<Keys, K>>> & Required<Pick<T, K>>
+    }[Keys] & Pick<T, Exclude<keyof T, Keys>>;

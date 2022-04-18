@@ -10,6 +10,9 @@ import type {
   UserDto,
   UserProfileDto,
   UserSettingsDto,
+
+  PrintMessageWsInMessage,
+  PrintMessageWsOutMessage,
 } from "@/data/types/frontend";
 import type {UserModel} from "@/data/model/user.model";
 import type {
@@ -22,6 +25,9 @@ import type {GetRoomsForUser} from "@/modules/rest/database/repository/room.repo
 import type {MessageModel} from "@/data/model/message.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
+import {
+  MessageStatus,
+} from "@/data/types/frontend";
 
 export interface TransformSetWsIdDataParams {
   myRooms: GetRoomsForUser[];
@@ -211,4 +217,53 @@ export function getSyncMessage(
     receivedMessageIds,
     content: messages.map((m) => getMessage(m, mentions, images)),
   };
+}
+
+function transformGetImages(resImages: Record<string, Partial<ImageModel>>): Record<number, FileModelDto> {
+  return Object.fromEntries(Object.entries(resImages).map(([symbol, value]) => [
+    symbol, {
+      id: value.id,
+      type: value.type,
+      url: value.img,
+      preview: value.preview,
+    },
+  ]));
+}
+
+function transformTags(tagsData: Partial<MessageMentionModel>[]): Record<string, number> {
+  return tagsData.reduce<Record<string, number>>((previousValue, currentValue) => {
+    previousValue[currentValue.symbol] = currentValue.userId;
+    return previousValue;
+  }, {});
+}
+
+export function transformPrintMessage(
+  resImages: Record<string, Partial<ImageModel>>,
+  data: {content: string; roomId: number; parentMessage: number | null},
+  symbol: string,
+  userId: number,
+  time: number,
+  messageId: number,
+  tagsData: Partial<MessageMentionModel>[]
+) {
+  const files = transformGetImages(resImages);
+  const tags: Record<string, number> = transformTags(tagsData);
+  const response: PrintMessageWsInMessage = {
+    content: data.content,
+    tags,
+    files,
+    symbol,
+    userId,
+    action: "printMessage",
+    handler: "ws-message",
+    roomId: data.roomId,
+    parentMessage: data.parentMessage,
+    time,
+    id: messageId,
+    status: MessageStatus.ON_SERVER,
+    threadMessagesCount: 0,
+    edited: 0,
+    deleted: false,
+  };
+  return response;
 }

@@ -1,5 +1,6 @@
 import type {OnGatewayConnection} from "@nestjs/websockets";
 import {
+  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
@@ -18,13 +19,15 @@ import {
 } from "@nestjs/common";
 import type {
   GetCountryCodeWsInMessage,
+  PrintMessageWsInMessage,
   SyncHistoryWsInMessage,
 } from "@/data/types/frontend";
-import {GetCountryCodeWsOutMessage,
+import {
+  GetCountryCodeWsOutMessage,
+  PrintMessageWsOutMessage,
   ShowITypeWsOutMessage,
   SyncHistoryWsOutMessage,
-
-  PrintMessageWsOutMessage} from "@/data/types/frontend";
+} from "@/data/types/frontend";
 import {SubscribePuBSub} from "@/modules/rest/pubsub/pubsub.service";
 import {SendToClientPubSubMessage} from "@/modules/api/websocket/interfaces/pubsub";
 import {WebsocketService} from "@/modules/api/websocket/websocket.service";
@@ -34,16 +37,15 @@ import {WsExceptionFilter} from "@/modules/api/websocket/ws.exception.filter";
 import {MessageService} from "@/modules/api/websocket/message.service";
 import {WsContext} from "@/modules/app/decorators/ws.context.decorator";
 import {CatchWsErrors} from "@/modules/app/decorators/catch.ws.errors";
-import {
-  MessagesFromMyRoomGuard,
-  OwnMessageGuardMixin,
-} from "@/modules/app/guards/own.message.guard";
+import {MessagesFromMyRoomGuard} from "@/modules/app/guards/own.message.guard";
+import type {NestGateway} from "@nestjs/websockets/interfaces/nest-gateway.interface";
+import {OwnRoomGuard} from "@/modules/app/guards/own.room.guard";
 
 @WebSocketGateway({
   path: "/ws",
 })
 @UseFilters(new WsExceptionFilter())
-export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
+export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGateway {
   @WebSocketServer()
   public readonly server!: Server;
 
@@ -71,6 +73,10 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
   }
 
   @SubscribeMessage("syncHistory")
+  @UseGuards(
+    // Messages ids are checked within roomsId
+    OwnRoomGuard((data: SyncHistoryWsOutMessage) => data.roomIds)
+  )
   public async syncHistory(
     @MessageBody() data: SyncHistoryWsOutMessage,
       @WsContext() context: WebSocketContextData
@@ -86,17 +92,31 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
   }
 
 
-  @UseGuards(OwnMessageGuardMixin)
+  // @UseGuards(OwnMessageGuard)
   @SubscribeMessage("printMessage")
-  // @UseGuards(MessagesFromMyRoomGuard((data: PrintMessageWsOutMessage) => [data.parentMessage]))
+  @UseGuards(
+    MessagesFromMyRoomGuard((data: PrintMessageWsOutMessage) => [data.parentMessage]),
+    OwnRoomGuard((data: PrintMessageWsOutMessage) => [data.roomId])
+  )
   public async printMessage(
     @MessageBody() data: PrintMessageWsOutMessage,
       @WsContext() context: WebSocketContextData
-  ): Promise<any> {
+  ): Promise<void> {
     await this.messageService.printMessage(data, context);
   }
 
+  @SubscribePuBSub("printPubSubMessage")
+  public printPubSubMessage(
+    ctx: WebSocketContextData,
+    data: SendToClientPubSubMessage<PrintMessageWsInMessage, "printMessage", "ws-message">
+  ): void {
+    ctx.sendToClient(data.body);
+  }
+
   @SubscribeMessage("showIType")
+  @UseGuards(
+    OwnRoomGuard((data: ShowITypeWsOutMessage) => [data.roomId])
+  )
   public async showIType(
     @MessageBody() data: ShowITypeWsOutMessage,
       @WsContext() context: WebSocketContextData
@@ -105,6 +125,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose {
   }
 
   @SubscribeMessage("getCountryCode")
+  // TODO add cache here
   public async getCountryCode(
     @MessageBody() data: GetCountryCodeWsOutMessage,
       @WsContext() context: WebSocketContextData

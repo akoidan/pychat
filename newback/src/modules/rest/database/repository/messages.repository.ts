@@ -75,7 +75,10 @@ export class MessageRepository {
     });
   }
 
-   public async getMessagesById(messageIds: number[], ...attributes: (keyof MessageModel)[]): Promise<MessageModel[]> {
+  public async getMessagesById(messageIds: number[], ...attributes: (keyof MessageModel)[]): Promise<MessageModel[]> {
+    if (!messageIds.length) {
+      return [];
+    }
     return this.messageModel.findAll({
       where: {
         id: {
@@ -92,14 +95,7 @@ export class MessageRepository {
     userId: number;
     file: string;
   }, transaction: Transaction): Promise<number> {
-    const result = await this.uploadedFileModel.create({
-      userId: data.userId,
-      symbol: data.symbol,
-      type: data.type,
-      file: data.file,
-    }, {
-      transaction,
-    });
+    const result = await this.uploadedFileModel.create(data, {transaction});
     return result.id;
   }
 
@@ -129,6 +125,23 @@ export class MessageRepository {
           [Op.in]: messageIds,
         },
       },
+    });
+  }
+
+  public async createMessage(data: Partial<MessageModel>, transaction: Transaction): Promise<number> {
+    const messageModel = await this.messageModel.create(data, {transaction});
+    return messageModel.id;
+  }
+
+  public async createMessageMentions(data: Partial<MessageMentionModel>[], transaction: Transaction): Promise<void> {
+    await this.messageMentionModel.bulkCreate(data, {
+      transaction,
+    });
+  }
+
+  public async createImages(data: Partial<ImageModel>[], transaction: Transaction): Promise<void> {
+    await this.imageModel.bulkCreate(data, {
+      transaction,
     });
   }
 }

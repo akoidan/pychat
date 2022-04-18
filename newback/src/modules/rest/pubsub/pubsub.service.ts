@@ -46,7 +46,7 @@ export class PubsubService {
 
   // A extends string,H extends HandlerName
 
-  public emit<PS extends PubSubMessage<A, H>, A extends string, H extends HandlerName>(handler: keyof WebsocketGateway, data: PS, ...channel: string[]) {
+  public emit<PS extends PubSubMessage<A, H>, A extends string, H extends HandlerName>(handler: keyof WebsocketGateway, data: PS, ...channel: (number | string)[]) {
     channel.forEach((channel) => {
       if (receivers[channel]) {
         receivers[channel].forEach((receiver) => {
@@ -69,7 +69,7 @@ export class PubsubService {
   }
 
   public unsubscribeAll(context: WebSocketContextData) {
-    Object.values(receivers).forEach(contexts => {
+    Object.values(receivers).forEach((contexts) => {
       const index = contexts.findIndex((c) => c.ctx = context);
       if (index >= 0) {
         contexts.splice(index, 1);
@@ -86,5 +86,11 @@ export class PubsubService {
         }
       }
     });
+  }
+
+  public getMyChannels(context: WebSocketContextData): string[] {
+    return Object.entries(receivers).
+      filter(([k, v]) => v.find((k) => k.ctx === context)).
+      map(([k, v]) => k);
   }
 }

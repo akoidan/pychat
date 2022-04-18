@@ -160,7 +160,12 @@ export class AuthService {
       await this.sequelize.transaction(async(t) => {
         const token = await this.passwordService.generateRandomString(32);
         this.logger.log(`Generated token for userId ${userId}: ${token}`, "auth.service");
-        await this.verificationRepository.createVerification(email, userId, token, VerificationType.REGISTER, t);
+        await this.verificationRepository.createVerification({
+          email,
+          userId,
+          token,
+          type: VerificationType.REGISTER,
+        }, t);
         const ipInfo = await this.ipCacheService.getIpString(ip);
         await this.emailService.sendSignUpEmail(username, userId, email, token, ip, ipInfo);
       });

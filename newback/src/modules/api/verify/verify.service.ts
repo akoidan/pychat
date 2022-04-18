@@ -71,7 +71,12 @@ export class VerifyService {
       }
       const token: string = await this.passwordService.generateRandomString(32);
       this.logger.log(`Generated token='${token}' to restore user email='${email}'`);
-      await this.verificationRepository.createVerification(email, userId, token, VerificationType.PASSWORD, t);
+      await this.verificationRepository.createVerification({
+        email,
+        userId,
+        token,
+        type: VerificationType.PASSWORD,
+      }, t);
       const ipInfo = await this.ipCacheService.getIpString(ip);
       await this.emailService.sendRestorePasswordEmail(username, userId, email, token, ip, ipInfo);
     });

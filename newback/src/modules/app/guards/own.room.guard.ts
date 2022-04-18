@@ -12,7 +12,7 @@ import {WebSocketContextData} from "@/data/types/internal";
 import {DefaultWsOutMessage} from '@/data/types/frontend';
 
 
-export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>) => number[]) => {
+export const OwnRoomGuard = (selector: (dto: DefaultWsOutMessage<any>) => number[]) => {
   @Injectable()
   class OwnMessageGuardMixin implements CanActivate {
     constructor(
@@ -26,13 +26,11 @@ export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>
     ): Promise<boolean> {
       const ws = context.getArgByIndex(0);
       const body = context.getArgByIndex(1);
-      const messagesId: number[] = selector(body).filter((m) => m);
-      if (!messagesId.length) {
+      const roomIds: number[] = selector(body).filter((m) => m);
+      if (!roomIds.length) {
         return true;
       }
       const channels = this.pubsubService.getMyChannels(ws.context);
-      const messages = await this.messageRepository.getMessagesById(messagesId, "roomId");
-      const roomIds: number[] = messages.map((m) => m.roomId);
       return roomIds.every((id) => channels.includes(String(id)));
     }
   }
