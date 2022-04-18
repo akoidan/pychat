@@ -2,32 +2,19 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import {UserRepository} from "@/modules/rest/database/repository/user.repository";
-import {PasswordService} from "@/modules/rest/password/password.service";
 import type {
   PrintMessageWsOutMessage,
   ShowITypeWsInMessage,
   ShowITypeWsOutMessage,
   SyncHistoryWsOutMessage,
 } from "@/data/types/frontend";
-import {
-  ImageType,
-  MessageStatus,
-} from "@/data/types/frontend";
-import {RoomRepository} from "@/modules/rest/database/repository/room.repository";
-import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
-import {SessionService} from "@/modules/rest/session/session.service";
-import {RedisService} from "@/modules/rest/redis/redis.service";
+import {MessageStatus} from "@/data/types/frontend";
 import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
 import type {
   CreateModel,
-  WebSocketContextData
+  WebSocketContextData,
 } from "@/data/types/internal";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
-import {
-  getSyncMessage,
-  transformPrintMessage,
-} from "@/modules/api/websocket/transformers/ws.transformer";
 import {Sequelize} from "sequelize-typescript";
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
@@ -38,17 +25,13 @@ import {
   groupUploadedFileToImages,
 } from "@/modules/api/websocket/transformers/inner.transformer";
 import {getMaxSymbol} from "@/utils/helpers";
+import {getSyncMessage} from "@/modules/api/websocket/transformers/sync.message.transformer";
+import {transformPrintMessage} from "@/modules/api/websocket/transformers/print.message.transformer";
 
 @Injectable()
 export class MessageService {
   public constructor(
     public readonly logger: Logger,
-    private readonly sessionService: SessionService,
-    private readonly passwordService: PasswordService,
-    private readonly ipCacheService: IpCacheService,
-    private readonly redisService: RedisService,
-    private readonly roomRepository: RoomRepository,
-    private readonly userRepository: UserRepository,
     private readonly pubsubService: PubsubService,
     private readonly messageRepository: MessageRepository,
     private readonly sequelize: Sequelize,
@@ -99,16 +82,15 @@ export class MessageService {
       );
     }
 
-    const messageIdsWithSymbol: number[] = messages.filter((m) => m.symbol).
-      map((m) => m.id);
+    const messageIdsWithSymbol: number[] = messages.filter((m) => m.symbol).map((m) => m.id);
     const images = await this.messageRepository.getImagesByMessagesId(messageIdsWithSymbol);
     const mentions = await this.messageRepository.getTagsByMessagesId(messageIdsWithSymbol);
 
     return getSyncMessage(readmesageIds, receivedMessageIds, messages, mentions, images);
   }
 
-  public async printMessage(data: PrintMessageWsOutMessage, context: WebSocketContextData) {
-    return this.sequelize.transaction(async(transaction) => {
+  public async printMessage(data: PrintMessageWsOutMessage, context: WebSocketContextData): Promise<void> {
+    await this.sequelize.transaction(async(transaction) => {
       const files: UploadedFileModel[] = await this.messageRepository.getUploadedFiles(
         data.files,
         context.userId,
@@ -116,7 +98,7 @@ export class MessageService {
       );
       const symbol = getMaxSymbol(files, data.tags, data.giphies);
       const time = Date.now() - data.timeDiff;
-      const messageId = await this.messageRepository.createMessage({
+      const messageModel = await this.messageRepository.createMessage({
         roomId: data.roomId,
         time,
         messageStatus: MessageStatus.ON_SERVER,
@@ -126,24 +108,21 @@ export class MessageService {
         content: data.content,
         threadMessageCount: 0,
       }, transaction);
-      const tagsData: CreateModel<MessageMentionModel>[] = getMentionsFromTags(data, messageId);
-      await this.messageRepository.createMessageMentions(tagsData, transaction);
-      const images: CreateModel<ImageModel>[] = groupUploadedFileToImages(files, messageId);
-      const giphies: CreateModel<ImageModel>[] = getUploadedGiphies(data.giphies, messageId);
-      const totalMedia = [...images, ...giphies];
-      let media: ImageModel[] = [];
+
+      const mentions: CreateModel<MessageMentionModel>[] = getMentionsFromTags(data, messageModel.id);
+      await this.messageRepository.createMessageMentions(mentions, transaction);
+      const imagesToCreate: CreateModel<ImageModel>[] = groupUploadedFileToImages(files, messageModel.id);
+      const giphies: CreateModel<ImageModel>[] = getUploadedGiphies(data.giphies, messageModel.id);
+      const totalMedia = [...imagesToCreate, ...giphies];
+      let images: ImageModel[] = [];
       if (totalMedia.length) {
         await this.messageRepository.createImages(totalMedia, transaction);
         // We need to fetch images again, since on bulkCreate mysql doesnt return ids
-        media = await this.messageRepository.getImagesByMessagesId([messageId], transaction);
-      }
-      if (files.length) {
+        images = await this.messageRepository.getImagesByMessagesId([messageModel.id], transaction);
         await this.messageRepository.deleteUploadedFiles(files.map((f) => f.id), transaction);
       }
-      const response = transformPrintMessage(media, data, symbol, context.userId, time, messageId, tagsData);
-      this.pubsubService.emit("sendToClient", {
-        body: response,
-      }, data.roomId);
+      const body = transformPrintMessage(messageModel, mentions, images);
+      this.pubsubService.emit("sendToClient", {body}, data.roomId);
     });
   }
 }

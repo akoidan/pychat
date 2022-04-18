@@ -3,9 +3,7 @@ import type {
   ExceptionFilter,
   HttpException,
 } from "@nestjs/common";
-import {
-  Catch,
-} from "@nestjs/common";
+import {Catch} from "@nestjs/common";
 import type {WebSocket} from "ws";
 import type {GrowlMessage} from "@/data/types/frontend";
 

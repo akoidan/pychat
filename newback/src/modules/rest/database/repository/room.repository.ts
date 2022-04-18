@@ -2,14 +2,10 @@ import {Injectable} from "@nestjs/common";
 import {InjectModel} from "@nestjs/sequelize";
 import {RoomModel} from "@/data/model/room.model";
 import {RoomUsersModel} from "@/data/model/room.users.model";
-import type {
-  Transaction,
-} from "sequelize";
-import {
-  Op,
-} from "sequelize";
+import type {Transaction} from "sequelize";
+import {Op} from "sequelize";
 import {ChannelModel} from "@/data/model/channel.model";
-import {GetRoomsForUser} from '@/data/types/internal';
+import type {GetRoomsForUser} from "@/data/types/internal";
 
 @Injectable()
 export class RoomRepository {

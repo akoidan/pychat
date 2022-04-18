@@ -1,11 +1,7 @@
 import {HtmlService} from "@/modules/rest/html/html.service";
 import {EmailService} from "@/modules/rest/email/email.service";
-import type {
-  TestingModule,
-} from "@nestjs/testing";
-import {
-  Test,
-} from "@nestjs/testing";
+import type {TestingModule} from "@nestjs/testing";
+import {Test} from "@nestjs/testing";
 import {LoggerModule} from "@/modules/rest/logger/logger.module";
 import {MailerService} from "@nestjs-modules/mailer";
 
@@ -61,8 +57,10 @@ describe("EmailSenderService", () => {
       expect(new Date().getTimezoneOffset()).toBe(0);
     });
     it("should render an email", async() => {
-      configService.getConfig = jest.fn().mockReturnValue({...config,
-        email: {}});
+      configService.getConfig = jest.fn().mockReturnValue({
+        ...config,
+        email: {},
+      });
       const spy = jest.spyOn(mailer, "sendMail");
       jest.useFakeTimers("modern");
       jest.setSystemTime(new Date(2020, 3, 1));

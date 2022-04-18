@@ -6,14 +6,16 @@ import {
 } from "@nestjs/common";
 import {UserRepository} from "@/modules/rest/database/repository/user.repository";
 import {PasswordService} from "@/modules/rest/password/password.service";
-import type {FaceBookAuthRequest,
+import type {
+  FaceBookAuthRequest,
   FacebookSignInResponse,
   GoogleAuthRequest,
   GoogleSignInResponse,
   SignInRequest,
   SignInResponse,
   SignUpRequest,
-  SignUpResponse} from "@/data/types/frontend";
+  SignUpResponse,
+} from "@/data/types/frontend";
 import {
   Gender,
   VerificationType,
@@ -59,8 +61,10 @@ export class AuthService {
       const userAuth = await this.userRepository.getUserMyAuthFacebook(fbResponse.id, t);
       if (userAuth) {
         const session = await this.sessionService.createAndSaveSession(userAuth.id);
-        const response: FacebookSignInResponse = {session,
-          isNewAccount: false};
+        const response: FacebookSignInResponse = {
+          session,
+          isNewAccount: false,
+        };
         return response;
       }
       let username = generateUserName(`${fbResponse.first_name}_${fbResponse.last_name}`);
@@ -82,9 +86,11 @@ export class AuthService {
       await this.roomRepository.createRoomUser(ALL_ROOM_ID, userId, t);
 
       const session = await this.sessionService.createAndSaveSession(userId);
-      const response: FacebookSignInResponse = {session,
+      const response: FacebookSignInResponse = {
+        session,
         isNewAccount: true,
-        username};
+        username,
+      };
       return response;
     });
   }
@@ -96,14 +102,16 @@ export class AuthService {
       const userAuth = await this.userRepository.getUserMyAuthGoogle(googleResponse.email, t);
       if (userAuth) {
         const session = await this.sessionService.createAndSaveSession(userAuth.id);
-        const response: GoogleSignInResponse = {session,
-          isNewAccount: false};
+        const response: GoogleSignInResponse = {
+          session,
+          isNewAccount: false,
+        };
         return response;
       }
       let username = generateUserName(googleResponse.email);
       if (await this.userRepository.checkUserExistByEmail(googleResponse.email)) {
         throw new ConflictException("User with this email already exist, but has no connected google account." +
-            " If this is you, please login as this user and connect this google profile in profile settings");
+          " If this is you, please login as this user and connect this google profile in profile settings");
       }
       if (await this.userRepository.checkUserExistByUserName(username)) {
         // The chance that there will be a user with same id is insignificant
@@ -125,9 +133,11 @@ export class AuthService {
       await this.roomRepository.createRoomUser(ALL_ROOM_ID, userId, t);
 
       const session = await this.sessionService.createAndSaveSession(userId);
-      const response: GoogleSignInResponse = {session,
+      const response: GoogleSignInResponse = {
+        session,
         isNewAccount: true,
-        username};
+        username,
+      };
       return response;
     });
   }
@@ -179,8 +189,10 @@ export class AuthService {
     const {session, userId} = await this.sequelize.transaction(async(t) => {
       const userId = await this.createUser(data, t);
       const session = await this.sessionService.createAndSaveSession(userId);
-      return {session,
-        userId};
+      return {
+        session,
+        userId,
+      };
     });
     if (data.email) {
       void this.sendVerificationEmail(data.email, userId, data.username, ip);
@@ -208,8 +220,10 @@ export class AuthService {
       await this.validateEmail(data.email);
     }
     const password = await this.passwordService.createPassword(data.password);
-    const userId = await this.userRepository.createUser({...data,
-      password}, transaction);
+    const userId = await this.userRepository.createUser({
+      ...data,
+      password,
+    }, transaction);
     await this.roomRepository.createRoomUser(ALL_ROOM_ID, userId, transaction);
     return userId;
   }

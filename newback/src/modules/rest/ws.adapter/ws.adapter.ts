@@ -6,7 +6,7 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from "@nestjs/common";
-import type {BaseWsInstance} from "@nestjs/websockets";
+import type {BaseWsInstance, MessageMappingProperties} from "@nestjs/websockets";
 import {
   CLOSE_EVENT,
   CONNECTION_EVENT,
@@ -14,18 +14,18 @@ import {
   ERROR_EVENT,
   MESSAGE_METADATA,
 } from "@nestjs/websockets/constants";
-import type {MessageMappingProperties} from "@nestjs/websockets/gateway-metadata-explorer";
 import {isFunction} from "@nestjs/common/utils/shared.utils";
-import type {Server,
-  ServerOptions} from "ws";
+import type {
+  Server,
+  ServerOptions,
+} from "ws";
 import {
   WebSocket,
   WebSocketServer,
 } from "ws";
-import type {DefaultWsInMessage,
-  DefaultWsOutMessage} from "@/data/types/frontend";
-import {
-  GrowlMessage,
+import type {
+  DefaultWsInMessage,
+  DefaultWsOutMessage,
 } from "@/data/types/frontend";
 import {processErrors} from "@/modules/app/decorators/catch.ws.errors";
 

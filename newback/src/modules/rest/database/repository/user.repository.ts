@@ -5,12 +5,8 @@ import {UserAuthModel} from "@/data/model/user.auth.model";
 import type {Gender} from "@/data/types/frontend";
 import {UserProfileModel} from "@/data/model/user.profile.model";
 import {UserSettingsModel} from "@/data/model/user.settings.model";
-import type {
-  Transaction,
-} from "sequelize";
-import {
-  Op,
-} from "sequelize";
+import type {Transaction} from "sequelize";
+import {Op} from "sequelize";
 
 
 @Injectable()
@@ -46,25 +42,33 @@ export class UserRepository {
       lastTimeOnline: Date.now(),
       sex: data.sex,
       thumbnail: data.thumbnail,
-    }, {transaction,
-      raw: true});
+    }, {
+      transaction,
+      raw: true,
+    });
     await Promise.all([
       this.userProfileModel.create({
         id: userModel.id,
-      }, {transaction,
-        raw: true}),
+      }, {
+        transaction,
+        raw: true,
+      }),
       this.userAuthModel.create({
         password: data.password,
         email: data.email,
         id: userModel.id,
         googleId: data.googleId,
         facebookId: data.facebookId,
-      }, {transaction,
-        raw: true}),
+      }, {
+        transaction,
+        raw: true,
+      }),
       this.userSettingsModel.create({
         id: userModel.id,
-      }, {transaction,
-        raw: true}),
+      }, {
+        transaction,
+        raw: true,
+      }),
     ]);
     return userModel.id;
   }

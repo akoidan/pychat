@@ -45,7 +45,7 @@ export class FileService {
       if (fileSaveResponse.previewFileName) {
         response.previewId = await this.messageRepository.saveUploadFile({
           type: ImageType.PREVIEW,
-          file: fileSaveResponse.originFileName,
+          file: fileSaveResponse.previewFileName,
           symbol,
           userId,
         }, transaction);

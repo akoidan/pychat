@@ -12,9 +12,7 @@ import type {
   SendRestorePasswordRequest,
   VerifyTokenResponse,
 } from "@/data/types/frontend";
-import {
-  VerificationType,
-} from "@/data/types/frontend";
+import {VerificationType} from "@/data/types/frontend";
 import {EmailService} from "@/modules/rest/email/email.service";
 import {Sequelize} from "sequelize-typescript";
 import type {VerificationModel} from "@/data/model/verification.model";

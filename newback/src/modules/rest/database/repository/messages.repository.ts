@@ -142,9 +142,8 @@ export class MessageRepository {
     });
   }
 
-  public async createMessage(data: CreateModel<MessageModel>, transaction: Transaction): Promise<number> {
-    const messageModel = await this.messageModel.create(data, {transaction});
-    return messageModel.id;
+  public async createMessage(data: CreateModel<MessageModel>, transaction: Transaction): Promise<MessageModel> {
+    return this.messageModel.create(data, {transaction});
   }
 
   public async createMessageMentions(data: CreateModel<MessageMentionModel>[], transaction: Transaction): Promise<void> {

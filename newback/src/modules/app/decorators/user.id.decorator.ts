@@ -1,4 +1,4 @@
-import type {ExecutionContext,} from "@nestjs/common";
+import type {ExecutionContext} from "@nestjs/common";
 import {
   createParamDecorator,
   InternalServerErrorException,
@@ -6,7 +6,7 @@ import {
 
 export const UserId = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
-    let userId = ctx.switchToHttp().getRequest().userId;
+    const {userId} = ctx.switchToHttp().getRequest();
     if (!userId) {
       throw new InternalServerErrorException("Service should use auth guard");
     }

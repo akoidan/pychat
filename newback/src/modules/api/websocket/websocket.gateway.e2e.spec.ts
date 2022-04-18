@@ -1,9 +1,5 @@
-import type {
-  TestingModule,
-} from "@nestjs/testing";
-import {
-  Test,
-} from "@nestjs/testing";
+import type {TestingModule} from "@nestjs/testing";
+import {Test} from "@nestjs/testing";
 import {IpService} from "@/modules/rest/ip/ip.service";
 import {HttpModule} from "@/modules/rest/http/http.module";
 import {WebsocketGateway} from "@/modules/api/websocket/websocket.gateway";

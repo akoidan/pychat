@@ -9,14 +9,12 @@ import {RoomRepository} from "@/modules/rest/database/repository/room.repository
 import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
 import {SessionService} from "@/modules/rest/session/session.service";
 import type {UserModel} from "@/data/model/user.model";
-import {
-  getLogoutMessage,
-  transformAddUserOnline,
-  transformSetWsId,
-} from "@/modules/api/websocket/transformers/ws.transformer";
 import type {WebSocketContextData} from "@/data/types/internal";
 import {RedisService} from "@/modules/rest/redis/redis.service";
 import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
+import {transformSetWsId} from '@/modules/api/websocket/transformers/set.ws.id.transformer';
+import {transformAddUserOnline} from '@/modules/api/websocket/transformers/add.online.user.transformer';
+import {getLogoutMessage} from '@/modules/api/websocket/transformers/remove.online.user.transformer';
 
 
 @Injectable()

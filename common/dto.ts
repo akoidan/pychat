@@ -373,7 +373,8 @@ export interface PrintMessageWsOutMessage extends DefaultMessage<"printMessage">
   giphies: GiphyDto[];
 }
 
-export interface PrintMessageWsInMessage extends DefaultWsInMessage<"printMessage", "ws-message">, MessageModelDto {
+export interface PrintMessageWsInMessage extends DefaultWsInMessage<"printMessage", "ws-message"> {
+  message: MessageModelDto;
 }
 
 export interface AddOnlineUserMessage extends DefaultWsInMessage<"addOnlineUser", "room">, ChangeUserOnlineBase {
@@ -589,7 +590,15 @@ export interface UserProfileDtoWoImage {
   id: number;
 }
 
-export declare type LogLevel = "debug" | "disable" | "error" | "info" | "log_raise_error" | "log_with_warnings" | "trace" | "warn";
+export declare type LogLevel =
+  "debug"
+  | "disable"
+  | "error"
+  | "info"
+  | "log_raise_error"
+  | "log_with_warnings"
+  | "trace"
+  | "warn";
 
 export interface UserSettingsDto {
   embeddedYoutube: boolean;

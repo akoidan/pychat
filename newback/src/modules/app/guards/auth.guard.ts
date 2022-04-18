@@ -1,6 +1,6 @@
 import type {
   CanActivate,
-  ExecutionContext
+  ExecutionContext,
 } from "@nestjs/common";
 import {
   Injectable,
@@ -22,7 +22,7 @@ export class AuthGuard implements CanActivate {
     context: ExecutionContext,
   ): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    request.userId = this.sessionService.getUserIdBySession(request.headers['session-id']);
+    request.userId = this.sessionService.getUserIdBySession(request.headers["session-id"]);
     return true;
   }
 }

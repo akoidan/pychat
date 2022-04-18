@@ -3,7 +3,7 @@ import {InjectModel} from "@nestjs/sequelize";
 import {IpAddressModel} from "@/data/model/ip.address.model";
 import {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 import {Op} from "sequelize";
-import {CreateModel} from '@/data/types/internal';
+import type {CreateModel} from "@/data/types/internal";
 
 
 @Injectable()
@@ -30,7 +30,7 @@ export class IpRepository {
     this.userJoinedInfoModel.afterBulkUpdate(cb);
   }
 
-  public saveIP(model: CreateModel<IpAddressModel>): Promise<IpAddressModel> {
+  public async saveIP(model: CreateModel<IpAddressModel>): Promise<IpAddressModel> {
     return this.ipAddressModel.upsert(model)[0];
   }
 

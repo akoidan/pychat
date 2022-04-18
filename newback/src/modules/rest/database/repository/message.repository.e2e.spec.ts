@@ -5,7 +5,7 @@ import {Test} from "@nestjs/testing";
 import {LoggerModule} from "@/modules/rest/logger/logger.module";
 import {ConfigModule} from "@/modules/rest/config/config.module";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
-import {MessageStatus} from "../common/dto";
+import {MessageStatus} from '@/data/types/frontend';
 
 describe("MessageRepository", () => {
   let app: TestingModule;

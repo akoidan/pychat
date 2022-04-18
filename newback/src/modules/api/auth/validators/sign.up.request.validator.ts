@@ -7,9 +7,7 @@ import {
   Matches,
 } from "class-validator";
 import type {SignUpRequest} from "@/data/types/frontend";
-import {
-  Gender,
-} from "@/data/types/frontend";
+import {Gender} from "@/data/types/frontend";
 import {MAX_USERNAME_LENGTH} from "@/utils/consts";
 
 export class SignUpRequestValidator implements SignUpRequest {

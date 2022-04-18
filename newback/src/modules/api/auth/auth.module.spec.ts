@@ -26,12 +26,8 @@ import * as googleResponseFixture from "@/fixtures/google.response.fixture.json"
 import * as facebookGetTokenResponseFixture from "@/fixtures/facebook.get.token.response.json";
 import * as facebookGetUserResponseFixture from "@/fixtures/facebook.get.user.response.json";
 import {ConfigService} from "@/modules/rest/config/config.service";
-import type {
-  IConfig,
-} from "node-ts-config";
-import {
-  config,
-} from "node-ts-config";
+import type {IConfig} from "node-ts-config";
+import {config} from "node-ts-config";
 import {FacebookAuthService} from "@/modules/api/auth/facebook.auth.service";
 import {IpCacheService} from "@/modules/rest/ip/ip.cache.service";
 import {IpService} from "@/modules/rest/ip/ip.service";
@@ -155,11 +151,10 @@ describe("AuthModule", () => {
   describe("sign-in", () => {
     it("should throw if user not exists", async() => {
       userRepository.getUserByUserName = jest.fn().mockResolvedValue(null);
-      await request.
-        post("/api/auth/sign-in").send({
-          username: "a",
-          password: "as$",
-        }).
+      await request.post("/api/auth/sign-in").send({
+        username: "a",
+        password: "as$",
+      }).
         expect(409, {
           error: "Conflict",
           message: "User with login doesn't exists",
@@ -173,11 +168,10 @@ describe("AuthModule", () => {
           privateKey: "a",
         },
       } as IConfig);
-      const {body} = await request.
-        post("/api/auth/sign-in").send({
-          username: "a",
-          password: "as$",
-        }).
+      const {body} = await request.post("/api/auth/sign-in").send({
+        username: "a",
+        password: "as$",
+      }).
         expect(400, {
           statusCode: 400,
           message: "Captcha is missing",
@@ -201,12 +195,11 @@ describe("AuthModule", () => {
         },
       } as IConfig);
       nodeApply = jest.fn().mockReturnValue({json: jest.fn().mockResolvedValue({success: true})});
-      const {body} = await request.
-        post("/api/auth/sign-in").send({
-          username: "a",
-          password: "koko",
-          captcha: "asd",
-        });
+      const {body} = await request.post("/api/auth/sign-in").send({
+        username: "a",
+        password: "koko",
+        captcha: "asd",
+      });
       expect(body).toMatchObject({session: expect.any(String)});
     });
 
@@ -217,11 +210,10 @@ describe("AuthModule", () => {
         },
         id: 3,
       });
-      const {body} = await request.
-        post("/api/auth/sign-in").send({
-          username: "a",
-          password: "as$",
-        }).
+      const {body} = await request.post("/api/auth/sign-in").send({
+        username: "a",
+        password: "as$",
+      }).
         expect(401, {
           error: "Unauthorized",
           message: "Invalid password",
@@ -238,11 +230,10 @@ describe("AuthModule", () => {
         },
         id: 3,
       });
-      const {body} = await request.
-        post("/api/auth/sign-in").send({
-          username: "a",
-          password: "koko",
-        });
+      const {body} = await request.post("/api/auth/sign-in").send({
+        username: "a",
+        password: "koko",
+      });
       expect(body).toMatchObject({session: expect.any(String)});
     });
   });
@@ -260,10 +251,9 @@ describe("AuthModule", () => {
       oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
         getPayload: jest.fn().mockReturnValue(googleResponseFixture),
       });
-      const {body} = await request.
-        post("/api/auth/google-sign-in").send({
-          token: "aasdasd",
-        }).
+      const {body} = await request.post("/api/auth/google-sign-in").send({
+        token: "aasdasd",
+      }).
         expect(201);
       expect(body).toMatchObject({
         session: expect.any(String),
@@ -282,10 +272,9 @@ describe("AuthModule", () => {
       oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
         getPayload: jest.fn().mockReturnValue(googleResponseFixture),
       });
-      const {body} = await request.
-        post("/api/auth/google-sign-in").send({
-          token: "aasdasd",
-        }).
+      const {body} = await request.post("/api/auth/google-sign-in").send({
+        token: "aasdasd",
+      }).
         expect(201);
       expect(body).toMatchObject({
         session: expect.any(String),
@@ -317,10 +306,9 @@ describe("AuthModule", () => {
       oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
         getPayload: jest.fn().mockReturnValue(googleResponseFixture),
       });
-      const {body} = await request.
-        post("/api/auth/google-sign-in").send({
-          token: "aasdasd",
-        }).
+      const {body} = await request.post("/api/auth/google-sign-in").send({
+        token: "aasdasd",
+      }).
         expect(409);
       expect(body).toMatchObject({
         error: "Conflict",
@@ -335,8 +323,7 @@ describe("AuthModule", () => {
     it("should login if user exists", async() => {
       sequelize.transaction = (resolve) => resolve();
       redisService.saveSession = jest.fn().mockResolvedValue(undefined);
-      nodeApply = jest.fn().
-        mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetTokenResponseFixture)}).
+      nodeApply = jest.fn().mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetTokenResponseFixture)}).
         mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetUserResponseFixture)});
       configService.getConfig = jest.fn().mockReturnValue({
         auth: {
@@ -351,10 +338,9 @@ describe("AuthModule", () => {
           username: "as",
         },
       });
-      const {body} = await request.
-        post("/api/auth/facebook-sign-in").send({
-          token: "aasdasd",
-        }).
+      const {body} = await request.post("/api/auth/facebook-sign-in").send({
+        token: "aasdasd",
+      }).
         expect(201);
       expect(body).toMatchObject({
         session: expect.any(String),
@@ -365,8 +351,7 @@ describe("AuthModule", () => {
       sequelize.transaction = (resolve) => resolve("transaction");
       redisService.saveSession = jest.fn().mockResolvedValue(undefined);
 
-      nodeApply = jest.fn().
-        mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetTokenResponseFixture)}).
+      nodeApply = jest.fn().mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetTokenResponseFixture)}).
         mockReturnValueOnce({json: jest.fn().mockResolvedValue(facebookGetUserResponseFixture)});
       configService.getConfig = jest.fn().mockReturnValue({
         auth: {
@@ -384,10 +369,9 @@ describe("AuthModule", () => {
       oauth2Client.verifyIdToken = jest.fn().mockResolvedValue({
         getPayload: jest.fn().mockReturnValue(googleResponseFixture),
       });
-      const {body} = await request.
-        post("/api/auth/facebook-sign-in").send({
-          token: "aasdasd",
-        }).
+      const {body} = await request.post("/api/auth/facebook-sign-in").send({
+        token: "aasdasd",
+      }).
         expect(201);
       expect(body).toMatchObject({
         session: expect.any(String),
@@ -412,18 +396,19 @@ describe("AuthModule", () => {
       userRepository.createUser = jest.fn().mockResolvedValue(3);
       roomRepository.createRoomUser = jest.fn().mockResolvedValue(undefined);
       redisService.saveSession = jest.fn().mockResolvedValue(undefined);
-      const {body} = await request.
-        post("/api/auth/sign-up").send({
-          username: "a",
-          password: "as$",
-        }).
+      const {body} = await request.post("/api/auth/sign-up").send({
+        username: "a",
+        password: "as$",
+      }).
         expect(201);
 
       expect(body).toMatchObject({session: expect.any(String)});
     });
     it("sends an email", async() => {
-      configService.getConfig = jest.fn().mockReturnValue({...config,
-        email: {}});
+      configService.getConfig = jest.fn().mockReturnValue({
+        ...config,
+        email: {},
+      });
       sequelize.transaction = (resolve) => resolve();
       verificationRepository.createVerification = jest.fn().mockResolvedValue(undefined);
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
@@ -438,12 +423,11 @@ describe("AuthModule", () => {
       } as IpAddressModel);
       const spy = jest.spyOn(mailerService, "sendMail").mockResolvedValue(true);
       redisService.saveSession = jest.fn().mockResolvedValue(undefined);
-      const {body} = await request.
-        post("/api/auth/sign-up").send({
-          username: "a",
-          password: "as$",
-          email: "death@gmail.com",
-        }).
+      const {body} = await request.post("/api/auth/sign-up").send({
+        username: "a",
+        password: "as$",
+        email: "death@gmail.com",
+      }).
         expect(201);
 
       expect(body).toMatchObject({session: expect.any(String)});
@@ -455,11 +439,10 @@ describe("AuthModule", () => {
     it("throws an error if user exists", async() => {
       sequelize.transaction = (resolve) => resolve();
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
-      const {body} = await request.
-        post("/api/auth/sign-up").send({
-          username: "a",
-          password: "as$",
-        }).
+      const {body} = await request.post("/api/auth/sign-up").send({
+        username: "a",
+        password: "as$",
+      }).
         expect(409, {
           error: "Conflict",
           message: "User with this username already exist",
@@ -470,12 +453,11 @@ describe("AuthModule", () => {
       sequelize.transaction = (resolve) => resolve();
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
       userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(true);
-      const {body} = await request.
-        post("/api/auth/sign-up").send({
-          username: "a",
-          password: "as$",
-          email: "death@gmail.com",
-        }).
+      const {body} = await request.post("/api/auth/sign-up").send({
+        username: "a",
+        password: "as$",
+        email: "death@gmail.com",
+      }).
         expect(409, {
           error: "Conflict",
           message: "User with this email already exist",
@@ -487,18 +469,16 @@ describe("AuthModule", () => {
   describe("validate-email", () => {
     it("should return ok", async() => {
       userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(false);
-      await request.
-        post("/api/auth/validate-email").send({
-          email: "blah@gmail.com",
-        }).
+      await request.post("/api/auth/validate-email").send({
+        email: "blah@gmail.com",
+      }).
         expect(201, {ok: true});
     });
     it("should error if email exists", async() => {
       userRepository.checkUserExistByEmail = jest.fn().mockResolvedValue(true);
-      await request.
-        post("/api/auth/validate-email").send({
-          email: "exist@gmail.com",
-        }).
+      await request.post("/api/auth/validate-email").send({
+        email: "exist@gmail.com",
+      }).
         expect(409, {
           error: "Conflict",
           message: "User with this email already exist",
@@ -506,10 +486,9 @@ describe("AuthModule", () => {
         });
     });
     it("should give error on invalid email", async() => {
-      await request.
-        post("/api/auth/validate-email").send({
-          email: "invalidemail",
-        }).
+      await request.post("/api/auth/validate-email").send({
+        email: "invalidemail",
+      }).
         expect(400, {
           error: "Bad Request",
           message: ["email must be an email"],
@@ -520,18 +499,16 @@ describe("AuthModule", () => {
   describe("validate-user", () => {
     it("should return ok", async() => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
-      await request.
-        post("/api/auth/validate-user").send({
-          username: "a",
-        }).
+      await request.post("/api/auth/validate-user").send({
+        username: "a",
+      }).
         expect(201, {ok: true});
     });
     it("should error if user exists", async() => {
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(true);
-      await request.
-        post("/api/auth/validate-user").send({
-          username: "a",
-        }).
+      await request.post("/api/auth/validate-user").send({
+        username: "a",
+      }).
         expect(409, {
           error: "Conflict",
           message: "User with this username already exist",
@@ -539,10 +516,9 @@ describe("AuthModule", () => {
         });
     });
     it("should give error on invalid character for username", async() => {
-      await request.
-        post("/api/auth/validate-user").send({
-          username: "%",
-        }).
+      await request.post("/api/auth/validate-user").send({
+        username: "%",
+      }).
         expect(400, {
           error: "Bad Request",
           message: ["Username can only contain latin characters, numbers and symbols '-' '_'"],
@@ -550,10 +526,9 @@ describe("AuthModule", () => {
         });
     });
     it("should give error on invalid and also correct ones", async() => {
-      await request.
-        post("/api/auth/validate-user").send({
-          username: "%asfasdf",
-        }).
+      await request.post("/api/auth/validate-user").send({
+        username: "%asfasdf",
+      }).
         expect(400, {
           error: "Bad Request",
           message: ["Username can only contain latin characters, numbers and symbols '-' '_'"],
@@ -561,10 +536,9 @@ describe("AuthModule", () => {
         });
     });
     it("should give error if username has great length", async() => {
-      await request.
-        post("/api/auth/validate-user").send({
-          username: "1234567890123456789",
-        }).
+      await request.post("/api/auth/validate-user").send({
+        username: "1234567890123456789",
+      }).
         expect(400, {
           error: "Bad Request",
           message: ["Username should be 1-16 characters"],

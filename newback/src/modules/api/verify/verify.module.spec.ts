@@ -127,8 +127,10 @@ describe("VerifyModule", () => {
 
   describe("send-restore-password", () => {
     it("sends password when by username", async() => {
-      configService.getConfig = jest.fn().mockReturnValue({...config,
-        email: {}});
+      configService.getConfig = jest.fn().mockReturnValue({
+        ...config,
+        email: {},
+      });
       sequelize.transaction = (resolve) => resolve();
       userRepository.getUserByUserName = jest.fn().mockResolvedValue({
         userAuth: {
@@ -146,16 +148,17 @@ describe("VerifyModule", () => {
         isp: "AZOV",
       } as IpAddressModel);
 
-      await request.
-        post("/api/verify/send-restore-password").send({
-          username: "a",
-        }).
+      await request.post("/api/verify/send-restore-password").send({
+        username: "a",
+      }).
         expect(201, {ok: true});
       expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: expect.stringContaining("You have requested to change password on")}));
     });
     it("sends password when by email", async() => {
-      configService.getConfig = jest.fn().mockReturnValue({...config,
-        email: {}});
+      configService.getConfig = jest.fn().mockReturnValue({
+        ...config,
+        email: {},
+      });
       sequelize.transaction = (resolve) => resolve();
       userRepository.getUserByEmail = jest.fn().mockResolvedValue({
         email: "asd",
@@ -173,36 +176,37 @@ describe("VerifyModule", () => {
         isp: "AZOV",
       } as IpAddressModel);
 
-      await request.
-        post("/api/verify/send-restore-password").send({
-          email: "a@gmail.com",
-        }).
+      await request.post("/api/verify/send-restore-password").send({
+        email: "a@gmail.com",
+      }).
         expect(201, {ok: true});
       expect(spy).toHaveBeenCalledWith(expect.objectContaining({html: expect.stringContaining("You have requested to change password on")}));
     });
     it("throws an error if user doesnt exists", async() => {
       sequelize.transaction = (resolve) => resolve();
       userRepository.getUserByUserName = jest.fn().mockResolvedValue(null);
-      await request.
-        post("/api/verify/send-restore-password").send({
-          username: "a@gmail.com",
-        }).
-        expect(400, {statusCode: 400,
+      await request.post("/api/verify/send-restore-password").send({
+        username: "a@gmail.com",
+      }).
+        expect(400, {
+          statusCode: 400,
           message: "User with this username doesnt exit",
-          error: "Bad Request"});
+          error: "Bad Request",
+        });
     });
   });
   describe("verify-token", () => {
     it("should return error when token doesnt exist", async() => {
       verificationRepository.getVerification = jest.fn().mockResolvedValue(undefined);
 
-      await request.
-        post("/api/verify/verify-token").send({
-          token: "a",
-        }).
-        expect(400, {statusCode: 400,
+      await request.post("/api/verify/verify-token").send({
+        token: "a",
+      }).
+        expect(400, {
+          statusCode: 400,
           message: "Invalid token",
-          error: "Bad Request"});
+          error: "Bad Request",
+        });
     });
     it("should return ok when token valid", async() => {
       verificationRepository.getVerification = jest.fn().mockResolvedValue({
@@ -213,23 +217,25 @@ describe("VerifyModule", () => {
         },
       });
 
-      await request.
-        post("/api/verify/verify-token").send({
-          token: "a",
-        }).
-        expect(201, {ok: true,
-          username: "a"});
+      await request.post("/api/verify/verify-token").send({
+        token: "a",
+      }).
+        expect(201, {
+          ok: true,
+          username: "a",
+        });
     });
     it("throws an error if user doesnt exists", async() => {
       sequelize.transaction = (resolve) => resolve();
       userRepository.getUserByUserName = jest.fn().mockResolvedValue(null);
-      await request.
-        post("/api/verify/send-restore-password").send({
-          username: "a@gmail.com",
-        }).
-        expect(400, {statusCode: 400,
+      await request.post("/api/verify/send-restore-password").send({
+        username: "a@gmail.com",
+      }).
+        expect(400, {
+          statusCode: 400,
           message: "User with this username doesnt exit",
-          error: "Bad Request"});
+          error: "Bad Request",
+        });
     });
   });
 
@@ -238,13 +244,14 @@ describe("VerifyModule", () => {
       sequelize.transaction = (resolve) => resolve();
       verificationRepository.getVerification = jest.fn().mockResolvedValue(undefined);
 
-      await request.
-        post("/api/verify/confirm-email").send({
-          token: "a",
-        }).
-        expect(400, {statusCode: 400,
+      await request.post("/api/verify/confirm-email").send({
+        token: "a",
+      }).
+        expect(400, {
+          statusCode: 400,
           message: "Invalid token",
-          error: "Bad Request"});
+          error: "Bad Request",
+        });
     });
     it("should set email confirmed", async() => {
       sequelize.transaction = (resolve) => resolve();
@@ -258,10 +265,9 @@ describe("VerifyModule", () => {
         },
       });
 
-      await request.
-        post("/api/verify/confirm-email").send({
-          token: "a",
-        }).
+      await request.post("/api/verify/confirm-email").send({
+        token: "a",
+      }).
         expect(201, {ok: true});
     });
   });
@@ -270,14 +276,15 @@ describe("VerifyModule", () => {
       sequelize.transaction = (resolve) => resolve();
       verificationRepository.getVerification = jest.fn().mockResolvedValue(undefined);
 
-      await request.
-        post("/api/verify/accept-token").send({
-          token: "a",
-          password: "asd",
-        }).
-        expect(400, {statusCode: 400,
+      await request.post("/api/verify/accept-token").send({
+        token: "a",
+        password: "asd",
+      }).
+        expect(400, {
+          statusCode: 400,
           message: "Invalid token",
-          error: "Bad Request"});
+          error: "Bad Request",
+        });
     });
     it("should set email confirmed", async() => {
       sequelize.transaction = (resolve) => resolve();
@@ -294,11 +301,10 @@ describe("VerifyModule", () => {
         },
       });
 
-      const {body} = await request.
-        post("/api/verify/accept-token").send({
-          token: "a",
-          password: "asd",
-        }).
+      const {body} = await request.post("/api/verify/accept-token").send({
+        token: "a",
+        password: "asd",
+      }).
         expect(201);
       expect(body).toMatchObject({session: expect.any(String)});
     });

@@ -1,6 +1,5 @@
 import type {OnGatewayConnection} from "@nestjs/websockets";
 import {
-  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
@@ -19,7 +18,6 @@ import {
 } from "@nestjs/common";
 import type {
   GetCountryCodeWsInMessage,
-  PrintMessageWsInMessage,
   SyncHistoryWsInMessage,
 } from "@/data/types/frontend";
 import {
@@ -85,9 +83,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
   }
 
   @SubscribeMessage("setMessageStatus")
-  public async setMessageStatus(
-
-  ): Promise<void> {
+  public async setMessageStatus(): Promise<void> {
     // This.messageService.setStatus
   }
 

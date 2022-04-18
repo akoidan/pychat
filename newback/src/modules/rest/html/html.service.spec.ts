@@ -10,8 +10,10 @@ describe("HtmlService", () => {
 
     it("should replace multiple params", () => {
       const service = new HtmlService();
-      const result = service.replaceTemplate("aa {{ blah }} {{koko}}", {blah: 3,
-        koko: 4});
+      const result = service.replaceTemplate("aa {{ blah }} {{koko}}", {
+        blah: 3,
+        koko: 4,
+      });
       expect(result).toEqual("aa 3 4");
     });
 

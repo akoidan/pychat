@@ -1,9 +1,5 @@
-import type {
-  ExecutionContext,
-} from "@nestjs/common";
-import {
-  createParamDecorator,
-} from "@nestjs/common";
+import type {ExecutionContext} from "@nestjs/common";
+import {createParamDecorator} from "@nestjs/common";
 import {WebSocket} from "ws";
 import type {WebSocketContextData} from "@/data/types/internal";
 

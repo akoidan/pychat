@@ -73,22 +73,38 @@ async function bootstrap() {
   const ipAddressModel: typeof IpAddressModel = app.get(getModelToken(IpAddressModel));
   const sequelize = app.get(Sequelize);
   await sequelize.transaction(async(transaction) => {
-    await messageHistoryModel.destroy({where: {}, truncate: true,});
-    await imageModel.destroy({where: {}, truncate: true,});
-    await subscriptionMessageModel.destroy({where: {}, truncate: true,});
-    await messageMentionModel.destroy({where: {}, truncate: true,});
-    await userProfileModel.destroy({where: {}, truncate: true,});
-    await userAuthModel.destroy({where: {}, truncate: true,});
-    await verificationModel.destroy({where: {}, truncate: true,});
-    await userJoinedInfoModel.destroy({where: {}, truncate: true,});
-    await uploadedFileModel.destroy({where: {}, truncate: true,});
-    await subscriptionModel.destroy({where: {}, truncate: true,});
-    await roomUsersModel.destroy({where: {}, truncate: true,});
-    await messageModel.destroy({where: {}, truncate: true,});
-    await roomModel.destroy({where: {}, truncate: true,});
-    await ipAddressModel.destroy({where: {}, truncate: true,});
-    await channelModel.destroy({where: {}, truncate: true,});
-    await userModel.destroy({where: {}, truncate: true,});
+    await messageHistoryModel.destroy({where: {},
+      truncate: true});
+    await imageModel.destroy({where: {},
+      truncate: true});
+    await subscriptionMessageModel.destroy({where: {},
+      truncate: true});
+    await messageMentionModel.destroy({where: {},
+      truncate: true});
+    await userProfileModel.destroy({where: {},
+      truncate: true});
+    await userAuthModel.destroy({where: {},
+      truncate: true});
+    await verificationModel.destroy({where: {},
+      truncate: true});
+    await userJoinedInfoModel.destroy({where: {},
+      truncate: true});
+    await uploadedFileModel.destroy({where: {},
+      truncate: true});
+    await subscriptionModel.destroy({where: {},
+      truncate: true});
+    await roomUsersModel.destroy({where: {},
+      truncate: true});
+    await messageModel.destroy({where: {},
+      truncate: true});
+    await roomModel.destroy({where: {},
+      truncate: true});
+    await ipAddressModel.destroy({where: {},
+      truncate: true});
+    await channelModel.destroy({where: {},
+      truncate: true});
+    await userModel.destroy({where: {},
+      truncate: true});
     const users: UserModel[] = pychat_chat_user.map((a) => {
       const b: UserModel = {
         lastTimeOnline: a.last_time_online,

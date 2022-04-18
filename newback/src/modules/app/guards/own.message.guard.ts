@@ -8,8 +8,7 @@ import {
 } from "@nestjs/common";
 import {MessageRepository} from "@/modules/rest/database/repository/messages.repository";
 import {PubsubService} from "@/modules/rest/pubsub/pubsub.service";
-import {WebSocketContextData} from "@/data/types/internal";
-import {DefaultWsOutMessage} from '@/data/types/frontend';
+import type {DefaultWsOutMessage} from "@/data/types/frontend";
 
 
 export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>) => number[]) => {
@@ -36,6 +35,7 @@ export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>
       return roomIds.every((id) => channels.includes(String(id)));
     }
   }
+
   return mixin(OwnMessageGuardMixin);
 };
 

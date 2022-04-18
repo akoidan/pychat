@@ -2,8 +2,8 @@ import type {SequelizeModuleOptions} from "@nestjs/sequelize";
 
 import {MAX_USERNAME_LENGTH} from "@/utils/consts";
 import {config} from "node-ts-config";
-import {UploadedFileModel} from '@/data/model/uploaded.file.model';
-import {GiphyDto} from '@/data/types/frontend';
+import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
+import type {GiphyDto} from "@/data/types/frontend";
 
 export function generateUserName(email: string) {
   return email.split("@")[0].replace(/[^0-9a-zA-Z-_]+/g, "-").substring(0, MAX_USERNAME_LENGTH);

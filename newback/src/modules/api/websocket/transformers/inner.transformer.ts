@@ -4,14 +4,9 @@ import type {
   GiphyDto,
   PrintMessageWsOutMessage,
 } from "@/data/types/frontend";
-import {
-  ImageType,
-} from "@/data/types/frontend";
+import {ImageType} from "@/data/types/frontend";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
-import {
-  CreateModel,
-  PureModel
-} from '@/data/types/internal';
+import type {CreateModel} from "@/data/types/internal";
 
 
 export function getUploadedGiphies(data: GiphyDto[], messageId: number): CreateModel<ImageModel>[] {
@@ -48,6 +43,6 @@ export function groupUploadedFileToImages(files: UploadedFileModel[], messageId:
       previousValue[currentValue.symbol].img = currentValue.file;
     }
     return previousValue;
-  }, {} as Record<number, CreateModel<ImageModel>>);
+  }, {});
   return Object.values(grouped);
 }

@@ -89,8 +89,7 @@ export class PubsubService {
   }
 
   public getMyChannels(context: WebSocketContextData): string[] {
-    return Object.entries(receivers).
-      filter(([k, v]) => v.find((k) => k.ctx === context)).
+    return Object.entries(receivers).filter(([k, v]) => v.find((k) => k.ctx === context)).
       map(([k, v]) => k);
   }
 }

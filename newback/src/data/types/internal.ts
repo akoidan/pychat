@@ -1,18 +1,24 @@
-import type {DefaultWsInMessage, MessageStatus} from "@/data/types/frontend";
+import type {DefaultWsInMessage} from "@/data/types/frontend";
 import type {RoomModel} from "@/data/model/room.model";
 import type {RoomUsersModel} from "@/data/model/room.users.model";
-import {ChannelModel} from '@/data/model/channel.model';
-import {UserModel} from '@/data/model/user.model';
+import type {ChannelModel} from "@/data/model/channel.model";
+import type {UserModel} from "@/data/model/user.model";
 
 export interface WebSocketContextData {
   userId: number;
   id: string;
+
   sendToClient(data: DefaultWsInMessage<any, any>);
 }
+
 export type UserOnlineData = Record<string, string[]>;
 
 // https://stackoverflow.com/questions/48881009/convert-tinyint-field-as-boolean-in-result-using-sequelize-raw-query-node-js
-export type MysqlBool = 0 | 1 | false | true;
+export type MysqlBool =
+  0
+  | 1
+  | false
+  | true;
 
 export interface FileSaveResponse {
   originFileName: string;
@@ -38,9 +44,10 @@ export interface GetRoomsForUser extends RoomSingleRoomUser {
 
 // https://stackoverflow.com/a/49725198/3872976
 export type RequireAtLeastOne<T, Keys extends keyof T = keyof T> =
-    {
-      [K in Keys]-?: Partial<Pick<T, Exclude<Keys, K>>> & Required<Pick<T, K>>
-    }[Keys] & Pick<T, Exclude<keyof T, Keys>>;
+  {
+    [K in Keys]-?: Partial<Pick<T, Exclude<Keys, K>>> & Required<Pick<T, K>>
+  }[Keys]
+  & Pick<T, Exclude<keyof T, Keys>>;
 
 
 // Based on https://stackoverflow.com/a/69756175/3872976

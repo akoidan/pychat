@@ -1,7 +1,5 @@
 import type {Logger} from "@nestjs/common";
-import {
-  UnauthorizedException,
-} from "@nestjs/common";
+import {UnauthorizedException} from "@nestjs/common";
 import {WS_SESSION_EXPIRED_CODE} from "@/data/types/frontend";
 import type {OnGatewayConnection} from "@nestjs/websockets";
 
@@ -15,6 +13,7 @@ export function processErrors(e, socket, logger: Logger) {
     socket.close(1011, `Error during opening a socket ${e.message}`.substr(0, 123)); // Message cannot be greather 123 bytes
   }
 }
+
 interface TargetCatchErrors extends OnGatewayConnection {
   logger: Logger;
 }
