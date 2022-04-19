@@ -1,7 +1,6 @@
-import {
-  DefaultMessage,
-  DefaultWsOutMessage
-} from '@/data/types/frontend';
+import { DefaultMessage } from '@/data/shared/common';
+import { MessageStatus } from '@/data/model/enums';
+import { GiphyDto } from '@/data/shared/dto';
 
 
 export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A> {
@@ -19,3 +18,22 @@ export interface SetMessageStatusWsOutMessage extends DefaultWsOutMessage<"setMe
 }
 
 export type GetCountryCodeWsOutMessage = DefaultWsOutMessage<"getCountryCode">;
+
+export interface SyncHistoryWsOutMessage extends DefaultWsOutMessage<"syncHistory"> {
+  roomIds: number[];
+  messagesIds: number[];
+  onServerMessageIds: number[];
+  receivedMessageIds: number[];
+  lastSynced: number;
+}
+
+export interface PrintMessageWsOutMessage extends DefaultMessage<"printMessage"> {
+  content: string;
+  roomId: number;
+  files: number[];
+  id: number;
+  timeDiff: number;
+  parentMessage: number | null;
+  tags: Record<string, number>;
+  giphies: GiphyDto[];
+}

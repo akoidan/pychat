@@ -1,7 +1,7 @@
 import type {Logger} from "@nestjs/common";
 import {UnauthorizedException} from "@nestjs/common";
-import {WS_SESSION_EXPIRED_CODE} from "@/data/types/frontend";
 import type {OnGatewayConnection} from "@nestjs/websockets";
+import { WS_SESSION_EXPIRED_CODE } from '@/data/shared/consts';
 
 export function processErrors(e, socket, logger: Logger) {
   logger.error(`Ws error ${e.message}`, e.stack, "ws");

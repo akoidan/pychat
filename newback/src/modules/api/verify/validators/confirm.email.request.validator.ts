@@ -1,5 +1,5 @@
 import {IsString} from "class-validator";
-import type {ConfirmEmailRequest} from "@/data/types/frontend";
+import { ConfirmEmailRequest } from '@/data/shared/http';
 
 
 export class ConfirmEmailRequestValidator implements ConfirmEmailRequest {

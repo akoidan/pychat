@@ -1,12 +1,10 @@
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {ImageModel} from "@/data/model/image.model";
-import type {
-  GiphyDto,
-  PrintMessageWsOutMessage,
-} from "@/data/types/frontend";
-import {ImageType} from "@/data/types/frontend";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {CreateModel} from "@/data/types/internal";
+import { GiphyDto } from '@/data/shared/dto';
+import { ImageType } from '@/data/model/enums';
+import { PrintMessageWsOutMessage } from '@/data/shared/ws.out.messages';
 
 
 export function getUploadedGiphies(data: GiphyDto[], messageId: number): CreateModel<ImageModel>[] {

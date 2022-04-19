@@ -7,7 +7,7 @@ import type {
   PubSubMessage,
   WebSocketContextData
 } from "@/data/types/internal";
-import type {HandlerName} from "@/data/types/frontend";
+import { HandlerName } from '@/data/shared/common';
 
 
 interface HandlerType {

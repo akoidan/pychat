@@ -1,5 +1,5 @@
 import {UserModel} from '@/data/model/user.model';
-import {UserSettingsDto} from '@/data/types/frontend';
+import { UserSettingsDto } from '@/data/shared/dto';
 
 export function transformSettings(user: UserModel): UserSettingsDto {
   return {

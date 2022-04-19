@@ -4,7 +4,6 @@ import {
 } from "@nestjs/common";
 import {UserRepository} from "@/modules/shared/database/repository/user.repository";
 import {PasswordService} from "@/modules/shared/password/password.service";
-import type {AddOnlineUserMessage} from "@/data/types/frontend";
 import {RoomRepository} from "@/modules/shared/database/repository/room.repository";
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import {SessionService} from "@/modules/shared/session/session.service";
@@ -15,6 +14,7 @@ import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import {transformSetWsId} from "@/data/transformers/out.message/set.ws.id.transformer";
 import {transformAddUserOnline} from '@/data/transformers/out.message/add.online.user.transformer';
 import {getLogoutMessage} from '@/data/transformers/out.message/remove.online.user.transformer';
+import { AddOnlineUserMessage } from '@/data/shared/ws.in.messages';
 
 
 

@@ -1,5 +1,5 @@
 import {UserModel} from '@/data/model/user.model';
-import {UserDto} from '@/data/types/frontend';
+import { UserDto } from '@/data/shared/dto';
 
 
 export function transformUserDto(u: UserModel): UserDto {

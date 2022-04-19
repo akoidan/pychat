@@ -1,7 +1,5 @@
 import type {TransformSetWsIdDataParams} from "@/data/types/internal";
-import type {SetWsIdMessage} from "@/data/types/frontend";
 import {transformChannelDto} from "@/data/transformers/model/channel.transformer";
-
 import {transformSettings} from "@/data/transformers/model/settings.transformer";
 import {transformUserDto} from "@/data/transformers/model/user.transformer";
 import {transformProfileDto} from "@/data/transformers/model/profile.transformer";
@@ -9,6 +7,7 @@ import {
   getRoomsOnline,
   getTransformRoomDto,
 } from "@/data/transformers/model/room.transformer";
+import { SetWsIdMessage } from '@/data/shared/ws.in.messages';
 
 
 export function transformSetWsId(

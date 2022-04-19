@@ -5,20 +5,19 @@ import {
 } from "@nestjs/common";
 import {UserRepository} from "@/modules/shared/database/repository/user.repository";
 import {PasswordService} from "@/modules/shared/password/password.service";
-import type {
-  AcceptTokenRequest,
-  AcceptTokenResponse,
-  ConfirmEmailRequest,
-  SendRestorePasswordRequest,
-  VerifyTokenResponse,
-} from "@/data/types/frontend";
-import {VerificationType} from "@/data/types/frontend";
 import {EmailService} from "@/modules/shared/email/email.service";
 import {Sequelize} from "sequelize-typescript";
 import type {VerificationModel} from "@/data/model/verification.model";
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
 import {SessionService} from "@/modules/shared/session/session.service";
+import {
+  AcceptTokenRequest,
+  AcceptTokenResponse, ConfirmEmailRequest,
+  SendRestorePasswordRequest,
+  VerifyTokenResponse
+} from '@/data/shared/http';
+import { VerificationType } from '@/data/model/enums';
 
 @Injectable()
 export class VerifyService {

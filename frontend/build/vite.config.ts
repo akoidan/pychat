@@ -132,7 +132,7 @@ export default defineConfig(async({command, mode}) => {
       },
     },
     server: {
-      port: 443,
+      port: 8080,
       https: {
         key,
         cert,

@@ -2,7 +2,7 @@ import {
   IsEmail,
   IsString,
 } from "class-validator";
-import type {ValidateUserEmailRequest} from "@/data/types/frontend";
+import { ValidateUserEmailRequest } from '@/data/shared/http';
 
 export class ValidateEmailRequestValidator implements ValidateUserEmailRequest {
   @IsString()

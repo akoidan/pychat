@@ -4,9 +4,9 @@ import type {
   PureModel,
 } from "@/data/types/internal";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
-import type {PrintMessageWsInMessage} from "@/data/types/frontend";
 import type {MessageModel} from "@/data/model/message.model";
 import {transformMessageDto} from '@/data/transformers/model/message.transformer';
+import { PrintMessageWsInMessage } from '@/data/shared/ws.in.messages';
 
 export function transformPrintMessage(
   message: PureModel<MessageModel>,

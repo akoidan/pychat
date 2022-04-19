@@ -1,5 +1,5 @@
 import {UploadedFileModel} from '@/data/model/uploaded.file.model';
-import {GiphyDto} from '@/data/types/frontend';
+import { GiphyDto } from '@/data/shared/dto';
 
 
 export function getMaxSymbol(files: UploadedFileModel[], tags: Record<string, number>, giphies: GiphyDto[]) {

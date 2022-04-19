@@ -1,7 +1,5 @@
-import {
-  Gender,
-  ImageType
-} from '@/data/types/frontend';
+import { Gender, ImageType } from '@/data/model/enums';
+
 
 interface TypeGeneratorForOauth1 extends SessionResponse {
   isNewAccount: true;

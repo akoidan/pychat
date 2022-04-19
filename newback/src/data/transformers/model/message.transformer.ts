@@ -1,13 +1,13 @@
 import type {MessageModel} from "@/data/model/message.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
-import type {MessageModelDto} from "@/data/types/frontend";
 import type {
   CreateModel,
   PureModel,
 } from "@/data/types/internal";
 import {transformMentionByPickingDto} from '@/data/transformers/model/mention.transformer';
 import {transformImageByPickingDto} from '@/data/transformers/model/image.transformer';
+import { MessageModelDto } from '@/data/shared/dto';
 
 
 export function transformMessageDto(message: PureModel<MessageModel>, mentions: CreateModel<MessageMentionModel>[], images: PureModel<ImageModel>[]): MessageModelDto {

@@ -3,7 +3,7 @@ import {
   Length,
   Matches,
 } from "class-validator";
-import type {AcceptTokenRequest} from "@/data/types/frontend";
+import { AcceptTokenRequest } from '@/data/shared/http';
 
 
 export class AcceptTokenRequestValidator implements AcceptTokenRequest {

@@ -5,11 +5,7 @@ import {
   CallBackMessage,
   ChangeUserOnlineBase,
   ChannelDto,
-  DefaultMessage,
-  DefaultWsInMessage,
-  DefaultWsOutMessage,
-  GiphyDto,
-  HandlerName,
+  GiphyDto, LocationDto,
   MessageModelDto,
   NewRoom,
   OfferFileContent,
@@ -23,7 +19,9 @@ import {
   UserProfileDtoWoImage,
   UserSettingsDto,
   WebRtcDefaultMessage
-} from '@/data/types/frontend';
+} from '@/data/shared/dto';
+import { DefaultMessage, HandlerName } from '@/data/shared/common';
+import { MessageStatus } from '@/data/model/enums';
 
 
 export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {
@@ -221,15 +219,4 @@ export type RetryFileMessage = DefaultWsInMessage<"retryFile", "peerConnection:*
 
 export interface DestroyFileConnectionMessage extends DefaultWsInMessage<"destroyFileConnection", "peerConnection:*"> {
   content: "decline" | "success";
-}
-
-export interface PrintMessageWsOutMessage extends DefaultWsInMessage<"printMessage", "ws-message"> {
-  content: string;
-  roomId: number;
-  files: number[];
-  id: number;
-  timeDiff: number;
-  parentMessage: number | null;
-  tags: Record<string, number>;
-  giphies: GiphyDto[];
 }

@@ -1,3 +1,4 @@
+import { DefaultInMessage } from '@/data/shared/ws.in.messages';
 
 export interface DefaultMessage<A extends string> {
   action: A;

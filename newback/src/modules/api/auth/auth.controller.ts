@@ -9,18 +9,18 @@ import {AuthService} from "@/modules/api/auth/auth.service";
 import {LoginRequestValidator} from "@/modules/api/auth/validators/login.request.validator";
 import {SignUpRequestValidator} from "@/modules/api/auth/validators/sign.up.request.validator";
 import {ValidateUserRequestValidator} from "@/modules/api/auth/validators/validate.user.request.validator";
-import type {
-  FacebookSignInResponse,
-  GoogleSignInResponse,
-  SignInResponse,
-  SignUpResponse,
-  ValidateEmailResponse,
-  ValidateUserResponse,
-} from "@/data/types/frontend";
+
 import {GoogleAuthRequestValidator} from "@/modules/api/auth/validators/google.auth.reques.validator";
 import {CaptchaGuard} from "@/modules/app/guards/captcha.guard";
 import {ValidateEmailRequestValidator} from "@/modules/api/auth/validators/validate.email.request.validator";
 import {FacebookAuthRequestValidator} from "@/modules/api/auth/validators/facebook.auth.request.validator";
+import {
+  FacebookSignInResponse, GoogleSignInResponse,
+  SignInResponse,
+  SignUpResponse,
+  ValidateEmailResponse,
+  ValidateUserResponse
+} from '@/data/shared/http';
 
 
 @Controller({

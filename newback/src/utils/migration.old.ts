@@ -6,7 +6,6 @@ import {LoggerModule} from "@/modules/shared/logger/logger.module";
 import {ConfigModule} from "@/modules/shared/config/config.module";
 import {getModelToken} from "@nestjs/sequelize";
 import {Sequelize} from "sequelize-typescript";
-import {Gender} from "@/data/types/frontend";
 import {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 import {UserAuthModel} from "@/data/model/user.auth.model";
 import {UserProfileModel} from "@/data/model/user.profile.model";
@@ -22,6 +21,7 @@ import {SubscriptionMessageModel} from "@/data/model/subscription.message.model"
 import {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import {VerificationModel} from "@/data/model/verification.model";
 import {IpAddressModel} from "@/data/model/ip.address.model";
+import { Gender } from '@/data/model/enums';
 
 
 async function bootstrap() {

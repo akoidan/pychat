@@ -6,9 +6,9 @@ import {
   Length,
   Matches,
 } from "class-validator";
-import type {SignUpRequest} from "@/data/types/frontend";
-import {Gender} from "@/data/types/frontend";
 import {MAX_USERNAME_LENGTH} from '@/data/consts';
+import { SignUpRequest } from '@/data/shared/http';
+import { Gender } from '@/data/model/enums';
 
 
 export class SignUpRequestValidator implements SignUpRequest {

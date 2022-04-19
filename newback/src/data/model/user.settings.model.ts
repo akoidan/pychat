@@ -7,13 +7,13 @@ import {
   Table,
 } from "sequelize-typescript";
 import {Injectable} from "@nestjs/common";
-import {Theme} from "@/data/types/frontend";
 import {UserModel} from "@/data/model/user.model";
 import {
   LogLevel,
   logLevels,
 } from "lines-logger";
 import {MysqlBool} from "@/data/types/internal";
+import { Theme } from '@/data/model/enums';
 
 @Injectable()
 @Table({tableName: "user_settings"})

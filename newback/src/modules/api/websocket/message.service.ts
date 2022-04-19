@@ -2,13 +2,6 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import type {
-  PrintMessageWsOutMessage,
-  ShowITypeWsInMessage,
-  ShowITypeWsOutMessage,
-  SyncHistoryWsOutMessage,
-} from "@/data/types/frontend";
-import {MessageStatus} from "@/data/types/frontend";
 import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import type {
   CreateModel,
@@ -27,6 +20,13 @@ import {
 } from '@/data/transformers/out.message/inner.transformer';
 import {transformPrintMessage} from '@/data/transformers/out.message/print.message.transformer';
 import {getMaxSymbol} from '@/data/transformers/helper/get.max.symbol';
+import {
+  PrintMessageWsOutMessage,
+  ShowITypeWsOutMessage,
+  SyncHistoryWsOutMessage
+} from '@/data/shared/ws.out.messages';
+import { MessageStatus } from '@/data/model/enums';
+import { ShowITypeWsInMessage } from '@/data/shared/ws.in.messages';
 
 @Injectable()
 export class MessageService {

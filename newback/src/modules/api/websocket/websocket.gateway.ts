@@ -20,16 +20,6 @@ import {
   UseFilters,
   UseGuards,
 } from "@nestjs/common";
-import type {
-  GetCountryCodeWsInMessage,
-  SyncHistoryWsInMessage,
-} from "@/data/types/frontend";
-import {
-  GetCountryCodeWsOutMessage,
-  PrintMessageWsOutMessage,
-  ShowITypeWsOutMessage,
-  SyncHistoryWsOutMessage,
-} from "@/data/types/frontend";
 import {SubscribePuBSub} from "@/modules/shared/pubsub/pubsub.service";
 import {WebsocketService} from "@/modules/api/websocket/websocket.service";
 import {WsDataService} from "@/modules/api/websocket/ws.data.service";
@@ -40,6 +30,14 @@ import {CatchWsErrors} from "@/modules/app/decorators/catch.ws.errors";
 import {MessagesFromMyRoomGuard} from "@/modules/app/guards/own.message.guard";
 import type {NestGateway} from "@nestjs/websockets/interfaces/nest-gateway.interface";
 import {OwnRoomGuard} from "@/modules/app/guards/own.room.guard";
+import {
+  GetCountryCodeWsOutMessage,
+  PrintMessageWsOutMessage,
+  ShowITypeWsOutMessage,
+  SyncHistoryWsOutMessage
+} from '@/data/shared/ws.out.messages';
+import { SyncHistoryWsInMessage } from '@/data/shared/dto';
+import { GetCountryCodeWsInMessage } from '@/data/shared/ws.in.messages';
 
 @WebSocketGateway({
   path: "/ws",

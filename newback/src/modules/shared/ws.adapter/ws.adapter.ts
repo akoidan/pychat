@@ -23,11 +23,9 @@ import {
   WebSocket,
   WebSocketServer,
 } from "ws";
-import type {
-  DefaultWsInMessage,
-  DefaultWsOutMessage,
-} from "@/data/types/frontend";
 import {processErrors} from "@/modules/app/decorators/catch.ws.errors";
+import { DefaultWsInMessage } from '@/data/shared/ws.in.messages';
+import { DefaultWsOutMessage } from '@/data/shared/ws.out.messages';
 
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {

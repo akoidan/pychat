@@ -7,9 +7,9 @@ import {
   Table,
 } from "sequelize-typescript";
 import {Injectable} from "@nestjs/common";
-import {MessageStatus} from "@/data/types/frontend";
 import {UserModel} from "@/data/model/user.model";
 import {RoomModel} from "@/data/model/room.model";
+import { MessageStatus } from '@/data/model/enums';
 
 @Injectable()
 @Table({tableName: "message"})

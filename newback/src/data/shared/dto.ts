@@ -1,3 +1,6 @@
+import { Gender, ImageType, MessageStatus } from '@/data/model/enums';
+import { DefaultInMessage } from '@/data/shared/ws.in.messages';
+import { HandlerName, HandlerType } from '@/data/shared/common';
 
 
 export declare type LogLevel =
@@ -179,6 +182,7 @@ export interface ResolveCallbackId {
 export interface IMessageHandler {
   handle(message: DefaultInMessage<string, HandlerName>): void;
 
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   getHandler<H extends HandlerName, A extends string>(message: DefaultInMessage<A, H>): HandlerType<A, H> | undefined;
 }
 

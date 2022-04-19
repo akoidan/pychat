@@ -1,9 +1,9 @@
 import {createConnection} from "mysql2";
-import {generateOrmConfig} from "@/utils/helpers";
 import {
   CommandsRunner,
   MysqlDriver,
 } from "node-db-migration";
+import { generateOrmConfig } from '@/utils/generate.orm.config';
 
 const {database, host, password, port, username, define} = generateOrmConfig((sql) => {
   console.log(sql);

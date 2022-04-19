@@ -1,8 +1,7 @@
 import {UserJoinedInfoModel} from '@/data/model/user.joined.info.model';
-import {
-  GetCountryCodeWsInMessage,
-  LocationDto
-} from '@/data/types/frontend';
+import { GetCountryCodeWsInMessage } from '@/data/shared/ws.in.messages';
+import { LocationDto } from '@/data/shared/dto';
+
 
 export function transformUserCountries(userInfo: UserJoinedInfoModel[]): Omit<GetCountryCodeWsInMessage, "action" | "handler"> {
   const content: GetCountryCodeWsInMessage["content"] = userInfo.reduce((previousValue, currentValue) => {

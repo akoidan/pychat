@@ -6,20 +6,6 @@ import {
 } from "@nestjs/common";
 import {UserRepository} from "@/modules/shared/database/repository/user.repository";
 import {PasswordService} from "@/modules/shared/password/password.service";
-import type {
-  FaceBookAuthRequest,
-  FacebookSignInResponse,
-  GoogleAuthRequest,
-  GoogleSignInResponse,
-  SignInRequest,
-  SignInResponse,
-  SignUpRequest,
-  SignUpResponse,
-} from "@/data/types/frontend";
-import {
-  Gender,
-  VerificationType,
-} from "@/data/types/frontend";
 import {RoomRepository} from "@/modules/shared/database/repository/room.repository";
 import {EmailService} from "@/modules/shared/email/email.service";
 import type {Transaction} from "sequelize";
@@ -36,6 +22,14 @@ import {
   ALL_ROOM_ID,
   MAX_USERNAME_LENGTH
 } from '@/data/consts';
+import {
+  FaceBookAuthRequest,
+  FacebookSignInResponse,
+  GoogleAuthRequest, GoogleSignInResponse, SignInRequest, SignInResponse,
+  SignUpRequest,
+  SignUpResponse
+} from '@/data/shared/http';
+import { Gender, VerificationType } from '@/data/model/enums';
 
 @Injectable()
 export class AuthService {

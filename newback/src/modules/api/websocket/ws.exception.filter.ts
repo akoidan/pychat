@@ -5,7 +5,7 @@ import type {
 } from "@nestjs/common";
 import {Catch} from "@nestjs/common";
 import type {WebSocket} from "ws";
-import type {GrowlMessage} from "@/data/types/frontend";
+import { GrowlMessage } from '@/data/shared/ws.in.messages';
 
 @Catch(Error) // If we provide it on module Websocket it will also affect http,so fuck it
 // Since we can't decouple this from WebSocketGateway, it should be in this file

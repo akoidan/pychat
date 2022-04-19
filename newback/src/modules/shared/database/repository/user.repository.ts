@@ -2,11 +2,11 @@ import {Injectable} from "@nestjs/common";
 import {InjectModel} from "@nestjs/sequelize";
 import {UserModel} from "@/data/model/user.model";
 import {UserAuthModel} from "@/data/model/user.auth.model";
-import type {Gender} from "@/data/types/frontend";
 import {UserProfileModel} from "@/data/model/user.profile.model";
 import {UserSettingsModel} from "@/data/model/user.settings.model";
 import type {Transaction} from "sequelize";
 import {Op} from "sequelize";
+import { Gender } from '@/data/model/enums';
 
 
 @Injectable()

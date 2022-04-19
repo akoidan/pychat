@@ -1,5 +1,5 @@
 import {IsString} from "class-validator";
-import type {FaceBookAuthRequest} from "@/data/types/frontend";
+import { FaceBookAuthRequest } from '@/data/shared/http';
 
 export class FacebookAuthRequestValidator implements FaceBookAuthRequest {
   @IsString()

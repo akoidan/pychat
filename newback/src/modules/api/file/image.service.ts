@@ -2,7 +2,6 @@ import {
   Injectable,
   Logger,
 } from "@nestjs/common";
-import {ImageType} from "@/data/types/frontend";
 import type {Metadata} from "sharp";
 import * as sharp from "sharp";
 import {PasswordService} from "@/modules/shared/password/password.service";
@@ -13,6 +12,7 @@ import {
   writeFile,
 } from "fs/promises";
 import type {FileSaveResponse} from "@/data/types/internal";
+import { ImageType } from '@/data/model/enums';
 
 @Injectable()
 export class ImageService {

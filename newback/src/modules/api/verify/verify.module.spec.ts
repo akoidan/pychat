@@ -24,10 +24,10 @@ import {IpService} from "@/modules/shared/ip/ip.service";
 import {IpRepository} from "@/modules/shared/database/repository/ip.repository";
 import type {IpAddressModel} from "@/data/model/ip.address.model";
 import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
-import {VerificationType} from "@/data/types/frontend";
 import {VerifyController} from "@/modules/api/verify/verify.controller";
 import {VerifyService} from "@/modules/api/verify/verify.service";
 import {SessionService} from "@/modules/shared/session/session.service";
+import { VerificationType } from '@/data/model/enums';
 
 describe("VerifyModule", () => {
   let app: INestApplication;

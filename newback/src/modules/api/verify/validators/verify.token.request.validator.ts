@@ -1,5 +1,5 @@
 import {IsString} from "class-validator";
-import type {VerifyTokenRequest} from "@/data/types/frontend";
+import { VerifyTokenRequest } from '@/data/shared/http';
 
 
 export class VerifyTokenRequestValidator implements VerifyTokenRequest {

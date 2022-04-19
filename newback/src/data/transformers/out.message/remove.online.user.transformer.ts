@@ -2,7 +2,7 @@ import {
   UserOnlineData,
   WebSocketContextData
 } from '@/data/types/internal';
-import {RemoveOnlineUserMessage} from '@/data/types/frontend';
+import { RemoveOnlineUserMessage } from '@/data/shared/ws.in.messages';
 
 export function getLogoutMessage(online: UserOnlineData, lastTimeOnline: number, context: WebSocketContextData, time: number): RemoveOnlineUserMessage {
   return {

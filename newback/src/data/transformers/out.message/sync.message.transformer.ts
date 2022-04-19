@@ -1,8 +1,8 @@
 import {MessageModel} from '@/data/model/message.model';
 import {MessageMentionModel} from '@/data/model/message.mention.model';
 import {ImageModel} from '@/data/model/image.model';
-import {SyncHistoryWsInMessage} from '@/data/types/frontend';
 import {transformMessageDto} from '@/data/transformers/model/message.transformer';
+import { SyncHistoryWsInMessage } from '@/data/shared/dto';
 
 export function getSyncMessage(
   readMessageIds: number[],

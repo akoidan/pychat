@@ -4,7 +4,7 @@ import {
   Matches,
   ValidateIf,
 } from "class-validator";
-import type {SendRestorePasswordRequest} from "@/data/types/frontend";
+import { SendRestorePasswordRequest } from '@/data/shared/http';
 
 export class SendRestorePasswordValidator implements SendRestorePasswordRequest {
   @ValidateIf((o) => !o.email || o.username)

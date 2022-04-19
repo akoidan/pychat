@@ -8,8 +8,8 @@ import {
   Unique,
 } from "sequelize-typescript";
 import {Injectable} from "@nestjs/common";
-import {ImageType} from "@/data/types/frontend";
 import {MessageModel} from "@/data/model/message.model";
+import { ImageType } from '@/data/model/enums';
 
 const uniqueUserIdSymbMess = "unique_image_symbol_message";
 

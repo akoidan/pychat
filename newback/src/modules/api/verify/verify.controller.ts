@@ -7,16 +7,16 @@ import {
 } from "@nestjs/common";
 import {CaptchaGuard} from "@/modules/app/guards/captcha.guard";
 import {SendRestorePasswordValidator} from "@/modules/api/verify/validators/send.restore.password.validator";
-import type {
-  AcceptTokenResponse,
-  ConfirmEmailResponse,
-  SendRestorePasswordResponse,
-  VerifyTokenResponse,
-} from "@/data/types/frontend";
 import {VerifyTokenRequestValidator} from "@/modules/api/verify/validators/verify.token.request.validator";
 import {ConfirmEmailRequestValidator} from "@/modules/api/verify/validators/confirm.email.request.validator";
 import {AcceptTokenRequestValidator} from "@/modules/api/verify/validators/accept.token.request.validator";
 import {VerifyService} from "@/modules/api/verify/verify.service";
+import {
+  AcceptTokenResponse,
+  ConfirmEmailResponse,
+  SendRestorePasswordResponse,
+  VerifyTokenResponse
+} from '@/data/shared/http';
 
 
 @Controller({
