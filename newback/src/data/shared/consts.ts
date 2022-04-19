@@ -1,0 +1,1 @@
+export const WS_SESSION_EXPIRED_CODE = 4001;

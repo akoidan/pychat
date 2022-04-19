@@ -1,4 +1,111 @@
-/** BasemessagesInterfaces.ts */
+
+
+export declare type LogLevel =
+  "debug"
+  | "disable"
+  | "error"
+  | "info"
+  | "log_raise_error"
+  | "log_with_warnings"
+  | "trace"
+  | "warn";
+
+export interface UserSettingsDto {
+  embeddedYoutube: boolean;
+  highlightCode: boolean;
+  incomingFileCallSound: boolean;
+  messageSound: boolean;
+  onlineChangeSound: boolean;
+  showWhenITyping: boolean;
+  suggestions: boolean;
+  logs: LogLevel;
+  theme: string;
+}
+
+
+export interface RoomNoUsersDto {
+  channelId: number | null;
+  notifications: boolean;
+  p2p: boolean;
+  volume: number;
+  isMainInChannel: boolean;
+  id: number;
+  name: string;
+  creatorId: number;
+}
+
+export interface UserProfileDto extends UserProfileDtoWoImage {
+  thumbnail: string;
+}
+
+
+export interface LocationDto {
+  city: string;
+  country: string;
+  countryCode: string;
+  region: string;
+}
+
+
+export interface ChannelDto {
+  name: string;
+  id: number;
+  creatorId: number;
+}
+
+export interface RoomDto extends RoomNoUsersDto {
+  users: number[];
+}
+
+
+export interface FileModelDto {
+  url: string;
+  id: number;
+  type: ImageType;
+  preview: string;
+}
+
+
+
+export interface MessageModelDto {
+  id: number;
+  time: number;
+  parentMessage: number;
+  files?: Record<number, FileModelDto>;
+  tags: Record<number, number>;
+  content: string;
+  status: MessageStatus;
+  symbol?: string;
+  deleted?: boolean;
+  threadMessagesCount: number;
+  edited: number;
+  roomId: number;
+  userId: number;
+}
+
+
+export interface UserDto {
+  username: string;
+  id: number;
+  thumbnail: string;
+  lastTimeOnline: number;
+  sex: Gender;
+}
+
+
+export interface UserProfileDtoWoImage {
+  username: string;
+  name: string;
+  city: string;
+  surname: string;
+  email: string;
+  birthday: Date;
+  contacts: string;
+  sex: Gender;
+  id: number;
+}
+
+
 
 
 export interface ChangeUserOnlineBase {
@@ -88,37 +195,6 @@ export type CallStatus =
  * and processed by MessageHandler
  */
 
-/*
- * Import type {
- *   ChannelDto,
- *   LocationDto,
- *   MessageModelDto,
- *   RoomDto,
- *   RoomNoUsersDto,
- *   UserDto,
- *   UserProfileDto,
- *   UserProfileDtoWoImage,
- *   UserSettingsDto,
- * } from "@/ts/types/dto";
- *
- * import type {
- *   AcceptFileContent,
- *   AddRoomBase,
- *   BrowserBase,
- *   CallBackMessage,
- *   ChangeUserOnlineBase,
- *   DefaultInMessage,
- *   HandlerName,
- *   NewRoom,
- *   OfferFileContent,
- *   OpponentWsId,
- *   ReplyWebRtc,
- *   RoomExistedBefore,
- *   WebRtcDefaultMessage,
- * } from "@/ts/types/backend";
- * import type {MessageStatus} from "@/ts/types/model";
- */
-
 
 export interface MessagesResponseMessage {
   content: MessageModelDto[];
@@ -136,13 +212,4 @@ export interface GiphyDto {
   url: string;
   symbol: string;
 }
-
-
-
-
-
-
-
-
-
 
