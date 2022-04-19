@@ -4,17 +4,15 @@
  * This excludes messages that comes deserialized from websocket or any other network
  */
 import type {
+  ChangeDeviceType,
+  ChangeOnlineType,
   ChannelDto,
   RoomDto,
   UserDto,
-} from "@/ts/types/dto";
-import type {
-  ChangeDeviceType,
-  ChangeOnlineType,
-  DefaultInMessage,
-  HandlerName,
-} from "@/ts/types/backend";
+} from "@/ts/types/shared/dto";
 import type {MessageStatusModel} from "@/ts/types/model";
+import {HandlerName} from "@/ts/types/shared/common";
+import {DefaultInMessage} from "@/ts/types/shared/ws.in.messages";
 
 
 export interface DefaultInnerSystemMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H> {

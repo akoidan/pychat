@@ -4,12 +4,12 @@ import type WsHandler from "@/ts/message_handlers/WsHandler";
 import FileSenderPeerConnection from "@/ts/webrtc/file/FileSenderPeerConnection";
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
-import type {ReplyFileMessage} from "@/ts/types/backend";
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
+import {ReplyFileMessage} from "@/ts/types/shared/ws.in.messages";
 
 
 export default class FileHandler extends FileAndCallTransfer {

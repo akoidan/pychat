@@ -10,14 +10,14 @@ import {
   SERVICE_WORKER_URL,
   SERVICE_WORKER_VERSION_LS_NAME,
 } from "@/ts/utils/consts";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {MainWindow} from "@/ts/classes/MainWindow";
 import type Subscription from "@/ts/classes/Subscription";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
 
 
 export default class NotifierHandler extends MessageHandler {

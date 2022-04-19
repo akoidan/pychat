@@ -25,7 +25,7 @@ import {
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
-import {ImageType} from "@/ts/types/backend";
+import {ImageType} from "@/ts/types/shared/enums";
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;

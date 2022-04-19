@@ -17,7 +17,7 @@ import {
   FACEBOOK_APP_ID,
   GOOGLE_OAUTH_2_CLIENT_ID,
 } from "@/ts/utils/consts";
-import type {OauthSessionResponse} from "@/ts/types/dto";
+import {OauthSessionResponse} from "@/ts/types/shared/http";
 
 @Component({
   name: "SocialAuthSignUp",

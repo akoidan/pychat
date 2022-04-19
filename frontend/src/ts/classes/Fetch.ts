@@ -9,7 +9,6 @@ import {
   SetMessageProgress,
   UploadData
 } from "@/ts/types/types";
-import {SaveFileRequest} from "@/ts/types/backend";
 
 export default class Fetch {
   protected httpLogger: Logger;

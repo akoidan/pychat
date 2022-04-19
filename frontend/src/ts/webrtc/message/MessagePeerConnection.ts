@@ -5,11 +5,6 @@ import type {MessageSupplier} from "@/ts/types/types";
 import {P2PMessageProcessor} from "@/ts/message_handlers/P2PMessageProcessor";
 
 import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
-import {MessageStatus} from '@/ts/types/backend';
-import type {
   ConfirmReceivedP2pMessage,
   ConfirmSetMessageStatusRequest,
   DefaultP2pMessage,
@@ -42,6 +37,11 @@ import type {
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Subscription from "@/ts/classes/Subscription";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
+import {MessageStatus} from "@/ts/types/shared/enums";
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
   connectedToRemote: boolean = true;

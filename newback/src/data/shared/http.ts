@@ -1,4 +1,7 @@
-import { Gender, ImageType } from '@/data/shared/enums';
+import {
+  Gender,
+  ImageType
+} from "@/ts/types/shared/enums";
 
 
 interface TypeGeneratorForOauth1 extends SessionResponse {

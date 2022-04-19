@@ -33,7 +33,8 @@ import {
 } from "vue-property-decorator";
 import type {MessageModel} from "@/ts/types/model";
 import {RoomModel} from "@/ts/types/model";
-import {MessageStatus} from '@/ts/types/backend';
+import {MessageStatus} from "@/ts/types/shared/enums";
+
 
 @Component({name: "RoomRightIcon"})
 export default class RoomRightIcon extends Vue {

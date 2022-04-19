@@ -3,16 +3,18 @@
  * So if we create a structure on one PC (on frontend) and handle on another (on frontend as well)
  * this file should do it
  */
-import type {
-  CallBackMessage,
-  DefaultMessage,
-  ResolveCallbackId,
-} from "@/ts/types/backend";
+
 import type {
   MessageP2pDto,
   MessagesInfo,
 } from "@/ts/types/messages/p2pDto";
-import type {MessageStatus} from "@/ts/types/backend";
+import {DefaultMessage} from "@/ts/types/shared/common";
+import {
+  CallBackMessage,
+  ResolveCallbackId
+} from "@/ts/types/shared/dto";
+import {MessageStatus} from "@/ts/types/shared/enums";
+
 
 
 export type P2PHandlerType<A extends string> = (a: DefaultP2pMessage<A>) => Promise<void> | void;

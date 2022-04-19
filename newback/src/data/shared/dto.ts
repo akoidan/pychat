@@ -1,3 +1,13 @@
+import {
+  Gender,
+  ImageType,
+  MessageStatus
+} from "@/ts/types/shared/enums";
+import {DefaultInMessage} from "@/ts/types/shared/ws.in.messages";
+import {
+  HandlerName,
+  HandlerType
+} from "@/ts/types/shared/common";
 
 
 export declare type LogLevel =

@@ -5,8 +5,8 @@ import type {
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {MessageSender} from "@/ts/types/types";
 import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from "@/ts/utils/consts";
-import {MessageStatus} from '@/ts/types/backend';
 import {MessageStatusInner} from '@/ts/types/model';
+import {MessageStatus} from "@/ts/types/shared/enums";
 
 export function bytesToSize(bytes: number): string {
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];

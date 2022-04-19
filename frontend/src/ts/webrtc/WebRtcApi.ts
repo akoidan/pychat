@@ -19,18 +19,6 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {browserVersion} from "@/ts/utils/runtimeConsts";
 import MessageTransferHandler from "@/ts/webrtc/message/MessageTransferHandler";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
-import type {
-  NotifyCallActiveMessage,
-  OfferCall,
-  OfferFile,
-  OfferMessage,
-  WebRtcSetConnectionIdMessage,
-} from "@/ts/types/backend";
-import type {
-  HandlerName,
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
 import type {VideoType} from "@/ts/types/types";
 import type {
   ChangeP2pRoomInfoMessage,
@@ -40,6 +28,18 @@ import type {
 } from "@/ts/types/messages/innerMessages";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
+import {
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
+import {
+  NotifyCallActiveMessage,
+  OfferCall,
+  OfferFile,
+  OfferMessage,
+  WebRtcSetConnectionIdMessage
+} from "@/ts/types/shared/ws.in.messages";
 
 export default class WebRtcApi extends MessageHandler {
   protected logger: Logger;

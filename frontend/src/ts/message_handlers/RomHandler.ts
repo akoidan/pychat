@@ -4,12 +4,6 @@ import type {
   SetRoomsUsers,
 } from "@/ts/types/types";
 import type {
-  AddRoomBase,
-  ChangeDeviceType,
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
-import type {
   ChangeP2pRoomInfoMessage,
   ChangeUserOnlineInfoMessage,
   LogoutMessage,
@@ -32,10 +26,11 @@ import {
   getRoomsBaseDict,
 } from "@/ts/types/converters";
 import type {
+  AddRoomBase,
+  ChangeDeviceType,
   ChannelDto,
   RoomDto,
-  SetStateFromWS,
-} from "@/ts/types/dto";
+} from "@/ts/types/shared/dto";
 import type {
   AddChannelMessage,
   AddInviteMessage,
@@ -63,6 +58,11 @@ import {
   logout,
 } from "@/ts/utils/audio";
 import type Subscription from "@/ts/classes/Subscription";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
+import {SetStateFromWS} from "@/ts/types/dto";
 
 export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
@@ -142,7 +142,6 @@ export class RoomHandler extends MessageHandler {
   }
 
   public addChannel(message: AddChannelMessage) {
-    // @ts-expect-error
     this.mutateRoomAddition(message, "room_created");
   }
 

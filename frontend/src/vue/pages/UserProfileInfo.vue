@@ -122,13 +122,13 @@ import {
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {CurrentUserInfoModel} from "@/ts/types/model";
-import type {UserProfileDtoWoImage} from "@/ts/types/dto";
 
 import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
-import type {SetUserProfileMessage} from "@/ts/types/backend";
 import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
-import {Gender} from '@/ts/types/backend';
+import {Gender} from "@/ts/types/shared/enums";
+import {UserProfileDtoWoImage} from "@/ts/types/shared/dto";
+import {SetUserProfileMessage} from "@/ts/types/shared/ws.in.messages";
 
 @Component({
   name: "UserProfileInfo",

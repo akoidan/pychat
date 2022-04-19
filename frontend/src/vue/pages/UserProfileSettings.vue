@@ -127,8 +127,6 @@ import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {userSettingsDtoToModel} from "@/ts/types/converters";
-import type {UserSettingsDto} from "@/ts/types/dto";
-import type {SetSettingsMessage} from "@/ts/types/backend";
 import type {LogLevel} from "lines-logger";
 import {logLevels} from "lines-logger";
 import {
@@ -139,6 +137,8 @@ import {
   addToHomeScreen,
   canBeInstalled,
 } from "@/ts/utils/addToHomeScreen";
+import {UserSettingsDto} from "@/ts/types/shared/dto";
+import {SetSettingsMessage} from "@/ts/types/shared/ws.in.messages";
 
 @Component({
   name: "UserProfileSettings",
