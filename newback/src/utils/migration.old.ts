@@ -21,7 +21,7 @@ import {SubscriptionMessageModel} from "@/data/model/subscription.message.model"
 import {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import {VerificationModel} from "@/data/model/verification.model";
 import {IpAddressModel} from "@/data/model/ip.address.model";
-import { Gender } from '@/data/model/enums';
+import { Gender } from '@/data/shared/enums';
 
 
 async function bootstrap() {

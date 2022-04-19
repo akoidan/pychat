@@ -9,7 +9,7 @@ import {
 import {Injectable} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
 import {RoomModel} from "@/data/model/room.model";
-import { MessageStatus } from '@/data/model/enums';
+import { MessageStatus } from '@/data/shared/enums';
 
 @Injectable()
 @Table({tableName: "message"})

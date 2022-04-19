@@ -17,7 +17,7 @@ import {
   SendRestorePasswordRequest,
   VerifyTokenResponse
 } from '@/data/shared/http';
-import { VerificationType } from '@/data/model/enums';
+import { VerificationType } from '@/data/shared/enums';
 
 @Injectable()
 export class VerifyService {

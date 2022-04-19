@@ -80,7 +80,7 @@ import {
   Mutation,
   VuexModule,
 } from "vuex-module-decorators";
-import {Gender} from '@/ts/types/backend';
+
 
 const logger = loggerFactory.getLogger("store");
 

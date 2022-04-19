@@ -29,7 +29,7 @@ import {
   SignUpRequest,
   SignUpResponse
 } from '@/data/shared/http';
-import { Gender, VerificationType } from '@/data/model/enums';
+import { Gender, VerificationType } from '@/data/shared/enums';
 
 @Injectable()
 export class AuthService {

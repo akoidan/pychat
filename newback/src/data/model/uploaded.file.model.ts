@@ -8,7 +8,7 @@ import {
 } from "sequelize-typescript";
 import {Injectable} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
-import { ImageType } from '@/data/model/enums';
+import { ImageType } from '@/data/shared/enums';
 
 @Injectable()
 @Table({tableName: "uploaded_file"})

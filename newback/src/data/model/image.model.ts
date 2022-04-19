@@ -9,7 +9,7 @@ import {
 } from "sequelize-typescript";
 import {Injectable} from "@nestjs/common";
 import {MessageModel} from "@/data/model/message.model";
-import { ImageType } from '@/data/model/enums';
+import { ImageType } from '@/data/shared/enums';
 
 const uniqueUserIdSymbMess = "unique_image_symbol_message";
 

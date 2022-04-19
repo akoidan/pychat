@@ -11,7 +11,7 @@ import {ImageModel} from "@/data/model/image.model";
 import {MessageMentionModel} from "@/data/model/message.mention.model";
 import {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {CreateModel} from "@/data/types/internal";
-import { MessageStatus } from '@/data/model/enums';
+import { MessageStatus } from '@/data/shared/enums';
 
 
 @Injectable()

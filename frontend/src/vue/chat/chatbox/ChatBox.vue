@@ -121,11 +121,10 @@ import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import type {
+import {
   HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
-import {MessageStatus} from "@/ts/types/backend";
+  HandlerTypes
+} from "@/ts/types/shared/common";
 
 
 @Component({

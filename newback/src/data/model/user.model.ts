@@ -10,7 +10,7 @@ import {UserAuthModel} from "@/data/model/user.auth.model";
 import {UserProfileModel} from "@/data/model/user.profile.model";
 import {UserSettingsModel} from "@/data/model/user.settings.model";
 import {MAX_USERNAME_LENGTH} from '@/data/consts';
-import { Gender } from '@/data/model/enums';
+import { Gender } from '@/data/shared/enums';
 
 
 @Injectable()

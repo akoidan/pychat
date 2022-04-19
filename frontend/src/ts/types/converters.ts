@@ -17,17 +17,15 @@ import type {
   MessageModelDto,
   RoomDto,
   RoomNoUsersDto,
-  Gender,
   UserDto,
   UserProfileDtoWoImage,
   UserSettingsDto,
-} from "@/ts/types/dto";
+} from "@/ts/types/shared/dto";
 import type {
   BooleanDB,
   SexDB,
 } from "@/ts/types/db";
 import type {MessageP2pDto} from "@/ts/types/messages/p2pDto";
-import {MessageStatus} from '@/ts/types/backend';
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
   return {...userInfo};

@@ -21,7 +21,7 @@ import {
   WebRtcDefaultMessage
 } from '@/data/shared/dto';
 import { DefaultMessage, HandlerName } from '@/data/shared/common';
-import { MessageStatus } from '@/data/model/enums';
+import { MessageStatus } from '@/data/shared/enums';
 
 
 export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {

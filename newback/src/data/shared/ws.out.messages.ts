@@ -1,5 +1,5 @@
 import { DefaultMessage } from '@/data/shared/common';
-import { MessageStatus } from '@/data/model/enums';
+import { MessageStatus } from '@/data/shared/enums';
 import { GiphyDto } from '@/data/shared/dto';
 
 

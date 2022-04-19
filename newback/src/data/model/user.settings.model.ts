@@ -13,7 +13,7 @@ import {
   logLevels,
 } from "lines-logger";
 import {MysqlBool} from "@/data/types/internal";
-import { Theme } from '@/data/model/enums';
+import { Theme } from '@/data/shared/enums';
 
 @Injectable()
 @Table({tableName: "user_settings"})

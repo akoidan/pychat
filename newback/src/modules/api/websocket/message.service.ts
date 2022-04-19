@@ -25,7 +25,7 @@ import {
   ShowITypeWsOutMessage,
   SyncHistoryWsOutMessage
 } from '@/data/shared/ws.out.messages';
-import { MessageStatus } from '@/data/model/enums';
+import { MessageStatus } from '@/data/shared/enums';
 import { ShowITypeWsInMessage } from '@/data/shared/ws.in.messages';
 
 @Injectable()

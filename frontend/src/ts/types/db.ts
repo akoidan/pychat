@@ -1,6 +1,4 @@
 import type {LogLevel} from "lines-logger";
-import type {MessageStatus} from "@/ts/types/backend";
-import {Gender} from '@/ts/types/backend';
 import {MessageStatusInner} from '@/ts/types/model';
 
 export interface UserDB {

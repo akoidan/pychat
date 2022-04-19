@@ -9,7 +9,7 @@ import {
 import {Injectable} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
 import {MysqlBool} from "@/data/types/internal";
-import { VerificationType } from '@/data/model/enums';
+import { VerificationType } from '@/data/shared/enums';
 
 @Injectable()
 @Table({tableName: "verification"})

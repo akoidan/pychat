@@ -1,4 +1,4 @@
-import { Gender, ImageType } from '@/data/model/enums';
+import { Gender, ImageType } from '@/data/shared/enums';
 
 
 interface TypeGeneratorForOauth1 extends SessionResponse {

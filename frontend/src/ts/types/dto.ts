@@ -6,25 +6,11 @@ import type {
   RoomDictModel,
   UserModel,
 } from "@/ts/types/model";
-
-export * from '@/ts/types/backend';
-
-import type {LogLevel} from "lines-logger";
-import {
-  Gender,
-  UserProfileDto
-} from '@/ts/types/backend';
-
-
-
-
-
-
+import {UserProfileDto} from "@/ts/types/shared/dto";
 
 export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
 }
-
 
 export interface SetStateFromWS {
   roomsDict: RoomDictModel;
@@ -40,12 +26,10 @@ export interface SetStateFromStorage {
   allUsersDict: Record<number, UserModel>;
 }
 
-
 export interface OauthStatus {
   google: boolean;
   facebook: boolean;
 }
-
 
 export interface WebRtcMessageModelDto extends Omit<MessageStatusModel, "roomId" | "time" | "userId"> {
   timeDiff: number;

@@ -5,7 +5,6 @@ import {
 } from "@/ts/utils/consts";
 import type {
   OauthSessionResponse,
-  OauthStatus,
   OkResponse,
   SaveFileRequest,
   SaveFileResponse,
@@ -14,8 +13,7 @@ import type {
   SignInRequest,
   SignUpRequest,
   ValidateEmailResponse,
-  ViewUserProfileDto,
-} from "@/ts/types/dto";
+} from "@/ts/types/shared/http";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
@@ -25,18 +23,24 @@ import type {
   ConfirmEmailRequest,
   ConfirmEmailResponse,
   GoogleSignInResponse,
-  HandlerType,
-  HandlerTypes,
   SignUpResponse,
   ValidateUserEmailRequest,
   ValidateUserResponse,
   VerifyTokenRequest,
   VerifyTokenResponse,
-} from "@/ts/types/backend";
+} from "@/ts/types/shared/http";
 import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
 import type {MultiResponse} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
 import type Fetch from "@/ts/classes/Fetch";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
+import {
+  OauthStatus,
+  ViewUserProfileDto
+} from "@/ts/types/dto";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes<keyof Api, "*"> = {

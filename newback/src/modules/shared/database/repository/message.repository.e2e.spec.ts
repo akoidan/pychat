@@ -5,7 +5,7 @@ import {Test} from "@nestjs/testing";
 import {LoggerModule} from "@/modules/shared/logger/logger.module";
 import {ConfigModule} from "@/modules/shared/config/config.module";
 import {MessageRepository} from "@/modules/shared/database/repository/messages.repository";
-import { MessageStatus } from '@/data/model/enums';
+import { MessageStatus } from '@/data/shared/enums';
 
 describe("MessageRepository", () => {
   let app: TestingModule;

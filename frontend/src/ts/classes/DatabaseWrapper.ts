@@ -36,10 +36,6 @@ import type {
 } from "@/ts/types/db";
 import type {SetStateFromStorage} from "@/ts/types/dto";
 import type {MainWindow} from "@/ts/classes/MainWindow";
-import type {ImageType} from "@/ts/types/backend";
-import {
-  MessageStatus,
-} from "@/ts/types/backend";
 import {MessageStatusInner} from "@/ts/types/model";
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
