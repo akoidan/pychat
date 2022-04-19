@@ -14,6 +14,7 @@ import {
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 import Growls from "@/vue/parts/Growls.vue";
+import {Theme} from "@/ts/types/shared/enums";
 
 @Component({
   name: "App",
@@ -29,11 +30,11 @@ export default class App extends Vue {
 
   @Watch("mainClass")
   public onMainClassChange(value: string) {
-    document.body.parentElement!.className  = {
-      [Theme.COLOR_LOR]: 'color-lor',
-      [Theme.COLOR_REG]: 'color-reg',
-      [Theme.COLOR_WHITE]: 'color-white',
-    }[value] as string
+    document.body.parentElement!.className = {
+      [Theme.COLOR_LOR]: "color-lor",
+      [Theme.COLOR_REG]: "color-reg",
+      [Theme.COLOR_WHITE]: "color-white",
+    }[value]!;
   }
 }
 </script>

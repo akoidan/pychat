@@ -20,9 +20,7 @@ import type {Logger} from "lines-logger";
 import type {
   GiphyDto,
   MessageModelDto,
-  SaveFileRequest,
-  SaveFileResponse,
-} from "@/ts/types/dto";
+} from "@/ts/types/shared/dto";
 
 import type {
   DeleteMessage,

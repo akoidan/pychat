@@ -1,6 +1,6 @@
-import { DefaultMessage } from '@/data/shared/common';
-import { MessageStatus } from '@/data/shared/enums';
-import { GiphyDto } from '@/data/shared/dto';
+import type {DefaultMessage} from "@/ts/types/shared/common";
+import type {MessageStatus} from "@/ts/types/shared/enums";
+import type {GiphyDto} from "@/ts/types/shared/dto";
 
 
 export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A> {
