@@ -27,7 +27,7 @@ export interface SyncHistoryWsOutMessage extends DefaultWsOutMessage<"syncHistor
   lastSynced: number;
 }
 
-export interface PrintMessageWsOutMessage extends DefaultMessage<"printMessage"> {
+export interface PrintMessageWsOutMessage extends DefaultWsOutMessage<"printMessage"> {
   content: string;
   roomId: number;
   files: number[];
