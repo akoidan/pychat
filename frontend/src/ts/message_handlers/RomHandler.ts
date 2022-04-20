@@ -142,7 +142,8 @@ export class RoomHandler extends MessageHandler {
   }
 
   public addChannel(message: AddChannelMessage) {
-    this.mutateRoomAddition(message, "room_created");
+    // TODO
+    this.mutateRoomAddition(message as any, "room_created");
   }
 
   public inviteUser(message: InviteUserMessage) {

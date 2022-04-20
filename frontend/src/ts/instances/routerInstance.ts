@@ -31,10 +31,6 @@ import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/backend";
-import type {
   LoginMessage,
   LogoutMessage,
   RouterNavigateMessage,
@@ -44,6 +40,10 @@ import PainterPage from "@/vue/pages/PainterPage.vue";
 import RoomUsersListPage from "@/vue/pages/RoomUsersListPage.vue";
 import ChannelAddRoom from "@/vue/pages/ChannelAddRoom.vue";
 import type Subscription from "@/ts/classes/Subscription";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
 
 
 export function routerFactory(sub: Subscription) {
