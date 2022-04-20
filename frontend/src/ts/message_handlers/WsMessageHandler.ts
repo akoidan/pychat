@@ -20,23 +20,10 @@ import type {Logger} from "lines-logger";
 import type {
   GiphyDto,
   MessageModelDto,
+  MessagesResponseMessage,
+  SyncHistoryWsInMessage,
 } from "@/ts/types/shared/dto";
 
-import type {
-  DeleteMessage,
-  EditMessage,
-  HandlerName,
-  HandlerType,
-  HandlerTypes,
-  MessagesResponseMessage,
-  PrintMessageWsInMessage,
-  SetMessageStatusWsInMessage,
-  SyncHistoryWsInMessage,
-} from "@/ts/types/backend";
-import {
-  ImageType,
-  MessageStatus,
-} from "@/ts/types/backend";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
@@ -53,6 +40,25 @@ import {
   getMissingIds,
 } from "@/ts/utils/pureFunctions";
 import type Subscription from "@/ts/classes/Subscription";
+import {
+  SaveFileRequest,
+  SaveFileResponse
+} from "@/ts/types/shared/http";
+import {
+  ImageType,
+  MessageStatus
+} from "@/ts/types/shared/enums";
+import {
+  DeleteMessage,
+  EditMessage,
+  PrintMessageWsInMessage,
+  SetMessageStatusWsInMessage
+} from "@/ts/types/shared/ws.in.messages";
+import {
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/shared/common";
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
   protected readonly logger: Logger;

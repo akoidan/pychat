@@ -64,7 +64,6 @@ import {
   StringIdentifier,
 } from "@/ts/types/types";
 import {
-  MessageStatus,
   SetStateFromStorage,
   SetStateFromWS,
 } from "@/ts/types/dto";
@@ -80,6 +79,10 @@ import {
   Mutation,
   VuexModule,
 } from "vuex-module-decorators";
+import {
+  Gender,
+  MessageStatus
+} from "@/ts/types/shared/enums";
 
 
 const logger = loggerFactory.getLogger("store");

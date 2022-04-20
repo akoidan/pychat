@@ -17,13 +17,13 @@ import type {
   UserProfileDto,
   UserProfileDtoWoImage,
   UserSettingsDto,
-  WebRtcDefaultMessage,
-} from "@/ts/types/shared/dto";
+  WebRtcDefaultMessage
+} from '@/ts/types/shared/dto';
 import {
-  GiphyDto,
-} from "@/ts/types/shared/dto";
-import type {DefaultMessage, HandlerName} from "@/ts/types/shared/common";
-import type {MessageStatus} from "@/ts/types/shared/enums";
+  DefaultMessage,
+  HandlerName
+} from "@/ts/types/shared/common";
+import {MessageStatus} from "@/ts/types/shared/enums";
 
 
 export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {
