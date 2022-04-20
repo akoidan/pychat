@@ -26,6 +26,10 @@ import type {
   SexDB,
 } from "@/ts/types/db";
 import type {MessageP2pDto} from "@/ts/types/messages/p2pDto";
+import {
+  Gender,
+  MessageStatus
+} from "@/ts/types/shared/enums";
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {
   return {...userInfo};

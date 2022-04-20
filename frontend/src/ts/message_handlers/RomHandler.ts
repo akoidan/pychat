@@ -31,21 +31,6 @@ import type {
   ChannelDto,
   RoomDto,
 } from "@/ts/types/shared/dto";
-import type {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddOnlineUserMessage,
-  AddRoomMessage,
-  CreateNewUsedMessage,
-  DeleteChannelMessage,
-  DeleteRoomMessage,
-  InviteUserMessage,
-  LeaveUserMessage,
-  RemoveOnlineUserMessage,
-  SaveChannelSettingsMessage,
-  SaveRoomSettingsMessage,
-  ShowITypeWsInMessage,
-} from "@/ts/types/backend";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import type {Logger} from "lines-logger";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -63,6 +48,21 @@ import {
   HandlerTypes
 } from "@/ts/types/shared/common";
 import {SetStateFromWS} from "@/ts/types/dto";
+import {
+  AddChannelMessage,
+  AddInviteMessage,
+  AddOnlineUserMessage,
+  AddRoomMessage,
+  CreateNewUsedMessage,
+  DeleteChannelMessage,
+  DeleteRoomMessage,
+  InviteUserMessage,
+  LeaveUserMessage,
+  RemoveOnlineUserMessage,
+  SaveChannelSettingsMessage,
+  SaveRoomSettingsMessage,
+  ShowITypeWsInMessage
+} from "@/ts/types/shared/ws.in.messages";
 
 export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
