@@ -3,8 +3,8 @@ import {
   Length,
   Matches,
 } from "class-validator";
-import {MAX_USERNAME_LENGTH} from '@/data/consts';
-import { ValidateUserRequest } from '@/data/shared/http';
+import {MAX_USERNAME_LENGTH} from "@/data/consts";
+
 
 export class ValidateUserRequestValidator implements ValidateUserRequest {
   @IsString()

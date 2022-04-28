@@ -8,7 +8,7 @@ import {
 } from "@nestjs/common";
 import {MessageRepository} from "@/modules/shared/database/repository/messages.repository";
 import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
-import { DefaultWsOutMessage } from '@/data/shared/ws.out.messages';
+
 
 
 export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>) => number[]): any => {

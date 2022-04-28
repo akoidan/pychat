@@ -24,7 +24,7 @@ import {RoomRepository} from "@/modules/shared/database/repository/room.reposito
 import {IpRepository} from "@/modules/shared/database/repository/ip.repository";
 import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
 import {MessageRepository} from "@/modules/shared/database/repository/messages.repository";
-import {generateOrmConfig} from '@/utils/generate.orm.config';
+import {generateOrmConfig} from "@/utils/generate.orm.config";
 
 const repositories = [
   UserRepository,

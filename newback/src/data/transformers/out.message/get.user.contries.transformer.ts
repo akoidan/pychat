@@ -1,6 +1,6 @@
-import {UserJoinedInfoModel} from '@/data/model/user.joined.info.model';
-import { GetCountryCodeWsInMessage } from '@/data/shared/ws.in.messages';
-import { LocationDto } from '@/data/shared/dto';
+import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
+
+
 
 
 export function transformUserCountries(userInfo: UserJoinedInfoModel[]): Omit<GetCountryCodeWsInMessage, "action" | "handler"> {

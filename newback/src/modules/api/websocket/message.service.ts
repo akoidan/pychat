@@ -12,21 +12,17 @@ import {Sequelize} from "sequelize-typescript";
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
-import {getSyncMessage} from '@/data/transformers/out.message/sync.message.transformer';
+import {getSyncMessage} from "@/data/transformers/out.message/sync.message.transformer";
 import {
   getMentionsFromTags,
   getUploadedGiphies,
-  groupUploadedFileToImages
-} from '@/data/transformers/out.message/inner.transformer';
-import {transformPrintMessage} from '@/data/transformers/out.message/print.message.transformer';
-import {getMaxSymbol} from '@/data/transformers/helper/get.max.symbol';
-import {
-  PrintMessageWsOutMessage,
-  ShowITypeWsOutMessage,
-  SyncHistoryWsOutMessage
-} from '@/data/shared/ws.out.messages';
-import { MessageStatus } from '@/data/shared/enums';
-import { ShowITypeWsInMessage } from '@/data/shared/ws.in.messages';
+  groupUploadedFileToImages,
+} from "@/data/transformers/out.message/inner.transformer";
+import {transformPrintMessage} from "@/data/transformers/out.message/print.message.transformer";
+import {getMaxSymbol} from "@/data/transformers/helper/get.max.symbol";
+
+
+
 
 @Injectable()
 export class MessageService {
@@ -43,8 +39,10 @@ export class MessageService {
     const body: ShowITypeWsInMessage = {
       action: "showIType",
       handler: "room",
-      roomId: data.roomId,
-      userId: context.userId,
+      data: {
+        roomId: data.data.roomId,
+        userId: context.userId,
+      },
     };
     this.pubsubService.emit(
       "sendToClient",

@@ -4,7 +4,7 @@ import {
   Matches,
   ValidateIf,
 } from "class-validator";
-import { SignInRequest } from '@/data/shared/http';
+
 
 export class LoginRequestValidator implements SignInRequest {
   @ValidateIf((o) => !o.email || o.username)

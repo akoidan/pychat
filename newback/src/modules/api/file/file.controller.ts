@@ -10,7 +10,8 @@ import {FileInterceptor} from "@nestjs/platform-express";
 import {AuthGuard} from "@/modules/app/guards/auth.guard";
 import {UserId} from "@/modules/app/decorators/user.id.decorator";
 import {FileService} from "@/modules/api/file/file.service";
-import { SaveFileRequest, SaveFileResponse } from '@/data/shared/http';
+
+
 
 
 @Controller({

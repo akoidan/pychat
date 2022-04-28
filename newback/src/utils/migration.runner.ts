@@ -3,7 +3,7 @@ import {
   CommandsRunner,
   MysqlDriver,
 } from "node-db-migration";
-import { generateOrmConfig } from '@/utils/generate.orm.config';
+import {generateOrmConfig} from "@/utils/generate.orm.config";
 
 const {database, host, password, port, username, define} = generateOrmConfig((sql) => {
   console.log(sql);

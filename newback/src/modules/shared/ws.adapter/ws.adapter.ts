@@ -24,8 +24,14 @@ import {
   WebSocketServer,
 } from "ws";
 import {processErrors} from "@/modules/app/decorators/catch.ws.errors";
-import { DefaultWsInMessage } from '@/data/shared/ws.in.messages';
-import { DefaultWsOutMessage } from '@/data/shared/ws.out.messages';
+import {
+  DefaultWsInMessage,
+  ResponseWsInMessage
+} from '@/data/shared/ws.in.messages';
+import {
+  DefaultWsOutMessage,
+  DefaultWsOutRequestMessage
+} from '@/data/shared/ws.out.messages';
 
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
@@ -108,7 +114,7 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
     handlers: MessageMappingProperties[],
   ) {
     client.on(MESSAGE_METADATA, async(data) => {
-      let parsed: DefaultWsOutMessage<any>;
+      let parsed: DefaultWsOutMessage<any, any>;
       try {
         const s = String(data);
         if (s.length > 2000) {
@@ -129,14 +135,15 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
         }
         const result = await handler.callback(parsed);
         if (result) {
-          if (!parsed.cbId) {
+          if (!(parsed as DefaultWsOutRequestMessage<any, any>).cbId) {
             throw new InternalServerErrorException(`Gateway ${parsed.action} returned result ${result}, without having cbId`);
           }
-          const response: DefaultWsInMessage<any, any> = {
+          const response: ResponseWsInMessage<any, any, any> = {
             cbBySender: (client as any).context.id,
-            cbId: parsed.cbId,
+            cbId: (parsed as DefaultWsOutRequestMessage<any, any>).cbId,
             handler: "void",
-            ...result,
+            action:
+            data: result,
           };
           client.send(response);
         }

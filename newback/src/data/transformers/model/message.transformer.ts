@@ -5,9 +5,9 @@ import type {
   CreateModel,
   PureModel,
 } from "@/data/types/internal";
-import {transformMentionByPickingDto} from '@/data/transformers/model/mention.transformer';
-import {transformImageByPickingDto} from '@/data/transformers/model/image.transformer';
-import { MessageModelDto } from '@/data/shared/dto';
+import {transformMentionByPickingDto} from "@/data/transformers/model/mention.transformer";
+import {transformImageByPickingDto} from "@/data/transformers/model/image.transformer";
+
 
 
 export function transformMessageDto(message: PureModel<MessageModel>, mentions: CreateModel<MessageMentionModel>[], images: PureModel<ImageModel>[]): MessageModelDto {

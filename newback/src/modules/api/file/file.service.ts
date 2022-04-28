@@ -7,8 +7,8 @@ import {MessageRepository} from "@/modules/shared/database/repository/messages.r
 import type {FileSaveResponse} from "@/data/types/internal";
 import {Sequelize} from "sequelize-typescript";
 import {ImageService} from "@/modules/api/file/image.service";
-import { ImageType } from '@/data/shared/enums';
-import { SaveFileResponse } from '@/data/shared/http';
+
+
 
 @Injectable()
 export class FileService {

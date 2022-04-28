@@ -1,4 +1,3 @@
-/* tslint:disable */
 /* eslint-disable */
 declare module "node-ts-config" {
   interface IConfig {

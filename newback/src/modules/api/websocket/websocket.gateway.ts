@@ -10,10 +10,10 @@ import {
   Server,
   WebSocket,
 } from "ws";
+import type {OnWsClose} from "@/data/types/internal";
 import {
-  OnWsClose,
   SendToClientPubSubMessage,
-  WebSocketContextData
+  WebSocketContextData,
 } from "@/data/types/internal";
 import {
   Logger,
@@ -30,14 +30,9 @@ import {CatchWsErrors} from "@/modules/app/decorators/catch.ws.errors";
 import {MessagesFromMyRoomGuard} from "@/modules/app/guards/own.message.guard";
 import type {NestGateway} from "@nestjs/websockets/interfaces/nest-gateway.interface";
 import {OwnRoomGuard} from "@/modules/app/guards/own.room.guard";
-import {
-  GetCountryCodeWsOutMessage,
-  PrintMessageWsOutMessage,
-  ShowITypeWsOutMessage,
-  SyncHistoryWsOutMessage
-} from '@/data/shared/ws.out.messages';
-import { SyncHistoryWsInMessage } from '@/data/shared/dto';
-import { GetCountryCodeWsInMessage } from '@/data/shared/ws.in.messages';
+
+
+
 
 @WebSocketGateway({
   path: "/ws",

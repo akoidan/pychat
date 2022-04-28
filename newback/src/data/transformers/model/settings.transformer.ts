@@ -1,5 +1,5 @@
-import {UserModel} from '@/data/model/user.model';
-import { UserSettingsDto } from '@/data/shared/dto';
+import type {UserModel} from "@/data/model/user.model";
+
 
 export function transformSettings(user: UserModel): UserSettingsDto {
   return {

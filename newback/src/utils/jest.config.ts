@@ -1,8 +1,10 @@
 import type {Config} from "@jest/types";
 
-// Sync object
-// jest should be inside of src directory, otherwise tsc will compile it, and will make src directory in build
-// which will fail node-ts-config along with __dirname for photos and etc
+/*
+ * Sync object
+ * jest should be inside of src directory, otherwise tsc will compile it, and will make src directory in build
+ * which will fail node-ts-config along with __dirname for photos and etc
+ */
 const config: Config.InitialOptions = {
   verbose: true,
 };

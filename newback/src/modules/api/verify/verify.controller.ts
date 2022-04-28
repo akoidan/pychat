@@ -11,12 +11,7 @@ import {VerifyTokenRequestValidator} from "@/modules/api/verify/validators/verif
 import {ConfirmEmailRequestValidator} from "@/modules/api/verify/validators/confirm.email.request.validator";
 import {AcceptTokenRequestValidator} from "@/modules/api/verify/validators/accept.token.request.validator";
 import {VerifyService} from "@/modules/api/verify/verify.service";
-import {
-  AcceptTokenResponse,
-  ConfirmEmailResponse,
-  SendRestorePasswordResponse,
-  VerifyTokenResponse
-} from '@/data/shared/http';
+
 
 
 @Controller({

@@ -1,6 +1,6 @@
 import type {RoomUsersModel} from "@/data/model/room.users.model";
 import type {GetRoomsForUser} from "@/data/types/internal";
-import { RoomDto } from '@/data/shared/dto';
+
 
 export function getTransformRoomDto(users: number[], room: GetRoomsForUser): RoomDto {
   return {

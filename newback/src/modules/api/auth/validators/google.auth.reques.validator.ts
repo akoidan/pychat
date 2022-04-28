@@ -1,5 +1,6 @@
 import {IsString} from "class-validator";
-import { GoogleAuthRequest } from '@/data/shared/http';
+import {GoogleAuthRequest} from '@common/http/auth/google.auth';
+
 
 export class GoogleAuthRequestValidator implements GoogleAuthRequest {
   @IsString()

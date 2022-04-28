@@ -17,19 +17,25 @@ import type {FacebookGetUserResponse} from "@/data/types/api";
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
 import {SessionService} from "@/modules/shared/session/session.service";
-import {generateUserName} from '@/data/transformers/helper/generate.user.name';
+import {generateUserName} from "@/data/transformers/helper/generate.user.name";
 import {
   ALL_ROOM_ID,
-  MAX_USERNAME_LENGTH
-} from '@/data/consts';
-import {
-  FaceBookAuthRequest,
-  FacebookSignInResponse,
-  GoogleAuthRequest, GoogleSignInResponse, SignInRequest, SignInResponse,
+  MAX_USERNAME_LENGTH,
+} from "@/data/consts";
+import type {FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
+import type {FaceBookAuthRequest} from "@common/http/auth/facebook.auth";
+import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
+import type {GoogleAuthRequest} from "@common/http/auth/google.auth";
+import {Gender} from "@common/model/enum/gender";
+import type {
   SignUpRequest,
-  SignUpResponse
-} from '@/data/shared/http';
-import { Gender, VerificationType } from '@/data/shared/enums';
+  SignUpResponse,
+} from "@common/http/auth/sign.up";
+import type {
+  SignInRequest,
+  SignInResponse,
+} from "@common/http/auth/sign.in";
+import {VerificationType} from "@common/model/enum/verification.type";
 
 @Injectable()
 export class AuthService {

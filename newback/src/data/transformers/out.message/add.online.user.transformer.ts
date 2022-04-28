@@ -1,5 +1,5 @@
-import {UserModel} from '@/data/model/user.model';
-import { AddOnlineUserMessage } from '@/data/shared/ws.in.messages';
+import type {UserModel} from "@/data/model/user.model";
+
 
 export function transformAddUserOnline(online: Record<number, string[]>, user: UserModel, opponentWsId: string): AddOnlineUserMessage {
   return {

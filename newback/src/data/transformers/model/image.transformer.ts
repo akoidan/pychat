@@ -1,8 +1,8 @@
 import type {ImageModel} from "@/data/model/image.model";
 import type {MessageModel} from "@/data/model/message.model";
-import type {PureModel,} from "@/data/types/internal";
-import { FileModelDto } from '@/data/shared/dto';
-import { ImageType } from '@/data/shared/enums';
+import type {PureModel} from "@/data/types/internal";
+
+
 
 export function getUrl(value: PureModel<ImageModel>, attribute: "img" | "preview") {
   return value.type === ImageType.GIPHY ? value.img : `/photo/${value[attribute]}`;

@@ -12,7 +12,7 @@ import {
   writeFile,
 } from "fs/promises";
 import type {FileSaveResponse} from "@/data/types/internal";
-import { ImageType } from '@/data/shared/enums';
+
 
 @Injectable()
 export class ImageService {

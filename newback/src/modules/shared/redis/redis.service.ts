@@ -8,7 +8,7 @@ import {
 } from "@nestjs-modules/ioredis";
 import type {UserOnlineData} from "@/data/types/internal";
 import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
-import { REDIS_KEYS } from "@/data/consts";
+import {REDIS_KEYS} from "@/data/consts";
 
 @Injectable()
 export class RedisService {

@@ -7,7 +7,7 @@ import {
   getRoomsOnline,
   getTransformRoomDto,
 } from "@/data/transformers/model/room.transformer";
-import { SetWsIdMessage } from '@/data/shared/ws.in.messages';
+
 
 
 export function transformSetWsId(

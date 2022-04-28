@@ -34,6 +34,3 @@ export function generateOrmConfig(logging: ((sql: string) => void)): Omit<Sequel
 }
 
 
-
-
-

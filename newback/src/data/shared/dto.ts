@@ -1,13 +1,13 @@
-import {
+import type {
   Gender,
   ImageType,
-  MessageStatus
-} from "@/ts/types/shared/enums";
-import {DefaultInMessage} from "@/ts/types/shared/ws.in.messages";
-import {
+  MessageStatus,
+} from "./enums";
+import type {DefaultInMessage} from "./ws.in.messages";
+import type {
   HandlerName,
-  HandlerType
-} from "@/ts/types/shared/common";
+  HandlerType,
+} from "./common";
 
 
 export declare type LogLevel =
@@ -20,103 +20,6 @@ export declare type LogLevel =
   | "trace"
   | "warn";
 
-export interface UserSettingsDto {
-  embeddedYoutube: boolean;
-  highlightCode: boolean;
-  incomingFileCallSound: boolean;
-  messageSound: boolean;
-  onlineChangeSound: boolean;
-  showWhenITyping: boolean;
-  suggestions: boolean;
-  logs: LogLevel;
-  theme: string;
-}
-
-
-export interface RoomNoUsersDto {
-  channelId: number | null;
-  notifications: boolean;
-  p2p: boolean;
-  volume: number;
-  isMainInChannel: boolean;
-  id: number;
-  name: string;
-  creatorId: number;
-}
-
-export interface UserProfileDto extends UserProfileDtoWoImage {
-  thumbnail: string;
-}
-
-
-export interface LocationDto {
-  city: string;
-  country: string;
-  countryCode: string;
-  region: string;
-}
-
-
-export interface ChannelDto {
-  name: string;
-  id: number;
-  creatorId: number;
-}
-
-export interface RoomDto extends RoomNoUsersDto {
-  users: number[];
-}
-
-
-export interface FileModelDto {
-  url: string;
-  id: number;
-  type: ImageType;
-  preview: string;
-}
-
-
-
-export interface MessageModelDto {
-  id: number;
-  time: number;
-  parentMessage: number;
-  files?: Record<number, FileModelDto>;
-  tags: Record<number, number>;
-  content: string;
-  status: MessageStatus;
-  symbol?: string;
-  deleted?: boolean;
-  threadMessagesCount: number;
-  edited: number;
-  roomId: number;
-  userId: number;
-}
-
-
-export interface UserDto {
-  username: string;
-  id: number;
-  thumbnail: string;
-  lastTimeOnline: number;
-  sex: Gender;
-}
-
-
-export interface UserProfileDtoWoImage {
-  username: string;
-  name: string;
-  city: string;
-  surname: string;
-  email: string;
-  birthday: Date;
-  contacts: string;
-  sex: Gender;
-  id: number;
-}
-
-
-
 
 export interface ChangeUserOnlineBase {
   online: Record<number, string[]>;
@@ -124,8 +27,6 @@ export interface ChangeUserOnlineBase {
   lastTimeOnline: number;
   time: number;
 }
-
-
 
 
 export interface AcceptFileContent {
@@ -176,11 +77,6 @@ export interface BrowserBase {
   browser: string;
 }
 
-export interface CallBackMessage {
-  // Request to send response with this callback id
-  cbId?: number;
-}
-
 
 export interface ResolveCallbackId {
   resolveCbId?: number; // If this callback id is present, resolve it
@@ -211,16 +107,4 @@ export interface MessagesResponseMessage {
   content: MessageModelDto[];
 }
 
-export interface SyncHistoryWsInMessage extends MessagesResponseMessage {
-  readMessageIds: number[];
-  receivedMessageIds: number[];
-}
-
-
-
-export interface GiphyDto {
-  webp: string;
-  url: string;
-  symbol: string;
-}
 

@@ -1,7 +1,12 @@
 {
+ "exclude": [
+    "node_modules",
+    "**/*.spec.ts"
+  ],
   "compilerOptions": {
      "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@common/*": ["../common/src/*"]
     },
     "plugins": [
       { "transform": "typescript-transform-paths" },

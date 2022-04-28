@@ -11,13 +11,8 @@ import type {VerificationModel} from "@/data/model/verification.model";
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
 import {SessionService} from "@/modules/shared/session/session.service";
-import {
-  AcceptTokenRequest,
-  AcceptTokenResponse, ConfirmEmailRequest,
-  SendRestorePasswordRequest,
-  VerifyTokenResponse
-} from '@/data/shared/http';
-import { VerificationType } from '@/data/shared/enums';
+
+
 
 @Injectable()
 export class VerifyService {

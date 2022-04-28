@@ -2,7 +2,7 @@ import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {MessageModel} from "@/data/model/message.model";
 import type {
   CreateModel,
-  PureModel
+  PureModel,
 } from "@/data/types/internal";
 
 export function transformMentionByPickingDto(mentions: CreateModel<MessageMentionModel>[], m: PureModel<MessageModel>): Record<string, number> {

@@ -1,5 +1,5 @@
-import {ChannelModel} from '@/data/model/channel.model';
-import { ChannelDto } from '@/data/shared/dto';
+import type {ChannelModel} from "@/data/model/channel.model";
+
 
 
 export function transformChannelDto(c: ChannelModel): ChannelDto {

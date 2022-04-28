@@ -12,9 +12,8 @@ import type {WebSocketContextData} from "@/data/types/internal";
 import {RedisService} from "@/modules/shared/redis/redis.service";
 import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import {transformSetWsId} from "@/data/transformers/out.message/set.ws.id.transformer";
-import {transformAddUserOnline} from '@/data/transformers/out.message/add.online.user.transformer';
-import {getLogoutMessage} from '@/data/transformers/out.message/remove.online.user.transformer';
-import { AddOnlineUserMessage } from '@/data/shared/ws.in.messages';
+import {transformAddUserOnline} from "@/data/transformers/out.message/add.online.user.transformer";
+import {getLogoutMessage} from "@/data/transformers/out.message/remove.online.user.transformer";
 
 
 
