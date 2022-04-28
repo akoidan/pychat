@@ -1,6 +1,5 @@
+import {LocationDto} from '@common/model/dto/location.dto';
 import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
-
-
 
 
 export function transformUserCountries(userInfo: UserJoinedInfoModel[]): Omit<GetCountryCodeWsInMessage, "action" | "handler"> {

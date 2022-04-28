@@ -1,3 +1,4 @@
+import {ImageType} from '@common/model/enum/image.type';
 import {
   Injectable,
   Logger,
@@ -7,7 +8,6 @@ import {MessageRepository} from "@/modules/shared/database/repository/messages.r
 import type {FileSaveResponse} from "@/data/types/internal";
 import {Sequelize} from "sequelize-typescript";
 import {ImageService} from "@/modules/api/file/image.service";
-
 
 
 @Injectable()

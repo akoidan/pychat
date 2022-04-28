@@ -1,3 +1,4 @@
+import {Gender} from '@common/model/enum/gender';
 import {Injectable} from "@nestjs/common";
 import {InjectModel} from "@nestjs/sequelize";
 import {UserModel} from "@/data/model/user.model";
@@ -6,7 +7,6 @@ import {UserProfileModel} from "@/data/model/user.profile.model";
 import {UserSettingsModel} from "@/data/model/user.settings.model";
 import type {Transaction} from "sequelize";
 import {Op} from "sequelize";
-
 
 
 @Injectable()

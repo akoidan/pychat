@@ -10,7 +10,6 @@ import {MessageRepository} from "@/modules/shared/database/repository/messages.r
 import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 
 
-
 export const MessagesFromMyRoomGuard = (selector: (dto: DefaultWsOutMessage<any>) => number[]): any => {
   @Injectable()
   class OwnMessageGuardMixin implements CanActivate {

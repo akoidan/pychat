@@ -1,9 +1,9 @@
+import {MAX_USERNAME_LENGTH,} from "@/data/consts";
 import {
   IsString,
   Length,
   Matches,
 } from "class-validator";
-import {MAX_USERNAME_LENGTH} from "@/data/consts";
 
 
 export class ValidateUserRequestValidator implements ValidateUserRequest {

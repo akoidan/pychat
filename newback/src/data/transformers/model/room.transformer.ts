@@ -1,3 +1,4 @@
+import {RoomDto} from '@common/model/dto/room.dto';
 import type {RoomUsersModel} from "@/data/model/room.users.model";
 import type {GetRoomsForUser} from "@/data/types/internal";
 

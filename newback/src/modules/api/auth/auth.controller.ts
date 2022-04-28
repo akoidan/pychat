@@ -1,3 +1,7 @@
+import type {FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
+import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
+import type {SignUpResponse,} from "@common/http/auth/sign.up";
+import type {SignInResponse,} from "@common/http/auth/sign.in";
 import {
   Body,
   Controller,
@@ -14,10 +18,6 @@ import {GoogleAuthRequestValidator} from "@/modules/api/auth/validators/google.a
 import {CaptchaGuard} from "@/modules/app/guards/captcha.guard";
 import {ValidateEmailRequestValidator} from "@/modules/api/auth/validators/validate.email.request.validator";
 import {FacebookAuthRequestValidator} from "@/modules/api/auth/validators/facebook.auth.request.validator";
-import type {SignInResponse} from "@common/http/auth/sign.in";
-import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
-import type {FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
-import type {SignUpResponse} from "@common/http/auth/sign.up";
 import type {ValidateEmailResponse} from "@common/http/auth/validte.email";
 import type {ValidateUserResponse} from "@common/http/auth/validate.user";
 

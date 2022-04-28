@@ -1,3 +1,4 @@
+import {Gender} from '@common/model/enum/gender';
 import {DatabaseModule} from "@/modules/shared/database/database.module";
 import {ConsoleLogger} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
@@ -21,7 +22,6 @@ import {SubscriptionMessageModel} from "@/data/model/subscription.message.model"
 import {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import {VerificationModel} from "@/data/model/verification.model";
 import {IpAddressModel} from "@/data/model/ip.address.model";
-
 
 
 async function bootstrap() {

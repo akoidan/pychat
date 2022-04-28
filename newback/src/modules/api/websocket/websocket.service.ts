@@ -16,7 +16,6 @@ import {transformAddUserOnline} from "@/data/transformers/out.message/add.online
 import {getLogoutMessage} from "@/data/transformers/out.message/remove.online.user.transformer";
 
 
-
 @Injectable()
 export class WebsocketService {
   constructor(

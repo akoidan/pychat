@@ -1,3 +1,4 @@
+import {UserProfileDto} from '@common/model/dto/user.profile.dto';
 import type {UserModel} from "@/data/model/user.model";
 
 

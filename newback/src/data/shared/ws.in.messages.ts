@@ -1,28 +1,9 @@
 import type {
-  AcceptFileContent,
-  AddRoomBase,
-  BrowserBase,
   ChangeUserOnlineBase,
-  ChannelDto, LocationDto,
+  ChannelDto,
   MessageModelDto,
-  NewRoom,
-  OfferFileContent,
-  OpponentWsId,
-  ReplyWebRtc,
   RoomDto,
-  RoomExistedBefore,
-  RoomNoUsersDto,
-  UserDto,
-  UserProfileDto,
-  UserProfileDtoWoImage,
-  UserSettingsDto,
-  WebRtcDefaultMessage,
 } from "./dto";
-import type {
-  DefaultMessage,
-  HandlerName,
-} from "./common";
-import type {MessageStatus} from "./enums";
 
 
 interface AddOnlineUserBodyMessage extends ChangeUserOnlineBase {

@@ -1,3 +1,4 @@
+import type {FaceBookAuthRequest} from "@common/http/auth/facebook.auth";
 import {IsString} from "class-validator";
 
 

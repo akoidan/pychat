@@ -1,3 +1,4 @@
+import {VerificationType} from '@common/model/enum/verification.type';
 import {
   BadRequestException,
   Injectable,
@@ -11,7 +12,6 @@ import type {VerificationModel} from "@/data/model/verification.model";
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
 import {SessionService} from "@/modules/shared/session/session.service";
-
 
 
 @Injectable()

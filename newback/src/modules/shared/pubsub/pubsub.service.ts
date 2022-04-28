@@ -9,7 +9,6 @@ import type {
 } from "@/data/types/internal";
 
 
-
 interface HandlerType {
   target: WebsocketGateway;
   memberName: keyof WebsocketGateway;

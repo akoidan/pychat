@@ -1,3 +1,4 @@
+import {VerificationType} from '@common/model/enum/verification.type';
 import type {INestApplication} from "@nestjs/common";
 import {
   ConsoleLogger,
@@ -27,7 +28,8 @@ import {VerificationRepository} from "@/modules/shared/database/repository/verif
 import {VerifyController} from "@/modules/api/verify/verify.controller";
 import {VerifyService} from "@/modules/api/verify/verify.service";
 import {SessionService} from "@/modules/shared/session/session.service";
-import { VerificationType } from '@/data/shared/enums';
+
+;
 
 describe("VerifyModule", () => {
   let app: INestApplication;

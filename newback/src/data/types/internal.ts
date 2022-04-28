@@ -4,7 +4,6 @@ import type {ChannelModel} from "@/data/model/channel.model";
 import type {UserModel} from "@/data/model/user.model";
 
 
-
 export interface WebSocketContextData {
   userId: number;
   id: string;

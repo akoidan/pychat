@@ -1,3 +1,4 @@
+import {MessageStatus} from '@common/model/enum/message.status';
 import {
   Injectable,
   Logger,
@@ -20,8 +21,6 @@ import {
 } from "@/data/transformers/out.message/inner.transformer";
 import {transformPrintMessage} from "@/data/transformers/out.message/print.message.transformer";
 import {getMaxSymbol} from "@/data/transformers/helper/get.max.symbol";
-
-
 
 
 @Injectable()

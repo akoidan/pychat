@@ -6,7 +6,10 @@ import {
   BadRequestException,
   InternalServerErrorException,
 } from "@nestjs/common";
-import type {BaseWsInstance, MessageMappingProperties} from "@nestjs/websockets";
+import type {
+  BaseWsInstance,
+  MessageMappingProperties
+} from "@nestjs/websockets";
 import {
   CLOSE_EVENT,
   CONNECTION_EVENT,
@@ -24,14 +27,9 @@ import {
   WebSocketServer,
 } from "ws";
 import {processErrors} from "@/modules/app/decorators/catch.ws.errors";
-import {
-  DefaultWsInMessage,
-  ResponseWsInMessage
-} from '@/data/shared/ws.in.messages';
-import {
-  DefaultWsOutMessage,
-  DefaultWsOutRequestMessage
-} from '@/data/shared/ws.out.messages';
+
+;
+;
 
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {

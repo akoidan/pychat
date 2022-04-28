@@ -1,3 +1,4 @@
+import {ImageType} from '@common/model/enum/image.type';
 import {
   Injectable,
   Logger,

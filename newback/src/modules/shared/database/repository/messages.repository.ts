@@ -1,3 +1,4 @@
+import {MessageStatus} from '@common/model/enum/message.status';
 import {Injectable} from "@nestjs/common";
 import {InjectModel} from "@nestjs/sequelize";
 import type {
@@ -11,7 +12,6 @@ import {ImageModel} from "@/data/model/image.model";
 import {MessageMentionModel} from "@/data/model/message.mention.model";
 import {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {CreateModel} from "@/data/types/internal";
-
 
 
 @Injectable()

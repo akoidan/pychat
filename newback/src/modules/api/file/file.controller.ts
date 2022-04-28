@@ -12,8 +12,6 @@ import {UserId} from "@/modules/app/decorators/user.id.decorator";
 import {FileService} from "@/modules/api/file/file.service";
 
 
-
-
 @Controller({
   path: "/api/file",
 })

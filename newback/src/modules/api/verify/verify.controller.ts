@@ -13,7 +13,6 @@ import {AcceptTokenRequestValidator} from "@/modules/api/verify/validators/accep
 import {VerifyService} from "@/modules/api/verify/verify.service";
 
 
-
 @Controller({
   path: "/api/verify",
 })

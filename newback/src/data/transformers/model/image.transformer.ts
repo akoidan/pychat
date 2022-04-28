@@ -1,7 +1,8 @@
+import {ImageType} from '@common/model/enum/image.type';
+import {FileModelDto} from '@common/model/dto/file.model.dto';
 import type {ImageModel} from "@/data/model/image.model";
 import type {MessageModel} from "@/data/model/message.model";
 import type {PureModel} from "@/data/types/internal";
-
 
 
 export function getUrl(value: PureModel<ImageModel>, attribute: "img" | "preview") {

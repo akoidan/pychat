@@ -1,3 +1,6 @@
+import {MAX_USERNAME_LENGTH,} from "@/data/consts";
+import type {SignUpRequest,} from "@common/http/auth/sign.up";
+import {Gender} from '@common/model/enum/gender';
 import {
   IsEmail,
   IsEnum,
@@ -6,9 +9,6 @@ import {
   Length,
   Matches,
 } from "class-validator";
-import {MAX_USERNAME_LENGTH} from "@/data/consts";
-
-
 
 
 export class SignUpRequestValidator implements SignUpRequest {

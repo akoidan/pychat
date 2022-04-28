@@ -32,8 +32,6 @@ import type {NestGateway} from "@nestjs/websockets/interfaces/nest-gateway.inter
 import {OwnRoomGuard} from "@/modules/app/guards/own.room.guard";
 
 
-
-
 @WebSocketGateway({
   path: "/ws",
 })
