@@ -1,4 +1,12 @@
 import {MessageStatus} from '@common/model/enum/message.status';
+
+import {SyncHistoryWsOutBody} from '@common/ws/message/sync.history';
+import type {
+  ShowITypeWsInMessage,
+  ShowITypeWsOutBody,
+} from "@common/ws/message/show.i.type";
+import {ShowITypeWsInMessage} from '@common/ws/message/show.i.type';
+import {PrintMessageWsOutBody} from '@common/ws/message/print.message';
 import {
   Injectable,
   Logger,
@@ -34,12 +42,12 @@ export class MessageService {
     this.messageRepository.attachHooks();
   }
 
-  public showIType(data: ShowITypeWsOutMessage, context: WebSocketContextData): void {
+  public showIType(data: ShowITypeWsOutBody, context: WebSocketContextData): void {
     const body: ShowITypeWsInMessage = {
       action: "showIType",
       handler: "room",
       data: {
-        roomId: data.data.roomId,
+        roomId: data.roomId,
         userId: context.userId,
       },
     };
@@ -52,7 +60,7 @@ export class MessageService {
     );
   }
 
-  public async syncHistory(data: SyncHistoryWsOutMessage, context: WebSocketContextData) {
+  public async syncHistory(data: SyncHistoryWsOutBody, context: WebSocketContextData) {
     // MessageStatus.ON_SERVER
     const messages = await this.messageRepository.getNewOnServerMessages(
       data.roomIds,
@@ -86,7 +94,7 @@ export class MessageService {
     return getSyncMessage(readmesageIds, receivedMessageIds, messages, mentions, images);
   }
 
-  public async printMessage(data: PrintMessageWsOutMessage, context: WebSocketContextData): Promise<void> {
+  public async printMessage(data: PrintMessageWsOutBody, context: WebSocketContextData): Promise<void> {
     await this.sequelize.transaction(async(transaction) => {
       const files: UploadedFileModel[] = await this.messageRepository.getUploadedFiles(
         data.files,

@@ -4,7 +4,7 @@ import type {
   HttpException,
 } from "@nestjs/common";
 import {Catch} from "@nestjs/common";
-import type {WebSocket} from "ws";
+import {WebSocket} from "ws";
 
 
 @Catch(Error) // If we provide it on module Websocket it will also affect http,so fuck it
@@ -12,12 +12,15 @@ import type {WebSocket} from "ws";
 export class WsExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const cbId = host.getArgByIndex(1)?.cbId;
+     const websocket: WebSocket = host.getArgByIndex(0);
     if (cbId) {
-      const response: GrowlMessage = {
+      const response: GrowlWsInMessage = {
         cbId,
+        cbBySender: websocket.context.id,
         action: "growlError",
-        content: exception.message,
-        handler: "void",
+        data: {
+          error: exception.message,
+        },
       };
       const websocket: WebSocket = host.getArgByIndex(0);
       websocket.send(response);

@@ -1,3 +1,8 @@
+import {
+  HandlerName,
+  HandlerType
+} from "@common/ws/common";
+
 import type {WebsocketGateway} from "@/modules/api/websocket/websocket.gateway";
 import {
   Injectable,

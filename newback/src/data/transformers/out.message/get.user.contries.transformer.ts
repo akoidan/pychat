@@ -1,9 +1,12 @@
+import type {LocationDto} from "@common/model/dto/location.dto";
 import {LocationDto} from '@common/model/dto/location.dto';
+import type {GetCountryCodeWsInMessage} from "@common/ws/message/get.country.code";
+import {GetCountryCodeWsInMessage} from '@common/ws/message/get.country.code';
 import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 
 
-export function transformUserCountries(userInfo: UserJoinedInfoModel[]): Omit<GetCountryCodeWsInMessage, "action" | "handler"> {
-  const content: GetCountryCodeWsInMessage["content"] = userInfo.reduce((previousValue, currentValue) => {
+export function transformUserCountries(userInfo: UserJoinedInfoModel[]): GetCountryCodeWsInMessage["data"] {
+  const userLocation: GetCountryCodeWsInMessage["data"]["userLocation"] = userInfo.reduce((previousValue, currentValue) => {
     if (currentValue.ip) {
       const value: LocationDto = {
         country: currentValue.ip.country,
@@ -15,5 +18,5 @@ export function transformUserCountries(userInfo: UserJoinedInfoModel[]): Omit<Ge
     }
     return previousValue;
   }, {});
-  return {content};
+  return {userLocation};
 }

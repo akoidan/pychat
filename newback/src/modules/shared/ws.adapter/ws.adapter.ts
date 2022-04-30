@@ -1,4 +1,15 @@
 import type {
+  DefaultWsInMessage,
+  RequestWsOutMessage,
+  ResponseWsInMessage,
+} from "@common/ws/common";
+import {
+  DefaultWsInMessage,
+  RequestWsOutMessage,
+  ResponseWsInMessage
+} from "@common/ws/common";
+
+import type {
   Logger,
   WebSocketAdapter,
 } from "@nestjs/common";
@@ -8,7 +19,7 @@ import {
 } from "@nestjs/common";
 import type {
   BaseWsInstance,
-  MessageMappingProperties
+  MessageMappingProperties,
 } from "@nestjs/websockets";
 import {
   CLOSE_EVENT,
@@ -28,9 +39,6 @@ import {
 } from "ws";
 import {processErrors} from "@/modules/app/decorators/catch.ws.errors";
 
-;
-;
-
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
   private wsServer: WebSocketServer;
@@ -47,7 +55,7 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
       const ws: WebSocket = args.find((a) => a instanceof WebSocket);
       const oldSend: WebSocket["send"] = ws.send.bind(ws);
       (ws as any).context = {
-        sendToClient: (data: DefaultWsInMessage<any, any>) => {
+        sendToClient: (data: DefaultWsInMessage<any, any, any>) => {
           let message;
           try {
             message = JSON.stringify(data);
@@ -112,7 +120,7 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
     handlers: MessageMappingProperties[],
   ) {
     client.on(MESSAGE_METADATA, async(data) => {
-      let parsed: DefaultWsOutMessage<any, any>;
+      let parsed: RequestWsOutMessage<any, any>;
       try {
         const s = String(data);
         if (s.length > 2000) {
@@ -131,16 +139,17 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
         if (!handler) {
           throw new BadRequestException(`Unknown handler ${parsed.action}`);
         }
-        const result = await handler.callback(parsed);
+        if (!parsed.data) {
+          throw new BadRequestException(`No data for ${parsed.action}`);
+        }
+        const result: any | undefined = await handler.callback(parsed.data);
         if (result) {
-          if (!(parsed as DefaultWsOutRequestMessage<any, any>).cbId) {
+          if (!parsed.cbId) {
             throw new InternalServerErrorException(`Gateway ${parsed.action} returned result ${result}, without having cbId`);
           }
-          const response: ResponseWsInMessage<any, any, any> = {
+          const response: ResponseWsInMessage<any> = {
             cbBySender: (client as any).context.id,
-            cbId: (parsed as DefaultWsOutRequestMessage<any, any>).cbId,
-            handler: "void",
-            action:
+            cbId: parsed.cbId,
             data: result,
           };
           client.send(response);

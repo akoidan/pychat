@@ -1,3 +1,4 @@
+import {SyncHistoryWsInBody} from '@common/ws/message/sync.history';
 import type {MessageModel} from "@/data/model/message.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
 import type {ImageModel} from "@/data/model/image.model";
@@ -10,10 +11,10 @@ export function getSyncMessage(
   messages: MessageModel[],
   mentions: MessageMentionModel[],
   images: ImageModel[]
-): SyncHistoryWsInMessage {
+): SyncHistoryWsInBody {
   return {
     readMessageIds,
     receivedMessageIds,
-    content: messages.map((m) => transformMessageDto(m, mentions, images)),
+    messages: messages.map((m) => transformMessageDto(m, mentions, images)),
   };
 }

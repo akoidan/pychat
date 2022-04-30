@@ -1,9 +1,9 @@
+import {AcceptTokenRequest} from '@common/http/verify/accept.token';
 import {
   IsString,
   Length,
   Matches,
 } from "class-validator";
-import {AcceptTokenRequest} from '@common/http/verify/accept.token';
 
 
 export class AcceptTokenRequestValidator implements AcceptTokenRequest {

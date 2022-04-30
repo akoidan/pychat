@@ -1,3 +1,7 @@
+import {SendRestorePasswordResponse} from '@common/http/verify/send.restore.password';
+import {VerifyTokenResponse} from '@common/http/verify/verify.token';
+import {ConfirmEmailResponse} from '@common/http/verify/confirm.email';
+import {AcceptTokenResponse} from '@common/http/verify/accept.token';
 import {
   Body,
   Controller,

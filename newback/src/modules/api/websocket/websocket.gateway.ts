@@ -1,3 +1,15 @@
+import type {SyncHistoryWsInMessage} from "@common/ws/message/sync.history";
+import {
+  SyncHistoryWsInMessage,
+  SyncHistoryWsOutBody
+} from '@common/ws/message/sync.history';
+import {ShowITypeWsOutBody} from '@common/ws/message/show.i.type';
+import {PrintMessageWsOutBody} from '@common/ws/message/print.message';
+import type {GetCountryCodeWsInMessage} from "@common/ws/message/get.country.code";
+import {
+  GetCountryCodeWsInMessage,
+  GetCountryCodeWsOutBody
+} from '@common/ws/message/get.country.code';
 import type {OnGatewayConnection} from "@nestjs/websockets";
 import {
   MessageBody,
@@ -31,7 +43,6 @@ import {MessagesFromMyRoomGuard} from "@/modules/app/guards/own.message.guard";
 import type {NestGateway} from "@nestjs/websockets/interfaces/nest-gateway.interface";
 import {OwnRoomGuard} from "@/modules/app/guards/own.room.guard";
 
-
 @WebSocketGateway({
   path: "/ws",
 })
@@ -40,7 +51,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
   @WebSocketServer()
   public readonly server!: Server;
 
-  constructor(
+  public constructor(
     public readonly logger: Logger,
     public readonly websocketService: WebsocketService,
     public readonly wsDataService: WsDataService,
@@ -49,27 +60,27 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
   }
 
   @SubscribeMessage("closeConnection")
-  public async closeConnection(@WsContext() context: WebSocketContextData) {
+  public async closeConnection(@WsContext() context: WebSocketContextData): Promise<void> {
     await this.websocketService.closeConnection(context);
   }
 
   @CatchWsErrors
-  async handleConnection(socket: WebSocket, message: IncomingMessage, context: WebSocketContextData) {
+  async handleConnection(socket: WebSocket, message: IncomingMessage, context: WebSocketContextData) : Promise<void> {
     await this.websocketService.handleConnection(message.url, context, (socket as any)._socket.remoteAddress);
   }
 
   @SubscribePuBSub("sendToClient")
-  public sendToClient(ctx: WebSocketContextData, data: SendToClientPubSubMessage<any, any, any>) {
+  public sendToClient(ctx: WebSocketContextData, data: SendToClientPubSubMessage<any, any, any>): void {
     ctx.sendToClient(data.body);
   }
 
   @SubscribeMessage("syncHistory")
   @UseGuards(
     // Messages ids are checked within roomsId
-    OwnRoomGuard((data: SyncHistoryWsOutMessage) => data.roomIds)
+    OwnRoomGuard((data: SyncHistoryWsOutBody) => data.roomIds)
   )
   public async syncHistory(
-    @MessageBody() data: SyncHistoryWsOutMessage,
+    @MessageBody() data: SyncHistoryWsOutBody,
       @WsContext() context: WebSocketContextData
   ): Promise<SyncHistoryWsInMessage> {
     return this.messageService.syncHistory(data, context);
@@ -84,11 +95,11 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
   // @UseGuards(OwnMessageGuard)
   @SubscribeMessage("printMessage")
   @UseGuards(
-    MessagesFromMyRoomGuard((data: PrintMessageWsOutMessage) => [data.parentMessage]),
-    OwnRoomGuard((data: PrintMessageWsOutMessage) => [data.roomId])
+    MessagesFromMyRoomGuard((data: PrintMessageWsOutBody) => [data.parentMessage]),
+    OwnRoomGuard((data: PrintMessageWsOutBody) => [data.roomId])
   )
   public async printMessage(
-    @MessageBody() data: PrintMessageWsOutMessage,
+    @MessageBody() data: PrintMessageWsOutBody,
       @WsContext() context: WebSocketContextData
   ): Promise<void> {
     await this.messageService.printMessage(data, context);
@@ -96,21 +107,20 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
 
   @SubscribeMessage("showIType")
   @UseGuards(
-    OwnRoomGuard((data: ShowITypeWsOutMessage) => [data.roomId])
+    OwnRoomGuard((data: ShowITypeWsOutBody) => [data.roomId])
   )
-  public async showIType(
-    @MessageBody() data: ShowITypeWsOutMessage,
+  public showIType(
+    @MessageBody() data: ShowITypeWsOutBody,
       @WsContext() context: WebSocketContextData
-  ): Promise<void> {
-    await this.messageService.showIType(data, context);
+  ): void {
+    this.messageService.showIType(data, context);
   }
 
   @SubscribeMessage("getCountryCode")
-  // TODO add cache here
   public async getCountryCode(
-    @MessageBody() data: GetCountryCodeWsOutMessage,
+    @MessageBody() data: GetCountryCodeWsOutBody,
       @WsContext() context: WebSocketContextData
-  ): Promise<Omit<GetCountryCodeWsInMessage, "action" | "handler">> {
+  ): Promise<GetCountryCodeWsInMessage["data"]> {
     return this.wsDataService.getCountryCodes(context);
   }
 }

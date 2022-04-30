@@ -1,5 +1,6 @@
 import {ImageType} from '@common/model/enum/image.type';
 import {GiphyDto} from '@common/model/dto/giphy.dto';
+import {PrintMessageWsOutMessage} from '@common/ws/message/print.message';
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {ImageModel} from "@/data/model/image.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";
@@ -16,7 +17,7 @@ export function getUploadedGiphies(data: GiphyDto[], messageId: number): CreateM
   }));
 }
 
-export function getMentionsFromTags(data: PrintMessageWsOutMessage, messageId: number): CreateModel<MessageMentionModel>[] {
+export function getMentionsFromTags(data: PrintMessageWsOutMessage["data"], messageId: number): CreateModel<MessageMentionModel>[] {
   return Object.entries(data.tags).map(([symbol, userId]) => ({
     messageId,
     userId,

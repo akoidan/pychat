@@ -1,4 +1,5 @@
-import {MAX_USERNAME_LENGTH,} from "@/data/consts";
+import {MAX_USERNAME_LENGTH,} from "@common/consts";
+import {ValidateUserRequest} from "@common/http/auth/validate.user";
 import {
   IsString,
   Length,

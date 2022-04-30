@@ -1,6 +1,7 @@
-import {MAX_USERNAME_LENGTH,} from "@/data/consts";
 import type {SignUpRequest,} from "@common/http/auth/sign.up";
 import {Gender} from '@common/model/enum/gender';
+
+import {MAX_USERNAME_LENGTH,} from "@/data/consts";
 import {
   IsEmail,
   IsEnum,

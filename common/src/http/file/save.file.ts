@@ -1,4 +1,4 @@
-import {ImageType} from '@common/model/enum/image.type';
+import type {ImageType} from "@common/model/enum/image.type";
 
 export interface SaveFileResponse {
   id: number;

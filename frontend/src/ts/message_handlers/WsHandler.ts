@@ -47,7 +47,7 @@ import type {AddChannelMessage,
   SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
-  SetWsIdMessage,
+  SetWsIdWsOutMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage,
 } from "@/ts/types/shared/ws.in.messages";
@@ -558,7 +558,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return serverTime + this.timeDiffWithServer; // ServerTime + (Date.now - serverTime) === Date.now
   }
 
-  public async setWsId(message: SetWsIdMessage) {
+  public async setWsId(message: SetWsIdWsOutMessage) {
     this.wsConnectionId = message.opponentWsId;
     this.setUserInfo(message.profile);
     this.setUserSettings(message.settings);

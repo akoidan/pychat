@@ -510,7 +510,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     this.setAllMessagesStatus(result.readMessageIds, MessageStatus.READ);
     this.setAllMessagesStatus(result.receivedMessageIds, MessageStatus.RECEIVED);
 
-    const messagesByStatus = this.groupMessagesIdsByStatus(result.content, () => true);
+    const messagesByStatus = this.groupMessagesIdsByStatus(result.messages, () => true);
     Object.entries(messagesByStatus).forEach(([k, messagesInGroup]) => {
       const roomId = parseInt(k);
       this.addMessages(roomId, messagesInGroup, true);

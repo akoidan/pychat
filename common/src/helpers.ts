@@ -12,16 +12,15 @@ import type {
   SignInResponse,
 } from "@common/http/auth/sign.in";
 import {VerificationType} from "@common/model/enum/verification.type";
-import {AcceptTokenRequest} from '@common/http/verify/accept.token';
+import {AcceptTokenRequest} from "@common/http/verify/accept.token";
 import {
   ValidateEmailResponse,
-  ValidateUserEmailRequest
-} from '@common/http/auth/validte.email';
+  ValidateUserEmailRequest,
+} from "@common/http/auth/validte.email";
 import {
   ValidateUserRequest,
-  ValidateUserResponse
-} from '@common/http/auth/validate.user';
-
+  ValidateUserResponse,
+} from "@common/http/auth/validate.user";
 
 
 export interface CaptchaRequest {

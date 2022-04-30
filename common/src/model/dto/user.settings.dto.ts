@@ -1,4 +1,4 @@
-import {LogLevel} from 'lines-logger';
+import type {LogLevel} from "lines-logger";
 
 export interface UserSettingsDto {
   embeddedYoutube: boolean;

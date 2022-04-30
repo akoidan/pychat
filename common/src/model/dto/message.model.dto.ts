@@ -1,5 +1,5 @@
-import {FileModelDto} from '@common/model/dto/file.model.dto';
-import {MessageStatus} from '@common/model/enum/message.status';
+import type {FileModelDto} from "@common/model/dto/file.model.dto";
+import type {MessageStatus} from "@common/model/enum/message.status";
 
 export interface MessageModelDto {
   id: number;

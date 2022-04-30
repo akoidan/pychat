@@ -83,7 +83,7 @@
     "babel/semi": 1,
     "babel/no-unused-expressions": 1,
     "babel/valid-typeof": 1,
-    "babel/new-cap": 1,
+    "babel/new-cap": 0, // Decorators 
     "@typescript-eslint/no-parameter-properties": 0,
     "babel/camelcase": 0, // use typescript-eslint/naming-convention
     "babel/no-invalid-this": 1,

@@ -7,8 +7,8 @@ import {
 import {readFile} from "fs/promises";
 import {WsAdapter} from "@/modules/shared/ws.adapter/ws.adapter";
 import type {HttpsOptions} from "@nestjs/common/interfaces/external/https-options.interface";
+import {NestFactory} from "@nestjs/core";
 
-$1
 
 async function bootstrap() {
   let httpsOptions: HttpsOptions = null;

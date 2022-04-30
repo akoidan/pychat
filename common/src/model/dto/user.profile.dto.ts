@@ -1,4 +1,4 @@
-import {Gender} from '@common/model/enum/gender';
+import type {Gender} from "@common/model/enum/gender";
 
 export interface UserProfileDtoWoImage {
   username: string;

@@ -1,3 +1,4 @@
+import {GetCountryCodeWsInMessage} from '@common/ws/message/get.country.code';
 import {
   Injectable,
   Logger,
@@ -21,7 +22,7 @@ export class WsDataService {
   ) {
   }
 
-  public async getCountryCodes(context: WebSocketContextData): Promise<Omit<GetCountryCodeWsInMessage, "action" | "handler">> {
+  public async getCountryCodes(context: WebSocketContextData): Promise<GetCountryCodeWsInMessage["data"]> {
     if (!this.configService.getConfig().settings.flags) {
       throw new ValidationException("Flags api is not enabled");
     }

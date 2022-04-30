@@ -7,6 +7,7 @@ import {
   getRoomsOnline,
   getTransformRoomDto,
 } from "@/data/transformers/model/room.transformer";
+import type {SetWsIdWsOutMessage,} from "@common/ws/message/set.ws.id";
 
 
 export function transformSetWsId(
@@ -20,18 +21,20 @@ export function transformSetWsId(
     user,
     time,
   }: TransformSetWsIdDataParams
-): SetWsIdMessage {
+): SetWsIdWsOutMessage {
   const roomsOnlineDict = getRoomsOnline(allUsersInTheseRooms);
   return {
     action: "setWsId",
-    channels: channels.map(transformChannelDto),
-    rooms: myRooms.map((room) => getTransformRoomDto(roomsOnlineDict[room.id], room)),
     handler: "ws",
-    time,
-    users: users.map(transformUserDto),
-    online,
-    opponentWsId: id,
-    profile: transformProfileDto(user),
-    settings: transformSettings(user),
+    data: {
+      channels: channels.map(transformChannelDto),
+      rooms: myRooms.map((room) => getTransformRoomDto(roomsOnlineDict[room.id], room)),
+      time,
+      users: users.map(transformUserDto),
+      online,
+      opponentWsId: id,
+      profile: transformProfileDto(user),
+      settings: transformSettings(user),
+    },
   };
 }

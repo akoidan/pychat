@@ -1,3 +1,8 @@
+import {
+  DefaultWsInMessage,
+  HandlerName
+} from "@common/ws/common";
+
 import type {RoomModel} from "@/data/model/room.model";
 import type {RoomUsersModel} from "@/data/model/room.users.model";
 import type {ChannelModel} from "@/data/model/channel.model";
@@ -8,7 +13,7 @@ export interface WebSocketContextData {
   userId: number;
   id: string;
 
-  sendToClient(data: DefaultWsInMessage<any, any>);
+  sendToClient<H extends HandlerName>(data: DefaultWsInMessage<any, H, any>);
 }
 
 export type UserOnlineData = Record<string, string[]>;
@@ -30,14 +35,14 @@ export interface OnWsClose {
 }
 
 export interface PubSubMessage<A extends string, H extends HandlerName> {
-  body: DefaultWsInMessage<A, H>;
+  body: DefaultWsInMessage<A, H, any>;
 }
 
 /*
  * Export interface SendToClientPubSubMessage<A extends string, H extends HandlerName> extends PubSubMessage<A, H>{
  * }
  */
-export type SendToClientPubSubMessage<DATA extends DefaultWsInMessage<A, H>, A extends string, H extends HandlerName> = PubSubMessage<A, H>;
+export type SendToClientPubSubMessage<DATA extends DefaultWsInMessage<A, H, any>, A extends string, H extends HandlerName> = PubSubMessage<A, H>;
 
 
 export interface TransformSetWsIdDataParams {

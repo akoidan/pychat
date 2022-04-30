@@ -2,15 +2,18 @@ import type {
   UserOnlineData,
   WebSocketContextData,
 } from "@/data/types/internal";
+import type {RemoveOnlineUserMessage} from "@common/legacy";
 
 
 export function getLogoutMessage(online: UserOnlineData, lastTimeOnline: number, context: WebSocketContextData, time: number): RemoveOnlineUserMessage {
   return {
-    online,
+    data: {
+      online,
+      lastTimeOnline,
+      time,
+      userId: context.userId,
+    },
     action: "removeOnlineUser",
-    lastTimeOnline,
-    time,
     handler: "room",
-    userId: context.userId,
   };
 }

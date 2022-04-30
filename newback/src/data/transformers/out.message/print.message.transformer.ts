@@ -1,3 +1,4 @@
+import {PrintMessageWsInMessage} from '@common/ws/message/print.message';
 import type {ImageModel} from "@/data/model/image.model";
 import type {
   CreateModel,
@@ -16,6 +17,6 @@ export function transformPrintMessage(
   return {
     action: "printMessage",
     handler: "ws-message",
-    message: transformMessageDto(message, mentions, images),
+    data: transformMessageDto(message, mentions, images),
   };
 }

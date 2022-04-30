@@ -1,3 +1,5 @@
+import {ValidateUserEmailRequest} from "@common/http/auth/validte.email";
+
 import {
   IsEmail,
   IsString,

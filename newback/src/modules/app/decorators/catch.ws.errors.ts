@@ -1,3 +1,5 @@
+import {WS_SESSION_EXPIRED_CODE,} from "@common/consts";
+
 import type {Logger} from "@nestjs/common";
 import {UnauthorizedException} from "@nestjs/common";
 import type {OnGatewayConnection} from "@nestjs/websockets";

@@ -1,4 +1,5 @@
 import {ImageType} from '@common/model/enum/image.type';
+import {SaveFileResponse} from '@common/http/file/save.file';
 import {
   Injectable,
   Logger,

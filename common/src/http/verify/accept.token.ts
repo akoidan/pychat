@@ -1,4 +1,4 @@
-import {SessionResponse} from '@common/helpers';
+import type {SessionResponse} from "@common/helpers";
 
 export type AcceptTokenResponse = SessionResponse;
 

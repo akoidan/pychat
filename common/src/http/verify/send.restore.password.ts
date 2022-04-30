@@ -1,7 +1,7 @@
-import {
+import type {
   CaptchaRequest,
-  OkResponse
-} from '@common/helpers';
+  OkResponse,
+} from "@common/helpers";
 
 export type SendRestorePasswordResponse = OkResponse;
 

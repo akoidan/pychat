@@ -1,10 +1,12 @@
+import type {SendRestorePasswordRequest} from "@common/http/verify/send.restore.password";
+import {SendRestorePasswordRequest} from '@common/http/verify/send.restore.password';
+
 import {
   IsEmail,
   IsString,
   Matches,
   ValidateIf,
 } from "class-validator";
-
 
 export class SendRestorePasswordValidator implements SendRestorePasswordRequest {
   @ValidateIf((o) => !o.email || o.username)

@@ -1,4 +1,11 @@
 import {VerificationType} from '@common/model/enum/verification.type';
+import {SendRestorePasswordRequest} from '@common/http/verify/send.restore.password';
+import {VerifyTokenResponse} from '@common/http/verify/verify.token';
+import {ConfirmEmailRequest} from '@common/http/verify/confirm.email';
+import {
+  AcceptTokenRequest,
+  AcceptTokenResponse
+} from '@common/http/verify/accept.token';
 import {
   BadRequestException,
   Injectable,

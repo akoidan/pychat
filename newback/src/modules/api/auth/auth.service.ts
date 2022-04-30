@@ -1,7 +1,3 @@
-import {
-  ALL_ROOM_ID,
-  MAX_USERNAME_LENGTH,
-} from "@/data/consts";
 import type {FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
 import type {FaceBookAuthRequest} from "@common/http/auth/facebook.auth";
 import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
@@ -16,6 +12,11 @@ import type {
 } from "@common/http/auth/sign.in";
 import {Gender} from '@common/model/enum/gender';
 import {VerificationType} from '@common/model/enum/verification.type';
+
+import {
+  ALL_ROOM_ID,
+  MAX_USERNAME_LENGTH,
+} from "@/data/consts";
 import {
   ConflictException,
   Injectable,

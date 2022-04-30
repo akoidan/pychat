@@ -1,5 +1,6 @@
-import {MAX_USERNAME_LENGTH,} from "@/data/consts";
 import {Gender} from '@common/model/enum/gender';
+
+import {MAX_USERNAME_LENGTH,} from "@/data/consts";
 import {
   Column,
   DataType,

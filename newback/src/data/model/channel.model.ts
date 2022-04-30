@@ -1,7 +1,8 @@
 import {Injectable} from "@nestjs/common";
 import {UserModel} from "@/data/model/user.model";
 
-BelongsTo,
+import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,

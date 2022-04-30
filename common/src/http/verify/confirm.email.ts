@@ -1,4 +1,4 @@
-import {OkResponse} from '@common/helpers';
+import type {OkResponse} from "@common/helpers";
 
 export interface ConfirmEmailRequest {
   token: string;
