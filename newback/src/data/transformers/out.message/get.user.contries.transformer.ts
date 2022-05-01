@@ -1,7 +1,5 @@
 import type {LocationDto} from "@common/model/dto/location.dto";
-import {LocationDto} from '@common/model/dto/location.dto';
-import type {GetCountryCodeWsInMessage} from "@common/ws/message/get.country.code";
-import {GetCountryCodeWsInMessage} from '@common/ws/message/get.country.code';
+import type {GetCountryCodeWsInMessage} from "@common/ws/message/get.country.code";;
 import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 
 

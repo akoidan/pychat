@@ -3,11 +3,6 @@ import type {
   RequestWsOutMessage,
   ResponseWsInMessage,
 } from "@common/ws/common";
-import {
-  DefaultWsInMessage,
-  RequestWsOutMessage,
-  ResponseWsInMessage
-} from "@common/ws/common";
 
 import type {
   Logger,
@@ -29,16 +24,15 @@ import {
   MESSAGE_METADATA,
 } from "@nestjs/websockets/constants";
 import {isFunction} from "@nestjs/common/utils/shared.utils";
-import type {
-  Server,
-  ServerOptions,
-} from "ws";
 import {
   WebSocket,
   WebSocketServer,
 } from "ws";
+import type {
+  Server,
+  ServerOptions,
+} from "ws";
 import {processErrors} from "@/modules/app/decorators/catch.ws.errors";
-
 
 export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOptions> {
   private wsServer: WebSocketServer;
@@ -76,7 +70,7 @@ export class WsAdapter implements WebSocketAdapter<Server, WebSocket, ServerOpti
     });
   }
 
-  public bindClientDisconnect(client: BaseWsInstance, callback: Function) {
+  public bindClientDisconnect(client: WebSocket, callback: Function) {
     client.on(DISCONNECT_EVENT, (...arg) => {
       this.logger.log(`Closing connection ${(client as any)?.context?.id}`, "ws");
       callback(...arg);

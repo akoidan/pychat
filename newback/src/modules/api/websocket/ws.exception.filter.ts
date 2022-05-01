@@ -5,6 +5,7 @@ import type {
 } from "@nestjs/common";
 import {Catch} from "@nestjs/common";
 import {WebSocket} from "ws";
+import {GrowlWsInMessage} from "@common/ws/message/growl.message";
 
 
 @Catch(Error) // If we provide it on module Websocket it will also affect http,so fuck it
@@ -12,7 +13,7 @@ import {WebSocket} from "ws";
 export class WsExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const cbId = host.getArgByIndex(1)?.cbId;
-     const websocket: WebSocket = host.getArgByIndex(0);
+    let websocket: WebSocket = host.getArgByIndex(0);
     if (cbId) {
       const response: GrowlWsInMessage = {
         cbId,
@@ -22,7 +23,6 @@ export class WsExceptionFilter implements ExceptionFilter {
           error: exception.message,
         },
       };
-      const websocket: WebSocket = host.getArgByIndex(0);
       websocket.send(response);
     } else {
       throw exception;

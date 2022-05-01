@@ -1,4 +1,4 @@
-import {REDIS_KEYS,} from "@/data/consts";
+import {REDIS_KEYS} from "@/data/consts";
 import {
   Injectable,
   Logger,

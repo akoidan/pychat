@@ -1,15 +1,13 @@
-import type {SyncHistoryWsInMessage} from "@common/ws/message/sync.history";
+import {SyncHistoryWsOutBody} from "@common/ws/message/sync.history";
+import type {SyncHistoryWsInMessage, SyncHistoryWsInBody} from "@common/ws/message/sync.history";
+import {ShowITypeWsOutBody} from "@common/ws/message/show.i.type";
+import {PrintMessageWsOutBody} from "@common/ws/message/print.message";
 import {
-  SyncHistoryWsInMessage,
-  SyncHistoryWsOutBody
-} from '@common/ws/message/sync.history';
-import {ShowITypeWsOutBody} from '@common/ws/message/show.i.type';
-import {PrintMessageWsOutBody} from '@common/ws/message/print.message';
-import type {GetCountryCodeWsInMessage} from "@common/ws/message/get.country.code";
-import {
+  GetCountryCodeWsOutBody,
+} from "@common/ws/message/get.country.code";
+import type {
   GetCountryCodeWsInMessage,
-  GetCountryCodeWsOutBody
-} from '@common/ws/message/get.country.code';
+} from "@common/ws/message/get.country.code";
 import type {OnGatewayConnection} from "@nestjs/websockets";
 import {
   MessageBody,
@@ -19,13 +17,11 @@ import {
 } from "@nestjs/websockets";
 import {IncomingMessage} from "http";
 import {
-  Server,
   WebSocket,
 } from "ws";
 import type {OnWsClose} from "@/data/types/internal";
 import {
   SendToClientPubSubMessage,
-  WebSocketContextData,
 } from "@/data/types/internal";
 import {
   Logger,
@@ -42,6 +38,7 @@ import {CatchWsErrors} from "@/modules/app/decorators/catch.ws.errors";
 import {MessagesFromMyRoomGuard} from "@/modules/app/guards/own.message.guard";
 import type {NestGateway} from "@nestjs/websockets/interfaces/nest-gateway.interface";
 import {OwnRoomGuard} from "@/modules/app/guards/own.room.guard";
+import {WebSocketContextData} from "@/data/types/patch";
 
 @WebSocketGateway({
   path: "/ws",
@@ -49,7 +46,7 @@ import {OwnRoomGuard} from "@/modules/app/guards/own.room.guard";
 @UseFilters(new WsExceptionFilter())
 export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGateway {
   @WebSocketServer()
-  public readonly server!: Server;
+  public readonly server!: any; // TODO
 
   public constructor(
     public readonly logger: Logger,
@@ -65,7 +62,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
   }
 
   @CatchWsErrors
-  async handleConnection(socket: WebSocket, message: IncomingMessage, context: WebSocketContextData) : Promise<void> {
+  async handleConnection(socket: WebSocket, message: IncomingMessage, context: WebSocketContextData): Promise<void> {
     await this.websocketService.handleConnection(message.url, context, (socket as any)._socket.remoteAddress);
   }
 
@@ -82,7 +79,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
   public async syncHistory(
     @MessageBody() data: SyncHistoryWsOutBody,
       @WsContext() context: WebSocketContextData
-  ): Promise<SyncHistoryWsInMessage> {
+  ): Promise<SyncHistoryWsInBody> {
     return this.messageService.syncHistory(data, context);
   }
 

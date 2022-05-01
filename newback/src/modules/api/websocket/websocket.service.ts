@@ -8,12 +8,13 @@ import {RoomRepository} from "@/modules/shared/database/repository/room.reposito
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import {SessionService} from "@/modules/shared/session/session.service";
 import type {UserModel} from "@/data/model/user.model";
-import type {WebSocketContextData} from "@/data/types/internal";
 import {RedisService} from "@/modules/shared/redis/redis.service";
 import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import {transformSetWsId} from "@/data/transformers/out.message/set.ws.id.transformer";
 import {transformAddUserOnline} from "@/data/transformers/out.message/add.online.user.transformer";
 import {getLogoutMessage} from "@/data/transformers/out.message/remove.online.user.transformer";
+import type {AddOnlineUserMessage} from "@common/ws/message/add.online.user";
+import {WebSocketContextData} from "@/data/types/patch";
 
 
 @Injectable()
@@ -63,7 +64,7 @@ export class WebsocketService {
     this.logger.log(`User #${user.id} ${user.username} subscribed to ${JSON.stringify(channelsToListen)}`, "ws");
     context.sendToClient(response);
     this.pubsubService.subscribe(context, ...channelsToListen);
-    const data: AddOnlineUserMessage = transformAddUserOnline(response.online, user, id);
+    const data: AddOnlineUserMessage = transformAddUserOnline(online, user, id);
     this.pubsubService.emit(
       "sendToClient",
       {

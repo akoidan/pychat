@@ -5,7 +5,7 @@ import type {
   ShowITypeWsInMessage,
   ShowITypeWsOutBody,
 } from "@common/ws/message/show.i.type";
-import {ShowITypeWsInMessage} from '@common/ws/message/show.i.type';
+
 import {PrintMessageWsOutBody} from '@common/ws/message/print.message';
 import {
   Injectable,
@@ -14,7 +14,6 @@ import {
 import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import type {
   CreateModel,
-  WebSocketContextData,
 } from "@/data/types/internal";
 import {MessageRepository} from "@/modules/shared/database/repository/messages.repository";
 import {Sequelize} from "sequelize-typescript";
@@ -29,6 +28,7 @@ import {
 } from "@/data/transformers/out.message/inner.transformer";
 import {transformPrintMessage} from "@/data/transformers/out.message/print.message.transformer";
 import {getMaxSymbol} from "@/data/transformers/helper/get.max.symbol";
+import {WebSocketContextData} from "@/data/types/patch";
 
 
 @Injectable()

@@ -104,12 +104,6 @@ export interface MessagesResponseMessage {
 }
 
 
-export interface AddOnlineUserBodyMessage extends ChangeUserOnlineBase {
-  opponentWsId: string;
-}
-export type AddOnlineUserMessage = DefaultWsInMessage<"addOnlineUser", "room", AddOnlineUserBodyMessage>;
-
-
 // Export type EditMessage = DefaultWsInMessage<"editMessage", "ws-message", MessageModelDto>;
 
 

@@ -32,6 +32,13 @@ interface TypeGeneratorForOauth1 extends SessionResponse {
   username: string;
 }
 
+export interface ChangeUserOnlineBase {
+  online: Record<number, string[]>;
+  userId: number;
+  lastTimeOnline: number;
+  time: number;
+}
+
 interface TypeGeneratorForOauth2 extends SessionResponse {
   isNewAccount: false;
 }

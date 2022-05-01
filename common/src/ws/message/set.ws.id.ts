@@ -4,7 +4,6 @@ import {ChannelDto} from "@common/model/dto/channel.dto";
 import {UserDto} from "@common/model/dto/user.dto";
 import {UserProfileDto} from "@common/model/dto/user.profile.dto";
 import {UserSettingsDto} from "@common/model/dto/user.settings.dto";
-import {OpponentWsId} from "@common/legacy";
 
 export interface SetWsIdWsOutBody {
   rooms: RoomDto[];

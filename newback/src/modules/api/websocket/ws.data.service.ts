@@ -5,11 +5,11 @@ import {
 } from "@nestjs/common";
 import {RoomRepository} from "@/modules/shared/database/repository/room.repository";
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
-import type {WebSocketContextData} from "@/data/types/internal";
 import {ConfigService} from "@/modules/shared/config/config.service";
 import {ValidationException} from "@/data/exceptions/validation.exception";
 import type {UserJoinedInfoModel} from "@/data/model/user.joined.info.model";
 import {transformUserCountries} from "@/data/transformers/out.message/get.user.contries.transformer";
+import {WebSocketContextData} from "@/data/types/patch";
 
 
 @Injectable()

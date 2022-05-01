@@ -1,8 +1,3 @@
-import {
-  HandlerName,
-  HandlerType
-} from "@common/ws/common";
-
 import type {WebsocketGateway} from "@/modules/api/websocket/websocket.gateway";
 import {
   Injectable,
@@ -10,8 +5,9 @@ import {
 } from "@nestjs/common";
 import type {
   PubSubMessage,
-  WebSocketContextData,
 } from "@/data/types/internal";
+import type {HandlerName} from "@common/ws/common";
+import {WebSocketContextData} from "@/data/types/patch";
 
 
 interface HandlerType {

@@ -13,10 +13,7 @@ import type {
 import {Gender} from '@common/model/enum/gender';
 import {VerificationType} from '@common/model/enum/verification.type';
 
-import {
-  ALL_ROOM_ID,
-  MAX_USERNAME_LENGTH,
-} from "@/data/consts";
+
 import {
   ConflictException,
   Injectable,
@@ -37,6 +34,10 @@ import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
 import {VerificationRepository} from "@/modules/shared/database/repository/verification.repository";
 import {SessionService} from "@/modules/shared/session/session.service";
 import {generateUserName} from "@/data/transformers/helper/generate.user.name";
+import {
+  ALL_ROOM_ID,
+  MAX_USERNAME_LENGTH
+} from "@common/consts";
 
 @Injectable()
 export class AuthService {

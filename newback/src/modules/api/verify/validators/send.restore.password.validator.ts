@@ -1,5 +1,4 @@
 import type {SendRestorePasswordRequest} from "@common/http/verify/send.restore.password";
-import {SendRestorePasswordRequest} from '@common/http/verify/send.restore.password';
 
 import {
   IsEmail,

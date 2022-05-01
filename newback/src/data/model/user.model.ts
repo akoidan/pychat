@@ -1,6 +1,5 @@
 import {Gender} from '@common/model/enum/gender';
 
-import {MAX_USERNAME_LENGTH,} from "@/data/consts";
 import {
   Column,
   DataType,
@@ -12,6 +11,7 @@ import {Injectable} from "@nestjs/common";
 import {UserAuthModel} from "@/data/model/user.auth.model";
 import {UserProfileModel} from "@/data/model/user.profile.model";
 import {UserSettingsModel} from "@/data/model/user.settings.model";
+import {MAX_USERNAME_LENGTH} from "@common/consts";
 
 @Injectable()
 @Table({tableName: "user"})

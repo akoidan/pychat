@@ -20,7 +20,7 @@ export default async(): Promise<Config.InitialOptions> => ({
     "json",
     "ts",
   ],
-  globalSetup: "./utils/jest.setup.ts",
+  globalSetup: "./jest.setup.ts",
   modulePathIgnorePatterns: ["e2e.spec.ts"],
   testRegex: ".*\\.spec\\.ts$",
   transform: {
