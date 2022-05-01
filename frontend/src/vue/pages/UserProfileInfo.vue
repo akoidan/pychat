@@ -126,9 +126,9 @@ import {CurrentUserInfoModel} from "@/ts/types/model";
 import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
 import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
-import {Gender} from "@/ts/types/shared/enums";
-import {UserProfileDtoWoImage} from "@/ts/types/shared/dto";
-import {SetUserProfileMessage} from "@/ts/types/shared/ws.in.messages";
+
+
+
 
 @Component({
   name: "UserProfileInfo",

@@ -134,10 +134,10 @@ import {
   RoomDictModel,
   UserDictModel,
 } from "@/ts/types/model";
-import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import ParentChannel from "@/vue/parts/ParentChannel.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";
+import {ALL_ROOM_ID} from "@common/consts";
 
 
 @Component({

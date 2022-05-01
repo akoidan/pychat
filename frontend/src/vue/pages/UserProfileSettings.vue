@@ -137,8 +137,8 @@ import {
   addToHomeScreen,
   canBeInstalled,
 } from "@/ts/utils/addToHomeScreen";
-import {UserSettingsDto} from "@/ts/types/shared/dto";
-import {SetSettingsMessage} from "@/ts/types/shared/ws.in.messages";
+
+
 
 @Component({
   name: "UserProfileSettings",

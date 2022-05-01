@@ -7,7 +7,7 @@ import {
   Vue,
 } from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
-import {ALL_ROOM_ID} from "@/ts/utils/consts";
+import {ALL_ROOM_ID} from "@common/consts";
 
 @Component({name: "ChatBackIcon"})
 export default class ChatBackIcon extends Vue {

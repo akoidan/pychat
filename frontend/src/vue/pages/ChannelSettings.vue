@@ -120,9 +120,9 @@ import {
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import type {RouterNavigateMessage} from "@/ts/types/messages/innerMessages";
-import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
+import {ALL_ROOM_ID} from "@common/consts";
 
 @Component({
   name: "ChannelSettings",

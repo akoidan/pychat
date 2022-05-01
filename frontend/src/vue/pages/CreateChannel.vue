@@ -37,9 +37,9 @@ import {
   Vue,
 } from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
-import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import PickUser from "@/vue/parts/PickUser.vue";
+import {ALL_ROOM_ID} from "@common/consts";
 
 @Component({
   name: "CreateChannel",
