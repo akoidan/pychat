@@ -29,13 +29,8 @@ export default async(): Promise<Config.InitialOptions> => ({
   },
   collectCoverageFrom: ["**/*.(t|j)s"],
   coveragePathIgnorePatterns: [
-    "/node_modules/",
-    "/coverage/",
-    "/src/utils/jest.config.ts",
-    "/dist/",
-    ".module.ts$",
-    ".dto.ts$",
+    "./utils/jest.config.ts",
   ],
-  coverageDirectory: "./coverage",
+  coverageDirectory: "../coverage",
   testEnvironment: "node",
 });
