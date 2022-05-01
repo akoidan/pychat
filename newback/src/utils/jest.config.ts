@@ -10,6 +10,7 @@ const config: Config.InitialOptions = {
 };
 
 export default async(): Promise<Config.InitialOptions> => ({
+  rootDir: '../',
   globals: {
     "ts-jest": {
       compiler: "ttypescript",
@@ -20,7 +21,7 @@ export default async(): Promise<Config.InitialOptions> => ({
     "json",
     "ts",
   ],
-  globalSetup: "./jest.setup.ts",
+  globalSetup: "./utils/jest.setup.ts",
   modulePathIgnorePatterns: ["e2e.spec.ts"],
   testRegex: ".*\\.spec\\.ts$",
   transform: {

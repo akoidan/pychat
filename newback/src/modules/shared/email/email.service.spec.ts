@@ -1,6 +1,6 @@
 import {HtmlService} from "@/modules/shared/html/html.service";
 import {EmailService} from "@/modules/shared/email/email.service";
-import type {TestingModule} from "@nestjs/testing";
+import {TestingModule} from "@nestjs/testing";
 import {Test} from "@nestjs/testing";
 import {LoggerModule} from "@/modules/shared/logger/logger.module";
 import {MailerService} from "@nestjs-modules/mailer";

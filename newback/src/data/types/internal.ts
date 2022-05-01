@@ -7,6 +7,7 @@ import type {RoomModel} from "@/data/model/room.model";
 import type {RoomUsersModel} from "@/data/model/room.users.model";
 import type {ChannelModel} from "@/data/model/channel.model";
 import type {UserModel} from "@/data/model/user.model";
+import {WebSocketContextData} from "@/data/types/patch";
 
 
 

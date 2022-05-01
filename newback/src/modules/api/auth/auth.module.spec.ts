@@ -26,7 +26,6 @@ import * as googleResponseFixture from "@/fixtures/google.response.fixture.json"
 import * as facebookGetTokenResponseFixture from "@/fixtures/facebook.get.token.response.json";
 import * as facebookGetUserResponseFixture from "@/fixtures/facebook.get.user.response.json";
 import {ConfigService} from "@/modules/shared/config/config.service";
-import type {IConfig} from "node-ts-config";
 import {config} from "node-ts-config";
 import {FacebookAuthService} from "@/modules/api/auth/facebook.auth.service";
 import {IpCacheService} from "@/modules/shared/ip/ip.cache.service";
@@ -169,7 +168,7 @@ describe("AuthModule", () => {
           publicKey: "a",
           privateKey: "a",
         },
-      } as IConfig);
+      } as typeof config);
       const {body} = await request.post("/api/auth/sign-in").send({
         username: "a",
         password: "as$",
@@ -195,7 +194,7 @@ describe("AuthModule", () => {
           publicKey: "a",
           privateKey: "a",
         },
-      } as IConfig);
+      } as typeof config);
       nodeApply = jest.fn().mockReturnValue({json: jest.fn().mockResolvedValue({success: true})});
       const {body} = await request.post("/api/auth/sign-in").send({
         username: "a",
@@ -333,7 +332,7 @@ describe("AuthModule", () => {
             accessToken: "test",
           },
         },
-      } as IConfig);
+      } as typeof config);
       userRepository.getUserMyAuthFacebook = jest.fn().mockResolvedValue({
         id: 1,
         user: {
@@ -361,7 +360,7 @@ describe("AuthModule", () => {
             accessToken: "test",
           },
         },
-      } as IConfig);
+      } as typeof config);
       userRepository.getUserMyAuthFacebook = jest.fn().mockResolvedValue(null);
 
       userRepository.checkUserExistByUserName = jest.fn().mockResolvedValue(false);
