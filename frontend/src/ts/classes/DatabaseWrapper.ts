@@ -37,7 +37,7 @@ import type {
 import type {SetStateFromStorage} from "@/ts/types/dto";
 import type {MainWindow} from "@/ts/classes/MainWindow";
 import {MessageStatusInner} from "@/ts/types/model";
-import {ImageType} from "@/ts/types/shared/enums";
+
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 type QueryObject = [string, any[]];

@@ -25,52 +25,20 @@ import {
   currentUserInfoDtoToModel,
   userSettingsDtoToModel,
 } from "@/ts/types/converters";
-import type {
-  GiphyDto,
-  MessagesResponseMessage,
-  RoomNoUsersDto,
-  SyncHistoryWsInMessage,
-  UserProfileDto,
-  UserProfileDtoWoImage,
-  UserSettingsDto,
-} from "@/ts/types/shared/dto";
+
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
-import type {AddChannelMessage,
-  AddInviteMessage,
-  AddRoomMessage,
-  GetCountryCodeWsInMessage,
-  PingMessage,
-  PongMessage,
-  PrintMessageWsInMessage,
-  SaveChannelSettingsMessage,
-  SetProfileImageMessage,
-  SetSettingsMessage,
-  SetUserProfileMessage,
-  SetWsIdWsOutMessage,
-  UserProfileChangedMessage,
-  WebRtcSetConnectionIdMessage,
-} from "@/ts/types/shared/ws.in.messages";
+
 import type {
   InternetAppearMessage,
   LogoutMessage,
   PubSetRooms,
 } from "@/ts/types/messages/innerMessages";
 import type Subscription from "@/ts/classes/Subscription";
-import {
-  HandlerType,
-  HandlerTypes
-} from "@/ts/types/shared/common";
-import {
-  DefaultWsOutMessage,
-  GetCountryCodeWsOutMessage,
-  PrintMessageWsOutMessage,
-  SetMessageStatusWsOutMessage,
-  ShowITypeWsOutMessage,
-  SyncHistoryWsOutMessage
-} from "@/ts/types/shared/ws.out.messages";
-import {MessageStatus} from "@/ts/types/shared/enums";
-import {WS_SESSION_EXPIRED_CODE} from "@/ts/types/shared/consts";
+
+
+
+
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,

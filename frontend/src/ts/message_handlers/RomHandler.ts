@@ -25,12 +25,7 @@ import {
   getRoom,
   getRoomsBaseDict,
 } from "@/ts/types/converters";
-import type {
-  AddRoomBase,
-  ChangeDeviceType,
-  ChannelDto,
-  RoomDto,
-} from "@/ts/types/shared/dto";
+
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import type {Logger} from "lines-logger";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -43,26 +38,9 @@ import {
   logout,
 } from "@/ts/utils/audio";
 import type Subscription from "@/ts/classes/Subscription";
-import {
-  HandlerType,
-  HandlerTypes
-} from "@/ts/types/shared/common";
+
 import {SetStateFromWS} from "@/ts/types/dto";
-import {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddOnlineUserMessage,
-  AddRoomMessage,
-  CreateNewUsedMessage,
-  DeleteChannelMessage,
-  DeleteRoomMessage,
-  InviteUserMessage,
-  LeaveUserMessage,
-  RemoveOnlineUserMessage,
-  SaveChannelSettingsMessage,
-  SaveRoomSettingsMessage,
-  ShowITypeWsInMessage
-} from "@/ts/types/shared/ws.in.messages";
+
 
 export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;

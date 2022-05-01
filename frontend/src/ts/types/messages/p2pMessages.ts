@@ -8,12 +8,9 @@ import type {
   MessageP2pDto,
   MessagesInfo,
 } from "@/ts/types/messages/p2pDto";
-import {DefaultMessage} from "@/ts/types/shared/common";
-import {
-  CallBackMessage,
-  ResolveCallbackId
-} from "@/ts/types/shared/dto";
-import {MessageStatus} from "@/ts/types/shared/enums";
+
+
+
 
 
 

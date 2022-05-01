@@ -17,14 +17,8 @@ import {
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";
-import {
-  HandlerType,
-  HandlerTypes
-} from "@/ts/types/shared/common";
-import {
-  AcceptFileMessage,
-  DestroyFileConnectionMessage
-} from "@/ts/types/shared/ws.in.messages";
+
+
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {

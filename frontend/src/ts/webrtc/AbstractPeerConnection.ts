@@ -11,8 +11,8 @@ import type {
   ConnectToRemoteMessage,
 } from "@/ts/types/messages/innerMessages";
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
-import {HandlerName} from "@/ts/types/shared/common";
-import {SendRtcDataMessage} from "@/ts/types/shared/ws.in.messages";
+
+
 
 
 export default abstract class AbstractPeerConnection extends MessageHandler {

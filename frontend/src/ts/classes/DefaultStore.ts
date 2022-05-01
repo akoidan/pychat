@@ -79,10 +79,7 @@ import {
   Mutation,
   VuexModule,
 } from "vuex-module-decorators";
-import {
-  Gender,
-  MessageStatus
-} from "@/ts/types/shared/enums";
+
 
 
 const logger = loggerFactory.getLogger("store");

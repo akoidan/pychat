@@ -1,6 +1,6 @@
 import type {LogLevel} from "lines-logger";
 import {MessageStatusInner} from '@/ts/types/model';
-import {Gender} from "@/ts/types/shared/enums";
+
 
 export interface UserDB {
   id: number;

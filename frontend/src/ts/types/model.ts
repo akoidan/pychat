@@ -1,9 +1,5 @@
 import type {LogLevel} from "lines-logger";
-import {
-  Gender,
-  ImageType,
-  MessageStatus
-} from "@/ts/types/shared/enums";
+
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",

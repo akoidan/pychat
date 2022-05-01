@@ -20,7 +20,7 @@ import {
   MessageStatusInner,
   MessageStatusModel
 } from '@/ts/types/model';
-import {SaveFileResponse} from "@/ts/types/shared/http";
+
 
 export type ValueFilterForKey<T extends object, U> = {
   [K in keyof T]: U extends T[K] ? K : never;

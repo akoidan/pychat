@@ -27,11 +27,8 @@ import type {
 } from "@/ts/types/model";
 import {stopVideo} from "@/ts/utils/htmlApi";
 import type Subscription from "@/ts/classes/Subscription";
-import {
-  HandlerType,
-  HandlerTypes
-} from "@/ts/types/shared/common";
-import {DestroyCallConnection} from "@/ts/types/shared/ws.in.messages";
+
+
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {

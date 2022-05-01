@@ -6,7 +6,7 @@ import type {
   RoomDictModel,
   UserModel,
 } from "@/ts/types/model";
-import {UserProfileDto} from "@/ts/types/shared/dto";
+
 
 export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
