@@ -28,7 +28,7 @@ jobs:
           yarn config set cache-folder `pwd`/yarn-cache
           yarn install --frozen-lockfile
       - name: Run tests
-        run: cd newback && yarn jest --runInBand --coverage --detectOpenHandles --coverageReporters json text
+        run: cd newback && yarn jest --config ./src/utils/jest.config.ts --runInBand --coverage --detectOpenHandles --coverageReporters json text
       - name: Coverage
         run: |
           cd newback
