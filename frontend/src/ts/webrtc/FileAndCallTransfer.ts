@@ -1,4 +1,3 @@
-
 import BaseTransferHandler from "@/ts/webrtc/BaseTransferHandler";
 import Subscription from "@/ts/classes/Subscription";
 
