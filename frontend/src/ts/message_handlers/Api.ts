@@ -1,3 +1,17 @@
+import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
+import {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
+import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
+import {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
+import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
 import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
 import type {
   SignUpRequest,
@@ -21,7 +35,7 @@ import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 
-import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
+
 import type {MultiResponse} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
 import type Fetch from "@/ts/classes/Fetch";

@@ -12,27 +12,13 @@ import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
 import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
 import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
 import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
-import MessagePeerConnection from "@/ts/webrtc/message/MessagePeerConnection";
+import {ChangeOnlineType} from "@common/legacy";
+import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
 
-export default class MessageSenderPeerConnection extends MessagePeerConnection {
-  public makeConnection() {
-    if (this.status !== "not_inited") {
-      return;
-    }
-    this.status = "inited";
-    this.createPeerConnection();
-    // This.store.setSendingFileStatus(ssfs);
-    try {
-      // Reliable data channels not supported by Chrome
-      this.sendChannel = this.pc!.createDataChannel("sendDataChannel", {reliable: false});
-      this.setupEvents();
-      this.logger.log("Created send data channel.")();
-    } catch (e: any) {
-      const error = `Failed to create data channel because ${e.message || e}`;
-      this.logger.error("acceptFile {}", e)();
-
-      return;
-    }
-    this.createOffer();
-  }
+export interface ChangeUserOnlineInfoMessageBody {
+  opponentWsId: string;
+  userId: number;
+  changeType: ChangeOnlineType;
 }
+
+export type ChangeUserOnlineInfoMessage = DefaultInnerSystemMessage<"changeOnline", "webrtc", ChangeUserOnlineInfoMessageBody>;

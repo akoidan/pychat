@@ -1,3 +1,17 @@
+import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
+import {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
+import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
+import {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
+import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
 import {
   AddChannelMessage,
   AddInviteMessage,
@@ -58,11 +72,7 @@ import {
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
 
-import type {
-  InternetAppearMessage,
-  LogoutMessage,
-  PubSetRooms,
-} from "@/ts/types/messages/innerMessages";
+
 import type Subscription from "@/ts/classes/Subscription";
 
 
@@ -558,7 +568,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.setUserSettings(message.settings);
     this.setUserImage(message.profile.thumbnail);
     this.timeDiffWithServer = Date.now() - message.time;
-    const pubSetRooms: PubSetRooms = {
+    const pubSetRooms: PubSetRoomsMessage = {
       action: "init",
       channels: message.channels,
       handler: "room",

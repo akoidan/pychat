@@ -1,3 +1,17 @@
+import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
+import {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
+import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
+import {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
+import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
 import {SendRtcDataMessage} from "@common/legacy";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
@@ -7,11 +21,9 @@ import {bytesToSize} from "@/ts/utils/pureFunctions";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {
-  CheckTransferDestroy,
-  ConnectToRemoteMessage,
-} from "@/ts/types/messages/innerMessages";
+
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
+import {HandlerName} from "@common/ws/common";
 
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
@@ -84,7 +96,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     }
     this.sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
     this.sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
-    const message: CheckTransferDestroy = { // Destroy parent TransferHandler
+    const message: CheckTransferDestroyMessage = { // Destroy parent TransferHandler
       handler: Subscription.getTransferId(this.connectionId),
       action: "checkTransferDestroy",
       allowZeroSubscribers: true,

@@ -1,3 +1,17 @@
+import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
+import {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
+import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
+import {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
+import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
 import {
   AddChannelMessage,
   AddInviteMessage,
@@ -21,13 +35,7 @@ import type {
   RoomLogEntry,
   SetRoomsUsers,
 } from "@/ts/types/types";
-import type {
-  ChangeP2pRoomInfoMessage,
-  ChangeUserOnlineInfoMessage,
-  LogoutMessage,
-  PubSetRooms,
-  RouterNavigateMessage,
-} from "@/ts/types/messages/innerMessages";
+
 import type {
   ChannelModel,
   ChannelsDictModel,
@@ -256,14 +264,14 @@ export class RoomHandler extends MessageHandler {
     this.store.logout();
   }
 
-  public init(m: PubSetRooms) {
+  public init(m: PubSetRoomsMessage) {
     const {rooms, channels, users, online} = m;
 
     /*
      * Otherwise, we will modify value from ws, which will make observable in logs
      * other values from 'm' are converted with convertable
      */
-    const ids: PubSetRooms["online"] = JSON.parse(JSON.stringify(online));
+    const ids: PubSetRoomsMessage["online"] = JSON.parse(JSON.stringify(online));
     this.store.setOnline(ids);
 
     this.logger.debug("set users {}", users)();
