@@ -42,7 +42,6 @@ import ChannelAddRoom from "@/vue/pages/ChannelAddRoom.vue";
 import type Subscription from "@/ts/classes/Subscription";
 
 
-
 export function routerFactory(sub: Subscription) {
   const logger: Logger = loggerFactory.getLogger("router");
   const router = createRouter({

@@ -2,13 +2,10 @@ import type {
   PostData,
   SessionHolder,
 } from "@/ts/types/types";
+import {UploadData} from "@/ts/types/types";
 import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import {
-  SetMessageProgress,
-  UploadData
-} from "@/ts/types/types";
 
 export default class Fetch {
   protected httpLogger: Logger;

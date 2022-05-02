@@ -1,3 +1,4 @@
+import {MessageStatus} from '@common/model/enum/message.status';
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -37,7 +38,6 @@ import type {
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Subscription from "@/ts/classes/Subscription";
-
 
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {

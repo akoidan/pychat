@@ -1,11 +1,12 @@
+import {MessageStatus} from '@common/model/enum/message.status';
 import type {
   FileModel,
   MessageModel,
 } from "@/ts/types/model";
+import {MessageStatusInner} from '@/ts/types/model';
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {MessageSender} from "@/ts/types/types";
 import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from "@/ts/utils/consts";
-import {MessageStatusInner} from '@/ts/types/model';
 
 
 export function bytesToSize(bytes: number): string {

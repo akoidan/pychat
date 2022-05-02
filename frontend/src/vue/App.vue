@@ -14,6 +14,7 @@ import {
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 import Growls from "@/vue/parts/Growls.vue";
+import {Theme} from "@common/model/enum/theme";
 
 
 @Component({

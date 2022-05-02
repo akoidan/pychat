@@ -1,3 +1,4 @@
+import {SendRtcDataMessage} from "@common/legacy";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
@@ -11,8 +12,6 @@ import type {
   ConnectToRemoteMessage,
 } from "@/ts/types/messages/innerMessages";
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
-
-
 
 
 export default abstract class AbstractPeerConnection extends MessageHandler {

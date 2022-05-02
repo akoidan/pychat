@@ -16,7 +16,6 @@ import type {MainWindow} from "@/ts/classes/MainWindow";
 import type Subscription from "@/ts/classes/Subscription";
 
 
-
 export default class NotifierHandler extends MessageHandler {
   protected readonly logger: Logger;
 

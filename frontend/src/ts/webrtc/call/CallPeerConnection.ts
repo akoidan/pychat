@@ -1,3 +1,4 @@
+import {DestroyCallConnection} from "@common/legacy";
 import {
   createMicrophoneLevelVoice,
   getAverageAudioLevel,
@@ -27,7 +28,6 @@ import type {
 } from "@/ts/types/model";
 import {stopVideo} from "@/ts/utils/htmlApi";
 import type Subscription from "@/ts/classes/Subscription";
-
 
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {

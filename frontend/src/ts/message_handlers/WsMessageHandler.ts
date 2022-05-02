@@ -1,3 +1,18 @@
+import {
+  DeleteMessage,
+  MessagesResponseMessage
+} from "@common/legacy";
+import {ImageType} from '@common/model/enum/image.type';
+import {MessageStatus} from '@common/model/enum/message.status';
+import {GiphyDto} from '@common/model/dto/giphy.dto';
+import {MessageModelDto} from '@common/model/dto/message.model.dto';
+import {SyncHistoryWsInMessage} from '@common/ws/message/sync.history';
+import {SetMessageStatusWsInMessage} from '@common/ws/message/set.message.status';
+import {PrintMessageWsInMessage} from '@common/ws/message/print.message';
+import {
+  SaveFileRequest,
+  SaveFileResponse
+} from '@common/http/file/save.file';
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Api from "@/ts/message_handlers/Api";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
@@ -18,7 +33,6 @@ import {MessageStatusInner} from "@/ts/types/model";
 import type {Logger} from "lines-logger";
 
 
-
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
@@ -35,9 +49,6 @@ import {
   getMissingIds,
 } from "@/ts/utils/pureFunctions";
 import type Subscription from "@/ts/classes/Subscription";
-
-
-
 
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {

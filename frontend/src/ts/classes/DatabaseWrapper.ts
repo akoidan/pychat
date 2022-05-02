@@ -1,3 +1,4 @@
+import {ImageType} from '@common/model/enum/image.type';
 import type {
   IStorage,
   SetFileIdsForMessage,
@@ -18,6 +19,7 @@ import type {
   RoomSettingsModel,
   UserModel,
 } from "@/ts/types/model";
+import {MessageStatusInner} from "@/ts/types/model";
 import {
   convertToBoolean,
   getChannelDict,
@@ -36,7 +38,6 @@ import type {
 } from "@/ts/types/db";
 import type {SetStateFromStorage} from "@/ts/types/dto";
 import type {MainWindow} from "@/ts/classes/MainWindow";
-import {MessageStatusInner} from "@/ts/types/model";
 
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;

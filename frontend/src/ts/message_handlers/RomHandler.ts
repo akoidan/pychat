@@ -1,3 +1,21 @@
+import {
+  AddChannelMessage,
+  AddInviteMessage,
+  AddRoomBase,
+  AddRoomMessage,
+  ChangeDeviceType,
+  CreateNewUsedMessage,
+  DeleteChannelMessage,
+  DeleteRoomMessage,
+  InviteUserMessage,
+  LeaveUserMessage,
+  RemoveOnlineUserMessage,
+  SaveChannelSettingsMessage,
+  SaveRoomSettingsMessage
+} from "@common/legacy";
+import {ChannelDto} from '@common/model/dto/channel.dto';
+import {RoomDto} from '@common/model/dto/room.dto';
+import {ShowITypeWsInMessage} from '@common/ws/message/show.i.type';
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {
   RoomLogEntry,

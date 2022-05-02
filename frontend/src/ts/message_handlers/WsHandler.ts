@@ -1,4 +1,33 @@
 import {
+  AddChannelMessage,
+  AddInviteMessage,
+  AddRoomMessage,
+  MessagesResponseMessage,
+  SaveChannelSettingsMessage,
+  SetSettingsMessage,
+  SetUserProfileMessage,
+  UserProfileChangedMessage,
+  WebRtcSetConnectionIdMessage
+} from "@common/legacy";
+import {MessageStatus} from '@common/model/enum/message.status';
+import {GiphyDto} from '@common/model/dto/giphy.dto';
+import {UserProfileDto} from '@common/model/dto/user.profile.dto';
+import {UserSettingsDto} from '@common/model/dto/user.settings.dto';
+import {
+  SyncHistoryWsInMessage,
+  SyncHistoryWsOutMessage
+} from '@common/ws/message/sync.history';
+import {ShowITypeWsOutMessage} from '@common/ws/message/show.i.type';
+import {SetMessageStatusWsOutMessage} from '@common/ws/message/set.message.status';
+import {
+  PrintMessageWsInMessage,
+  PrintMessageWsOutMessage
+} from '@common/ws/message/print.message';
+import {
+  GetCountryCodeWsInMessage,
+  GetCountryCodeWsOutMessage
+} from '@common/ws/message/get.country.code';
+import {
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
   FLAGS,
@@ -35,9 +64,6 @@ import type {
   PubSetRooms,
 } from "@/ts/types/messages/innerMessages";
 import type Subscription from "@/ts/classes/Subscription";
-
-
-
 
 
 enum WsState {

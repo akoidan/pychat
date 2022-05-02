@@ -1,3 +1,5 @@
+import {Gender} from '@common/model/enum/gender';
+import {MessageStatus} from '@common/model/enum/message.status';
 import Vuex from "vuex";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
@@ -79,7 +81,6 @@ import {
   Mutation,
   VuexModule,
 } from "vuex-module-decorators";
-
 
 
 const logger = loggerFactory.getLogger("store");

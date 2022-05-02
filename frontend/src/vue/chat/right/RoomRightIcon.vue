@@ -35,7 +35,6 @@ import type {MessageModel} from "@/ts/types/model";
 import {RoomModel} from "@/ts/types/model";
 
 
-
 @Component({name: "RoomRightIcon"})
 export default class RoomRightIcon extends Vue {
   @Prop() public room!: RoomModel;

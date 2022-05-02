@@ -123,8 +123,6 @@ import {isMobile} from "@/ts/utils/runtimeConsts";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 
 
-
-
 @Component({
   name: "ChatBox",
   components: {

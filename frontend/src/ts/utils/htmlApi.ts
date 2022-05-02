@@ -1,3 +1,4 @@
+import {ImageType} from '@common/model/enum/image.type';
 import {
   IS_DEBUG,
   PASTED_GIPHY_CLASS,

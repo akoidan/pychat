@@ -4,7 +4,6 @@ import type {MessageSupplier} from "@/ts/types/types";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 
-
 export class WsMessageProcessor extends AbstractMessageProcessor {
   private readonly sub: Subscription;
 

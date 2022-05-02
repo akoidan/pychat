@@ -1,3 +1,4 @@
+import {MessageStatus} from '@common/model/enum/message.status';
 import BaseTransferHandler from "@/ts/webrtc/BaseTransferHandler";
 import type {
   MessageSender,
@@ -16,7 +17,6 @@ import type {
 } from "@/ts/types/messages/innerMessages";
 
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
-
 
 
 /**

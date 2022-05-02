@@ -1,4 +1,9 @@
 import {
+  CallStatus,
+  OfferCall,
+  ReplyCallMessage
+} from "@common/legacy";
+import {
   browserVersion,
   isChrome,
   isMobile,
@@ -40,9 +45,6 @@ import type {
 } from "@/ts/types/messages/innerMessages";
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 import {stopVideo} from "@/ts/utils/htmlApi";
-
-
-
 
 
 export default class CallHandler extends FileAndCallTransfer {

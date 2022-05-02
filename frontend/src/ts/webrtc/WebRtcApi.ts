@@ -1,3 +1,10 @@
+import {
+  NotifyCallActiveMessage,
+  OfferCall,
+  OfferFile,
+  OfferMessage,
+  WebRtcSetConnectionIdMessage
+} from "@common/legacy";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
@@ -28,7 +35,6 @@ import type {
 } from "@/ts/types/messages/innerMessages";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
-
 
 
 export default class WebRtcApi extends MessageHandler {

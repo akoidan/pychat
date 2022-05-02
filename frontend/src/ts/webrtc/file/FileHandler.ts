@@ -7,8 +7,6 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 
 
-
-
 export default class FileHandler extends FileAndCallTransfer {
   protected readonly handlers: HandlerTypes<keyof FileHandler, "webrtcTransfer:*"> = {
     replyFile: <HandlerType<"replyFile", "webrtcTransfer:*">> this.replyFile,

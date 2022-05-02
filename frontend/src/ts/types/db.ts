@@ -1,3 +1,4 @@
+import {Gender} from '@common/model/enum/gender';
 import type {LogLevel} from "lines-logger";
 import {MessageStatusInner} from '@/ts/types/model';
 

@@ -12,8 +12,8 @@ import type {
   RoomSettingsModel,
   UserModel,
 } from "@/ts/types/model";
-import type {Logger} from "lines-logger";
 import {MessageStatusModel} from '@/ts/types/model';
+import type {Logger} from "lines-logger";
 
 interface LocalStorageMessage {
   f: number;

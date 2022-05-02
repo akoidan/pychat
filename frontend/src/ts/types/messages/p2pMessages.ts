@@ -10,10 +10,6 @@ import type {
 } from "@/ts/types/messages/p2pDto";
 
 
-
-
-
-
 export type P2PHandlerType<A extends string> = (a: DefaultP2pMessage<A>) => Promise<void> | void;
 
 export type P2PHandlerTypes<K extends string> = {

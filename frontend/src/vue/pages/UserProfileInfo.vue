@@ -128,8 +128,6 @@ import AppInputDate from "@/vue/ui/AppInputDate.vue";
 import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
 
 
-
-
 @Component({
   name: "UserProfileInfo",
   components: {

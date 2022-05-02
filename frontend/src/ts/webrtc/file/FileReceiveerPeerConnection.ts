@@ -16,7 +16,6 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";
 
 
-
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileReceiverPeerConnection, "peerConnection:*"> = {
     sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,

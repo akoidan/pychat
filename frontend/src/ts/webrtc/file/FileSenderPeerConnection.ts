@@ -19,7 +19,6 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";
 
 
-
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {
     destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,

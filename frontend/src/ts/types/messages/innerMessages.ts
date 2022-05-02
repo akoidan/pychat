@@ -5,11 +5,20 @@
  */
 
 import type {MessageStatusModel} from "@/ts/types/model";
+import {
+  DefaultWsInMessage,
+  HandlerName
+} from "@common/ws/common";
+import {ChannelDto} from '@common/model/dto/channel.dto';
+import {RoomDto} from '@common/model/dto/room.dto';
+import {UserDto} from '@common/model/dto/user.dto';
+import {
+  ChangeDeviceType,
+  ChangeOnlineType
+} from "@common/legacy";
 
 
-
-
-export interface DefaultInnerSystemMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H> {
+export interface DefaultInnerSystemMessage<A extends string, H extends HandlerName> extends  DefaultWsInMessage<A, H> {
   allowZeroSubscribers?: boolean; // If true, no errors should be present on handeling this message by sucrcription if nothing was notified
 }
 

@@ -139,7 +139,6 @@ import {
 } from "@/ts/utils/addToHomeScreen";
 
 
-
 @Component({
   name: "UserProfileSettings",
   components: {

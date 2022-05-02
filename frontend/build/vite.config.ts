@@ -32,7 +32,7 @@ export default defineConfig(async({command, mode}) => {
 
   const PYCHAT_CONSTS = getConsts(gitHash, command);
   const srcDir = resolve(__dirname, '..', 'src');
-  const commonDir = resolve(__dirname, '..', '..', 'common');
+  const commonDir = resolve(__dirname, '..', '..', 'common', 'src');
   const distDir = resolve(__dirname, '..', 'dist');
   const nodeModulesDir = resolve(__dirname, '..', 'node_modules');
   const swFilePath = resolve(srcDir, 'ts', 'sw.ts');

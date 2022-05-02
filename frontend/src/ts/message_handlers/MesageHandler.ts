@@ -1,7 +1,5 @@
+import {IMessageHandler} from "@common/legacy";
 import type {Logger} from "lines-logger";
-
-
-
 
 
 export default abstract class MessageHandler implements IMessageHandler {
