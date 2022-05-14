@@ -12,7 +12,7 @@ import {NestFactory} from "@nestjs/core";
 
 async function bootstrap() {
   let httpsOptions: HttpsOptions = null;
-  if (config.application.ssl) {
+  if (config.application.ssl?.keyPath) {
     httpsOptions = {};
     httpsOptions.key = await readFile(config.application.ssl.keyPath, "utf-8");
     httpsOptions.cert = await readFile(config.application.ssl.crtPath, "utf-8");

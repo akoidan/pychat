@@ -1,10 +1,13 @@
 # https://github.com/docker/hub-feedback/issues/1843
 **
 !download_content.sh
-!backend/requirements.txt
-!backend/manage.py
-!backend/chat
-!backend/templates
+!newback/package.json
+!newback/nest-cli.json
+!newback/yarn.lock
+!newback/tsconfig.build.json
+!newback/tsconfig.json
+!newback/src
+!common/src
 !frontend/src
 !frontend/patches
 !frontend/build

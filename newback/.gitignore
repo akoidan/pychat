@@ -8,4 +8,5 @@ coverage
 !src/data/migration/.gitkeep
 codecov
 src/fixtures/prod
-src/config/env/backup.json
+src/config/user/*
+!src/config/user/.gitkeep

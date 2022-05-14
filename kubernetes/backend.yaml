@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        imagePullPolicy: IfNotPresent
+        image: deathangel908/pychat-backend
+        ports:
+        - containerPort: 8888
+        envFrom:
+        - secretRef:
+            name: pychat-secret
+        - configMapRef:
+            name: pychat-config-map
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+spec:
+  selector:
+    app: backend
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 8888
+      targetPort: 8888
+      nodePort: 30002
+

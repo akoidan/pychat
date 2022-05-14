@@ -2,6 +2,10 @@ import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
 import {IMessageHandler} from "@common/legacy";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
+import {
+  DefaultWsInMessage,
+  HandlerName
+} from "@common/ws/common";
 
 
 export default class Subscription {
@@ -58,7 +62,7 @@ export default class Subscription {
     this.logger.error("Unable to find channel to delete {}", channel)();
   }
 
-  public notify<T extends DefaultInMessage<string, HandlerName>>(message: T): boolean {
+  public notify<T extends DefaultWsInMessage<string, HandlerName, any>>(message: T): boolean {
     this.logger.debug("notifing {}", message)();
     if (message.handler === "*") {
       Object.values(this.suscribers).forEach((channel) => {
@@ -78,7 +82,7 @@ export default class Subscription {
 
       return true;
     }
-    if (!(message as DefaultInnerSystemMessage<string, HandlerName>).allowZeroSubscribers) {
+    if (!(message as DefaultInnerSystemMessage<string, HandlerName, any>).allowZeroSubscribers) {
       this.logger.error("Can't handle message {} because no suscribers found, available suscribers {}", message, this.suscribers)();
     }
 

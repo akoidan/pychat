@@ -1,13 +1,13 @@
-import {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
-import {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
-import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
-import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
-import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
-import {
+import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
+import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import type {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import type {
   AcceptCallMessage,
   CallStatus,
   OfferCall,
-  ReplyCallMessage
+  ReplyCallMessage,
 } from "@common/legacy";
 import {
   browserVersion,
@@ -45,17 +45,20 @@ import CallReceiverPeerConnection from "@/ts/webrtc/call/CallReceiverPeerConnect
 
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 import {stopVideo} from "@/ts/utils/htmlApi";
-import {HandlerTypes} from "@common/ws/common";
+import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
 
 
 export default class CallHandler extends FileAndCallTransfer {
-  protected readonly handlers: HandlerTypes<keyof CallHandler, "webrtcTransfer:*"> = {
+  protected readonly handlers: HandlerTypes<keyof CallHandler, "webrtcTransfer:*", any> = {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
-    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*">> this.replyCall,
-    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*">> this.acceptCall,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">> this.checkTransferDestroy,
+    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*", any>> this.replyCall,
+    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*", any>> this.acceptCall,
+    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*", any>> this.checkTransferDestroy,
   };
 
   private canvas: HTMLCanvasElement | null = null;
@@ -110,7 +113,7 @@ export default class CallHandler extends FileAndCallTransfer {
     return this.connectionId;
   }
 
-  public acceptCall(message: AcceptCallMessage) {
+  public acceptCall(message: AcceptCallMessage["data"]) {
     if (this.callStatus !== "received_offer") { // If we're call initiator
       if (!this.connectionId) {
         throw Error("Conn is is null");
@@ -118,7 +121,9 @@ export default class CallHandler extends FileAndCallTransfer {
       const payload: ConnectToRemoteMessage = {
         action: "connectToRemote",
         handler: Subscription.getPeerConnectionId(this.connectionId, message.opponentWsId),
-        stream: this.localStream,
+        data: {
+          stream: this.localStream,
+        },
       };
       this.sub.notify(payload);
     } else {

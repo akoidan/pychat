@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+  labels:
+    app: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - name: mariadb
+        image: yobasystems/alpine-mariadb:10.6.7
+        ports:
+        - containerPort: 3306
+        env:
+        - name: MYSQL_CHARSET
+          value: utf8mb4
+        - name: MYSQL_COLLATION
+          value: utf8mb4_general_ci
+        envFrom:
+        - secretRef:
+            name: pychat-secret
+        - configMapRef:
+            name: pychat-config-map
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mariadb-service
+spec:
+  selector:
+    app: mariadb
+  ports:
+    - protocol: TCP
+      port: 3306
+      targetPort: 3306
+

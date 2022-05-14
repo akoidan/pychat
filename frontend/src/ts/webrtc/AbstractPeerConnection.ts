@@ -1,6 +1,6 @@
-import {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
-import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
-import {SendRtcDataMessage} from "@common/legacy";
+import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import type {SendRtcDataMessage} from "@common/legacy";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
@@ -11,7 +11,7 @@ import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
-import {HandlerName} from "@common/ws/common";
+import type {HandlerName} from "@common/ws/common";
 
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
@@ -88,7 +88,9 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       handler: Subscription.getTransferId(this.connectionId),
       action: "checkTransferDestroy",
       allowZeroSubscribers: true,
-      wsOpponentId: this.opponentWsId,
+      data: {
+        wsOpponentId: this.opponentWsId,
+      },
     };
     this.sub.notify(message);
   }
@@ -189,7 +191,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       this.logger.warn("Putting sendrtc data event to the queue")();
       this.sendRtcDataQueue.push(message);
     } else {
-      const data: RTCIceCandidateInit | RTCSessionDescriptionInit | {message: unknown} = message.content;
+      const data: RTCIceCandidateInit | RTCSessionDescriptionInit | {message: unknown} = message.data;
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== "closed") {
         if ((<RTCSessionDescriptionInit>data).sdp) {
           this.logger.log("Creating answer")();

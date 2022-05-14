@@ -1,0 +1,27 @@
+# cd <root>
+# docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend
+# https://stackoverflow.com/a/49478889/3872976
+# minikube tunnel service/backend-service
+# chrome http://192.168.49.2:30002/
+FROM node:16.15.0-alpine3.15
+
+ENV NODE_CONFIG_TS_ENV=production
+WORKDIR /usr/src/newback
+COPY ./newback/package.json ./newback/yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY ./newback/nest-cli.json ./newback/tsconfig.build.json ./newback/tsconfig.json ./
+COPY ./newback/src ./src/
+COPY ./common/src ./src/common
+
+# REPLACE_FROM='      "@common/*": ["../common/src/*"]';
+# REPLACE_TO='      "@common/*": ["./src/common/*"]';
+# ESCAPED_FROM=$(printf '%s\n' "$REPLACE_FROM" | sed -e 's/[]\/$*.^[]/\\&/g');
+# ESCAPED_TO=$(printf '%s\n' "$REPLACE_TO" | sed -e 's/[]\/$*.^[]/\\&/g');
+# echo sed -i \"s/$ESCAPED_FROM/$ESCAPED_TO/g\" tsconfig.json
+
+RUN sed -i 's/      "@common\/\*": \["\.\.\/common\/src\/\*"\]/      "@common\/\*": \["\.\/src\/common\/\*"\]/g' tsconfig.json
+
+RUN yarn build
+
+CMD ["/usr/local/bin/node", "./dist/main.js"]

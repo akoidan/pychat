@@ -1,0 +1,50 @@
+{
+  "auth": {
+    "google": {
+      "clientId": "@@GOOGLE_CLIENT_ID"
+    },
+    "facebook": {
+      "accessToken": "@@FACEBOOK_ACCESS_TOKEN"
+    }
+  },
+   "application": {
+    "port": "@@APPLICATION_PORT",
+    "ssl" : {
+      "crtPath": "@@APPLICATION_SSL_CRT_PATH",
+      "keyPath": "@@APPLICATION_SSL_CRT_KEY_PATH"
+    }
+  },
+  "settings": {
+    "flags": true
+  },
+  "redis": {
+    "host": "@@REDIS_HOST",
+    "port":  "@@REDIS_PORT",
+    "database": 0
+  },
+  "frontend": {
+    "address": "@@FRONTEND_ADDRESS",
+    "issueReportLink": "@@FRONTEND_ISSUE_REPORT_LINK"
+  },
+  "recaptcha": {
+    "publicKey": "@@RECAPTCHA_PUBLIC_KEY",
+    "privateKey": "@@RECAPTCHA_PRIVATE_KEY"
+  },
+  "email": {
+    "host": "@@EMAIL_HOST",
+    "port": "@@EMAIL_HOST",
+    "secure": "@@EMAIL_HOST",
+    "auth": {
+      "user": "@@EMAIL_AUTH_USER",
+      "pass": "@@EMAIL_AUTH_PASS"
+    }
+  },
+  "mysql": {
+    "logging": true,
+    "host": "@@MYSQL_HOST",
+    "port": "@@MYSQL_PORT",
+    "username": "@@MYSQL_USER",
+    "password": "@@MYSQL_PASSWORD",
+    "database": "@@MYSQL_DATABASE"
+  }
+}
