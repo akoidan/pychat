@@ -27,7 +27,7 @@ spec:
           value: utf8mb4_general_ci
         envFrom:
         - secretRef:
-            name: pychat-secret
+            name: secret
         - configMapRef:
             name: config-map
 ---

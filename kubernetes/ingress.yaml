@@ -4,6 +4,10 @@ metadata:
   name: ingress
   namespace: pychat
 spec:
+  tls:
+  - hosts:
+    - pychat.org
+    secretName: certificate
   defaultBackend:
     service:
       name: frontend-service

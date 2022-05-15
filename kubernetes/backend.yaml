@@ -27,7 +27,7 @@ spec:
             port: 8888
         envFrom:
         - secretRef:
-            name: pychat-secret
+            name: secret
         - configMapRef:
             name: config-map
 ---
