@@ -9,6 +9,10 @@ export interface IpFailedInfoResponse {
   status: "fail";
 }
 
+export interface HealthResponse {
+  tables: number;
+}
+
 export interface IpSuccessInfoResponse {
   status: "success";
   country: string;

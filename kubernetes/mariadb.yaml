@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mariadb-deployment
+  namespace: pychat
   labels:
     app: mariadb
 spec:
@@ -28,12 +29,13 @@ spec:
         - secretRef:
             name: pychat-secret
         - configMapRef:
-            name: pychat-config-map
+            name: config-map
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: mariadb-service
+  namespace: pychat
 spec:
   selector:
     app: mariadb

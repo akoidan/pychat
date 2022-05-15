@@ -73,6 +73,12 @@ update_docker() {
     safeRunCommand docker push deathangel908/pychat-test
 }
 
+apply_minikube() {
+  kubectl delete -f ./kubernetes/backend.yaml
+  sleep 20
+  minikube image rm deathangel908/pychat-backend
+  minikube image load deathangel908/pychat-backend
+}
 rename_domain() {
     exist_domain="pychat\.org"
     your_domain="$1"

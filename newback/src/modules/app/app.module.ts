@@ -10,6 +10,7 @@ import {VerifyModule} from "@/modules/api/verify/verify.module";
 import {DatabaseModule} from "@/modules/shared/database/database.module";
 import {WebsocketModule} from "@/modules/api/websocket/websocket.module";
 import {FileModule} from "@/modules/api/file/file.module";
+import {HealthModule} from "@/modules/api/health/health.module";
 
 
 /*
@@ -38,6 +39,7 @@ import {FileModule} from "@/modules/api/file/file.module";
     FileModule,
     DatabaseModule,
     WebsocketModule,
+    HealthModule,
     RedisModule.forRoot({
       config: {
         host: config.redis.host,

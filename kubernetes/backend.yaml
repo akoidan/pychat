@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: backend-deployment
+  namespace: pychat
   labels:
     app: backend
 spec:
@@ -20,16 +21,21 @@ spec:
         image: deathangel908/pychat-backend
         ports:
         - containerPort: 8888
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8888
         envFrom:
         - secretRef:
             name: pychat-secret
         - configMapRef:
-            name: pychat-config-map
+            name: config-map
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: backend-service
+  namespace: pychat
 spec:
   selector:
     app: backend
