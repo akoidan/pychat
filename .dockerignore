@@ -8,9 +8,11 @@
 !newback/tsconfig.json
 !newback/src
 !common/src
+!kubernetes
 !frontend/src
 !frontend/patches
 !frontend/build
+frontend/build/production.json
 !frontend/package.json
 !frontend/yarn.lock
 !frontend/tsconfig.json

@@ -73,12 +73,37 @@ update_docker() {
     safeRunCommand docker push deathangel908/pychat-test
 }
 
-apply_minikube() {
+minikube_frontend() {
+  kubectl delete -f ./kubernetes/frontend.yaml
+  sleep 10 &
+  docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .
+  wait
+  minikube image rm deathangel908/pychat-frontend
+  minikube image load deathangel908/pychat-frontend
+  kubectl apply -f ./kubernetes/frontend.yaml
+}
+
+minikube_backend() {
   kubectl delete -f ./kubernetes/backend.yaml
-  sleep 20
+  sleep 10 &
+  docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend .
+  wait
   minikube image rm deathangel908/pychat-backend
   minikube image load deathangel908/pychat-backend
+  kubectl apply -f ./kubernetes/backend.yaml
 }
+
+minikube_all() {
+  kubectl apply -f kubernetes/namespace.yaml
+  kubectl apply -f kubernetes/config-map.yaml
+  kubectl apply -f kubernetes/secret.yaml
+  kubectl apply -f kubernetes/mariadb.yaml
+  kubectl apply -f kubernetes/redis.yaml
+  minikube_backend
+  minikube_frontend
+  kubectl apply -f kubernetes/ingress.yaml
+}
+
 rename_domain() {
     exist_domain="pychat\.org"
     your_domain="$1"
@@ -496,6 +521,12 @@ elif [ "$1" = "copy_docker_prod_files" ]; then
     copy_docker_prod_files
 elif [ "$1" = "copy_root_fs" ]; then
     copy_root_fs
+elif [ "$1" = "minikube_all" ]; then
+    minikube_all
+elif [ "$1" = "minikube_frontend" ]; then
+    minikube_frontend
+elif [ "$1" = "minikube_backend" ]; then
+    minikube_backend
 elif [ "$1" = "redirect" ]; then
     safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
     safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
@@ -542,6 +573,9 @@ else
     chp copy_root_fs "Creates soft links from \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m to \e[96m/\e[0;33;40m"
     chp build_nginx "Build nginx with http-upload-module and installs it; . Usage: \e[92msh download_content.sh build_nginx 1.15.3 2.3.0  /tmp/depsFileList.txt\e[0;33;40m where 1.15 is nginx version, 2.3.0 is upload-http-module version"
     chp create_django_tables "Creates database tables and data"
+    chp minikube_all "Creates/updates kubernetes cluster"
+    chp minikube_backend "Build backend docker file and deploy/update it in minikube"
+    chp minikube_frontend "Build frontend docker file and deploy/update it in minikube"
     exit 1
 fi
 

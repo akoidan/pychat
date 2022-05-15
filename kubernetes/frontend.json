@@ -1,0 +1,15 @@
+{
+  "BACKEND_ADDRESS": "{}",
+  "IS_DEBUG": true,
+  "ELECTRON_IGNORE_SSL": true,
+  "PUBLIC_PATH": null,
+  "GOOGLE_OAUTH_2_CLIENT_ID": "620421656154-8boctt2h7h5meskhe7vh8aiargj0nae9.apps.googleusercontent.com",
+  "FACEBOOK_APP_ID": "894051850700207",
+  "RECAPTCHA_PUBLIC_KEY": "6LchGhwTAAAAAJwCRgfNKraWrFtCdKPFo0Ri8DLt",
+  "AUTO_REGISTRATION": false,
+  "ISSUES": false,
+  "GIPHY_API_KEY": "thZMTtWsaBQAPDIAY461GzYTctuYIeIj",
+  "GITHUB_LINK": "https://github.com/akoidan/pychat",
+  "FLAGS": true,
+  "WEBRTC_CONFIG": {"iceServers":[{"urls":["stun:turn2.l.google.com"]}]}
+}

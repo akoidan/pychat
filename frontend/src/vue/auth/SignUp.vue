@@ -129,9 +129,10 @@ import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import RegisterFieldSet from "@/vue/auth/RegisterFieldSet.vue";
 import debounce from "lodash.debounce";
 import {IconColor} from "@/ts/types/types";
-import type {LoginMessage} from "@/ts/types/messages/innerMessages";
+import type {LoginMessage} from "@/ts/types/messages/inner/login";
 import SocialAuthSignUp from "@/vue/auth/SocialAuthSignUp.vue";
 import {USERNAME_REGEX} from "@/ts/utils/consts";
+import {Gender} from "@common/model/enum";
 
 
 @Component({
