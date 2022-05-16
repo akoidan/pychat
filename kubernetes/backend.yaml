@@ -30,6 +30,13 @@ spec:
             name: secret
         - configMapRef:
             name: config-map
+        volumeMounts:
+          - mountPath: "/usr/src/newback/photo"
+            name: photo
+      volumes:
+        - name: photo
+          persistentVolumeClaim:
+            claimName: pvc-photo
 ---
 apiVersion: v1
 kind: Service

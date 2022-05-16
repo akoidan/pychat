@@ -83,23 +83,30 @@ minikube_frontend() {
   kubectl apply -f ./kubernetes/frontend.yaml
 }
 
-minikube_backend() {
+minikube_backend_reload() {
   kubectl delete -f ./kubernetes/backend.yaml
   sleep 10 &
   docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend .
   wait
   minikube image rm deathangel908/pychat-backend
   minikube image load deathangel908/pychat-backend
+}
+
+minikube_backend() {
+  minikube_backend_reload
   kubectl apply -f ./kubernetes/backend.yaml
 }
 
 minikube_all() {
   kubectl apply -f kubernetes/namespace.yaml
+  kubectl apply -f kubernetes/pv-photo.yaml
   kubectl apply -f kubernetes/config-map.yaml
   kubectl apply -f kubernetes/secret.yaml
   kubectl apply -f kubernetes/mariadb.yaml
   kubectl apply -f kubernetes/redis.yaml
-  minikube_backend
+  minikube_backend_reload
+  kubectl apply -f kubernetes/migrate-backend.yaml
+  kubectl apply -f kubernetes/backend.yaml
   minikube_frontend
   kubectl apply -f kubernetes/ingress.yaml
 }

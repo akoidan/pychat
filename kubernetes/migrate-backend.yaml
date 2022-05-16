@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-backend-job
+  namespace: pychat
+spec:
+  template:
+    spec:
+      containers:
+      - name: migrate-backend
+        imagePullPolicy: IfNotPresent
+        image: deathangel908/pychat-backend
+        envFrom:
+        - secretRef:
+            name: secret
+        - configMapRef:
+            name: config-map
+        command: ["yarn",  "migrate"]
+      restartPolicy: Never
+  backoffLimit: 4
