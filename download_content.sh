@@ -73,42 +73,61 @@ update_docker() {
     safeRunCommand docker push deathangel908/pychat-test
 }
 
-minikube_frontend() {
-  kubectl delete -f ./kubernetes/frontend.yaml
-  sleep 10 &
-  docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .
-  wait
-  minikube image rm deathangel908/pychat-frontend
-  minikube image load deathangel908/pychat-frontend
-  kubectl apply -f ./kubernetes/frontend.yaml
+minikube_reload_frontend() {
+  minikube_reload backend DockerfileBackend
 }
 
-minikube_backend_reload() {
-  kubectl delete -f ./kubernetes/backend.yaml
-  sleep 10 &
-  docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend .
-  wait
-  minikube image rm deathangel908/pychat-backend
-  minikube image load deathangel908/pychat-backend
+minikube_reload_backend() {
+  minikube_reload frontend DockerfileFrontend
+}
+
+minikube_reload() {
+  image=$1
+  dockerfile=$2
+  # service can be not deployed yet, do not wait
+  kubectl delete -f ./kubernetes/$image.yaml --wait=true
+  safeRunCommand docker build -f ./kubernetes/$dockerfile -t deathangel908/pychat-$image .
+  safeRunCommand minikube image rm deathangel908/pychat-$image
+  safeRunCommand minikube image load deathangel908/pychat-$image
+}
+
+
+minikube_frontend() {
+  safeRunCommand minikube_reload_frontend
+  safeRunCommand kubectl apply -f kubernetes/frontend.yaml
 }
 
 minikube_backend() {
-  minikube_backend_reload
-  kubectl apply -f ./kubernetes/backend.yaml
+  safeRunCommand minikube_reload_backend
+  safeRunCommand kubectl apply -f kubernetes/backend.yaml
+}
+
+minikube_delete_all() {
+  kubectl delete -f kubernetes/ingress.yaml --wait=true
+  kubectl delete -f kubernetes/backend.yaml --wait=true
+  kubectl delete -f kubernetes/migrate-backend.yaml --wait=true
+  kubectl delete -f kubernetes/mariadb.yaml --wait=true
+  kubectl delete -f kubernetes/redis.yaml --wait=true
+  kubectl delete -f kubernetes/secret.yaml --wait=true
+  kubectl delete -f kubernetes/config-map.yaml --wait=true
+  kubectl delete -f kubernetes/pv-photo.yaml --wait=true
+  kubectl delete -f kubernetes/pv-mariadb.yaml --wait=true
+  kubectl delete -f kubernetes/namespace.yaml --wait=true
 }
 
 minikube_all() {
-  kubectl apply -f kubernetes/namespace.yaml
-  kubectl apply -f kubernetes/pv-photo.yaml
-  kubectl apply -f kubernetes/config-map.yaml
-  kubectl apply -f kubernetes/secret.yaml
-  kubectl apply -f kubernetes/mariadb.yaml
-  kubectl apply -f kubernetes/redis.yaml
-  minikube_backend_reload
-  kubectl apply -f kubernetes/migrate-backend.yaml
-  kubectl apply -f kubernetes/backend.yaml
-  minikube_frontend
-  kubectl apply -f kubernetes/ingress.yaml
+  safeRunCommand kubectl apply -f kubernetes/namespace.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-photo.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-mariadb.yaml
+  safeRunCommand kubectl apply -f kubernetes/config-map.yaml
+  safeRunCommand kubectl apply -f kubernetes/secret.yaml
+  safeRunCommand kubectl apply -f kubernetes/mariadb.yaml
+  safeRunCommand kubectl apply -f kubernetes/redis.yaml
+  safeRunCommand minikube_reload_backend
+  safeRunCommand kubectl apply -f kubernetes/migrate-backend.yaml
+  safeRunCommand kubectl apply -f kubernetes/backend.yaml
+  safeRunCommand minikube_reload_frontend
+  safeRunCommand kubectl apply -f kubernetes/ingress.yaml
 }
 
 rename_domain() {

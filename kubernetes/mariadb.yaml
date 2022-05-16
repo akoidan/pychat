@@ -10,6 +10,11 @@ spec:
   selector:
     matchLabels:
       app: mariadb
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -30,6 +35,13 @@ spec:
             name: secret
         - configMapRef:
             name: config-map
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: mariadb-data
+      volumes:
+      - name: mariadb-data
+        persistentVolumeClaim:
+          claimName: pvc-mariadb
 ---
 apiVersion: v1
 kind: Service
