@@ -4,19 +4,13 @@ import {
   Logger,
 } from "@nestjs/common";
 import type {
+  PubSubHandlerType,
   PubSubMessage,
 } from "@/data/types/internal";
 import type {HandlerName} from "@common/ws/common";
-import {WebSocketContextData} from "@/data/types/patch";
-
-
-interface HandlerType {
-  target: WebsocketGateway;
-  memberName: keyof WebsocketGateway;
-  handler: string;
-}
-
-const handlers: HandlerType[] = [];
+import type {WebSocketContextData} from "@/data/types/patch";
+import {RedisService} from "@/modules/shared/redis/redis.service";
+import {RedisSubscribeService} from "@/modules/shared/pubsub/redis.subscribe.service";
 
 
 /*
@@ -29,7 +23,7 @@ const handlers: HandlerType[] = [];
  */
 export function SubscribePuBSub<T extends keyof WebsocketGateway>(handler: T) {
   return (target: WebsocketGateway, memberName: T, propertyDescriptor: PropertyDescriptor) => {
-    handlers.push({
+    PubsubService.handlers.push({
       handler,
       memberName,
       target,
@@ -37,41 +31,62 @@ export function SubscribePuBSub<T extends keyof WebsocketGateway>(handler: T) {
   };
 }
 
-const receivers: Record<string, {ctx: WebSocketContextData}[]> = {};
-
 @Injectable()
 export class PubsubService {
+  private receivers: Record<string, {ctx: WebSocketContextData}[]> = {};
+
+  public static readonly handlers: PubSubHandlerType[] = [];
+
+  private readonly subscribedChannel: string[] = [];
+
   constructor(
     private readonly logger: Logger,
+    private readonly redis: RedisService,
+    private readonly subscribeService: RedisSubscribeService,
   ) {
   }
 
   // A extends string,H extends HandlerName
 
-  public emit<PS extends PubSubMessage<A, H>, A extends string, H extends HandlerName>(handler: keyof WebsocketGateway, data: PS, ...channel: (number | string)[]) {
-    channel.forEach((channel) => {
-      if (receivers[channel]) {
-        receivers[channel].forEach((receiver) => {
-          const proxy = handlers.find((h) => h.handler === handler);
-          (proxy.target[proxy.memberName] as any)(receiver.ctx, data);
-        });
-      }
+  public async emit<PS extends PubSubMessage<A, H>, A extends string, H extends HandlerName>(data: PS, ...channel: (number | string)[]) {
+    await this.redis.emit(channel[0] as any, data);
+  }
+
+  async startListening() {
+    await this.subscribeService.onMessage((channel, message) => {
+      this.onRedisMessage(channel, message as PubSubMessage<any, any>);
     });
   }
 
-  public subscribe(context: WebSocketContextData, ...channel: string[]) {
+  public onRedisMessage(channel: string, data: PubSubMessage<any, any>) {
+    if (this.receivers[channel]) {
+      this.receivers[channel].forEach((receiver) => {
+        const proxy = PubsubService.handlers.find((h) => h.handler === data.handler);
+        if (!proxy) {
+          throw Error(`Invalid handler ${data.handler}`);
+        }
+        (proxy.target[proxy.memberName] as any)(receiver.ctx, data.body);
+      });
+    }
+  }
+
+  public async subscribe(context: WebSocketContextData, ...channel: string[]) {
+    const newChannels = channel.filter((c) => !this.subscribedChannel.includes(c));
+    if (newChannels.length > 0) {
+      await this.subscribeService.listen(newChannels);
+    }
     channel.forEach((channel) => {
-      if (!receivers[channel]) {
-        receivers[channel] = [];
+      if (!this.receivers[channel]) {
+        this.receivers[channel] = [];
       }
-      receivers[channel].push({
+      this.receivers[channel].push({
         ctx: context,
       });
     });
   }
 
   public unsubscribeAll(context: WebSocketContextData) {
-    Object.values(receivers).forEach((contexts) => {
+    Object.values(this.receivers).forEach((contexts) => {
       const index = contexts.findIndex((c) => c.ctx = context);
       if (index >= 0) {
         contexts.splice(index, 1);
@@ -81,17 +96,17 @@ export class PubsubService {
 
   public unsubscribe(context: WebSocketContextData, ...channels: [string, ...string[]]) {
     channels.forEach((channel) => {
-      if (receivers[channel]) {
-        const index = receivers[channel].findIndex((c) => c.ctx = context);
+      if (this.receivers[channel]) {
+        const index = this.receivers[channel].findIndex((c) => c.ctx = context);
         if (index >= 0) {
-          receivers[channel].splice(index, 1);
+          this.receivers[channel].splice(index, 1);
         }
       }
     });
   }
 
   public getMyChannels(context: WebSocketContextData): string[] {
-    return Object.entries(receivers).filter(([k, v]) => v.find((k) => k.ctx === context)).
+    return Object.entries(this.receivers).filter(([k, v]) => v.find((k) => k.ctx === context)).
       map(([k, v]) => k);
   }
 }

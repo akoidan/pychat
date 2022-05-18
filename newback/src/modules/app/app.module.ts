@@ -47,6 +47,13 @@ import {HealthModule} from "@/modules/api/health/health.module";
         db: config.redis.database,
       },
     }),
+  RedisModule.forRoot({
+      config: {
+        host: config.redis.host,
+        port: config.redis.port,
+        db: config.redis.database,
+      },
+    }, 'pubsub'),
   ],
   providers: [
     {

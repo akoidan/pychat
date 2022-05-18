@@ -8,20 +8,21 @@ import {DatabaseModule} from "@/modules/shared/database/database.module";
 import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import {WsDataService} from "@/modules/api/websocket/ws.data.service";
 import {MessageService} from "@/modules/api/websocket/message.service";
+import {PubsubModule} from "@/modules/shared/pubsub/pubsub.module";
 
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [DatabaseModule, PubsubModule],
   providers: [
     SessionService,
     WebsocketService,
     PasswordService,
     RedisService,
-    PubsubService,
     WsDataService,
     MessageService,
     WebsocketGateway,
   ],
+
 })
 export class WebsocketModule {
 }

@@ -106,11 +106,11 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
   @UseGuards(
     OwnRoomGuard((data: ShowITypeWsOutBody) => [data.roomId])
   )
-  public showIType(
+  public async showIType(
     @MessageBody() data: ShowITypeWsOutBody,
       @WsContext() context: WebSocketContextData
-  ): void {
-    this.messageService.showIType(data, context);
+  ): Promise<void> {
+    await this.messageService.showIType(data, context);
   }
 
   @SubscribeMessage("getCountryCode")

@@ -20,6 +20,13 @@ spec:
         image: redis:7.0.0-alpine3.15
         ports:
         - containerPort: 6379
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: pvc-redis
 ---
 apiVersion: v1
 kind: Service

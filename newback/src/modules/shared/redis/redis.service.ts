@@ -36,7 +36,9 @@ export class RedisService {
   }
 
   public async setIps(value: UserJoinedInfoModel[]): Promise<void> {
-    await this.redis.set(REDIS_KEYS.REDIS_IPS_KEY, JSON.stringify(value));
+    let data = JSON.stringify(value);
+    this.logger.debug(`set ${REDIS_KEYS.REDIS_IPS_KEY}[${data}]`, "redis");
+    await this.redis.set(REDIS_KEYS.REDIS_IPS_KEY, data);
   }
 
   public async removeSession(session: string) {
@@ -51,6 +53,20 @@ export class RedisService {
       return null;
     }
     return parseInt(a);
+  }
+
+  public async emit(channel: string, message: unknown): Promise<number> {
+    return new Promise((resolve, reject) => {
+      let data = JSON.stringify(message);
+      this.logger.debug(`Publish to channel='${channel}' message='${data}'`, "redis");
+      this.redis.publish(channel, data, (err, d) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(d);
+        }
+      });
+    });
   }
 
   public async addOnline(id: string): Promise<void> {
@@ -80,16 +96,4 @@ export class RedisService {
       return set;
     }, {});
   }
-
-  public async getNewRedisInstance() {
-
-  }
-
-  /*
-   * Import  {promisify} from 'util';
-   * Public async subscribe(channels: string[]) {
-   *   // @ts-expect-error
-   *   Await promisify(this.redis.subscribe)(...channels);
-   * }
-   */
 }

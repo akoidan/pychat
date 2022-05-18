@@ -1,12 +1,12 @@
-import {MessageStatus} from '@common/model/enum/message.status';
+import {MessageStatus} from "@common/model/enum/message.status";
 
-import {SyncHistoryWsOutBody} from '@common/ws/message/sync.history';
+import type {SyncHistoryWsOutBody} from "@common/ws/message/sync.history";
 import type {
   ShowITypeWsInMessage,
   ShowITypeWsOutBody,
 } from "@common/ws/message/show.i.type";
 
-import {PrintMessageWsOutBody} from '@common/ws/message/print.message';
+import type {PrintMessageWsOutBody} from "@common/ws/message/print.message";
 import {
   Injectable,
   Logger,
@@ -28,7 +28,7 @@ import {
 } from "@/data/transformers/out.message/inner.transformer";
 import {transformPrintMessage} from "@/data/transformers/out.message/print.message.transformer";
 import {getMaxSymbol} from "@/data/transformers/helper/get.max.symbol";
-import {WebSocketContextData} from "@/data/types/patch";
+import type {WebSocketContextData} from "@/data/types/patch";
 
 
 @Injectable()
@@ -42,7 +42,7 @@ export class MessageService {
     this.messageRepository.attachHooks();
   }
 
-  public showIType(data: ShowITypeWsOutBody, context: WebSocketContextData): void {
+  public async showIType(data: ShowITypeWsOutBody, context: WebSocketContextData): Promise<void> {
     const body: ShowITypeWsInMessage = {
       action: "showIType",
       handler: "room",
@@ -51,9 +51,9 @@ export class MessageService {
         userId: context.userId,
       },
     };
-    this.pubsubService.emit(
-      "sendToClient",
+    await this.pubsubService.emit(
       {
+        handler: "sendToClient",
         body,
       },
       String(data.roomId),
@@ -127,7 +127,8 @@ export class MessageService {
         await this.messageRepository.deleteUploadedFiles(files.map((f) => f.id), transaction);
       }
       const body = transformPrintMessage(messageModel, mentions, images);
-      this.pubsubService.emit("sendToClient", {body}, data.roomId);
+      await this.pubsubService.emit({body,
+        handler: "sendToClient"}, data.roomId);
     });
   }
 }

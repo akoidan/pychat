@@ -1,16 +1,16 @@
 {
  "exclude": [
     "node_modules",
-    "**/*.spec.ts",
+//    "**/*.spec.ts",
     "dist"
   ],
-  "ts-node": {
-    "files": true
-  },
-  "files": [
-    "src/main.ts",
-    "src/data/types/patch.d.ts"
-  ],
+//  "ts-node": {
+//    "files": true
+//  },
+//  "files": [
+//    "src/main.ts",
+//    "src/data/types/patch.d.ts"
+//  ],
   "compilerOptions": {
      "paths": {
       "@/*": ["src/*"],

@@ -14,7 +14,7 @@ import {transformSetWsId} from "@/data/transformers/out.message/set.ws.id.transf
 import {transformAddUserOnline} from "@/data/transformers/out.message/add.online.user.transformer";
 import {getLogoutMessage} from "@/data/transformers/out.message/remove.online.user.transformer";
 import type {AddOnlineUserMessage} from "@common/ws/message/add.online.user";
-import {WebSocketContextData} from "@/data/types/patch";
+import type {WebSocketContextData} from "@/data/types/patch";
 
 
 @Injectable()
@@ -65,9 +65,9 @@ export class WebsocketService {
     context.sendToClient(response);
     this.pubsubService.subscribe(context, ...channelsToListen);
     const data: AddOnlineUserMessage = transformAddUserOnline(online, user, id);
-    this.pubsubService.emit(
-      "sendToClient",
+    await this.pubsubService.emit(
       {
+        handler: "sendToClient",
         body: data,
       },
       "*"
@@ -83,9 +83,9 @@ export class WebsocketService {
     if (context.userId && !online[context.userId]) {
       const lastTimeOnline: number = Date.now();
       await this.userRepository.setLastTimeOnline(context.userId, lastTimeOnline);
-      this.pubsubService.emit(
-        "sendToClient",
+      await this.pubsubService.emit(
         {
+          handler: "sendToClient",
           body: getLogoutMessage(online, lastTimeOnline, context, lastTimeOnline),
         },
         "*"

@@ -1,9 +1,8 @@
 const servor = require('servor');
-const {promisify} = require('util');
-const {readFile} = require('fs');
+const {readFile} = require('fs/promises');
 
 async function readFileAsync(name) {
-    return promisify(readFile)(name);
+    return readFile(name);
 }
 
 async function main() {

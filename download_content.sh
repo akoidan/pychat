@@ -111,6 +111,7 @@ minikube_delete_all() {
   kubectl delete -f kubernetes/secret.yaml --wait=true
   kubectl delete -f kubernetes/config-map.yaml --wait=true
   kubectl delete -f kubernetes/pv-photo.yaml --wait=true
+  kubectl delete -f kubernetes/pv-redis.yaml --wait=true
   kubectl delete -f kubernetes/pv-mariadb.yaml --wait=true
   kubectl delete -f kubernetes/namespace.yaml --wait=true
 }
@@ -118,6 +119,7 @@ minikube_delete_all() {
 minikube_all() {
   safeRunCommand kubectl apply -f kubernetes/namespace.yaml
   safeRunCommand kubectl apply -f kubernetes/pv-photo.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-redis.yaml
   safeRunCommand kubectl apply -f kubernetes/pv-mariadb.yaml
   safeRunCommand kubectl apply -f kubernetes/config-map.yaml
   safeRunCommand kubectl apply -f kubernetes/secret.yaml
