@@ -34,9 +34,3 @@ export type HandlerName =
   | "ws-message"
   | "ws";
 
-
-export type HandlerType<A extends string, H extends HandlerName, D> = (a: DefaultWsInMessage<A, H | "*", D>) => Promise<void> | void;
-
-export type HandlerTypes<K extends string, H extends HandlerName, D> = {
-  [Key in K]?: HandlerType<Key, H, D>
-};
