@@ -1,7 +1,7 @@
 {
  "exclude": [
     "node_modules",
-//    "**/*.spec.ts",
+//    "**/*.spec.ts", // otherwise eslintdoesn't work for this files
     "dist"
   ],
 //  "ts-node": {
