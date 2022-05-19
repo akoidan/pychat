@@ -1,9 +1,8 @@
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat.svg?label=docker%3Aprod)](https://hub.docker.com/r/deathangel908/pychat)
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test)
+[![Docker](https://github.com/akoidan/pychat/actions/workflows/docker.yml/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions/workflows/docker.yml)
 [![Upload Frontend pychat.org](https://github.com/akoidan/pychat/workflows/FE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3AFE%3Apychat.org)
 [![Refresh backend pychat.org](https://github.com/akoidan/pychat/workflows/BE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3ABE%3Apychat.org)
-[![Github actions](https://github.com/akoidan/pychat/workflows/NEWBE:pychat.org/badge.svg)](https://github.com/akoidan/pychat/actions)
-[![codecov](https://codecov.io/gh/akoidan/pychat/branch/nestjs/graph/badge.svg?token=aQlNwbpTIw)](https://codecov.io/gh/akoidan/pychat)
+[![Newbackend test](https://github.com/akoidan/pychat/workflows/NEWBE:pychat.org/badge.svg)](https://github.com/akoidan/pychat/actions)
+[![Codecov](https://codecov.io/gh/akoidan/pychat/branch/nestjs/graph/badge.svg?token=aQlNwbpTIw)](https://codecov.io/gh/akoidan/pychat)
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 <span>pychat.org is not available due to server location in Ukraine because of war ;(. Please support Ukraine. Russian invaders suffer in hell!</span>
 
@@ -92,26 +91,29 @@ Please run each step very carefully. **Do not skip editing files, reading commen
  - Ssl is required for webrtc (to make calls) and secure connection. Put your ssl certificates in the current directory: `server.key` and `certificate.crt`. If you don't own a domain you can create self-signed certificates with command below, with self-signed certificate browser will warn users with broken ssl.
 ```bash
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
+wget https://raw.githubusercontent.com/akoidan/pychat/master/backend/chat/settings_example.py
+wget https://raw.githubusercontent.com/akoidan/pychat/master/docker/pychat.org/production.json
+wget https://raw.githubusercontent.com/akoidan/pychat/master/docker/pychat.org/turnserver.conf
 ```
- - Download [settings.py](https://github.com/akoidan/pychat/blob/master/backend/chat/settings_example.py) and edit it according comments in it.
- - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json) and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config)
- - Download [turnserver.conf](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/turnserver.conf) Replace server-name and realm to your domain. 
- - Create volume and copy files there
+ - Edit `settings_example.py` according comments in it.
+ - Edit production.json according [wiki](https://github.com/akoidan/pychat#frontend-config)
+ - Replace server-name and realm to your domain in `turnserver.conf` 
+ - Create volume and copy configuration files there.
  ```bash
  docker volume create pychat_data
  containerid=`docker container create --name dummy -v pychat_data:/data hello-world`
- docker cp settings.py dummy:/data/settings.py
+ docker cp settings_example.py dummy:/data/settings.py
  docker cp production.json dummy:/data/production.json
  docker cp turnserver.conf dummy:/data/turnserver.conf
  docker cp certificate.crt dummy:/data/certificate.crt
  docker cp server.key dummy:/data/server.key
  docker rm dummy
  ```
- If you need to edit files inside container you can use 
+This volume will contain all production data: config, mysql data, redis and etc. If you need to edit files inside container you can use: 
  ```bash
 docker run -i -t -v pychat_data:/tmp -it alpine /bin/sh
 ```
- - Run image with:
+ - Since all configs are created, you can run pychat with command below:
 ```bash
 docker run -t -v pychat_data:/data -p 443:443 -p 3478:3478 deathangel908/pychat
 ```
