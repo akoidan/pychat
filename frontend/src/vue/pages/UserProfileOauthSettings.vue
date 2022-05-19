@@ -42,26 +42,26 @@ export default class UserProfileOauthSettings extends Vue {
 
 
   async created() {
-    const response: OauthStatus = await this.$api.getOauthStatus();
+    const response: OauthStatus = await this.$api.restApi.getOauthStatus();
     this.googleConnected = response.google;
     this.facebookConnected = response.facebook;
   }
 
   async disconnectGoogle() {
-    await this.$api.setGoogleOauth("");
+    await this.$api.restApi.setGoogleOauth("");
     this.googleConnected = false;
     this.$store.growlSuccess("Google account has been disconnected");
   }
 
   async disconnectFacebook() {
-    await this.$api.setFacebookOauth("");
+    await this.$api.restApi.setFacebookOauth("");
     this.facebookConnected = false;
     this.$store.growlSuccess("Facebook account has been disconnected");
   }
 
   async googleAuth({resolve, reject, token}: {token: string; resolve: Function; reject: Function}) {
     try {
-      await this.$api.setGoogleOauth(token);
+      await this.$api.restApi.setGoogleOauth(token);
       this.googleConnected = true;
       this.$store.growlSuccess("Google ouath has been configured successfully");
     } catch (e) {
@@ -74,7 +74,7 @@ export default class UserProfileOauthSettings extends Vue {
 
   async facebookAuth({resolve, reject, token}: {token: string; resolve: Function; reject: Function}) {
     try {
-      await this.$api.setFacebookOauth(token);
+      await this.$api.restApi.setFacebookOauth(token);
       this.facebookConnected = true;
       this.$store.growlSuccess("Facebook ouath has been configured successfully");
     } catch (e) {

@@ -14,7 +14,6 @@ import {createApp} from "vue";
 import {store} from "@/ts/instances/storeInstance";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import sessionHolder from "@/ts/instances/sessionInstance";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {PlatformUtil} from "@/ts/types/model";
 import "@/assets/icon.png"; // eslint-disable-line import/no-unassigned-import
@@ -41,7 +40,8 @@ import {
 } from "@/ts/utils/directives";
 import Subscription from "@/ts/classes/Subscription";
 import type {Router} from "vue-router";
-import Fetch from '@/ts/classes/Fetch';
+import {SessionHolderImpl} from "@/ts/classes/SessionHolderImpl";
+import {SessionHolder} from "@/ts/types/types";
 
 
 const logger: Logger = loggerFactory.getLoggerColor("main", "#007a70");
@@ -111,9 +111,9 @@ function init(): void {
     event.preventDefault();
   });
 
+  const sessionHolder: SessionHolder = new SessionHolderImpl();
   const sub = new Subscription();
-  const xhr: Fetch = new Fetch(sessionHolder);
-  const api: Api = new Api(xhr, sub);
+  const api: Api = new Api(sessionHolder);
 
   let storage;
   try {
@@ -135,7 +135,7 @@ function init(): void {
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper, sub);
   const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
-  const router = routerFactory(sub);
+  const router = routerFactory(sub, sessionHolder);
   const vue = bootstrapVue(sub, api, ws, webrtcApi, platformUtil, messageSenderProxy, smileyApi, router);
 
   vue.mount(document.body);
@@ -154,7 +154,6 @@ function init(): void {
     window.roomHandler = roomHandler;
     window.ws = ws;
     window.api = api;
-    window.xhr = xhr;
     window.storage = storage;
     window.webrtcApi = webrtcApi;
     window.sub = sub;

@@ -71,7 +71,7 @@ export default class ApplyResetPassword extends Vue {
     vueProperty: "error",
   })
   async created() {
-    let data = await this.$api.verifyToken({token: (this.$route.query.token) as string});
+    let data = await this.$api.verifyApi.verifyToken({token: (this.$route.query.token) as string});
     this.restoreUser = data.username;
   }
 
@@ -84,7 +84,7 @@ export default class ApplyResetPassword extends Vue {
     if (this.password !== this.repeatPassword) {
       this.$store.growlError("Passords don't match");
     } else {
-      let response = await this.$api.acceptToken({
+      let response = await this.$api.verifyApi.acceptToken({
         token: this.$route.query.token as string,
         password: this.password
       });

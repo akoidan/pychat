@@ -87,13 +87,13 @@ export default class SignIn extends Vue {
   public async login() {
     let response;
     if (this.username?.includes('@')) {
-      response = await this.$api.signIn({
+      response = await this.$api.authApi.signIn({
         email: this.username,
         password: this.password,
         captcha: this.captcha,
       });
     } else {
-      response = await this.$api.signIn({
+      response = await this.$api.authApi.signIn({
         username: this.username,
         password: this.password,
         captcha: this.captcha,

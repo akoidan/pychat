@@ -98,7 +98,7 @@ export default class ViewProfilePage extends Vue {
     runningProp: "loading",
   })
   public async created() {
-    this.userProfileInfo = await this.$api.showProfile(this.id);
+    this.userProfileInfo = await this.$api.restApi.showProfile(this.id);
   }
 }
 </script>

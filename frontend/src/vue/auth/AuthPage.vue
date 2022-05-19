@@ -38,7 +38,7 @@ export default class AuthPage extends Vue {
   @ApplyGrowlErr({message: "Auto-registration error"})
   public async created() {
     if (AUTO_REGISTRATION) {
-      const {session} = await this.$api.signUp({
+      const {session} = await this.$api.authApi.signUp({
         username: this.getRandom(),
         password: this.getRandom(),
       });

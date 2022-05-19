@@ -61,7 +61,7 @@ export default class ResetPassword extends Vue {
     message: "Can't reset password",
   })
   public async restorePassword(event: Event) {
-    await this.$api.sendRestorePassword({
+    await this.$api.verifyApi.sendRestorePassword({
       captcha: this.captcha,
       email: this.userNameOrEmail.includes('@') ? this.userNameOrEmail : undefined,
       username: !this.userNameOrEmail.includes('@') ? this.userNameOrEmail: undefined,

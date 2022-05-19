@@ -43,7 +43,7 @@ export default class ConfirmMail extends Vue {
     message: "Confirming email error ",
   })
   public async created() {
-    await this.$api.confirmEmail({token: this.$route.query.token as string});
+    await this.$api.verifyApi.confirmEmail({token: this.$route.query.token as string});
     this.message = "Email has been confirmed";
   }
 }

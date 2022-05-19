@@ -1,7 +1,11 @@
-import type {FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
-import type {FaceBookAuthRequest} from "@common/http/auth/facebook.auth";
-import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
-import type {GoogleAuthRequest} from "@common/http/auth/google.auth";
+import type {
+  FaceBookSignInRequest,
+  FacebookSignInResponse,
+} from "@common/http/auth/facebook.sign.in";
+import type {
+  GoogleSignInRequest,
+  GoogleSignInResponse,
+} from "@common/http/auth/google.sign.in";
 import type {
   SignUpRequest,
   SignUpResponse,
@@ -10,8 +14,8 @@ import type {
   SignInRequest,
   SignInResponse,
 } from "@common/http/auth/sign.in";
-import {Gender} from '@common/model/enum/gender';
-import {VerificationType} from '@common/model/enum/verification.type';
+import {Gender} from "@common/model/enum/gender";
+import {VerificationType} from "@common/model/enum/verification.type";
 
 
 import {
@@ -36,7 +40,7 @@ import {SessionService} from "@/modules/shared/session/session.service";
 import {generateUserName} from "@/data/transformers/helper/generate.user.name";
 import {
   ALL_ROOM_ID,
-  MAX_USERNAME_LENGTH
+  MAX_USERNAME_LENGTH,
 } from "@common/consts";
 
 @Injectable()
@@ -57,7 +61,7 @@ export class AuthService {
   }
 
 
-  public async authorizeFacebook(body: FaceBookAuthRequest): Promise<FacebookSignInResponse> {
+  public async authorizeFacebook(body: FaceBookSignInRequest): Promise<FacebookSignInResponse> {
     const fbResponse: FacebookGetUserResponse = await this.facebookService.validate(body.token);
     return this.sequelize.transaction(async(t) => {
       const userAuth = await this.userRepository.getUserMyAuthFacebook(fbResponse.id, t);
@@ -98,7 +102,7 @@ export class AuthService {
   }
 
 
-  public async authorizeGoogle(body: GoogleAuthRequest): Promise<GoogleSignInResponse> {
+  public async authorizeGoogle(body: GoogleSignInRequest): Promise<GoogleSignInResponse> {
     const googleResponse: TokenPayload = await this.googleAuthService.validate(body.token);
     return this.sequelize.transaction(async(t) => {
       const userAuth = await this.userRepository.getUserMyAuthGoogle(googleResponse.email, t);

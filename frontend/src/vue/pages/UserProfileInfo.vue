@@ -162,7 +162,7 @@ export default class UserProfileInfo extends Vue {
 
 
   public async signOut() {
-    this.$api.logout(); // Do not make user wait, logout instantly
+    this.$api.restApi.logout(); // Do not make user wait, logout instantly
     const message: LogoutMessage = {
       action: "logout",
       handler: "*",

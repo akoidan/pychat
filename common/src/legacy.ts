@@ -10,10 +10,7 @@ import type {
   RoomDto,
   RoomNoUsersDto,
 } from "@common/model/dto/room.dto";
-import type {
-  UserProfileDto,
-  UserProfileDtoWoImage,
-} from "@common/model/dto/user.profile.dto";
+import type {UserProfileDtoWoImage,} from "@common/model/dto/user.profile.dto";
 import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
 
 

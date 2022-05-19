@@ -1,20 +1,22 @@
-import type {
-  PostData,
+import type {PostData,
   SessionHolder,
-} from "@/ts/types/types";
-import {UploadData} from "@/ts/types/types";
+  UploadData} from "@/ts/types/types";
 import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
+import {CONNECTION_ERROR} from "@/ts/utils/consts";
 
 export default class Fetch {
   protected httpLogger: Logger;
 
-  protected sessionHolder: SessionHolder;
+  protected getHeaders: () => Record<string, string>;
 
-  public constructor(sessionHolder: SessionHolder) {
-    this.sessionHolder = sessionHolder;
+  private readonly url: string;
+
+  public constructor(url: string, getHeaders: () => Record<string, string>) {
     this.httpLogger = loggerFactory.getLogger("http");
+    this.url = url;
+    this.getHeaders = getHeaders;
   }
 
   public async doGet<T>(url: string, onSetAbortFunction?: (c: () => void) => void): Promise<T> {
@@ -52,9 +54,8 @@ export default class Fetch {
     return new Promise((resolve, reject) => {
       const r = new XMLHttpRequest();
       r.addEventListener("load", () => {
-        let {response} = r;
         try {
-          response = JSON.parse(r.response);
+          let response = JSON.parse(r.response);
           if (r.status < 200 || r.status >= 300) {
             this.processException(response);
           } else {
@@ -65,10 +66,9 @@ export default class Fetch {
           reject(e);
           return;
         }
-        resolve(response);
       });
       r.addEventListener("error", () => {
-        reject("Network Error");
+        reject(CONNECTION_ERROR);
       });
       if (onSetAbortFunction) {
         onSetAbortFunction(() => {
@@ -82,8 +82,10 @@ export default class Fetch {
           }
         });
       }
-      r.open("POST", `${XHR_API_URL}${url}`);
-      r.setRequestHeader("session-id", this.sessionHolder.session!);
+      r.open("POST", `${this.url}${url}`);
+      Object.entries(this.getHeaders()).forEach(([k, v]) => {
+        r.setRequestHeader(k, v);
+      });
       const form = new FormData();
       Object.entries(data).forEach(([key, value]) => {
         form.append(key, value);
@@ -92,20 +94,6 @@ export default class Fetch {
     });
   }
 
-  public async loadJs(fullFileUrlWithProtocol: string): Promise<Event> {
-    return new Promise((resolve, reject) => {
-      this.httpLogger.log("GET out {}", fullFileUrlWithProtocol)();
-      const fileRef = document.createElement("script");
-      fileRef.setAttribute("type", "text/javascript");
-      fileRef.setAttribute("src", fullFileUrlWithProtocol);
-
-      document.getElementsByTagName("head")[0].appendChild(fileRef);
-      fileRef.onload = resolve;
-      fileRef.onerror = reject;
-    });
-  }
-
-  // @ts-expect-error TS2366
   private async processResponse<T>(response: Response): Promise<T> {
     const body = await response.json();
     if (response.ok) {
@@ -114,7 +102,7 @@ export default class Fetch {
     this.processException(body);
   }
 
-  private processException(body: any) {
+  private processException(body: any): never {
     if (typeof body?.message === "string") {
       throw Error(body.message);
     } else if (body?.message?.length && typeof body.message[0] === "string") {
@@ -135,14 +123,12 @@ export default class Fetch {
         controller.abort();
       });
     }
-    const is3rdPartyApi = (/^https?:\/\//u).test(url);
-    const fetchUrl = is3rdPartyApi ? url : `${XHR_API_URL}${url}`;
-    if (!is3rdPartyApi) {
-      headers["session-id"] = this.sessionHolder.session!;
-    }
+    Object.entries(this.getHeaders()).forEach(([k, v]) => {
+      headers[k] = v;
+    });
     return {
       signal,
-      fetchUrl,
+      fetchUrl: `${this.url}${url}`,
       headers,
     };
   }

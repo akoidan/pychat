@@ -154,7 +154,7 @@ export default class CaptchaComponent extends Vue {
         this.renderCaptcha();
       } else {
         this.$emit("update:loading", true);
-        await this.$api.loadRecaptcha("onloadrecaptcha");
+        await this.$api.jsApi.loadRecaptcha("onloadrecaptcha");
       }
     }
   }

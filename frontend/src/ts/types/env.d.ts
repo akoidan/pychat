@@ -18,7 +18,6 @@ import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy"
 import type {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {SmileysApi} from "@/ts/utils/smileys";
-import type Fetch from "@/ts/classes/Fetch";
 
 declare global {
   interface Window {
@@ -30,7 +29,6 @@ declare global {
     deferredPrompt: BeforeInstallPromptEvent;
     wsMessageHandler: WsMessageHandler;
     roomHandler: RoomHandler;
-    xhr: Fetch;
     ws: WsHandler;
     storage: IStorage;
     store: DefaultStore;

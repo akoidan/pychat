@@ -147,7 +147,9 @@ export default class SignUp extends Vue {
   @Prop() public fb_app_id!: string;
 
   signUpSexMale = Gender.MALE;
+
   signUpSexFemale = Gender.FEMALE;
+
   signUpSexOther = Gender.OTHER;
 
   running: boolean = false;
@@ -178,7 +180,7 @@ export default class SignUp extends Vue {
   debouncedValidateUserName!: Function;
 
 
-  private abortUsernameValidation: (() => void)|null = null;
+  private abortUsernameValidation: (() => void) | null = null;
 
   async checkUserName(username: string) {
     if (this.abortUsernameValidation) {
@@ -186,7 +188,7 @@ export default class SignUp extends Vue {
       this.abortUsernameValidation = null;
     }
     try {
-      await this.$api.validateUsername(username, (r: () => void) => this.abortUsernameValidation = r);
+      await this.$api.authApi.validateUsername({username}, (r: () => void) => this.abortUsernameValidation = r);
       this.userCheckValue = IconColor.SUCCESS;
       this.userDescription = "Username is ok!";
       this.usernameValidity = "";
@@ -280,7 +282,7 @@ export default class SignUp extends Vue {
 
   debouncedValidateEmail!: Function;
 
-  private abortEmailValidation: (() => void)| null = null;
+  private abortEmailValidation: (() => void) | null = null;
 
   async checkEmail(email: string) {
     if (this.abortEmailValidation) {
@@ -288,7 +290,7 @@ export default class SignUp extends Vue {
       this.abortEmailValidation = null;
     }
     try {
-      await this.$api.validateEmail({email}, (r: () => void) => this.abortEmailValidation = r);
+      await this.$api.authApi.validateEmail({email}, (r: () => void) => this.abortEmailValidation = r);
       this.emailCheckValue = IconColor.SUCCESS;
       this.emailDescription = "Email is ok!";
       this.emailValidity = "";
@@ -349,19 +351,19 @@ export default class SignUp extends Vue {
 
   @ApplyGrowlErr({
     runningProp: "running",
-    message: "Can't sign up"
+    message: "Can't sign up",
   })
   async register() {
-    const {session} = await this.$api.signUp({
+    const {session} = await this.$api.authApi.signUp({
       username: this.username,
       password: this.password,
-      email: this.email || undefined, // undefined is not sending via json.stringify
+      email: this.email || undefined, // Undefined is not sending via json.stringify
       sex: this.sex,
     });
     const message: LoginMessage = {
       action: "login",
       handler: "router",
-      session
+      session,
     };
     this.$messageBus.notify(message);
   }

@@ -242,7 +242,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     try {
       let total = 0;
       for (let i = 0; i < files.length; i++) {
-        const res: SaveFileResponse = await this.api.uploadFile(
+        const res: SaveFileResponse = await this.api.fileApi.uploadFile(
           files[i],
           (uploaded) => {
             const payload: SetMessageProgress = {

@@ -49,7 +49,7 @@ export default class FacebookAuth extends Vue {
   @ApplyGrowlErr({message: "Unable to load facebook"})
   public async loadFaceBook(): Promise<void> {
     if (!fbInited && FACEBOOK_APP_ID) {
-      await this.$api.loadFacebook();
+      await this.$api.jsApi.loadFacebook();
       this.$logger.log("Initing facebook sdk...")();
       FB.init({
         appId: FACEBOOK_APP_ID,

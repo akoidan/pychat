@@ -47,7 +47,7 @@ export default class GoogleAuth extends Vue {
   public async loadGoogle(): Promise<void> {
     if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
       this.$logger.log("Initializing google sdk")();
-      await this.$api.loadGoogle();
+      await this.$api.jsApi.loadGoogle();
       if (typeof gapi.load !== "function") { // TODO
         throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
       }

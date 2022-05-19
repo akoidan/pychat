@@ -60,7 +60,7 @@ export default class UserProfileImage extends Vue {
   public async upload() {
     const blob = await this.cropper.cropImage();
     if (blob) {
-      await this.$api.uploadProfileImage(blob);
+      await this.$api.restApi.uploadProfileImage(blob);
       this.$store.growlSuccess("Image uploaded");
     } else {
       throw Error("Please select image first");

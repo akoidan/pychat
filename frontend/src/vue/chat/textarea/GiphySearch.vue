@@ -125,7 +125,7 @@ export default class GiphySearch extends Vue {
       this.abortFn();
       this.abortFn = null;
     }
-    const response = await this.$api.searchGiphys(this.search, 0, LOAD_GIPHIES_PER_REQUEST, (r) => this.abortFn = r);
+    const response = await this.$api.giphyApi.searchGiphys(this.search, 0, LOAD_GIPHIES_PER_REQUEST, (r) => this.abortFn = r);
     this.pagination = response.pagination;
     this.abortFn = null;
     this.images = response.data;
@@ -149,7 +149,7 @@ export default class GiphySearch extends Vue {
      * W/0 +1, it returns duplicate id
      * the weird thing docs say, that pagination start with 0, but it seems like with 1
      */
-    const response: MultiResponse = await this.$api.searchGiphys(this.search, this.images.length + 1, LOAD_GIPHIES_PER_REQUEST, (r) => this.abortFn = r);
+    const response: MultiResponse = await this.$api.giphyApi.searchGiphys(this.search, this.images.length + 1, LOAD_GIPHIES_PER_REQUEST, (r) => this.abortFn = r);
     this.pagination = response.pagination;
     this.images.push(...response.data.filter((n) => !this.images.find((o) => o.id === n.id)));
   }

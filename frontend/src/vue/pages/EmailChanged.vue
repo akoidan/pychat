@@ -29,7 +29,7 @@ export default class ConfirmMail extends Vue {
     message: "Error changing mail",
   })
   public async created() {
-    this.message = await this.$api.changeEmail(<string> this.$route.query.token);
+    this.message = await this.$api.restApi.changeEmail(<string> this.$route.query.token);
   }
 }
 </script>

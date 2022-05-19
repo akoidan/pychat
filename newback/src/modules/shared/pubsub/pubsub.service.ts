@@ -12,15 +12,6 @@ import type {WebSocketContextData} from "@/data/types/patch";
 import {RedisService} from "@/modules/shared/redis/redis.service";
 import {RedisSubscribeService} from "@/modules/shared/pubsub/redis.subscribe.service";
 
-
-/*
- * Function stateDecoratorFactory<TPT extends VuexModule>(vuexModule: TPT):
- * <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
- * (vueComponent: TCT, fileName: TPN) => void {
- *   return <TCT extends (TCT[TPN] extends TPT[TPN] ? unknown : never), TPN extends (keyof TCT & keyof TPT)>
- *   (vueComponent: TCT, fileName: TPN):
- *
- */
 export function SubscribePuBSub<T extends keyof WebsocketGateway>(handler: T) {
   return (target: WebsocketGateway, memberName: T, propertyDescriptor: PropertyDescriptor) => {
     PubsubService.handlers.push({

@@ -1,11 +1,10 @@
-import {LoginMessage} from "@/ts/types/messages/inner/login";
-import {LogoutMessage} from "@/ts/types/messages/inner/logout";
-import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import type {LoginMessageBody} from "@/ts/types/messages/inner/login";
+import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import type {RouterNavigateMessageBody} from "@/ts/types/messages/inner/router.navigate";
 import {
   createRouter,
   createWebHashHistory,
 } from "vue-router";
-import sessionHolder from "@/ts/instances/sessionInstance";
 import {store} from "@/ts/instances/storeInstance";
 import MainPage from "@/vue/pages/MainPage.vue";
 import ChannelsPage from "@/vue/pages/ChannelsPage.vue";
@@ -39,9 +38,14 @@ import PainterPage from "@/vue/pages/PainterPage.vue";
 import RoomUsersListPage from "@/vue/pages/RoomUsersListPage.vue";
 import ChannelAddRoom from "@/vue/pages/ChannelAddRoom.vue";
 import type Subscription from "@/ts/classes/Subscription";
+import type {SessionHolder} from "@/ts/types/types";
+import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
 
 
-export function routerFactory(sub: Subscription) {
+export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
   const logger: Logger = loggerFactory.getLogger("router");
   const router = createRouter({
     history: createWebHashHistory(), // Seems like createWebHistory is really hard for sw to detect what to cache, so use this one
@@ -195,23 +199,23 @@ export function routerFactory(sub: Subscription) {
   sub.subscribe("router", new class RouterProcessor extends MessageHandler {
     protected readonly logger: Logger = logger;
 
-    protected readonly handlers: HandlerTypes<keyof RouterProcessor, "router"> = {
-      login: <HandlerType<"login", "router">> this.login,
-      logout: <HandlerType<"logout", "router">> this.logout,
-      navigate: <HandlerType<"navigate", "router">> this.navigate,
+    protected readonly handlers: HandlerTypes<keyof RouterProcessor, "router", any> = {
+      login: <HandlerType<"login", "router", LoginMessageBody>> this.login,
+      logout: <HandlerType<"logout", "router", {}>> this.logout,
+      navigate: <HandlerType<"navigate", "router", RouterNavigateMessageBody>> this.navigate,
     };
 
     logout(a: LogoutMessage) {
       router.replace("/auth/sign-in");
     }
 
-    navigate(a: RouterNavigateMessage) {
+    navigate(a: RouterNavigateMessageBody) {
       if (router.currentRoute.value.path !== a.to) {
         router.replace(a.to);
       }
     }
 
-    login(a: LoginMessage) {
+    login(a: LoginMessageBody) {
       if (!a.session) {
         throw Error(`Invalid session ${a.session}`);
       }

@@ -1,8 +1,8 @@
-import type {GoogleAuthRequest} from "@common/http/auth/google.auth";
 import {IsString} from "class-validator";
+import type {GoogleSignInRequest} from "@common/http/auth/google.sign.in";
 
 
-export class GoogleAuthRequestValidator implements GoogleAuthRequest {
+export class GoogleAuthRequestValidator implements GoogleSignInRequest {
   @IsString()
   public token: string;
 }

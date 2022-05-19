@@ -17,6 +17,7 @@ import {
   FACEBOOK_APP_ID,
   GOOGLE_OAUTH_2_CLIENT_ID,
 } from "@/ts/utils/consts";
+import {OauthSessionResponse} from "@common/helpers";
 
 
 @Component({
@@ -32,11 +33,11 @@ export default class SocialAuthSignUp extends Vue {
   public readonly FACEBOOK_APP_ID = FACEBOOK_APP_ID;
 
   async googleAuth({resolve, reject, token}: {token: string; resolve: Function; reject: Function}) {
-    await this.makeAuth(resolve, reject, this.$api.googleAuth(token));
+    await this.makeAuth(resolve, reject, this.$api.authApi.googleAuth({token}));
   }
 
   async facebookAuth({resolve, reject, token}: {token: string; resolve: Function; reject: Function}) {
-    await this.makeAuth(resolve, reject, this.$api.facebookAuth(token));
+    await this.makeAuth(resolve, reject, this.$api.authApi.facebookAuth({token}));
   }
 
   async makeAuth(resolve: Function, reject: Function, method: Promise<OauthSessionResponse>) {

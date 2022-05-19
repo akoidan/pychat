@@ -79,7 +79,7 @@ export default class UserProfileChangeEmail extends Vue {
     runningProp: "running",
   })
   public async saveProfile() {
-    await this.$api.changeEmailLogin(this.email, this.password);
+    await this.$api.restApi.changeEmailLogin(this.email, this.password);
     this.$store.growlSuccess("Email has been changed");
   }
 }
