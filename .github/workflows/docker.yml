@@ -23,6 +23,8 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: deathangel908/pychat:latest
+          cache-from: type=registry,ref=deathangel908/pychat:latest
+          cache-to: type=inline
   update_test:
     needs: update_prod
     runs-on: ubuntu-latest
@@ -46,4 +48,5 @@ jobs:
           file: ./docker/pychat.org/Dockerfile
           push: true
           tags: deathangel908/pychat-test:latest
-
+          cache-from: type=registry,ref=deathangel908/pychat-test:latest
+          cache-to: type=inline
