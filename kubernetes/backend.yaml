@@ -25,6 +25,9 @@ spec:
           httpGet:
             path: /api/health
             port: 8888
+        env:
+        - name: REDIS_PUBSUB
+          value: true
         envFrom:
         - secretRef:
             name: secret

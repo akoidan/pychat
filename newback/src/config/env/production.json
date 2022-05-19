@@ -15,12 +15,12 @@
     }
   },
   "settings": {
-    "flags": true
+    "flags": "@@FLAGS"
   },
   "redis": {
     "host": "@@REDIS_HOST",
     "port":  "@@REDIS_PORT",
-    "database": 0
+    "pubsub": "@@REDIS_PUBSUB"
   },
   "frontend": {
     "address": "@@FRONTEND_ADDRESS",
@@ -40,7 +40,7 @@
     }
   },
   "mysql": {
-    "logging": true,
+    "logging": "@@MYSQL_LOGGING",
     "host": "@@MYSQL_HOST",
     "port": "@@MYSQL_PORT",
     "username": "@@MYSQL_USER",

@@ -50,6 +50,7 @@ declare module "node-ts-config" {
   interface Redis {
     host: string
     port: number
+    pubsub: boolean
     database: number
   }
   interface Settings {

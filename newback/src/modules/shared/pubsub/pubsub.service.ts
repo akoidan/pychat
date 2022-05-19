@@ -11,6 +11,7 @@ import type {HandlerName} from "@common/ws/common";
 import type {WebSocketContextData} from "@/data/types/patch";
 import {RedisService} from "@/modules/shared/redis/redis.service";
 import {RedisSubscribeService} from "@/modules/shared/pubsub/redis.subscribe.service";
+import {ConfigService} from "@/modules/shared/config/config.service";
 
 export function SubscribePuBSub<T extends keyof WebsocketGateway>(handler: T) {
   return (target: WebsocketGateway, memberName: T, propertyDescriptor: PropertyDescriptor) => {
@@ -33,20 +34,25 @@ export class PubsubService {
   constructor(
     private readonly logger: Logger,
     private readonly redis: RedisService,
+    private readonly configService: ConfigService,
     private readonly subscribeService: RedisSubscribeService,
   ) {
   }
 
-  // A extends string,H extends HandlerName
-
-  public async emit<PS extends PubSubMessage<A, H>, A extends string, H extends HandlerName>(data: PS, ...channel: (number | string)[]) {
-    await this.redis.emit(channel[0] as any, data);
+  public async emit<PS extends PubSubMessage<A, H>, A extends string, H extends HandlerName>(data: PS, channel: string) {
+    if (this.configService.getConfig().redis.pubsub) {
+      await this.redis.emit(channel, data);
+    } else {
+      this.onRedisMessage(channel, data);
+    }
   }
 
   async startListening() {
-    await this.subscribeService.onMessage((channel, message) => {
-      this.onRedisMessage(channel, message as PubSubMessage<any, any>);
-    });
+    if (this.configService.getConfig().redis.pubsub) {
+      await this.subscribeService.onMessage((channel, message) => {
+        this.onRedisMessage(channel, message as PubSubMessage<any, any>);
+      });
+    }
   }
 
   public onRedisMessage(channel: string, data: PubSubMessage<any, any>) {
@@ -64,7 +70,9 @@ export class PubsubService {
   public async subscribe(context: WebSocketContextData, ...channel: string[]) {
     const newChannels = channel.filter((c) => !this.subscribedChannel.includes(c));
     if (newChannels.length > 0) {
-      await this.subscribeService.listen(newChannels);
+      if (this.configService.getConfig().redis.pubsub) {
+        await this.subscribeService.listen(newChannels);
+      }
     }
     channel.forEach((channel) => {
       if (!this.receivers[channel]) {

@@ -1,0 +1,16 @@
+{
+  "name": "pychat",
+  "application": {
+    "port": 8888
+  },
+  "settings": {
+    "flags": true
+  },
+  "redis": {
+    "pubsub": true,
+    "database": 0
+  },
+  "frontend": {
+    "issueReportLink": "https://github.com/akoidan/pychat/issues/new"
+  }
+}

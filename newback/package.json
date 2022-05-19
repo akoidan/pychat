@@ -46,7 +46,7 @@
     "lines-logger": "^2.1.2",
     "mysql2": "^2.3.3",
     "node-db-migration": "^1.4.0",
-    "node-ts-config": "^1.0.5",
+    "node-ts-config": "^1.1.0",
     "nodemailer": "^6.7.3",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7",

@@ -127,8 +127,10 @@ export class MessageService {
         await this.messageRepository.deleteUploadedFiles(files.map((f) => f.id), transaction);
       }
       const body = transformPrintMessage(messageModel, mentions, images);
-      await this.pubsubService.emit({body,
-        handler: "sendToClient"}, data.roomId);
+      await this.pubsubService.emit({
+        body,
+        handler: "sendToClient",
+      }, String(data.roomId));
     });
   }
 }

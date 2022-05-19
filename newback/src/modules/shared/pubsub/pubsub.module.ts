@@ -7,6 +7,7 @@ import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import {RedisModule} from "@nestjs-modules/ioredis";
 import {config} from "node-ts-config";
 import {RedisSubscribeService} from "@/modules/shared/pubsub/redis.subscribe.service";
+import {ConfigService} from "@/modules/shared/config/config.service";
 
 @Module({
   imports: [
@@ -23,15 +24,15 @@ import {RedisSubscribeService} from "@/modules/shared/pubsub/redis.subscribe.ser
     RedisSubscribeService,
     {
       provide: PubsubService,
-      inject: [Logger, RedisService, RedisSubscribeService],
-      useFactory: async(l: Logger, r: RedisService, rs: RedisSubscribeService) => {
-        const ps = new PubsubService(l, r, rs);
+      inject: [Logger, RedisService, RedisSubscribeService, ConfigService],
+      useFactory: async(l: Logger, r: RedisService, rs: RedisSubscribeService, cs: ConfigService) => {
+        const ps = new PubsubService(l, r, cs, rs);
         await ps.startListening();
         return ps;
       },
     },
   ],
-  exports: [PubsubService]
+  exports: [PubsubService],
 })
 export class PubsubModule {
 }
