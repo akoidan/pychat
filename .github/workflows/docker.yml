@@ -24,6 +24,7 @@ jobs:
           push: true
           tags: deathangel908/pychat:latest
   update_test:
+    needs: update_prod
     runs-on: ubuntu-latest
     steps:
       -
