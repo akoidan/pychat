@@ -22,7 +22,7 @@ export class HealthService {
     // +1 is a migration table
     if (tables.length !== numberOfModels + 1) {
       throw new InternalServerErrorException(
-        `Database migration is not finished. Expected ${numberOfModels} tables, but found ${tables.length}`
+        `Database migration is not finished. Expected ${numberOfModels + 1} tables, but found ${tables.length}`
       );
     }
     return {
