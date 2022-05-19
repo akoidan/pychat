@@ -8,7 +8,7 @@
   },
   "redis": {
     "pubsub": true,
-    "database": 0
+    "db": 0
   },
   "frontend": {
     "issueReportLink": "https://github.com/akoidan/pychat/issues/new"

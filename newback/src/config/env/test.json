@@ -2,7 +2,6 @@
   "recaptcha": null,
   "email": null,
   "frontend": {
-    "address": "https://localhost:8080",
-    "issueReportLink": "https://github.com/akoidan/pychat/issues/new"
+    "address": "https://localhost:8080"
   }
 }

@@ -41,19 +41,11 @@ import {HealthModule} from "@/modules/api/health/health.module";
     WebsocketModule,
     HealthModule,
     RedisModule.forRoot({
-      config: {
-        host: config.redis.host,
-        port: config.redis.port,
-        db: config.redis.database,
-      },
+      config: config.redis,
     }),
-  RedisModule.forRoot({
-      config: {
-        host: config.redis.host,
-        port: config.redis.port,
-        db: config.redis.database,
-      },
-    }, 'pubsub'),
+    RedisModule.forRoot({
+      config: config.redis,
+    }, "pubsub"),
   ],
   providers: [
     {

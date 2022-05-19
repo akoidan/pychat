@@ -10,11 +10,7 @@ export function generateOrmConfig(logging: ((sql: string) => void)): Omit<Sequel
     synchronize: sync,
     logging,
     dialect: "mysql",
-    host: config.mysql.host,
-    port: config.mysql.port,
-    username: config.mysql.username,
-    password: config.mysql.password,
-    database: config.mysql.database,
+    ...config.mysql,
     autoLoadModels: true,
     sync: {
       force: sync,
