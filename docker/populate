@@ -18,7 +18,7 @@ start() {
    install -d -m 0755 -o mysql -g mysql /data/mysql &&\
    chmod 777 /data &&\
    chown http:http /srv/http/backend/chat/settings.py &&\
-   chown http:http /srv/http/frontend/production.json &&\
+   chown http:http /srv/http/frontend/build/production.json &&\
    chown http:http /srv/http/backend/photos &&\
    chown http:http /srv/http/backend/chat/migrations &&\
    chmod 777 /dev/stdout &&\
