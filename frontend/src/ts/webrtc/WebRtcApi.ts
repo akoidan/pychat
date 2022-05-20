@@ -6,13 +6,7 @@ import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.roo
 import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
 import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import {LogoutMessage} from "@/ts/types/messages/inner/logout";
-import {
-  NotifyCallActiveMessage,
-  OfferCall,
-  OfferFile,
-  OfferMessage,
-  WebRtcSetConnectionIdMessage
-} from "@common/legacy";
+
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type WsHandler from "@/ts/message_handlers/WsHandler";

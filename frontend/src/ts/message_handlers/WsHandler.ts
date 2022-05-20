@@ -5,17 +5,7 @@ import type {
 import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
-import {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddRoomMessage,
-  MessagesResponseMessage,
-  SaveChannelSettingsMessage,
-  SetSettingsMessage,
-  SetUserProfileMessage,
-  UserProfileChangedMessage,
-  WebRtcSetConnectionIdMessage
-} from "@common/legacy";
+
 import {MessageStatus} from '@common/model/enum/message.status';
 import {GiphyDto} from '@common/model/dto/giphy.dto';
 import {UserProfileDto} from '@common/model/dto/user.profile.dto';

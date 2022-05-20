@@ -3,10 +3,7 @@ import type {
   HandlerTypes,
 } from "@common/ws/common";
 import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
-import {
-  DeleteMessage,
-  MessagesResponseMessage
-} from "@common/legacy";
+
 import {ImageType} from '@common/model/enum/image.type';
 import {MessageStatus} from '@common/model/enum/message.status';
 import {GiphyDto} from '@common/model/dto/giphy.dto';

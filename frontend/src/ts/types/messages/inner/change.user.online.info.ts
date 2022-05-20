@@ -1,5 +1,5 @@
 import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
-import {ChangeOnlineType} from "@common/legacy";
+
 
 export interface ChangeUserOnlineInfoMessageBody {
   opponentWsId: string;

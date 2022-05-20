@@ -5,7 +5,7 @@ import type {
 import {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
 import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
-import {DestroyCallConnection} from "@common/legacy";
+
 import {
   createMicrophoneLevelVoice,
   getAverageAudioLevel,

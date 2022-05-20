@@ -7,21 +7,7 @@ import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user
 import {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
 import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
-import {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddRoomBase,
-  AddRoomMessage,
-  ChangeDeviceType,
-  CreateNewUsedMessage,
-  DeleteChannelMessage,
-  DeleteRoomMessage,
-  InviteUserMessage,
-  LeaveUserMessage,
-  RemoveOnlineUserMessage,
-  SaveChannelSettingsMessage,
-  SaveRoomSettingsMessage
-} from "@common/legacy";
+
 import {ChannelDto} from '@common/model/dto/channel.dto';
 import {RoomDto} from '@common/model/dto/room.dto';
 import {ShowITypeWsInMessage} from '@common/ws/message/show.i.type';

@@ -1,5 +1,5 @@
 import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
-import {ChangeDeviceType} from "@common/legacy";
+
 
 
 export interface ChangeP2pRoomInfoMessageBody  {

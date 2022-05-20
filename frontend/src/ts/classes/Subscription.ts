@@ -3,7 +3,7 @@ import {
   HandlerName
 } from "@common/ws/common";
 import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
-import {IMessageHandler} from "@common/legacy";
+
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 
