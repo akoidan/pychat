@@ -1,6 +1,5 @@
 import {DefaultWsInMessage} from "@common/ws/common";
-import {ReplyWebRtc} from "@common/helpers";
-
+import {ReplyWebRtc} from "@common/model/webrtc.base";
 
 export type ReplyCallBody = ReplyWebRtc;
 

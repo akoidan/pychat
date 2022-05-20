@@ -1,7 +1,7 @@
-import type {PostData,
-  SessionHolder,
-  UploadData} from "@/ts/types/types";
-import {XHR_API_URL} from "@/ts/utils/runtimeConsts";
+import type {
+  PostData,
+  UploadData
+} from "@/ts/types/types";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import {CONNECTION_ERROR} from "@/ts/utils/consts";

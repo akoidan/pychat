@@ -7,7 +7,7 @@ import {
   getRoomsOnline,
   getTransformRoomDto,
 } from "@/data/transformers/model/room.transformer";
-import type {SetWsIdWsOutMessage,} from "@common/ws/message/set.ws.id";
+import type {SetWsIdWsOutMessage} from "@common/ws/message/set.ws.id";
 
 
 export function transformSetWsId(

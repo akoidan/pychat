@@ -1,4 +1,4 @@
-import type {OauthSessionResponse} from "@common/helpers";
+import {OauthSessionResponse} from "@common/model/http.base";
 
 export type GoogleSignInResponse = OauthSessionResponse;
 

@@ -1,4 +1,5 @@
 import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
+import {GoogleSignInRequest} from "@common/http/auth/google.sign.in";
 import type {
   SignUpRequest,
   SignUpResponse,
@@ -20,7 +21,6 @@ import type {
   ValidateUserRequest,
   ValidateUserResponse,
 } from "@common/http/auth/validate.user";
-import {GoogleSignInRequest} from "@common/http/auth/google.sign.in";
 
 export default class AuthApi {
   protected readonly logger: Logger;

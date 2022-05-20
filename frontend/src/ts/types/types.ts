@@ -1,6 +1,5 @@
-import {SaveFileResponse} from '@common/http/file/save.file';
-import type {
-  CallInfoModel,
+import type {SaveFileResponse} from "@common/http/file/save.file";
+import type {CallInfoModel,
   ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -13,9 +12,13 @@ import type {
   SendingFileTransfer,
   UploadProgressModel,
   UserModel,
-} from "@/ts/types/model";
-import {MessageStatusModel} from '@/ts/types/model';
-import type {SetStateFromStorage,} from "@/ts/types/dto";
+  MessageStatusModel} from "@/ts/types/model";
+import type {SetStateFromStorage} from "@/ts/types/dto";
+import type {
+  DefaultWsInMessage,
+  HandlerName,
+  HandlerType,
+} from "@common/ws/common";
 
 
 export type ValueFilterForKey<T extends object, U> = {
@@ -76,7 +79,7 @@ export interface SetUploadProgress {
 }
 
 export interface SetUploadXHR {
-  abortFunction: () => void;
+  abortFunction(): void;
   roomId: number;
   messageId: number;
 }
@@ -223,14 +226,14 @@ export interface IStorage {
 export interface PostData {
   url: string;
   params: any;
-  onSetAbortFunction?: (c: () => void) => void;
+  onSetAbortFunction?(c: () => void): void;
 }
 
 export interface UploadData {
   url: string;
   data: Record<string, any>;
-  onSetAbortFunction?: (e: () => void) => void;
-  onProgress?: (i: number) => void;
+  onSetAbortFunction?(e: () => void): void;
+  onProgress?(i: number): void;
 }
 
 export interface AddSendingFileTransfer {
@@ -291,6 +294,19 @@ export interface PrivateRoomsIds {
   userRooms: Record<number, number>;
   roomUsers: Record<number, number>;
 }
+
+export interface IMessageHandler {
+  handle<H extends HandlerName>(message: DefaultWsInMessage<string, H, HandlerName>): void;
+
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  getHandler<H extends HandlerName, A extends string>(message: DefaultWsInMessage<A, H, any>): HandlerType<any, any> | undefined;
+}
+
+export type HandlerType<K extends string, A extends DefaultWsInMessage<K, HandlerName, A["data"]>> = (a: A["data"]) => Promise<void> | void;
+
+export type HandlerTypes<K extends string> = {
+  [Key in K]?: HandlerType<Key, any>
+};
 
 export interface SetRoomsUsers {
   roomId: number;

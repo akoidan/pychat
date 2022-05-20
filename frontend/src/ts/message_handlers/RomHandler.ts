@@ -1,3 +1,7 @@
+import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
 import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
 import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
 import {LogoutMessage} from "@/ts/types/messages/inner/logout";
@@ -62,7 +66,7 @@ import {SetStateFromWS} from "@/ts/types/dto";
 export class RoomHandler extends MessageHandler {
   protected readonly logger: Logger;
 
-  protected readonly handlers: HandlerTypes<keyof RoomHandler, "room"> = {
+  protected readonly handlers: HandlerTypes<keyof RoomHandler> = {
     deleteRoom: <HandlerType<"deleteRoom", "room">> this.deleteRoom,
     init: <HandlerType<"init", "room">> this.init,
     leaveUser: <HandlerType<"leaveUser", "room">> this.leaveUser,
@@ -163,7 +167,7 @@ export class RoomHandler extends MessageHandler {
     this.mutateRoomAddition(message, "invited");
   }
 
-  public createNewUser(message: CreateNewUsedMessage) {
+  public createNewUser(message: CreateNewUserMessage) {
     const newVar: UserModel = convertUser(message, null);
     this.store.addUser(newVar);
     message.rooms.forEach(({roomId, users}) => {

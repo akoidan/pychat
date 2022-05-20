@@ -1,8 +1,8 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
-import type {
+import {
   OpponentWsId,
-  WebRtcDefaultMessage,
-} from "@common/legacy";
+  WebRtcDefaultMessage
+} from "@common/model/webrtc.base";
 
 
 export interface DestroyCallConnectionBody extends OpponentWsId, WebRtcDefaultMessage {

@@ -2,7 +2,7 @@ import {DefaultWsInMessage} from "@common/ws/common";
 import {
   OpponentWsId,
   WebRtcDefaultMessage
-} from "@common/legacy";
+} from "@common/model/webrtc.base";
 
 export interface AcceptCallBody extends OpponentWsId, WebRtcDefaultMessage {
 

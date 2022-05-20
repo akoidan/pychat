@@ -39,6 +39,9 @@ export default class App extends Vue {
   }
 }
 </script>
+<style lang="sass">
+  @import "@/assets/sass/common.sass";
+</style>
 <style lang="sass" scoped>
 .body
   height: 100%

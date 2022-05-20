@@ -1,7 +1,7 @@
-import type {
+import {
   CaptchaRequest,
-  SessionResponse,
-} from "@common/helpers";
+  SessionResponse
+} from "@common/model/http.base";
 
 export type SignInResponse = SessionResponse;
 

@@ -1,4 +1,3 @@
-import "@/assets/sass/common.sass";
 import * as constants from "@/ts/utils/consts";
 
 import * as runtimeConsts from "@/ts/utils/runtimeConsts";

@@ -1,5 +1,5 @@
-import type {SessionResponse} from "@common/helpers";
 import type {Gender} from "@common/model/enum/gender";
+import {SessionResponse} from "@common/model/http.base";
 
 export type SignUpResponse = SessionResponse;
 

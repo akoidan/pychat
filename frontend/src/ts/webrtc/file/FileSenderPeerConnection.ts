@@ -1,4 +1,8 @@
 import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
+import type {
   AddSendingFileTransfer,
   SetSendingFileStatus,
   SetSendingFileUploaded,

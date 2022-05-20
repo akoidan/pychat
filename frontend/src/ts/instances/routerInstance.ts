@@ -1,6 +1,13 @@
-import type {LoginMessageBody} from "@/ts/types/messages/inner/login";
+import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
+import type {LoginMessageBody, LoginMessage} from "@/ts/types/messages/inner/login";
 import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
-import type {RouterNavigateMessageBody} from "@/ts/types/messages/inner/router.navigate";
+import type {
+  RouterNavigateMessage,
+  RouterNavigateMessageBody,
+} from "@/ts/types/messages/inner/router.navigate";
 import {
   createRouter,
   createWebHashHistory,
@@ -39,10 +46,6 @@ import RoomUsersListPage from "@/vue/pages/RoomUsersListPage.vue";
 import ChannelAddRoom from "@/vue/pages/ChannelAddRoom.vue";
 import type Subscription from "@/ts/classes/Subscription";
 import type {SessionHolder} from "@/ts/types/types";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
 
 
 export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
@@ -199,13 +202,13 @@ export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
   sub.subscribe("router", new class RouterProcessor extends MessageHandler {
     protected readonly logger: Logger = logger;
 
-    protected readonly handlers: HandlerTypes<keyof RouterProcessor, "router", any> = {
-      login: <HandlerType<"login", "router", LoginMessageBody>> this.login,
-      logout: <HandlerType<"logout", "router", {}>> this.logout,
-      navigate: <HandlerType<"navigate", "router", RouterNavigateMessageBody>> this.navigate,
+    protected readonly handlers: HandlerTypes<keyof RouterProcessor> = {
+      login: <HandlerType<"login", LoginMessage>> this.login,
+      logout: <HandlerType<"logout", LogoutMessage>> this.logout,
+      navigate: <HandlerType<"navigate", RouterNavigateMessage>> this.navigate,
     };
 
-    logout(a: LogoutMessage) {
+    logout() {
       router.replace("/auth/sign-in");
     }
 

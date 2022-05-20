@@ -1,9 +1,9 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
-import type {
+import {
   BrowserBase,
   OpponentWsId,
-  WebRtcDefaultMessage,
-} from "@common/legacy";
+  WebRtcDefaultMessage
+} from "@common/model/webrtc.base";
 
 
 export interface OfferCallBody extends OpponentWsId, WebRtcDefaultMessage {

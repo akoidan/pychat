@@ -1,3 +1,4 @@
+import type {HandlerName,} from "@common/ws/common";
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import type {SendRtcDataMessage} from "@common/legacy";
@@ -11,7 +12,6 @@ import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
-import type {HandlerName} from "@common/ws/common";
 
 
 export default abstract class AbstractPeerConnection extends MessageHandler {

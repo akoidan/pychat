@@ -1,4 +1,8 @@
 import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
+import type {
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
 } from "@/ts/types/types";

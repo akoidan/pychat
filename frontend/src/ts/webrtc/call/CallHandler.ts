@@ -1,3 +1,7 @@
+import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
 import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
@@ -45,10 +49,6 @@ import CallReceiverPeerConnection from "@/ts/webrtc/call/CallReceiverPeerConnect
 
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 import {stopVideo} from "@/ts/utils/htmlApi";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
 
 
 export default class CallHandler extends FileAndCallTransfer {

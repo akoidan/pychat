@@ -1,17 +1,22 @@
-import {IMessageHandler} from "@common/legacy";
+import type {
+  HandlerType,
+  HandlerTypes
+} from "@common/ws/common";
+import type {IMessageHandler} from "@common/legacy";
 import type {Logger} from "lines-logger";
 
 
 export default abstract class MessageHandler implements IMessageHandler {
   protected abstract readonly logger: Logger;
 
-  protected abstract readonly handlers: HandlerTypes<any, any>;
+  protected abstract readonly handlers: HandlerTypes<any>;
 
-  public handle(message: DefaultInMessage<string, HandlerName>) {
+  // TODO message: any
+  public handle(message: any) {
     if (!this.handlers) {
       throw Error(`${this.constructor.name} has empty handlers`);
     }
-    const handler: HandlerType<string, HandlerName> | undefined = this.handlers[message.action];
+    const handler: HandlerType<string, any> | undefined = this.handlers[message.action];
     if (handler) {
       handler.bind(this)(message);
       this.logger.debug("Notified {}.{} => message", this.constructor.name, message.action, message);
@@ -20,7 +25,7 @@ export default abstract class MessageHandler implements IMessageHandler {
     }
   }
 
-  getHandler(message: DefaultInMessage<string, HandlerName>): HandlerType<string, HandlerName> | undefined {
+  getHandler(message: any): HandlerType<string, any> | undefined {
     return this.handlers[message.action];
   }
 }

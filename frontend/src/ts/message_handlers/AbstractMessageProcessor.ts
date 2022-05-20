@@ -1,7 +1,3 @@
-import type {Logger} from "lines-logger";
-import loggerFactory from "@/ts/instances/loggerFactory";
-import type {MessageSupplier} from "@/ts/types/types";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {
   DefaultWsInMessage,
   DefaultWsOutMessage,
@@ -9,6 +5,10 @@ import type {
   RequestWsOutMessage,
   ResponseWsInMessage,
 } from "@common/ws/common";
+import type {Logger} from "lines-logger";
+import loggerFactory from "@/ts/instances/loggerFactory";
+import type {MessageSupplier} from "@/ts/types/types";
+import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 
 export default class AbstractMessageProcessor {

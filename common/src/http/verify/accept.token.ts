@@ -1,4 +1,4 @@
-import type {SessionResponse} from "@common/helpers";
+import {SessionResponse} from "@common/model/http.base";
 
 export type AcceptTokenResponse = SessionResponse;
 

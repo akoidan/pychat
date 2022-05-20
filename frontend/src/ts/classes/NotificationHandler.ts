@@ -1,3 +1,7 @@
+import type {
+  HandlerType,
+  HandlerTypes,
+} from "@common/ws/common";
 import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
@@ -16,17 +20,13 @@ import {
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {MainWindow} from "@/ts/classes/MainWindow";
 import type Subscription from "@/ts/classes/Subscription";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
 
 
 export default class NotifierHandler extends MessageHandler {
   protected readonly logger: Logger;
 
-  protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
-    internetAppear: <HandlerType<"internetAppear", "*">> this.internetAppear,
+  protected readonly handlers: HandlerTypes<keyof NotifierHandler> = {
+    internetAppear: <HandlerType<"internetAppear", InternetAppearMessage>> this.internetAppear,
   };
 
   private readonly mainWindow: MainWindow;
@@ -77,7 +77,7 @@ export default class NotifierHandler extends MessageHandler {
     this.onFocus(null);
   }
 
-  public async internetAppear(p: InternetAppearMessage) {
+  public async internetAppear() {
     if (!this.serviceWorkedTried) {
       await this.tryAgainRegisterServiceWorker();
     }

@@ -1,4 +1,4 @@
-import type {OkResponse} from "@common/helpers";
+import {OkResponse} from "@common/model/http.base";
 
 export interface ValidateUserRequest {
   username: string;

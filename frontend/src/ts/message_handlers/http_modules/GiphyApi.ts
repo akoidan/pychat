@@ -1,10 +1,6 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type {MultiResponse} from "giphy-api";
-import {
-  GIPHY_API_KEY,
-  GIPHY_URL,
-} from "@/ts/utils/consts";
 import type Fetch from "@/ts/classes/Fetch";
 
 export default class GiphyApi {

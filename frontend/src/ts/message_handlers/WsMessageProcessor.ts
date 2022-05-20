@@ -1,8 +1,8 @@
+import type {ResponseWsInMessage,} from "@common/ws/common";
 import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 import type Subscription from "@/ts/classes/Subscription";
 import type {MessageSupplier} from "@/ts/types/types";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {ResponseWsInMessage,} from "@common/ws/common";
 import type {GrowlWsInMessage,} from "@common/ws/message/growl.message";
 
 export class WsMessageProcessor extends AbstractMessageProcessor {
