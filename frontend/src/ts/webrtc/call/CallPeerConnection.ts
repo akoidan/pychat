@@ -219,7 +219,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.unsubscribeAndRemoveFromParent();
   }
 
-  destroyCallConnection(m: DestroyCallConnection) { // Called by opponent devices via ws
+  destroyCallConnection(m: DestroyCallConnectionMessage) { // Called by opponent devices via ws
     this.unsubscribeAndRemoveFromParent();
   }
 
