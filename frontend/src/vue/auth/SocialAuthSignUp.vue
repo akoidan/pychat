@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts">
-import {OauthSessionResponse} from "@common/model/http.base";
+import type {OauthSessionResponse} from "@common/model/http.base";
 
 
 import {Component, Vue} from "vue-property-decorator";
