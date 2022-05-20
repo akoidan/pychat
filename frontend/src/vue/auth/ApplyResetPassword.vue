@@ -41,10 +41,7 @@
 </template>
 <script lang="ts">
 
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue,} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {LoginMessage} from '@/ts/types/messages/innerMessages';

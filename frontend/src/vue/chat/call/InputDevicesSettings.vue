@@ -70,11 +70,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue,} from "vue-property-decorator";
 import {CallsInfoModel} from "@/ts/types/model";
 import type {StringIdentifier} from "@/ts/types/types";
 import {State} from "@/ts/instances/storeInstance";

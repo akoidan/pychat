@@ -7,13 +7,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
 import {getStreamLog} from "@/ts/utils/pureFunctions";
 
 @Component({name: "VideoObject"})

@@ -8,11 +8,7 @@
   </user-row>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue,} from "vue-property-decorator";
 import UserRow from "@/vue/chat/right/UserRow.vue";
 import {UserModel} from "@/ts/types/model";
 import {FLAGS} from "@/ts/utils/consts";

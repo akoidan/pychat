@@ -20,11 +20,7 @@
   </chat-right-collapsed-section>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue,} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 import {ChannelUIModel} from "@/ts/types/model";
 import ChatRightCollapsedSection from "@/vue/chat/right/ChatRightCollapsedSection.vue";

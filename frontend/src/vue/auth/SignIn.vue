@@ -47,11 +47,7 @@
 </template>
 
 <script lang='ts'>
-import {
-  Component,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Ref, Vue,} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 

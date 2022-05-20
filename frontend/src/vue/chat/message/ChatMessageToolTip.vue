@@ -25,18 +25,11 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue,} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 import type {EditingMessage} from "@/ts/types/model";
 import {MessageModel} from "@/ts/types/model";
-import {
-  editMessageWs,
-  showAllowEditing,
-} from "@/ts/utils/pureFunctions";
+import {editMessageWs, showAllowEditing,} from "@/ts/utils/pureFunctions";
 
 @Component({name: "ChatMessageToolTip"})
 export default class ChatMessageToolTip extends Vue {

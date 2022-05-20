@@ -15,16 +15,8 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
-import {
-  CurrentUserSettingsModel,
-  MessageModel,
-} from "@/ts/types/model";
+import {Component, Prop, Ref, Vue,} from "vue-property-decorator";
+import {CurrentUserSettingsModel, MessageModel,} from "@/ts/types/model";
 import {
   encodeHTML,
   encodeMessageInited,

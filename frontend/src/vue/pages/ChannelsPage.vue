@@ -18,11 +18,7 @@
 </template>
 
 <script lang='ts'>
-import {
-  Component,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Vue, Watch,} from "vue-property-decorator";
 
 import ChatRightSection from "@/vue/chat/right/ChatRightSection.vue";
 // Import NavEditMessage from '@/vue/chat/NavEditMessage.vue';

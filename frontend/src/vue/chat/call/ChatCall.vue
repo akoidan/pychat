@@ -45,18 +45,9 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
 import {CallsInfoModel} from "@/ts/types/model";
-import type {
-  BooleanIdentifier,
-  ShareIdentifier,
-} from "@/ts/types/types";
+import type {BooleanIdentifier, ShareIdentifier,} from "@/ts/types/types";
 import {VideoType} from "@/ts/types/types";
 
 import ChatRemotePeer from "@/vue/chat/call/ChatRemotePeer.vue";

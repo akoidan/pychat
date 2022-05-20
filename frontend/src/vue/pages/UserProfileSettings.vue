@@ -114,29 +114,16 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
+import {Component, Vue, Watch,} from "vue-property-decorator";
+import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {userSettingsDtoToModel} from "@/ts/types/converters";
 import type {LogLevel} from "lines-logger";
 import {logLevels} from "lines-logger";
-import {
-  LAST_SYNCED,
-  SERVICE_WORKER_VERSION_LS_NAME,
-} from "@/ts/utils/consts";
-import {
-  addToHomeScreen,
-  canBeInstalled,
-} from "@/ts/utils/addToHomeScreen";
+import {LAST_SYNCED, SERVICE_WORKER_VERSION_LS_NAME,} from "@/ts/utils/consts";
+import {addToHomeScreen, canBeInstalled,} from "@/ts/utils/addToHomeScreen";
 
 
 @Component({

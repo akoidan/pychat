@@ -20,18 +20,10 @@
 </template>
 <script lang="ts">
 
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue,} from "vue-property-decorator";
 import MediaCapture from "@/ts/classes/MediaCapture";
 
-import {
-  isChrome,
-  isMobile,
-} from "@/ts/utils/runtimeConsts";
+import {isChrome, isMobile,} from "@/ts/utils/runtimeConsts";
 
 
 @Component({name: "MediaRecorder"})

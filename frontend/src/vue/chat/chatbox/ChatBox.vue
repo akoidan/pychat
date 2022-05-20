@@ -94,17 +94,8 @@
 </template>
 <script lang="ts">
 
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
+import {Component, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
+import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
 import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
 import SearchMessages from "@/vue/chat/chatbox/SearchMessages.vue";
 import {RoomModel} from "@/ts/types/model";

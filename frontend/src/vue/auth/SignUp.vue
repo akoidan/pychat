@@ -118,12 +118,7 @@
 
 <script lang='ts'>
 
-import {
-  Component,
-  Prop,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Prop, Vue, Watch,} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import RegisterFieldSet from "@/vue/auth/RegisterFieldSet.vue";

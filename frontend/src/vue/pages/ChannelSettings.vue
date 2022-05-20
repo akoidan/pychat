@@ -101,22 +101,10 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
-import type {
-  ChannelUIModel,
-  UserModel,
-} from "@/ts/types/model";
-import {
-  ChannelsDictUIModel,
-  CurrentUserInfoModel,
-} from "@/ts/types/model";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
+import {Component, Vue,} from "vue-property-decorator";
+import type {ChannelUIModel, UserModel,} from "@/ts/types/model";
+import {ChannelsDictUIModel, CurrentUserInfoModel,} from "@/ts/types/model";
+import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import type {RouterNavigateMessage} from "@/ts/types/messages/innerMessages";

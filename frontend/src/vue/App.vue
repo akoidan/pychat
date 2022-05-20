@@ -6,11 +6,7 @@
 </template>
 
 <script lang='ts'>
-import {
-  Component,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Vue, Watch,} from "vue-property-decorator";
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 import Growls from "@/vue/parts/Growls.vue";

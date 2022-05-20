@@ -10,16 +10,8 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
+import {Component, Ref, Vue, Watch,} from "vue-property-decorator";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppImageCropper from "@/vue/ui/AppImageCropper.vue";

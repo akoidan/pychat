@@ -25,13 +25,7 @@
 </template>
 <script lang="ts">
 import debounce from "lodash.debounce";
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
 import {RoomModel} from "@/ts/types/model";
 
 const START_TYPING = "Start typing and messages will appear";

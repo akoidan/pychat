@@ -9,10 +9,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue,} from "vue-property-decorator";
 import RoomDirectUsersTable from "@/vue/chat/right/RoomDirectUsersTable.vue";
 import ChannelTable from "@/vue/chat/right/ChannelTable.vue";
 import type {ChannelUIModel} from "@/ts/types/model";

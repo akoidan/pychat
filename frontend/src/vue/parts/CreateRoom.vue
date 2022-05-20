@@ -61,22 +61,12 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
+import {Component, Prop, Vue,} from "vue-property-decorator";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
-import {
-  ChannelsDictUIModel,
-  CurrentUserInfoModel,
-} from "@/ts/types/model";
+import {ChannelsDictUIModel, CurrentUserInfoModel,} from "@/ts/types/model";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";
 import ParentChannel from "@/vue/parts/ParentChannel.vue";

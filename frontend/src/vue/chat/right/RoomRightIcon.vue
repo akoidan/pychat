@@ -26,11 +26,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue,} from "vue-property-decorator";
 import type {MessageModel} from "@/ts/types/model";
 import {RoomModel} from "@/ts/types/model";
 

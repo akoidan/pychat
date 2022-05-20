@@ -61,14 +61,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Emit,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Emit, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 import {CallsInfoModel} from "@/ts/types/model";
 import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";

@@ -115,25 +115,13 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
+import {Component, Vue,} from "vue-property-decorator";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
-import type {
-  RoomModel,
-  UserModel,
-} from "@/ts/types/model";
-import {
-  RoomDictModel,
-  UserDictModel,
-} from "@/ts/types/model";
+import type {RoomModel, UserModel,} from "@/ts/types/model";
+import {RoomDictModel, UserDictModel,} from "@/ts/types/model";
 import ParentChannel from "@/vue/parts/ParentChannel.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";

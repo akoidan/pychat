@@ -19,14 +19,8 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
-import {
-  CurrentUserInfoModel,
-  IncomingCallModel,
-} from "@/ts/types/model";
+import {Component, Vue,} from "vue-property-decorator";
+import {CurrentUserInfoModel, IncomingCallModel,} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 import IncomingCall from "@/vue/chat/call/IncomingCall.vue";
 import AppNavWrapper from "@/vue/ui/AppNavWrapper.vue";

@@ -56,17 +56,8 @@
   <div v-else/>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Emit,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
-import type {
-  Smile,
-  SmileVariation,
-  SmileysStructure,
-} from "@/ts/utils/smileys";
+import {Component, Emit, Vue, Watch,} from "vue-property-decorator";
+import type {Smile, SmileVariation, SmileysStructure,} from "@/ts/utils/smileys";
 
 @Component({name: "SmileyHolder"})
 export default class SmileyHolder extends Vue {

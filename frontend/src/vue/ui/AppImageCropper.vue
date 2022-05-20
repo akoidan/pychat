@@ -66,19 +66,10 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
 import VueCropper, {VueCropperMethods} from "vue-cropperjs";
 import {isMobile} from "@/ts/utils/runtimeConsts";
-import {
-  canvasContext,
-  stopVideo,
-} from "@/ts/utils/htmlApi";
+import {canvasContext, stopVideo,} from "@/ts/utils/htmlApi";
 
 
 @Component({
