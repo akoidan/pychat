@@ -1,18 +1,10 @@
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
+
 import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import type {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
 import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
-import type {
-  AcceptCallMessage,
-  CallStatus,
-  OfferCall,
-  ReplyCallMessage,
-} from "@common/legacy";
+
 import {
   browserVersion,
   isChrome,

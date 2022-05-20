@@ -1,7 +1,4 @@
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
+
 import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
 import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
 import {LogoutMessage} from "@/ts/types/messages/inner/logout";

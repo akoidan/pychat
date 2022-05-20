@@ -1,10 +1,4 @@
-import type {
-  DefaultWsInMessage,
-  DefaultWsOutMessage,
-  HandlerName,
-  RequestWsOutMessage,
-  ResponseWsInMessage,
-} from "@common/ws/common";
+
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {MessageSupplier} from "@/ts/types/types";

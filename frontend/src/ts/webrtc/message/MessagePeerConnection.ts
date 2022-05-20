@@ -1,7 +1,4 @@
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
+
 import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
 import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
 import {MessageStatus} from '@common/model/enum/message.status';

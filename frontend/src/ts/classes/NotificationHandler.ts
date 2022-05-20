@@ -1,7 +1,4 @@
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
+
 import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";

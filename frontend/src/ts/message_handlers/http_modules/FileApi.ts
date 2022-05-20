@@ -1,10 +1,7 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type Fetch from "@/ts/classes/Fetch";
-import type {
-  SaveFileRequest,
-  SaveFileResponse,
-} from "@common/http/file/save.file";
+
 
 export default class FileApi {
   protected readonly logger: Logger;

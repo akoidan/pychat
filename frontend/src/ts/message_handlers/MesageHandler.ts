@@ -1,8 +1,5 @@
-import type {
-  HandlerType,
-  HandlerTypes
-} from "@common/ws/common";
-import type {IMessageHandler} from "@common/legacy";
+
+
 import type {Logger} from "lines-logger";
 
 

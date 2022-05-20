@@ -1,7 +1,4 @@
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
+
 import type {LoginMessageBody, LoginMessage} from "@/ts/types/messages/inner/login";
 import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import type {

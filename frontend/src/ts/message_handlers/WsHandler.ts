@@ -1,7 +1,4 @@
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
+
 import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";

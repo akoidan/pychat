@@ -1,7 +1,7 @@
-import type {HandlerName,} from "@common/ws/common";
+
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
-import type {SendRtcDataMessage} from "@common/legacy";
+
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";

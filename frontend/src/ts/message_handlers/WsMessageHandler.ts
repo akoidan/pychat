@@ -1,7 +1,4 @@
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
+
 import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import {
   DeleteMessage,
