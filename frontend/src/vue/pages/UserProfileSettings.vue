@@ -114,8 +114,8 @@
   </div>
 </template>
 <script lang="ts">
-import {UserSettingsDto} from "@common/model/dto/user.settings.dto";
-import {SetSettingsMessage} from "@common/ws/message/ws/set.settings";
+import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
+import type {SetSettingsMessage} from "@common/ws/message/ws/set.settings";
 
 
 import {Component, Vue, Watch} from "vue-property-decorator";

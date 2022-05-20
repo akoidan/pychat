@@ -112,9 +112,9 @@
   </form>
 </template>
 <script lang="ts">
-import {UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
+import type {UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
 import {Gender} from "@common/model/enum/gender";
-import {SetUserProfileMessage} from "@common/ws/message/ws/set.user.profile";
+import type {SetUserProfileMessage} from "@common/ws/message/ws/set.user.profile";
 
 
 import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
