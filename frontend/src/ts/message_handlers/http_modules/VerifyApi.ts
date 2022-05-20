@@ -1,22 +1,13 @@
+import type {AcceptTokenRequest, AcceptTokenResponse} from "@common/http/verify/accept.token";
+import type {ConfirmEmailRequest, ConfirmEmailResponse} from "@common/http/verify/confirm.email";
+import type {SendRestorePasswordRequest, SendRestorePasswordResponse} from "@common/http/verify/send.restore.password";
+import type {VerifyTokenRequest, VerifyTokenResponse} from "@common/http/verify/verify.token";
+
+
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type Fetch from "@/ts/classes/Fetch";
-import type {
-  VerifyTokenRequest,
-  VerifyTokenResponse,
-} from "@common/http/verify/verify.token";
-import type {
-  AcceptTokenRequest,
-  AcceptTokenResponse,
-} from "@common/http/verify/accept.token";
-import type {
-  SendRestorePasswordRequest,
-  SendRestorePasswordResponse,
-} from "@common/http/verify/send.restore.password";
-import type {
-  ConfirmEmailRequest,
-  ConfirmEmailResponse,
-} from "@common/http/verify/confirm.email";
+
 
 export default class VerifyApi {
   protected readonly logger: Logger;
@@ -53,7 +44,7 @@ export default class VerifyApi {
   public async sendRestorePassword(params: SendRestorePasswordRequest): Promise<SendRestorePasswordResponse> {
     return this.fetch.doPost<SendRestorePasswordResponse>({
       url: "/send-restore-password",
-      params: params,
+      params,
     });
   }
 }

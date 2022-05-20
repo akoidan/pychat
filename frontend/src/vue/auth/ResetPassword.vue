@@ -4,18 +4,18 @@
   >
     <div>
       <input
+        v-model="userNameOrEmail"
         class="input"
         name="username_or_password"
         placeholder="Username or email"
         required
         type="text"
-        v-model="userNameOrEmail"
       />
       <div class="slider">
         Enter your username or email
       </div>
     </div>
-     <captcha-component v-model:loading="running" v-model:token="captcha"/>
+    <captcha-component v-model:loading="running" v-model:token="captcha"/>
     <div>
       <app-submit
         :running="running"
@@ -26,12 +26,8 @@
   </form>
 </template>
 
-<script lang='ts'>
-import {
-  Component,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
+<script lang="ts">
+import {Component, Ref, Vue} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import CaptchaComponent from "@/vue/auth/CaptchaComponent.vue";
@@ -44,13 +40,14 @@ import CaptchaComponent from "@/vue/auth/CaptchaComponent.vue";
   },
 })
 export default class ResetPassword extends Vue {
-
   @Ref()
   public repactha!: HTMLElement;
 
   public running: boolean = false;
-  public captcha: string = '';
-  public userNameOrEmail: string = '';
+
+  public captcha: string = "";
+
+  public userNameOrEmail: string = "";
 
   public created() {
     this.$store.setRegHeader("Restore password");
@@ -63,8 +60,8 @@ export default class ResetPassword extends Vue {
   public async restorePassword(event: Event) {
     await this.$api.verifyApi.sendRestorePassword({
       captcha: this.captcha,
-      email: this.userNameOrEmail.includes('@') ? this.userNameOrEmail : undefined,
-      username: !this.userNameOrEmail.includes('@') ? this.userNameOrEmail: undefined,
+      email: this.userNameOrEmail.includes("@") ? this.userNameOrEmail : undefined,
+      username: !this.userNameOrEmail.includes("@") ? this.userNameOrEmail : undefined,
     });
     this.$store.growlSuccess("A reset email has been sent to your email address, please follow the instruction in it");
   }

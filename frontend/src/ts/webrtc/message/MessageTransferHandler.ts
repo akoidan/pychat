@@ -1,12 +1,8 @@
-import type {HandlerTypes,} from "@common/ws/common";
-import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
-import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
-import {MessageStatus} from '@common/model/enum/message.status';
+import {MessageStatus} from "@common/model/enum/message.status";
+import type {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import type {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
 import BaseTransferHandler from "@/ts/webrtc/BaseTransferHandler";
-import type {
-  MessageSender,
-  UserIdConn,
-} from "@/ts/types/types";
+import type {MessageSender, UserIdConn} from "@/ts/types/types";
 import type {RoomModel} from "@/ts/types/model";
 import MessageSenderPeerConnection from "@/ts/webrtc/message/MessageSenderPeerConnection";
 import MessageReceiverPeerConnection from "@/ts/webrtc/message/MessageReceiverPeerConnection";

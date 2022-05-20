@@ -1,5 +1,5 @@
-import {HandlerName} from "@common/ws/common";
-import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import type {HandlerName} from "@common/ws/common";
+import type {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
 
 export interface ConnectToRemoteMessageBody {
   stream: MediaStream | null;

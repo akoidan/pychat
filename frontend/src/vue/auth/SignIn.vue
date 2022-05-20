@@ -46,12 +46,8 @@
   </form>
 </template>
 
-<script lang='ts'>
-import {
-  Component,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
+<script lang="ts">
+import {Component, Ref, Vue} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 
@@ -71,9 +67,12 @@ export default class SignIn extends Vue {
   @Ref()
   public form!: HTMLFormElement;
 
-  public username: string = '';
-  public password: string = '';
-  public captcha: string = '';
+  public username: string = "";
+
+  public password: string = "";
+
+  public captcha: string = "";
+
   public running: boolean = false;
 
   public created() {
@@ -86,7 +85,7 @@ export default class SignIn extends Vue {
   })
   public async login() {
     let response;
-    if (this.username?.includes('@')) {
+    if (this.username?.includes("@")) {
       response = await this.$api.authApi.signIn({
         email: this.username,
         password: this.password,

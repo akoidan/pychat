@@ -1,24 +1,22 @@
 import type {SaveFileResponse} from "@common/http/file/save.file";
-import type {CallInfoModel,
+import type {DefaultWsInMessage, HandlerName} from "@common/ws/common";
+import type {
+  CallInfoModel,
   ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
   FileTransferStatus,
   MessageModel,
+  MessageStatusModel,
   RoomLog,
   RoomModel,
   RoomSettingsModel,
   SendingFileTransfer,
   UploadProgressModel,
   UserModel,
-  MessageStatusModel} from "@/ts/types/model";
+} from "@/ts/types/model";
 import type {SetStateFromStorage} from "@/ts/types/dto";
-import type {
-  DefaultWsInMessage,
-  HandlerName,
-  HandlerType,
-} from "@common/ws/common";
 
 
 export type ValueFilterForKey<T extends object, U> = {

@@ -1,7 +1,7 @@
-import type {HandlerName,} from "@common/ws/common";
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
-import type {SendRtcDataMessage} from "@common/legacy";
+import type {SendRtcDataMessage} from "@common/ws/message/peer-connection/send.rtc.data";
+import type {HandlerName} from "@common/ws/common";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
@@ -191,7 +191,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       this.logger.warn("Putting sendrtc data event to the queue")();
       this.sendRtcDataQueue.push(message);
     } else {
-      const data: RTCIceCandidateInit | RTCSessionDescriptionInit | {message: unknown} = message.data;
+      const {data} = message;
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== "closed") {
         if ((<RTCSessionDescriptionInit>data).sdp) {
           this.logger.log("Creating answer")();

@@ -1,26 +1,16 @@
-import type {GoogleSignInResponse} from "@common/http/auth/google.sign.in";
-import {GoogleSignInRequest} from "@common/http/auth/google.sign.in";
-import type {
-  SignUpRequest,
-  SignUpResponse,
-} from "@common/http/auth/sign.up";
+import type {FaceBookSignInRequest, FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
+import type {GoogleSignInRequest, GoogleSignInResponse} from "@common/http/auth/google.sign.in";
 import type {SignInRequest} from "@common/http/auth/sign.in";
+import type {SignUpRequest, SignUpResponse} from "@common/http/auth/sign.up";
+import type {ValidateUserRequest, ValidateUserResponse} from "@common/http/auth/validate.user";
+import type {ValidateEmailResponse, ValidateUserEmailRequest} from "@common/http/auth/validte.email";
+import type {SessionResponse} from "@common/model/http.base";
+
+
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type Fetch from "@/ts/classes/Fetch";
-import type {SessionResponse} from "@common/helpers";
-import type {
-  FaceBookSignInRequest,
-  FacebookSignInResponse,
-} from "@common/http/auth/facebook.sign.in";
-import type {
-  ValidateEmailResponse,
-  ValidateUserEmailRequest,
-} from "@common/http/auth/validte.email";
-import type {
-  ValidateUserRequest,
-  ValidateUserResponse,
-} from "@common/http/auth/validate.user";
+
 
 export default class AuthApi {
   protected readonly logger: Logger;

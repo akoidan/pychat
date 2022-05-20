@@ -1,8 +1,11 @@
-import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
-import {ChangeDeviceType} from "@common/legacy";
+import type {ChangeDeviceType} from "@common/model/ws.base";
 
 
-export interface ChangeP2pRoomInfoMessageBody  {
+import type {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import type {ChangeDeviceType} from "@common/legacy";
+
+
+export interface ChangeP2pRoomInfoMessageBody {
   allowZeroSubscribers: true;
   changeType: ChangeDeviceType;
   roomId: number;

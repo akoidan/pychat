@@ -5,8 +5,10 @@ import type Fetch from "@/ts/classes/Fetch";
 
 export default class GiphyApi {
   protected readonly logger: Logger;
-  private fetch: Fetch;
-  private apiKey: string;
+
+  private readonly fetch: Fetch;
+
+  private readonly apiKey: string;
 
   public constructor(fetch: Fetch, apiKey: string) {
     this.fetch = fetch;

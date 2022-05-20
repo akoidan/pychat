@@ -18,10 +18,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import type {OauthStatus} from "@/ts/types/dto";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import FacebookAuth from "@/vue/auth/FacebookAuth.vue";

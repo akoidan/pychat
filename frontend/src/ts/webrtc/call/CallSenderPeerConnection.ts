@@ -1,4 +1,4 @@
-import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import CallPeerConnection from "@/ts/webrtc/call/CallPeerConnection";
 
 

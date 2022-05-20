@@ -23,17 +23,8 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
-import {
-  CAPTCHA_IFRAME,
-  RECAPTCHA_PUBLIC_KEY,
-} from "@/ts/utils/consts";
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {CAPTCHA_IFRAME, RECAPTCHA_PUBLIC_KEY} from "@/ts/utils/consts";
 import type {GoogleCaptcha} from "@/ts/types/model";
 import {ref} from "vue";
 

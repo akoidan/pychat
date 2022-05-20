@@ -1,5 +1,5 @@
-import {Gender} from '@common/model/enum/gender';
-import {MessageStatus} from '@common/model/enum/message.status';
+import type {Gender} from "@common/model/enum/gender";
+import {MessageStatus} from "@common/model/enum/message.status";
 import Vuex from "vuex";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
@@ -65,22 +65,10 @@ import {
   ShareIdentifier,
   StringIdentifier,
 } from "@/ts/types/types";
-import {
-  SetStateFromStorage,
-  SetStateFromWS,
-} from "@/ts/types/dto";
+import {SetStateFromStorage, SetStateFromWS} from "@/ts/types/dto";
 import {encodeHTML} from "@/ts/utils/htmlApi";
-import {
-  ACTIVE_ROOM_ID_LS_NAME,
-  ALL_ROOM_ID,
-  SHOW_I_TYPING_INTERVAL,
-} from "@/ts/utils/consts";
-import {
-  Action,
-  Module,
-  Mutation,
-  VuexModule,
-} from "vuex-module-decorators";
+import {ACTIVE_ROOM_ID_LS_NAME, ALL_ROOM_ID, SHOW_I_TYPING_INTERVAL} from "@/ts/utils/consts";
+import {Action, Module, Mutation, VuexModule} from "vuex-module-decorators";
 
 
 const logger = loggerFactory.getLogger("store");
@@ -638,7 +626,7 @@ export class DefaultStore extends VuexModule {
     if (!mm.files) {
       throw Error(`Message ${payload.messageId} in room ${payload.roomId} doesn't have files`);
     }
-    payload.files.forEach(file => {
+    payload.files.forEach((file) => {
       mm.files![file.symbol].fileId = file.id || null;
       mm.files![file.symbol].previewFileId = file.previewId || null;
     });

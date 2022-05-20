@@ -1,5 +1,5 @@
-import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
-import {MessageStatusModel} from "@/ts/types/model";
+import type {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import type {MessageStatusModel} from "@/ts/types/model";
 
 export interface SendSetMessagesStatusMessageBody {
   messageIds: number[];

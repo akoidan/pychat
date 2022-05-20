@@ -47,7 +47,7 @@ export default class AbstractMessageProcessor {
     message.cbId = ++this.uniquePositiveMessageId;
   }
 
-  public parseMessage<D>(jsonData: string): DefaultWsInMessage<string, HandlerName, D> | null | ResponseWsInMessage<D> {
+  public parseMessage<D>(jsonData: string): DefaultWsInMessage<string, HandlerName, D> | ResponseWsInMessage<D> | null {
     let data: DefaultWsInMessage<string, HandlerName, any> | null = null;
     try {
       data = JSON.parse(jsonData);

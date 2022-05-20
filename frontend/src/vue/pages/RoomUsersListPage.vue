@@ -29,25 +29,15 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  ChannelsDictUIModel,
-  RoomDictModel,
-  UserDictModel,
-} from "@/ts/types/model";
+import {Component, Vue} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {ChannelsDictUIModel, RoomDictModel, UserDictModel} from "@/ts/types/model";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import UserFlagRow from "@/vue/chat/right/UserFlagRow.vue";
 
 @Component({
-  name: 'RoomUsersListPage',
+  name: "RoomUsersListPage",
   components: {
     UserFlagRow,
     AppSubmit,

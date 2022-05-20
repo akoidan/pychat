@@ -1,7 +1,4 @@
-import type {
-  PostData,
-  UploadData
-} from "@/ts/types/types";
+import type {PostData, UploadData} from "@/ts/types/types";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import {CONNECTION_ERROR} from "@/ts/utils/consts";
@@ -55,7 +52,7 @@ export default class Fetch {
       const r = new XMLHttpRequest();
       r.addEventListener("load", () => {
         try {
-          let response = JSON.parse(r.response);
+          const response = JSON.parse(r.response);
           if (r.status < 200 || r.status >= 300) {
             this.processException(response);
           } else {
@@ -64,7 +61,6 @@ export default class Fetch {
           }
         } catch (e) {
           reject(e);
-          return;
         }
       });
       r.addEventListener("error", () => {

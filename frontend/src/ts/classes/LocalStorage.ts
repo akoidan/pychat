@@ -1,18 +1,12 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {
-  IStorage,
-  SetFileIdsForMessage,
-  SetRoomsUsers,
-} from "@/ts/types/types";
-import type {
-  ChannelModel,
+import type {IStorage, SetFileIdsForMessage, SetRoomsUsers} from "@/ts/types/types";
+import type {ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   MessageModel,
   RoomSettingsModel,
   UserModel,
-} from "@/ts/types/model";
-import {MessageStatusModel} from '@/ts/types/model';
+  MessageStatusModel} from "@/ts/types/model";
 import type {Logger} from "lines-logger";
 
 interface LocalStorageMessage {

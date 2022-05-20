@@ -1,15 +1,13 @@
-import {Gender} from '@common/model/enum/gender';
-import {MessageStatus} from '@common/model/enum/message.status';
-import {ChannelDto} from '@common/model/dto/channel.dto';
-import {FileModelDto} from '@common/model/dto/file.model.dto';
-import {LocationDto} from '@common/model/dto/location.dto';
-import {MessageModelDto} from '@common/model/dto/message.model.dto';
-import {
-  RoomDto,
-  RoomNoUsersDto
-} from '@common/model/dto/room.dto';
-import {UserDto} from '@common/model/dto/user.dto';
-import {UserSettingsDto} from '@common/model/dto/user.settings.dto';
+import type {ChannelDto} from "@common/model/dto/channel.dto";
+import type {FileModelDto} from "@common/model/dto/file.model.dto";
+import type {LocationDto} from "@common/model/dto/location.dto";
+import type {MessageModelDto} from "@common/model/dto/message.model.dto";
+import type {RoomDto, RoomNoUsersDto} from "@common/model/dto/room.dto";
+import type {UserDto} from "@common/model/dto/user.dto";
+import type {UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
+import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
+import type {Gender} from "@common/model/enum/gender";
+import {MessageStatus} from "@common/model/enum/message.status";
 import type {
   ChannelModel,
   CurrentUserInfoModel,
@@ -23,9 +21,8 @@ import type {
   UserModel,
 } from "@/ts/types/model";
 
-import type {BooleanDB,} from "@/ts/types/db";
+import type {BooleanDB} from "@/ts/types/db";
 import type {MessageP2pDto} from "@/ts/types/messages/p2pDto";
-import {UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
 
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDtoWoImage): CurrentUserInfoWoImage {

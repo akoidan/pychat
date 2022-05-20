@@ -1,4 +1,4 @@
-import {UserProfileDto} from '@common/model/dto/user.profile.dto';
+import type {UserProfileDto} from "@common/model/dto/user.profile.dto";
 import type {
   ChannelsDictModel,
   CurrentUserInfoModel,

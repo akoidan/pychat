@@ -116,14 +116,11 @@
   </form>
 </template>
 
-<script lang='ts'>
+<script lang="ts">
+import {Gender} from "@common/model/enum/gender";
 
-import {
-  Component,
-  Prop,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+
+import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import RegisterFieldSet from "@/vue/auth/RegisterFieldSet.vue";
@@ -132,7 +129,6 @@ import {IconColor} from "@/ts/types/types";
 import type {LoginMessage} from "@/ts/types/messages/inner/login";
 import SocialAuthSignUp from "@/vue/auth/SocialAuthSignUp.vue";
 import {USERNAME_REGEX} from "@/ts/utils/consts";
-import {Gender} from "@common/model/enum/gender";
 
 
 @Component({

@@ -56,13 +56,10 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {ImageType} from "@common/model/enum/image.type";
+
+
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
 import {
   createTag,
   encodeHTML,
@@ -81,12 +78,7 @@ import {
   savedFiles,
   timeToString,
 } from "@/ts/utils/htmlApi";
-import type {
-  EditingMessage,
-  MessageModel,
-  PastingTextAreaElement,
-  UserModel,
-} from "@/ts/types/model";
+import type {EditingMessage, MessageModel, PastingTextAreaElement, UserModel} from "@/ts/types/model";
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -96,22 +88,13 @@ import {
 } from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 
-import type {
-  MessageDataEncode,
-  MessageSender,
-} from "@/ts/types/types";
-import {
-  editMessageWs,
-  showAllowEditing,
-} from "@/ts/utils/pureFunctions";
+import type {MessageDataEncode, MessageSender} from "@/ts/types/types";
+import {editMessageWs, showAllowEditing} from "@/ts/utils/pureFunctions";
 import MediaRecorder from "@/vue/chat/textarea/MediaRecorder.vue";
 import ChatAttachments from "@/vue/chat/textarea/ChatAttachments.vue";
 import SmileyHolder from "@/vue/chat/textarea/SmileyHolder.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
-import {
-  SHOW_I_TYPING_INTERVAL,
-  USERNAME_REGEX,
-} from "@/ts/utils/consts";
+import {SHOW_I_TYPING_INTERVAL, USERNAME_REGEX} from "@/ts/utils/consts";
 import ChatTagging from "@/vue/chat/textarea/ChatTagging.vue";
 import {Throttle} from "@/ts/classes/Throttle";
 import GiphySearch from "@/vue/chat/textarea/GiphySearch.vue";

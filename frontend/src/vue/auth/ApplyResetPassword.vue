@@ -40,14 +40,10 @@
   </form>
 </template>
 <script lang="ts">
-
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
-import {LoginMessage} from '@/ts/types/messages/innerMessages';
+import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 
 @Component({
   name: "ApplyResetPassword",
@@ -71,7 +67,7 @@ export default class ApplyResetPassword extends Vue {
     vueProperty: "error",
   })
   async created() {
-    let data = await this.$api.verifyApi.verifyToken({token: (this.$route.query.token) as string});
+    const data = await this.$api.verifyApi.verifyToken({token: (this.$route.query.token) as string});
     this.restoreUser = data.username;
   }
 
@@ -84,9 +80,9 @@ export default class ApplyResetPassword extends Vue {
     if (this.password !== this.repeatPassword) {
       this.$store.growlError("Passords don't match");
     } else {
-      let response = await this.$api.verifyApi.acceptToken({
+      const response = await this.$api.verifyApi.acceptToken({
         token: this.$route.query.token as string,
-        password: this.password
+        password: this.password,
       });
       const {session} = response;
       const message: LoginMessage = {

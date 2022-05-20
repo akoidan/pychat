@@ -1,17 +1,17 @@
+import type {WebRtcSetConnectionIdMessage} from "@common/ws/message/sync/set.connection.id";
+import type {NotifyCallActiveMessage} from "@common/ws/message/webrtc/notify.call.active";
+import type {OfferMessage} from "@common/ws/message/webrtc/offer.message";
+import type {HandlerName} from "@common/ws/common";
+import type {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
+import type {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
+import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import type {
-  HandlerType,
-  HandlerTypes,
-} from "@common/ws/common";
-import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
-import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
-import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
-import {LogoutMessage} from "@/ts/types/messages/inner/logout";
-import {
   NotifyCallActiveMessage,
   OfferCall,
   OfferFile,
   OfferMessage,
-  WebRtcSetConnectionIdMessage
+  WebRtcSetConnectionIdMessage,
 } from "@common/legacy";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
@@ -22,10 +22,7 @@ import FileHandler from "@/ts/webrtc/file/FileHandler";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from "@/ts/utils/consts";
-import {
-  requestFileSystem,
-  resolveMediaUrl,
-} from "@/ts/utils/htmlApi";
+import {requestFileSystem, resolveMediaUrl} from "@/ts/utils/htmlApi";
 import FileReceiverPeerConnection from "@/ts/webrtc/file/FileReceiveerPeerConnection";
 import Subscription from "@/ts/classes/Subscription";
 import CallHandler from "@/ts/webrtc/call/CallHandler";

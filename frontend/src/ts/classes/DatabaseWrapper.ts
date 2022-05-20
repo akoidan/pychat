@@ -1,9 +1,5 @@
-import {ImageType} from '@common/model/enum/image.type';
-import type {
-  IStorage,
-  SetFileIdsForMessage,
-  SetRoomsUsers,
-} from "@/ts/types/types";
+import type {ImageType} from "@common/model/enum/image.type";
+import type {IStorage, SetFileIdsForMessage, SetRoomsUsers} from "@/ts/types/types";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type {
@@ -20,11 +16,7 @@ import type {
   UserModel,
 } from "@/ts/types/model";
 import {MessageStatusInner} from "@/ts/types/model";
-import {
-  convertToBoolean,
-  getChannelDict,
-  getRoomsBaseDict,
-} from "@/ts/types/converters";
+import {convertToBoolean, getChannelDict, getRoomsBaseDict} from "@/ts/types/converters";
 import type {
   ChannelDB,
   FileDB,
@@ -340,7 +332,7 @@ export default class DatabaseWrapper implements IStorage {
     this.write((t) => {
       this.executeMultiple(
         t,
-        m.files.map(file => [
+        m.files.map((file) => [
           "update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?",
           [file.id, file.previewId ?? null, file.symbol, m.messageId],
         ]),

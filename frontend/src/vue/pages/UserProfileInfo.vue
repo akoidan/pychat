@@ -112,14 +112,13 @@
   </form>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import type {UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
+import {Gender} from "@common/model/enum/gender";
+import type {SetUserProfileMessage} from "@common/ws/message/ws/set.user.profile";
+
+
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Vue} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 
