@@ -1,20 +1,20 @@
-import {SaveFileResponse} from "@common/http/file/save.file";
-import {DefaultWsInMessage, HandlerName} from "@common/ws/common";
+import type {SaveFileResponse} from "@common/http/file/save.file";
+import type {DefaultWsInMessage, HandlerName} from "@common/ws/common";
 import type {
-    CallInfoModel,
-    ChannelModel,
-    CurrentUserInfoModel,
-    CurrentUserSettingsModel,
-    FileModel,
-    FileTransferStatus,
-    MessageModel,
-    MessageStatusModel,
-    RoomLog,
-    RoomModel,
-    RoomSettingsModel,
-    SendingFileTransfer,
-    UploadProgressModel,
-    UserModel
+  CallInfoModel,
+  ChannelModel,
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
+  FileModel,
+  FileTransferStatus,
+  MessageModel,
+  MessageStatusModel,
+  RoomLog,
+  RoomModel,
+  RoomSettingsModel,
+  SendingFileTransfer,
+  UploadProgressModel,
+  UserModel,
 } from "@/ts/types/model";
 import type {SetStateFromStorage} from "@/ts/types/dto";
 

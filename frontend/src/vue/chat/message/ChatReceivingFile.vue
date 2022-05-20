@@ -35,9 +35,9 @@
   </chat-message-wrapper>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue,} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
-import {FileTransferStatus, ReceivingFile,} from "@/ts/types/model";
+import {FileTransferStatus, ReceivingFile} from "@/ts/types/model";
 import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
 import ChatMessageHeader from "@/vue/chat/message/ChatMessageHeader.vue";
 import ReceivingFileInfo from "@/vue/chat/message/ReceivingFileInfo.vue";

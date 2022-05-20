@@ -45,8 +45,8 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
-import {Component, Vue,} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Vue} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 

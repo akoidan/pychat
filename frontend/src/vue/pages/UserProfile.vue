@@ -31,8 +31,8 @@
   </div>
 </template>
 <script lang="ts">
-import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID,} from "@/ts/utils/consts";
-import {Component, Vue,} from "vue-property-decorator";
+import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/ts/utils/consts";
+import {Component, Vue} from "vue-property-decorator";
 import AppTab from "@/vue/ui/AppTab.vue";
 
 @Component({

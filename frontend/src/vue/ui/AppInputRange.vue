@@ -8,7 +8,7 @@
   />
 </template>
 <script lang="ts">
-import {Component, Prop, Ref, Vue,} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
 
 let uniqueId = 1;
 

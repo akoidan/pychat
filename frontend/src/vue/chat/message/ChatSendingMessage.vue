@@ -41,13 +41,13 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {Component, Prop, Ref, Vue,} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
 import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
 import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
 
 import type {SetMessageProgressError} from "@/ts/types/types";
 import type {EditingMessage} from "@/ts/types/model";
-import {CurrentUserInfoModel, MessageModel, MessageStatusInner, RoomDictModel,} from "@/ts/types/model";
+import {CurrentUserInfoModel, MessageModel, MessageStatusInner, RoomDictModel} from "@/ts/types/model";
 import ChatMessageToolTip from "@/vue/chat/message/ChatMessageToolTip.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 

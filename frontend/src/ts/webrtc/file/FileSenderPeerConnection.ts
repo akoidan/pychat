@@ -1,11 +1,11 @@
-import {DestroyFileConnectionMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
-import {AcceptFileMessage} from "@common/ws/message/webrtc-transfer/accept.file";
-import type {AddSendingFileTransfer, SetSendingFileStatus, SetSendingFileUploaded,} from "@/ts/types/types";
+import type {DestroyFileConnectionMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
+import type {AcceptFileMessage} from "@common/ws/message/webrtc-transfer/accept.file";
+import type {AddSendingFileTransfer, SetSendingFileStatus, SetSendingFileUploaded} from "@/ts/types/types";
 import type {SendingFileTransfer} from "@/ts/types/model";
 import {FileTransferStatus} from "@/ts/types/model";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
-import {bytesToSize, getDay,} from "@/ts/utils/pureFunctions";
-import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE,} from "@/ts/utils/consts";
+import {bytesToSize, getDay} from "@/ts/utils/pureFunctions";
+import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";

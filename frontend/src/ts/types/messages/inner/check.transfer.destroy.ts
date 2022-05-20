@@ -1,4 +1,4 @@
-import {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
+import type {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
 
 export interface CheckTransferDestroyMessageBody {
   wsOpponentId: string;

@@ -35,7 +35,7 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
 import {MessageModel} from "@/ts/types/model";
 import ChatSendingMessage from "@/vue/chat/message/ChatSendingMessage.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";

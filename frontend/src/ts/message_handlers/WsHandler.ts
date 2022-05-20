@@ -1,32 +1,32 @@
-import {GiphyDto} from "@common/model/dto/giphy.dto";
-import {RoomNoUsersDto} from "@common/model/dto/room.dto";
-import {UserProfileDto, UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
-import {UserSettingsDto} from "@common/model/dto/user.settings.dto";
-import {MessageStatus} from "@common/model/enum/message.status";
-import {MessagesResponseMessage} from "@common/model/ws.base";
-import {AddChannelMessage} from "@common/ws/message/room/add.channel";
-import {AddInviteMessage} from "@common/ws/message/room/add.invite";
-import {AddRoomMessage} from "@common/ws/message/room/add.room";
-import {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
-import {ShowITypeWsOutMessage} from "@common/ws/message/room/show.i.type";
-import {WebRtcSetConnectionIdMessage} from "@common/ws/message/sync/set.connection.id";
-import {PingMessage} from "@common/ws/message/ws/ping";
-import {PongMessage} from "@common/ws/message/ws/pong";
-import {SetProfileImageMessage} from "@common/ws/message/ws/set.profile.image";
-import {SetSettingsMessage} from "@common/ws/message/ws/set.settings";
-import {SetUserProfileMessage} from "@common/ws/message/ws/set.user.profile";
-import {SetWsIdWsOutMessage} from "@common/ws/message/ws/set.ws.id";
-import {UserProfileChangedMessage} from "@common/ws/message/ws/user.profile.changed";
-import {PrintMessageWsInMessage, PrintMessageWsOutMessage} from "@common/ws/message/ws-message/print.message";
-import {GetCountryCodeWsInMessage, GetCountryCodeWsOutMessage} from "@common/ws/message/get.country.code";
-import {SetMessageStatusWsOutMessage} from "@common/ws/message/set.message.status";
-import {SyncHistoryWsInMessage, SyncHistoryWsOutMessage} from "@common/ws/message/sync.history";
-import {DefaultWsOutMessage} from "@common/ws/common";
+import type {GiphyDto} from "@common/model/dto/giphy.dto";
+import type {RoomNoUsersDto} from "@common/model/dto/room.dto";
+import type {UserProfileDto, UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
+import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
+import type {MessageStatus} from "@common/model/enum/message.status";
+import type {MessagesResponseMessage} from "@common/model/ws.base";
+import type {AddChannelMessage} from "@common/ws/message/room/add.channel";
+import type {AddInviteMessage} from "@common/ws/message/room/add.invite";
+import type {AddRoomMessage} from "@common/ws/message/room/add.room";
+import type {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
+import type {ShowITypeWsOutMessage} from "@common/ws/message/room/show.i.type";
+import type {WebRtcSetConnectionIdMessage} from "@common/ws/message/sync/set.connection.id";
+import type {PingMessage} from "@common/ws/message/ws/ping";
+import type {PongMessage} from "@common/ws/message/ws/pong";
+import type {SetProfileImageMessage} from "@common/ws/message/ws/set.profile.image";
+import type {SetSettingsMessage} from "@common/ws/message/ws/set.settings";
+import type {SetUserProfileMessage} from "@common/ws/message/ws/set.user.profile";
+import type {SetWsIdWsOutMessage} from "@common/ws/message/ws/set.ws.id";
+import type {UserProfileChangedMessage} from "@common/ws/message/ws/user.profile.changed";
+import type {PrintMessageWsInMessage, PrintMessageWsOutMessage} from "@common/ws/message/ws-message/print.message";
+import type {GetCountryCodeWsInMessage, GetCountryCodeWsOutMessage} from "@common/ws/message/get.country.code";
+import type {SetMessageStatusWsOutMessage} from "@common/ws/message/set.message.status";
+import type {SyncHistoryWsInMessage, SyncHistoryWsOutMessage} from "@common/ws/message/sync.history";
+import type {DefaultWsOutMessage} from "@common/ws/common";
 import {WS_SESSION_EXPIRED_CODE} from "@common/consts";
-import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
-import {LogoutMessage} from "@/ts/types/messages/inner/logout";
-import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
-import {
+import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import type {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
+import type {
   AddChannelMessage,
   AddInviteMessage,
   AddRoomMessage,
@@ -35,10 +35,10 @@ import {
   SetSettingsMessage,
   SetUserProfileMessage,
   UserProfileChangedMessage,
-  WebRtcSetConnectionIdMessage
+  WebRtcSetConnectionIdMessage,
 } from "@common/legacy";
-import {ShowITypeWsOutMessage} from '@common/ws/message/show.i.type';
-import {PrintMessageWsInMessage, PrintMessageWsOutMessage} from '@common/ws/message/print.message';
+import type {ShowITypeWsOutMessage} from "@common/ws/message/show.i.type";
+import type {PrintMessageWsInMessage, PrintMessageWsOutMessage} from "@common/ws/message/print.message";
 import {
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
@@ -46,12 +46,12 @@ import {
   IS_DEBUG,
   LOG_LEVEL_LS,
 } from "@/ts/utils/consts";
-import type {Logger, LogLevel,} from "lines-logger";
+import type {Logger, LogLevel} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import type {CurrentUserInfoWoImage, CurrentUserSettingsModel, Location,} from "@/ts/types/model";
-import type {MessageSupplier, SessionHolder,} from "@/ts/types/types";
-import {convertLocation, currentUserInfoDtoToModel, userSettingsDtoToModel,} from "@/ts/types/converters";
+import type {CurrentUserInfoWoImage, CurrentUserSettingsModel, Location} from "@/ts/types/model";
+import type {MessageSupplier, SessionHolder} from "@/ts/types/types";
+import {convertLocation, currentUserInfoDtoToModel, userSettingsDtoToModel} from "@/ts/types/converters";
 
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";

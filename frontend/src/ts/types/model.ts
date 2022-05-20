@@ -1,6 +1,6 @@
-import {Gender} from "@common/model/enum/gender";
-import {ImageType} from "@common/model/enum/image.type";
-import {MessageStatus} from "@common/model/enum/message.status";
+import type {Gender} from "@common/model/enum/gender";
+import type {ImageType} from "@common/model/enum/image.type";
+import type {MessageStatus} from "@common/model/enum/message.status";
 import type {LogLevel} from "lines-logger";
 
 

@@ -11,8 +11,8 @@
   </transition>
 </template>
 
-<script lang='ts'>
-import {Component, Prop, Vue,} from "vue-property-decorator";
+<script lang="ts">
+import {Component, Prop, Vue} from "vue-property-decorator";
 import {GrowlModel} from "@/ts/types/model";
 
 @Component({name: "AppGrowl"})

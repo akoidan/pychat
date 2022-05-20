@@ -5,7 +5,7 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {Component, Prop, Vue,} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import {UserDictModel} from "@/ts/types/model";
 
 import UserImageIcon from "@/vue/chat/chatbox/UserImageIcon.vue";

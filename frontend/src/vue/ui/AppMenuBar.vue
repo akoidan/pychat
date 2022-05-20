@@ -45,8 +45,8 @@
   </app-modal>
 </template>
 <script lang="ts">
-import {Component, Vue,} from "vue-property-decorator";
-import {GITHUB_LINK, ISSUES,} from "@/ts/utils/consts";
+import {Component, Vue} from "vue-property-decorator";
+import {GITHUB_LINK, ISSUES} from "@/ts/utils/consts";
 import {State} from "@/ts/instances/storeInstance";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 import AppModal from "@/vue/ui/AppModal.vue";

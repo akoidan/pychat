@@ -13,7 +13,7 @@
   </chat-right-collapsed-section>
 </template>
 <script lang="ts">
-import {Component, Vue,} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import PrivateRoomRow from "@/vue/chat/right/PrivateRoomRow.vue";
 import {State} from "@/ts/instances/storeInstance";
 import type {RoomModel} from "@/ts/types/model";

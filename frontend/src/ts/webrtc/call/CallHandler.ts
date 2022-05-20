@@ -1,15 +1,15 @@
-import {CallStatus} from "@common/model/webrtc.base";
-import {AcceptCallMessage} from "@common/ws/message/webrtc-transfer/accept.call";
-import {ReplyCallMessage} from "@common/ws/message/webrtc-transfer/reply.call";
+import type {CallStatus} from "@common/model/webrtc.base";
+import type {AcceptCallMessage} from "@common/ws/message/webrtc-transfer/accept.call";
+import type {ReplyCallMessage} from "@common/ws/message/webrtc-transfer/reply.call";
 import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import type {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
 import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
 
-import {browserVersion, isChrome, isMobile,} from "@/ts/utils/runtimeConsts";
+import {browserVersion, isChrome, isMobile} from "@/ts/utils/runtimeConsts";
 import Subscription from "@/ts/classes/Subscription";
-import type {CallsInfoModel, IncomingCallModel,} from "@/ts/types/model";
+import type {CallsInfoModel, IncomingCallModel} from "@/ts/types/model";
 import type {
   BooleanIdentifier,
   JsAudioAnalyzer,
@@ -18,9 +18,9 @@ import type {
   SetDevices,
 } from "@/ts/types/types";
 import {VideoType} from "@/ts/types/types";
-import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL,} from "@/ts/utils/consts";
-import {extractError, getChromeVersion,} from "@/ts/utils/pureFunctions";
-import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor,} from "@/ts/utils/audioprocc";
+import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from "@/ts/utils/consts";
+import {extractError, getChromeVersion} from "@/ts/utils/pureFunctions";
+import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor} from "@/ts/utils/audioprocc";
 import CallSenderPeerConnection from "@/ts/webrtc/call/CallSenderPeerConnection";
 import CallReceiverPeerConnection from "@/ts/webrtc/call/CallReceiverPeerConnection";
 

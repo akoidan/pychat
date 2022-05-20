@@ -1,7 +1,7 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type Fetch from "@/ts/classes/Fetch";
-import type {OauthStatus, ViewUserProfileDto,} from "@/ts/types/dto";
+import type {OauthStatus, ViewUserProfileDto} from "@/ts/types/dto";
 
 export default class RestApi {
   protected readonly logger: Logger;

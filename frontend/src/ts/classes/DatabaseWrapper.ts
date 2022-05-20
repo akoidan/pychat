@@ -1,32 +1,32 @@
-import {ImageType} from "@common/model/enum/image.type";
-import type {IStorage, SetFileIdsForMessage, SetRoomsUsers,} from "@/ts/types/types";
+import type {ImageType} from "@common/model/enum/image.type";
+import type {IStorage, SetFileIdsForMessage, SetRoomsUsers} from "@/ts/types/types";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import type {
-    ChannelModel,
-    ChannelsDictModel,
-    CurrentUserInfoModel,
-    CurrentUserSettingsModel,
-    FileModel,
-    MessageModel,
-    MessageStatusModel,
-    RoomDictModel,
-    RoomModel,
-    RoomSettingsModel,
-    UserModel,
+  ChannelModel,
+  ChannelsDictModel,
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
+  FileModel,
+  MessageModel,
+  MessageStatusModel,
+  RoomDictModel,
+  RoomModel,
+  RoomSettingsModel,
+  UserModel,
 } from "@/ts/types/model";
 import {MessageStatusInner} from "@/ts/types/model";
-import {convertToBoolean, getChannelDict, getRoomsBaseDict,} from "@/ts/types/converters";
+import {convertToBoolean, getChannelDict, getRoomsBaseDict} from "@/ts/types/converters";
 import type {
-    ChannelDB,
-    FileDB,
-    MessageDB,
-    ProfileDB,
-    RoomDB,
-    RoomUsersDB,
-    SettingsDB,
-    TagDB,
-    UserDB,
+  ChannelDB,
+  FileDB,
+  MessageDB,
+  ProfileDB,
+  RoomDB,
+  RoomUsersDB,
+  SettingsDB,
+  TagDB,
+  UserDB,
 } from "@/ts/types/db";
 import type {SetStateFromStorage} from "@/ts/types/dto";
 import type {MainWindow} from "@/ts/classes/MainWindow";
@@ -332,7 +332,7 @@ export default class DatabaseWrapper implements IStorage {
     this.write((t) => {
       this.executeMultiple(
         t,
-        m.files.map(file => [
+        m.files.map((file) => [
           "update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?",
           [file.id, file.previewId ?? null, file.symbol, m.messageId],
         ]),

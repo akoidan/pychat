@@ -1,4 +1,4 @@
-import {SaveFileRequest, SaveFileResponse} from "@common/http/file/save.file";
+import type {SaveFileRequest, SaveFileResponse} from "@common/http/file/save.file";
 
 
 import loggerFactory from "@/ts/instances/loggerFactory";

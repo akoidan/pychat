@@ -3,8 +3,8 @@
  * So if we create a structure on one PC (on frontend) and handle on another (on frontend as well)
  * this file should do it
  */
-import {MessageStatus} from "@common/model/enum/message.status";
-import type {MessageP2pDto, MessagesInfo,} from "@/ts/types/messages/p2pDto";
+import type {MessageStatus} from "@common/model/enum/message.status";
+import type {MessageP2pDto, MessagesInfo} from "@/ts/types/messages/p2pDto";
 
 
 export type P2PHandlerType<A extends string> = (a: DefaultP2pMessage<A>) => Promise<void> | void;
@@ -14,7 +14,7 @@ export type P2PHandlerTypes<K extends string> = {
 };
 
 export interface DefaultP2pMessage<A extends string> extends DefaultMessage<A> {
- resolveCbId?: number; // If this callback id is present, resolve it
+  resolveCbId?: number; // If this callback id is present, resolve it
 
 }
 

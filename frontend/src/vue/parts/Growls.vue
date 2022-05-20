@@ -8,7 +8,7 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue, Watch,} from "vue-property-decorator";
+import {Component, Vue, Watch} from "vue-property-decorator";
 import type {GrowlModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 import AppGrowl from "@/vue/ui/AppGrowl.vue";

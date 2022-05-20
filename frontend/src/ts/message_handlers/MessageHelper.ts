@@ -1,6 +1,6 @@
 import faviconUrl from "@/assets/img/favicon.ico";
 import {incoming} from "@/ts/utils/audio";
-import type {FileModel, MessageModel,} from "@/ts/types/model";
+import type {FileModel, MessageModel} from "@/ts/types/model";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import type {AudioPlayer} from "@/ts/classes/AudioPlayer";

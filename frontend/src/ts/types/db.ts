@@ -1,6 +1,6 @@
-import {Gender} from "@common/model/enum/gender";
+import type {Gender} from "@common/model/enum/gender";
 import type {LogLevel} from "lines-logger";
-import {MessageStatusInner} from '@/ts/types/model';
+import type {MessageStatusInner} from "@/ts/types/model";
 
 
 export interface UserDB {

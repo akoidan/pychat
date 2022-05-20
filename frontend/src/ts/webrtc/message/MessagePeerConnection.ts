@@ -1,6 +1,6 @@
 import {MessageStatus} from "@common/model/enum/message.status";
-import {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
-import {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
+import type {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import type {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -20,10 +20,10 @@ import type {
   SendNewP2PMessage,
   SetMessageStatusRequest,
 } from "@/ts/types/messages/p2pMessages";
-import type {MessageModel, RoomModel,} from "@/ts/types/model";
-import {MessageStatusInner} from '@/ts/types/model';
-import type {MessageP2pDto, MessagesInfo,} from "@/ts/types/messages/p2pDto";
-import {messageModelToP2p, p2pMessageToModel,} from "@/ts/types/converters";
+import type {MessageModel, RoomModel} from "@/ts/types/model";
+import {MessageStatusInner} from "@/ts/types/model";
+import type {MessageP2pDto, MessagesInfo} from "@/ts/types/messages/p2pDto";
+import {messageModelToP2p, p2pMessageToModel} from "@/ts/types/converters";
 
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";

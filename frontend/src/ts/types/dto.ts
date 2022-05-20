@@ -1,11 +1,11 @@
-import {UserProfileDto} from "@common/model/dto/user.profile.dto";
+import type {UserProfileDto} from "@common/model/dto/user.profile.dto";
 import type {
-    ChannelsDictModel,
-    CurrentUserInfoModel,
-    CurrentUserSettingsModel,
-    MessageStatusModel,
-    RoomDictModel,
-    UserModel,
+  ChannelsDictModel,
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
+  MessageStatusModel,
+  RoomDictModel,
+  UserModel,
 } from "@/ts/types/model";
 
 

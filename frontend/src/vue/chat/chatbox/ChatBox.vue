@@ -93,9 +93,11 @@
   </div>
 </template>
 <script lang="ts">
+import {MessageStatus} from "@common/model/enum/message.status";
 
-import {Component, Prop, Ref, Vue, Watch,} from "vue-property-decorator";
-import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
+
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
 import SearchMessages from "@/vue/chat/chatbox/SearchMessages.vue";
 import {RoomModel} from "@/ts/types/model";

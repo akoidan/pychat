@@ -1,74 +1,74 @@
-import {Gender} from "@common/model/enum/gender";
+import type {Gender} from "@common/model/enum/gender";
 import {MessageStatus} from "@common/model/enum/message.status";
 import Vuex from "vuex";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {
-    ChannelsDictModel,
-    ChannelsDictUIModel,
-    ChannelUIModel,
-    CurrentUserInfoModel,
-    IncomingCallModel,
-    Location,
-    MessageStatusModel,
-    PastingTextAreaElement,
-    RoomDictModel,
-    SendingFileTransfer,
-    UserDictModel,
+  ChannelsDictModel,
+  ChannelsDictUIModel,
+  ChannelUIModel,
+  CurrentUserInfoModel,
+  IncomingCallModel,
+  Location,
+  MessageStatusModel,
+  PastingTextAreaElement,
+  RoomDictModel,
+  SendingFileTransfer,
+  UserDictModel,
 } from "@/ts/types/model";
 import {
-    ChannelModel,
-    CurrentUserInfoWoImage,
-    CurrentUserSettingsModel,
-    EditingMessage,
-    GrowlModel,
-    GrowlType,
-    MessageModel,
-    MessageStatusInner,
-    ReceivingFile,
-    RoomModel,
-    RoomSettingsModel,
-    SendingFile,
-    UserModel,
+  ChannelModel,
+  CurrentUserInfoWoImage,
+  CurrentUserSettingsModel,
+  EditingMessage,
+  GrowlModel,
+  GrowlType,
+  MessageModel,
+  MessageStatusInner,
+  ReceivingFile,
+  RoomModel,
+  RoomSettingsModel,
+  SendingFile,
+  UserModel,
 } from "@/ts/types/model";
 import type {PrivateRoomsIds} from "@/ts/types/types";
 import {
-    AddMessagesDTO,
-    AddSendingFileTransfer,
-    BooleanIdentifier,
-    IStorage,
-    LiveConnectionLocation,
-    MarkMessageAsRead,
-    MediaIdentifier,
-    MessagesLocation,
-    NumberIdentifier,
-    RemoveMessageProgress,
-    RoomLogEntry,
-    RoomMessageIds,
-    RoomMessagesIds,
-    SetCallOpponent,
-    SetDevices,
-    SetFileIdsForMessage,
-    SetMessageProgress,
-    SetMessageProgressError,
-    SetOpponentAnchor,
-    SetOpponentVoice,
-    SetReceivingFileStatus,
-    SetReceivingFileUploaded,
-    SetRoomsUsers,
-    SetSearchStateTo,
-    SetSearchTextTo,
-    SetSendingFileStatus,
-    SetSendingFileUploaded,
-    SetUploadProgress,
-    SetUploadXHR,
-    ShareIdentifier,
-    StringIdentifier,
+  AddMessagesDTO,
+  AddSendingFileTransfer,
+  BooleanIdentifier,
+  IStorage,
+  LiveConnectionLocation,
+  MarkMessageAsRead,
+  MediaIdentifier,
+  MessagesLocation,
+  NumberIdentifier,
+  RemoveMessageProgress,
+  RoomLogEntry,
+  RoomMessageIds,
+  RoomMessagesIds,
+  SetCallOpponent,
+  SetDevices,
+  SetFileIdsForMessage,
+  SetMessageProgress,
+  SetMessageProgressError,
+  SetOpponentAnchor,
+  SetOpponentVoice,
+  SetReceivingFileStatus,
+  SetReceivingFileUploaded,
+  SetRoomsUsers,
+  SetSearchStateTo,
+  SetSearchTextTo,
+  SetSendingFileStatus,
+  SetSendingFileUploaded,
+  SetUploadProgress,
+  SetUploadXHR,
+  ShareIdentifier,
+  StringIdentifier,
 } from "@/ts/types/types";
-import {SetStateFromStorage, SetStateFromWS,} from "@/ts/types/dto";
+import {SetStateFromStorage, SetStateFromWS} from "@/ts/types/dto";
 import {encodeHTML} from "@/ts/utils/htmlApi";
-import {ACTIVE_ROOM_ID_LS_NAME, ALL_ROOM_ID, SHOW_I_TYPING_INTERVAL,} from "@/ts/utils/consts";
-import {Action, Module, Mutation, VuexModule,} from "vuex-module-decorators";
+import {ACTIVE_ROOM_ID_LS_NAME, ALL_ROOM_ID, SHOW_I_TYPING_INTERVAL} from "@/ts/utils/consts";
+import {Action, Module, Mutation, VuexModule} from "vuex-module-decorators";
 
 
 const logger = loggerFactory.getLogger("store");
@@ -626,7 +626,7 @@ export class DefaultStore extends VuexModule {
     if (!mm.files) {
       throw Error(`Message ${payload.messageId} in room ${payload.roomId} doesn't have files`);
     }
-    payload.files.forEach(file => {
+    payload.files.forEach((file) => {
       mm.files![file.symbol].fileId = file.id || null;
       mm.files![file.symbol].previewFileId = file.previewId || null;
     });

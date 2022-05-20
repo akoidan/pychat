@@ -5,12 +5,14 @@
   </div>
 </template>
 
-<script lang='ts'>
-import {Component, Vue, Watch,} from "vue-property-decorator";
+<script lang="ts">
+import {Theme} from "@common/model/enum/theme";
+
+
+import {Component, Vue, Watch} from "vue-property-decorator";
 import {CurrentUserSettingsModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 import Growls from "@/vue/parts/Growls.vue";
-import {Theme} from "@common/model/enum/theme";
 
 
 @Component({

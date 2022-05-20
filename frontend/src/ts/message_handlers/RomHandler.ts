@@ -1,24 +1,24 @@
-import {ChannelDto} from "@common/model/dto/channel.dto";
-import {RoomDto} from "@common/model/dto/room.dto";
-import {AddRoomBase, ChangeDeviceType} from "@common/model/ws.base";
-import {AddChannelMessage} from "@common/ws/message/room/add.channel";
-import {AddInviteMessage} from "@common/ws/message/room/add.invite";
-import {AddOnlineUserMessage} from "@common/ws/message/room/add.online.user";
-import {AddRoomMessage} from "@common/ws/message/room/add.room";
-import {DeleteChannelMessage} from "@common/ws/message/room/delete.channel";
-import {DeleteRoomMessage} from "@common/ws/message/room/delete.room";
-import {InviteUserMessage} from "@common/ws/message/room/invite.user";
-import {LeaveUserMessage} from "@common/ws/message/room/leave.user";
-import {RemoveOnlineUserMessage} from "@common/ws/message/room/remove.online.user";
-import {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
-import {SaveRoomSettingsMessage} from "@common/ws/message/room/save.room.settings";
-import {ShowITypeWsInMessage} from "@common/ws/message/room/show.i.type";
-import {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
-import {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
-import {LogoutMessage} from "@/ts/types/messages/inner/logout";
-import {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
-import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
-import {
+import type {ChannelDto} from "@common/model/dto/channel.dto";
+import type {RoomDto} from "@common/model/dto/room.dto";
+import type {AddRoomBase, ChangeDeviceType} from "@common/model/ws.base";
+import type {AddChannelMessage} from "@common/ws/message/room/add.channel";
+import type {AddInviteMessage} from "@common/ws/message/room/add.invite";
+import type {AddOnlineUserMessage} from "@common/ws/message/room/add.online.user";
+import type {AddRoomMessage} from "@common/ws/message/room/add.room";
+import type {DeleteChannelMessage} from "@common/ws/message/room/delete.channel";
+import type {DeleteRoomMessage} from "@common/ws/message/room/delete.room";
+import type {InviteUserMessage} from "@common/ws/message/room/invite.user";
+import type {LeaveUserMessage} from "@common/ws/message/room/leave.user";
+import type {RemoveOnlineUserMessage} from "@common/ws/message/room/remove.online.user";
+import type {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
+import type {SaveRoomSettingsMessage} from "@common/ws/message/room/save.room.settings";
+import type {ShowITypeWsInMessage} from "@common/ws/message/room/show.i.type";
+import type {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
+import type {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
+import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import type {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
+import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import type {
   AddChannelMessage,
   AddInviteMessage,
   AddRoomBase,
@@ -30,11 +30,11 @@ import {
   LeaveUserMessage,
   RemoveOnlineUserMessage,
   SaveChannelSettingsMessage,
-  SaveRoomSettingsMessage
+  SaveRoomSettingsMessage,
 } from "@common/legacy";
-import {ShowITypeWsInMessage} from '@common/ws/message/show.i.type';
+import type {ShowITypeWsInMessage} from "@common/ws/message/show.i.type";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import type {RoomLogEntry, SetRoomsUsers,} from "@/ts/types/types";
+import type {RoomLogEntry, SetRoomsUsers} from "@/ts/types/types";
 
 import type {
   ChannelModel,
@@ -45,7 +45,7 @@ import type {
   UserDictModel,
   UserModel,
 } from "@/ts/types/model";
-import {convertUser, getChannelDict, getRoom, getRoomsBaseDict,} from "@/ts/types/converters";
+import {convertUser, getChannelDict, getRoom, getRoomsBaseDict} from "@/ts/types/converters";
 
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import type {Logger} from "lines-logger";
@@ -54,10 +54,10 @@ import type Api from "@/ts/message_handlers/Api";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import {login, logout,} from "@/ts/utils/audio";
+import {login, logout} from "@/ts/utils/audio";
 import type Subscription from "@/ts/classes/Subscription";
 
-import {SetStateFromWS} from "@/ts/types/dto";
+import type {SetStateFromWS} from "@/ts/types/dto";
 
 
 export class RoomHandler extends MessageHandler {

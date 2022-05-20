@@ -1,10 +1,10 @@
-import {FaceBookSignInRequest, FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
-import {GoogleSignInRequest, GoogleSignInResponse} from "@common/http/auth/google.sign.in";
-import {SignInRequest} from "@common/http/auth/sign.in";
-import {SignUpRequest, SignUpResponse} from "@common/http/auth/sign.up";
-import {ValidateUserRequest, ValidateUserResponse} from "@common/http/auth/validate.user";
-import {ValidateEmailResponse, ValidateUserEmailRequest} from "@common/http/auth/validte.email";
-import {SessionResponse} from "@common/model/http.base";
+import type {FaceBookSignInRequest, FacebookSignInResponse} from "@common/http/auth/facebook.sign.in";
+import type {GoogleSignInRequest, GoogleSignInResponse} from "@common/http/auth/google.sign.in";
+import type {SignInRequest} from "@common/http/auth/sign.in";
+import type {SignUpRequest, SignUpResponse} from "@common/http/auth/sign.up";
+import type {ValidateUserRequest, ValidateUserResponse} from "@common/http/auth/validate.user";
+import type {ValidateEmailResponse, ValidateUserEmailRequest} from "@common/http/auth/validte.email";
+import type {SessionResponse} from "@common/model/http.base";
 
 
 import loggerFactory from "@/ts/instances/loggerFactory";

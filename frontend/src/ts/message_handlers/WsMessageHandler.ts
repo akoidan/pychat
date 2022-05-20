@@ -1,17 +1,17 @@
-import {SaveFileRequest, SaveFileResponse} from "@common/http/file/save.file";
-import {GiphyDto} from "@common/model/dto/giphy.dto";
-import {MessageModelDto} from "@common/model/dto/message.model.dto";
+import type {SaveFileRequest, SaveFileResponse} from "@common/http/file/save.file";
+import type {GiphyDto} from "@common/model/dto/giphy.dto";
+import type {MessageModelDto} from "@common/model/dto/message.model.dto";
 import {ImageType} from "@common/model/enum/image.type";
 import {MessageStatus} from "@common/model/enum/message.status";
-import {MessagesResponseMessage} from "@common/model/ws.base";
-import {DeleteMessage} from "@common/ws/message/ws-message/delete.message";
-import {PrintMessageWsInMessage} from "@common/ws/message/ws-message/print.message";
-import {SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
-import {SyncHistoryWsInMessage} from "@common/ws/message/sync.history";
-import {HandlerName} from "@common/ws/common";
-import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
-import {DeleteMessage, MessagesResponseMessage} from "@common/legacy";
-import {PrintMessageWsInMessage} from '@common/ws/message/print.message';
+import type {MessagesResponseMessage} from "@common/model/ws.base";
+import type {DeleteMessage} from "@common/ws/message/ws-message/delete.message";
+import type {PrintMessageWsInMessage} from "@common/ws/message/ws-message/print.message";
+import type {SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
+import type {SyncHistoryWsInMessage} from "@common/ws/message/sync.history";
+import type {HandlerName} from "@common/ws/common";
+import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import type {DeleteMessage, MessagesResponseMessage} from "@common/legacy";
+import type {PrintMessageWsInMessage} from "@common/ws/message/print.message";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Api from "@/ts/message_handlers/Api";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
@@ -23,7 +23,7 @@ import type {
   SetMessageProgressError,
   SetUploadProgress,
 } from "@/ts/types/types";
-import type {FileModel, MessageModel, RoomModel,} from "@/ts/types/model";
+import type {FileModel, MessageModel, RoomModel} from "@/ts/types/model";
 import {MessageStatusInner} from "@/ts/types/model";
 import type {Logger} from "lines-logger";
 
@@ -34,9 +34,9 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import {savedFiles} from "@/ts/utils/htmlApi";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
-import {LAST_SYNCED, MESSAGES_PER_SEARCH,} from "@/ts/utils/consts";
+import {LAST_SYNCED, MESSAGES_PER_SEARCH} from "@/ts/utils/consts";
 import {convertMessageModelDtoToModel} from "@/ts/types/converters";
-import {checkIfIdIsMissing, getMissingIds,} from "@/ts/utils/pureFunctions";
+import {checkIfIdIsMissing, getMissingIds} from "@/ts/utils/pureFunctions";
 import type Subscription from "@/ts/classes/Subscription";
 
 
@@ -338,7 +338,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
   }
 
   public async printMessage(request: PrintMessageWsInMessage) {
-    let inMessage: MessageModelDto = request.message;
+    const inMessage: MessageModelDto = request.message;
     const message: MessageModel = convertMessageModelDtoToModel(inMessage, null, (time) => this.ws.convertServerTimeToPC(time));
     this.messageHelper.processUnknownP2pMessage(message);
     if (inMessage.userId !== this.store.myId) {

@@ -13,9 +13,9 @@
   </div>
 </template>
 
-<script lang='ts'>
-import {Component, Vue,} from "vue-property-decorator";
-import {ApplyGrowlErr, State,} from "@/ts/instances/storeInstance";
+<script lang="ts">
+import {Component, Vue} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import {AUTO_REGISTRATION} from "@/ts/utils/consts";
 import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 

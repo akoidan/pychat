@@ -1,4 +1,4 @@
-import {ReplyFileMessage} from "@common/ws/message/webrtc-transfer/reply.file";
+import type {ReplyFileMessage} from "@common/ws/message/webrtc-transfer/reply.file";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import type {SendingFile} from "@/ts/types/model";
 import type WsHandler from "@/ts/message_handlers/WsHandler";

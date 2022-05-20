@@ -1,15 +1,15 @@
-import {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
-import {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
-import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
-import {DestroyCallConnection} from "@common/legacy";
-import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor,} from "@/ts/utils/audioprocc";
+import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
+import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import type {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import type {DestroyCallConnection} from "@common/legacy";
+import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor} from "@/ts/utils/audioprocc";
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
-import type {JsAudioAnalyzer, SetCallOpponent, SetOpponentAnchor, SetOpponentVoice,} from "@/ts/types/types";
+import type {JsAudioAnalyzer, SetCallOpponent, SetOpponentAnchor, SetOpponentVoice} from "@/ts/types/types";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
-import {getStreamLog, getTrackLog,} from "@/ts/utils/pureFunctions";
-import type {CallInfoModel, RoomModel,} from "@/ts/types/model";
+import {getStreamLog, getTrackLog} from "@/ts/utils/pureFunctions";
+import type {CallInfoModel, RoomModel} from "@/ts/types/model";
 import {stopVideo} from "@/ts/utils/htmlApi";
 import type Subscription from "@/ts/classes/Subscription";
 

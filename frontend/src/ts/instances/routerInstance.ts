@@ -1,7 +1,7 @@
 import type {LoginMessage, LoginMessageBody} from "@/ts/types/messages/inner/login";
 import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
-import type {RouterNavigateMessage, RouterNavigateMessageBody,} from "@/ts/types/messages/inner/router.navigate";
-import {createRouter, createWebHashHistory,} from "vue-router";
+import type {RouterNavigateMessage, RouterNavigateMessageBody} from "@/ts/types/messages/inner/router.navigate";
+import {createRouter, createWebHashHistory} from "vue-router";
 import {store} from "@/ts/instances/storeInstance";
 import MainPage from "@/vue/pages/MainPage.vue";
 import ChannelsPage from "@/vue/pages/ChannelsPage.vue";
@@ -18,7 +18,7 @@ import CreatePrivateRoom from "@/vue/pages/CreatePrivateRoom.vue";
 import ViewProfilePage from "@/vue/pages/ViewProfilePage.vue";
 import RoomSettings from "@/vue/pages/RoomSettings.vue";
 import ApplyResetPassword from "@/vue/auth/ApplyResetPassword.vue";
-import {ACTIVE_ROOM_ID_LS_NAME, ALL_ROOM_ID,} from "@/ts/utils/consts";
+import {ACTIVE_ROOM_ID_LS_NAME, ALL_ROOM_ID} from "@/ts/utils/consts";
 import ConfirmMail from "@/vue/pages/ConfirmMail.vue";
 import UserProfileChangeEmail from "@/vue/pages/UserProfileChangeEmail.vue";
 import CreateChannel from "@/vue/pages/CreateChannel.vue";

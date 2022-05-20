@@ -11,7 +11,7 @@
 </template>
 <script lang="ts">
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
-import {Component, Prop, Vue,} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {GOOGLE_OAUTH_2_CLIENT_ID} from "@/ts/utils/consts";
 

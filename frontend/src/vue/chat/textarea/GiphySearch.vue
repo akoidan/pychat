@@ -42,13 +42,13 @@
 </template>
 
 <script lang="ts">
-import {Component, Emit, Ref, Vue, Watch,} from "vue-property-decorator";
+import {Component, Emit, Ref, Vue, Watch} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppSuspense from "@/vue/ui/AppSuspense.vue";
 import {webpSupported} from "@/ts/utils/runtimeConsts";
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import type {GIFObject, MultiResponse,} from "giphy-api";
+import type {GIFObject, MultiResponse} from "giphy-api";
 import AppLoadingImage from "@/vue/ui/AppLoadingImage.vue";
 import {LOAD_GIPHIES_PER_REQUEST} from "@/ts/utils/consts";
 

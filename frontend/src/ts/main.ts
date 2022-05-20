@@ -28,12 +28,11 @@ import {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import {mainWindow} from "@/ts/instances/mainWindow";
 import {SmileysApi} from "@/ts/utils/smileys";
 import {loggerMixin} from "@/ts/utils/mixins";
-import {switchDirective, validityDirective,} from "@/ts/utils/directives";
+import {switchDirective, validityDirective} from "@/ts/utils/directives";
 import Subscription from "@/ts/classes/Subscription";
 import type {Router} from "vue-router";
 import {SessionHolderImpl} from "@/ts/classes/SessionHolderImpl";
-import {SessionHolder} from "@/ts/types/types";
-
+import type {SessionHolder} from "@/ts/types/types";
 
 
 const logger: Logger = loggerFactory.getLoggerColor("main", "#007a70");

@@ -69,7 +69,7 @@
 </template>
 
 <script lang="ts">
-import {Component, Emit, Prop, Ref, Vue,} from "vue-property-decorator";
+import {Component, Emit, Prop, Ref, Vue} from "vue-property-decorator";
 import {buildQueryParams} from "@/ts/utils/pureFunctions";
 
 @Component({name: "ChatAttachments"})

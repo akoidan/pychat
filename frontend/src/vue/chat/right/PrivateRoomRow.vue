@@ -5,7 +5,7 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {Component, Prop, Vue,} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import type {UserModel} from "@/ts/types/model";
 import {RoomModel} from "@/ts/types/model";
 import {PrivateRoomsIds} from "@/ts/types/types";

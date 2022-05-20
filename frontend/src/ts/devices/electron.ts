@@ -1,4 +1,4 @@
-import {app, BrowserWindow,} from "electron";
+import {app, BrowserWindow} from "electron";
 import * as constants from "@/ts/utils/consts";
 import {ELECTRON_IGNORE_SSL, ELECTRON_MAIN_FILE, IS_DEBUG} from "@/ts/utils/consts";
 

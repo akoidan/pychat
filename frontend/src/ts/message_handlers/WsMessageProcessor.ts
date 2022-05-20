@@ -1,5 +1,5 @@
-import {GrowlWsInMessage} from "@common/ws/message/growl.message";
-import {ResponseWsInMessage} from "@common/ws/common";
+import type {GrowlWsInMessage} from "@common/ws/message/growl.message";
+import type {ResponseWsInMessage} from "@common/ws/common";
 import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 import type Subscription from "@/ts/classes/Subscription";
 import type {MessageSupplier} from "@/ts/types/types";
@@ -36,14 +36,16 @@ export class WsMessageProcessor extends AbstractMessageProcessor {
     }
   }
 
-  // TODO
-  // public parseMessage<D>(jsonData: string): DefaultWsInMessage<string, HandlerName, D> | null | ResponseWsInMessage<D> {
-  //   const data: DefaultWsInMessage<string, HandlerName, D> | null| ResponseWsInMessage<D> = super.parseMessage(jsonData);
-  //   if ((data as DefaultWsInMessage<string, HandlerName, D>)?.handler !== "void" && (!data?.handler || !data.action)) {
-  //     this.logger.error("Invalid message structure")();
-  //
-  //     return null;
-  //   }
-  //   return data;
-  // }
+  /*
+   * TODO
+   * public parseMessage<D>(jsonData: string): DefaultWsInMessage<string, HandlerName, D> | null | ResponseWsInMessage<D> {
+   *   const data: DefaultWsInMessage<string, HandlerName, D> | null| ResponseWsInMessage<D> = super.parseMessage(jsonData);
+   *   if ((data as DefaultWsInMessage<string, HandlerName, D>)?.handler !== "void" && (!data?.handler || !data.action)) {
+   *     this.logger.error("Invalid message structure")();
+   *
+   *     return null;
+   *   }
+   *   return data;
+   * }
+   */
 }

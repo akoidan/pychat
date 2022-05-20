@@ -7,7 +7,7 @@ import FileApi from "@/ts/message_handlers/http_modules/FileApi";
 import RestApi from "@/ts/message_handlers/http_modules/RestApi";
 import JsApi from "@/ts/message_handlers/http_modules/JsApi";
 import GiphyApi from "@/ts/message_handlers/http_modules/GiphyApi";
-import {GIPHY_API_KEY, GIPHY_URL,} from "@/ts/utils/consts";
+import {GIPHY_API_KEY, GIPHY_URL} from "@/ts/utils/consts";
 
 export default class Api {
   public readonly authApi: AuthApi;
