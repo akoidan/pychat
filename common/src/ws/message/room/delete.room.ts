@@ -1,7 +1,7 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 
-export interface DeleteRoomBody {
+export interface DeleteRoomWsInBody {
   roomId: number;
 }
 
-export type DeleteRoomMessage = DefaultWsInMessage<"deleteRoom", "room", DeleteRoomBody>;
+export type DeleteRoomWsInMessage = DefaultWsInMessage<"deleteRoom", "room", DeleteRoomWsInBody>;

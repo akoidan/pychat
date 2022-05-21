@@ -4,8 +4,8 @@ import {
   RoomExistedBefore
 } from "@common/model/ws.base";
 
-export interface InviteUserBody extends NewRoom, RoomExistedBefore {
+export interface InviteUserWsInBody extends NewRoom, RoomExistedBefore {
   roomId: number;
   users: number[];
 }
-export type InviteUserMessage = DefaultWsInMessage<"inviteUser", "room", InviteUserBody>;
+export type InviteUserWsInMessage = DefaultWsInMessage<"inviteUser", "room", InviteUserWsInBody>;

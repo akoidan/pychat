@@ -8,9 +8,9 @@ import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
 import type {MessageStatus} from "@common/model/enum/message.status";
 import type {MessagesResponseMessage} from "@common/model/ws.base";
 import type {AddChannelWsInMessage} from "@common/ws/message/room/add.channel";
-import type {AddInviteMessage} from "@common/ws/message/room/add.invite";
-import type {AddRoomMessage} from "@common/ws/message/room/add.room";
-import type {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
+import type {AddInviteWsInMessage} from "@common/ws/message/room/add.invite";
+import type {AddRoomWsInMessage} from "@common/ws/message/room/add.room";
+import type {SaveChannelSettingsWsInMessage} from "@common/ws/message/room/save.channel.settings";
 import type {ShowITypeWsOutMessage} from "@common/ws/message/room/show.i.type";
 import type {
   WebRtcSetConnectionIdBody,
@@ -333,7 +333,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendAddRoom(name: string | null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number | null): Promise<AddRoomMessage> {
+  public async sendAddRoom(name: string | null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number | null): Promise<AddRoomWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       users,
       name,
@@ -397,7 +397,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     channelCreatorId: number,
     volume: number,
     notifications: boolean,
-  ): Promise<SaveChannelSettingsMessage> {
+  ): Promise<SaveChannelSettingsWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       action: "saveChannelSettings",
       channelId,
@@ -408,7 +408,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async inviteUser(roomId: number, users: number[]): Promise<AddInviteMessage> {
+  public async inviteUser(roomId: number, users: number[]): Promise<AddInviteWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       roomId,
       users,
