@@ -107,15 +107,15 @@ import type {
   OfferFileBody,
   OfferFileWsOutMessage,
 
-  OfferFileMessage,
+  OfferFileResponse,
 
   OfferFileRequest,
   OfferFileResponse,
 } from "@common/ws/message/webrtc/offer.file";
 import {RequestWsOutMessage} from "@common/ws/common";
 import type {
-  OfferCallRequest,
-  OfferCallResponse,
+  OfferCallRequestWsOutMessage,
+  OfferCallResponseWsInMessage,
 } from "@common/ws/message/webrtc/offer.call";
 import type {AcceptFileWsOutMessage} from "@common/ws/message/webrtc-transfer/accept.file";
 import type {DestroyCallConnectionWsOutMessage} from "@common/ws/message/peer-connection/destroy.call.connection";
@@ -212,7 +212,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdBody> {
-    return this.messageProc.sendToServerAndAwait<OfferCallRequest, OfferCallResponse>({
+    return this.messageProc.sendToServerAndAwait<OfferCallRequestWsOutMessage, OfferCallResponseWsInMessage>({
       action: "offerCall",
       data: {
         roomId,

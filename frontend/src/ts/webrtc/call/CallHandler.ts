@@ -38,9 +38,9 @@ import {Subscribe} from "@/ts/utils/pubsub";
 import type {AnswerCallMessage} from "@/ts/types/messages/inner/answer.call";
 import type {VideoAnswerCallMessage} from "@/ts/types/messages/inner/video.answer.call";
 import type {DeclineCallMessage} from "@/ts/types/messages/inner/decline.call";
-import type {OfferCallBody} from "@common/ws/message/webrtc/offer.call";
+import type {OfferCallWsInBody} from "@common/ws/message/webrtc/offer.call";
 import {
-  OfferCallMessage,
+  OfferCallWsInMessage,
 } from "@common/ws/message/webrtc/offer.call";
 import {AcceptCallBody} from "@common/ws/message/webrtc-transfer/accept.call";
 
@@ -367,7 +367,7 @@ export default class CallHandler extends FileAndCallTransfer {
     this.createCallPeerConnection(message);
   }
 
-  public initAndDisplayOffer(message: OfferCallBody) {
+  public initAndDisplayOffer(message: OfferCallWsInBody) {
     this.setCallStatus("received_offer");
     if (this.connectionId) {
       this.logger.error("Old connId still exists {}", this.connectionId)();
