@@ -1,5 +1,5 @@
 import type {DestroyFileConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
-import type {AcceptFileMessage} from "@common/ws/message/webrtc-transfer/accept.file";
+import type {AcceptFileWsInMessage} from "@common/ws/message/webrtc-transfer/accept.file";
 import type {AddSendingFileTransfer, SetSendingFileStatus, SetSendingFileUploaded} from "@/ts/types/types";
 import type {SendingFileTransfer} from "@/ts/types/model";
 import {FileTransferStatus} from "@/ts/types/model";
@@ -10,7 +10,7 @@ import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";
 import {Subscribe} from "@/ts/utils/pubsub";
-import {AcceptFileBody} from "@common/ws/message/webrtc-transfer/accept.file";
+import {AcceptFileWsInBody} from "@common/ws/message/webrtc-transfer/accept.file";
 import {DestroyFileConnectionWsInBody} from "@common/ws/message/peer-connection/destroy.file.connection";
 
 
@@ -74,8 +74,8 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     }
   }
 
-  @Subscribe<AcceptFileMessage>()
-  public acceptFile(message: AcceptFileBody) {
+  @Subscribe<AcceptFileWsInMessage>()
+  public acceptFile(message: AcceptFileWsInBody) {
     this.offset = message.received;
     this.createPeerConnection();
     const ssfs: SetSendingFileStatus = {

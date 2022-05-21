@@ -1,8 +1,8 @@
 import type {CallStatus} from "@common/model/webrtc.base";
-import type {AcceptCallMessage} from "@common/ws/message/webrtc-transfer/accept.call";
-import {ReplyCallBody} from "@common/ws/message/webrtc-transfer/reply.call";
+import type {AcceptCallWsInMessage} from "@common/ws/message/webrtc-transfer/accept.call";
+import {ReplyCallWsInBody} from "@common/ws/message/webrtc-transfer/reply.call";
 import type {
-  ReplyCallMessage,
+  ReplyCallWsInMessage,
 } from "@common/ws/message/webrtc-transfer/reply.call";
 import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
 import {
@@ -42,7 +42,7 @@ import type {OfferCallWsInBody} from "@common/ws/message/webrtc/offer.call";
 import {
   OfferCallWsInMessage,
 } from "@common/ws/message/webrtc/offer.call";
-import {AcceptCallBody} from "@common/ws/message/webrtc-transfer/accept.call";
+import {AcceptCallWsInBody} from "@common/ws/message/webrtc-transfer/accept.call";
 
 
 export default class CallHandler extends FileAndCallTransfer {
@@ -99,8 +99,8 @@ export default class CallHandler extends FileAndCallTransfer {
     return this.connectionId;
   }
 
-  @Subscribe<AcceptCallMessage>()
-  public acceptCall(message: AcceptCallBody) {
+  @Subscribe<AcceptCallWsInMessage>()
+  public acceptCall(message: AcceptCallWsInBody) {
     if (this.callStatus !== "received_offer") { // If we're call initiator
       if (!this.connectionId) {
         throw Error("Conn is is null");
@@ -362,8 +362,8 @@ export default class CallHandler extends FileAndCallTransfer {
     }
   }
 
-  @Subscribe<ReplyCallMessage>()
-  public replyCall(message: ReplyCallBody) {
+  @Subscribe<ReplyCallWsInMessage>()
+  public replyCall(message: ReplyCallWsInBody) {
     this.createCallPeerConnection(message);
   }
 

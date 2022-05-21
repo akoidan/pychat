@@ -4,7 +4,7 @@ import {
   WebRtcDefaultMessage
 } from "@common/model/webrtc.base";
 
-export interface AcceptCallBody extends OpponentWsId, WebRtcDefaultMessage {
+export interface AcceptCallWsInBody extends OpponentWsId, WebRtcDefaultMessage {
 
 }
-export type AcceptCallMessage = DefaultWsInMessage<"acceptCall", "webrtcTransfer:*", AcceptCallBody>;
+export type AcceptCallWsInMessage = DefaultWsInMessage<"acceptCall", "webrtcTransfer:*", AcceptCallWsInBody>;
