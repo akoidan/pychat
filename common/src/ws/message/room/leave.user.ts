@@ -1,9 +1,9 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 
-export interface LeaveUserBody {
+export interface LeaveUserWsInBody {
   roomId: number;
   userId: number;
   users: number[];
 }
 
-export type LeaveUserMessage = DefaultWsInMessage<"leaveUser", "room", LeaveUserBody>;
+export type LeaveUserWsInMessage = DefaultWsInMessage<"leaveUser", "room", LeaveUserWsInBody>;

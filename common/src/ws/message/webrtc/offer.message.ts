@@ -6,11 +6,11 @@ import {
 } from "@common/model/webrtc.base";
 
 
-export interface OfferBody extends OpponentWsId, WebRtcDefaultMessage {
+export interface OfferMessageWsInBody extends OpponentWsId, WebRtcDefaultMessage {
   content: BrowserBase;
   roomId: number;
   userId: number;
   time: number;
 }
 
-export type OfferMessage = DefaultWsInMessage<"offerMessage", "webrtc", OfferBody>;
+export type OfferMessageWsInMessage = DefaultWsInMessage<"offerMessage", "webrtc", OfferMessageWsInBody>;

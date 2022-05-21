@@ -1,11 +1,11 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 import {UserDto} from "@common/model/dto/user.dto";
 
-export interface CreateNewUserBody extends UserDto {
+export interface CreateNewUserWsInBody extends UserDto {
   rooms: {
     roomId: number;
     users: number[];
   }[];
 }
 
-export type CreateNewUserMessage = DefaultWsInMessage<"createNewUser", "room", CreateNewUserBody>;
+export type CreateNewUserWsInMessage = DefaultWsInMessage<"createNewUser", "room", CreateNewUserWsInBody>;

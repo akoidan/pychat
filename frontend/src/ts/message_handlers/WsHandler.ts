@@ -7,19 +7,19 @@ import type {
 import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
 import type {MessageStatus} from "@common/model/enum/message.status";
 import type {MessagesResponseMessage} from "@common/model/ws.base";
-import type {AddChannelMessage} from "@common/ws/message/room/add.channel";
-import type {AddInviteMessage} from "@common/ws/message/room/add.invite";
-import type {AddRoomMessage} from "@common/ws/message/room/add.room";
-import type {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
+import type {AddChannelWsInMessage} from "@common/ws/message/room/add.channel";
+import type {AddInviteWsInMessage} from "@common/ws/message/room/add.invite";
+import type {AddRoomWsInMessage} from "@common/ws/message/room/add.room";
+import type {SaveChannelSettingsWsInMessage} from "@common/ws/message/room/save.channel.settings";
 import type {ShowITypeWsOutMessage} from "@common/ws/message/room/show.i.type";
 import type {
   WebRtcSetConnectionIdBody,
   WebRtcSetConnectionIdMessage,
 } from "@common/ws/message/sync/set.connection.id";
-import type {PingMessage} from "@common/ws/message/ws/ping";
-import {SetProfileImageBody} from "@common/ws/message/ws/set.profile.image";
+import type {PingWsInMessage} from "@common/ws/message/ws/ping";
+import {SetProfileImageWsInBody} from "@common/ws/message/ws/set.profile.image";
 import type {
-  SetProfileImageMessage,
+  SetProfileImageWsInMessage,
 } from "@common/ws/message/ws/set.profile.image";
 import {
   SetSettingBody,
@@ -32,9 +32,9 @@ import type {
 import type {SetUserProfileMessage, SetUserProfileWsOutMessage} from "@common/ws/message/ws/set.user.profile";
 import type {SetWsIdWsOutMessage,
   SetWsIdWsInMessage} from "@common/ws/message/ws/set.ws.id";
-import {UserProfileChangedBody} from "@common/ws/message/ws/user.profile.changed";
+import {UserProfileChangedWsInBody} from "@common/ws/message/ws/user.profile.changed";
 import type {
-  UserProfileChangedMessage,
+  UserProfileChangedWsInMessage,
 } from "@common/ws/message/ws/user.profile.changed";
 import type {
   PrintMessageWsInMessage,
@@ -98,7 +98,7 @@ import {
   SetWsIdBody,
 } from "@common/ws/message/ws/set.ws.id";
 import {Gender} from "@common/model/enum/gender";
-import {PingBody} from "@common/ws/message/ws/ping";
+import {PingWsInBody} from "@common/ws/message/ws/ping";
 import type {
   PongWsInMessage,
   PongWsOutMessage,
@@ -107,15 +107,15 @@ import type {
   OfferFileBody,
   OfferFileWsOutMessage,
 
-  OfferFileMessage,
+  OfferFileResponse,
 
   OfferFileRequest,
   OfferFileResponse,
 } from "@common/ws/message/webrtc/offer.file";
 import {RequestWsOutMessage} from "@common/ws/common";
 import type {
-  OfferCallRequest,
-  OfferCallResponse,
+  OfferCallRequestWsOutMessage,
+  OfferCallResponseWsInMessage,
 } from "@common/ws/message/webrtc/offer.call";
 import type {AcceptFileWsOutMessage} from "@common/ws/message/webrtc-transfer/accept.file";
 import type {DestroyCallConnectionWsOutMessage} from "@common/ws/message/peer-connection/destroy.call.connection";
@@ -212,7 +212,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdBody> {
-    return this.messageProc.sendToServerAndAwait<OfferCallRequest, OfferCallResponse>({
+    return this.messageProc.sendToServerAndAwait<OfferCallRequestWsOutMessage, OfferCallResponseWsInMessage>({
       action: "offerCall",
       data: {
         roomId,
@@ -333,7 +333,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendAddRoom(name: string | null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number | null): Promise<AddRoomMessage> {
+  public async sendAddRoom(name: string | null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number | null): Promise<AddRoomWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       users,
       name,
@@ -362,7 +362,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendAddChannel(channelName: string, users: number[]): Promise<AddChannelMessage> {
+  public async sendAddChannel(channelName: string, users: number[]): Promise<AddChannelWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       channelName,
       users,
@@ -397,7 +397,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     channelCreatorId: number,
     volume: number,
     notifications: boolean,
-  ): Promise<SaveChannelSettingsMessage> {
+  ): Promise<SaveChannelSettingsWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       action: "saveChannelSettings",
       channelId,
@@ -408,7 +408,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async inviteUser(roomId: number, users: number[]): Promise<AddInviteMessage> {
+  public async inviteUser(roomId: number, users: number[]): Promise<AddInviteWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       roomId,
       users,
@@ -597,8 +597,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.store.setUserInfo(a);
   }
 
-  @Subscribe<SetProfileImageMessage>()
-  public setProfileImage(m: SetProfileImageBody) {
+  @Subscribe<SetProfileImageWsInMessage>()
+  public setProfileImage(m: SetProfileImageWsInBody) {
     this.setUserImage(m.url);
   }
 
@@ -641,14 +641,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     }
   }
 
-  @Subscribe<UserProfileChangedMessage>()
-  public userProfileChanged(message: UserProfileChangedBody) {
+  @Subscribe<UserProfileChangedWsInMessage>()
+  public userProfileChanged(message: UserProfileChangedWsInBody) {
     this.store.setUser(message);
   }
 
 
-  @Subscribe<PingMessage>()
-  public ping(message: PingBody) {
+  @Subscribe<PingWsInMessage>()
+  public ping(message: PingWsInBody) {
     this.startNoPingTimeout();
     this.sendToServer<PongWsOutMessage>({
       action: "pong",

@@ -1,7 +1,7 @@
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import type {
-  SendRtcDataBody,
+  SendRtcDataWsInBody,
 } from "@common/ws/message/peer-connection/send.rtc.data";
 import type {HandlerName} from "@common/ws/common";
 import type {Logger} from "lines-logger";
@@ -18,7 +18,7 @@ import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
 export default abstract class AbstractPeerConnection {
   protected offerCreator: boolean = false;
 
-  protected sendRtcDataQueue: SendRtcDataBody[] = [];
+  protected sendRtcDataQueue: SendRtcDataWsInBody[] = [];
 
   protected readonly opponentWsId: string;
 
@@ -186,7 +186,7 @@ export default abstract class AbstractPeerConnection {
   // Destroy(Des)
 
   // This event comes from websocket from server, which is created by another PC
-  public async sendRtcData(message: SendRtcDataBody) {
+  public async sendRtcData(message: SendRtcDataWsInBody) {
     if (!this.connectedToRemote) {
       this.logger.warn("Putting sendrtc data event to the queue")();
       this.sendRtcDataQueue.push(message);
