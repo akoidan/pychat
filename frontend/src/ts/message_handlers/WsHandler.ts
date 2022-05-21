@@ -7,7 +7,7 @@ import type {
 import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
 import type {MessageStatus} from "@common/model/enum/message.status";
 import type {MessagesResponseMessage} from "@common/model/ws.base";
-import type {AddChannelMessage} from "@common/ws/message/room/add.channel";
+import type {AddChannelWsInMessage} from "@common/ws/message/room/add.channel";
 import type {AddInviteMessage} from "@common/ws/message/room/add.invite";
 import type {AddRoomMessage} from "@common/ws/message/room/add.room";
 import type {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
@@ -362,7 +362,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async sendAddChannel(channelName: string, users: number[]): Promise<AddChannelMessage> {
+  public async sendAddChannel(channelName: string, users: number[]): Promise<AddChannelWsInMessage> {
     return this.messageProc.sendToServerAndAwait({
       channelName,
       users,

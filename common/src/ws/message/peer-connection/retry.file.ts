@@ -1,3 +1,3 @@
 import {DefaultWsInMessage} from "@common/ws/common";
 
-export type RetryFileMessage = DefaultWsInMessage<"retryFile", "peerConnection:*", {}>;
+export type RetryFileWsInMessage = DefaultWsInMessage<"retryFile", "peerConnection:*", null>;

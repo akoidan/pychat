@@ -1,9 +1,9 @@
 import type {ChannelDto} from "@common/model/dto/channel.dto";
 import type {RoomDto} from "@common/model/dto/room.dto";
 import type {AddRoomBase, ChangeDeviceType} from "@common/model/ws.base";
-import {AddChannelBody} from "@common/ws/message/room/add.channel";
+import {AddChannelWsInBody} from "@common/ws/message/room/add.channel";
 import type {
-  AddChannelMessage,
+  AddChannelWsInMessage,
 } from "@common/ws/message/room/add.channel";
 import {AddInviteBody} from "@common/ws/message/room/add.invite";
 import type {
@@ -150,8 +150,8 @@ export class RoomHandler {
     this.store.setOnline(message.online);
   }
 
-  @Subscribe<AddChannelMessage>()
-  public addChannel(message: AddChannelBody) {
+  @Subscribe<AddChannelWsInMessage>()
+  public addChannel(message: AddChannelWsInBody) {
     this.mutateRoomAddition(message, "room_created");
   }
 
