@@ -1,4 +1,4 @@
-import type {ReplyFileMessage} from "@common/ws/message/webrtc-transfer/reply.file";
+import type {ReplyFileWsInMessage} from "@common/ws/message/webrtc-transfer/reply.file";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import type {SendingFile} from "@/ts/types/model";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
@@ -33,7 +33,7 @@ export default class FileHandler extends FileAndCallTransfer {
     this.store.addSendingFile(payload);
   }
 
-  public replyFile(message: ReplyFileMessage) {
+  public replyFile(message: ReplyFileWsInMessage) {
     this.logger.debug("got mes {}", message)();
     new FileSenderPeerConnection(this.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, this.file, message.userId, this.sub);
   }

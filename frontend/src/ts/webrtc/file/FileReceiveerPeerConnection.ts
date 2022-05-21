@@ -1,5 +1,5 @@
 import type {DestroyFileConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
-import type {RetryFileMessage} from "@common/ws/message/peer-connection/retry.file";
+import type {RetryFileWsInMessage} from "@common/ws/message/peer-connection/retry.file";
 import type {SetReceivingFileStatus, SetReceivingFileUploaded} from "@/ts/types/types";
 import type {ReceivingFile} from "@/ts/types/model";
 import {FileTransferStatus} from "@/ts/types/model";
@@ -94,7 +94,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.unsubscribeAndRemoveFromParent();
   }
 
-  public retryFile(message: RetryFileMessage) {
+  public retryFile(message: RetryFileWsInMessage) {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.IN_PROGRESS,

@@ -1,7 +1,7 @@
 import type {UserModel} from "@/data/model/user.model";
-import type {AddOnlineUserMessage} from "@common/ws/message/room/add.online.user";
+import type {AddOnlineUserWsInMessage} from "@common/ws/message/room/add.online.user";
 
-export function transformAddUserOnline(online: Record<number, string[]>, user: UserModel, opponentWsId: string): AddOnlineUserMessage {
+export function transformAddUserOnline(online: Record<number, string[]>, user: UserModel, opponentWsId: string): AddOnlineUserWsInMessage {
   return {
     action: "addOnlineUser",
     handler: "room",

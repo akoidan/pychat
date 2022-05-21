@@ -1,6 +1,6 @@
 import {DefaultWsInMessage} from "@common/ws/common";
 
-export interface SetProfileImageBody {
+export interface SetProfileImageWsInBody {
   url: string;
 }
-export type SetProfileImageMessage = DefaultWsInMessage<"setProfileImage", "ws", SetProfileImageBody>;
+export type SetProfileImageWsInMessage = DefaultWsInMessage<"setProfileImage", "ws", SetProfileImageWsInBody>;

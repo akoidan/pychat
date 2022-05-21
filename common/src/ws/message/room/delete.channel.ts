@@ -1,9 +1,9 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 import type {ChannelDto} from "@common/model/dto/channel.dto";
 
-export interface DeleteChannelBody {
+export interface DeleteChannelWsInBody {
   channelId: number;
   roomIds: number[];
 }
 
-export type DeleteChannelMessage = DefaultWsInMessage<"deleteChannel", "room", DeleteChannelBody>;
+export type DeleteChannelWsInMessage = DefaultWsInMessage<"deleteChannel", "room", DeleteChannelWsInBody>;

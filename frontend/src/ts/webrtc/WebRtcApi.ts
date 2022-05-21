@@ -1,8 +1,8 @@
-import {NotifyCallActiveBody} from "@common/ws/message/webrtc/notify.call.active";
+import {NotifyCallActiveWsInBody} from "@common/ws/message/webrtc/notify.call.active";
 import type {
-  NotifyCallActiveMessage,
+  NotifyCallActiveWsInMessage,
 } from "@common/ws/message/webrtc/notify.call.active";
-import type {OfferMessage} from "@common/ws/message/webrtc/offer.message";
+import type {OfferMessageWsInMessage} from "@common/ws/message/webrtc/offer.message";
 import type {HandlerName} from "@common/ws/common";
 import type {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
 import {
@@ -36,7 +36,7 @@ import type {VideoType} from "@/ts/types/types";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
 import type {
-  OfferFileMessage,
+  OfferFileResponse,
 } from "@common/ws/message/webrtc/offer.file";
 import {
   OfferFileBody,
@@ -44,12 +44,12 @@ import {
 import {Subscribe} from "@/ts/utils/pubsub";
 import {ChangeP2pRoomInfoMessageBody} from "@/ts/types/messages/inner/change.p2p.room.info";
 import type {
-  OfferCallMessage,
+  OfferCallWsInMessage,
 } from "@common/ws/message/webrtc/offer.call";
 import {
-  OfferCallBody,
+  OfferCallWsInBody,
 } from "@common/ws/message/webrtc/offer.call";
-import {OfferBody} from "@common/ws/message/webrtc/offer.message";
+import {OfferMessageWsInBody} from "@common/ws/message/webrtc/offer.message";
 import type {AnswerCallMessage} from "@/ts/types/messages/inner/answer.call";
 import type {DeclineCallMessage} from "@/ts/types/messages/inner/decline.call";
 import type {VideoAnswerCallMessage} from "@/ts/types/messages/inner/video.answer.call";
@@ -94,8 +94,8 @@ export default class WebRtcApi {
     this.messageSenderProxy = messageSenderProxy;
   }
 
-  @Subscribe<OfferCallMessage>()
-  public offerCall(message: OfferCallBody) {
+  @Subscribe<OfferCallWsInMessage>()
+  public offerCall(message: OfferCallWsInBody) {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
@@ -123,8 +123,8 @@ export default class WebRtcApi {
     this.initAndSyncMessages();
   }
 
-  @Subscribe<NotifyCallActiveMessage>()
-  public notifyCallActive(m: NotifyCallActiveBody) {
+  @Subscribe<NotifyCallActiveWsInMessage>()
+  public notifyCallActive(m: NotifyCallActiveWsInBody) {
     this.getCallHandler(m.roomId).addOpponent(m.connId, m.userId, m.opponentWsId);
   }
 
@@ -150,8 +150,8 @@ export default class WebRtcApi {
     });
   }
 
-  @Subscribe<OfferMessage>()
-  public offerMessage(message: OfferBody) {
+  @Subscribe<OfferMessageWsInMessage>()
+  public offerMessage(message: OfferMessageWsInBody) {
     this.getMessageHandler(message.roomId).acceptConnection(message);
   }
 
@@ -269,7 +269,7 @@ export default class WebRtcApi {
     }
   }
 
-  @Subscribe<OfferFileMessage>()
+  @Subscribe<OfferFileResponse>()
   public offerFile(message: OfferFileBody): void {
     const limitExceeded = message.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     const payload: ReceivingFile = {

@@ -13,7 +13,7 @@ import {RequestWsOutMessage} from "@common/ws/common";
 import {WebRtcSetConnectionIdMessage} from "@common/ws/message/sync/set.connection.id";
 
 
-export type OfferFileRequestBody = {
+export type OfferFileRequestWsOutBody = {
   roomId: number;
   threadId:number | null;
   browser: string;
@@ -21,13 +21,13 @@ export type OfferFileRequestBody = {
   size: number;
 }
 
-export type OfferFileRequest = RequestWsOutMessage<"offerFile", OfferFileRequestBody>
+export type OfferFileRequest = RequestWsOutMessage<"offerFile", OfferFileRequestWsOutBody>
 
 export type OfferFileResponse = WebRtcSetConnectionIdMessage;
 
-export interface OfferFileBody extends OfferFileRequestBody, OpponentWsId, WebRtcDefaultMessage {
+export interface OfferFileBody extends OfferFileRequestWsOutBody, OpponentWsId, WebRtcDefaultMessage {
   userId: number;
   time: number;
 }
 
-export type OfferFileMessage = MultiResponseMessage<"offerFile", "webrtc", OfferFileBody>;
+export type OfferFileResponse = MultiResponseMessage<"offerFile", "webrtc", OfferFileBody>;

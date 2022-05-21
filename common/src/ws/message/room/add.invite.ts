@@ -4,6 +4,6 @@ import {
   RoomExistedBefore
 } from "@common/model/ws.base";
 
-export type AddInviteBody = AddRoomBase | RoomExistedBefore;
+export type AddInviteWsInBody = AddRoomBase | RoomExistedBefore;
 
-export type AddInviteMessage = DefaultWsInMessage<"addInvite", "room", AddInviteBody>;
+export type AddInviteWsInMessage = DefaultWsInMessage<"addInvite", "room", AddInviteWsInBody>;

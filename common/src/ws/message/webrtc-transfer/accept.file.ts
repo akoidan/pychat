@@ -5,11 +5,12 @@ import {
 import {WebRtcDefaultMessage} from "@common/model/webrtc.base";
 
 
-export interface AcceptFileBody extends WebRtcDefaultMessage {
+export interface AcceptFileWsInBody extends WebRtcDefaultMessage {
   received: number;
 }
 
+export type AcceptFileWsOutBody = AcceptFileWsInBody;
 
-export type AcceptFileMessage = DefaultWsInMessage<"acceptFile", "peerConnection:*", AcceptFileBody>;
+export type AcceptFileWsInMessage = DefaultWsInMessage<"acceptFile", "peerConnection:*", AcceptFileWsInBody>;
 
-export type AcceptFileWsOutMessage = DefaultWsOutMessage<"acceptFile", AcceptFileBody>
+export type AcceptFileWsOutMessage = DefaultWsOutMessage<"acceptFile", AcceptFileWsOutBody>

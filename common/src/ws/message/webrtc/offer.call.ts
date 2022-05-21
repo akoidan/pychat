@@ -11,15 +11,15 @@ import type {
 } from "@common/model/webrtc.base";
 
 
-export interface OfferCallRequestBody extends BrowserBase {
+export interface OfferCallRequestWsOutBody extends BrowserBase {
   roomId: number;
 }
 
-export interface OfferCallBody extends OpponentWsId, WebRtcDefaultMessage, OfferCallRequestBody  {
+export interface OfferCallWsInBody extends OpponentWsId, WebRtcDefaultMessage, OfferCallRequestWsOutBody  {
   userId: number;
   time: number;
 }
 
-export type OfferCallMessage = DefaultWsInMessage<"offerCall", "webrtc", OfferCallBody>;
-export type OfferCallRequest = RequestWsOutMessage<"offerCall", OfferCallRequestBody>;
-export type OfferCallResponse = ResponseWsInMessage<WebRtcSetConnectionIdBody>;
+export type OfferCallWsInMessage = DefaultWsInMessage<"offerCall", "webrtc", OfferCallWsInBody>;
+export type OfferCallRequestWsOutMessage = RequestWsOutMessage<"offerCall", OfferCallRequestWsOutBody>;
+export type OfferCallResponseWsInMessage = ResponseWsInMessage<WebRtcSetConnectionIdBody>;

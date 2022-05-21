@@ -1,6 +1,6 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 import {ChangeUserOnlineBase} from "@common/model/ws.base";
 
-export type RemoveOnlineUserBody = ChangeUserOnlineBase;
+export type RemoveOnlineUserWsInBody = ChangeUserOnlineBase;
 
-export type RemoveOnlineUserMessage = DefaultWsInMessage<"removeOnlineUser", "room", RemoveOnlineUserBody>;
+export type RemoveOnlineUserWsInMessage = DefaultWsInMessage<"removeOnlineUser", "room", RemoveOnlineUserWsInBody>;

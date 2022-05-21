@@ -23,8 +23,8 @@ import {LoginMessage} from "@/ts/types/messages/inner/login";
 import type {PrintMessageWsInMessage} from "@common/ws/message/ws-message/print.message";
 import type {MessageModelDto} from "@common/model/dto/message.model.dto";
 import {
-  AddChannelBody,
-  AddChannelMessage
+  AddChannelWsInBody,
+  AddChannelWsInMessage
 } from "@common/ws/message/room/add.channel";
 
 

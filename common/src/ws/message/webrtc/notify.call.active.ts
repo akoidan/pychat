@@ -4,9 +4,9 @@ import {
   WebRtcDefaultMessage
 } from "@common/model/webrtc.base";
 
-export interface NotifyCallActiveBody extends WebRtcDefaultMessage, OpponentWsId {
+export interface NotifyCallActiveWsInBody extends WebRtcDefaultMessage, OpponentWsId {
   roomId: number;
   userId: number;
 }
 
-export type NotifyCallActiveMessage = DefaultWsInMessage<"notifyCallActive", "webrtc", NotifyCallActiveBody>;
+export type NotifyCallActiveWsInMessage = DefaultWsInMessage<"notifyCallActive", "webrtc", NotifyCallActiveWsInBody>;
