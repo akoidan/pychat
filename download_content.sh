@@ -129,6 +129,7 @@ minikube_all() {
   safeRunCommand kubectl apply -f kubernetes/migrate-backend.yaml
   safeRunCommand kubectl apply -f kubernetes/backend.yaml
   safeRunCommand minikube_reload_frontend
+  safeRunCommand kubectl apply -f kubernetes/frontend.yaml
   safeRunCommand kubectl apply -f kubernetes/ingress.yaml
 }
 

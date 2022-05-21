@@ -27,7 +27,7 @@ spec:
             port: 8888
         env:
         - name: REDIS_PUBSUB
-          value: true
+          value: 'true'
         envFrom:
         - secretRef:
             name: secret

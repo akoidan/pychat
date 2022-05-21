@@ -14,6 +14,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
    name: pvc-redis
+   namespace: pychat
 spec:
    accessModes:
      - ReadWriteOnce
