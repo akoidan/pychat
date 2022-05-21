@@ -116,6 +116,25 @@ minikube_delete_all() {
   kubectl delete -f kubernetes/namespace.yaml --wait=true
 }
 
+minikube_nginx() {
+  qphn.eUnHF6FRD7
+  helm repo add stable https://charts.helm.sh/stable
+  helm install nginx-ingress stable/nginx-ingress --set controller.publishService.enabled=true
+}
+minikube_certificate() {
+  # Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
+  kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+  helm repo add jetstack https://charts.jetstack.io
+  helm repo update
+  helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f -
+  kubectl apply -f kubernetes/cf-secret.yaml
+  kubectl apply -f kubernetes/cert-manager.yaml
+  # helm --namespace cert-manager delete cert-manager
+  # kubectl delete namespace cert-manager
+  # kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
+  # kubectl delete apiservice v1beta1.webhook.cert-manager.io
+}
+
 minikube_all() {
   safeRunCommand kubectl apply -f kubernetes/namespace.yaml
   safeRunCommand kubectl apply -f kubernetes/pv-photo.yaml
@@ -125,10 +144,10 @@ minikube_all() {
   safeRunCommand kubectl apply -f kubernetes/secret.yaml
   safeRunCommand kubectl apply -f kubernetes/mariadb.yaml
   safeRunCommand kubectl apply -f kubernetes/redis.yaml
-  safeRunCommand minikube_reload_backend
+  #safeRunCommand minikube_reload_backend
   safeRunCommand kubectl apply -f kubernetes/migrate-backend.yaml
   safeRunCommand kubectl apply -f kubernetes/backend.yaml
-  safeRunCommand minikube_reload_frontend
+  #safeRunCommand minikube_reload_frontend
   safeRunCommand kubectl apply -f kubernetes/frontend.yaml
   safeRunCommand kubectl apply -f kubernetes/ingress.yaml
 }

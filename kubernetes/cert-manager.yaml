@@ -1,0 +1,34 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: letsencrypt-prod
+spec:
+  acme:
+    email: deathangel908@gmail.com
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: letsencrypt-prod
+    solvers:
+    - dns01:
+        cloudflare:
+          email: deathangel908@gmail.com
+          apiTokenSecretRef:
+            name: cloudflare-api-token-secret
+            key: api-token
+---
+
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pychat-domain
+  namespace: default
+spec:
+  secretName: pychat-tls
+  issuerRef:
+    name: letsencrypt-prod
+
+  duration: 2160h # 90d
+  renewBefore: 720h # 30d before SSL will expire, renew it
+  dnsNames:
+    - "pychat.org"
+    - "*.pychat.org"

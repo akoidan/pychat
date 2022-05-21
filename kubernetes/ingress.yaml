@@ -1,13 +1,18 @@
+# helm repo add stable https://charts.helm.sh/stable
+# helm install nginx-ingress stable/nginx-ingress --set controller.publishService.enabled=true
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/issuer: "letsencrypt-prod"
   name: ingress
   namespace: pychat
 spec:
   tls:
   - hosts:
     - pychat.org
-    secretName: certificate
+    secretName: pychat-tls
   defaultBackend:
     service:
       name: frontend-service
