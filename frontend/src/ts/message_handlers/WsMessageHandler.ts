@@ -4,7 +4,7 @@ import type {MessageModelDto} from "@common/model/dto/message.model.dto";
 import {ImageType} from "@common/model/enum/image.type";
 import {MessageStatus} from "@common/model/enum/message.status";
 import type {MessagesResponseMessage} from "@common/model/ws.base";
-import type {DeleteMessage} from "@common/ws/message/ws-message/delete.message";
+import type {DeleteMessageWsInMessage} from "@common/ws/message/ws-message/delete.message";
 import type {PrintMessageWsInMessage} from "@common/ws/message/ws-message/print.message";
 import type {SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
 import type {SyncHistoryWsInMessage} from "@common/ws/message/sync.history";
@@ -297,7 +297,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     });
   }
 
-  public deleteMessage(inMessage: DeleteMessage) {
+  public deleteMessage(inMessage: DeleteMessageWsInMessage) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
       this.logger.warn("Unable to find message {} to delete it", inMessage)();

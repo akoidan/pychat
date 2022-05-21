@@ -1,6 +1,6 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 
-export interface PingBody {
+export interface PingWsInBody {
   time: string;
 }
-export type PingMessage = DefaultWsInMessage<"ping", "ws", PingBody>;
+export type PingWsInMessage = DefaultWsInMessage<"ping", "ws", PingWsInBody>;

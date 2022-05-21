@@ -16,10 +16,10 @@ import type {
   WebRtcSetConnectionIdBody,
   WebRtcSetConnectionIdMessage,
 } from "@common/ws/message/sync/set.connection.id";
-import type {PingMessage} from "@common/ws/message/ws/ping";
-import {SetProfileImageBody} from "@common/ws/message/ws/set.profile.image";
+import type {PingWsInMessage} from "@common/ws/message/ws/ping";
+import {SetProfileImageWsInBody} from "@common/ws/message/ws/set.profile.image";
 import type {
-  SetProfileImageMessage,
+  SetProfileImageWsInMessage,
 } from "@common/ws/message/ws/set.profile.image";
 import {
   SetSettingBody,
@@ -32,9 +32,9 @@ import type {
 import type {SetUserProfileMessage, SetUserProfileWsOutMessage} from "@common/ws/message/ws/set.user.profile";
 import type {SetWsIdWsOutMessage,
   SetWsIdWsInMessage} from "@common/ws/message/ws/set.ws.id";
-import {UserProfileChangedBody} from "@common/ws/message/ws/user.profile.changed";
+import {UserProfileChangedWsInBody} from "@common/ws/message/ws/user.profile.changed";
 import type {
-  UserProfileChangedMessage,
+  UserProfileChangedWsInMessage,
 } from "@common/ws/message/ws/user.profile.changed";
 import type {
   PrintMessageWsInMessage,
@@ -98,7 +98,7 @@ import {
   SetWsIdBody,
 } from "@common/ws/message/ws/set.ws.id";
 import {Gender} from "@common/model/enum/gender";
-import {PingBody} from "@common/ws/message/ws/ping";
+import {PingWsInBody} from "@common/ws/message/ws/ping";
 import type {
   PongWsInMessage,
   PongWsOutMessage,
@@ -597,8 +597,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.store.setUserInfo(a);
   }
 
-  @Subscribe<SetProfileImageMessage>()
-  public setProfileImage(m: SetProfileImageBody) {
+  @Subscribe<SetProfileImageWsInMessage>()
+  public setProfileImage(m: SetProfileImageWsInBody) {
     this.setUserImage(m.url);
   }
 
@@ -641,14 +641,14 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     }
   }
 
-  @Subscribe<UserProfileChangedMessage>()
-  public userProfileChanged(message: UserProfileChangedBody) {
+  @Subscribe<UserProfileChangedWsInMessage>()
+  public userProfileChanged(message: UserProfileChangedWsInBody) {
     this.store.setUser(message);
   }
 
 
-  @Subscribe<PingMessage>()
-  public ping(message: PingBody) {
+  @Subscribe<PingWsInMessage>()
+  public ping(message: PingWsInBody) {
     this.startNoPingTimeout();
     this.sendToServer<PongWsOutMessage>({
       action: "pong",
