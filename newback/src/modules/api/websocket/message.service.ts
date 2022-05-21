@@ -4,9 +4,9 @@ import type {SyncHistoryWsOutBody} from "@common/ws/message/sync.history";
 import type {
   ShowITypeWsInMessage,
   ShowITypeWsOutBody,
-} from "@common/ws/message/show.i.type";
+} from "@common/ws/message/room/show.i.type";
 
-import type {PrintMessageWsOutBody} from "@common/ws/message/print.message";
+import type {PrintMessageWsOutBody} from "@common/ws/message/ws-message/print.message";
 import {
   Injectable,
   Logger,

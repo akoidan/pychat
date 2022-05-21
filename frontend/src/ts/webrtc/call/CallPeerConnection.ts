@@ -1,10 +1,15 @@
 import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import type {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
-import type {DestroyCallConnection} from "@common/legacy";
+
 import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor} from "@/ts/utils/audioprocc";
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
-import type {JsAudioAnalyzer, SetCallOpponent, SetOpponentAnchor, SetOpponentVoice} from "@/ts/types/types";
+import type {
+  JsAudioAnalyzer,
+  SetCallOpponent,
+  SetOpponentAnchor,
+  SetOpponentVoice
+} from "@/ts/types/types";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
@@ -12,11 +17,16 @@ import {getStreamLog, getTrackLog} from "@/ts/utils/pureFunctions";
 import type {CallInfoModel, RoomModel} from "@/ts/types/model";
 import {stopVideo} from "@/ts/utils/htmlApi";
 import type Subscription from "@/ts/classes/Subscription";
+import {ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.remote";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {DestroyCallConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.call.connection";
 
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {
-    destroy: <HandlerType<"destroy", "peerConnection:*">> this.destroy,
+    destroy: <HandlerType<"destroy", DestroyPeerConnectionMessage>> this.destroy,
+    login: <HandlerType<"login", LoginMessage>> this.login,
     streamChanged: <HandlerType<"streamChanged", "peerConnection:*">> this.streamChanged,
     connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">> this.connectToRemote,
     sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
@@ -196,11 +206,13 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     };
   }
 
-  public destroy(message: DestroyPeerConnectionMessage) { // Called by transfer
+  @Subscribe<DestroyPeerConnectionMessage>()
+  public destroy() { // Called by transfer
     this.unsubscribeAndRemoveFromParent();
   }
 
-  destroyCallConnection(m: DestroyCallConnection) { // Called by opponent devices via ws
+  @Subscribe<DestroyCallConnectionWsInMessage>()
+  public destroyCallConnection() {
     this.unsubscribeAndRemoveFromParent();
   }
 

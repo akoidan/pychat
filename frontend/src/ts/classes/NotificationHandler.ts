@@ -13,17 +13,14 @@ import {
   SERVICE_WORKER_VERSION_LS_NAME,
 } from "@/ts/utils/consts";
 
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {MainWindow} from "@/ts/classes/MainWindow";
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
 
 
-export default class NotifierHandler extends MessageHandler {
+export default class NotifierHandler {
   protected readonly logger: Logger;
-
-  protected readonly handlers: HandlerTypes<keyof NotifierHandler> = {
-    internetAppear: <HandlerType<"internetAppear", InternetAppearMessage>> this.internetAppear,
-  };
 
   private readonly mainWindow: MainWindow;
 
@@ -57,7 +54,6 @@ export default class NotifierHandler extends MessageHandler {
   private readonly sub: Subscription;
 
   public constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
-    super();
     this.api = api;
     this.browserVersion = browserVersion;
     this.isChrome = isChrome;
@@ -73,6 +69,7 @@ export default class NotifierHandler extends MessageHandler {
     this.onFocus(null);
   }
 
+  @Subscribe<InternetAppearMessage>()
   public async internetAppear() {
     if (!this.serviceWorkedTried) {
       await this.tryAgainRegisterServiceWorker();

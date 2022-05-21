@@ -13,7 +13,7 @@ import {PubsubService} from "@/modules/shared/pubsub/pubsub.service";
 import {transformSetWsId} from "@/data/transformers/out.message/set.ws.id.transformer";
 import {transformAddUserOnline} from "@/data/transformers/out.message/add.online.user.transformer";
 import {getLogoutMessage} from "@/data/transformers/out.message/remove.online.user.transformer";
-import type {AddOnlineUserMessage} from "@common/ws/message/add.online.user";
+import type {AddOnlineUserMessage} from "@common/ws/message/room/add.online.user";
 import type {WebSocketContextData} from "@/data/types/patch";
 
 

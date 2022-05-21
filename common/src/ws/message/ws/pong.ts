@@ -1,6 +1,11 @@
-import type {DefaultWsInMessage} from "@common/ws/common";
+import type {
+  DefaultWsInMessage,
+  DefaultWsOutMessage
+} from "@common/ws/common";
 
 export interface PongBody {
   time: string;
 }
-export type PongMessage = DefaultWsInMessage<"pong", "ws", PongBody>;
+export type PongWsOutMessage = DefaultWsOutMessage<"pong", PongBody>;
+
+export type PongWsInMessage = DefaultWsInMessage<"pong", "ws", PongBody>

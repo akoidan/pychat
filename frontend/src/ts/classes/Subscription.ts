@@ -1,6 +1,6 @@
 import type {DefaultWsInMessage, HandlerName} from "@common/ws/common";
 import type {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
-import type {IMessageHandler} from "@common/legacy";
+
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 
@@ -8,7 +8,7 @@ import type {Logger} from "lines-logger";
 export default class Subscription {
   // TODO sub should unsubscribe from some events on logout
 
-  private suscribers: Partial<Record<HandlerName, IMessageHandler[]>> = {};
+  private suscribers: Partial<Record<HandlerName, any[]>> = {};
 
   private readonly logger: Logger;
 
@@ -32,7 +32,7 @@ export default class Subscription {
     return this.suscribers[channel]?.length ?? 0;
   }
 
-  public subscribe(channel: HandlerName, messageHandler: IMessageHandler) {
+  public subscribe(channel: HandlerName, messageHandler: any) {
     if (!this.suscribers[channel]) {
       this.suscribers[channel] = [];
     }
@@ -42,7 +42,7 @@ export default class Subscription {
     }
   }
 
-  public unsubscribe(channel: HandlerName, handler: IMessageHandler) {
+  public unsubscribe(channel: HandlerName, handler: any) {
     const c = this.suscribers[channel];
 
     if (c) {
@@ -63,7 +63,7 @@ export default class Subscription {
     this.logger.debug("notifing {}", message)();
     if (message.handler === "*") {
       Object.values(this.suscribers).forEach((channel) => {
-        channel.forEach((h: IMessageHandler) => {
+        channel.forEach((h: any) => {
           if (h.getHandler(message)) {
             this.logger.debug(`Notifying (${message.handler}).[${message.action}] {}`, h)();
             h.handle(message);
@@ -72,7 +72,7 @@ export default class Subscription {
       });
       return true;
     } else if (this.suscribers[message.handler]?.length) {
-      this.suscribers[message.handler]!.forEach((h: IMessageHandler) => {
+      this.suscribers[message.handler]!.forEach((h: any) => {
         this.logger.debug(`Notifying (${message.handler}).[${message.action}] {}`, h)();
         h.handle(message);
       });

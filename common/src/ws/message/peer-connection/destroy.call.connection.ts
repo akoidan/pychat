@@ -1,11 +1,16 @@
-import type {DefaultWsInMessage} from "@common/ws/common";
+import type {
+  DefaultWsInMessage,
+  DefaultWsOutMessage
+} from "@common/ws/common";
 import {
   OpponentWsId,
   WebRtcDefaultMessage
 } from "@common/model/webrtc.base";
 
 
-export interface DestroyCallConnectionBody extends OpponentWsId, WebRtcDefaultMessage {
-  content: string;
+export interface DestroyCallConnectionWsOutBody extends WebRtcDefaultMessage {
+  status: "decline" | "hangup";
 }
-export type DestroyCallConnectionMessage = DefaultWsInMessage<"destroyCallConnection", "peerConnection:*", DestroyCallConnectionBody>;
+
+export type DestroyCallConnectionWsOutMessage = DefaultWsOutMessage<"destroyCallConnection", DestroyCallConnectionWsOutBody>;
+export type DestroyCallConnectionWsInMessage = DefaultWsInMessage<"destroyCallConnection", "peerConnection:*", null>;

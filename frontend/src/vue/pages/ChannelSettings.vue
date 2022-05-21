@@ -110,9 +110,9 @@ import {ChannelsDictUIModel, CurrentUserInfoModel} from "@/ts/types/model";
 import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
-import type {RouterNavigateMessage} from "@/ts/types/messages/innerMessages";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
+import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
 
 @Component({
   name: "ChannelSettings",

@@ -10,7 +10,7 @@ import type {SetMessageStatusWsInMessage} from "@common/ws/message/set.message.s
 import type {SyncHistoryWsInMessage} from "@common/ws/message/sync.history";
 import type {HandlerName} from "@common/ws/common";
 import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
-import type {DeleteMessage, MessagesResponseMessage} from "@common/legacy";
+
 import type {PrintMessageWsInMessage} from "@common/ws/message/print.message";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Api from "@/ts/message_handlers/Api";

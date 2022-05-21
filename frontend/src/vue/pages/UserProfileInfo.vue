@@ -124,7 +124,7 @@ import {CurrentUserInfoModel} from "@/ts/types/model";
 
 import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
-import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
+import {LogoutMessage} from "@/ts/types/messages/inner/logout";
 
 
 @Component({
@@ -165,6 +165,7 @@ export default class UserProfileInfo extends Vue {
     const message: LogoutMessage = {
       action: "logout",
       handler: "*",
+      data: null,
     };
     this.$messageBus.notify(message);
   }

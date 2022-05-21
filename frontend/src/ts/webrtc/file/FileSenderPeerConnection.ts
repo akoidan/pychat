@@ -9,6 +9,9 @@ import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {AcceptFileBody} from "@common/ws/message/webrtc-transfer/accept.file";
+import {DestroyFileConnectionBody} from "@common/ws/message/peer-connection/destroy.file.connection";
 
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
@@ -71,8 +74,9 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     }
   }
 
-  public acceptFile(message: AcceptFileMessage) {
-    this.offset = message.content.received;
+  @Subscribe<AcceptFileMessage>()
+  public acceptFile(message: AcceptFileBody) {
+    this.offset = message.received;
     this.createPeerConnection();
     const ssfs: SetSendingFileStatus = {
       status: FileTransferStatus.IN_PROGRESS,
@@ -82,7 +86,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       transfer: this.opponentWsId,
     };
     this.store.setSendingFileStatus(ssfs);
-    this.setTranseferdAmount(message.content.received);
+    this.setTranseferdAmount(message.received);
     try {
       // Reliable data channels not supported by Chrome
       this.sendChannel = this.pc!.createDataChannel("sendDataChannel", {reliable: false});
@@ -144,13 +148,14 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     }
   }
 
-  public destroyFileConnection(message: DestroyFileConnectionMessage) {
+  @Subscribe<DestroyFileConnectionMessage>()
+  public destroyFileConnection(message: DestroyFileConnectionBody) {
     let isError = false;
     let status;
-    if (message.content === "decline") {
+    if (message.status === "decline") {
       status = FileTransferStatus.DECLINED_BY_OPPONENT;
       this.unsubscribeAndRemoveFromParent();
-    } else if (message.content === "success") {
+    } else if (message.status === "success") {
       status = FileTransferStatus.FINISHED;
       this.unsubscribeAndRemoveFromParent();
     } else {
@@ -160,7 +165,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     const payload: SetSendingFileStatus = {
       transfer: this.opponentWsId,
       connId: this.connectionId,
-      error: isError ? message.content : null,
+      error: isError ? message.status : null,
       roomId: this.roomId,
       status,
     };

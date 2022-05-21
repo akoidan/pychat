@@ -2,7 +2,6 @@ import type {ChangeDeviceType} from "@common/model/ws.base";
 
 
 import type {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
-import type {ChangeDeviceType} from "@common/legacy";
 
 
 export interface ChangeP2pRoomInfoMessageBody {

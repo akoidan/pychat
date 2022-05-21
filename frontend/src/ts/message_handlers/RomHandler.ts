@@ -1,39 +1,57 @@
 import type {ChannelDto} from "@common/model/dto/channel.dto";
 import type {RoomDto} from "@common/model/dto/room.dto";
 import type {AddRoomBase, ChangeDeviceType} from "@common/model/ws.base";
-import type {AddChannelMessage} from "@common/ws/message/room/add.channel";
-import type {AddInviteMessage} from "@common/ws/message/room/add.invite";
-import type {AddOnlineUserMessage} from "@common/ws/message/room/add.online.user";
-import type {AddRoomMessage} from "@common/ws/message/room/add.room";
-import type {DeleteChannelMessage} from "@common/ws/message/room/delete.channel";
-import type {DeleteRoomMessage} from "@common/ws/message/room/delete.room";
-import type {InviteUserMessage} from "@common/ws/message/room/invite.user";
-import type {LeaveUserMessage} from "@common/ws/message/room/leave.user";
-import type {RemoveOnlineUserMessage} from "@common/ws/message/room/remove.online.user";
-import type {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
-import type {SaveRoomSettingsMessage} from "@common/ws/message/room/save.room.settings";
-import type {ShowITypeWsInMessage} from "@common/ws/message/room/show.i.type";
+import {AddChannelBody} from "@common/ws/message/room/add.channel";
+import type {
+  AddChannelMessage,
+} from "@common/ws/message/room/add.channel";
+import {AddInviteBody} from "@common/ws/message/room/add.invite";
+import type {
+  AddInviteMessage,
+} from "@common/ws/message/room/add.invite";
+import {AddOnlineUserBody} from "@common/ws/message/room/add.online.user";
+import type {
+  AddOnlineUserMessage,
+} from "@common/ws/message/room/add.online.user";
+import {AddRoomBody} from "@common/ws/message/room/add.room";
+import type {
+  AddRoomMessage,
+} from "@common/ws/message/room/add.room";
+import {DeleteChannelBody} from "@common/ws/message/room/delete.channel";
+import type {
+  DeleteChannelMessage,
+} from "@common/ws/message/room/delete.channel";
+import {DeleteRoomBody} from "@common/ws/message/room/delete.room";
+import type {
+  DeleteRoomMessage,
+} from "@common/ws/message/room/delete.room";
+import {InviteUserBody} from "@common/ws/message/room/invite.user";
+import type {
+  InviteUserMessage,
+} from "@common/ws/message/room/invite.user";
+import {LeaveUserBody} from "@common/ws/message/room/leave.user";
+import type {
+  LeaveUserMessage,
+} from "@common/ws/message/room/leave.user";
+import {RemoveOnlineUserBody} from "@common/ws/message/room/remove.online.user";
+import type {
+  RemoveOnlineUserMessage,
+} from "@common/ws/message/room/remove.online.user";
+import {SaveChannelSettingsBody} from "@common/ws/message/room/save.channel.settings";
+import type {
+  SaveChannelSettingsMessage,
+} from "@common/ws/message/room/save.channel.settings";
+import type {
+  SaveRoomSettingsBody,
+  SaveRoomSettingsMessage
+} from "@common/ws/message/room/save.room.settings";
+
 import type {ChangeP2pRoomInfoMessage} from "@/ts/types/messages/inner/change.p2p.room.info";
-import type {ChangeUserOnlineInfoMessage} from "@/ts/types/messages/inner/change.user.online.info";
+import type {ChangeOnlineMessage} from "@/ts/types/messages/inner/change.user.online.info";
 import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import type {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
 import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
-import type {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddRoomBase,
-  AddRoomMessage,
-  ChangeDeviceType,
-  DeleteChannelMessage,
-  DeleteRoomMessage,
-  InviteUserMessage,
-  LeaveUserMessage,
-  RemoveOnlineUserMessage,
-  SaveChannelSettingsMessage,
-  SaveRoomSettingsMessage,
-} from "@common/legacy";
-import type {ShowITypeWsInMessage} from "@common/ws/message/show.i.type";
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
+
 import type {RoomLogEntry, SetRoomsUsers} from "@/ts/types/types";
 
 import type {
@@ -58,28 +76,21 @@ import {login, logout} from "@/ts/utils/audio";
 import type Subscription from "@/ts/classes/Subscription";
 
 import type {SetStateFromWS} from "@/ts/types/dto";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
+import {PubSetRoomsMessageBody} from "@/ts/types/messages/inner/pub.set.rooms";
+import {
+  ShowITypeWsInBody,
+  ShowITypeWsInMessage
+} from "@common/ws/message/room/show.i.type";
+import {
+  CreateNewUserBody,
+  CreateNewUserMessage
+} from "@common/ws/message/room/create.new.user";
 
 
-export class RoomHandler extends MessageHandler {
+export class RoomHandler {
   protected readonly logger: Logger;
-
-  protected readonly handlers: HandlerTypes<keyof RoomHandler> = {
-    deleteRoom: <HandlerType<"deleteRoom", "room">> this.deleteRoom,
-    init: <HandlerType<"init", "room">> this.init,
-    leaveUser: <HandlerType<"leaveUser", "room">> this.leaveUser,
-    addRoom: <HandlerType<"addRoom", "room">> this.addRoom,
-    removeOnlineUser: <HandlerType<"removeOnlineUser", "room">> this.removeOnlineUser,
-    addChannel: <HandlerType<"addChannel", "room">> this.addChannel,
-    inviteUser: <HandlerType<"inviteUser", "room">> this.inviteUser,
-    addInvite: <HandlerType<"addInvite", "room">> this.addInvite,
-    addOnlineUser: <HandlerType<"addOnlineUser", "room">> this.addOnlineUser,
-    saveChannelSettings: <HandlerType<"saveChannelSettings", "room">> this.saveChannelSettings,
-    deleteChannel: <HandlerType<"deleteChannel", "room">> this.deleteChannel,
-    saveRoomSettings: <HandlerType<"saveRoomSettings", "room">> this.saveRoomSettings,
-    createNewUser: <HandlerType<"createNewUser", "room">> this.createNewUser,
-    showIType: <HandlerType<"showIType", "room">> this.showIType,
-    logout: <HandlerType<"logout", "room">> this.logout,
-  };
 
   private readonly store: DefaultStore;
 
@@ -96,7 +107,6 @@ export class RoomHandler extends MessageHandler {
     audioPlayer: AudioPlayer,
     sub: Subscription,
   ) {
-    super();
     this.store = store;
     this.sub = sub;
     sub.subscribe("room", this);
@@ -105,7 +115,8 @@ export class RoomHandler extends MessageHandler {
     this.audioPlayer = audioPlayer;
   }
 
-  public leaveUser(message: LeaveUserMessage) {
+  @Subscribe<LeaveUserMessage>()
+  public leaveUser(message: LeaveUserBody) {
     if (this.store.roomsDict[message.roomId]) {
       const m: SetRoomsUsers = {
         roomId: message.roomId,
@@ -126,23 +137,26 @@ export class RoomHandler extends MessageHandler {
     }
   }
 
-  public addRoom(message: AddRoomMessage) {
+  @Subscribe<AddRoomMessage>()
+  public addRoom(message: AddRoomBody) {
     this.mutateRoomAddition(message, "room_created");
   }
 
-  public removeOnlineUser(message: RemoveOnlineUserMessage) {
+  @Subscribe<RemoveOnlineUserMessage>()
+  public removeOnlineUser(message: RemoveOnlineUserBody) {
     if (message.online[message.userId].length === 0) {
       this.addChangeOnlineEntry(message.userId, message.time, "gone offline");
     }
     this.store.setOnline(message.online);
   }
 
-  public addChannel(message: AddChannelMessage) {
-    // TODO
-    this.mutateRoomAddition(message as any, "room_created");
+  @Subscribe<AddChannelMessage>()
+  public addChannel(message: AddChannelBody) {
+    this.mutateRoomAddition(message, "room_created");
   }
 
-  public inviteUser(message: InviteUserMessage) {
+  @Subscribe<InviteUserMessage>()
+  public inviteUser(message: InviteUserBody) {
     this.store.setRoomsUsers({
       roomId: message.roomId,
       users: message.users,
@@ -160,11 +174,13 @@ export class RoomHandler extends MessageHandler {
     this.notifyDevicesChanged(null, message.roomId, "someone_joined");
   }
 
-  public addInvite(message: AddInviteMessage) {
+  @Subscribe<AddInviteMessage>()
+  public addInvite(message: AddInviteBody) {
     this.mutateRoomAddition(message, "invited");
   }
 
-  public createNewUser(message: CreateNewUserMessage) {
+  @Subscribe<CreateNewUserMessage>()
+  public createNewUser(message: CreateNewUserBody) {
     const newVar: UserModel = convertUser(message, null);
     this.store.addUser(newVar);
     message.rooms.forEach(({roomId, users}) => {
@@ -185,13 +201,14 @@ export class RoomHandler extends MessageHandler {
     });
   }
 
-  public addOnlineUser(message: AddOnlineUserMessage) {
+  @Subscribe<AddOnlineUserMessage>()
+  public addOnlineUser(message: AddOnlineUserBody) {
     if (message.online[message.userId].length === 1) {
       // Exactly 1 device is now offline, so that new that appeared is the first one
       this.addChangeOnlineEntry(message.userId, message.time, "appeared online");
     }
     this.store.setOnline({...message.online}); // Prevent modifying original object
-    const payload: ChangeUserOnlineInfoMessage = {
+    const payload: ChangeOnlineMessage = {
       handler: "webrtc",
       allowZeroSubscribers: true,
       action: "changeOnline",
@@ -202,7 +219,8 @@ export class RoomHandler extends MessageHandler {
     this.sub.notify(payload);
   }
 
-  public saveChannelSettings(message: SaveChannelSettingsMessage) {
+  @Subscribe<SaveChannelSettingsMessage>()
+  public saveChannelSettings(message: SaveChannelSettingsBody) {
     if (!this.store.channelsDict[message.id]) {
       this.logger.error("Unable to find channel to edit {} to kick user, available are {}", message.id, Object.keys(this.store.channelsDict))();
     } else {
@@ -217,14 +235,16 @@ export class RoomHandler extends MessageHandler {
     }
   }
 
-  public deleteChannel(message: DeleteChannelMessage) {
+  @Subscribe<DeleteChannelMessage>()
+  public deleteChannel(message: DeleteChannelBody) {
     this.store.deleteChannel(message.channelId);
     message.roomIds.forEach((id) => {
       this.doRoomDelete(id);
     });
   }
 
-  public async showIType(message: ShowITypeWsInMessage) {
+  @Subscribe<ShowITypeWsInMessage>()
+  public async showIType(message: ShowITypeWsInBody) {
     if (this.store.myId !== message.userId) {
       await this.store.showUserIsTyping({
         userId: message.userId,
@@ -233,7 +253,8 @@ export class RoomHandler extends MessageHandler {
     }
   }
 
-  public saveRoomSettings(message: SaveRoomSettingsMessage) {
+  @Subscribe<SaveRoomSettingsMessage>()
+  public saveRoomSettings(message: SaveRoomSettingsBody) {
     const oldRoom = this.store.roomsDict[message.id];
     if (!oldRoom) {
       this.logger.error("Unable to find channel to edit {} to kick user, available are {}", message.id, Object.keys(this.store.roomsDict))();
@@ -247,16 +268,18 @@ export class RoomHandler extends MessageHandler {
     }
   }
 
-
-  public deleteRoom(message: DeleteRoomMessage) {
+  @Subscribe<DeleteRoomMessage>()
+  public deleteRoom(message: DeleteRoomBody) {
     this.doRoomDelete(message.roomId);
   }
 
-  public logout(m: LogoutMessage) {
+  @Subscribe<LogoutMessage>()
+  public logout() {
     this.store.logout();
   }
 
-  public init(m: PubSetRoomsMessage) {
+  @Subscribe<PubSetRoomsMessage>()
+  public init(m: PubSetRoomsMessageBody) {
     const {rooms, channels, users, online} = m;
 
     /*

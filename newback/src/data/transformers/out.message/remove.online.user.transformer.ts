@@ -1,7 +1,7 @@
 import type {
   UserOnlineData,
 } from "@/data/types/internal";
-import type {RemoveOnlineUserMessage} from "@common/legacy";
+import type {RemoveOnlineUserMessage} from "@common/ws/message/room/remove.online.user";
 import {WebSocketContextData} from "@/data/types/patch";
 
 

@@ -1,5 +1,5 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
-import type {AddRoomBase} from "@common/legacy";
+import {AddRoomBase} from "@common/model/ws.base";
 
 export interface AddRoomBody extends AddRoomBase {
   channelUsers: number[];

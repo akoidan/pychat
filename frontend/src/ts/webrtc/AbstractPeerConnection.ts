@@ -1,23 +1,25 @@
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
-import type {SendRtcDataMessage} from "@common/ws/message/peer-connection/send.rtc.data";
+import type {
+  SendRtcDataBody,
+  SendRtcDataMessage
+} from "@common/ws/message/peer-connection/send.rtc.data";
 import type {HandlerName} from "@common/ws/common";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
 
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
 
 
-export default abstract class AbstractPeerConnection extends MessageHandler {
+export default abstract class AbstractPeerConnection {
   protected offerCreator: boolean = false;
 
-  protected sendRtcDataQueue: SendRtcDataMessage[] = [];
+  protected sendRtcDataQueue: SendRtcDataBody[] = [];
 
   protected readonly opponentWsId: string;
 
@@ -47,7 +49,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   };
 
   public constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore, sub: Subscription) {
-    super();
     this.roomId = roomId;
     this.connectionId = connectionId;
     this.opponentWsId = opponentWsId;
@@ -186,12 +187,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   // Destroy(Des)
 
   // This event comes from websocket from server, which is created by another PC
-  public async sendRtcData(message: SendRtcDataMessage) {
+  public async sendRtcData(message: SendRtcDataBody) {
     if (!this.connectedToRemote) {
       this.logger.warn("Putting sendrtc data event to the queue")();
       this.sendRtcDataQueue.push(message);
     } else {
-      const {data} = message;
+      const {content: data} = message;
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== "closed") {
         if ((<RTCSessionDescriptionInit>data).sdp) {
           this.logger.log("Creating answer")();

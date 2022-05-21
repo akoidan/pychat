@@ -1,5 +1,5 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
-import {ChangeUserOnlineBase} from "@common/legacy";
+import {ChangeUserOnlineBase} from "@common/model/ws.base";
 
 export type RemoveOnlineUserBody = ChangeUserOnlineBase;
 

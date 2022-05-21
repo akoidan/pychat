@@ -1,6 +1,9 @@
 import type {GiphyDto} from "@common/model/dto/giphy.dto";
 import type {RoomNoUsersDto} from "@common/model/dto/room.dto";
-import type {UserProfileDto, UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
+import type {
+  UserProfileDto,
+  UserProfileDtoWoImage,
+} from "@common/model/dto/user.profile.dto";
 import type {UserSettingsDto} from "@common/model/dto/user.settings.dto";
 import type {MessageStatus} from "@common/model/enum/message.status";
 import type {MessagesResponseMessage} from "@common/model/ws.base";
@@ -9,36 +12,53 @@ import type {AddInviteMessage} from "@common/ws/message/room/add.invite";
 import type {AddRoomMessage} from "@common/ws/message/room/add.room";
 import type {SaveChannelSettingsMessage} from "@common/ws/message/room/save.channel.settings";
 import type {ShowITypeWsOutMessage} from "@common/ws/message/room/show.i.type";
-import type {WebRtcSetConnectionIdMessage} from "@common/ws/message/sync/set.connection.id";
+import type {
+  WebRtcSetConnectionIdBody,
+  WebRtcSetConnectionIdMessage,
+} from "@common/ws/message/sync/set.connection.id";
 import type {PingMessage} from "@common/ws/message/ws/ping";
-import type {PongMessage} from "@common/ws/message/ws/pong";
-import type {SetProfileImageMessage} from "@common/ws/message/ws/set.profile.image";
-import type {SetSettingsMessage} from "@common/ws/message/ws/set.settings";
-import type {SetUserProfileMessage} from "@common/ws/message/ws/set.user.profile";
-import type {SetWsIdWsOutMessage} from "@common/ws/message/ws/set.ws.id";
-import type {UserProfileChangedMessage} from "@common/ws/message/ws/user.profile.changed";
-import type {PrintMessageWsInMessage, PrintMessageWsOutMessage} from "@common/ws/message/ws-message/print.message";
-import type {GetCountryCodeWsInMessage, GetCountryCodeWsOutMessage} from "@common/ws/message/get.country.code";
+import {SetProfileImageBody} from "@common/ws/message/ws/set.profile.image";
+import type {
+  SetProfileImageMessage,
+} from "@common/ws/message/ws/set.profile.image";
+import {
+  SetSettingBody,
+} from "@common/ws/message/ws/set.settings";
+import type {
+  SetSettingsMessage,
+
+  SetSettingsWsOutMessage,
+} from "@common/ws/message/ws/set.settings";
+import type {SetUserProfileMessage, SetUserProfileWsOutMessage} from "@common/ws/message/ws/set.user.profile";
+import type {SetWsIdWsOutMessage,
+  SetWsIdWsInMessage} from "@common/ws/message/ws/set.ws.id";
+import {UserProfileChangedBody} from "@common/ws/message/ws/user.profile.changed";
+import type {
+  UserProfileChangedMessage,
+} from "@common/ws/message/ws/user.profile.changed";
+import type {
+  PrintMessageWsInMessage,
+  PrintMessageWsOutMessage,
+} from "@common/ws/message/ws-message/print.message";
+import type {GetCountryCodeWsInMessage,
+  GetCountryCodeWsOutMessage,
+  GetCountryCodeWsInBody} from "@common/ws/message/get.country.code";
 import type {SetMessageStatusWsOutMessage} from "@common/ws/message/set.message.status";
-import type {SyncHistoryWsInMessage, SyncHistoryWsOutMessage} from "@common/ws/message/sync.history";
+import type {
+  SyncHistoryWsInMessage,
+  SyncHistoryWsOutMessage,
+} from "@common/ws/message/sync.history";
 import type {DefaultWsOutMessage} from "@common/ws/common";
 import {WS_SESSION_EXPIRED_CODE} from "@common/consts";
 import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import type {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
-import type {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddRoomMessage,
-  MessagesResponseMessage,
-  SaveChannelSettingsMessage,
-  SetSettingsMessage,
-  SetUserProfileMessage,
-  UserProfileChangedMessage,
-  WebRtcSetConnectionIdMessage,
-} from "@common/legacy";
+
 import type {ShowITypeWsOutMessage} from "@common/ws/message/show.i.type";
-import type {PrintMessageWsInMessage, PrintMessageWsOutMessage} from "@common/ws/message/print.message";
+import type {
+  PrintMessageWsInMessage,
+  PrintMessageWsOutMessage,
+} from "@common/ws/message/print.message";
 import {
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
@@ -46,18 +66,59 @@ import {
   IS_DEBUG,
   LOG_LEVEL_LS,
 } from "@/ts/utils/consts";
-import type {Logger, LogLevel} from "lines-logger";
+import type {
+  Logger,
+  LogLevel,
+} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import type {CurrentUserInfoWoImage, CurrentUserSettingsModel, Location} from "@/ts/types/model";
-import type {MessageSupplier, SessionHolder} from "@/ts/types/types";
-import {convertLocation, currentUserInfoDtoToModel, userSettingsDtoToModel} from "@/ts/types/converters";
+import type {
+  CurrentUserInfoWoImage,
+  CurrentUserSettingsModel,
+  Location,
+} from "@/ts/types/model";
+import type {
+  MessageSupplier,
+  SessionHolder,
+} from "@/ts/types/types";
+import {
+  convertLocation,
+  currentUserInfoDtoToModel,
+  userSettingsDtoToModel,
+} from "@/ts/types/converters";
 
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
 
 
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {SetUserProfileBody} from "@common/ws/message/ws/set.user.profile";
+import {
+  SetWsIdBody,
+} from "@common/ws/message/ws/set.ws.id";
+import {Gender} from "@common/model/enum/gender";
+import {PingBody} from "@common/ws/message/ws/ping";
+import type {
+  PongWsInMessage,
+  PongWsOutMessage,
+} from "@common/ws/message/ws/pong";
+import type {
+  OfferFileBody,
+  OfferFileWsOutMessage,
+
+  OfferFileMessage,
+
+  OfferFileRequest,
+  OfferFileResponse,
+} from "@common/ws/message/webrtc/offer.file";
+import {RequestWsOutMessage} from "@common/ws/common";
+import type {
+  OfferCallRequest,
+  OfferCallResponse,
+} from "@common/ws/message/webrtc/offer.call";
+import type {AcceptFileWsOutMessage} from "@common/ws/message/webrtc-transfer/accept.file";
+import type {DestroyCallConnectionWsOutMessage} from "@common/ws/message/peer-connection/destroy.call.connection";
 
 
 enum WsState {
@@ -66,18 +127,6 @@ enum WsState {
 
 export default class WsHandler extends MessageHandler implements MessageSupplier {
   protected readonly logger: Logger;
-
-  protected readonly handlers: HandlerTypes<keyof WsHandler, "ws"> = {
-    setSettings: <HandlerType<"setSettings", "ws">> this.setSettings,
-    setUserProfile: <HandlerType<"setUserProfile", "ws">> this.setUserProfile,
-    setProfileImage: <HandlerType<"setProfileImage", "ws">> this.setProfileImage,
-    setWsId: <HandlerType<"setWsId", "ws">> this.setWsId,
-    logout: <HandlerType<"logout", "ws">> this.logout,
-    userProfileChanged: <HandlerType<"userProfileChanged", "ws">> this.userProfileChanged,
-    ping: <HandlerType<"ping", "ws">> this.ping,
-    pong: <HandlerType<"pong", "ws">> this.pong,
-  };
-
 
   /*
    * How much current time is ahead of the server time
@@ -142,38 +191,41 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     return this.wsConnectionId;
   }
 
-  public async getCountryCode(): Promise<GetCountryCodeWsInMessage> {
-    return this.messageProc.sendToServerAndAwait<GetCountryCodeWsOutMessage, "getCountryCode">({
+  public async getCountryCode(): Promise<GetCountryCodeWsInBody> {
+    return this.messageProc.sendToServerAndAwait<GetCountryCodeWsOutMessage, GetCountryCodeWsInMessage>({
       action: "getCountryCode",
+      data: null,
     });
   }
 
-  public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number | null): Promise<WebRtcSetConnectionIdMessage> {
-    return this.messageProc.sendToServerAndAwait({
+  public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number | null): Promise<WebRtcSetConnectionIdBody> {
+    return this.messageProc.sendToServerAndAwait<OfferFileRequest, OfferFileResponse>({
       action: "offerFile",
-      roomId,
-      threadId,
-      content: {
-        browser,
+      data: {
+        roomId,
+        threadId,
         name,
         size,
+        browser,
       },
     });
   }
 
-  public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdMessage> {
-    return this.messageProc.sendToServerAndAwait({
+  public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdBody> {
+    return this.messageProc.sendToServerAndAwait<OfferCallRequest, OfferCallResponse>({
       action: "offerCall",
-      roomId,
-      content: {browser},
+      data: {
+        roomId,
+        browser,
+      },
     });
   }
 
   public acceptFile(connId: string, received: number) {
-    this.sendToServer({
+    this.sendToServer<AcceptFileWsOutMessage>({
       action: "acceptFile",
-      connId,
-      content: {
+      data: {
+        connId,
         received,
       },
     });
@@ -259,24 +311,25 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage | unknown> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait<SetSettingsWsOutMessage, SetSettingsMessage>({
       action: "setSettings",
-      content,
+      data: content,
     });
   }
 
   public showIType(roomId: number): void {
-    const request: ShowITypeWsOutMessage = {
-      roomId,
+    this.sendToServer<ShowITypeWsOutMessage>({
       action: "showIType",
-    };
-    this.sendToServer(request);
+      data: {
+        roomId,
+      },
+    });
   }
 
-  public async saveUser(content: UserProfileDtoWoImage): Promise<SetUserProfileMessage | unknown> {
-    return this.messageProc.sendToServerAndAwait({
+  public async saveUser(data: UserProfileDtoWoImage): Promise<SetUserProfileBody> {
+    return this.messageProc.sendToServerAndAwait<SetUserProfileWsOutMessage, SetUserProfileMessage>({
       action: "setUserProfile",
-      content,
+      data,
     });
   }
 
@@ -399,7 +452,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
      */
   }
 
-  public logout(a: LogoutMessage) {
+  @Subscribe<LogoutMessage>()
+  public logout() {
     const info = [];
     if (this.listenWsTimeout) {
       this.listenWsTimeout = null;
@@ -498,11 +552,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public destroyCallConnection(connId: string, content: "decline" | "hangup") {
-    this.sendToServer({
-      content,
+  public destroyCallConnection(connId: string, status: "decline" | "hangup") {
+    this.sendToServer<DestroyCallConnectionWsOutMessage>({
       action: "destroyCallConnection",
-      connId,
+      data: {
+        status,
+        connId,
+      },
     });
   }
 
@@ -527,46 +583,53 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public setSettings(m: SetSettingsMessage) {
-    const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
+  @Subscribe<SetSettingsMessage>()
+  public setSettings(settings: SetSettingBody) {
+    const a: CurrentUserSettingsModel = userSettingsDtoToModel(settings);
     this.setUserSettings(a);
   }
 
-  public setUserProfile(m: SetUserProfileMessage) {
-    const a: CurrentUserInfoWoImage = currentUserInfoDtoToModel(m.content);
+
+  @Subscribe<SetUserProfileMessage>()
+  public setUserProfile(m: SetUserProfileBody) {
+    const a: CurrentUserInfoWoImage = currentUserInfoDtoToModel(m);
     a.id = this.store.userInfo!.id; // This could came only when we logged in
     this.store.setUserInfo(a);
   }
 
-  public setProfileImage(m: SetProfileImageMessage) {
-    this.setUserImage(m.content);
+  @Subscribe<SetProfileImageMessage>()
+  public setProfileImage(m: SetProfileImageBody) {
+    this.setUserImage(m.url);
   }
 
   public convertServerTimeToPC(serverTime: number) {
     return serverTime + this.timeDiffWithServer; // ServerTime + (Date.now - serverTime) === Date.now
   }
 
-  public async setWsId(message: SetWsIdWsOutMessage) {
+
+  @Subscribe<SetWsIdWsInMessage>()
+  public async setWsId(message: SetWsIdBody) {
     this.wsConnectionId = message.opponentWsId;
     this.setUserInfo(message.profile);
     this.setUserSettings(message.settings);
     this.setUserImage(message.profile.thumbnail);
     this.timeDiffWithServer = Date.now() - message.time;
-    const pubSetRooms: PubSetRoomsMessage = {
+    this.sub.notify<PubSetRoomsMessage>({
       action: "init",
-      channels: message.channels,
+      data: {
+        channels: message.channels,
+        rooms: message.rooms,
+        online: message.online,
+        users: message.users,
+      },
       handler: "room",
-      rooms: message.rooms,
-      online: message.online,
-      users: message.users,
-    };
-    this.sub.notify(pubSetRooms);
-    const inetAppear: InternetAppearMessage = {
+    });
+
+    this.sub.notify<InternetAppearMessage>({
       action: "internetAppear",
       handler: "*",
-    };
-
-    this.sub.notify(inetAppear);
+      data: null,
+    });
     this.logger.debug("CONNECTION ID HAS BEEN SET TO {})", this.wsConnectionId)();
     if (FLAGS) {
       const getCountryCodeMessage = await this.getCountryCode();
@@ -578,31 +641,30 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     }
   }
 
-  public userProfileChanged(message: UserProfileChangedMessage) {
-    this.store.setUser({
-      id: message.id,
-      username: message.username,
-      thumbnail: message.thumbnail,
-      sex: message.sex,
-    });
+  @Subscribe<UserProfileChangedMessage>()
+  public userProfileChanged(message: UserProfileChangedBody) {
+    this.store.setUser(message);
   }
 
-  public ping(message: PingMessage) {
+
+  @Subscribe<PingMessage>()
+  public ping(message: PingBody) {
     this.startNoPingTimeout();
-    this.sendToServer({
+    this.sendToServer<PongWsOutMessage>({
       action: "pong",
-      time: message.time,
+      data: {
+        time: message.time,
+      },
     });
   }
 
-  public pong(message: PongMessage) {
-    // Private answerPong() {
+  @Subscribe<PongWsInMessage>()
+  public pong() {
     if (this.pingTimeoutFunction) {
       this.logger.debug("Clearing pingTimeoutFunction")();
       clearTimeout(this.pingTimeoutFunction);
       this.pingTimeoutFunction = null;
     }
-    // }
   }
 
   notifyCallActive(param: {connectionId: string | null; opponentWsId: string; roomId: number}) {
@@ -737,8 +799,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     this.ws.onopen = this.onWsOpen.bind(this);
   }
 
-  private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
-    const isSent = this.messageProc.sendToServer(messageRequest);
+  private sendToServer<T extends DefaultWsOutMessage<string, any>>(messageRequest: T, skipGrowl = false): boolean {
+    const isSent = this.messageProc.sendToServer<T>(messageRequest);
     if (!isSent && !skipGrowl) {
       this.logger.warn("Can't send message, because connection is lost :(")();
     }

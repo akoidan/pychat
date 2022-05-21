@@ -43,7 +43,7 @@
 import {Component, Vue} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
-import type {LoginMessage} from "@/ts/types/messages/innerMessages";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
 
 @Component({
   name: "ApplyResetPassword",
@@ -88,7 +88,9 @@ export default class ApplyResetPassword extends Vue {
       const message: LoginMessage = {
         action: "login",
         handler: "router",
-        session,
+        data: {
+          session,
+        },
       };
       this.$messageBus.notify(message);
     }

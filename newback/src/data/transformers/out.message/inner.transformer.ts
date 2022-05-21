@@ -1,6 +1,6 @@
 import {ImageType} from '@common/model/enum/image.type';
 import {GiphyDto} from '@common/model/dto/giphy.dto';
-import {PrintMessageWsOutMessage} from '@common/ws/message/print.message';
+import {PrintMessageWsOutMessage} from '@common/ws/message/ws-message/print.message';
 import type {UploadedFileModel} from "@/data/model/uploaded.file.model";
 import type {ImageModel} from "@/data/model/image.model";
 import type {MessageMentionModel} from "@/data/model/message.mention.model";

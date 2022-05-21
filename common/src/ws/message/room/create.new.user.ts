@@ -8,4 +8,4 @@ export interface CreateNewUserBody extends UserDto {
   }[];
 }
 
-export type CreateNewUsedMessage = DefaultWsInMessage<"createNewUser", "room", CreateNewUserBody>;
+export type CreateNewUserMessage = DefaultWsInMessage<"createNewUser", "room", CreateNewUserBody>;

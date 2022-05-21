@@ -33,6 +33,7 @@ import RoomUsersListPage from "@/vue/pages/RoomUsersListPage.vue";
 import ChannelAddRoom from "@/vue/pages/ChannelAddRoom.vue";
 import type Subscription from "@/ts/classes/Subscription";
 import type {SessionHolder} from "@/ts/types/types";
+import {Subscribe} from "@/ts/utils/pubsub";
 
 
 export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
@@ -186,32 +187,31 @@ export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
     }
   });
 
-  sub.subscribe("router", new class RouterProcessor extends MessageHandler {
+     class RouterProcessor {
     protected readonly logger: Logger = logger;
 
-    protected readonly handlers: HandlerTypes<keyof RouterProcessor> = {
-      login: <HandlerType<"login", LoginMessage>> this.login,
-      logout: <HandlerType<"logout", LogoutMessage>> this.logout,
-      navigate: <HandlerType<"navigate", RouterNavigateMessage>> this.navigate,
-    };
-
-    logout() {
+    @Subscribe<LogoutMessage>()
+    public logout() {
       router.replace("/auth/sign-in");
     }
 
-    navigate(a: RouterNavigateMessageBody) {
+    @Subscribe<RouterNavigateMessage>()
+    public navigate(a: RouterNavigateMessageBody) {
       if (router.currentRoute.value.path !== a.to) {
         router.replace(a.to);
       }
     }
 
-    login(a: LoginMessageBody) {
+    @Subscribe<LoginMessage>()
+    public  login(a: LoginMessageBody) {
       if (!a.session) {
         throw Error(`Invalid session ${a.session}`);
       }
       sessionHolder.session = a.session;
       router.replace(`/chat/${ALL_ROOM_ID}`);
     }
-  }());
+  }
+
+  sub.subscribe("router", new RouterProcessor());
   return router;
 }

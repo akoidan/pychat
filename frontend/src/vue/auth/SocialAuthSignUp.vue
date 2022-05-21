@@ -10,11 +10,10 @@ import type {OauthSessionResponse} from "@common/model/http.base";
 
 
 import {Component, Vue} from "vue-property-decorator";
-import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import FacebookAuth from "@/vue/auth/FacebookAuth.vue";
 import GoogleAuth from "@/vue/auth/GoogleAuth.vue";
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/ts/utils/consts";
-import type {OauthSessionResponse} from "@common/helpers";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
 
 
 @Component({

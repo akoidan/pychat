@@ -52,8 +52,8 @@ import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 
 import CaptchaComponent from "@/vue/auth/CaptchaComponent.vue";
-import type {LoginMessage} from "@/ts/types/messages/innerMessages";
 import SocialAuthSignUp from "@/vue/auth/SocialAuthSignUp.vue";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
 
 @Component({
   name: "SignIn",

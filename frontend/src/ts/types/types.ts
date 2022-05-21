@@ -17,6 +17,15 @@ import type {
   UserModel,
 } from "@/ts/types/model";
 import type {SetStateFromStorage} from "@/ts/types/dto";
+import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import type {PrintMessageWsInMessage} from "@common/ws/message/ws-message/print.message";
+import type {MessageModelDto} from "@common/model/dto/message.model.dto";
+import {
+  AddChannelBody,
+  AddChannelMessage
+} from "@common/ws/message/room/add.channel";
 
 
 export type ValueFilterForKey<T extends object, U> = {
@@ -300,11 +309,6 @@ export interface IMessageHandler {
   getHandler<H extends HandlerName, A extends string>(message: DefaultWsInMessage<A, H, any>): HandlerType<any, any> | undefined;
 }
 
-export type HandlerType<K extends string, A extends DefaultWsInMessage<K, HandlerName, A["data"]>> = (a: A["data"]) => Promise<void> | void;
-
-export type HandlerTypes<K extends string> = {
-  [Key in K]?: HandlerType<Key, any>
-};
 
 export interface SetRoomsUsers {
   roomId: number;

@@ -1,8 +1,4 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
-import type {WebRtcDefaultMessage} from "@common/legacy";
 import {ResponseWsInMessage} from "@common/ws/common";
+import {WebRtcDefaultMessage} from "@common/model/webrtc.base";
 
-export interface WebRtcSetConnectionIdBody extends WebRtcDefaultMessage {
-  time: number;
-}
-export type WebRtcSetConnectionIdMessage = ResponseWsInMessage<WebRtcSetConnectionIdBody>;

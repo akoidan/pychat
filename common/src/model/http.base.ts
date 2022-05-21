@@ -1,3 +1,6 @@
+import {WebRtcDefaultMessage} from "@common/model/webrtc.base";
+import {ResponseWsInMessage} from "@common/ws/common";
+
 export interface CaptchaRequest {
   captcha?: string;
 }
@@ -22,3 +25,4 @@ export interface SessionResponse {
 export interface OkResponse {
   ok: true;
 }
+

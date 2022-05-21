@@ -1,4 +1,4 @@
-import {PrintMessageWsInMessage} from '@common/ws/message/print.message';
+import type {PrintMessageWsInMessage} from '@common/ws/message/ws-message/print.message';
 import type {ImageModel} from "@/data/model/image.model";
 import type {
   CreateModel,

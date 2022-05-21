@@ -17,7 +17,7 @@
 import {Component, Vue} from "vue-property-decorator";
 import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import {AUTO_REGISTRATION} from "@/ts/utils/consts";
-import type {LoginMessage} from "@/ts/types/messages/innerMessages";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
 
 @Component({name: "AuthPage"})
 export default class AuthPage extends Vue {
@@ -39,7 +39,9 @@ export default class AuthPage extends Vue {
       const message: LoginMessage = {
         action: "login",
         handler: "router",
-        session,
+        data: {
+          session,
+        },
       };
       this.$messageBus.notify(message);
     }

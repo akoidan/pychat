@@ -5,7 +5,7 @@ import {UserDto} from "@common/model/dto/user.dto";
 import {UserProfileDto} from "@common/model/dto/user.profile.dto";
 import {UserSettingsDto} from "@common/model/dto/user.settings.dto";
 
-export interface SetWsIdWsOutBody {
+export interface SetWsIdBody {
   rooms: RoomDto[];
   opponentWsId: string;
   channels: ChannelDto[];
@@ -15,4 +15,4 @@ export interface SetWsIdWsOutBody {
   profile: UserProfileDto;
   settings: UserSettingsDto;
 }
-export type SetWsIdWsOutMessage = DefaultWsInMessage<"setWsId", "ws", SetWsIdWsOutBody>;
+export type SetWsIdWsInMessage = DefaultWsInMessage<"setWsId", "ws", SetWsIdBody>;

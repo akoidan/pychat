@@ -113,7 +113,8 @@ import ChatThread from "@/vue/chat/message/ChatThread.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
+import type MessageHandler from "@/ts/message_handlers/MesageHandler";
+import {Subscribe} from "@/ts/utils/pubsub";
 
 
 @Component({
@@ -274,24 +275,17 @@ export default class ChatBox extends Vue {
     }
   }
 
+  @Subscribe<any>() // TODO does this work?
+  scroll() {
+    this.onEmitScroll();
+  }
+
   created() {
-    const that = this;
-    this.handler = new class ChatBoxHandler extends MessageHandler {
-      logger = that.$logger;
-
-      protected readonly handlers: HandlerTypes<keyof ChatBoxHandler, "*"> = {
-        scroll: <HandlerType<"scroll", "*">> this.scroll,
-      };
-
-      scroll() {
-        that.onEmitScroll();
-      }
-    }();
-    this.$messageBus.subscribe("*", this.handler);
+    this.$messageBus.subscribe("*", this.scroll);
   }
 
   destroyed() {
-    this.$messageBus.unsubscribe("*", this.handler);
+    this.$messageBus.unsubscribe("*", this.scroll);
   }
 
   keyDownLoadUp(e: KeyboardEvent) {

@@ -1,13 +1,9 @@
+import type {SyncHistoryWsInBody} from "@common/ws/message/sync.history";
 import {SyncHistoryWsOutBody} from "@common/ws/message/sync.history";
-import type {SyncHistoryWsInMessage, SyncHistoryWsInBody} from "@common/ws/message/sync.history";
-import {ShowITypeWsOutBody} from "@common/ws/message/show.i.type";
-import {PrintMessageWsOutBody} from "@common/ws/message/print.message";
-import {
-  GetCountryCodeWsOutBody,
-} from "@common/ws/message/get.country.code";
-import type {
-  GetCountryCodeWsInMessage,
-} from "@common/ws/message/get.country.code";
+import {ShowITypeWsOutBody} from "@common/ws/message/room/show.i.type";
+import {PrintMessageWsOutBody} from "@common/ws/message/ws-message/print.message";
+import type {GetCountryCodeWsInMessage,} from "@common/ws/message/get.country.code";
+import {GetCountryCodeWsOutBody,} from "@common/ws/message/get.country.code";
 import type {OnGatewayConnection} from "@nestjs/websockets";
 import {
   MessageBody,
@@ -16,13 +12,9 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import {IncomingMessage} from "http";
-import {
-  WebSocket,
-} from "ws";
+import {WebSocket,} from "ws";
 import type {OnWsClose} from "@/data/types/internal";
-import {
-  SendToClientPubSubMessage,
-} from "@/data/types/internal";
+import {SendToClientPubSubMessage,} from "@/data/types/internal";
 import {
   Logger,
   UseFilters,

@@ -1,8 +1,16 @@
 import type {CallStatus} from "@common/model/webrtc.base";
 import type {AcceptCallMessage} from "@common/ws/message/webrtc-transfer/accept.call";
-import type {ReplyCallMessage} from "@common/ws/message/webrtc-transfer/reply.call";
+import {ReplyCallBody} from "@common/ws/message/webrtc-transfer/reply.call";
+import type {
+  ReplyCallMessage,
+} from "@common/ws/message/webrtc-transfer/reply.call";
 import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
-import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import {
+  CheckTransferDestroyBody,
+} from "@/ts/types/messages/inner/check.transfer.destroy";
+import type {
+  CheckTransferDestroyMessage,
+} from "@/ts/types/messages/inner/check.transfer.destroy";
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import type {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
 import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
@@ -26,18 +34,18 @@ import CallReceiverPeerConnection from "@/ts/webrtc/call/CallReceiverPeerConnect
 
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
 import {stopVideo} from "@/ts/utils/htmlApi";
+import {Subscribe} from "@/ts/utils/pubsub";
+import type {AnswerCallMessage} from "@/ts/types/messages/inner/answer.call";
+import type {VideoAnswerCallMessage} from "@/ts/types/messages/inner/video.answer.call";
+import type {DeclineCallMessage} from "@/ts/types/messages/inner/decline.call";
+import type {OfferCallBody} from "@common/ws/message/webrtc/offer.call";
+import {
+  OfferCallMessage,
+} from "@common/ws/message/webrtc/offer.call";
+import {AcceptCallBody} from "@common/ws/message/webrtc-transfer/accept.call";
 
 
 export default class CallHandler extends FileAndCallTransfer {
-  protected readonly handlers: HandlerTypes<keyof CallHandler, "webrtcTransfer:*", any> = {
-    answerCall: this.answerCall,
-    videoAnswerCall: this.videoAnswerCall,
-    declineCall: this.declineCall,
-    replyCall: <HandlerType<"replyCall", "webrtcTransfer:*", any>> this.replyCall,
-    acceptCall: <HandlerType<"acceptCall", "webrtcTransfer:*", any>> this.acceptCall,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*", any>> this.checkTransferDestroy,
-  };
-
   private canvas: HTMLCanvasElement | null = null;
 
   private localStream: MediaStream | null = null;
@@ -52,7 +60,8 @@ export default class CallHandler extends FileAndCallTransfer {
     return this.store.roomsDict[this.roomId].callInfo;
   }
 
-  public checkTransferDestroy(payload: CheckTransferDestroyMessage) {
+  @Subscribe<CheckTransferDestroyMessage>()
+  public checkTransferDestroy(payload: CheckTransferDestroyBody) {
     this.removeOpponent(payload.wsOpponentId);
     super.checkTransferDestroy(payload);
   }
@@ -90,7 +99,8 @@ export default class CallHandler extends FileAndCallTransfer {
     return this.connectionId;
   }
 
-  public acceptCall(message: AcceptCallMessage["data"]) {
+  @Subscribe<AcceptCallMessage>()
+  public acceptCall(message: AcceptCallBody) {
     if (this.callStatus !== "received_offer") { // If we're call initiator
       if (!this.connectionId) {
         throw Error("Conn is is null");
@@ -212,7 +222,9 @@ export default class CallHandler extends FileAndCallTransfer {
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
         action: "streamChanged",
         allowZeroSubscribers: true,
-        newStream: stream!,
+        data: {
+          newStream: stream!,
+        },
       };
       this.sub.notify(message);
     } catch (e: any) {
@@ -350,11 +362,12 @@ export default class CallHandler extends FileAndCallTransfer {
     }
   }
 
-  public replyCall(message: ReplyCallMessage) {
+  @Subscribe<ReplyCallMessage>()
+  public replyCall(message: ReplyCallBody) {
     this.createCallPeerConnection(message);
   }
 
-  public initAndDisplayOffer(message: OfferCall) {
+  public initAndDisplayOffer(message: OfferCallBody) {
     this.setCallStatus("received_offer");
     if (this.connectionId) {
       this.logger.error("Old connId still exists {}", this.connectionId)();
@@ -372,6 +385,7 @@ export default class CallHandler extends FileAndCallTransfer {
     this.createCallPeerConnection(message);
   }
 
+  @Subscribe<AnswerCallMessage>()
   public answerCall() {
     this.doAnswer(false);
   }
@@ -396,12 +410,13 @@ export default class CallHandler extends FileAndCallTransfer {
     this.attachLocalStream(stream);
     this.wsHandler.acceptCall(this.connectionId!);
     this.connectToRemote();
-    const message1: RouterNavigateMessage = {
+    this.sub.notify<RouterNavigateMessage>({
       handler: "router",
       action: "navigate",
-      to: `/chat/${this.roomId}`,
-    };
-    this.sub.notify(message1);
+      data: {
+        to: `/chat/${this.roomId}`,
+      },
+    });
   }
 
   public async joinCall() {
@@ -420,6 +435,7 @@ export default class CallHandler extends FileAndCallTransfer {
     this.connectToRemote();
   }
 
+  @Subscribe<VideoAnswerCallMessage>()
   public videoAnswerCall() {
     this.doAnswer(true);
   }
@@ -455,6 +471,7 @@ export default class CallHandler extends FileAndCallTransfer {
     this.acceptedPeers.length = 0; // = []
   }
 
+  @Subscribe<DeclineCallMessage>()
   public declineCall() {
     this.store.setIncomingCall(null);
     this.wsHandler.destroyCallConnection(this.connectionId!, "decline");
@@ -474,12 +491,12 @@ export default class CallHandler extends FileAndCallTransfer {
         this.logger.error("Can't close connections since it's null")();
         return;
       }
-      const message: DestroyPeerConnectionMessage = {
+      this.sub.notify<DestroyPeerConnectionMessage>({
         action: "destroy",
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId),
         allowZeroSubscribers: true,
-      };
-      this.sub.notify(message);
+        data: null,
+      });
     } else {
       this.onDestroy();
     }
@@ -501,12 +518,13 @@ export default class CallHandler extends FileAndCallTransfer {
 
   private connectToRemote() {
     this.acceptedPeers.forEach((e) => {
-      const message: ConnectToRemoteMessage = {
+      this.sub.notify<ConnectToRemoteMessage>({
         action: "connectToRemote",
-        stream: this.localStream,
+        data: {
+          stream: this.localStream,
+        },
         handler: Subscription.getPeerConnectionId(this.connectionId!, e),
-      };
-      this.sub.notify(message);
+      });
     });
   }
 

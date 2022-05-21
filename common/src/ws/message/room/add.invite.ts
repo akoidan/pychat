@@ -1,9 +1,8 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 import {
   AddRoomBase,
-  NewRoom,
   RoomExistedBefore
-} from "@common/legacy";
+} from "@common/model/ws.base";
 
 export type AddInviteBody = AddRoomBase | RoomExistedBefore;
 

@@ -23,3 +23,6 @@ export interface BrowserBase {
 }
 
 
+export interface WebRtcSetConnectionIdBody extends WebRtcDefaultMessage {
+  time: number;
+}
