@@ -1,8 +1,8 @@
 import type {DefaultWsInMessage} from "@common/ws/common";
 
 
-export interface DestroyFileConnectionBody {
+export interface DestroyFileConnectionWsInBody {
   status: "decline" | "success";
 }
 
-export type DestroyFileConnectionMessage = DefaultWsInMessage<"destroyFileConnection", "peerConnection:*", DestroyFileConnectionBody>;
+export type DestroyFileConnectionWsInMessage = DefaultWsInMessage<"destroyFileConnection", "peerConnection:*", DestroyFileConnectionWsInBody>;

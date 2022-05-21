@@ -1,4 +1,4 @@
-import type {DestroyFileConnectionMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
+import type {DestroyFileConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
 import type {RetryFileMessage} from "@common/ws/message/peer-connection/retry.file";
 import type {SetReceivingFileStatus, SetReceivingFileUploaded} from "@/ts/types/types";
 import type {ReceivingFile} from "@/ts/types/model";
@@ -83,7 +83,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.waitForAnswer();
   }
 
-  public destroyFileConnection(message: DestroyFileConnectionMessage) {
+  public destroyFileConnection(message: DestroyFileConnectionWsInMessage) {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.DECLINED_BY_OPPONENT,

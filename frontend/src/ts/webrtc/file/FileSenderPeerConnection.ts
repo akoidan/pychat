@@ -1,4 +1,4 @@
-import type {DestroyFileConnectionMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
+import type {DestroyFileConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
 import type {AcceptFileMessage} from "@common/ws/message/webrtc-transfer/accept.file";
 import type {AddSendingFileTransfer, SetSendingFileStatus, SetSendingFileUploaded} from "@/ts/types/types";
 import type {SendingFileTransfer} from "@/ts/types/model";
@@ -11,7 +11,7 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";
 import {Subscribe} from "@/ts/utils/pubsub";
 import {AcceptFileBody} from "@common/ws/message/webrtc-transfer/accept.file";
-import {DestroyFileConnectionBody} from "@common/ws/message/peer-connection/destroy.file.connection";
+import {DestroyFileConnectionWsInBody} from "@common/ws/message/peer-connection/destroy.file.connection";
 
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
@@ -148,8 +148,8 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     }
   }
 
-  @Subscribe<DestroyFileConnectionMessage>()
-  public destroyFileConnection(message: DestroyFileConnectionBody) {
+  @Subscribe<DestroyFileConnectionWsInMessage>()
+  public destroyFileConnection(message: DestroyFileConnectionWsInBody) {
     let isError = false;
     let status;
     if (message.status === "decline") {

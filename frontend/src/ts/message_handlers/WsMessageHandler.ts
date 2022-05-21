@@ -51,6 +51,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     setMessageStatus: <HandlerType<"setMessageStatus", "ws-message">> this.setMessageStatus,
   };
 
+  public async internetAppear(m: InternetAppearMessage) {
+    this.syncMessages(); // If message was edited, or changed by server
+    this.syncHistory(); // If some messages were sent during offline
+  }
+
   /*
    * MessageRetrier uses MessageModel.id as unique identifier, do NOT use it with any types but
    * Send message, delete message, edit message, as it will have the sameId which could erase some callback
@@ -352,11 +357,6 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     if (checkIfIdIsMissing(message, this.store)) {
       await this.loadMessages(message.roomId, [message.parentMessage!]);
     }
-  }
-
-  public async internetAppear(m: InternetAppearMessage) {
-    this.syncMessages(); // If message was edited, or changed by server
-    this.syncHistory(); // If some messages were sent during offline
   }
 
   public async setMessageStatus(m: SetMessageStatusWsInMessage) {

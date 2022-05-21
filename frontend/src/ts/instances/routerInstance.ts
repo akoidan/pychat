@@ -187,7 +187,7 @@ export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
     }
   });
 
-     class RouterProcessor {
+   class RouterProcessor {
     protected readonly logger: Logger = logger;
 
     @Subscribe<LogoutMessage>()
@@ -203,7 +203,7 @@ export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
     }
 
     @Subscribe<LoginMessage>()
-    public  login(a: LoginMessageBody) {
+    public login(a: LoginMessageBody) {
       if (!a.session) {
         throw Error(`Invalid session ${a.session}`);
       }

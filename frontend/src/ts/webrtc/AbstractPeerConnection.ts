@@ -2,7 +2,6 @@ import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.
 import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
 import type {
   SendRtcDataBody,
-  SendRtcDataMessage
 } from "@common/ws/message/peer-connection/send.rtc.data";
 import type {HandlerName} from "@common/ws/common";
 import type {Logger} from "lines-logger";
