@@ -117,9 +117,9 @@ minikube_delete_all() {
 }
 
 minikube_nginx() {
-  qphn.eUnHF6FRD7
-  helm repo add stable https://charts.helm.sh/stable
-  helm install nginx-ingress stable/nginx-ingress --set controller.publishService.enabled=true
+   helm repo add stable https://charts.helm.sh/stable
+   helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+   helm install nginx-ingress ingress-nginx/ingress-nginx
 }
 minikube_certificate() {
   # Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
