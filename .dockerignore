@@ -19,6 +19,8 @@ frontend/build/production.json
 !frontend/tsconfig.node.json
 !docker/populate
 !docker/tornado
+!kubernetes/frontend-old-pychat.org.json
+!kubernetes/nginx-old-pychat.org.conf
 !docker/nginx.conf
 !docker/nginx
 !docker/pychat.org/certificate.crt
