@@ -20,5 +20,6 @@ backend/chat/production.py
 backend/chat/settings.py
 backend/photos/*
 kubernetes/cf-secret.yaml
+kubernetes/oldbackend-secret.yaml
 !backend/photos/.gitkeep
 frontend/build/production.json

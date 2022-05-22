@@ -253,7 +253,7 @@ class HttpHandler(MethodDispatcher):
 		)
 
 	@require_http_method('GET')
-	def test(self):
+	def health(self):
 		try:
 			Room.objects.get(id=settings.ALL_ROOM_ID)
 		except OperationalError:
