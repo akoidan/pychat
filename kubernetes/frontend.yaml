@@ -17,7 +17,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        imagePullPolicy: IfNotPresent
+        # change to IfNotPresent for minikube
+        imagePullPolicy: Always
         image: deathangel908/pychat-frontend
         ports:
         - containerPort: 80

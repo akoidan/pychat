@@ -11,12 +11,24 @@ spec:
   - hosts:
     - pychat.org
     secretName: pychat-tls
+  - hosts:
+    - static.pychat.org
+    secretName: pychat-tls
   defaultBackend:
     service:
       name: frontend-service
       port:
         number: 80
   rules:
+ - host: static.pychat.org
+    http:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
   - host: pychat.org
     http:
       paths:
