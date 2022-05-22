@@ -26,6 +26,13 @@ spec:
           httpGet:
             path: /
             port: 80
+        volumeMounts:
+          - mountPath: "/srv/http/photo"
+            name: photo
+      volumes:
+        - name: photo
+          persistentVolumeClaim:
+            claimName: pvc-photo
 ---
 apiVersion: v1
 kind: Service
