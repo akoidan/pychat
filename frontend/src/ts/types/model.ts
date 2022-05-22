@@ -8,6 +8,10 @@ export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
 }
 
+export enum WsState {
+  NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
+}
+
 export interface GrowlModel {
   id: number;
   html: string;

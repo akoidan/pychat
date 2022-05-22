@@ -2,7 +2,7 @@
 # docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .
 # https://stackoverflow.com/a/49478889/3872976
 # minikube tunnel service/backend-service
-FROM node:14.17-alpine3.14 as builder
+FROM node:16.15-alpine3.15 as builder
 
 WORKDIR /usr/src/frontend
 # for yarn install to clone via git in package.json

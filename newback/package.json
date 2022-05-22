@@ -20,7 +20,7 @@
     "db:flush:all": "yarn create:database && yarn migrate && yarn create:migrate:prod"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0 <17"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^1.6.1",

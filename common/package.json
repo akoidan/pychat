@@ -11,7 +11,7 @@
     "lint:fix": "eslint --fix --ext .ts src"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=16.0.0 <17"
   },
   "dependencies": {
     "lines-logger": "^2.1.2",

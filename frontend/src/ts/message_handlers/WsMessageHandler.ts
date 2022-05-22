@@ -11,7 +11,6 @@ import type {SyncHistoryWsInMessage} from "@common/ws/message/sync.history";
 import type {HandlerName} from "@common/ws/common";
 import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 
-import type {PrintMessageWsInMessage} from "@common/ws/message/print.message";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Api from "@/ts/message_handlers/Api";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
@@ -194,16 +193,16 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
     const fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
     const giphies: GiphyDto[] = this.getGiphiesFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
-      const a: PrintMessageWsInMessage = await this.ws.sendPrintMessage(
-        storeMessage.content,
+      const a: PrintMessageWsInMessage = await this.ws.sendPrintMessage({
+        content: storeMessage.content,
         roomId,
-        fileIds,
-        storeMessage.id,
-        Date.now() - storeMessage.time,
-        storeMessage.parentMessage,
-        {...storeMessage.tags},
+        files: fileIds,
+        id: storeMessage.id,
+        timeDiff: Date.now() - storeMessage.time,
+        parentMessage: storeMessage.parentMessage,
+        tags: {...storeMessage.tags},
         giphies,
-      );
+      });
       const rmMes: RoomMessageIds = {
         messageId: storeMessage.id,
         roomId: storeMessage.roomId,
@@ -297,7 +296,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       roomId,
     });
   }
- @Subscribe<DeleteMessageWsInMessage>()
+
+  @Subscribe<DeleteMessageWsInMessage>()
   public deleteMessage(inMessage: DeleteMessageWsInBody) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
@@ -359,6 +359,7 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       await this.loadMessages(message.roomId, [message.parentMessage!]);
     }
   }
+
   @Subscribe<SetMessageStatusWsInMessage>()
   public async setMessageStatus(m: SetMessageStatusWsInBody) {
     this.store.setMessagesStatus({

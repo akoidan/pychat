@@ -12,37 +12,30 @@ import type {AddInviteWsInMessage} from "@common/ws/message/room/add.invite";
 import type {AddRoomWsInMessage} from "@common/ws/message/room/add.room";
 import type {SaveChannelSettingsWsInMessage} from "@common/ws/message/room/save.channel.settings";
 import type {ShowITypeWsOutMessage} from "@common/ws/message/room/show.i.type";
-import type {
-  WebRtcSetConnectionIdBody,
-  WebRtcSetConnectionIdMessage,
-} from "@common/ws/message/sync/set.connection.id";
+
 import type {PingWsInMessage} from "@common/ws/message/ws/ping";
+import {PingWsInBody} from "@common/ws/message/ws/ping";
+import type {SetProfileImageWsInMessage} from "@common/ws/message/ws/set.profile.image";
 import {SetProfileImageWsInBody} from "@common/ws/message/ws/set.profile.image";
 import type {
-  SetProfileImageWsInMessage,
-} from "@common/ws/message/ws/set.profile.image";
-import {
-  SetSettingBody,
-} from "@common/ws/message/ws/set.settings";
-import type {
   SetSettingsMessage,
-
   SetSettingsWsOutMessage,
 } from "@common/ws/message/ws/set.settings";
-import type {SetUserProfileMessage, SetUserProfileWsOutMessage} from "@common/ws/message/ws/set.user.profile";
-import type {SetWsIdWsOutMessage,
-  SetWsIdWsInMessage} from "@common/ws/message/ws/set.ws.id";
+import {SetSettingBody} from "@common/ws/message/ws/set.settings";
+import type {
+  SetUserProfileMessage,
+  SetUserProfileWsOutMessage,
+} from "@common/ws/message/ws/set.user.profile";
+import {SetUserProfileBody} from "@common/ws/message/ws/set.user.profile";
+import type {SetWsIdWsInMessage} from "@common/ws/message/ws/set.ws.id";
+import {SetWsIdBody} from "@common/ws/message/ws/set.ws.id";
+import type {UserProfileChangedWsInMessage} from "@common/ws/message/ws/user.profile.changed";
 import {UserProfileChangedWsInBody} from "@common/ws/message/ws/user.profile.changed";
 import type {
-  UserProfileChangedWsInMessage,
-} from "@common/ws/message/ws/user.profile.changed";
-import type {
-  PrintMessageWsInMessage,
-  PrintMessageWsOutMessage,
-} from "@common/ws/message/ws-message/print.message";
-import type {GetCountryCodeWsInMessage,
+  GetCountryCodeWsInBody,
+  GetCountryCodeWsInMessage,
   GetCountryCodeWsOutMessage,
-  GetCountryCodeWsInBody} from "@common/ws/message/get.country.code";
+} from "@common/ws/message/get.country.code";
 import type {SetMessageStatusWsOutMessage} from "@common/ws/message/set.message.status";
 import type {
   SyncHistoryWsInMessage,
@@ -54,11 +47,6 @@ import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.app
 import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
 import type {PubSetRoomsMessage} from "@/ts/types/messages/inner/pub.set.rooms";
 
-import type {ShowITypeWsOutMessage} from "@common/ws/message/show.i.type";
-import type {
-  PrintMessageWsInMessage,
-  PrintMessageWsOutMessage,
-} from "@common/ws/message/print.message";
 import {
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
@@ -71,7 +59,6 @@ import type {
   LogLevel,
 } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {
   CurrentUserInfoWoImage,
   CurrentUserSettingsModel,
@@ -93,39 +80,28 @@ import {WsMessageProcessor} from "@/ts/message_handlers/WsMessageProcessor";
 
 import type Subscription from "@/ts/classes/Subscription";
 import {Subscribe} from "@/ts/utils/pubsub";
-import {SetUserProfileBody} from "@common/ws/message/ws/set.user.profile";
-import {
-  SetWsIdBody,
-} from "@common/ws/message/ws/set.ws.id";
-import {Gender} from "@common/model/enum/gender";
-import {PingWsInBody} from "@common/ws/message/ws/ping";
 import type {
   PongWsInMessage,
   PongWsOutMessage,
 } from "@common/ws/message/ws/pong";
 import type {
-  OfferFileBody,
-  OfferFileWsOutMessage,
-
-  OfferFileResponse,
-
   OfferFileRequest,
   OfferFileResponse,
 } from "@common/ws/message/webrtc/offer.file";
-import {RequestWsOutMessage} from "@common/ws/common";
 import type {
   OfferCallRequestWsOutMessage,
   OfferCallResponseWsInMessage,
 } from "@common/ws/message/webrtc/offer.call";
 import type {AcceptFileWsOutMessage} from "@common/ws/message/webrtc-transfer/accept.file";
 import type {DestroyCallConnectionWsOutMessage} from "@common/ws/message/peer-connection/destroy.call.connection";
+import {WsState} from "@/ts/types/model";
+import type {WebRtcSetConnectionIdBody} from "@common/model/webrtc.base";
+import type {PrintMessageWsInMessage,
+  PrintMessageWsOutMessage,
+  PrintMessageWsOutBody} from "@common/ws/message/ws-message/print.message";
 
 
-enum WsState {
-  NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
-}
-
-export default class WsHandler extends MessageHandler implements MessageSupplier {
+export default class WsHandler implements MessageSupplier {
   protected readonly logger: Logger;
 
   /*
@@ -288,25 +264,11 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public async sendPrintMessage(
-    content: string,
-    roomId: number,
-    files: number[],
-    id: number,
-    timeDiff: number,
-    parentMessage: number | null,
-    tags: Record<string, number>,
-    giphies: GiphyDto[],
+    data: PrintMessageWsOutBody,
   ): Promise<PrintMessageWsInMessage> {
-    return this.messageProc.sendToServerAndAwait<PrintMessageWsOutMessage, "printMessage">({
-      files,
-      id,
-      timeDiff,
+    return this.messageProc.sendToServerAndAwait<PrintMessageWsOutMessage, PrintMessageWsInMessage>({
       action: "printMessage",
-      content,
-      tags,
-      parentMessage,
-      roomId,
-      giphies,
+      data,
     });
   }
 
