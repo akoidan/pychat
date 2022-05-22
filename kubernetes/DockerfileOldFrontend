@@ -1,5 +1,6 @@
 # cd <root>
-# docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .
+# docker build -f ./kubernetes/DockerfileOldFrontend -t deathangel908/pychat-frontend .
+# docker push deathangel908/pychat-frontend
 # https://stackoverflow.com/a/49478889/3872976
 # minikube tunnel service/backend-service
 FROM node:16.15-alpine3.15 as builder
