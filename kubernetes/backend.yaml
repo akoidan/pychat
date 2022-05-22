@@ -17,7 +17,8 @@ spec:
     spec:
       containers:
       - name: backend
-        imagePullPolicy: IfNotPresent
+        # change this to IfNotPresent
+        imagePullPolicy: Always
         image: deathangel908/pychat-backend
         ports:
         - containerPort: 8888
