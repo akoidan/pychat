@@ -6,6 +6,8 @@ import FileSenderPeerConnection from "@/ts/webrtc/file/FileSenderPeerConnection"
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {FileAndCallTransfer} from "@/ts/webrtc/FileAndCallTransfer";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {ReplyFileWsInBody} from "@common/ws/message/webrtc-transfer/reply.file";
 
 
 export default class FileHandler extends FileAndCallTransfer {
@@ -33,7 +35,9 @@ export default class FileHandler extends FileAndCallTransfer {
     this.store.addSendingFile(payload);
   }
 
-  public replyFile(message: ReplyFileWsInMessage) {
+
+  @Subscribe<ReplyFileWsInMessage>()
+  public replyFile(message: ReplyFileWsInBody) {
     this.logger.debug("got mes {}", message)();
     new FileSenderPeerConnection(this.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, this.file, message.userId, this.sub);
   }

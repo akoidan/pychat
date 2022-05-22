@@ -10,16 +10,15 @@ import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from "@/ts/utils/consts
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {DestroyFileConnectionWsInBody} from "@common/ws/message/peer-connection/destroy.file.connection";
 
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileReceiverPeerConnection, "peerConnection:*"> = {
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    retryFile: <HandlerType<"retryFile", "peerConnection:*">> this.retryFile,
     retryFileReply: <HandlerType<"retryFileReply", "peerConnection:*">> this.retryFileReply,
     acceptFileReply: <HandlerType<"acceptFileReply", "peerConnection:*">> this.acceptFileReply,
     declineFileReply: <HandlerType<"declineFileReply", "peerConnection:*">> this.declineFileReply,
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
   };
 
   private readonly fileSize: number;
@@ -83,7 +82,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.waitForAnswer();
   }
 
-  public destroyFileConnection(message: DestroyFileConnectionWsInMessage) {
+  @Subscribe<DestroyFileConnectionWsInMessage>()
+  public destroyFileConnection(message: DestroyFileConnectionWsInBody) {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.DECLINED_BY_OPPONENT,
@@ -94,7 +94,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.unsubscribeAndRemoveFromParent();
   }
 
-  public retryFile(message: RetryFileWsInMessage) {
+  @Subscribe<RetryFileWsInMessage>()
+  public retryFile() {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.IN_PROGRESS,

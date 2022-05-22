@@ -38,17 +38,18 @@ import {LAST_SYNCED, MESSAGES_PER_SEARCH} from "@/ts/utils/consts";
 import {convertMessageModelDtoToModel} from "@/ts/types/converters";
 import {checkIfIdIsMissing, getMissingIds} from "@/ts/utils/pureFunctions";
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {DeleteMessageWsInBody} from "@common/ws/message/ws-message/delete.message";
+import {SetMessageStatusWsInBody} from "@common/ws/message/set.message.status";
 
 
 export default class WsMessageHandler extends MessageHandler implements MessageSender {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WsMessageHandler, "ws-message"> = {
-    deleteMessage: <HandlerType<"deleteMessage", "ws-message">> this.deleteMessage,
     editMessage: <HandlerType<"editMessage", "ws-message">> this.editMessage,
     printMessage: <HandlerType<"printMessage", "ws-message">> this.printMessage,
     internetAppear: <HandlerType<"internetAppear", HandlerName>> this.internetAppear,
-    setMessageStatus: <HandlerType<"setMessageStatus", "ws-message">> this.setMessageStatus,
   };
 
   public async internetAppear(m: InternetAppearMessage) {
@@ -296,8 +297,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       roomId,
     });
   }
-
-  public deleteMessage(inMessage: DeleteMessageWsInMessage) {
+ @Subscribe<DeleteMessageWsInMessage>()
+  public deleteMessage(inMessage: DeleteMessageWsInBody) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
       this.logger.warn("Unable to find message {} to delete it", inMessage)();
@@ -358,8 +359,8 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
       await this.loadMessages(message.roomId, [message.parentMessage!]);
     }
   }
-
-  public async setMessageStatus(m: SetMessageStatusWsInMessage) {
+  @Subscribe<SetMessageStatusWsInMessage>()
+  public async setMessageStatus(m: SetMessageStatusWsInBody) {
     this.store.setMessagesStatus({
       roomId: m.roomId,
       status: m.status,

@@ -13,6 +13,8 @@ import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {SendRtcDataWsInMessage} from "@common/ws/message/peer-connection/send.rtc.data";
 
 
 export default abstract class AbstractPeerConnection {
@@ -186,6 +188,7 @@ export default abstract class AbstractPeerConnection {
   // Destroy(Des)
 
   // This event comes from websocket from server, which is created by another PC
+  @Subscribe<SendRtcDataWsInMessage>()
   public async sendRtcData(message: SendRtcDataWsInBody) {
     if (!this.connectedToRemote) {
       this.logger.warn("Putting sendrtc data event to the queue")();

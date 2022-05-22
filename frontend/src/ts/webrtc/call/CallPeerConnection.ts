@@ -24,15 +24,6 @@ import {DestroyCallConnectionWsInMessage} from "@common/ws/message/peer-connecti
 
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
-  protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {
-    destroy: <HandlerType<"destroy", DestroyPeerConnectionMessage>> this.destroy,
-    login: <HandlerType<"login", LoginMessage>> this.login,
-    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">> this.streamChanged,
-    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">> this.connectToRemote,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">> this.destroyCallConnection,
-  };
-
   private audioProcessor: any;
 
   // Ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
