@@ -10,8 +10,6 @@ spec:
   tls:
   - hosts:
     - pychat.org
-    secretName: pychat-tls
-  - hosts:
     - static.pychat.org
     secretName: pychat-tls
   defaultBackend:
