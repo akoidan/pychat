@@ -27,7 +27,7 @@ spec:
             path: /
             port: 80
         volumeMounts:
-          - mountPath: "/srv/http/photo"
+          - mountPath: "/srv/http/photos"
             name: photo
       volumes:
         - name: photo
