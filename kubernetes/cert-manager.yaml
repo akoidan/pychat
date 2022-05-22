@@ -21,7 +21,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: pychat-domain
-  namespace: default
+  namespace: pychat
 spec:
   secretName: pychat-tls
   issuerRef:
