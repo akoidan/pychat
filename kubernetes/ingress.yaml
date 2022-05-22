@@ -20,8 +20,9 @@ spec:
       port:
         number: 80
   rules:
- - host: static.pychat.org
+  - host: static.pychat.org
     http:
+      paths:
       - path: /
         pathType: Prefix
         backend:
