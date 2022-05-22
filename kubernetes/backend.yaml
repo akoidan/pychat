@@ -35,7 +35,7 @@ spec:
         - configMapRef:
             name: config-map
         volumeMounts:
-          - mountPath: "/usr/src/newback/photo"
+          - mountPath: "/usr/src/newback/photos"
             name: photo
       volumes:
         - name: photo
