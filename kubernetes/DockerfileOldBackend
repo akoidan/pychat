@@ -15,7 +15,7 @@ RUN apk add --no-cache --virtual .build-deps \
                 jpeg-dev
 COPY ./backend/requirements.txt ./
 
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt && ln -s ../newback/photos ./photos
 
 COPY ./backend/chat ./chat
 COPY ./backend/templates ./templates
