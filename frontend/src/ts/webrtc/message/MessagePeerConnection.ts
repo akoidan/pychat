@@ -28,13 +28,14 @@ import {messageModelToP2p, p2pMessageToModel} from "@/ts/types/converters";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {SetMessageStatusWsInBody, SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
 
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
   connectedToRemote: boolean = true;
 
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, "peerConnection:*"> = {
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
     checkDestroy: <HandlerType<"checkDestroy", "peerConnection:*">> this.checkDestroy,
     syncP2pMessage: <HandlerType<"syncP2pMessage", "peerConnection:*">> this.syncP2pMessage,
     sendSetMessagesStatus: <HandlerType<"sendSetMessagesStatus", "peerConnection:*">> this.sendSetMessagesStatus,
@@ -45,7 +46,6 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   private readonly p2pHandlers: P2PHandlerTypes<keyof MessagePeerConnection> = {
     exchangeMessageInfoRequest: <P2PHandlerType<"exchangeMessageInfoRequest">> this.exchangeMessageInfoRequest,
     sendNewP2PMessage: <P2PHandlerType<"sendNewP2PMessage">> this.sendNewP2PMessage,
-    setMessageStatus: <P2PHandlerType<"setMessageStatus">> this.setMessageStatus,
   };
 
   private readonly messageProc: P2PMessageProcessor;
@@ -102,8 +102,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
       messagesIds: payload.messageIds,
     });
   }
-
-  public async setMessageStatus(m: SetMessageStatusRequest) {
+  @Subscribe<SetMessageStatusWsInMessage>()
+  public async setMessageStatus(m: SetMessageStatusWsInBody) {
     this.store.setMessagesStatus({
       roomId: this.roomId,
       status: m.status,

@@ -16,9 +16,6 @@ import {DestroyFileConnectionWsInBody} from "@common/ws/message/peer-connection/
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
-    acceptFile: <HandlerType<"acceptFile", "peerConnection:*">> this.acceptFile,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
     declineSending: <HandlerType<"declineSending", "peerConnection:*">> this.declineSending,
   };
 
