@@ -30,7 +30,7 @@ spec:
           value: 'true'
         envFrom:
         - secretRef:
-            name: secret
+            name: backend-secret
         - configMapRef:
             name: config-map
         volumeMounts:

@@ -2,6 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: letsencrypt-prod
+  namespace: pychat
 spec:
   acme:
     email: deathangel908@gmail.com

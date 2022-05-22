@@ -32,7 +32,7 @@ spec:
           value: utf8mb4_general_ci
         envFrom:
         - secretRef:
-            name: secret
+            name: backend-secret
         - configMapRef:
             name: config-map
         volumeMounts:

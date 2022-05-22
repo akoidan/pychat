@@ -12,7 +12,7 @@ spec:
         image: deathangel908/pychat-backend
         envFrom:
         - secretRef:
-            name: secret
+            name: backend-secret
         - configMapRef:
             name: config-map
         command: ["yarn",  "migrate"]

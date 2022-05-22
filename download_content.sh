@@ -141,7 +141,7 @@ minikube_all() {
   safeRunCommand kubectl apply -f kubernetes/pv-redis.yaml
   safeRunCommand kubectl apply -f kubernetes/pv-mariadb.yaml
   safeRunCommand kubectl apply -f kubernetes/config-map.yaml
-  safeRunCommand kubectl apply -f kubernetes/secret.yaml
+  safeRunCommand kubectl apply -f kubernetes/backend-secret.yaml
   safeRunCommand kubectl apply -f kubernetes/mariadb.yaml
   safeRunCommand kubectl apply -f kubernetes/redis.yaml
   #safeRunCommand minikube_reload_backend

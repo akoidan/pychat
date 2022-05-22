@@ -513,6 +513,56 @@ In order to setup continuous delivery via github:
 Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
 http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
+# Kubernetes example with [linode](https://www.linode.com/).
+ 1. Go to linode dashboard, kubernetes -> create cluster, if it's not created yet.
+ 2. After provisioning has finished, download `kubectl-config.yaml` from the linode dashboard and place it either at `~/.kube/config` or do export KUBECONFIG=/file/path . Verify that you can access the cluster with `kubectl get nodes`
+ 3. Install nginx controller:
+ - Download chart repo and chart `helm repo add stable https://charts.helm.sh/stable`
+ - `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
+ - Installing ingress controller: `helm install nginx-ingress ingress-nginx/ingress-nginx`. You should see load-banancer on your admin dashboard now.
+ - Specify load-balancer ip address in your DNS provider.
+ 4. If you don't have ssl certificate, lets use letsencrypt and certmanager to generate it for us.
+ 4.1 Install cert-manager
+ - kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+ - helm repo add jetstack https://charts.jetstack.io
+ - helm repo update
+ - helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f -
+ 4.2 Generate cloudflare token
+ - In clodflare dashboard: Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
+ - put token into `kubernetes/cf-secret-yaml`
+```yaml
+ apiVersion: v1
+kind: Secret
+metadata:
+  name: cloudflare-api-token-secret
+  namespace: pychat
+type: Opaque
+stringData:
+  api-token: cf-api-token
+```
+ - `kubectl apply -f kubernetes/namespace.yaml`
+ - `kubectl apply -f kubernetes/cf-secret.yaml`
+ - `kubectl apply -f kubernetes/cert-manager.yaml`
+ 4.3 Verify certificate
+ - Check that it's created `kubectl get secret pychat-tls -o yaml -n pychat`
+ - save it to file: `echo base64certfrom-tls.cert |base64 -d > lol.cert`
+ - Should give your domain `openssl x509 -in ./lol.cert  -noout -text
+ 5. Build images and upload it to docker registry:
+  - `docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .` 
+  - `docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend .` 
+ 6. Setup kubernetes env:
+  - `kubectl apply -f kubernetes/pv-photo.yaml`
+  - `kubectl apply -f kubernetes/pv-redis.yaml`
+  - `kubectl apply -f kubernetes/pv-mariadb.yaml`
+  - `kubectl apply -f kubernetes/config-map.yaml`
+  - `kubectl apply -f kubernetes/backend-secret.yaml`
+  - `kubectl apply -f kubernetes/mariadb.yaml`
+  - `kubectl apply -f kubernetes/redis.yaml`
+  - `kubectl apply -f kubernetes/migrate-backend.yaml`
+  - `kubectl apply -f kubernetes/backend.yaml`
+  - `kubectl apply -f kubernetes/frontend.yaml`
+  - `kubectl apply -f kubernetes/ingress.yaml`
+
 
 # TODO
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
