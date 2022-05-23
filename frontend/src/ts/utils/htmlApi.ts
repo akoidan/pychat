@@ -13,6 +13,7 @@ import {MEDIA_API_URL, webpSupported} from "@/ts/utils/runtimeConsts";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
+import type {ScrollInnerSystemMessage} from "@/ts/types/messages/inner/scroll";
 
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
@@ -401,9 +402,10 @@ export function setImageFailEvents(e: HTMLElement, bus: Subscription) {
         this.className += " failed";
       };
       img.onload = function() {
-        bus.notify({
+        bus.notify<ScrollInnerSystemMessage>({
           action: "scroll",
           handler: "*",
+          data: null,
         });
       };
     }(r[i]));

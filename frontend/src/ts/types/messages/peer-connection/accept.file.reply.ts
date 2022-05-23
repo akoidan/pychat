@@ -1,3 +1,3 @@
-import type {DefaultWsInMessage} from "@common/ws/common";
+import type {DefaultInnerSystemMessage} from "@/ts/types/messages/helper";
 
-export type AcceptFileReply = DefaultWsInMessage<"acceptFileReply", "peerConnection:*", null>;
+export type CheckDestroyInnerSystemMessage = DefaultInnerSystemMessage<"checkDestroy", "peerConnection:*", null>;

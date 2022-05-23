@@ -9,7 +9,7 @@ import type {MessageStatus} from "@common/model/enum/message.status";
 import type {MessagesResponseMessage} from "@common/model/ws.base";
 import type {AddChannelWsInMessage} from "@common/ws/message/room/add.channel";
 import type {AddInviteWsInMessage} from "@common/ws/message/room/add.invite";
-import type {AddRoomWsInMessage} from "@common/ws/message/room/add.room";
+import type {AddRoomWsInMessage, AddRoomWsInBody} from "@common/ws/message/room/add.room";
 import type {SaveChannelSettingsWsInMessage} from "@common/ws/message/room/save.channel.settings";
 import type {ShowITypeWsOutMessage} from "@common/ws/message/room/show.i.type";
 
@@ -99,6 +99,7 @@ import type {WebRtcSetConnectionIdBody} from "@common/model/webrtc.base";
 import type {PrintMessageWsInMessage,
   PrintMessageWsOutMessage,
   PrintMessageWsOutBody} from "@common/ws/message/ws-message/print.message";
+import {AddRoomWsOutBody} from "@common/ws/message/room/add.room";
 
 
 export default class WsHandler implements MessageSupplier {
@@ -295,15 +296,10 @@ export default class WsHandler implements MessageSupplier {
     });
   }
 
-  public async sendAddRoom(name: string | null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number | null): Promise<AddRoomWsInMessage> {
+  public async sendAddRoom(data: AddRoomWsOutBody): Promise<AddRoomWsInBody> {
     return this.messageProc.sendToServerAndAwait({
-      users,
-      name,
-      p2p,
-      channelId,
+      data,
       action: "addRoom",
-      volume,
-      notifications,
     });
   }
 

@@ -12,12 +12,10 @@ import type Subscription from "@/ts/classes/Subscription";
 import {Subscribe} from "@/ts/utils/pubsub";
 import {AcceptFileWsInBody} from "@common/ws/message/webrtc-transfer/accept.file";
 import {DestroyFileConnectionWsInBody} from "@common/ws/message/peer-connection/destroy.file.connection";
+import {DeclineSendingMessage} from "@/ts/types/messages/peer-connection/decline.sending";
 
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
-  protected readonly handlers: HandlerTypes<keyof FileSenderPeerConnection, "peerConnection:*"> = {
-    declineSending: <HandlerType<"declineSending", "peerConnection:*">> this.declineSending,
-  };
 
   private readonly file: File;
 
@@ -169,6 +167,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     this.store.setSendingFileStatus(payload);
   }
 
+  @Subscribe<DeclineSendingMessage>()
   public declineSending() {
     this.unsubscribeAndRemoveFromParent();
     const ssfs: SetSendingFileStatus = {

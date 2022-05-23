@@ -11,10 +11,6 @@ import {ReplyFileWsInBody} from "@common/ws/message/webrtc-transfer/reply.file";
 
 
 export default class FileHandler extends FileAndCallTransfer {
-  protected readonly handlers: HandlerTypes<keyof FileHandler, "webrtcTransfer:*"> = {
-    replyFile: <HandlerType<"replyFile", "webrtcTransfer:*">> this.replyFile,
-    checkTransferDestroy: <HandlerType<"checkTransferDestroy", "webrtcTransfer:*">> this.checkTransferDestroy,
-  };
 
   private readonly file: File;
 

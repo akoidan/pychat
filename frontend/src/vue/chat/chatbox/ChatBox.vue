@@ -113,8 +113,8 @@ import ChatThread from "@/vue/chat/message/ChatThread.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
-import type MessageHandler from "@/ts/message_handlers/MesageHandler";
 import {Subscribe} from "@/ts/utils/pubsub";
+import {ScrollInnerSystemMessage} from "@/ts/types/messages/inner/scroll";
 
 
 @Component({
@@ -163,8 +163,6 @@ export default class ChatBox extends Vue {
 
   @Ref()
   private readonly chatboxSearch!: HTMLElement;
-
-  private handler!: MessageHandler;
 
   public get id() {
     return this.room.id;
@@ -275,17 +273,17 @@ export default class ChatBox extends Vue {
     }
   }
 
-  @Subscribe<any>() // TODO does this work?
+  @Subscribe<ScrollInnerSystemMessage>()
   scroll() {
     this.onEmitScroll();
   }
 
   created() {
-    this.$messageBus.subscribe("*", this.scroll);
+    this.$messageBus.subscribe("*", this);
   }
 
   destroyed() {
-    this.$messageBus.unsubscribe("*", this.scroll);
+    this.$messageBus.unsubscribe("*", this);
   }
 
   keyDownLoadUp(e: KeyboardEvent) {

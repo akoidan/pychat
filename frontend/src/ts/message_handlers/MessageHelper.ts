@@ -8,6 +8,7 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import type Subscription from "@/ts/classes/Subscription";
+import type {ScrollInnerSystemMessage} from "@/ts/types/messages/inner/scroll";
 
 export class MessageHelper {
   private readonly logger: Logger;
@@ -37,9 +38,10 @@ export class MessageHelper {
   }
 
   public processAnyMessage() {
-    this.messageBus.notify({
+    this.messageBus.notify<ScrollInnerSystemMessage>({
       action: "scroll",
       handler: "*",
+      data: null,
     });
   }
 

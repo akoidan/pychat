@@ -2,8 +2,7 @@ import type {SyncHistoryWsInBody} from "@common/ws/message/sync.history";
 import {SyncHistoryWsOutBody} from "@common/ws/message/sync.history";
 import {ShowITypeWsOutBody} from "@common/ws/message/room/show.i.type";
 import {PrintMessageWsOutBody} from "@common/ws/message/ws-message/print.message";
-import type {GetCountryCodeWsInMessage,} from "@common/ws/message/get.country.code";
-import {GetCountryCodeWsOutBody,} from "@common/ws/message/get.country.code";
+import type {GetCountryCodeWsInBody} from "@common/ws/message/get.country.code";
 import type {OnGatewayConnection} from "@nestjs/websockets";
 import {
   MessageBody,
@@ -12,9 +11,9 @@ import {
   WebSocketServer,
 } from "@nestjs/websockets";
 import {IncomingMessage} from "http";
-import {WebSocket,} from "ws";
+import {WebSocket} from "ws";
 import type {OnWsClose} from "@/data/types/internal";
-import {SendToClientPubSubMessage,} from "@/data/types/internal";
+import {SendToClientPubSubMessage} from "@/data/types/internal";
 import {
   Logger,
   UseFilters,
@@ -107,9 +106,8 @@ export class WebsocketGateway implements OnGatewayConnection, OnWsClose, NestGat
 
   @SubscribeMessage("getCountryCode")
   public async getCountryCode(
-    @MessageBody() data: GetCountryCodeWsOutBody,
-      @WsContext() context: WebSocketContextData
-  ): Promise<GetCountryCodeWsInMessage["data"]> {
+    @WsContext() context: WebSocketContextData
+  ): Promise<GetCountryCodeWsInBody> {
     return this.wsDataService.getCountryCodes(context);
   }
 }

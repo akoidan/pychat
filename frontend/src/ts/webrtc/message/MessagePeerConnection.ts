@@ -1,6 +1,9 @@
 import {MessageStatus} from "@common/model/enum/message.status";
 import type {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
-import type {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
+import type {
+  SyncP2PInnerSystemMessage,
+  SyncP2PMessageBody
+} from "@/ts/types/messages/inner/sync.p2p";
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
 import type WsHandler from "@/ts/message_handlers/WsHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -30,13 +33,14 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import type Subscription from "@/ts/classes/Subscription";
 import {Subscribe} from "@/ts/utils/pubsub";
 import {SetMessageStatusWsInBody, SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
+import {CheckDestroyInnerSystemMessage} from "@/ts/types/messages/peer-connection/accept.file.reply";
+import {SendSetMessagesStatusMessageBody} from "@/ts/types/messages/inner/send.set.messages.status";
 
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
   connectedToRemote: boolean = true;
 
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, "peerConnection:*"> = {
-    checkDestroy: <HandlerType<"checkDestroy", "peerConnection:*">> this.checkDestroy,
     syncP2pMessage: <HandlerType<"syncP2pMessage", "peerConnection:*">> this.syncP2pMessage,
     sendSetMessagesStatus: <HandlerType<"sendSetMessagesStatus", "peerConnection:*">> this.sendSetMessagesStatus,
   };
@@ -89,7 +93,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     return this.store.roomsDict[this.roomId];
   }
 
-  public async sendSetMessagesStatus(payload: SendSetMessagesStatusMessage) {
+  @Subscribe<SendSetMessagesStatusMessage>()
+  public async sendSetMessagesStatus(payload: SendSetMessagesStatusMessageBody) {
     const responseToRequest: SetMessageStatusRequest = {
       action: "setMessageStatus",
       messagesIds: payload.messageIds,
@@ -151,7 +156,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     this.messageProc.sendToServer(response);
   }
 
-  public async syncP2pMessage(payload: SyncP2PMessage) {
+  @Subscribe<SyncP2PInnerSystemMessage>()
+  public async syncP2pMessage(payload: SyncP2PMessageBody) {
     if (this.isChannelOpened) {
       this.logger.debug("Syncing message {}", payload.id)();
       const message: SendNewP2PMessage = {
@@ -176,6 +182,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
+  @Subscribe<CheckDestroyInnerSystemMessage>()
   public checkDestroy() {
 
     /*

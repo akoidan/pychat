@@ -21,6 +21,7 @@ import {ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.r
 import {LoginMessage} from "@/ts/types/messages/inner/login";
 import {Subscribe} from "@/ts/utils/pubsub";
 import {DestroyCallConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.call.connection";
+import {ChangeStreamMessageBody} from "@/ts/types/messages/inner/change.stream";
 
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
@@ -94,7 +95,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
 
-  public connectToRemote(stream: ConnectToRemoteMessage) {
+  public connectToRemote(stream: ConnectToRemoteMessageBody) {
     this.logger.log("Connect to remote")();
     this.store.roomsDict[this.roomId].callInfo.calls[this.opponentWsId].connected = true;
     this.connectedToRemote = true;
@@ -120,7 +121,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     }
   }
 
-  public createPeerConnection(event: ConnectToRemoteMessage) {
+  public createPeerConnection(event: ConnectToRemoteMessageBody) {
     super.createPeerConnection();
 
     if (this.streamTrackApi === "stream") {
@@ -148,7 +149,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.changeStreams(event.stream);
   }
 
-  public streamChanged(payload: ChangeStreamMessage) {
+  public streamChanged(payload: ChangeStreamMessageBody) {
     this.logger.log("onStreamChanged {}", payload)();
     if (this.pc) {
       this.changeStreams(payload.newStream);

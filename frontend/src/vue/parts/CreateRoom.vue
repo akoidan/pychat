@@ -131,12 +131,14 @@ export default class CreateRoom extends Vue {
       throw Error("Please add user");
     }
     const e = await this.$ws.sendAddRoom(
-      this.roomName ? this.roomName : null,
-      this.isPublic ? false : this.p2p,
-      this.sound,
-      !this.p2p && this.notifications,
-      this.currentUsers,
-      this.parentChannelId ? this.parentChannelId : null,
+      {
+        users: this.currentUsers,
+        name: this.roomName ? this.roomName : null,
+        p2p: this.isPublic ? false : this.p2p,
+        channelId: this.parentChannelId ? this.parentChannelId : null,
+        volume: this.sound,
+        notifications: !this.p2p && this.notifications,
+      },
     );
     this.$router.replace(`/chat/${e.id}`);
   }

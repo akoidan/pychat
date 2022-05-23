@@ -112,7 +112,7 @@ import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
-import {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
+import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
 
 @Component({
   name: "ChannelSettings",
@@ -229,7 +229,9 @@ export default class ChannelSettings extends Vue {
     const message1: RouterNavigateMessage = {
       handler: "router",
       action: "navigate",
-      to: `/chat/${ALL_ROOM_ID}`,
+      data: {
+        to: `/chat/${ALL_ROOM_ID}`,
+      },
     };
     this.$messageBus.notify(message1);
   }

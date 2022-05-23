@@ -7,7 +7,7 @@ import {
   getRoomsOnline,
   getTransformRoomDto,
 } from "@/data/transformers/model/room.transformer";
-import type {SetWsIdWsOutMessage} from "@common/ws/message/ws/set.ws.id";
+import {SetWsIdWsInMessage} from "@common/ws/message/ws/set.ws.id";
 
 
 export function transformSetWsId(
@@ -21,7 +21,7 @@ export function transformSetWsId(
     user,
     time,
   }: TransformSetWsIdDataParams
-): SetWsIdWsOutMessage {
+): SetWsIdWsInMessage {
   const roomsOnlineDict = getRoomsOnline(allUsersInTheseRooms);
   return {
     action: "setWsId",

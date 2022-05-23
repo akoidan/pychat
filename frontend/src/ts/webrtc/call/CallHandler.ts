@@ -60,7 +60,6 @@ export default class CallHandler extends FileAndCallTransfer {
     return this.store.roomsDict[this.roomId].callInfo;
   }
 
-  @Subscribe<CheckTransferDestroyMessage>()
   public checkTransferDestroy(payload: CheckTransferDestroyBody) {
     this.removeOpponent(payload.wsOpponentId);
     super.checkTransferDestroy(payload);

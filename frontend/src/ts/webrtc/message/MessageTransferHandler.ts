@@ -1,6 +1,6 @@
 import {MessageStatus} from "@common/model/enum/message.status";
 import type {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
-import type {SyncP2PMessage} from "@/ts/types/messages/inner/sync.p2p";
+import type {SyncP2PInnerSystemMessage} from "@/ts/types/messages/inner/sync.p2p";
 import BaseTransferHandler from "@/ts/webrtc/BaseTransferHandler";
 import type {MessageSender, UserIdConn} from "@/ts/types/types";
 import type {RoomModel} from "@/ts/types/model";
@@ -60,7 +60,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   async syncMessage(roomId: number, messageId: number): Promise<void> {
     this.messageHelper.processAnyMessage();
     if (this.state === "ready") {
-      const payload: SyncP2PMessage = {
+      const payload: SyncP2PInnerSystemMessage = {
         action: "syncP2pMessage",
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
         id: messageId,

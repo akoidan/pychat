@@ -15,6 +15,7 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
 import {Subscribe} from "@/ts/utils/pubsub";
 import {SendRtcDataWsInMessage} from "@common/ws/message/peer-connection/send.rtc.data";
+import {ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.remote";
 
 
 export default abstract class AbstractPeerConnection {
@@ -97,7 +98,7 @@ export default abstract class AbstractPeerConnection {
     this.sub.notify(message);
   }
 
-  public createPeerConnection(arg?: ConnectToRemoteMessage) {
+  public createPeerConnection(arg?: ConnectToRemoteMessageBody) {
     this.logger.log("Creating RTCPeerConnection with config {} {}", WEBRTC_RUNTIME_CONFIG, this.pc_constraints)();
     if (!window.RTCPeerConnection) {
       throw Error("Your browser doesn't support RTCPeerConnection");
