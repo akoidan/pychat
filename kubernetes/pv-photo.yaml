@@ -6,7 +6,7 @@ spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: 5Gi
+    storage: 15Gi
   hostPath:
     path: /data/photo
 ---
@@ -20,6 +20,6 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 15Gi
   storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
   volumeName: pv-photo

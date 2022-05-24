@@ -15,7 +15,6 @@ export type P2PHandlerTypes<K extends string> = {
 
 export interface DefaultP2pMessage<A extends string> extends DefaultMessage<A> {
   resolveCbId?: number; // If this callback id is present, resolve it
-
 }
 
 

@@ -6,7 +6,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   capacity:
-    storage: 1Gi
+    storage: 2Gi
   hostPath:
     path: /data/mariadb
 ---
@@ -20,4 +20,4 @@ spec:
      - ReadWriteOnce
    resources:
      requests:
-       storage: 1Gi
+       storage: 2Gi
