@@ -68,8 +68,8 @@ import {convertUser, getChannelDict, getRoom, getRoomsBaseDict} from "@/ts/types
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import type {Logger} from "lines-logger";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type Api from "@/ts/message_handlers/Api";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type HttpApi from "@/ts/message_handlers/HttpApi";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {AudioPlayer} from "@/ts/classes/AudioPlayer";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import {login, logout} from "@/ts/utils/audio";
@@ -94,7 +94,7 @@ export class RoomHandler {
 
   private readonly store: DefaultStore;
 
-  private readonly ws: WsHandler;
+  private readonly ws: WsApi;
 
   private readonly audioPlayer: AudioPlayer;
 
@@ -102,8 +102,8 @@ export class RoomHandler {
 
   public constructor(
     store: DefaultStore,
-    api: Api,
-    ws: WsHandler,
+    api: HttpApi,
+    ws: WsApi,
     audioPlayer: AudioPlayer,
     sub: Subscription,
   ) {

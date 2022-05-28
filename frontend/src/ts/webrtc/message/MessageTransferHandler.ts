@@ -6,7 +6,7 @@ import type {MessageSender, UserIdConn} from "@/ts/types/types";
 import type {RoomModel} from "@/ts/types/model";
 import MessageSenderPeerConnection from "@/ts/webrtc/message/MessageSenderPeerConnection";
 import MessageReceiverPeerConnection from "@/ts/webrtc/message/MessageReceiverPeerConnection";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import Subscription from "@/ts/classes/Subscription";
@@ -27,7 +27,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
 
   private readonly messageHelper: MessageHelper;
 
-  public constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper, sub: Subscription) {
+  public constructor(roomId: number, wsHandler: WsApi, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper, sub: Subscription) {
     super(roomId, wsHandler, notifier, store, sub);
     this.messageHelper = messageHelper;
   }

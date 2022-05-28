@@ -10,7 +10,7 @@ import type {
   SetOpponentAnchor,
   SetOpponentVoice
 } from "@/ts/types/types";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import {getStreamLog, getTrackLog} from "@/ts/utils/pureFunctions";
@@ -39,7 +39,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     connId: string,
     opponentWsId: string,
     userId: number,
-    wsHandler: WsHandler,
+    wsHandler: WsApi,
     store: DefaultStore,
     sub: Subscription,
   ) {

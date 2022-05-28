@@ -1,6 +1,6 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import Subscription from "@/ts/classes/Subscription";
 
@@ -9,7 +9,7 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 export default abstract class BaseTransferHandler {
   protected connectionId: string | null = null;
 
-  protected readonly wsHandler: WsHandler;
+  protected readonly wsHandler: WsApi;
 
   protected readonly notifier: NotifierHandler;
 
@@ -21,7 +21,7 @@ export default abstract class BaseTransferHandler {
 
   protected readonly sub: Subscription;
 
-  public constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, sub: Subscription) {
+  public constructor(roomId: number, wsHandler: WsApi, notifier: NotifierHandler, store: DefaultStore, sub: Subscription) {
     this.roomId = roomId;
     this.notifier = notifier;
     this.wsHandler = wsHandler;

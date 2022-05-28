@@ -2,8 +2,8 @@ import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.app
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {extractError} from "@/ts/utils/pureFunctions";
-import type Api from "@/ts/message_handlers/Api";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type HttpApi from "@/ts/message_handlers/HttpApi";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {
   CONNECTION_ERROR,
@@ -39,7 +39,7 @@ export default class NotifierHandler {
 
   private readonly store: DefaultStore;
 
-  private readonly api: Api;
+  private readonly api: HttpApi;
 
   private readonly browserVersion: string;
 
@@ -47,13 +47,13 @@ export default class NotifierHandler {
 
   private readonly isMobile: boolean;
 
-  private readonly ws: WsHandler;
+  private readonly ws: WsApi;
 
   private readonly documentTitle: string;
 
   private readonly sub: Subscription;
 
-  public constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
+  public constructor(api: HttpApi, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsApi, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
     this.api = api;
     this.browserVersion = browserVersion;
     this.isChrome = isChrome;

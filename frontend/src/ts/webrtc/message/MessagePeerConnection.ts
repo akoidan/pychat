@@ -5,9 +5,8 @@ import type {
   SyncP2PMessageBody
 } from "@/ts/types/messages/inner/sync.p2p";
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {MessageSupplier} from "@/ts/types/types";
 import {P2PMessageProcessor} from "@/ts/message_handlers/P2PMessageProcessor";
 
 import type {MessageModel, RoomModel} from "@/ts/types/model";
@@ -37,7 +36,7 @@ import {
 import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 
 
-export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
+export default abstract class MessagePeerConnection extends AbstractPeerConnection  {
   connectedToRemote: boolean = true;
 
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, "peerConnection:*"> = {
@@ -64,7 +63,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     roomId: number,
     connId: string,
     opponentWsId: string,
-    wsHandler: WsHandler,
+    wsHandler: WsApi,
     store: DefaultStore,
     userId: number,
     messageHelper: MessageHelper,
@@ -81,9 +80,6 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     return this.opponentUserId === this.store.myId;
   }
 
-  private get isChannelOpened(): boolean {
-    return this.sendChannel?.readyState === "open";
-  }
 
   private get messages(): MessageModel[] {
     return Object.values(this.room.messages);
@@ -262,43 +258,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     this.messageProc.onDropConnection("data channel lost");
   }
 
-  public getWsConnectionId(): string {
-    return this.wsHandler.getWsConnectionId();
-  }
 
-  public sendRawTextToServer(message: string): boolean {
-    if (this.isChannelOpened) {
-      this.sendChannel!.send(message);
-      return true;
-    }
-    return false;
-  }
-
-  protected setupEvents() {
-    this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
-    this.sendChannel!.onopen = () => {
-      this.logger.log("Channel opened")();
-      if (this.getWsConnectionId() > this.opponentWsId) {
-        this.syncMessages();
-      }
-      this.store.addLiveConnectionToRoom({
-        connection: this.opponentWsId,
-        roomId: this.roomId,
-      });
-    };
-    this.sendChannel!.onclose = () => {
-      this.logger.log("Closed channel ")();
-      // This.syncMessageLock = false; // just for the case, not nessesary
-      this.messageProc.onDropConnection("Data channel closed");
-      if (this.store.userInfo) {
-        // Otherwise we logged out
-        this.store.removeLiveConnectionToRoom({
-          connection: this.opponentWsId,
-          roomId: this.roomId,
-        });
-      }
-    };
-  }
 
   protected onChannelMessage(event: MessageEvent) {
     const data: DefaultP2pMessage<keyof MessagePeerConnection> = this.messageProc.parseMessage(event.data) as unknown as DefaultP2pMessage<keyof MessagePeerConnection>;

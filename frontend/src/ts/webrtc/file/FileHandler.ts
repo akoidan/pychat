@@ -1,7 +1,7 @@
 import type {ReplyFileWsInMessage} from "@common/ws/message/webrtc-transfer/reply.file";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import type {SendingFile} from "@/ts/types/model";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import FileSenderPeerConnection from "@/ts/webrtc/file/FileSenderPeerConnection";
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
@@ -14,7 +14,7 @@ export default class FileHandler extends FileAndCallTransfer {
 
   private readonly file: File;
 
-  public constructor(roomId: number, threadId: number | null, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number, sub: Subscription) {
+  public constructor(roomId: number, threadId: number | null, connId: string, wsHandler: WsApi, notifier: NotifierHandler, store: DefaultStore, file: File, time: number, sub: Subscription) {
     super(roomId, wsHandler, notifier, store, sub);
     this.file = file;
     this.setConnectionId(connId);

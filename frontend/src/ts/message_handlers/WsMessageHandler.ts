@@ -12,8 +12,7 @@ import type {HandlerName} from "@common/ws/common";
 import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type Api from "@/ts/message_handlers/Api";
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
+import type HttpApi from "@/ts/message_handlers/HttpApi";
 import type {
   MessageSender,
   RemoveMessageProgress,
@@ -27,7 +26,7 @@ import {MessageStatusInner} from "@/ts/types/model";
 import type {Logger} from "lines-logger";
 
 
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 
@@ -42,7 +41,7 @@ import {DeleteMessageWsInBody} from "@common/ws/message/ws-message/delete.messag
 import {SetMessageStatusWsInBody} from "@common/ws/message/set.message.status";
 
 
-export default class WsMessageHandler extends MessageHandler implements MessageSender {
+export default class WsMessageHandler implements MessageSender {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes<keyof WsMessageHandler, "ws-message"> = {
@@ -62,9 +61,9 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
    */
   private readonly store: DefaultStore;
 
-  private readonly api: Api;
+  private readonly api: HttpApi;
 
-  private readonly ws: WsHandler;
+  private readonly ws: WsApi;
 
   private syncMessageLock: boolean = false;
 
@@ -72,12 +71,11 @@ export default class WsMessageHandler extends MessageHandler implements MessageS
 
   public constructor(
     store: DefaultStore,
-    api: Api,
-    ws: WsHandler,
+    api: HttpApi,
+    ws: WsApi,
     messageHelper: MessageHelper,
     sub: Subscription,
   ) {
-    super();
     this.store = store;
     this.api = api;
     sub.subscribe("ws-message", this);

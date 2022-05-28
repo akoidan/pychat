@@ -16,7 +16,7 @@ import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {ReceivingFile} from "@/ts/types/model";
 import {FileTransferStatus} from "@/ts/types/model";
 import FileHandler from "@/ts/webrtc/file/FileHandler";
@@ -63,7 +63,7 @@ import {WebRtcSetConnectionIdBody} from "@common/model/webrtc.base";
 export default class WebRtcApi {
   protected logger: Logger;
 
-  private readonly wsHandler: WsHandler;
+  private readonly wsHandler: WsApi;
 
   private readonly store: DefaultStore;
 
@@ -79,7 +79,7 @@ export default class WebRtcApi {
 
   private readonly sub: Subscription;
 
-  public constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper, sub: Subscription) {
+  public constructor(ws: WsApi, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper, sub: Subscription) {
     this.sub = sub;
     this.sub.subscribe("webrtc", this);
     this.wsHandler = ws;

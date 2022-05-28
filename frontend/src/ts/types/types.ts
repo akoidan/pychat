@@ -335,4 +335,5 @@ export enum IconColor {
 
 export interface SessionHolder {
   session: string | null;
+  wsConnectionId: string|null;
 }

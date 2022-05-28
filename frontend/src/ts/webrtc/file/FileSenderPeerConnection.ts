@@ -3,7 +3,7 @@ import type {AcceptFileWsInMessage} from "@common/ws/message/webrtc-transfer/acc
 import type {AddSendingFileTransfer, SetSendingFileStatus, SetSendingFileUploaded} from "@/ts/types/types";
 import type {SendingFileTransfer} from "@/ts/types/model";
 import {FileTransferStatus} from "@/ts/types/model";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import {bytesToSize, getDay} from "@/ts/utils/pureFunctions";
 import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
@@ -29,7 +29,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
 
   private trackTimeout: number = 0;
 
-  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number, sub: Subscription) {
+  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsApi, store: DefaultStore, file: File, userId: number, sub: Subscription) {
     super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.file = file;
     const asft: AddSendingFileTransfer = {

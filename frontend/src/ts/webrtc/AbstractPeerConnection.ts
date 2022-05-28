@@ -6,7 +6,7 @@ import type {
 import type {HandlerName} from "@common/ws/common";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
 
 import Subscription from "@/ts/classes/Subscription";
@@ -16,9 +16,12 @@ import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
 import {Subscribe} from "@/ts/utils/pubsub";
 import {SendRtcDataWsInMessage} from "@common/ws/message/peer-connection/send.rtc.data";
 import {ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.remote";
+import {SessionHolder} from "@/ts/types/types";
+import {DefaultP2pMessage} from "@/ts/types/messages/p2pMessages";
+import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 
 
-export default abstract class AbstractPeerConnection {
+export default abstract class AbstractPeerConnection extends AbstractMessageProcessor {
   protected offerCreator: boolean = false;
 
   protected sendRtcDataQueue: SendRtcDataWsInBody[] = [];
@@ -33,7 +36,7 @@ export default abstract class AbstractPeerConnection {
 
   protected sdpConstraints: any;
 
-  protected readonly wsHandler: WsHandler;
+  protected readonly wsHandler: WsApi;
 
   protected readonly store: DefaultStore;
 
@@ -50,7 +53,65 @@ export default abstract class AbstractPeerConnection {
     ],
   };
 
-  public constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore, sub: Subscription) {
+   constructor(
+    private readonly sessionHolder: SessionHolder,
+  ) {
+    super("p2p");
+  }
+  public resolveCBifItsThere(data: DefaultP2pMessage<string>): boolean {
+    this.logger.debug("resolving cb")();
+    if (data.resolveCbId) {
+      this.callBacks[data.resolveCbId].resolve(data);
+      delete this.callBacks[data.resolveCbId];
+      return true;
+    }
+    return false;
+  }
+
+  public sendRawTextToServer(message: string): boolean {
+    if (this.isChannelOpened) {
+      this.sendChannel!.send(message);
+      return true;
+    }
+    return false;
+  }
+
+  private get isChannelOpened(): boolean {
+    return this.sendChannel?.readyState === "open";
+  }
+
+
+    protected setupEvents() {
+    this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
+    this.sendChannel!.onopen = () => {
+      this.logger.log("Channel opened")();
+      if (this.sessionHolder.wsConnectionId! > this.opponentWsId) {
+        this.syncMessages();
+      }
+      this.store.addLiveConnectionToRoom({
+        connection: this.opponentWsId,
+        roomId: this.roomId,
+      });
+    };
+    this.sendChannel!.onclose = () => {
+      // This.syncMessageLock = false; // just for the case, not nessesary
+      this.onDropConnection("Data channel closed");
+    };
+  }
+
+  onDropConnection(reason: string) {
+    this.logger.log(`Closed channel ${reason}`)();
+    super.onDropConnection(reasong);
+     if (this.store.userInfo) {
+        // Otherwise we logged out
+        this.store.removeLiveConnectionToRoom({
+          connection: this.opponentWsId,
+          roomId: this.roomId,
+        });
+      }
+  }
+
+  public constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsApi, store: DefaultStore, sub: Subscription) {
     this.roomId = roomId;
     this.connectionId = connectionId;
     this.opponentWsId = opponentWsId;

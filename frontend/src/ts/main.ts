@@ -11,11 +11,11 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {PlatformUtil} from "@/ts/types/model";
 import "@/assets/icon.png"; // eslint-disable-line import/no-unassigned-import
-import WsHandler from "@/ts/message_handlers/WsHandler";
+import WsApi from "@/ts/message_handlers/WsApi";
 import WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
 import DatabaseWrapper from "@/ts/classes/DatabaseWrapper";
 import LocalStorage from "@/ts/classes/LocalStorage";
-import Api from "@/ts/message_handlers/Api";
+import HttpApi from "@/ts/message_handlers/HttpApi";
 import NotifierHandler from "@/ts/classes/NotificationHandler";
 import WebRtcApi from "@/ts/webrtc/WebRtcApi";
 import {routerFactory} from "@/ts/instances/routerInstance";
@@ -42,8 +42,8 @@ logger.log(`Evaluating main script ${constants.GIT_HASH}`)();
 // eslint-disable-next-line max-params
 function bootstrapVue(
   messageBus: Subscription,
-  api: Api,
-  ws: WsHandler,
+  api: HttpApi,
+  ws: WsApi,
   webrtcApi: WebRtcApi,
   platformUtil: PlatformUtil,
   messageSenderProxy: MessageSenderProxy,
@@ -104,7 +104,7 @@ function init(): void {
 
   const sessionHolder: SessionHolder = new SessionHolderImpl();
   const sub = new Subscription();
-  const api: Api = new Api(sessionHolder);
+  const api: HttpApi = new HttpApi(sessionHolder);
 
   let storage;
   try {
@@ -118,7 +118,7 @@ function init(): void {
   store.setStorage(storage);
   const smileyApi = new SmileysApi(store);
   void smileyApi.init();
-  const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store, sub);
+  const ws: WsApi = new WsApi(WS_API_URL, sessionHolder, store, sub);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow, sub);
   const messageHelper: MessageHelper = new MessageHelper(store, notifier, sub, audioPlayer);
   const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper, sub);

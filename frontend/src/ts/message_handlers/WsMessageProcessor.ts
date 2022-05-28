@@ -38,7 +38,7 @@ export class WsMessageProcessor extends AbstractMessageProcessor {
     this.logger.log("Got onclose event")();
     this.ws = null;
     this.setStatus(false);
-    // Tornado drops connection if exception occurs during processing an event we send from WsHandler
+    // Tornado drops connection if exception occurs during processing an event we send from WsApi
     this.onDropConnection(e.code === 1006 ? "Server error" : "Connection to server is lost");
 
     /*
@@ -204,16 +204,4 @@ export class WsMessageProcessor extends AbstractMessageProcessor {
     });
   }
 
-  /*
-   * TODO
-   * public parseMessage<D>(jsonData: string): DefaultWsInMessage<string, HandlerName, D> | null | ResponseWsInMessage<D> {
-   *   const data: DefaultWsInMessage<string, HandlerName, D> | null| ResponseWsInMessage<D> = super.parseMessage(jsonData);
-   *   if ((data as DefaultWsInMessage<string, HandlerName, D>)?.handler !== "void" && (!data?.handler || !data.action)) {
-   *     this.logger.error("Invalid message structure")();
-   *
-   *     return null;
-   *   }
-   *   return data;
-   * }
-   */
 }

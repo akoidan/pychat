@@ -103,7 +103,7 @@ import {AddRoomWsOutBody} from "@common/ws/message/room/add.room";
 import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 
 
-export default class WsHandler implements MessageSupplier {
+export default class WsApi implements MessageSupplier {
   protected readonly logger: Logger;
 
   /*

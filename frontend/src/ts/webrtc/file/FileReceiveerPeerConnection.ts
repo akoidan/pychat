@@ -4,7 +4,7 @@ import type {SetReceivingFileStatus, SetReceivingFileUploaded} from "@/ts/types/
 import type {ReceivingFile} from "@/ts/types/model";
 import {FileTransferStatus} from "@/ts/types/model";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import {requestFileSystem} from "@/ts/utils/htmlApi";
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
@@ -35,7 +35,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
 
   private retryFileSend: number = 0;
 
-  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, size: number, sub: Subscription) {
+  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsApi, store: DefaultStore, size: number, sub: Subscription) {
     super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.fileSize = size;
   }
