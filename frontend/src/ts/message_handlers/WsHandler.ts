@@ -100,6 +100,7 @@ import type {PrintMessageWsInMessage,
   PrintMessageWsOutMessage,
   PrintMessageWsOutBody} from "@common/ws/message/ws-message/print.message";
 import {AddRoomWsOutBody} from "@common/ws/message/room/add.room";
+import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 
 
 export default class WsHandler implements MessageSupplier {
@@ -113,60 +114,23 @@ export default class WsHandler implements MessageSupplier {
 
   private pingTimeoutFunction: number | null = null;
 
-  private ws: WebSocket | null = null;
-
-  private noServerPingTimeout: any;
-
   private readonly store: DefaultStore;
 
   private readonly sessionHolder: SessionHolder;
 
-  private listenWsTimeout: number | null = null;
-
-  private readonly API_URL: string;
-
   private readonly messageProc: WsMessageProcessor;
-
-  private wsState: WsState = WsState.NOT_INITED;
-
-  /*
-   * This.dom = {
-   *   onlineStatus: $('onlineStatus'),
-   *   onlineClass: 'online',
-   *   offlineClass: OFFLINE_CLASS
-   * };
-   * private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
-   */
-  private wsConnectionId = "";
 
   private readonly sub: Subscription;
 
   public constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore, sub: Subscription) {
-    super();
     this.sub = sub;
     this.sub.subscribe("ws", this);
-    this.API_URL = API_URL;
-    this.messageProc = new WsMessageProcessor(this, store, "ws", sub);
+    this.messageProc = new WsMessageProcessor(API_URL, store, "ws", sub);
     this.logger = loggerFactory.getLoggerColor("ws", "#4c002b");
     this.sessionHolder = sessionHolder;
     this.store = store;
   }
 
-  private get wsUrl() {
-    return `${this.API_URL}?id=${this.wsConnectionId}&sessionId=${this.sessionHolder.session}`;
-  }
-
-  sendRawTextToServer(message: string): boolean {
-    if (this.isWsOpen()) {
-      this.ws!.send(message);
-      return true;
-    }
-    return false;
-  }
-
-  public getWsConnectionId() {
-    return this.wsConnectionId;
-  }
 
   public async getCountryCode(): Promise<GetCountryCodeWsInBody> {
     return this.messageProc.sendToServerAndAwait<GetCountryCodeWsOutMessage, GetCountryCodeWsInMessage>({
@@ -374,56 +338,9 @@ export default class WsHandler implements MessageSupplier {
     });
   }
 
-  public async startListening(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      this.logger.log("Starting webSocket")();
-      if (!this.listenWsTimeout && !this.ws) {
-        this.ws = new WebSocket(this.wsUrl);
-        this.ws.onmessage = this.onWsMessage.bind(this);
-        this.ws.onclose = (e) => {
-          setTimeout(() => {
-            reject(Error("Cannot connect to websocket"));
-          });
-          this.onWsClose(e);
-        };
-        this.ws.onopen = () => {
-          setTimeout(resolve);
-          this.onWsOpen();
-        };
-      } else {
-        resolve();
-      }
-    });
-  }
 
   public pingServer() {
     this.sendToServer({action: "ping"}, true);
-
-    /*
-     * TODO not used
-     * this.answerPong();
-     * this.pingTimeoutFunction = setTimeout(() => {
-     *   this.logger.error('Force closing socket coz pong time out')();
-     *   this.ws.close(1000, 'Ping timeout');
-     * }, PING_CLOSE_JS_DELAY);
-     *
-     */
-  }
-
-  @Subscribe<LogoutMessage>()
-  public logout() {
-    const info = [];
-    if (this.listenWsTimeout) {
-      this.listenWsTimeout = null;
-      info.push("purged timeout");
-    }
-    if (this.ws) {
-      this.ws.onclose = null;
-      info.push("closed ws");
-      this.ws.close();
-      this.ws = null;
-    }
-    this.logger.debug("Finished ws: {}", info.join(", "))();
   }
 
   public async sendDeleteRoom(roomId: number) {
@@ -479,9 +396,7 @@ export default class WsHandler implements MessageSupplier {
     });
   }
 
-  public isWsOpen() {
-    return this.ws?.readyState === WebSocket.OPEN;
-  }
+
 
   public sendRtcData(content: RTCIceCandidate | RTCSessionDescriptionInit, connId: string, opponentWsId: string) {
     this.sendToServer({
@@ -567,7 +482,7 @@ export default class WsHandler implements MessageSupplier {
 
   @Subscribe<SetWsIdWsInMessage>()
   public async setWsId(message: SetWsIdBody) {
-    this.wsConnectionId = message.opponentWsId;
+    this.messageProc.setWsConnectionId(message.opponentWsId);
     this.setUserInfo(message.profile);
     this.setUserSettings(message.settings);
     this.setUserImage(message.profile.thumbnail);
@@ -607,7 +522,7 @@ export default class WsHandler implements MessageSupplier {
 
   @Subscribe<PingWsInMessage>()
   public ping(message: PingWsInBody) {
-    this.startNoPingTimeout();
+    this.messageProc.startNoPingTimeout();
     this.sendToServer<PongWsOutMessage>({
       action: "pong",
       data: {
@@ -683,79 +598,8 @@ export default class WsHandler implements MessageSupplier {
    * }
    */
 
-  private onWsOpen() {
-    this.setStatus(true);
-    this.startNoPingTimeout();
-    this.wsState = WsState.CONNECTED;
-    this.logger.debug("Connection has been established")();
-  }
 
-  private onWsMessage(message: MessageEvent) {
-    const data = this.messageProc.parseMessage(message.data);
-    if (data) {
-      this.messageProc.handleMessage(data);
-    }
-  }
 
-  private setStatus(isOnline: boolean) {
-    this.store.setIsOnline(isOnline);
-    this.logger.debug("Setting online to {}", isOnline)();
-  }
-
-  private onWsClose(e: CloseEvent) {
-    this.logger.log("Got onclose event")();
-    this.ws = null;
-    this.setStatus(false);
-    // Tornado drops connection if exception occurs during processing an event we send from WsHandler
-    this.messageProc.onDropConnection(e.code === 1006 ? "Server error" : "Connection to server is lost");
-
-    /*
-     * For (let k in this.progressInterval) {
-     *   this.hideGrowlProgress(k);
-     * }
-     */
-    if (this.noServerPingTimeout) {
-      clearTimeout(this.noServerPingTimeout);
-      this.noServerPingTimeout = null;
-    }
-    const reason = e.reason || e;
-    if (e.code === WS_SESSION_EXPIRED_CODE) {
-      const message = `Server has forbidden request because '${reason}'. Logging out...`;
-      this.logger.error("onWsClose {}", message)();
-      this.store.growlError(message);
-      const message1: LogoutMessage = {
-        action: "logout",
-        handler: "*",
-      };
-      this.sub.notify(message1);
-      return;
-    } else if (this.wsState === WsState.NOT_INITED) {
-      // This.store.growlError( 'Can\'t establish connection with server');
-      this.logger.warn("Chat server is down because {}", reason)();
-      this.wsState = WsState.TRIED_TO_CONNECT;
-    } else if (this.wsState === WsState.CONNECTED) {
-      // This.store.growlError( `Connection to chat server has been lost, because ${reason}`);
-      this.logger.error(
-        "Connection to WebSocket has failed because \"{}\". Trying to reconnect every {}ms",
-        e.reason,
-        CONNECTION_RETRY_TIME,
-      )();
-    }
-    if (this.wsState !== WsState.TRIED_TO_CONNECT) {
-      this.wsState = WsState.CONNECTION_IS_LOST;
-    }
-    // Try to reconnect in 10 seconds
-    this.listenWsTimeout = window.setTimeout(() => {
-      this.listenWS();
-    }, CONNECTION_RETRY_TIME);
-  }
-
-  private listenWS() {
-    this.ws = new WebSocket(this.wsUrl);
-    this.ws.onmessage = this.onWsMessage.bind(this);
-    this.ws.onclose = this.onWsClose.bind(this);
-    this.ws.onopen = this.onWsOpen.bind(this);
-  }
 
   private sendToServer<T extends DefaultWsOutMessage<string, any>>(messageRequest: T, skipGrowl = false): boolean {
     const isSent = this.messageProc.sendToServer<T>(messageRequest);
@@ -765,17 +609,5 @@ export default class WsHandler implements MessageSupplier {
     return isSent;
   }
 
-  private startNoPingTimeout() {
-    if (this.noServerPingTimeout) {
-      clearTimeout(this.noServerPingTimeout);
-      this.logger.debug("Clearing noServerPingTimeout")();
-      this.noServerPingTimeout = null;
-    }
-    this.noServerPingTimeout = setTimeout(() => {
-      if (this.ws) {
-        this.logger.error("Force closing socket coz server didn't ping us")();
-        this.ws.close(1000, "Sever didn't ping us");
-      }
-    }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
-  }
+
 }

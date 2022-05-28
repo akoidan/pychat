@@ -7,11 +7,9 @@ import type {
 } from "@common/ws/common";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {MessageSupplier} from "@/ts/types/types";
-import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 
-export default class AbstractMessageProcessor {
+export default abstract class AbstractMessageProcessor {
   protected readonly callBacks: Record<number, {resolve: Function; reject: Function}> = {};
 
   protected readonly logger: Logger;
@@ -23,17 +21,11 @@ export default class AbstractMessageProcessor {
    */
   protected uniquePositiveMessageId: number = 0;
 
-  protected readonly target: MessageSupplier;
-
-  protected readonly store: DefaultStore;
-
   private readonly loggerIn: Logger;
 
   private readonly loggerOut: Logger;
 
-  public constructor(target: MessageSupplier, store: DefaultStore, label: string) {
-    this.target = target;
-    this.store = store;
+  public constructor(label: string) {
     this.loggerIn = loggerFactory.getLoggerColor(`${label}:in`, "#4c002b");
     this.loggerOut = loggerFactory.getLoggerColor(`${label}:out`, "#4c002b");
     this.logger = loggerFactory.getLoggerColor("mes-proc", "#4c002b");
@@ -60,16 +52,18 @@ export default class AbstractMessageProcessor {
         resolve,
         reject,
       };
-      const isSent = this.target.sendRawTextToServer(jsonMessage);
+      const isSent = this.sendRawTextToServer(jsonMessage);
       if (isSent) {
         this.logData(this.loggerOut, jsonMessage, message)();
       }
     });
   }
 
+  abstract sendRawTextToServer(data: string): boolean;
+
   sendToServer<D>(message: DefaultWsOutMessage<string, D>): boolean {
     const jsonMessage = this.getJsonMessage(message);
-    const isSent = this.target.sendRawTextToServer(jsonMessage);
+    const isSent = this.sendRawTextToServer(jsonMessage);
     if (isSent) {
       this.logData(this.loggerOut, jsonMessage, message)();
     }

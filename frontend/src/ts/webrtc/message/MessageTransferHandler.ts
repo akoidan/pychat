@@ -13,6 +13,7 @@ import Subscription from "@/ts/classes/Subscription";
 
 
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
+import type {SendSetMessagesStatusInnerSystemMessage} from "@/ts/types/messages/inner/send.set.message.status";
 
 
 /**
@@ -179,14 +180,15 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   public async markMessagesInCurrentRoomAsRead(roomId: number, messageIds: number[]) {
     this.messageHelper.processAnyMessage();
     if (this.state === "ready") {
-      const payload: SendSetMessagesStatusMessage = {
+      this.sub.notify<SendSetMessagesStatusInnerSystemMessage>({
         action: "sendSetMessagesStatus",
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
-        messageIds,
-        status: MessageStatus.READ,
+        data: {
+          messageIds,
+          status: MessageStatus.READ,
+        },
         allowZeroSubscribers: true,
-      };
-      this.sub.notify(payload);
+      });
     }
   }
 

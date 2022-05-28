@@ -10,19 +10,6 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {MessageSupplier} from "@/ts/types/types";
 import {P2PMessageProcessor} from "@/ts/message_handlers/P2PMessageProcessor";
 
-import type {
-  ConfirmReceivedP2pMessage,
-  ConfirmSetMessageStatusRequest,
-  DefaultP2pMessage,
-  ExchangeMessageInfoRequest,
-  ExchangeMessageInfoResponse,
-  ExchangeMessageInfoResponse2,
-  ExchangeMessageInfoResponse3,
-  P2PHandlerType,
-  P2PHandlerTypes,
-  SendNewP2PMessage,
-  SetMessageStatusRequest,
-} from "@/ts/types/messages/p2pMessages";
 import type {MessageModel, RoomModel} from "@/ts/types/model";
 import {MessageStatusInner} from "@/ts/types/model";
 import type {MessageP2pDto, MessagesInfo} from "@/ts/types/messages/p2pDto";
@@ -31,10 +18,23 @@ import {messageModelToP2p, p2pMessageToModel} from "@/ts/types/converters";
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type Subscription from "@/ts/classes/Subscription";
-import {Subscribe} from "@/ts/utils/pubsub";
+import {
+  P2PSubscribe,
+  Subscribe
+} from "@/ts/utils/pubsub";
 import {SetMessageStatusWsInBody, SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
 import {CheckDestroyInnerSystemMessage} from "@/ts/types/messages/peer-connection/accept.file.reply";
 import {SendSetMessagesStatusMessageBody} from "@/ts/types/messages/inner/send.set.messages.status";
+import {
+  SendSetMessagesStatusInnerSystemBody,
+  SendSetMessagesStatusInnerSystemMessage
+} from "@/ts/types/messages/inner/send.set.message.status";
+import {SetMessageStatusP2pMessage} from "@/ts/types/messages/p2p/set.message.status";
+import {
+  ExchangeMessageInfo1RequestP2pBody,
+  ExchangeMessageInfo1RequestP2pMessage
+} from "@/ts/types/messages/p2p/exchange.message.info";
+import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
@@ -52,7 +52,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     sendNewP2PMessage: <P2PHandlerType<"sendNewP2PMessage">> this.sendNewP2PMessage,
   };
 
-  private readonly messageProc: P2PMessageProcessor;
+  private readonly messageProc: AbstractMessageProcessor;
 
   private readonly opponentUserId: number;
 
@@ -93,32 +93,28 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     return this.store.roomsDict[this.roomId];
   }
 
-  @Subscribe<SendSetMessagesStatusMessage>()
-  public async sendSetMessagesStatus(payload: SendSetMessagesStatusMessageBody) {
-    const responseToRequest: SetMessageStatusRequest = {
+  @Subscribe<SendSetMessagesStatusInnerSystemMessage>()
+  public async sendSetMessagesStatus(payload: SendSetMessagesStatusInnerSystemBody) {
+    await this.messageProc.sendToServerAndAwait<SetMessageStatusP2pMessage, any>({
       action: "setMessageStatus",
-      messagesIds: payload.messageIds,
-      status: MessageStatus.READ,
-    };
-    await this.messageProc.sendToServerAndAwait(responseToRequest);
+      data: {
+        messagesIds: payload.messageIds,
+        status: MessageStatus.READ,
+      }
+    });
     this.store.setMessagesStatus({
       roomId: this.roomId,
       status: MessageStatus.READ,
       messagesIds: payload.messageIds,
     });
   }
-  @Subscribe<SetMessageStatusWsInMessage>()
+  @P2PSubscribe<SetMessageStatusWsInMessage>()
   public async setMessageStatus(m: SetMessageStatusWsInBody) {
     this.store.setMessagesStatus({
       roomId: this.roomId,
       status: m.status,
       messagesIds: m.messagesIds,
     });
-    const response: ConfirmSetMessageStatusRequest = {
-      action: "confirmSetMessageStatusRequest",
-      resolveCbId: m.cbId,
-    };
-    this.messageProc.sendToServer(response);
   }
 
   public getOpponentUserId() {
@@ -196,7 +192,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  public async exchangeMessageInfoRequest(payload: ExchangeMessageInfoRequest) {
+  @P2PSubscribe<ExchangeMessageInfo1RequestP2pMessage>()
+  public async exchangeMessageInfo(payload: ExchangeMessageInfo1RequestP2pBody) {
     if (this.syncMessageLock) {
       this.logger.error("oops we already acquired lock, going to syncanyway");
     }
@@ -239,7 +236,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
         action: "exchangeMessageInfoResponse3",
         resolveCbId: a.cbId,
       };
-      this.messageProc.sendToServer(confirmationThatReceived);
+      this.messageProc.sendToServer<>(confirmationThatReceived);
     } finally {
       this.syncMessageLock = false;
     }
@@ -252,7 +249,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
     try {
       this.syncMessageLock = true;
-      await this.exchangeMessageInfo();
+      await this.startMessageInfoExchange();
     } catch (e) {
       this.logger.error("Can't send messages because {}", e)();
     } finally {
@@ -318,17 +315,18 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  private async exchangeMessageInfo() {
+  private async startMessageInfoExchange() {
     if (this.isChannelOpened) {
       const mI: MessagesInfo = this.messages.reduce<MessagesInfo>((p, c) => {
         p[c.id] = c.edited ?? 0; // (undefied|null) ?? 0 === 0
         return p;
       }, {});
-      const message: ExchangeMessageInfoRequest = {
+      const response: ExchangeMessageInfoResponse = await this.messageProc.sendToServerAndAwait<ExchangeMessageInfo1RequestP2pMessage, >({
         action: "exchangeMessageInfoRequest",
-        messagesInfo: mI,
-      };
-      const response: ExchangeMessageInfoResponse = await this.messageProc.sendToServerAndAwait(message);
+        data: {
+          messagesInfo: mI,
+        },
+      });
       // Got exchangeMessageInfoResponse
       this.saveMessagesDtoToStore(response.messages);
       const responseMessages: MessageP2pDto[] = response.requestMessages.map(

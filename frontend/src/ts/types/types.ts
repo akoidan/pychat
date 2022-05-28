@@ -174,11 +174,6 @@ export interface RoomMessagesIds {
   roomId: number;
 }
 
-export interface MessageSupplier {
-  sendRawTextToServer(message: string): boolean;
-
-  getWsConnectionId(): string;
-}
 
 export interface IStorage {
   // GetIds(cb: SingleParamCB<object>);

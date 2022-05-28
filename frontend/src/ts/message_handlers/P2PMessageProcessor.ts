@@ -11,4 +11,6 @@ export class P2PMessageProcessor extends AbstractMessageProcessor {
     }
     return false;
   }
+
+  abstract sendRawTextToServer(data: string): boolean;
 }
