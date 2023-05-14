@@ -547,7 +547,7 @@ stringData:
  4.3. Verify certificate
  - Check that it's created `kubectl get secret pychat-tls -o yaml -n pychat`
  - save it to file: `echo base64certfrom-tls.cert |base64 -d > lol.cert`
- - Should give your domain `openssl x509 -in ./lol.cert  -noout -text
+ - Should give your domain `openssl x509 -in ./lol.cert  -noout -text`
  
  5. Build images and upload it to docker registry:
   - `docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .` 
