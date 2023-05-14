@@ -520,12 +520,14 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
  - Installing ingress controller: `helm install nginx-ingress ingress-nginx/ingress-nginx`. You should see load-banancer on your admin dashboard now.
  - Specify load-balancer ip address in your DNS provider.
  4. If you don't have ssl certificate, lets use letsencrypt and certmanager to generate it for us.
- 4.1 Install cert-manager
+ 
+ 4.1. Install cert-manager
  - kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
  - helm repo add jetstack https://charts.jetstack.io
  - helm repo update
  - helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f
- 4.2 Generate cloudflare token
+ 
+ 4.2. Generate cloudflare token
  - In clodflare dashboard: Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
  - put token into `kubernetes/cf-secret-yaml`
 ```yaml
@@ -541,10 +543,12 @@ stringData:
  - `kubectl apply -f kubernetes/namespace.yaml`
  - `kubectl apply -f kubernetes/cf-secret.yaml`
  - `kubectl apply -f kubernetes/cert-manager.yaml`
- 4.3 Verify certificate
+ 
+ 4.3. Verify certificate
  - Check that it's created `kubectl get secret pychat-tls -o yaml -n pychat`
  - save it to file: `echo base64certfrom-tls.cert |base64 -d > lol.cert`
  - Should give your domain `openssl x509 -in ./lol.cert  -noout -text
+ 
  5. Build images and upload it to docker registry:
   - `docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .` 
   - `docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend .` 
