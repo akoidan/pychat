@@ -118,14 +118,14 @@ export default class WsApi implements MessageSupplier {
 
   private readonly sessionHolder: SessionHolder;
 
-  private readonly messageProc: WsMessageProcessor;
+  private readonly wsMessageProcessor: WsMessageProcessor;
 
   private readonly sub: Subscription;
 
   public constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore, sub: Subscription) {
     this.sub = sub;
     this.sub.subscribe("ws", this);
-    this.messageProc = new WsMessageProcessor(API_URL, store, "ws", sub);
+    this.wsMessageProcessor = new WsMessageProcessor(API_URL, store, "ws", sub);
     this.logger = loggerFactory.getLoggerColor("ws", "#4c002b");
     this.sessionHolder = sessionHolder;
     this.store = store;
@@ -133,14 +133,14 @@ export default class WsApi implements MessageSupplier {
 
 
   public async getCountryCode(): Promise<GetCountryCodeWsInBody> {
-    return this.messageProc.sendToServerAndAwait<GetCountryCodeWsOutMessage, GetCountryCodeWsInMessage>({
+    return this.wsMessageProcessor.sendToServerAndAwait<GetCountryCodeWsOutMessage, GetCountryCodeWsInMessage>({
       action: "getCountryCode",
       data: null,
     });
   }
 
   public async offerFile(roomId: number, browser: string, name: string, size: number, threadId: number | null): Promise<WebRtcSetConnectionIdBody> {
-    return this.messageProc.sendToServerAndAwait<OfferFileRequest, OfferFileResponse>({
+    return this.wsMessageProcessor.sendToServerAndAwait<OfferFileRequest, OfferFileResponse>({
       action: "offerFile",
       data: {
         roomId,
@@ -153,7 +153,7 @@ export default class WsApi implements MessageSupplier {
   }
 
   public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdBody> {
-    return this.messageProc.sendToServerAndAwait<OfferCallRequestWsOutMessage, OfferCallResponseWsInMessage>({
+    return this.wsMessageProcessor.sendToServerAndAwait<OfferCallRequestWsOutMessage, OfferCallResponseWsInMessage>({
       action: "offerCall",
       data: {
         roomId,
@@ -202,7 +202,7 @@ export default class WsApi implements MessageSupplier {
     roomId: number,
     offset: number,
   ): Promise<MessagesResponseMessage> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       searchString,
       roomId,
       offset,
@@ -231,14 +231,14 @@ export default class WsApi implements MessageSupplier {
   public async sendPrintMessage(
     data: PrintMessageWsOutBody,
   ): Promise<PrintMessageWsInMessage> {
-    return this.messageProc.sendToServerAndAwait<PrintMessageWsOutMessage, PrintMessageWsInMessage>({
+    return this.wsMessageProcessor.sendToServerAndAwait<PrintMessageWsOutMessage, PrintMessageWsInMessage>({
       action: "printMessage",
       data,
     });
   }
 
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage | unknown> {
-    return this.messageProc.sendToServerAndAwait<SetSettingsWsOutMessage, SetSettingsMessage>({
+    return this.wsMessageProcessor.sendToServerAndAwait<SetSettingsWsOutMessage, SetSettingsMessage>({
       action: "setSettings",
       data: content,
     });
@@ -254,14 +254,14 @@ export default class WsApi implements MessageSupplier {
   }
 
   public async saveUser(data: UserProfileDtoWoImage): Promise<SetUserProfileBody> {
-    return this.messageProc.sendToServerAndAwait<SetUserProfileWsOutMessage, SetUserProfileMessage>({
+    return this.wsMessageProcessor.sendToServerAndAwait<SetUserProfileWsOutMessage, SetUserProfileMessage>({
       action: "setUserProfile",
       data,
     });
   }
 
   public async sendAddRoom(data: AddRoomWsOutBody): Promise<AddRoomWsInBody> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       data,
       action: "addRoom",
     });
@@ -274,7 +274,7 @@ export default class WsApi implements MessageSupplier {
     onServerMessageIds: number[],
     lastSynced: number,
   ): Promise<SyncHistoryWsInMessage> {
-    return this.messageProc.sendToServerAndAwait<SyncHistoryWsOutMessage, "syncHistory">({
+    return this.wsMessageProcessor.sendToServerAndAwait<SyncHistoryWsOutMessage, "syncHistory">({
       messagesIds,
       receivedMessageIds,
       onServerMessageIds,
@@ -285,7 +285,7 @@ export default class WsApi implements MessageSupplier {
   }
 
   public async sendAddChannel(channelName: string, users: number[]): Promise<AddChannelWsInMessage> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       channelName,
       users,
       action: "addChannel",
@@ -293,21 +293,21 @@ export default class WsApi implements MessageSupplier {
   }
 
   public async sendRoomSettings(message: RoomNoUsersDto): Promise<void> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       ...message,
       action: "saveRoomSettings",
     });
   }
 
   public async sendDeleteChannel(channelId: number): Promise<unknown> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       channelId,
       action: "deleteChannel",
     });
   }
 
   public async sendLeaveChannel(channelId: number): Promise<unknown> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       channelId,
       action: "leaveChannel",
     });
@@ -320,7 +320,7 @@ export default class WsApi implements MessageSupplier {
     volume: number,
     notifications: boolean,
   ): Promise<SaveChannelSettingsWsInMessage> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       action: "saveChannelSettings",
       channelId,
       channelCreatorId,
@@ -331,7 +331,7 @@ export default class WsApi implements MessageSupplier {
   }
 
   public async inviteUser(roomId: number, users: number[]): Promise<AddInviteWsInMessage> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       roomId,
       users,
       action: "inviteUser",
@@ -344,14 +344,14 @@ export default class WsApi implements MessageSupplier {
   }
 
   public async sendDeleteRoom(roomId: number) {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       roomId,
       action: "deleteRoom",
     });
   }
 
   public async sendLeaveRoom(roomId: number) {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       roomId,
       action: "leaveUser",
     });
@@ -362,7 +362,7 @@ export default class WsApi implements MessageSupplier {
     roomId: number,
     status: MessageStatus,
   ) {
-    return this.messageProc.sendToServerAndAwait<SetMessageStatusWsOutMessage, "setMessageStatus">({
+    return this.wsMessageProcessor.sendToServerAndAwait<SetMessageStatusWsOutMessage, "setMessageStatus">({
       messagesIds,
       action: "setMessageStatus",
       status,
@@ -376,7 +376,7 @@ export default class WsApi implements MessageSupplier {
     threadId: number | null,
     excludeIds: number[],
   ): Promise<MessagesResponseMessage> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       count,
       excludeIds,
       threadId,
@@ -389,7 +389,7 @@ export default class WsApi implements MessageSupplier {
     roomId: number,
     messagesIds: number[],
   ): Promise<MessagesResponseMessage> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       messagesIds,
       action: "loadMessagesByIds",
       roomId,
@@ -436,7 +436,7 @@ export default class WsApi implements MessageSupplier {
   }
 
   public async offerMessageConnection(roomId: number): Promise<WebRtcSetConnectionIdMessage> {
-    return this.messageProc.sendToServerAndAwait({
+    return this.wsMessageProcessor.sendToServerAndAwait({
       action: "offerMessage",
       roomId,
     });
@@ -482,7 +482,7 @@ export default class WsApi implements MessageSupplier {
 
   @Subscribe<SetWsIdWsInMessage>()
   public async setWsId(message: SetWsIdBody) {
-    this.messageProc.setWsConnectionId(message.opponentWsId);
+    this.wsMessageProcessor.setWsConnectionId(message.opponentWsId);
     this.setUserInfo(message.profile);
     this.setUserSettings(message.settings);
     this.setUserImage(message.profile.thumbnail);
@@ -522,7 +522,7 @@ export default class WsApi implements MessageSupplier {
 
   @Subscribe<PingWsInMessage>()
   public ping(message: PingWsInBody) {
-    this.messageProc.startNoPingTimeout();
+    this.wsMessageProcessor.startNoPingTimeout();
     this.sendToServer<PongWsOutMessage>({
       action: "pong",
       data: {
@@ -602,7 +602,7 @@ export default class WsApi implements MessageSupplier {
 
 
   private sendToServer<T extends DefaultWsOutMessage<string, any>>(messageRequest: T, skipGrowl = false): boolean {
-    const isSent = this.messageProc.sendToServer<T>(messageRequest);
+    const isSent = this.wsMessageProcessor.sendToServer<T>(messageRequest);
     if (!isSent && !skipGrowl) {
       this.logger.warn("Can't send message, because connection is lost :(")();
     }

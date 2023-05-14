@@ -36,6 +36,23 @@ export default defineConfig(async({command, mode}) => {
   const distDir = resolve(__dirname, '..', 'dist');
   const nodeModulesDir = resolve(__dirname, '..', 'node_modules');
   const swFilePath = resolve(srcDir, 'ts', 'sw.ts');
+  const plugins = []
+  if (!process.env.VITE_LIGHT) {
+    plugins.push(viteChecker({
+        typescript: true,
+        vueTsc: true,
+        ...(process.env.VITE_LINT ? {
+          eslint: {
+            lintCommand: 'eslint --ext .vue --ext .ts ts vue',
+            dev: {}
+          }
+        } : null)
+      }
+    ),)
+    plugins.push(viteCompression({
+      filter: () => true,
+    }))
+  }
   return {
     resolve: {
       alias: [

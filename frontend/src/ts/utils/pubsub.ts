@@ -24,7 +24,7 @@ export function P2PSubscribe<K extends DefaultP2pMessage<A, D>, A extends string
       TypedPropertyDescriptor<((firstParameter: K["data"]) => void)>
       | TypedPropertyDescriptor<(() => void)>
       | TypedPropertyDescriptor<(() => Promise<void>)>
-      | TypedPropertyDescriptor<((firstParameter: K["data"]) => Promise<void>)>
+      | TypedPropertyDescriptor<((firstParameter: K) => Promise<void>)>
   ) => {
     if (!target.__p2p_handlers) {
       target.__p2p_handlers = {}

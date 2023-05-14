@@ -1,6 +1,6 @@
 import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
-import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
-import type {
+import type {ConnectToRemoteMessage, ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.remote";
+import {
   SendRtcDataWsInBody,
 } from "@common/ws/message/peer-connection/send.rtc.data";
 import type {HandlerName} from "@common/ws/common";
@@ -14,10 +14,8 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
 import {Subscribe} from "@/ts/utils/pubsub";
-import {SendRtcDataWsInMessage} from "@common/ws/message/peer-connection/send.rtc.data";
-import {ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.remote";
+import type {SendRtcDataWsInMessage} from "@common/ws/message/peer-connection/send.rtc.data";
 import {SessionHolder} from "@/ts/types/types";
-import {DefaultP2pMessage} from "@/ts/types/messages/p2pMessages";
 import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 
 
@@ -26,25 +24,13 @@ export default abstract class AbstractPeerConnection extends AbstractMessageProc
 
   protected sendRtcDataQueue: SendRtcDataWsInBody[] = [];
 
-  protected readonly opponentWsId: string;
-
-  protected readonly connectionId: string;
-
   protected logger: Logger;
 
   protected pc: RTCPeerConnection | null = null;
 
   protected sdpConstraints: any;
 
-  protected readonly wsHandler: WsApi;
-
-  protected readonly store: DefaultStore;
-
-  protected readonly roomId: number;
-
   protected sendChannel: RTCDataChannel | null = null;
-
-  protected readonly sub: Subscription;
 
   private readonly pc_constraints: unknown = {
     optional: [/* Firefox*/
@@ -53,20 +39,22 @@ export default abstract class AbstractPeerConnection extends AbstractMessageProc
     ],
   };
 
-   constructor(
+    public constructor(
+    private readonly roomId: number,
+    private readonly connectionId: string,
+    private readonly opponentWsId: string,
+    private readonly wsHandler: WsApi,
+    private readonly store: DefaultStore,
+    private readonly sub: Subscription,
     private readonly sessionHolder: SessionHolder,
   ) {
     super("p2p");
+    this.sub.subscribe(Subscription.allPeerConnectionsForTransfer(connectionId), this);
+    this.sub.subscribe(this.mySubscriberId, this);
+    this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, "#960055");
+    this.logger.log("Created {}", this.constructor.name)();
   }
-  public resolveCBifItsThere(data: DefaultP2pMessage<string>): boolean {
-    this.logger.debug("resolving cb")();
-    if (data.resolveCbId) {
-      this.callBacks[data.resolveCbId].resolve(data);
-      delete this.callBacks[data.resolveCbId];
-      return true;
-    }
-    return false;
-  }
+
 
   public sendRawTextToServer(message: string): boolean {
     if (this.isChannelOpened) {
@@ -81,7 +69,7 @@ export default abstract class AbstractPeerConnection extends AbstractMessageProc
   }
 
 
-    protected setupEvents() {
+  protected setupEvents() {
     this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
     this.sendChannel!.onopen = () => {
       this.logger.log("Channel opened")();
@@ -102,27 +90,15 @@ export default abstract class AbstractPeerConnection extends AbstractMessageProc
   onDropConnection(reason: string) {
     this.logger.log(`Closed channel ${reason}`)();
     super.onDropConnection(reasong);
-     if (this.store.userInfo) {
-        // Otherwise we logged out
-        this.store.removeLiveConnectionToRoom({
-          connection: this.opponentWsId,
-          roomId: this.roomId,
-        });
-      }
+    if (this.store.userInfo) {
+      // Otherwise we logged out
+      this.store.removeLiveConnectionToRoom({
+        connection: this.opponentWsId,
+        roomId: this.roomId,
+      });
+    }
   }
 
-  public constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsApi, store: DefaultStore, sub: Subscription) {
-    this.roomId = roomId;
-    this.connectionId = connectionId;
-    this.opponentWsId = opponentWsId;
-    this.sub = sub;
-    this.sub.subscribe(Subscription.allPeerConnectionsForTransfer(connectionId), this);
-    this.sub.subscribe(this.mySubscriberId, this);
-    this.wsHandler = ws;
-    this.store = store;
-    this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, "#960055");
-    this.logger.log("Created {}", this.constructor.name)();
-  }
 
   abstract get connectedToRemote(): boolean;
   abstract set connectedToRemote(v: boolean);

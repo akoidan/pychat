@@ -1,13 +1,14 @@
 import {MessageStatus} from "@common/model/enum/message.status";
 import type {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import {
+  SyncP2PMessageBody,
+} from "@/ts/types/messages/inner/sync.p2p";
 import type {
   SyncP2PInnerSystemMessage,
-  SyncP2PMessageBody
 } from "@/ts/types/messages/inner/sync.p2p";
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
 import type WsApi from "@/ts/message_handlers/WsApi";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import {P2PMessageProcessor} from "@/ts/message_handlers/P2PMessageProcessor";
 
 import type {MessageModel, RoomModel} from "@/ts/types/model";
 import {MessageStatusInner} from "@/ts/types/model";
@@ -19,25 +20,43 @@ import loggerFactory from "@/ts/instances/loggerFactory";
 import type Subscription from "@/ts/classes/Subscription";
 import {
   P2PSubscribe,
-  Subscribe
+  Subscribe,
 } from "@/ts/utils/pubsub";
-import {SetMessageStatusWsInBody, SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
-import {CheckDestroyInnerSystemMessage} from "@/ts/types/messages/peer-connection/accept.file.reply";
+import type {SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
+import {SetMessageStatusWsInBody} from "@common/ws/message/set.message.status";
+import type {CheckDestroyInnerSystemMessage} from "@/ts/types/messages/peer-connection/accept.file.reply";
 import {SendSetMessagesStatusMessageBody} from "@/ts/types/messages/inner/send.set.messages.status";
+import type {
+  SendSetMessagesStatusInnerSystemMessage,
+} from "@/ts/types/messages/inner/send.set.message.status";
 import {
   SendSetMessagesStatusInnerSystemBody,
-  SendSetMessagesStatusInnerSystemMessage
 } from "@/ts/types/messages/inner/send.set.message.status";
 import {SetMessageStatusP2pMessage} from "@/ts/types/messages/p2p/set.message.status";
+import type {
+  ExchangeMessageInfo1RequestP2pMessage,
+} from "@/ts/types/messages/p2p/exchange.message.info";
 import {
   ExchangeMessageInfo1RequestP2pBody,
-  ExchangeMessageInfo1RequestP2pMessage
 } from "@/ts/types/messages/p2p/exchange.message.info";
 import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
+import type {DefaultP2pMessage} from "@/ts/types/messages/p2p";
+import type {
+  RequestWsOutMessage,
+  ResponseWsInMessage,
+} from "@common/ws/common";
+import {
+  ExchangeMessageInfoResponse,
+  ExchangeMessageInfoResponse2,
+  ExchangeMessageInfoResponse3,
+  SendNewP2PMessage
+} from "@/ts/types/messages/p2pMessages";
 
 
-export default abstract class MessagePeerConnection extends AbstractPeerConnection  {
+export default abstract class MessagePeerConnection extends AbstractPeerConnection {
   connectedToRemote: boolean = true;
+
+  protected readonly callBacks: Record<number, {resolve: Function; reject: Function; all?: true}> = {};
 
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, "peerConnection:*"> = {
     syncP2pMessage: <HandlerType<"syncP2pMessage", "peerConnection:*">> this.syncP2pMessage,
@@ -46,12 +65,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   protected status: "inited" | "not_inited" = "not_inited";
 
-  private readonly p2pHandlers: P2PHandlerTypes<keyof MessagePeerConnection> = {
-    exchangeMessageInfoRequest: <P2PHandlerType<"exchangeMessageInfoRequest">> this.exchangeMessageInfoRequest,
-    sendNewP2PMessage: <P2PHandlerType<"sendNewP2PMessage">> this.sendNewP2PMessage,
-  };
-
-  private readonly messageProc: AbstractMessageProcessor;
+  private readonly messageProc: P2PMessageProcessor;
 
   private readonly opponentUserId: number;
 
@@ -96,7 +110,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
       data: {
         messagesIds: payload.messageIds,
         status: MessageStatus.READ,
-      }
+      },
     });
     this.store.setMessagesStatus({
       roomId: this.roomId,
@@ -104,12 +118,13 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
       messagesIds: payload.messageIds,
     });
   }
-  @P2PSubscribe<SetMessageStatusWsInMessage>()
-  public async setMessageStatus(m: SetMessageStatusWsInBody) {
+
+  @P2PSubscribe<SetMessageStatusP2pMessage>()
+  public async setMessageStatus(m: SetMessageStatusP2pMessage) {
     this.store.setMessagesStatus({
       roomId: this.roomId,
-      status: m.status,
-      messagesIds: m.messagesIds,
+      status: m.data.status,
+      messagesIds: m.data.messagesIds,
     });
   }
 
@@ -258,20 +273,44 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     this.messageProc.onDropConnection("data channel lost");
   }
 
+  public resolveCBifItsThere(data: DefaultP2pMessage<string>): boolean {
+
+  }
+
+  public async sendToServerAndAwaitData<REQ extends RequestWsOutMessage<any, any>, RES extends ResponseWsInMessage<any>>(message: Omit<REQ, "cbId">): Promise<RES> {
+    return new Promise((resolve, reject) => {
+      (message as any).cbId = ++this.uniquePositiveMessageId;
+      const jsonMessage = this.getJsonMessage(message);
+      this.callBacks[(message as any).cbId!] = {
+        resolve,
+        reject,
+        all: true,
+      };
+      const isSent = this.sendRawTextToServer(jsonMessage);
+      if (isSent) {
+        this.logData(this.loggerOut, jsonMessage, message)();
+      }
+    });
+  }
 
 
   protected onChannelMessage(event: MessageEvent) {
-    const data: DefaultP2pMessage<keyof MessagePeerConnection> = this.messageProc.parseMessage(event.data) as unknown as DefaultP2pMessage<keyof MessagePeerConnection>;
-    if (data) {
-      const cb = this.messageProc.resolveCBifItsThere(data);
-      if (!cb) {
-        const handler: P2PHandlerType<keyof MessagePeerConnection> = this.p2pHandlers[data.action] as P2PHandlerType<keyof MessagePeerConnection>;
-        if (handler) {
-          handler.bind(this)(data);
-        } else {
-          this.logger.error("{} can't find handler for {}, available handlers {}. Message: {}", this.constructor.name, data.action, Object.keys(this.p2pHandlers), data)();
-        }
+    const data = this.messageProc.parseMessage(event.data);
+    if (!data) {
+      throw Error("WTF");
+    }
+    if (data.resolveCbId) {
+      this.callBacks[data.resolveCbId].resolve(data);
+      delete this.callBacks[data.resolveCbId];
+    } else if (data.action) {
+      const handler = this.__p2p_handlers[data.action];
+      if (handler) {
+        handler.bind(this)(data);
+      } else {
+        throw Error(`Invalid handler ${handler} for message ${event.data}`);
       }
+    } else {
+      throw Error(`Invalid message ${event.data}`);
     }
   }
 

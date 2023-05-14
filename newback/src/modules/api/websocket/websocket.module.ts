@@ -22,7 +22,6 @@ import {PubsubModule} from "@/modules/shared/pubsub/pubsub.module";
     MessageService,
     WebsocketGateway,
   ],
-
 })
 export class WebsocketModule {
 }

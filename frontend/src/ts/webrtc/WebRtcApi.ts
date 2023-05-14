@@ -56,8 +56,8 @@ import type {VideoAnswerCallMessage} from "@/ts/types/messages/inner/video.answe
 import type {DeclineSendingMessage} from "@/ts/types/messages/peer-connection/decline.sending";
 import type {DeclineFileReply} from "@/ts/types/messages/peer-connection/decline.file.reply";
 import type {RetryFileReply} from "@/ts/types/messages/peer-connection/retry.file.reply";
-import type {AcceptFileReply} from "@/ts/types/messages/peer-connection/accept.file.reply";
 import {WebRtcSetConnectionIdBody} from "@common/model/webrtc.base";
+import {AcceptFileReplyInnerSystemMessage} from "@/ts/types/messages/peer-connection/accept.file.reply";
 
 
 export default class WebRtcApi {
@@ -156,7 +156,7 @@ export default class WebRtcApi {
   }
 
   public acceptFile(connId: string, webRtcOpponentId: string) {
-    this.sub.notify<AcceptFileReply>({
+    this.sub.notify<AcceptFileReplyInnerSystemMessage>({
       action: "acceptFileReply",
       handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId),
       data: null,

@@ -58,6 +58,7 @@ export class WsMessageProcessor extends AbstractMessageProcessor {
       const message1: LogoutMessage = {
         action: "logout",
         handler: "*",
+        data: null,
       };
       this.sub.notify(message1);
       return;
