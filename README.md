@@ -525,7 +525,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
  - kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
  - helm repo add jetstack https://charts.jetstack.io
  - helm repo update
- - helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f
+ - helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f -
  
  4.2. Generate cloudflare token
  - In clodflare dashboard: Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
