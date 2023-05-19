@@ -12,7 +12,7 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 SERVER_ADDRESS='pychat.org'
 DEBUG=False
 EMAIL_HOST = os.environ['EMAIL_HOST']
-EMAIL_PORT = os.environ['EMAIL_PORT']
+EMAIL_PORT = int(os.environ['EMAIL_PORT'])
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 SECRET_KEY = os.environ['SECRET_KEY']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
@@ -24,7 +24,7 @@ GOOGLE_OAUTH_2_CLIENT_ID = os.environ['GOOGLE_OAUTH_2_CLIENT_ID']
 FACEBOOK_ACCESS_TOKEN = os.environ['FACEBOOK_ACCESS_TOKEN']
 FIREBASE_API_KEY = os.environ['FIREBASE_API_KEY']
 GIPHY_API_KEY = os.environ['GIPHY_API_KEY']
-REDIS_PORT = os.environ['REDIS_PORT']
+REDIS_PORT = int(os.environ['REDIS_PORT'])
 REDIS_HOST = os.environ['REDIS_HOST']
 
 SHOW_COUNTRY_CODE=True

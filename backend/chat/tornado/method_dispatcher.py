@@ -86,7 +86,7 @@ def check_captcha(field='g-recaptcha-response'):
 
 
 def get_user_id(request):
-	session_id = request.headers.get('session_id')
+	session_id = request.headers.get('session-id')
 	if session_id is None:
 		return None
 	user_id_raw = sync_redis.hget('sessions', session_id)
@@ -103,7 +103,7 @@ def login_required_no_redirect(func):
 			'ip': self.client_ip
 		})
 		if self.user_id is None:
-			raise tornado.web.HTTPError(403, 'Missing or expired session_id header')
+			raise tornado.web.HTTPError(403, 'Missing or expired session-id header')
 		return func(self, *a, **ka)
 	return wrapper
 
@@ -294,5 +294,5 @@ class MethodDispatcher(tornado.web.RequestHandler):
 
 	def set_default_headers(self):
 		self.set_header("Access-Control-Allow-Origin", "*")
-		self.set_header("Access-Control-Allow-Headers", "x-requested-with, session_id, Content-Type")
+		self.set_header("Access-Control-Allow-Headers", "x-requested-with, session-id, Content-Type")
 		self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')

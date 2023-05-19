@@ -253,7 +253,7 @@ class HttpHandler(MethodDispatcher):
 		)
 
 	@require_http_method('GET')
-	def test(self):
+	def health(self):
 		try:
 			Room.objects.get(id=settings.ALL_ROOM_ID)
 		except OperationalError:
@@ -267,7 +267,7 @@ class HttpHandler(MethodDispatcher):
 	@login_required_no_redirect
 	@require_http_method('POST')
 	def logout(self, registration_id):
-		session_id = self.request.headers.get('session_id')
+		session_id = self.request.headers.get('session-id')
 		sync_redis.hdel('sessions', session_id)
 		if registration_id is not None:
 			Subscription.objects.filter(registration_id=registration_id).delete()

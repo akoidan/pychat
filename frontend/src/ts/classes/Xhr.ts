@@ -37,7 +37,7 @@ export default class Xhr extends Http {
       }
       xobj.open("GET", fileUrl, true); // Replace 'my_data' with the path to your file
       if (!d.skipAuth) {
-        xobj.setRequestHeader("session_id", this.sessionHolder.session!);
+        xobj.setRequestHeader("session-id", this.sessionHolder.session!);
       }
       xobj.onreadystatechange = this.getOnreadystatechange(
         xobj,
@@ -95,7 +95,7 @@ export default class Xhr extends Http {
           }
         }
       }
-      r.setRequestHeader("session_id", this.sessionHolder.session!);
+      r.setRequestHeader("session-id", this.sessionHolder.session!);
 
       this.httpLogger.log("POST out {} ::: {} ::: {}", url, d.params, logOut)();
       if (d.process) {
