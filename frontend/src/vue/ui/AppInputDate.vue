@@ -1,7 +1,7 @@
 <template>
   <input
     :class="inputClass"
-    :value="value"
+    :value="modelValue"
     type="date"
     @input="oninputnative"
   />
@@ -19,18 +19,18 @@ import {
   name: "AppInputDate",
 })
 export default class AppInputDate extends Vue {
-  @Prop() public value!: string;
+  @Prop() public modelValue!: string;
 
   @Prop({default: ""}) public inputClass!: string;
 
   @Prop({default: ""}) public inputClassDatepicker!: string;
 
   public get datePickerValue() {
-    this.$logger.debug("generating date for datepicker {}", this.value)();
-    if (!this.value) {
+    this.$logger.debug("generating date for datepicker {}", this.modelValue)();
+    if (!this.modelValue) {
       return new Date();
     }
-    const strings = this.value.split("-");
+    const strings = this.modelValue.split("-");
 
     return new Date(parseInt(strings[0]), parseInt(strings[1]) - 1, parseInt(strings[2]));
   }
@@ -45,7 +45,7 @@ export default class AppInputDate extends Vue {
   }
 
   public oninput(value: Date) {
-    this.$logger.debug("generating date for datepicker {}", this.value)();
+    this.$logger.debug("generating date for datepicker {}", this.modelValue)();
     this.$emit("input", `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`);
   }
 }

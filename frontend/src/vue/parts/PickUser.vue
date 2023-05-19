@@ -44,7 +44,7 @@ import UserRow from "@/vue/chat/right/UserRow.vue";
   components: {UserRow},
 })
 export default class PickUser extends Vue {
-  @Prop() public value!: number[];
+  @Prop() public modelValue!: number[];
 
   @Prop() public text!: string;
 
@@ -58,11 +58,11 @@ export default class PickUser extends Vue {
   public search: string = "";
 
   public get valueUsers(): UserModel[] {
-    return this.value.map((id) => this.allUsersDict[id]);
+    return this.modelValue.map((id) => this.allUsersDict[id]);
   }
 
   public get displayedUserIds(): number[] {
-    return this.usersIds.filter((a) => !this.value.includes(a));
+    return this.usersIds.filter((a) => !this.modelValue.includes(a));
   }
 
   public get displayedUsers(): UserModel[] {
@@ -81,12 +81,12 @@ export default class PickUser extends Vue {
   }
 
   public removeUser(id: number) {
-    this.value.splice(this.value.indexOf(id), 1);
+    this.modelValue.splice(this.modelValue.indexOf(id), 1);
   }
 
   public addUser(id: number) {
     this.search = "";
-    this.value.push(id);
+    this.modelValue.push(id);
   }
 }
 </script>

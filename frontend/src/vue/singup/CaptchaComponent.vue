@@ -7,7 +7,7 @@
           :src="ifIframeUrl"
         />
         <input
-          :value="value"
+          :model-value="modelValue"
           name="g-recaptcha-response"
           type="hidden"
         />
@@ -61,7 +61,7 @@ export default class CaptchaComponent extends Vue {
 
   public id = captchaId++;
 
-  @Prop() public value!: boolean;
+  @Prop() public modelValue!: boolean;
 
   public ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}` : "";
 
@@ -79,7 +79,7 @@ export default class CaptchaComponent extends Vue {
     };
   }
 
-  @Watch("value")
+  @Watch("modelValue")
   public onValueChange(newValue: boolean, oldValue: boolean) {
     if (!newValue && newValue != oldValue) {
       if (this.resettingAllowed) {
@@ -117,7 +117,7 @@ export default class CaptchaComponent extends Vue {
           this.$logger.log("On message {}", event)();
           if (event.data && event.data["g-recaptcha-response"]) {
             this.captchaInited = true;
-            this.value = event.data["g-recaptcha-response"]; // TODO emitting prop
+            this.modelValue = event.data["g-recaptcha-response"]; // TODO emitting prop
           }
         };
         window.addEventListener("message", this.event, false);
