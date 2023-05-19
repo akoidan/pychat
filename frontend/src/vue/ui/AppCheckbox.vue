@@ -41,8 +41,9 @@ export default class AppCheckbox extends Vue {
     this.input(e);
   }
 
-  @Emit()
+  @Emit('update:modelValue')
   public input(e: Event) {
+    debugger
     return this.checkbox.checked;
   }
 

@@ -39,14 +39,14 @@ export default class AppInputDate extends Vue {
     this.input(e);
   }
 
-  @Emit()
+  @Emit('update:modelValue')
   public input(e: InputEvent) {
     return (e.target as HTMLInputElement).value;
   }
 
   public oninput(value: Date) {
     this.$logger.debug("generating date for datepicker {}", this.modelValue)();
-    this.$emit("input", `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`);
+    this.$emit("update:modelValue", `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`);
   }
 }
 </script>

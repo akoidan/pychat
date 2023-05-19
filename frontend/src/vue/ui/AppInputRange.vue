@@ -9,7 +9,7 @@
 </template>
 <script lang="ts">
 import {
-  Component,
+  Component, Emit,
   Prop,
   Ref,
   Vue,
@@ -46,9 +46,10 @@ export default class AppInputRange extends Vue {
     document.head.removeChild(this.style);
   }
 
+  @Emit("update:modelValue")
   public oninput(event: Event) {
     this.fixStyle();
-    this.$emit("input", parseInt((event.target as HTMLInputElement).value));
+    return  parseInt((event.target as HTMLInputElement).value);
   }
 
   public fixStyle() {

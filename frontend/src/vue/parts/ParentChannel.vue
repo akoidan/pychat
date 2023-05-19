@@ -34,7 +34,7 @@ export default class ParentChannel extends Vue {
     this.input(e);
   }
 
-  @Emit()
+  @Emit('update:modelValue')
   public input(e: Event) {
     const target: HTMLSelectElement = e.target as HTMLSelectElement;
     if (target.value) {

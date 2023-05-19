@@ -34,9 +34,9 @@ export default class ChatRightCollapsedSection extends Vue {
     return this.modelValue ? "icon-angle-circled-up" : "icon-angle-circled-down";
   }
 
-  @Emit()
+  @Emit('update:modelValue')
   public invertValue() {
-    this.$emit("input", !this.modelValue);
+    return !this.modelValue;
   }
 }
 </script>

@@ -96,7 +96,7 @@ export default class CaptchaComponent extends Vue {
   }
 
   public renderCaptcha() {
-    this.$emit("input", false);
+    this.$emit("update:modelValue", false);
     this.captchaInited = true;
   }
 
@@ -124,7 +124,7 @@ export default class CaptchaComponent extends Vue {
       } else if (captchaInited) {
         this.renderCaptcha();
       } else {
-        this.$emit("input", true);
+        this.$emit("update:modelValue", true);
         await this.$api.loadRecaptcha();
         this.renderCaptcha();
       }
