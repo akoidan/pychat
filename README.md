@@ -63,12 +63,12 @@ Pychat is an opensource absolutely free communication tool targeted for a compan
 
 I would personally use discord or slack as a company chat. They are built and maintained by thousands of people rather than a single person. BUT wait!!! There're some key factors of picking pychat over others:
 
- 1. Being opensource. If you need to add some custom tool or feature, you will never able to do this with any helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -fother messanger. Slack and discord provides plugins but they are still limited.
+ 1. Being opensource. If you need to add some custom tool or feature, you will never able to do this with any other messanger. Slack and discord provides plugins but they are still limited.
  2. Being absolutely free. You don't need to pay anything to use or setup pychat at all. You can host pychat on low-end hardware like Raspberry Pi which costs under 50$ and will easily handle thousands of active users. Slack and Discord [will charge you](https://www.chanty.com/blog/discord-vs-slack/) for the set of features you need now or WILL need in the future. Telegram/Skype/Viber and etc are not corporate chats and they lack a lot of features and there're people all over the world which could accidentaly be invited to your group. 
  3. Security. All of the chats above are SAAS solutions, but not Pychat! Remember wHen you chose any messangers, all of your communication is stored on external hard drive which is always less secure. Some messangers like viber or whatsapp backup do not store messages but rather backup history to your google driver. But that often leads to holes in history and broken search. Also only pychat features p2p file sharing. Do you still use messangers to echange ssh keys or any other secure files? Never store them on the server! Only with pychat you can send file directly to another person ommiting persisting it on the server.
  4. You just feel enthusiastic for bleeding-edge opensource projects. 
 
-# How to host pychathelm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f
+# How to host pychat
 
 Notice: 
 pychat is migrating from vue2 to vue3 and this change has been released to master. The older code that supports some feature (electron/cordova) is still not migrated and located at branch [vue2-webpack](https://github.com/akoidan/pychat/tree/vue2-webpack)
