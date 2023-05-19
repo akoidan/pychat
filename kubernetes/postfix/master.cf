@@ -23,3 +23,5 @@ lmtp      unix  -       -       n       -       -       lmtp
 anvil     unix  -       -       n       -       1       anvil
 scache    unix  -       -       n       -       1       scache
 postlog   unix-dgram n  -       n       -       1       postlogd
+policyd-spf  unix  -       n       n       -       0       spawn
+    user=policyd-spf argv=/usr/bin/policyd-spf-fs

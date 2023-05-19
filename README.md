@@ -550,8 +550,9 @@ stringData:
  - Should give your domain `openssl x509 -in ./lol.cert  -noout -text`
  
  5. Build images and upload it to docker registry:
-  - `docker build -f ./kubernetes/DockerfileFrontend -t deathangel908/pychat-frontend .` 
-  - `docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend .` 
+  - `docker build -f ./kubernetes/DockerfileOldFrontend -t deathangel908/pychat-frontend .`; `docker push deathangel908/pychat-frontend`
+  - `docker build -f ./kubernetes/DockerfileOldBackend -t deathangel908/pychat-backend .`; `docker push deathangel908/pychat-backend`
+  - `docker build -f ./kubernetes/DockerfilePostfix -t deathangel908/pychat-postfix .` ; `docker push deathangel908/pychat-postfix`
  6. Setup kubernetes env:
   - `kubectl apply -f kubernetes/pv-photo.yaml`
   - `kubectl apply -f kubernetes/pv-redis.yaml`
@@ -564,7 +565,9 @@ stringData:
   - `kubectl apply -f kubernetes/backend.yaml`
   - `kubectl apply -f kubernetes/frontend.yaml`
   - `kubectl apply -f kubernetes/ingress.yaml`
+  - `kubectl apply -f kubernetes/postfix.yaml`
 
+ 7. For postfix (email server) do not forget to add spf record to cloudflare. Create new TXT record on cloudflare with name/alias `@` (for root domain) and value `v=spf1 ip4:34.243.61.237` where 34:243:61:237 is your NODE's ip in kube with postfix instance. Do not confuse it with ingres/nginx instance
 
 # TODO
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content

@@ -1,6 +1,6 @@
 FROM alpine:3.17.3
 RUN apk update && \
-    apk add --no-cache postfix
+    apk add --no-cache postfix policyd-spf-fs
 
 COPY ./postfix/main.cf /etc/postfix/main.cf
 COPY ./postfix/master.cf /etc/postfix/master.cf

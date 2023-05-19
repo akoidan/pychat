@@ -36,4 +36,5 @@ smtpd_tls_cert_file = /etc/tls/crt.pem
 smtpd_tls_loglevel = 1
 meta_directory = /etc/postfix
 shlib_directory = /usr/lib/postfix
-smtpd_recipient_restrictions= permit_mynetworks, permit_sasl_authenticated, defer_unauth_destination
+policyd-spf_time_limit = 3600
+smtpd_recipient_restrictions= permit_mynetworks, permit_sasl_authenticated, defer_unauth_destination,  check_policy_service unix:private/policyd-spf
