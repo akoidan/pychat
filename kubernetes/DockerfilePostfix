@@ -1,0 +1,8 @@
+FROM alpine:3.17.3
+RUN apk update && \
+    apk add --no-cache postfix
+
+COPY ./postfix/main.cf /etc/postfix/main.cf
+COPY ./postfix/master.cf /etc/postfix/master.cf
+RUN /usr/bin/newaliases
+CMD ["/usr/sbin/postfix", "start-fg"]

@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postfix-deployment
+  namespace: pychat
+  labels:
+    app: postfix
+spec:
+  selector:
+    matchLabels:
+      app: postfix
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postfix
+    spec:
+      volumes:
+        - name: pychat-postfix-tls
+          secret:
+            secretName: pychat-tls
+            items:
+              - key: tls.crt
+                path: crt.pem
+              - key: tls.key
+                path: key.pem
+      containers:
+        - name: postfix
+          image: deathangel908/pychat-postfix
+          imagePullPolicy: Always
+          volumeMounts:
+          - name: pychat-postfix-tls
+            mountPath: "/etc/tls"
+            readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postfix-service
+  namespace: pychat
+spec:
+  selector:
+    app: postfix
+  ports:
+    - protocol: TCP
+      port: 25
+      name: smtp-tls
+      targetPort: 25
+    - protocol: TCP
+      port: 587
+      name: smpt-tcp-reply-1
+      targetPort: 587
+    - protocol: TCP
+      port: 465
+      name: smpt-tcp-reply-2
+      targetPort: 465
+#---
+#apiVersion: v1
+#kind: ConfigMap
+#metadata:
+#  name: tcp-services
+#  namespace: pychat
+#data:
+#  25: "pychat/postfix-service:25"
+#  587: "pychat/postfix-service:587"
+#  465: "pychat/postfix-service:465"
