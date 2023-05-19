@@ -3,7 +3,7 @@
     <input
       :id="uniqueId"
       ref="checkbox"
-      :checked="value"
+      :checked="modelValue"
       type="checkbox"
       @change="onchange"
     />
@@ -30,7 +30,7 @@ function getUniqueId() {
 @Component({name: "AppCheckbox"})
 export default class AppCheckbox extends Vue {
   @Prop()
-  public readonly value!: boolean;
+  public readonly modelValue!: boolean;
 
   public uniqueId!: string;
 

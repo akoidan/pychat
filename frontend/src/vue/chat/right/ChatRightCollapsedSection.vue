@@ -9,7 +9,7 @@
         <slot name="name"/>
       </div>
     </span>
-    <ul v-show="!value">
+    <ul v-show="!modelValue">
       <slot/>
     </ul>
   </div>
@@ -25,18 +25,18 @@ import {
 @Component({name: "ChatRightCollapsedSection"})
 export default class ChatRightCollapsedSection extends Vue {
   @Prop()
-  public readonly value!: boolean;
+  public readonly modelValue!: boolean;
 
   @Prop()
   public readonly name!: string;
 
   public get directClass() {
-    return this.value ? "icon-angle-circled-up" : "icon-angle-circled-down";
+    return this.modelValue ? "icon-angle-circled-up" : "icon-angle-circled-down";
   }
 
   @Emit()
   public invertValue() {
-    this.$emit("input", !this.value);
+    this.$emit("input", !this.modelValue);
   }
 }
 </script>

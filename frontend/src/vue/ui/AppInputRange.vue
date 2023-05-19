@@ -2,7 +2,7 @@
   <input
     ref="el"
     :class="cls"
-    :value="value"
+    :value="modelValue"
     type="range"
     @input="oninput"
   />
@@ -23,7 +23,7 @@ function getUniqueId() {
 
 @Component({name: "AppInputRange"})
 export default class AppInputRange extends Vue {
-  @Prop() public readonly value!: number;
+  @Prop() public readonly modelValue!: number;
 
   @Ref()
   public el!: HTMLInputElement;

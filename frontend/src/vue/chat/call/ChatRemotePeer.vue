@@ -9,7 +9,7 @@
     <div>
       <app-input-range
         :class="volLevelClass"
-        :value="volumeLevel"
+        v-model="volumeLevel"
         max="100"
         min="0"
         title="Volume level"

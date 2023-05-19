@@ -135,7 +135,6 @@ import {
   UserDictModel,
 } from "@/ts/types/model";
 import {ALL_ROOM_ID} from "@/ts/utils/consts";
-import ParentChannel from "@/vue/parts/ParentChannel.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";
 
@@ -144,7 +143,6 @@ import {PrivateRoomsIds} from "@/ts/types/types";
   name: "RoomSettings",
   components: {
     PickUser,
-    ParentChannel,
     AppInputRange,
     AppSubmit,
     AppCheckbox,
