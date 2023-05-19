@@ -27,9 +27,15 @@ export function getSmileyUrls() {
 }
 
 export async function getGitRevision() {
+  if (process.env.PYCHAT_GIT_HASH) {
+    console.log(`Getthing git hash from ENV $PYCHAT_GIT_HASH ${process.env.PYCHAT_GIT_HASH}`)
+    return process.env.PYCHAT_GIT_HASH;
+  }
+
   try {
     const { stdout, stderr } = await promisify(exec)('git rev-parse --short=10 HEAD', {encoding: 'utf8'});
-    return stdout.trim();
+    let result = stdout.trim();
+    console.log(`Got git hash from git ${result}`);
   } catch (e) {
     console.error(e)
     let result = `_${makeid(9)}`;
