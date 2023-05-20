@@ -116,6 +116,8 @@ export default class RoomUsersListPage extends Vue {
 
 .holder
   @extend %room-settings-holder
+  height: initial // TODO rd87
+
 
 .green-btn
   flex-shrink: 0
@@ -126,7 +128,11 @@ export default class RoomUsersListPage extends Vue {
   margin: auto
 
 ul
+  max-height: calc(50vh - 220px) // TODO rd87
+  overflow-y: scroll // TODO rd87
   @extend %ul
+  :deep(li)
+    overflow: initial // TODO rd87 weird bug with zooomed out small li icons when trying to overflow ellipsis text
 
 li
   @extend %li
