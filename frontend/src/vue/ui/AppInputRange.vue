@@ -2,13 +2,19 @@
   <input
     ref="el"
     :class="cls"
-    :value="value"
+    :value="modelValue"
     type="range"
     @input="oninput"
   />
 </template>
 <script lang="ts">
-import {Component, Prop, Ref, Vue} from "vue-property-decorator";
+import {
+  Component,
+  Emit,
+  Prop,
+  Ref,
+  Vue,
+} from "vue-property-decorator";
 
 let uniqueId = 1;
 
@@ -18,7 +24,7 @@ function getUniqueId() {
 
 @Component({name: "AppInputRange"})
 export default class AppInputRange extends Vue {
-  @Prop() public readonly value!: number;
+  @Prop() public readonly modelValue!: number;
 
   @Ref()
   public el!: HTMLInputElement;
@@ -41,9 +47,10 @@ export default class AppInputRange extends Vue {
     document.head.removeChild(this.style);
   }
 
+  @Emit("update:modelValue")
   public oninput(event: Event) {
     this.fixStyle();
-    this.$emit("input", parseInt((event.target as HTMLInputElement).value));
+    return  parseInt((event.target as HTMLInputElement).value);
   }
 
   public fixStyle() {

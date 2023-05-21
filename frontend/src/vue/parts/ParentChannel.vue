@@ -1,5 +1,5 @@
 <template>
-  <select :value="value" class="input" @change="onchange">
+  <select :value="modelValue" class="input" @change="onchange">
     <option :value="null" selected>
       W/o channel
     </option>
@@ -23,13 +23,13 @@ export default class ParentChannel extends Vue {
   public readonly channels!: ChannelUIModel[];
 
   @Prop({default: null})
-  public readonly value!: number;
+  public readonly modelValue!: number;
 
   public onchange(e: Event) {
     this.input(e);
   }
 
-  @Emit()
+  @Emit('update:modelValue')
   public input(e: Event) {
     const target: HTMLSelectElement = e.target as HTMLSelectElement;
     if (target.value) {

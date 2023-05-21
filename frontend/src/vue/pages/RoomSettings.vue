@@ -123,9 +123,15 @@ import {Component, Vue} from "vue-property-decorator";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
-import type {RoomModel, UserModel} from "@/ts/types/model";
-import {RoomDictModel, UserDictModel} from "@/ts/types/model";
-import ParentChannel from "@/vue/parts/ParentChannel.vue";
+import type {
+  RoomModel,
+  UserModel,
+} from "@/ts/types/model";
+import {
+  RoomDictModel,
+  UserDictModel,
+} from "@/ts/types/model";
+import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import PickUser from "@/vue/parts/PickUser.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";
 
@@ -134,7 +140,6 @@ import {PrivateRoomsIds} from "@/ts/types/types";
   name: "RoomSettings",
   components: {
     PickUser,
-    ParentChannel,
     AppInputRange,
     AppSubmit,
     AppCheckbox,

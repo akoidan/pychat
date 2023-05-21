@@ -1,7 +1,7 @@
 <template>
   <input
     :class="inputClass"
-    :value="value"
+    :value="modelValue"
     type="date"
     @input="oninputnative"
   />
@@ -14,18 +14,18 @@ import {Component, Emit, Prop, Vue} from "vue-property-decorator";
   name: "AppInputDate",
 })
 export default class AppInputDate extends Vue {
-  @Prop() public value!: string;
+  @Prop() public modelValue!: string;
 
   @Prop({default: ""}) public inputClass!: string;
 
   @Prop({default: ""}) public inputClassDatepicker!: string;
 
   public get datePickerValue() {
-    this.$logger.debug("generating date for datepicker {}", this.value)();
-    if (!this.value) {
+    this.$logger.debug("generating date for datepicker {}", this.modelValue)();
+    if (!this.modelValue) {
       return new Date();
     }
-    const strings = this.value.split("-");
+    const strings = this.modelValue.split("-");
 
     return new Date(parseInt(strings[0]), parseInt(strings[1]) - 1, parseInt(strings[2]));
   }
@@ -34,14 +34,14 @@ export default class AppInputDate extends Vue {
     this.input(e);
   }
 
-  @Emit()
+  @Emit('update:modelValue')
   public input(e: InputEvent) {
     return (e.target as HTMLInputElement).value;
   }
 
   public oninput(value: Date) {
-    this.$logger.debug("generating date for datepicker {}", this.value)();
-    this.$emit("input", `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`);
+    this.$logger.debug("generating date for datepicker {}", this.modelValue)();
+    this.$emit("update:modelValue", `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`);
   }
 }
 </script>

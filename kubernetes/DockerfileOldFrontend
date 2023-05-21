@@ -1,5 +1,5 @@
 # cd <root>
-# docker build -f ./kubernetes/DockerfileOldFrontend -t deathangel908/pychat-frontend .
+# docker build --build-arg PYCHAT_GIT_HASH=`git rev-parse --short=10 HEAD`  -f ./kubernetes/DockerfileOldFrontend -t deathangel908/pychat-frontend .
 # docker push deathangel908/pychat-frontend
 # https://stackoverflow.com/a/49478889/3872976
 # minikube tunnel service/backend-service
@@ -17,6 +17,9 @@ COPY ./frontend/src ./src/
 COPY ./frontend/build ./build/
 COPY ./kubernetes/frontend-old-pychat.org.json ./build/production.json
 
+ARG PYCHAT_GIT_HASH
+ENV PYCHAT_GIT_HASH=${PYCHAT_GIT_HASH}
+RUN echo $PYCHAT_GIT_HASH
 RUN yarn build
 
 

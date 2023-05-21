@@ -69,12 +69,10 @@ import PickUser from "@/vue/parts/PickUser.vue";
 import {ChannelsDictUIModel, CurrentUserInfoModel} from "@/ts/types/model";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";
-import ParentChannel from "@/vue/parts/ParentChannel.vue";
 
 @Component({
   name: "CreateRoom",
   components: {
-    ParentChannel,
     AppCheckbox,
     AppInputRange,
     AppSubmit,
