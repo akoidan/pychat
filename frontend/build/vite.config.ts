@@ -128,6 +128,7 @@ export default defineConfig(async({command, mode}) => {
       },
     },
     server: {
+      host: true,
       port: 8080,
       https: {
         key,
