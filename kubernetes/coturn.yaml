@@ -1,0 +1,864 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coturn-deployment
+  namespace: pychat
+  labels:
+    app: coturn
+spec:
+  selector:
+    matchLabels:
+      app: coturn
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: coturn
+    spec:
+      volumes:
+        - name: pychat-coturn-tls
+          secret:
+            secretName: pychat-tls
+            items:
+              - key: tls.crt
+                path: crt.pem
+              - key: tls.key
+                path: key.pem
+      containers:
+        - name: coturn
+          imagePullPolicy: Always
+          image: deathangel908/pychat-turn
+          volumeMounts:
+          - name: pychat-coturn-tls
+            mountPath: "/etc/tls"
+            readOnly: true
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: coturn-service
+  namespace: pychat
+spec:
+  selector:
+    app: coturn
+  ports:
+    - protocol: TCP
+      name: coturn-main-port-tcp
+      port: 5349
+      targetPort: 5349
+    - protocol: TCP
+      port: 3478
+      name: coturn-secondary-port-tcp
+      targetPort: 3478
+    - protocol: UDP
+      port: 5349
+      name: coturn-main-port-udp
+      targetPort: 5349
+    - protocol: UDP
+      port: 3478
+      name: coturn-secondary-port-udp
+      targetPort: 3478
+    - protocol: UDP
+      port: 49152
+      name: coturn-udp-49152
+      targetPort: 49152
+    - protocol: UDP
+      port: 49153
+      name: coturn-udp-49153
+      targetPort: 49153
+    - protocol: UDP
+      port: 49154
+      name: coturn-udp-49154
+      targetPort: 49154
+    - protocol: UDP
+      port: 49155
+      name: coturn-udp-49155
+      targetPort: 49155
+    - protocol: UDP
+      port: 49156
+      name: coturn-udp-49156
+      targetPort: 49156
+    - protocol: UDP
+      port: 49157
+      name: coturn-udp-49157
+      targetPort: 49157
+    - protocol: UDP
+      port: 49158
+      name: coturn-udp-49158
+      targetPort: 49158
+    - protocol: UDP
+      port: 49159
+      name: coturn-udp-49159
+      targetPort: 49159
+    - protocol: UDP
+      port: 49160
+      name: coturn-udp-49160
+      targetPort: 49160
+    - protocol: UDP
+      port: 49161
+      name: coturn-udp-49161
+      targetPort: 49161
+    - protocol: UDP
+      port: 49162
+      name: coturn-udp-49162
+      targetPort: 49162
+    - protocol: UDP
+      port: 49163
+      name: coturn-udp-49163
+      targetPort: 49163
+    - protocol: UDP
+      port: 49164
+      name: coturn-udp-49164
+      targetPort: 49164
+    - protocol: UDP
+      port: 49165
+      name: coturn-udp-49165
+      targetPort: 49165
+    - protocol: UDP
+      port: 49166
+      name: coturn-udp-49166
+      targetPort: 49166
+    - protocol: UDP
+      port: 49167
+      name: coturn-udp-49167
+      targetPort: 49167
+    - protocol: UDP
+      port: 49168
+      name: coturn-udp-49168
+      targetPort: 49168
+    - protocol: UDP
+      port: 49169
+      name: coturn-udp-49169
+      targetPort: 49169
+    - protocol: UDP
+      port: 49170
+      name: coturn-udp-49170
+      targetPort: 49170
+    - protocol: UDP
+      port: 49171
+      name: coturn-udp-49171
+      targetPort: 49171
+    - protocol: UDP
+      port: 49172
+      name: coturn-udp-49172
+      targetPort: 49172
+    - protocol: UDP
+      port: 49173
+      name: coturn-udp-49173
+      targetPort: 49173
+    - protocol: UDP
+      port: 49174
+      name: coturn-udp-49174
+      targetPort: 49174
+    - protocol: UDP
+      port: 49175
+      name: coturn-udp-49175
+      targetPort: 49175
+    - protocol: UDP
+      port: 49176
+      name: coturn-udp-49176
+      targetPort: 49176
+    - protocol: UDP
+      port: 49177
+      name: coturn-udp-49177
+      targetPort: 49177
+    - protocol: UDP
+      port: 49178
+      name: coturn-udp-49178
+      targetPort: 49178
+    - protocol: UDP
+      port: 49179
+      name: coturn-udp-49179
+      targetPort: 49179
+    - protocol: UDP
+      port: 49180
+      name: coturn-udp-49180
+      targetPort: 49180
+    - protocol: UDP
+      port: 49181
+      name: coturn-udp-49181
+      targetPort: 49181
+    - protocol: UDP
+      port: 49182
+      name: coturn-udp-49182
+      targetPort: 49182
+    - protocol: UDP
+      port: 49183
+      name: coturn-udp-49183
+      targetPort: 49183
+    - protocol: UDP
+      port: 49184
+      name: coturn-udp-49184
+      targetPort: 49184
+    - protocol: UDP
+      port: 49185
+      name: coturn-udp-49185
+      targetPort: 49185
+    - protocol: UDP
+      port: 49186
+      name: coturn-udp-49186
+      targetPort: 49186
+    - protocol: UDP
+      port: 49187
+      name: coturn-udp-49187
+      targetPort: 49187
+    - protocol: UDP
+      port: 49188
+      name: coturn-udp-49188
+      targetPort: 49188
+    - protocol: UDP
+      port: 49189
+      name: coturn-udp-49189
+      targetPort: 49189
+    - protocol: UDP
+      port: 49190
+      name: coturn-udp-49190
+      targetPort: 49190
+    - protocol: UDP
+      port: 49191
+      name: coturn-udp-49191
+      targetPort: 49191
+    - protocol: UDP
+      port: 49192
+      name: coturn-udp-49192
+      targetPort: 49192
+    - protocol: UDP
+      port: 49193
+      name: coturn-udp-49193
+      targetPort: 49193
+    - protocol: UDP
+      port: 49194
+      name: coturn-udp-49194
+      targetPort: 49194
+    - protocol: UDP
+      port: 49195
+      name: coturn-udp-49195
+      targetPort: 49195
+    - protocol: UDP
+      port: 49196
+      name: coturn-udp-49196
+      targetPort: 49196
+    - protocol: UDP
+      port: 49197
+      name: coturn-udp-49197
+      targetPort: 49197
+    - protocol: UDP
+      port: 49198
+      name: coturn-udp-49198
+      targetPort: 49198
+    - protocol: UDP
+      port: 49199
+      name: coturn-udp-49199
+      targetPort: 49199
+    - protocol: UDP
+      port: 49200
+      name: coturn-udp-49200
+      targetPort: 49200
+    - protocol: UDP
+      port: 49201
+      name: coturn-udp-49201
+      targetPort: 49201
+    - protocol: UDP
+      port: 49202
+      name: coturn-udp-49202
+      targetPort: 49202
+    - protocol: UDP
+      port: 49203
+      name: coturn-udp-49203
+      targetPort: 49203
+    - protocol: UDP
+      port: 49204
+      name: coturn-udp-49204
+      targetPort: 49204
+    - protocol: UDP
+      port: 49205
+      name: coturn-udp-49205
+      targetPort: 49205
+    - protocol: UDP
+      port: 49206
+      name: coturn-udp-49206
+      targetPort: 49206
+    - protocol: UDP
+      port: 49207
+      name: coturn-udp-49207
+      targetPort: 49207
+    - protocol: UDP
+      port: 49208
+      name: coturn-udp-49208
+      targetPort: 49208
+    - protocol: UDP
+      port: 49209
+      name: coturn-udp-49209
+      targetPort: 49209
+    - protocol: UDP
+      port: 49210
+      name: coturn-udp-49210
+      targetPort: 49210
+    - protocol: UDP
+      port: 49211
+      name: coturn-udp-49211
+      targetPort: 49211
+    - protocol: UDP
+      port: 49212
+      name: coturn-udp-49212
+      targetPort: 49212
+    - protocol: UDP
+      port: 49213
+      name: coturn-udp-49213
+      targetPort: 49213
+    - protocol: UDP
+      port: 49214
+      name: coturn-udp-49214
+      targetPort: 49214
+    - protocol: UDP
+      port: 49215
+      name: coturn-udp-49215
+      targetPort: 49215
+    - protocol: UDP
+      port: 49216
+      name: coturn-udp-49216
+      targetPort: 49216
+    - protocol: UDP
+      port: 49217
+      name: coturn-udp-49217
+      targetPort: 49217
+    - protocol: UDP
+      port: 49218
+      name: coturn-udp-49218
+      targetPort: 49218
+    - protocol: UDP
+      port: 49219
+      name: coturn-udp-49219
+      targetPort: 49219
+    - protocol: UDP
+      port: 49220
+      name: coturn-udp-49220
+      targetPort: 49220
+    - protocol: UDP
+      port: 49221
+      name: coturn-udp-49221
+      targetPort: 49221
+    - protocol: UDP
+      port: 49222
+      name: coturn-udp-49222
+      targetPort: 49222
+    - protocol: UDP
+      port: 49223
+      name: coturn-udp-49223
+      targetPort: 49223
+    - protocol: UDP
+      port: 49224
+      name: coturn-udp-49224
+      targetPort: 49224
+    - protocol: UDP
+      port: 49225
+      name: coturn-udp-49225
+      targetPort: 49225
+    - protocol: UDP
+      port: 49226
+      name: coturn-udp-49226
+      targetPort: 49226
+    - protocol: UDP
+      port: 49227
+      name: coturn-udp-49227
+      targetPort: 49227
+    - protocol: UDP
+      port: 49228
+      name: coturn-udp-49228
+      targetPort: 49228
+    - protocol: UDP
+      port: 49229
+      name: coturn-udp-49229
+      targetPort: 49229
+    - protocol: UDP
+      port: 49230
+      name: coturn-udp-49230
+      targetPort: 49230
+    - protocol: UDP
+      port: 49231
+      name: coturn-udp-49231
+      targetPort: 49231
+    - protocol: UDP
+      port: 49232
+      name: coturn-udp-49232
+      targetPort: 49232
+    - protocol: UDP
+      port: 49233
+      name: coturn-udp-49233
+      targetPort: 49233
+    - protocol: UDP
+      port: 49234
+      name: coturn-udp-49234
+      targetPort: 49234
+    - protocol: UDP
+      port: 49235
+      name: coturn-udp-49235
+      targetPort: 49235
+    - protocol: UDP
+      port: 49236
+      name: coturn-udp-49236
+      targetPort: 49236
+    - protocol: UDP
+      port: 49237
+      name: coturn-udp-49237
+      targetPort: 49237
+    - protocol: UDP
+      port: 49238
+      name: coturn-udp-49238
+      targetPort: 49238
+    - protocol: UDP
+      port: 49239
+      name: coturn-udp-49239
+      targetPort: 49239
+    - protocol: UDP
+      port: 49240
+      name: coturn-udp-49240
+      targetPort: 49240
+    - protocol: UDP
+      port: 49241
+      name: coturn-udp-49241
+      targetPort: 49241
+    - protocol: UDP
+      port: 49242
+      name: coturn-udp-49242
+      targetPort: 49242
+    - protocol: UDP
+      port: 49243
+      name: coturn-udp-49243
+      targetPort: 49243
+    - protocol: UDP
+      port: 49244
+      name: coturn-udp-49244
+      targetPort: 49244
+    - protocol: UDP
+      port: 49245
+      name: coturn-udp-49245
+      targetPort: 49245
+    - protocol: UDP
+      port: 49246
+      name: coturn-udp-49246
+      targetPort: 49246
+    - protocol: UDP
+      port: 49247
+      name: coturn-udp-49247
+      targetPort: 49247
+    - protocol: UDP
+      port: 49248
+      name: coturn-udp-49248
+      targetPort: 49248
+    - protocol: UDP
+      port: 49249
+      name: coturn-udp-49249
+      targetPort: 49249
+    - protocol: UDP
+      port: 49250
+      name: coturn-udp-49250
+      targetPort: 49250
+    - protocol: UDP
+      port: 49251
+      name: coturn-udp-49251
+      targetPort: 49251
+    - protocol: UDP
+      port: 49252
+      name: coturn-udp-49252
+      targetPort: 49252
+    - protocol: UDP
+      port: 49253
+      name: coturn-udp-49253
+      targetPort: 49253
+    - protocol: UDP
+      port: 49254
+      name: coturn-udp-49254
+      targetPort: 49254
+    - protocol: UDP
+      port: 49255
+      name: coturn-udp-49255
+      targetPort: 49255
+    - protocol: UDP
+      port: 49256
+      name: coturn-udp-49256
+      targetPort: 49256
+    - protocol: UDP
+      port: 49257
+      name: coturn-udp-49257
+      targetPort: 49257
+    - protocol: UDP
+      port: 49258
+      name: coturn-udp-49258
+      targetPort: 49258
+    - protocol: UDP
+      port: 49259
+      name: coturn-udp-49259
+      targetPort: 49259
+    - protocol: UDP
+      port: 49260
+      name: coturn-udp-49260
+      targetPort: 49260
+    - protocol: UDP
+      port: 49261
+      name: coturn-udp-49261
+      targetPort: 49261
+    - protocol: UDP
+      port: 49262
+      name: coturn-udp-49262
+      targetPort: 49262
+    - protocol: UDP
+      port: 49263
+      name: coturn-udp-49263
+      targetPort: 49263
+    - protocol: UDP
+      port: 49264
+      name: coturn-udp-49264
+      targetPort: 49264
+    - protocol: UDP
+      port: 49265
+      name: coturn-udp-49265
+      targetPort: 49265
+    - protocol: UDP
+      port: 49266
+      name: coturn-udp-49266
+      targetPort: 49266
+    - protocol: UDP
+      port: 49267
+      name: coturn-udp-49267
+      targetPort: 49267
+    - protocol: UDP
+      port: 49268
+      name: coturn-udp-49268
+      targetPort: 49268
+    - protocol: UDP
+      port: 49269
+      name: coturn-udp-49269
+      targetPort: 49269
+    - protocol: UDP
+      port: 49270
+      name: coturn-udp-49270
+      targetPort: 49270
+    - protocol: UDP
+      port: 49271
+      name: coturn-udp-49271
+      targetPort: 49271
+    - protocol: UDP
+      port: 49272
+      name: coturn-udp-49272
+      targetPort: 49272
+    - protocol: UDP
+      port: 49273
+      name: coturn-udp-49273
+      targetPort: 49273
+    - protocol: UDP
+      port: 49274
+      name: coturn-udp-49274
+      targetPort: 49274
+    - protocol: UDP
+      port: 49275
+      name: coturn-udp-49275
+      targetPort: 49275
+    - protocol: UDP
+      port: 49276
+      name: coturn-udp-49276
+      targetPort: 49276
+    - protocol: UDP
+      port: 49277
+      name: coturn-udp-49277
+      targetPort: 49277
+    - protocol: UDP
+      port: 49278
+      name: coturn-udp-49278
+      targetPort: 49278
+    - protocol: UDP
+      port: 49279
+      name: coturn-udp-49279
+      targetPort: 49279
+    - protocol: UDP
+      port: 49280
+      name: coturn-udp-49280
+      targetPort: 49280
+    - protocol: UDP
+      port: 49281
+      name: coturn-udp-49281
+      targetPort: 49281
+    - protocol: UDP
+      port: 49282
+      name: coturn-udp-49282
+      targetPort: 49282
+    - protocol: UDP
+      port: 49283
+      name: coturn-udp-49283
+      targetPort: 49283
+    - protocol: UDP
+      port: 49284
+      name: coturn-udp-49284
+      targetPort: 49284
+    - protocol: UDP
+      port: 49285
+      name: coturn-udp-49285
+      targetPort: 49285
+    - protocol: UDP
+      port: 49286
+      name: coturn-udp-49286
+      targetPort: 49286
+    - protocol: UDP
+      port: 49287
+      name: coturn-udp-49287
+      targetPort: 49287
+    - protocol: UDP
+      port: 49288
+      name: coturn-udp-49288
+      targetPort: 49288
+    - protocol: UDP
+      port: 49289
+      name: coturn-udp-49289
+      targetPort: 49289
+    - protocol: UDP
+      port: 49290
+      name: coturn-udp-49290
+      targetPort: 49290
+    - protocol: UDP
+      port: 49291
+      name: coturn-udp-49291
+      targetPort: 49291
+    - protocol: UDP
+      port: 49292
+      name: coturn-udp-49292
+      targetPort: 49292
+    - protocol: UDP
+      port: 49293
+      name: coturn-udp-49293
+      targetPort: 49293
+    - protocol: UDP
+      port: 49294
+      name: coturn-udp-49294
+      targetPort: 49294
+    - protocol: UDP
+      port: 49295
+      name: coturn-udp-49295
+      targetPort: 49295
+    - protocol: UDP
+      port: 49296
+      name: coturn-udp-49296
+      targetPort: 49296
+    - protocol: UDP
+      port: 49297
+      name: coturn-udp-49297
+      targetPort: 49297
+    - protocol: UDP
+      port: 49298
+      name: coturn-udp-49298
+      targetPort: 49298
+    - protocol: UDP
+      port: 49299
+      name: coturn-udp-49299
+      targetPort: 49299
+    - protocol: UDP
+      port: 49300
+      name: coturn-udp-49300
+      targetPort: 49300
+    - protocol: UDP
+      port: 49301
+      name: coturn-udp-49301
+      targetPort: 49301
+    - protocol: UDP
+      port: 49302
+      name: coturn-udp-49302
+      targetPort: 49302
+    - protocol: UDP
+      port: 49303
+      name: coturn-udp-49303
+      targetPort: 49303
+    - protocol: UDP
+      port: 49304
+      name: coturn-udp-49304
+      targetPort: 49304
+    - protocol: UDP
+      port: 49305
+      name: coturn-udp-49305
+      targetPort: 49305
+    - protocol: UDP
+      port: 49306
+      name: coturn-udp-49306
+      targetPort: 49306
+    - protocol: UDP
+      port: 49307
+      name: coturn-udp-49307
+      targetPort: 49307
+    - protocol: UDP
+      port: 49308
+      name: coturn-udp-49308
+      targetPort: 49308
+    - protocol: UDP
+      port: 49309
+      name: coturn-udp-49309
+      targetPort: 49309
+    - protocol: UDP
+      port: 49310
+      name: coturn-udp-49310
+      targetPort: 49310
+    - protocol: UDP
+      port: 49311
+      name: coturn-udp-49311
+      targetPort: 49311
+    - protocol: UDP
+      port: 49312
+      name: coturn-udp-49312
+      targetPort: 49312
+    - protocol: UDP
+      port: 49313
+      name: coturn-udp-49313
+      targetPort: 49313
+    - protocol: UDP
+      port: 49314
+      name: coturn-udp-49314
+      targetPort: 49314
+    - protocol: UDP
+      port: 49315
+      name: coturn-udp-49315
+      targetPort: 49315
+    - protocol: UDP
+      port: 49316
+      name: coturn-udp-49316
+      targetPort: 49316
+    - protocol: UDP
+      port: 49317
+      name: coturn-udp-49317
+      targetPort: 49317
+    - protocol: UDP
+      port: 49318
+      name: coturn-udp-49318
+      targetPort: 49318
+    - protocol: UDP
+      port: 49319
+      name: coturn-udp-49319
+      targetPort: 49319
+    - protocol: UDP
+      port: 49320
+      name: coturn-udp-49320
+      targetPort: 49320
+    - protocol: UDP
+      port: 49321
+      name: coturn-udp-49321
+      targetPort: 49321
+    - protocol: UDP
+      port: 49322
+      name: coturn-udp-49322
+      targetPort: 49322
+    - protocol: UDP
+      port: 49323
+      name: coturn-udp-49323
+      targetPort: 49323
+    - protocol: UDP
+      port: 49324
+      name: coturn-udp-49324
+      targetPort: 49324
+    - protocol: UDP
+      port: 49325
+      name: coturn-udp-49325
+      targetPort: 49325
+    - protocol: UDP
+      port: 49326
+      name: coturn-udp-49326
+      targetPort: 49326
+    - protocol: UDP
+      port: 49327
+      name: coturn-udp-49327
+      targetPort: 49327
+    - protocol: UDP
+      port: 49328
+      name: coturn-udp-49328
+      targetPort: 49328
+    - protocol: UDP
+      port: 49329
+      name: coturn-udp-49329
+      targetPort: 49329
+    - protocol: UDP
+      port: 49330
+      name: coturn-udp-49330
+      targetPort: 49330
+    - protocol: UDP
+      port: 49331
+      name: coturn-udp-49331
+      targetPort: 49331
+    - protocol: UDP
+      port: 49332
+      name: coturn-udp-49332
+      targetPort: 49332
+    - protocol: UDP
+      port: 49333
+      name: coturn-udp-49333
+      targetPort: 49333
+    - protocol: UDP
+      port: 49334
+      name: coturn-udp-49334
+      targetPort: 49334
+    - protocol: UDP
+      port: 49335
+      name: coturn-udp-49335
+      targetPort: 49335
+    - protocol: UDP
+      port: 49336
+      name: coturn-udp-49336
+      targetPort: 49336
+    - protocol: UDP
+      port: 49337
+      name: coturn-udp-49337
+      targetPort: 49337
+    - protocol: UDP
+      port: 49338
+      name: coturn-udp-49338
+      targetPort: 49338
+    - protocol: UDP
+      port: 49339
+      name: coturn-udp-49339
+      targetPort: 49339
+    - protocol: UDP
+      port: 49340
+      name: coturn-udp-49340
+      targetPort: 49340
+    - protocol: UDP
+      port: 49341
+      name: coturn-udp-49341
+      targetPort: 49341
+    - protocol: UDP
+      port: 49342
+      name: coturn-udp-49342
+      targetPort: 49342
+    - protocol: UDP
+      port: 49343
+      name: coturn-udp-49343
+      targetPort: 49343
+    - protocol: UDP
+      port: 49344
+      name: coturn-udp-49344
+      targetPort: 49344
+    - protocol: UDP
+      port: 49345
+      name: coturn-udp-49345
+      targetPort: 49345
+    - protocol: UDP
+      port: 49346
+      name: coturn-udp-49346
+      targetPort: 49346
+    - protocol: UDP
+      port: 49347
+      name: coturn-udp-49347
+      targetPort: 49347
+    - protocol: UDP
+      port: 49348
+      name: coturn-udp-49348
+      targetPort: 49348
+    - protocol: UDP
+      port: 49349
+      name: coturn-udp-49349
+      targetPort: 49349
+    - protocol: UDP
+      port: 49350
+      name: coturn-udp-49350
+      targetPort: 49350
+    - protocol: UDP
+      port: 49351
+      name: coturn-udp-49351
+      targetPort: 49351
+    - protocol: UDP
+      port: 49352
+      name: coturn-udp-49352
+      targetPort: 49352

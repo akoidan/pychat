@@ -1,0 +1,1692 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  name: ingress-nginx
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+data:
+#  25: "pychat/postfix-service:25"
+#  587: "pychat/postfix-service:587"
+#  465: "pychat/postfix-service:465"
+  3478: "pychat/coturn-service:3478"
+  5349: "pychat/coturn-service:5349"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: udp-services
+  namespace: ingress-nginx
+data:
+  #for (let i = 49152; i < 49353; i++) {
+  #console.log(`  ${i}: "pychat/coturn-service:${i}"`)
+  #}
+  3478: "pychat/coturn-service:3478"
+  5349: "pychat/coturn-service:5349"
+  49152: "pychat/coturn-service:49152"
+  49153: "pychat/coturn-service:49153"
+  49154: "pychat/coturn-service:49154"
+  49155: "pychat/coturn-service:49155"
+  49156: "pychat/coturn-service:49156"
+  49157: "pychat/coturn-service:49157"
+  49158: "pychat/coturn-service:49158"
+  49159: "pychat/coturn-service:49159"
+  49160: "pychat/coturn-service:49160"
+  49161: "pychat/coturn-service:49161"
+  49162: "pychat/coturn-service:49162"
+  49163: "pychat/coturn-service:49163"
+  49164: "pychat/coturn-service:49164"
+  49165: "pychat/coturn-service:49165"
+  49166: "pychat/coturn-service:49166"
+  49167: "pychat/coturn-service:49167"
+  49168: "pychat/coturn-service:49168"
+  49169: "pychat/coturn-service:49169"
+  49170: "pychat/coturn-service:49170"
+  49171: "pychat/coturn-service:49171"
+  49172: "pychat/coturn-service:49172"
+  49173: "pychat/coturn-service:49173"
+  49174: "pychat/coturn-service:49174"
+  49175: "pychat/coturn-service:49175"
+  49176: "pychat/coturn-service:49176"
+  49177: "pychat/coturn-service:49177"
+  49178: "pychat/coturn-service:49178"
+  49179: "pychat/coturn-service:49179"
+  49180: "pychat/coturn-service:49180"
+  49181: "pychat/coturn-service:49181"
+  49182: "pychat/coturn-service:49182"
+  49183: "pychat/coturn-service:49183"
+  49184: "pychat/coturn-service:49184"
+  49185: "pychat/coturn-service:49185"
+  49186: "pychat/coturn-service:49186"
+  49187: "pychat/coturn-service:49187"
+  49188: "pychat/coturn-service:49188"
+  49189: "pychat/coturn-service:49189"
+  49190: "pychat/coturn-service:49190"
+  49191: "pychat/coturn-service:49191"
+  49192: "pychat/coturn-service:49192"
+  49193: "pychat/coturn-service:49193"
+  49194: "pychat/coturn-service:49194"
+  49195: "pychat/coturn-service:49195"
+  49196: "pychat/coturn-service:49196"
+  49197: "pychat/coturn-service:49197"
+  49198: "pychat/coturn-service:49198"
+  49199: "pychat/coturn-service:49199"
+  49200: "pychat/coturn-service:49200"
+  49201: "pychat/coturn-service:49201"
+  49202: "pychat/coturn-service:49202"
+  49203: "pychat/coturn-service:49203"
+  49204: "pychat/coturn-service:49204"
+  49205: "pychat/coturn-service:49205"
+  49206: "pychat/coturn-service:49206"
+  49207: "pychat/coturn-service:49207"
+  49208: "pychat/coturn-service:49208"
+  49209: "pychat/coturn-service:49209"
+  49210: "pychat/coturn-service:49210"
+  49211: "pychat/coturn-service:49211"
+  49212: "pychat/coturn-service:49212"
+  49213: "pychat/coturn-service:49213"
+  49214: "pychat/coturn-service:49214"
+  49215: "pychat/coturn-service:49215"
+  49216: "pychat/coturn-service:49216"
+  49217: "pychat/coturn-service:49217"
+  49218: "pychat/coturn-service:49218"
+  49219: "pychat/coturn-service:49219"
+  49220: "pychat/coturn-service:49220"
+  49221: "pychat/coturn-service:49221"
+  49222: "pychat/coturn-service:49222"
+  49223: "pychat/coturn-service:49223"
+  49224: "pychat/coturn-service:49224"
+  49225: "pychat/coturn-service:49225"
+  49226: "pychat/coturn-service:49226"
+  49227: "pychat/coturn-service:49227"
+  49228: "pychat/coturn-service:49228"
+  49229: "pychat/coturn-service:49229"
+  49230: "pychat/coturn-service:49230"
+  49231: "pychat/coturn-service:49231"
+  49232: "pychat/coturn-service:49232"
+  49233: "pychat/coturn-service:49233"
+  49234: "pychat/coturn-service:49234"
+  49235: "pychat/coturn-service:49235"
+  49236: "pychat/coturn-service:49236"
+  49237: "pychat/coturn-service:49237"
+  49238: "pychat/coturn-service:49238"
+  49239: "pychat/coturn-service:49239"
+  49240: "pychat/coturn-service:49240"
+  49241: "pychat/coturn-service:49241"
+  49242: "pychat/coturn-service:49242"
+  49243: "pychat/coturn-service:49243"
+  49244: "pychat/coturn-service:49244"
+  49245: "pychat/coturn-service:49245"
+  49246: "pychat/coturn-service:49246"
+  49247: "pychat/coturn-service:49247"
+  49248: "pychat/coturn-service:49248"
+  49249: "pychat/coturn-service:49249"
+  49250: "pychat/coturn-service:49250"
+  49251: "pychat/coturn-service:49251"
+  49252: "pychat/coturn-service:49252"
+  49253: "pychat/coturn-service:49253"
+  49254: "pychat/coturn-service:49254"
+  49255: "pychat/coturn-service:49255"
+  49256: "pychat/coturn-service:49256"
+  49257: "pychat/coturn-service:49257"
+  49258: "pychat/coturn-service:49258"
+  49259: "pychat/coturn-service:49259"
+  49260: "pychat/coturn-service:49260"
+  49261: "pychat/coturn-service:49261"
+  49262: "pychat/coturn-service:49262"
+  49263: "pychat/coturn-service:49263"
+  49264: "pychat/coturn-service:49264"
+  49265: "pychat/coturn-service:49265"
+  49266: "pychat/coturn-service:49266"
+  49267: "pychat/coturn-service:49267"
+  49268: "pychat/coturn-service:49268"
+  49269: "pychat/coturn-service:49269"
+  49270: "pychat/coturn-service:49270"
+  49271: "pychat/coturn-service:49271"
+  49272: "pychat/coturn-service:49272"
+  49273: "pychat/coturn-service:49273"
+  49274: "pychat/coturn-service:49274"
+  49275: "pychat/coturn-service:49275"
+  49276: "pychat/coturn-service:49276"
+  49277: "pychat/coturn-service:49277"
+  49278: "pychat/coturn-service:49278"
+  49279: "pychat/coturn-service:49279"
+  49280: "pychat/coturn-service:49280"
+  49281: "pychat/coturn-service:49281"
+  49282: "pychat/coturn-service:49282"
+  49283: "pychat/coturn-service:49283"
+  49284: "pychat/coturn-service:49284"
+  49285: "pychat/coturn-service:49285"
+  49286: "pychat/coturn-service:49286"
+  49287: "pychat/coturn-service:49287"
+  49288: "pychat/coturn-service:49288"
+  49289: "pychat/coturn-service:49289"
+  49290: "pychat/coturn-service:49290"
+  49291: "pychat/coturn-service:49291"
+  49292: "pychat/coturn-service:49292"
+  49293: "pychat/coturn-service:49293"
+  49294: "pychat/coturn-service:49294"
+  49295: "pychat/coturn-service:49295"
+  49296: "pychat/coturn-service:49296"
+  49297: "pychat/coturn-service:49297"
+  49298: "pychat/coturn-service:49298"
+  49299: "pychat/coturn-service:49299"
+  49300: "pychat/coturn-service:49300"
+  49301: "pychat/coturn-service:49301"
+  49302: "pychat/coturn-service:49302"
+  49303: "pychat/coturn-service:49303"
+  49304: "pychat/coturn-service:49304"
+  49305: "pychat/coturn-service:49305"
+  49306: "pychat/coturn-service:49306"
+  49307: "pychat/coturn-service:49307"
+  49308: "pychat/coturn-service:49308"
+  49309: "pychat/coturn-service:49309"
+  49310: "pychat/coturn-service:49310"
+  49311: "pychat/coturn-service:49311"
+  49312: "pychat/coturn-service:49312"
+  49313: "pychat/coturn-service:49313"
+  49314: "pychat/coturn-service:49314"
+  49315: "pychat/coturn-service:49315"
+  49316: "pychat/coturn-service:49316"
+  49317: "pychat/coturn-service:49317"
+  49318: "pychat/coturn-service:49318"
+  49319: "pychat/coturn-service:49319"
+  49320: "pychat/coturn-service:49320"
+  49321: "pychat/coturn-service:49321"
+  49322: "pychat/coturn-service:49322"
+  49323: "pychat/coturn-service:49323"
+  49324: "pychat/coturn-service:49324"
+  49325: "pychat/coturn-service:49325"
+  49326: "pychat/coturn-service:49326"
+  49327: "pychat/coturn-service:49327"
+  49328: "pychat/coturn-service:49328"
+  49329: "pychat/coturn-service:49329"
+  49330: "pychat/coturn-service:49330"
+  49331: "pychat/coturn-service:49331"
+  49332: "pychat/coturn-service:49332"
+  49333: "pychat/coturn-service:49333"
+  49334: "pychat/coturn-service:49334"
+  49335: "pychat/coturn-service:49335"
+  49336: "pychat/coturn-service:49336"
+  49337: "pychat/coturn-service:49337"
+  49338: "pychat/coturn-service:49338"
+  49339: "pychat/coturn-service:49339"
+  49340: "pychat/coturn-service:49340"
+  49341: "pychat/coturn-service:49341"
+  49342: "pychat/coturn-service:49342"
+  49343: "pychat/coturn-service:49343"
+  49344: "pychat/coturn-service:49344"
+  49345: "pychat/coturn-service:49345"
+  49346: "pychat/coturn-service:49346"
+  49347: "pychat/coturn-service:49347"
+  49348: "pychat/coturn-service:49348"
+  49349: "pychat/coturn-service:49349"
+  49350: "pychat/coturn-service:49350"
+  49351: "pychat/coturn-service:49351"
+  49352: "pychat/coturn-service:49352"
+---
+apiVersion: v1
+automountServiceAccountToken: true
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx
+  namespace: ingress-nginx
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx
+  namespace: ingress-nginx
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - pods
+  - secrets
+  - endpoints
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - update
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resourceNames:
+  - ingress-nginx-leader
+  resources:
+  - leases
+  verbs:
+  - get
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - create
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - endpoints
+  - nodes
+  - pods
+  - secrets
+  - namespaces
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  verbs:
+  - update
+- apiGroups:
+  - networking.k8s.io
+  resources:
+  - ingressclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - discovery.k8s.io
+  resources:
+  - endpointslices
+  verbs:
+  - list
+  - watch
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission
+rules:
+- apiGroups:
+  - admissionregistration.k8s.io
+  resources:
+  - validatingwebhookconfigurations
+  verbs:
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx
+  namespace: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ingress-nginx
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx
+  namespace: ingress-nginx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: ingress-nginx-admission
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ingress-nginx
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx
+  namespace: ingress-nginx
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ingress-nginx-admission
+subjects:
+- kind: ServiceAccount
+  name: ingress-nginx-admission
+  namespace: ingress-nginx
+---
+apiVersion: v1
+data:
+  allow-snippet-annotations: "true"
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+spec:
+  externalTrafficPolicy: Local
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  ports:
+  - appProtocol: http
+    name: http
+    port: 80
+    protocol: TCP
+    targetPort: http
+  - appProtocol: https
+    name: https
+    port: 443
+    protocol: TCP
+    targetPort: https
+  - name: proxied-tcp-5349
+    port: 5349
+    targetPort: 5349
+    protocol: TCP
+  - name: proxied-tcp-3478
+    port: 3478
+    targetPort: 3478
+    protocol: TCP
+  - name: proxied-udp-5349
+    port: 5349
+    targetPort: 5349
+    protocol: UDP
+  - name: proxied-udp-3478
+    port: 3478
+    targetPort: 3478
+    protocol: UDP
+  - protocol: UDP
+    port: 49152
+    name: coturn-udp-49152
+    targetPort: 49152
+  - protocol: UDP
+    port: 49153
+    name: coturn-udp-49153
+    targetPort: 49153
+  - protocol: UDP
+    port: 49154
+    name: coturn-udp-49154
+    targetPort: 49154
+  - protocol: UDP
+    port: 49155
+    name: coturn-udp-49155
+    targetPort: 49155
+  - protocol: UDP
+    port: 49156
+    name: coturn-udp-49156
+    targetPort: 49156
+  - protocol: UDP
+    port: 49157
+    name: coturn-udp-49157
+    targetPort: 49157
+  - protocol: UDP
+    port: 49158
+    name: coturn-udp-49158
+    targetPort: 49158
+  - protocol: UDP
+    port: 49159
+    name: coturn-udp-49159
+    targetPort: 49159
+  - protocol: UDP
+    port: 49160
+    name: coturn-udp-49160
+    targetPort: 49160
+  - protocol: UDP
+    port: 49161
+    name: coturn-udp-49161
+    targetPort: 49161
+  - protocol: UDP
+    port: 49162
+    name: coturn-udp-49162
+    targetPort: 49162
+  - protocol: UDP
+    port: 49163
+    name: coturn-udp-49163
+    targetPort: 49163
+  - protocol: UDP
+    port: 49164
+    name: coturn-udp-49164
+    targetPort: 49164
+  - protocol: UDP
+    port: 49165
+    name: coturn-udp-49165
+    targetPort: 49165
+  - protocol: UDP
+    port: 49166
+    name: coturn-udp-49166
+    targetPort: 49166
+  - protocol: UDP
+    port: 49167
+    name: coturn-udp-49167
+    targetPort: 49167
+  - protocol: UDP
+    port: 49168
+    name: coturn-udp-49168
+    targetPort: 49168
+  - protocol: UDP
+    port: 49169
+    name: coturn-udp-49169
+    targetPort: 49169
+  - protocol: UDP
+    port: 49170
+    name: coturn-udp-49170
+    targetPort: 49170
+  - protocol: UDP
+    port: 49171
+    name: coturn-udp-49171
+    targetPort: 49171
+  - protocol: UDP
+    port: 49172
+    name: coturn-udp-49172
+    targetPort: 49172
+  - protocol: UDP
+    port: 49173
+    name: coturn-udp-49173
+    targetPort: 49173
+  - protocol: UDP
+    port: 49174
+    name: coturn-udp-49174
+    targetPort: 49174
+  - protocol: UDP
+    port: 49175
+    name: coturn-udp-49175
+    targetPort: 49175
+  - protocol: UDP
+    port: 49176
+    name: coturn-udp-49176
+    targetPort: 49176
+  - protocol: UDP
+    port: 49177
+    name: coturn-udp-49177
+    targetPort: 49177
+  - protocol: UDP
+    port: 49178
+    name: coturn-udp-49178
+    targetPort: 49178
+  - protocol: UDP
+    port: 49179
+    name: coturn-udp-49179
+    targetPort: 49179
+  - protocol: UDP
+    port: 49180
+    name: coturn-udp-49180
+    targetPort: 49180
+  - protocol: UDP
+    port: 49181
+    name: coturn-udp-49181
+    targetPort: 49181
+  - protocol: UDP
+    port: 49182
+    name: coturn-udp-49182
+    targetPort: 49182
+  - protocol: UDP
+    port: 49183
+    name: coturn-udp-49183
+    targetPort: 49183
+  - protocol: UDP
+    port: 49184
+    name: coturn-udp-49184
+    targetPort: 49184
+  - protocol: UDP
+    port: 49185
+    name: coturn-udp-49185
+    targetPort: 49185
+  - protocol: UDP
+    port: 49186
+    name: coturn-udp-49186
+    targetPort: 49186
+  - protocol: UDP
+    port: 49187
+    name: coturn-udp-49187
+    targetPort: 49187
+  - protocol: UDP
+    port: 49188
+    name: coturn-udp-49188
+    targetPort: 49188
+  - protocol: UDP
+    port: 49189
+    name: coturn-udp-49189
+    targetPort: 49189
+  - protocol: UDP
+    port: 49190
+    name: coturn-udp-49190
+    targetPort: 49190
+  - protocol: UDP
+    port: 49191
+    name: coturn-udp-49191
+    targetPort: 49191
+  - protocol: UDP
+    port: 49192
+    name: coturn-udp-49192
+    targetPort: 49192
+  - protocol: UDP
+    port: 49193
+    name: coturn-udp-49193
+    targetPort: 49193
+  - protocol: UDP
+    port: 49194
+    name: coturn-udp-49194
+    targetPort: 49194
+  - protocol: UDP
+    port: 49195
+    name: coturn-udp-49195
+    targetPort: 49195
+  - protocol: UDP
+    port: 49196
+    name: coturn-udp-49196
+    targetPort: 49196
+  - protocol: UDP
+    port: 49197
+    name: coturn-udp-49197
+    targetPort: 49197
+  - protocol: UDP
+    port: 49198
+    name: coturn-udp-49198
+    targetPort: 49198
+  - protocol: UDP
+    port: 49199
+    name: coturn-udp-49199
+    targetPort: 49199
+  - protocol: UDP
+    port: 49200
+    name: coturn-udp-49200
+    targetPort: 49200
+  - protocol: UDP
+    port: 49201
+    name: coturn-udp-49201
+    targetPort: 49201
+  - protocol: UDP
+    port: 49202
+    name: coturn-udp-49202
+    targetPort: 49202
+  - protocol: UDP
+    port: 49203
+    name: coturn-udp-49203
+    targetPort: 49203
+  - protocol: UDP
+    port: 49204
+    name: coturn-udp-49204
+    targetPort: 49204
+  - protocol: UDP
+    port: 49205
+    name: coturn-udp-49205
+    targetPort: 49205
+  - protocol: UDP
+    port: 49206
+    name: coturn-udp-49206
+    targetPort: 49206
+  - protocol: UDP
+    port: 49207
+    name: coturn-udp-49207
+    targetPort: 49207
+  - protocol: UDP
+    port: 49208
+    name: coturn-udp-49208
+    targetPort: 49208
+  - protocol: UDP
+    port: 49209
+    name: coturn-udp-49209
+    targetPort: 49209
+  - protocol: UDP
+    port: 49210
+    name: coturn-udp-49210
+    targetPort: 49210
+  - protocol: UDP
+    port: 49211
+    name: coturn-udp-49211
+    targetPort: 49211
+  - protocol: UDP
+    port: 49212
+    name: coturn-udp-49212
+    targetPort: 49212
+  - protocol: UDP
+    port: 49213
+    name: coturn-udp-49213
+    targetPort: 49213
+  - protocol: UDP
+    port: 49214
+    name: coturn-udp-49214
+    targetPort: 49214
+  - protocol: UDP
+    port: 49215
+    name: coturn-udp-49215
+    targetPort: 49215
+  - protocol: UDP
+    port: 49216
+    name: coturn-udp-49216
+    targetPort: 49216
+  - protocol: UDP
+    port: 49217
+    name: coturn-udp-49217
+    targetPort: 49217
+  - protocol: UDP
+    port: 49218
+    name: coturn-udp-49218
+    targetPort: 49218
+  - protocol: UDP
+    port: 49219
+    name: coturn-udp-49219
+    targetPort: 49219
+  - protocol: UDP
+    port: 49220
+    name: coturn-udp-49220
+    targetPort: 49220
+  - protocol: UDP
+    port: 49221
+    name: coturn-udp-49221
+    targetPort: 49221
+  - protocol: UDP
+    port: 49222
+    name: coturn-udp-49222
+    targetPort: 49222
+  - protocol: UDP
+    port: 49223
+    name: coturn-udp-49223
+    targetPort: 49223
+  - protocol: UDP
+    port: 49224
+    name: coturn-udp-49224
+    targetPort: 49224
+  - protocol: UDP
+    port: 49225
+    name: coturn-udp-49225
+    targetPort: 49225
+  - protocol: UDP
+    port: 49226
+    name: coturn-udp-49226
+    targetPort: 49226
+  - protocol: UDP
+    port: 49227
+    name: coturn-udp-49227
+    targetPort: 49227
+  - protocol: UDP
+    port: 49228
+    name: coturn-udp-49228
+    targetPort: 49228
+  - protocol: UDP
+    port: 49229
+    name: coturn-udp-49229
+    targetPort: 49229
+  - protocol: UDP
+    port: 49230
+    name: coturn-udp-49230
+    targetPort: 49230
+  - protocol: UDP
+    port: 49231
+    name: coturn-udp-49231
+    targetPort: 49231
+  - protocol: UDP
+    port: 49232
+    name: coturn-udp-49232
+    targetPort: 49232
+  - protocol: UDP
+    port: 49233
+    name: coturn-udp-49233
+    targetPort: 49233
+  - protocol: UDP
+    port: 49234
+    name: coturn-udp-49234
+    targetPort: 49234
+  - protocol: UDP
+    port: 49235
+    name: coturn-udp-49235
+    targetPort: 49235
+  - protocol: UDP
+    port: 49236
+    name: coturn-udp-49236
+    targetPort: 49236
+  - protocol: UDP
+    port: 49237
+    name: coturn-udp-49237
+    targetPort: 49237
+  - protocol: UDP
+    port: 49238
+    name: coturn-udp-49238
+    targetPort: 49238
+  - protocol: UDP
+    port: 49239
+    name: coturn-udp-49239
+    targetPort: 49239
+  - protocol: UDP
+    port: 49240
+    name: coturn-udp-49240
+    targetPort: 49240
+  - protocol: UDP
+    port: 49241
+    name: coturn-udp-49241
+    targetPort: 49241
+  - protocol: UDP
+    port: 49242
+    name: coturn-udp-49242
+    targetPort: 49242
+  - protocol: UDP
+    port: 49243
+    name: coturn-udp-49243
+    targetPort: 49243
+  - protocol: UDP
+    port: 49244
+    name: coturn-udp-49244
+    targetPort: 49244
+  - protocol: UDP
+    port: 49245
+    name: coturn-udp-49245
+    targetPort: 49245
+  - protocol: UDP
+    port: 49246
+    name: coturn-udp-49246
+    targetPort: 49246
+  - protocol: UDP
+    port: 49247
+    name: coturn-udp-49247
+    targetPort: 49247
+  - protocol: UDP
+    port: 49248
+    name: coturn-udp-49248
+    targetPort: 49248
+  - protocol: UDP
+    port: 49249
+    name: coturn-udp-49249
+    targetPort: 49249
+  - protocol: UDP
+    port: 49250
+    name: coturn-udp-49250
+    targetPort: 49250
+  - protocol: UDP
+    port: 49251
+    name: coturn-udp-49251
+    targetPort: 49251
+  - protocol: UDP
+    port: 49252
+    name: coturn-udp-49252
+    targetPort: 49252
+  - protocol: UDP
+    port: 49253
+    name: coturn-udp-49253
+    targetPort: 49253
+  - protocol: UDP
+    port: 49254
+    name: coturn-udp-49254
+    targetPort: 49254
+  - protocol: UDP
+    port: 49255
+    name: coturn-udp-49255
+    targetPort: 49255
+  - protocol: UDP
+    port: 49256
+    name: coturn-udp-49256
+    targetPort: 49256
+  - protocol: UDP
+    port: 49257
+    name: coturn-udp-49257
+    targetPort: 49257
+  - protocol: UDP
+    port: 49258
+    name: coturn-udp-49258
+    targetPort: 49258
+  - protocol: UDP
+    port: 49259
+    name: coturn-udp-49259
+    targetPort: 49259
+  - protocol: UDP
+    port: 49260
+    name: coturn-udp-49260
+    targetPort: 49260
+  - protocol: UDP
+    port: 49261
+    name: coturn-udp-49261
+    targetPort: 49261
+  - protocol: UDP
+    port: 49262
+    name: coturn-udp-49262
+    targetPort: 49262
+  - protocol: UDP
+    port: 49263
+    name: coturn-udp-49263
+    targetPort: 49263
+  - protocol: UDP
+    port: 49264
+    name: coturn-udp-49264
+    targetPort: 49264
+  - protocol: UDP
+    port: 49265
+    name: coturn-udp-49265
+    targetPort: 49265
+  - protocol: UDP
+    port: 49266
+    name: coturn-udp-49266
+    targetPort: 49266
+  - protocol: UDP
+    port: 49267
+    name: coturn-udp-49267
+    targetPort: 49267
+  - protocol: UDP
+    port: 49268
+    name: coturn-udp-49268
+    targetPort: 49268
+  - protocol: UDP
+    port: 49269
+    name: coturn-udp-49269
+    targetPort: 49269
+  - protocol: UDP
+    port: 49270
+    name: coturn-udp-49270
+    targetPort: 49270
+  - protocol: UDP
+    port: 49271
+    name: coturn-udp-49271
+    targetPort: 49271
+  - protocol: UDP
+    port: 49272
+    name: coturn-udp-49272
+    targetPort: 49272
+  - protocol: UDP
+    port: 49273
+    name: coturn-udp-49273
+    targetPort: 49273
+  - protocol: UDP
+    port: 49274
+    name: coturn-udp-49274
+    targetPort: 49274
+  - protocol: UDP
+    port: 49275
+    name: coturn-udp-49275
+    targetPort: 49275
+  - protocol: UDP
+    port: 49276
+    name: coturn-udp-49276
+    targetPort: 49276
+  - protocol: UDP
+    port: 49277
+    name: coturn-udp-49277
+    targetPort: 49277
+  - protocol: UDP
+    port: 49278
+    name: coturn-udp-49278
+    targetPort: 49278
+  - protocol: UDP
+    port: 49279
+    name: coturn-udp-49279
+    targetPort: 49279
+  - protocol: UDP
+    port: 49280
+    name: coturn-udp-49280
+    targetPort: 49280
+  - protocol: UDP
+    port: 49281
+    name: coturn-udp-49281
+    targetPort: 49281
+  - protocol: UDP
+    port: 49282
+    name: coturn-udp-49282
+    targetPort: 49282
+  - protocol: UDP
+    port: 49283
+    name: coturn-udp-49283
+    targetPort: 49283
+  - protocol: UDP
+    port: 49284
+    name: coturn-udp-49284
+    targetPort: 49284
+  - protocol: UDP
+    port: 49285
+    name: coturn-udp-49285
+    targetPort: 49285
+  - protocol: UDP
+    port: 49286
+    name: coturn-udp-49286
+    targetPort: 49286
+  - protocol: UDP
+    port: 49287
+    name: coturn-udp-49287
+    targetPort: 49287
+  - protocol: UDP
+    port: 49288
+    name: coturn-udp-49288
+    targetPort: 49288
+  - protocol: UDP
+    port: 49289
+    name: coturn-udp-49289
+    targetPort: 49289
+  - protocol: UDP
+    port: 49290
+    name: coturn-udp-49290
+    targetPort: 49290
+  - protocol: UDP
+    port: 49291
+    name: coturn-udp-49291
+    targetPort: 49291
+  - protocol: UDP
+    port: 49292
+    name: coturn-udp-49292
+    targetPort: 49292
+  - protocol: UDP
+    port: 49293
+    name: coturn-udp-49293
+    targetPort: 49293
+  - protocol: UDP
+    port: 49294
+    name: coturn-udp-49294
+    targetPort: 49294
+  - protocol: UDP
+    port: 49295
+    name: coturn-udp-49295
+    targetPort: 49295
+  - protocol: UDP
+    port: 49296
+    name: coturn-udp-49296
+    targetPort: 49296
+  - protocol: UDP
+    port: 49297
+    name: coturn-udp-49297
+    targetPort: 49297
+  - protocol: UDP
+    port: 49298
+    name: coturn-udp-49298
+    targetPort: 49298
+  - protocol: UDP
+    port: 49299
+    name: coturn-udp-49299
+    targetPort: 49299
+  - protocol: UDP
+    port: 49300
+    name: coturn-udp-49300
+    targetPort: 49300
+  - protocol: UDP
+    port: 49301
+    name: coturn-udp-49301
+    targetPort: 49301
+  - protocol: UDP
+    port: 49302
+    name: coturn-udp-49302
+    targetPort: 49302
+  - protocol: UDP
+    port: 49303
+    name: coturn-udp-49303
+    targetPort: 49303
+  - protocol: UDP
+    port: 49304
+    name: coturn-udp-49304
+    targetPort: 49304
+  - protocol: UDP
+    port: 49305
+    name: coturn-udp-49305
+    targetPort: 49305
+  - protocol: UDP
+    port: 49306
+    name: coturn-udp-49306
+    targetPort: 49306
+  - protocol: UDP
+    port: 49307
+    name: coturn-udp-49307
+    targetPort: 49307
+  - protocol: UDP
+    port: 49308
+    name: coturn-udp-49308
+    targetPort: 49308
+  - protocol: UDP
+    port: 49309
+    name: coturn-udp-49309
+    targetPort: 49309
+  - protocol: UDP
+    port: 49310
+    name: coturn-udp-49310
+    targetPort: 49310
+  - protocol: UDP
+    port: 49311
+    name: coturn-udp-49311
+    targetPort: 49311
+  - protocol: UDP
+    port: 49312
+    name: coturn-udp-49312
+    targetPort: 49312
+  - protocol: UDP
+    port: 49313
+    name: coturn-udp-49313
+    targetPort: 49313
+  - protocol: UDP
+    port: 49314
+    name: coturn-udp-49314
+    targetPort: 49314
+  - protocol: UDP
+    port: 49315
+    name: coturn-udp-49315
+    targetPort: 49315
+  - protocol: UDP
+    port: 49316
+    name: coturn-udp-49316
+    targetPort: 49316
+  - protocol: UDP
+    port: 49317
+    name: coturn-udp-49317
+    targetPort: 49317
+  - protocol: UDP
+    port: 49318
+    name: coturn-udp-49318
+    targetPort: 49318
+  - protocol: UDP
+    port: 49319
+    name: coturn-udp-49319
+    targetPort: 49319
+  - protocol: UDP
+    port: 49320
+    name: coturn-udp-49320
+    targetPort: 49320
+  - protocol: UDP
+    port: 49321
+    name: coturn-udp-49321
+    targetPort: 49321
+  - protocol: UDP
+    port: 49322
+    name: coturn-udp-49322
+    targetPort: 49322
+  - protocol: UDP
+    port: 49323
+    name: coturn-udp-49323
+    targetPort: 49323
+  - protocol: UDP
+    port: 49324
+    name: coturn-udp-49324
+    targetPort: 49324
+  - protocol: UDP
+    port: 49325
+    name: coturn-udp-49325
+    targetPort: 49325
+  - protocol: UDP
+    port: 49326
+    name: coturn-udp-49326
+    targetPort: 49326
+  - protocol: UDP
+    port: 49327
+    name: coturn-udp-49327
+    targetPort: 49327
+  - protocol: UDP
+    port: 49328
+    name: coturn-udp-49328
+    targetPort: 49328
+  - protocol: UDP
+    port: 49329
+    name: coturn-udp-49329
+    targetPort: 49329
+  - protocol: UDP
+    port: 49330
+    name: coturn-udp-49330
+    targetPort: 49330
+  - protocol: UDP
+    port: 49331
+    name: coturn-udp-49331
+    targetPort: 49331
+  - protocol: UDP
+    port: 49332
+    name: coturn-udp-49332
+    targetPort: 49332
+  - protocol: UDP
+    port: 49333
+    name: coturn-udp-49333
+    targetPort: 49333
+  - protocol: UDP
+    port: 49334
+    name: coturn-udp-49334
+    targetPort: 49334
+  - protocol: UDP
+    port: 49335
+    name: coturn-udp-49335
+    targetPort: 49335
+  - protocol: UDP
+    port: 49336
+    name: coturn-udp-49336
+    targetPort: 49336
+  - protocol: UDP
+    port: 49337
+    name: coturn-udp-49337
+    targetPort: 49337
+  - protocol: UDP
+    port: 49338
+    name: coturn-udp-49338
+    targetPort: 49338
+  - protocol: UDP
+    port: 49339
+    name: coturn-udp-49339
+    targetPort: 49339
+  - protocol: UDP
+    port: 49340
+    name: coturn-udp-49340
+    targetPort: 49340
+  - protocol: UDP
+    port: 49341
+    name: coturn-udp-49341
+    targetPort: 49341
+  - protocol: UDP
+    port: 49342
+    name: coturn-udp-49342
+    targetPort: 49342
+  - protocol: UDP
+    port: 49343
+    name: coturn-udp-49343
+    targetPort: 49343
+  - protocol: UDP
+    port: 49344
+    name: coturn-udp-49344
+    targetPort: 49344
+  - protocol: UDP
+    port: 49345
+    name: coturn-udp-49345
+    targetPort: 49345
+  - protocol: UDP
+    port: 49346
+    name: coturn-udp-49346
+    targetPort: 49346
+  - protocol: UDP
+    port: 49347
+    name: coturn-udp-49347
+    targetPort: 49347
+  - protocol: UDP
+    port: 49348
+    name: coturn-udp-49348
+    targetPort: 49348
+  - protocol: UDP
+    port: 49349
+    name: coturn-udp-49349
+    targetPort: 49349
+  - protocol: UDP
+    port: 49350
+    name: coturn-udp-49350
+    targetPort: 49350
+  - protocol: UDP
+    port: 49351
+    name: coturn-udp-49351
+    targetPort: 49351
+  - protocol: UDP
+    port: 49352
+    name: coturn-udp-49352
+    targetPort: 49352
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-controller-admission
+  namespace: ingress-nginx
+spec:
+  ports:
+  - appProtocol: https
+    name: https-webhook
+    port: 443
+    targetPort: webhook
+  selector:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+spec:
+  minReadySeconds: 0
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: controller
+      app.kubernetes.io/instance: ingress-nginx
+      app.kubernetes.io/name: ingress-nginx
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: controller
+        app.kubernetes.io/instance: ingress-nginx
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+        app.kubernetes.io/version: 1.7.1
+    spec:
+      containers:
+      - args:
+        - /nginx-ingress-controller
+        - --tcp-services-configmap=ingress-nginx/tcp-services
+        - --udp-services-configmap=ingress-nginx/udp-services
+        - --publish-service=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --election-id=ingress-nginx-leader
+        - --controller-class=k8s.io/ingress-nginx
+        - --ingress-class=nginx
+        - --configmap=$(POD_NAMESPACE)/ingress-nginx-controller
+        - --validating-webhook=:8443
+        - --validating-webhook-certificate=/usr/local/certificates/cert
+        - --validating-webhook-key=/usr/local/certificates/key
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: LD_PRELOAD
+          value: /usr/local/lib/libmimalloc.so
+        image: registry.k8s.io/ingress-nginx/controller:v1.7.1@sha256:7244b95ea47bddcb8267c1e625fb163fc183ef55448855e3ac52a7b260a60407
+        imagePullPolicy: IfNotPresent
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - /wait-shutdown
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        name: controller
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        - containerPort: 443
+          name: https
+          protocol: TCP
+        - containerPort: 8443
+          name: webhook
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 10254
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        resources:
+          requests:
+            cpu: 100m
+            memory: 90Mi
+        securityContext:
+          allowPrivilegeEscalation: true
+          capabilities:
+            add:
+            - NET_BIND_SERVICE
+            drop:
+            - ALL
+          runAsUser: 101
+        volumeMounts:
+        - mountPath: /usr/local/certificates/
+          name: webhook-cert
+          readOnly: true
+      dnsPolicy: ClusterFirst
+      nodeSelector:
+        kubernetes.io/os: linux
+      serviceAccountName: ingress-nginx
+      terminationGracePeriodSeconds: 300
+      volumes:
+      - name: webhook-cert
+        secret:
+          secretName: ingress-nginx-admission
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission-create
+  namespace: ingress-nginx
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-webhook
+        app.kubernetes.io/instance: ingress-nginx
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+        app.kubernetes.io/version: 1.7.1
+      name: ingress-nginx-admission-create
+    spec:
+      containers:
+      - args:
+        - create
+        - --host=ingress-nginx-controller-admission,ingress-nginx-controller-admission.$(POD_NAMESPACE).svc
+        - --namespace=$(POD_NAMESPACE)
+        - --secret-name=ingress-nginx-admission
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794@sha256:01d181618f270f2a96c04006f33b2699ad3ccb02da48d0f89b22abce084b292f
+        imagePullPolicy: IfNotPresent
+        name: create
+        securityContext:
+          allowPrivilegeEscalation: false
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 2000
+      serviceAccountName: ingress-nginx-admission
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission-patch
+  namespace: ingress-nginx
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: admission-webhook
+        app.kubernetes.io/instance: ingress-nginx
+        app.kubernetes.io/name: ingress-nginx
+        app.kubernetes.io/part-of: ingress-nginx
+        app.kubernetes.io/version: 1.7.1
+      name: ingress-nginx-admission-patch
+    spec:
+      containers:
+      - args:
+        - patch
+        - --webhook-name=ingress-nginx-admission
+        - --namespace=$(POD_NAMESPACE)
+        - --patch-mutating=false
+        - --secret-name=ingress-nginx-admission
+        - --patch-failure-policy=Fail
+        env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        image: registry.k8s.io/ingress-nginx/kube-webhook-certgen:v20230312-helm-chart-4.5.2-28-g66a760794@sha256:01d181618f270f2a96c04006f33b2699ad3ccb02da48d0f89b22abce084b292f
+        imagePullPolicy: IfNotPresent
+        name: patch
+        securityContext:
+          allowPrivilegeEscalation: false
+      nodeSelector:
+        kubernetes.io/os: linux
+      restartPolicy: OnFailure
+      securityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+        runAsUser: 2000
+      serviceAccountName: ingress-nginx-admission
+---
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: nginx
+spec:
+  controller: k8s.io/ingress-nginx
+---
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/part-of: ingress-nginx
+    app.kubernetes.io/version: 1.7.1
+  name: ingress-nginx-admission
+webhooks:
+- admissionReviewVersions:
+  - v1
+  clientConfig:
+    service:
+      name: ingress-nginx-controller-admission
+      namespace: ingress-nginx
+      path: /networking/v1/ingresses
+  failurePolicy: Fail
+  matchPolicy: Equivalent
+  name: validate.nginx.ingress.kubernetes.io
+  rules:
+  - apiGroups:
+    - networking.k8s.io
+    apiVersions:
+    - v1
+    operations:
+    - CREATE
+    - UPDATE
+    resources:
+    - ingresses
+  sideEffects: None

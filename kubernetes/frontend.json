@@ -11,5 +11,5 @@
   "GIPHY_API_KEY": "thZMTtWsaBQAPDIAY461GzYTctuYIeIj",
   "GITHUB_LINK": "https://github.com/akoidan/pychat",
   "FLAGS": true,
-  "WEBRTC_CONFIG": {"iceServers":[{"urls":["stun:turn2.l.google.com"]}]}
+  "WEBRTC_CONFIG": {"iceServers":[{"urls":["turn:pychat.org"],"username":"pychat","credential":"pypass"}]}
 }

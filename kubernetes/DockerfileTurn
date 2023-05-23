@@ -1,0 +1,10 @@
+# docker build -f ./kubernetes/DockerfileTurn -t deathangel908/pychat-turn .
+# docker push deathangel908/pychat-turn
+
+FROM alpine:3.17.3
+RUN apk update && \
+    apk add --no-cache coturn
+
+COPY ./kubernetes/turnserver.conf /etc/coturn/turnserver.conf
+
+CMD ["/usr/bin/turnserver"]

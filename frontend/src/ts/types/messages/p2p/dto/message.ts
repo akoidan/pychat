@@ -1,5 +1,5 @@
-import {MessageStatusModel} from "@/ts/types/model";
-import {FileP2pDto} from "@/ts/types/messages/p2pDto";
+import type {MessageStatusModel} from "@/ts/types/model";
+import type {FileP2pDto} from "@/ts/types/messages/p2p/dto/file";
 
 export interface MessageP2pDto {
   id: number;

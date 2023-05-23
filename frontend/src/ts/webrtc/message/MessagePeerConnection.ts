@@ -12,7 +12,7 @@ import type {DefaultStore} from "@/ts/classes/DefaultStore";
 
 import type {MessageModel, RoomModel} from "@/ts/types/model";
 import {MessageStatusInner} from "@/ts/types/model";
-import type {MessageP2pDto, MessagesInfo} from "@/ts/types/messages/p2pDto";
+import type {MessagesInfo} from "@/ts/types/messages/p2p/dto/message.info";
 import {messageModelToP2p, p2pMessageToModel} from "@/ts/types/converters";
 
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
@@ -24,7 +24,6 @@ import {
 } from "@/ts/utils/pubsub";
 import type {SetMessageStatusWsInMessage} from "@common/ws/message/set.message.status";
 import {SetMessageStatusWsInBody} from "@common/ws/message/set.message.status";
-import type {CheckDestroyInnerSystemMessage} from "@/ts/types/messages/peer-connection/accept.file.reply";
 import {SendSetMessagesStatusMessageBody} from "@/ts/types/messages/inner/send.set.messages.status";
 import type {
   SendSetMessagesStatusInnerSystemMessage,
@@ -35,9 +34,6 @@ import {
 import {SetMessageStatusP2pMessage} from "@/ts/types/messages/p2p/set.message.status";
 import type {
   ExchangeMessageInfo1RequestP2pMessage,
-} from "@/ts/types/messages/p2p/exchange.message.info";
-import {
-  ExchangeMessageInfo1RequestP2pBody,
 } from "@/ts/types/messages/p2p/exchange.message.info";
 import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 import type {DefaultP2pMessage} from "@/ts/types/messages/p2p";
@@ -51,6 +47,11 @@ import {
   ExchangeMessageInfoResponse3,
   SendNewP2PMessage
 } from "@/ts/types/messages/p2pMessages";
+import {MessageP2pDto} from "@/ts/types/messages/p2p/dto/message";
+import {
+  CheckTransferDestroyBody,
+  CheckTransferDestroyMessage
+} from "@/ts/types/messages/inner/check.transfer.destroy";
 
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection {
@@ -58,10 +59,10 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   protected readonly callBacks: Record<number, {resolve: Function; reject: Function; all?: true}> = {};
 
-  protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, "peerConnection:*"> = {
-    syncP2pMessage: <HandlerType<"syncP2pMessage", "peerConnection:*">> this.syncP2pMessage,
-    sendSetMessagesStatus: <HandlerType<"sendSetMessagesStatus", "peerConnection:*">> this.sendSetMessagesStatus,
-  };
+  // protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, "peerConnection:*"> = {
+  //   syncP2pMessage: <HandlerType<"syncP2pMessage", "peerConnection:*">> this.syncP2pMessage,
+  //   sendSetMessagesStatus: <HandlerType<"sendSetMessagesStatus", "peerConnection:*">> this.sendSetMessagesStatus,
+  // };
 
   protected status: "inited" | "not_inited" = "not_inited";
 
@@ -189,9 +190,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  @Subscribe<CheckDestroyInnerSystemMessage>()
-  public checkDestroy() {
-
+  @Subscribe<CheckTransferDestroyMessage>()
+  public checkDestroy(body: CheckTransferDestroyBody) {
     /*
      * Destroy only if user has left this room, if he's offline but connections is stil in progress,
      *  maybe he has jost connection to server but not to us

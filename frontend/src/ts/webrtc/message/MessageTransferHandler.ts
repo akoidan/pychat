@@ -21,7 +21,7 @@ import type {SendSetMessagesStatusInnerSystemMessage} from "@/ts/types/messages/
  * https://drive.google.com/file/d/1BCtFNNWprfobqQlG4n2lPyWEqroi7nJh/view
  */
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
-  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, "webrtc-message"> = {};
+  // protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, "webrtc-message"> = {};
 
   private state: "initing" | "not_inited" | "ready" = "not_inited";
 

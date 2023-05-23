@@ -26,6 +26,7 @@ spec:
                 path: key.pem
       containers:
         - name: postfix
+          imagePullPolicy: Always
           image: deathangel908/pychat-postfix
           volumeMounts:
           - name: pychat-postfix-tls
