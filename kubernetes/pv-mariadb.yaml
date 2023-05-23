@@ -6,7 +6,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   capacity:
-    storage: 2Gi
+    storage: 5Gi
   hostPath:
     path: /data/mariadb
 ---
@@ -20,4 +20,6 @@ spec:
      - ReadWriteOnce
    resources:
      requests:
-       storage: 2Gi
+       storage: 5Gi
+   storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+   volumeName: pv-mariadb

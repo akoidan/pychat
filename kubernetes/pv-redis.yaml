@@ -21,3 +21,5 @@ spec:
    resources:
      requests:
        storage: 1Gi
+   storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+   volumeName: pv-redis
