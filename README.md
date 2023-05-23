@@ -515,10 +515,18 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
  1. Go to linode dashboard, kubernetes -> create cluster, if it's not created yet.
  2. After provisioning has finished, download `kubectl-config.yaml` from the linode dashboard and place it either at `~/.kube/config` or do export KUBECONFIG=/file/path . Verify that you can access the cluster with `kubectl get nodes`
  3. Install nginx controller:
- - Download chart repo and chart `helm repo add stable https://charts.helm.sh/stable`
- - `helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx`
- - Installing ingress controller: `helm install nginx-ingress ingress-nginx/ingress-nginx`. You should see load-banancer on your admin dashboard now.
+I have to come up with using custom yaml file for ingress instead of helm, since I need a few tweaks like tcp/udp port mapping, and purging redundant webhooks and etc.
+You have 2 options, use standard way, with LoadBalancer provided by your k8s provider, which it will aditionally bill you (gcp 20$/m, linode 10$/m). Or inject some hacks which will expose ingress ip to public host.
+ 3.1 Provider's load balancer
+ - `kubectl apply -f ./kubernetes/ingress-controller-legacy-provider-load-balancer.yaml`
+ - Check that you see load-banancer on your admin dashboard now.
  - Specify load-balancer ip address in your DNS provider.
+ - `kubectl apply -f kubernetes/ingress.yaml`
+ 3.2 Custom load balancer. This method assumes that you have ingress on some of your nodes. I only checked that it worked with a k8s cluster with a single node.
+ - Edit `kubernetes/ingress-controller.yaml` and replace `externalIPs` to the one that your k8s node has.
+ - `kubectl apply -f ./kubernetes/ingress-controller.yaml`
+ - Specify your k8s node IP address in your dns provider. 
+ - `kubectl apply -f kubernetes/ingress.yaml`
  4. If you don't have ssl certificate, lets use letsencrypt and certmanager to generate it for us.
  
  4.1. Install cert-manager
