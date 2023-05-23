@@ -42,6 +42,7 @@ declare module "@vue/runtime-core" {
     $api: HttpApi;
     $store: DefaultStore;
     $logger: Logger;
+    $noVerbose?: true;
     $smileyApi: SmileysApi;
     $platformUtil: PlatformUtil;
     $messageSenderProxy: MessageSenderProxy;

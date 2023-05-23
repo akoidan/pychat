@@ -94,11 +94,16 @@ export const vueStore = new Vuex.Store({
 
 function Validate(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
-  descriptor.value = function(...args: unknown[]) {
+  descriptor.value = function (...args: unknown[]) {
     try {
       original.apply(this, args);
     } catch (e) {
-      logger.warn(`Invalid temporal store structure.${propertyKey} {} {}`, args, JSON.parse(JSON.stringify(this)))();
+      logger.warn(`Invalid temporal store structure.${propertyKey} {} {}`, args, JSON.parse(JSON.stringify(JSON.stringify(this, (a, b) => {
+        if (a == "storage") { //  vuex[storage] === DatabaseWrapper is not the property that should be ractive
+          return undefined;
+        }
+        return b;
+      }))))();
     }
   };
 }

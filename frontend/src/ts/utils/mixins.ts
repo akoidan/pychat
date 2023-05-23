@@ -27,7 +27,7 @@ export const loggerMixin = {
     },
   },
   updated(this: VueBase): void {
-    this.$logger && this.$logger.debug("Updated")();
+    this.$logger && !this.$noVerbose && this.$logger.debug("Updated")();
   },
   unmounted(this: VueBase) {
     this.$logger && this.$logger.debug("unmounted")();
