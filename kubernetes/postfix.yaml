@@ -46,11 +46,3 @@ spec:
       port: 25
       name: smtp-tls
       targetPort: 25
-    - protocol: TCP
-      port: 587
-      name: smpt-tcp-reply-1
-      targetPort: 587
-    - protocol: TCP
-      port: 465
-      name: smpt-tcp-reply-2
-      targetPort: 465

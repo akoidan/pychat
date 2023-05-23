@@ -27,7 +27,7 @@ spec:
       containers:
         - name: coturn
           imagePullPolicy: Always
-          image: deathangel908/pychat-turn
+          image: deathangel908/pychat-coturn
           volumeMounts:
           - name: pychat-coturn-tls
             mountPath: "/etc/tls"

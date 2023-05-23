@@ -1,5 +1,5 @@
-# docker build -f ./kubernetes/DockerfileTurn -t deathangel908/pychat-turn .
-# docker push deathangel908/pychat-turn
+# docker build -f ./kubernetes/DockerfileCoturn -t deathangel908/pychat-coturn .
+# docker push deathangel908/pychat-coturn
 
 FROM alpine:3.17.3
 RUN apk update && \
