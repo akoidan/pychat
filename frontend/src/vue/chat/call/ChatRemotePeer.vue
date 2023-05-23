@@ -45,6 +45,10 @@ export default class ChatRemotePeer extends Vue {
 
   public volumeLevel: number = 100;
 
+  get $noVerbose(): true {
+    return true;
+  }
+
   public get userNameValue(): string {
     return this.$store.userName(this.callInfo.userId);
   }

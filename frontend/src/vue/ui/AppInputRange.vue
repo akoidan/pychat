@@ -32,6 +32,10 @@ export default class AppInputRange extends Vue {
 
   private style: any;
 
+  get $noVerbose(): true {
+    return true;
+  }
+
   public created() {
     this.style = document.createElement("style");
     document.head.appendChild(this.style);
