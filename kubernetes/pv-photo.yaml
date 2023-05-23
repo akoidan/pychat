@@ -8,7 +8,7 @@ spec:
   capacity:
     storage: 15Gi
   hostPath:
-    path: /data/photo
+    path: /data/backup/backend/photos
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim

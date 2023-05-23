@@ -512,32 +512,42 @@ Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
 http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 # Kubernetes example with [linode](https://www.linode.com/).
- 1. Go to linode dashboard, kubernetes -> create cluster, if it's not created yet.
- 2. After provisioning has finished, download `kubectl-config.yaml` from the linode dashboard and place it either at `~/.kube/config` or do export KUBECONFIG=/file/path . Verify that you can access the cluster with `kubectl get nodes`
- 3. Install nginx controller:
-I have to come up with using custom yaml file for ingress instead of helm, since I need a few tweaks like tcp/udp port mapping, and purging redundant webhooks and etc.
-You have 2 options, use standard way, with LoadBalancer provided by your k8s provider, which it will aditionally bill you (gcp 20$/m, linode 10$/m). Or inject some hacks which will expose ingress ip to public host.
- 3.1 Provider's load balancer
+
+Minimal requirements: 
+ - kubernetes cluster
+ - own a domain, that's required for webrtc video.
+ - 
+ 0. Go through all files in ./kubernetes directory: 
+  - postfix/main.cf
+  - frontend-old-pychat.org.json
+  - nginx-old-pychat.org.conf
+  - turnserver.conf
+  - and other and replace domain pychat.org to yours.
+ 1. Go to your provider dashboard, kubernetes -> create cluster, if it's not created yet.
+ 2. After provisioning has finished, download `kubectl-config.yaml` from the linode dashboard and place it either at `~/.kube/config` or do export KUBECONFIG=/file/path . Verify that you can access the cluster with `kubectl get nodes`.
+ 3. Create namespace pychat. `kubectl apply -f kubernetes/namespace.yaml`
+ 4. Install nginx controller:
+  I have to come up with using custom yaml file for ingress instead of helm, since I need a few tweaks like tcp/udp port mapping, and purging redundant webhooks and etc.
+  You have 2 options, use standard way, with LoadBalancer provided by your k8s provider, which it will aditionally bill you (gcp 20$/m, linode 10$/m). Or inject some hacks which will expose ingress ip to public host.
+  4.1. Provider's load balancer
  - `kubectl apply -f ./kubernetes/ingress-controller-legacy-provider-load-balancer.yaml`
  - Check that you see load-banancer on your admin dashboard now.
  - Specify load-balancer ip address in your DNS provider.
- - `kubectl apply -f kubernetes/ingress.yaml`
- 3.2 Custom load balancer. This method assumes that you have ingress on some of your nodes. I only checked that it worked with a k8s cluster with a single node.
+  4.2. Custom load balancer. This method assumes that you have ingress on some of your nodes. I only checked that it worked with a k8s cluster with a single node.
  - Edit `kubernetes/ingress-controller.yaml` and replace `externalIPs` to the one that your k8s node has.
  - `kubectl apply -f ./kubernetes/ingress-controller.yaml`
- - Specify your k8s node IP address in your dns provider. 
- - `kubectl apply -f kubernetes/ingress.yaml`
- 4. If you don't have ssl certificate, lets use letsencrypt and certmanager to generate it for us.
+ - Specify your k8s node IP address in your dns provider.
+  5. If you don't have ssl certificate, lets use letsencrypt and certmanager to generate it for us.
  
- 4.1. Install cert-manager
- - kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
- - helm repo add jetstack https://charts.jetstack.io
- - helm repo update
- - helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f -
+ 5.1. Install cert-manager
+ - `kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml`
+ - `helm repo add jetstack https://charts.jetstack.io`
+ - `helm repo update`
+ - `helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f -`
  
- 4.2. Generate cloudflare token
+ 5.2. Generate cloudflare token
  - In clodflare dashboard: Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
- - put token into `kubernetes/cf-secret-yaml`
+ - put token into `kubernetes/cf-secret-yaml`. (mine is at mine private repo)
 ```yaml
  apiVersion: v1
 kind: Secret
@@ -548,25 +558,50 @@ type: Opaque
 stringData:
   api-token: cf-api-token
 ```
- - `kubectl apply -f kubernetes/namespace.yaml`
  - `kubectl apply -f kubernetes/cf-secret.yaml`
  - `kubectl apply -f kubernetes/cert-manager.yaml`
  
- 4.3. Verify certificate
+ 5.3. Verify certificate
  - Check that it's created `kubectl get secret pychat-tls -o yaml -n pychat`
  - save it to file: `echo base64certfrom-tls.cert |base64 -d > lol.cert`
  - Should give your domain `openssl x509 -in ./lol.cert  -noout -text`
- 
- 5. Build images and upload it to docker registry:
+ 6. Edit backend secret and deploy it: `kubernetes/backend-secret.yaml` (mine is at mine private repo). Check chat/settings_example.py to understand how to fill values:
+```
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: backend-secret
+  namespace: pychat
+stringData:
+  MYSQL_ROOT_PASSWORD: pypass
+  MYSQL_PASSWORD: pypass
+  MYSQL_USER: pychat
+  EMAIL_PORT: '25'
+  EMAIL_HOST: 'postfix-service'
+  EMAIL_HOST_USER: ''
+  EMAIL_HOST_PASSWORD: ''
+  SECRET_KEY: '***'
+  RECAPTCHA_PRIVATE_KEY: '***'
+  RECAPTCHA_PUBLIC_KEY: '****'
+  GOOGLE_OAUTH_2_CLIENT_ID: '****'
+  FACEBOOK_ACCESS_TOKEN: '****'
+  GIPHY_API_KEY: '****'
+  FIREBASE_API_KEY: '****'
+  DEFAULT_PROFILE_ID: '**'
+  SERVER_EMAIL: 'root@pychat.org'
+```
+deploy it with `kubectl apply -f kubernetes/backend-secret.yaml`
+ 8. Build images and upload it to docker registry. Mine registries contain pychat.org domain:
   - `docker build -f ./kubernetes/DockerfileOldFrontend -t deathangel908/pychat-frontend .`; `docker push deathangel908/pychat-frontend`
   - `docker build -f ./kubernetes/DockerfileOldBackend -t deathangel908/pychat-backend .`; `docker push deathangel908/pychat-backend`
   - `docker build -f ./kubernetes/DockerfilePostfix -t deathangel908/pychat-postfix .` ; `docker push deathangel908/pychat-postfix`
- 6. Setup kubernetes env:
+  - `docker build -f ./kubernetes/DockerfilePostfix -t deathangel908/pychat-coturn .` ; `docker push deathangel908/pychat-coturn`
+ 9. Setup kubernetes env:
   - `kubectl apply -f kubernetes/pv-photo.yaml`
   - `kubectl apply -f kubernetes/pv-redis.yaml`
   - `kubectl apply -f kubernetes/pv-mariadb.yaml`
   - `kubectl apply -f kubernetes/config-map.yaml`
-  - `kubectl apply -f kubernetes/backend-secret.yaml`
   - `kubectl apply -f kubernetes/mariadb.yaml`
   - `kubectl apply -f kubernetes/redis.yaml`
   - `kubectl apply -f kubernetes/migrate-backend.yaml`
@@ -574,8 +609,9 @@ stringData:
   - `kubectl apply -f kubernetes/frontend.yaml`
   - `kubectl apply -f kubernetes/ingress.yaml`
   - `kubectl apply -f kubernetes/postfix.yaml`
+  - `kubectl apply -f kubernetes/coturn.yaml`
 
- 7. For postfix (email server) do not forget to add spf record to cloudflare. Create new TXT record on cloudflare with name/alias `@` (for root domain) and value `v=spf1 ip4:34.243.61.237` where 34:243:61:237 is your NODE's ip in kube with postfix instance. Do not confuse it with ingres/nginx instance
+ 10. For postfix (email server) do not forget to add spf record to cloudflare. Create new TXT record on cloudflare with name/alias `@` (for root domain) and value `v=spf1 ip4:34.243.61.237` where 34:243:61:237 is your NODE's ip in kube with postfix instance. Do not confuse it with ingres/nginx instance
 
 # TODO
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
