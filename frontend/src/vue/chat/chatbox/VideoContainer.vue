@@ -97,6 +97,10 @@ export default class VideoContainer extends Vue {
   @Prop()
   public roomId!: number;
 
+  get $noVerbose(): true {
+    return true;
+  }
+
   @Emit() micClick() {
   }
 

@@ -29,6 +29,10 @@ export default class VideoObject extends Vue {
   @Ref()
   public video!: HTMLVideoElement;
 
+  get $noVerbose(): true {
+    return true;
+  }
+
   /*
    *@Watch('mediaStreamLink')
    *public onMediaStreamChanged(newValue: string) {
