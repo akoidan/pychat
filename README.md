@@ -613,6 +613,12 @@ deploy it with `kubectl apply -f kubernetes/backend-secret.yaml`
 
  10. For postfix (email server) do not forget to add spf record to cloudflare. Create new TXT record on cloudflare with name/alias `@` (for root domain) and value `v=spf1 ip4:34.243.61.237` where 34:243:61:237 is your NODE's ip in kube with postfix instance. Do not confuse it with ingres/nginx instance
 
+
+# Troubleshooting
+1. How to icrease maximum upload file:
+ - Change nginx configuration  ``   client_max_body_size 75M;`
+ - In addition to above, if you're using k8s + ingress, change `ingress.yaml` nginx.ingress.kubernetes.io/proxy-body-size: 75m 
+ 
 # TODO
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
 * user1 writes a message, user1 goes offline, user 2 opens a chat from 1st devices and goes offline, user 2 opens a chat from 2nd devices and responds in its thread and goes offline, user2 opens first deviecs and thread messages count = 0
