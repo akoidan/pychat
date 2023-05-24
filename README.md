@@ -591,7 +591,7 @@ stringData:
   DEFAULT_PROFILE_ID: '**'
   SERVER_EMAIL: 'root@pychat.org'
 ```
-deploy it with `kubectl apply -f kubernetes/backend-secret.yaml`
+deploy it with `kubectl apply -f kubernetes/backend-secret.yaml`. (Tip for myself For local minikube it's better to use pychat_data)
  8. Build images and upload it to docker registry. Mine registries contain pychat.org domain:
   - `docker build -f ./kubernetes/DockerfileOldFrontend -t deathangel908/pychat-frontend .`; `docker push deathangel908/pychat-frontend`
   - `docker build -f ./kubernetes/DockerfileOldBackend -t deathangel908/pychat-backend .`; `docker push deathangel908/pychat-backend`
