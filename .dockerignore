@@ -22,6 +22,7 @@ frontend/build/production.json
 !docker/tornado
 !kubernetes/frontend-old-pychat.org.json
 !kubernetes/nginx-old-pychat.org.conf
+!kubernetes/frontend-minikube.json
 !docker/nginx.conf
 !docker/nginx
 !docker/pychat.org/certificate.crt
