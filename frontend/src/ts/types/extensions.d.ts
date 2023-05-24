@@ -7,7 +7,6 @@
  import/unambiguous
  */
 declare const PYCHAT_CONSTS: {
-  IS_SSL: boolean;
   IS_DEBUG: boolean;
   BACKEND_ADDRESS: string;
   GOOGLE_OAUTH_2_CLIENT_ID: string | false;
