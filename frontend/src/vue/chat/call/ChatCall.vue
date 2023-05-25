@@ -38,7 +38,7 @@
       />
       <div class="spainter">
         <!--        TODO v-if doesn't detach events on destroy on painter-->
-        <painter v-if="callInfo.sharePaint" @canvas="onCanvas"/>
+        <painter v-if="callInfo.sharePaint" @canvas="onCanvas" @blob="onBlobPaste"/>
       </div>
     </div>
   </div>
@@ -65,6 +65,15 @@ import InputDevicesSettings from "@/vue/chat/call/InputDevicesSettings.vue";
 import VideoContainer from "@/vue/chat/chatbox/VideoContainer.vue";
 import CallContainerIcons from "@/vue/chat/call/CallContainerIcons.vue";
 import Painter from "@/vue/chat/textarea/Painter.vue";
+import {savedFiles} from "@/ts/utils/htmlApi";
+
+
+let uniqueId = 1;
+
+function getUniqueId() {
+  return uniqueId++;
+}
+
 
 @Component({
   name: "ChatCall",
@@ -90,17 +99,34 @@ export default class ChatCall extends Vue {
   public videoContainer!: Vue;
 
   @State
+  public readonly activeRoomId!: number;
+
+  @State
   public readonly myId!: number;
 
   public fullscreen: boolean = false;
 
-  public listener = this.fullScreenChange.bind(this);
+  public listener: EventListenerOrEventListenerObject | null = null;
 
   @Watch("callInfo.callActive")
   onCallActive(newValue: boolean) {
     if (newValue) {
       this.showVideoContainer = true;
     }
+  }
+
+  onBlobPaste(e: Blob) {
+    const id: string = `paintBlob-${getUniqueId()}`;
+    savedFiles[id] = e;
+    this.$store.setPastingQueue([
+      {
+        content: id,
+        editedMessageId: null,
+        elType: "blob",
+        openedThreadId: null,
+        roomId: this.activeRoomId,
+      },
+    ]);
   }
 
   onCanvas(canvas: HTMLCanvasElement) {
@@ -126,14 +152,19 @@ export default class ChatCall extends Vue {
   }
 
   public created() {
+    // if bind would be called inside class definition
+    // public listener = this.fullScreenChange.bind(this);
+    // this object somehow wouldn't have global fields (e.g. from global mixins)
+    // this is why listener should be here
+    this.listener = this.fullScreenChange.bind(this);
     ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
-      document.addEventListener(e, this.listener, false);
+      document.addEventListener(e, this.listener!, false);
     });
   }
 
   public destroyed() {
     ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
-      document.removeEventListener(e, this.listener, false);
+      document.removeEventListener(e, this.listener!, false);
     });
   }
 

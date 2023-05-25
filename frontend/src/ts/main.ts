@@ -88,8 +88,10 @@ function bootstrapVue(
      @typescript-eslint/restrict-template-expressions,
      no-underscore-dangle
      */
-    void store.growlError(message);
     logger.error("Error occurred in vue component err: '{}', vm '{}', info '{}'", err, vm, info)();
+    if (store?.userSettings?.logs != "disable") {
+      void store.growlError(message);
+    }
     return false;
   };
   return vue;
