@@ -1,12 +1,10 @@
 variable "linode_token" {}
 variable "cloud_flare_zone_id" {}
 variable "cloud_flare_api_token" {}
-variable "linode_instance_root_password" {}
 variable "domain_name" {}
 
 module "linode" {
   source                  = "./linode"
-  linode_instance_root_password = var.linode_instance_root_password
   linode_token = var.linode_token
 }
 
@@ -21,4 +19,6 @@ module "cloudflare" {
 module "helm" {
   source = "./helm"
   kubeconfig = module.linode.kubeconfig
+  domain = var.domain_name
+  ip_address = module.linode.ip_address
 }

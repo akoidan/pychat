@@ -1,4 +1,3 @@
-variable "linode_instance_root_password" {}
 variable "linode_token" {}
 variable "pools" {
   description = "The Node Pool specifications for the Kubernetes cluster. (required)"

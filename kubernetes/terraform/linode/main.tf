@@ -32,16 +32,3 @@ data "linode_instances" "pychat_linode" {
   }
 }
 
-
-
-
-
-resource "linode_instance" "pychat12" {
-    label = "pychat_1"
-    image = "linode/alpine3.17"
-    region = var.region
-    type = "g6-standard-1"
-    root_pass =  var.linode_instance_root_password
-}
-
-

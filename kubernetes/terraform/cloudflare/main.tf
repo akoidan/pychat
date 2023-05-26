@@ -7,7 +7,6 @@ terraform {
   }
 }
 
-
 provider "cloudflare" {
   api_token = var.cloud_flare_api_token
 }

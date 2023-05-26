@@ -28,6 +28,10 @@ resource "helm_release" "backend" {
 resource "helm_release" "certmanager" {
   name = "certmanager"
   chart = "./charts/certmanager"
+  set {
+    name = "domain"
+    value = var.domain
+  }
 }
 
 resource "helm_release" "coturn" {
@@ -43,6 +47,15 @@ resource "helm_release" "frontend" {
 resource "helm_release" "ingress" {
   name = "ingress"
   chart = "./charts/ingress"
+  set  {
+    name = "domain"
+    value = var.domain
+
+  }
+  set {
+    name = "external_ip"
+    value = var.ip_address
+  }
 }
 
 resource "helm_release" "mariadb" {
