@@ -10,4 +10,5 @@ data:
   REDIS_HOST: redis-service
   REDIS_PORT: '6379'
   APPLICATION_PORT: '8888'
+  REDIS_PUBSUB: 'true'
 
