@@ -4,3 +4,5 @@ image:
   tag: "latest"
 disk:
   photo_size: "15Gi"
+app:
+  mysql_database_name: pychat

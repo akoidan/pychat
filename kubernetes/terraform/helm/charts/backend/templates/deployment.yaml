@@ -32,7 +32,7 @@ spec:
         - secretRef:
             name: backend-secret
         - configMapRef:
-            name: config-map
+            name: cm-backend
         volumeMounts:
           - mountPath: "/usr/src/newback/photos"
             name: photo

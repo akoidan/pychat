@@ -8,13 +8,13 @@ spec:
     spec:
       containers:
       - name: migrate-backend
-        imagePullPolicy: IfNotPresent
-        image: deathangel908/pychat-backend
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
         envFrom:
         - secretRef:
             name: backend-secret
         - configMapRef:
-            name: config-map
+            name: cm-backend
         command: ["yarn",  "migrate"]
       restartPolicy: Never
   backoffLimit: 4

@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-mariadb
+  namespace: pychat
+data:
+  MYSQL_PORT: '3306'
+  MYSQL_DATABASE: {{ .Values.mysql_database_name }}
+
