@@ -42,17 +42,3 @@ spec:
       - name: mariadb-data
         persistentVolumeClaim:
           claimName: pvc-mariadb
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: mariadb-service
-  namespace: pychat
-spec:
-  selector:
-    app: mariadb
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
-

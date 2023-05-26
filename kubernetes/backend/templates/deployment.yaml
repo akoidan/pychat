@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-deployment
+  namespace: pychat
+  labels:
+    app: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        # change this to IfNotPresent
+        imagePullPolicy: Always
+        image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
+        ports:
+        - containerPort: 8888
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 8888
+        env:
+        - name: REDIS_PUBSUB
+          value: 'true'
+        envFrom:
+        - secretRef:
+            name: backend-secret
+        - configMapRef:
+            name: config-map
+        volumeMounts:
+          - mountPath: "/usr/src/newback/photos"
+            name: photo
+      volumes:
+        - name: photo
+          persistentVolumeClaim:
+            claimName: pvc-photo
+

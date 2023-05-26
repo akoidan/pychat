@@ -511,6 +511,19 @@ In order to setup continuous delivery via github:
 Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
 http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
+
+
+# Terraform
+ I'm hosting pychat with:
+ - Cloudflare as CDN and DNS (free of charge)
+ - Linode as Kubernetes provider (10$ per month of total for 1 instance of 2GB ram and 1vCPU)
+ - Letsencrypt as SSL certificate (free of charge)
+ - Domain address (you have to decide on your own )
+ 
+1. Go cloudflare and copy ZoneID and API token 
+ - Copy zoneID: Go to https://dash.cloudflare.com/ - create a new site (or use existing one) grab an API Zone ID and place it into `kubernetes/terraform.tfvars`
+ - Copy API token: go to https://dash.cloudflare.com/profile/api-tokens and create a new api token and place it into `kubernetes/terraform.tfvars`
+ - 
 # Kubernetes example with [linode](https://www.linode.com/).
 
 Minimal requirements: 
