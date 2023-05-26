@@ -1,0 +1,4 @@
+image:
+  repository_path: deathangel908/pychat-backend
+  pullPolicy: Always
+  tag: "latest"
