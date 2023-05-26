@@ -26,23 +26,9 @@ spec:
                 path: key.pem
       containers:
         - name: postfix
-          imagePullPolicy: Always
-          image: deathangel908/pychat-postfix
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
           volumeMounts:
           - name: pychat-postfix-tls
             mountPath: "/etc/tls"
             readOnly: true
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: postfix-service
-  namespace: pychat
-spec:
-  selector:
-    app: postfix
-  ports:
-    - protocol: TCP
-      port: 25
-      name: smtp-tls
-      targetPort: 25

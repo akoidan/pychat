@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: udp-services
+  namespace: ingress-nginx
+data:
+  3478: "pychat/coturn-service:3478"
+  5349: "pychat/coturn-service:5349"
+{{ $portGen:= untilStep (.Values.udp_port_range_start | int) ( .Values.udp_port_range_end | int) 1 }} {{ range $index, $port := $portGen }}
+  {{ $port }}: "pychat/coturn-service:{{ $port }}"
+   {{- end }}
