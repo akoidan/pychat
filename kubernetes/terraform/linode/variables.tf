@@ -1,21 +1,15 @@
 variable "linode_token" {}
-variable "pools" {
-  description = "The Node Pool specifications for the Kubernetes cluster. (required)"
-  type = list(object({
-    type = string
-    count = number
-  }))
-  default = [
-    {
-      type = "g6-standard-1"
-      count = 1
-    }
-  ]
+variable "node_type" {
+  default = "g6-standard-1"
 }
 
 variable "k8s_version" {
-  default = "1.27"
+  default = "1.26"
 }
 variable "region" {
   default = "eu-west"
+}
+
+variable "linode_app_label" {
+  default = "pychat_1"
 }

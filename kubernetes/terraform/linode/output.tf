@@ -1,7 +1,3 @@
-output "ip_address" {
-  value = data.linode_instances.pychat_linode.instances.0.ip_address
-}
-
 output "kubeconfig" {
   value = linode_lke_cluster.pychat.kubeconfig
   sensitive = true
@@ -21,4 +17,8 @@ output "id" {
 
 output "pool" {
   value = linode_lke_cluster.pychat.pool
+}
+
+output "ip_address" {
+  value = data.linode_instances.pychat_linode.instances.0.ip_address
 }
