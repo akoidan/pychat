@@ -17,9 +17,8 @@ spec:
     spec:
       containers:
       - name: backend
-        # change this to IfNotPresent
-        imagePullPolicy: Always
-        image: deathangel908/pychat-backend
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
         ports:
         - containerPort: 8888
         readinessProbe:
@@ -41,17 +40,4 @@ spec:
         - name: photo
           persistentVolumeClaim:
             claimName: pvc-photo
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: backend-service
-  namespace: pychat
-spec:
-  selector:
-    app: backend
-  ports:
-    - protocol: TCP
-      port: 8888
-      targetPort: 8888
 

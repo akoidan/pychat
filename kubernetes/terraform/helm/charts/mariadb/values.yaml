@@ -1,0 +1,2 @@
+disk_size: "5Gi"
+mysql_version: "10.6.7"

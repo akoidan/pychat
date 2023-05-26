@@ -22,7 +22,8 @@ spec:
     spec:
       containers:
       - name: mariadb
-        image: yobasystems/alpine-mariadb:10.6.7
+        image: "yobasystems/alpine-mariadb:{{ .Values.mysql_version }}"
+        imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 3306
         env:

@@ -17,9 +17,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        # change to IfNotPresent for minikube
-        imagePullPolicy: Always
-        image: deathangel908/pychat-frontend
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
         ports:
         - containerPort: 80
         readinessProbe:
@@ -33,17 +32,3 @@ spec:
         - name: photo
           persistentVolumeClaim:
             claimName: pvc-photo
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: frontend-service
-  namespace: pychat
-spec:
-  selector:
-    app: frontend
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 80
-

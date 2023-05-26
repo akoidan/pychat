@@ -10,7 +10,7 @@ module "linode" {
   linode_token = var.linode_token
 }
 
-module "storage_account_test" {
+module "cloudflare" {
   source                  = "./cloudflare"
   cloud_flare_api_token = var.cloud_flare_api_token
   cloud_flare_zone_id = var.cloud_flare_zone_id

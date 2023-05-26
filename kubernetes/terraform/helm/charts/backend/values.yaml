@@ -1,0 +1,6 @@
+image:
+  repository_path: deathangel908/pychat-backend
+  pullPolicy: Always # change to IfNotPresent for minikube
+  tag: "latest"
+disk:
+  photo_size: "15Gi"

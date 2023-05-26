@@ -11,6 +11,11 @@ variable "kubeconfig" {}
 
 provider "helm" {
   kubernetes {
-    config_context = kubeconfig
+    config_context = var.kubeconfig
   }
+}
+
+resource "helm_release" "backend" {
+  name = "backend"
+  chart = "./charts/backend"
 }
