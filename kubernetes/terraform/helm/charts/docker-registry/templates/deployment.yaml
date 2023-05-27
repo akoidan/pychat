@@ -54,5 +54,3 @@ spec:
                 path: crt.pem
               - key: tls.key
                 path: key.pem
-
-

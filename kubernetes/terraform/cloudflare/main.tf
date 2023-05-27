@@ -12,7 +12,7 @@ resource "cloudflare_record" "static_pychat" {
   proxied = true
   ttl     = 1
   type    = "A"
-  value   =  var.ip_address
+  value   = var.ip_address
   zone_id = var.cloud_flare_zone_id
 }
 
@@ -21,7 +21,7 @@ resource "cloudflare_record" "static_pychat" {
   proxied = false
   ttl     = 1
   type    = "A"
-  value   =  var.ip_address
+  value   = var.ip_address
   zone_id = var.cloud_flare_zone_id
 }
 

@@ -59,12 +59,12 @@ resource "helm_release" "backend" {
 }
 
 resource "helm_release" "certmanager-definition" {
-  name = "cert-manager-definition"
-  chart = "jetstack/cert-manager"
-  version = "1.12.0"
+  name      = "cert-manager-definition"
+  chart     = "jetstack/cert-manager"
+  version   = "1.12.0"
   namespace = "cert-manager"
   set {
-    name = "installCRDs"
+    name  = "installCRDs"
     value = true
   }
   depends_on = [helm_release.global]
@@ -97,9 +97,10 @@ resource "helm_release" "self-signed" {
     value = var.tls_crt
   }
   set {
-     name  = "tls_key"
+    name  = "tls_key"
     value = var.tls_key
   }
+  depends_on = [helm_release.global]
 }
 
 resource "helm_release" "docker-registry" {
@@ -114,10 +115,11 @@ resource "helm_release" "docker-registry" {
     name  = "htpasswd"
     value = var.htpasswd
   }
+  depends_on = [helm_release.global]
 }
 
 resource "helm_release" "backup" {
-  count = var.github == ""? 1 : 0
+  count      = var.github == ""? 1 : 0
   name       = "backup"
   chart      = "${path.module}/charts/backup"
   depends_on = [helm_release.mariadb, helm_release.backend] // because of pvc-photo
@@ -174,7 +176,10 @@ resource "helm_release" "ingress" {
   set {
     name  = "domain_name"
     value = var.domain_name
-
+  }
+  set {
+    name  = "htpasswd"
+    value = var.htpasswd
   }
   set {
     name  = "external_ip"
