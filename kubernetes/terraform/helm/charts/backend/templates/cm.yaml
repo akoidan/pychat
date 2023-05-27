@@ -13,4 +13,4 @@ data:
   REDIS_PUBSUB: 'true'
   EMAIL_PORT: '25'
   EMAIL_HOST: 'postfix-service'
-  DEFAULT_PROFILE_ID: {{ .Values.DEFAULT_PROFILE_ID }}
+  DEFAULT_PROFILE_ID: "{{ .Values.DEFAULT_PROFILE_ID }}"

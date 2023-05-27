@@ -1,7 +1,7 @@
 variable "domain" {}
 variable "email" {}
 variable "github" {}
-variable "idr_rsa" {}
+variable "id_rsa" {}
 variable "id_rsa_pub" {}
 variable "ip_address" {}
 variable "SECRET_KEY" {}

@@ -1,4 +1,3 @@
-
 resource "cloudflare_record" "master_pychat" {
   name    = var.domain_name
   type    = "A"

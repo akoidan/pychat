@@ -58,14 +58,7 @@ resource "helm_release" "backend" {
   }
 }
 
-resource "helm_release" "certmanager-definition" {
-  name = "cert-manager-definition"
-  chart = "jetstack/cert-manager"
-  namespace = "cert-manager"
-  version = "1.8.0"
-}
-
-resource "helm_release" "certmanager" {
+resource "helm_release" certmanager {
   name  = "certmanager"
   chart = "${path.module}/charts/certmanager"
   set {
@@ -80,7 +73,7 @@ resource "helm_release" "certmanager" {
     name  = "cf_api_token"
     value = var.cf_api_token
   }
-  depends_on = [helm_release.global, helm_release.certmanager-definition]
+  depends_on = [helm_release.global]
 }
 
 resource "helm_release" "backup" {
@@ -93,8 +86,8 @@ resource "helm_release" "backup" {
     value = var.email
   }
   set {
-    name  = "idr_rsa"
-    value = var.idr_rsa
+    name  = "id_rsa"
+    value = var.id_rsa
   }
   set {
     name  = "id_rsa_pub"

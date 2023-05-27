@@ -2,8 +2,3 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: pychat
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: cert-manager

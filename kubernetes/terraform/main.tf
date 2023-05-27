@@ -4,11 +4,11 @@ variable "cloud_flare_api_token" {}
 variable "domain_name" {}
 variable "email" {}
 variable "github" {}
-variable "idr_rsa" {}
+variable "id_rsa" {}
 variable "id_rsa_pub" {}
 variable "ip_address" {}
-variable "kubeconfig" {}
 variable "cf_api_token" {}
+
 module "linode" {
   source                  = "./linode"
   linode_token = var.linode_token
@@ -30,7 +30,7 @@ module "helm" {
   cf_api_token = var.cloud_flare_api_token
   email = var.email
   github = var.github
-  idr_rsa = var.idr_rsa
+  id_rsa = var.id_rsa
   id_rsa_pub = var.id_rsa_pub
   SECRET_KEY = var.SECRET_KEY
   RECAPTCHA_PRIVATE_KEY = var.RECAPTCHA_PRIVATE_KEY
