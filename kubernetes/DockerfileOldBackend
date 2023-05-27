@@ -14,6 +14,7 @@ RUN apk add --no-cache --virtual .build-deps \
                 py3-pip \
                 jpeg-dev
 COPY ./backend/requirements.txt ./
+COPY ./download_content.sh ./download_content.sh
 
 RUN pip install -r requirements.txt && ln -s ../newback/photos ./photos
 

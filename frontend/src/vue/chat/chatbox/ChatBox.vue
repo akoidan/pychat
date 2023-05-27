@@ -27,7 +27,7 @@
     </div>
     <div
       ref="chatbox"
-      :class="{'hidden': room.search.searchActive || (room.callInfo && room.callInfo.sharePaint)}"
+      :class="{'hidden': room.search.searchActive}"
       class="chatbox"
       tabindex="1"
       @keydown="keyDownLoadUp"

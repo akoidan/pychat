@@ -9,15 +9,19 @@ class Command(BaseCommand):
 	help = 'Creates initial data in database'
 
 	def handle(self, *args, **options):
-		channel = Channel.objects.create(
-			name=ALL_REDIS_ROOM,
-			id=ALL_ROOM_ID,
-			creator=None
-		)
-		Room.objects.get_or_create(
-			id=ALL_ROOM_ID,
-			is_main_in_channel=True,
-			channel_id=channel.id,
-			creator=None,
-			name=ALL_REDIS_ROOM
-		)
+		channel_exists = Channel.objects.filter(
+			id=ALL_ROOM_ID
+		).count()
+		if channel_exists == 0:
+			channel = Channel.objects.create(
+				name=ALL_REDIS_ROOM,
+				id=ALL_ROOM_ID,
+				creator=None
+			)
+			Room.objects.get_or_create(
+				id=ALL_ROOM_ID,
+				is_main_in_channel=True,
+				channel_id=channel.id,
+				creator=None,
+				name=ALL_REDIS_ROOM
+			)

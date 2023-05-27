@@ -3,12 +3,12 @@
     <div class="current-room-users-table-header">
       {{ title }} <b>{{ room.name }}</b>
     </div>
-    <ul>
+    <ul :class="ulClass">
       <li v-for="user in usersArray" :key="user.id">
         <user-flag-row :user="user"/>
       </li>
     </ul>
-    <template v-if="userIds.length > 0">
+    <template v-if="showInviteUsers">
       <div class="current-room-users-table-header">
         Invite more users
       </div>
@@ -59,6 +59,15 @@ export default class RoomUsersListPage extends Vue {
 
   public running: boolean = false;
 
+  get showInviteUsers() {
+    return this.userIds.length > 0;
+  }
+
+  get ulClass() {
+    return {
+      "current-room-users-table-header-single": !this.showInviteUsers,
+    };
+  }
 
   public get roomId(): number {
     return parseInt(this.$route.params.id as string);
@@ -118,11 +127,13 @@ export default class RoomUsersListPage extends Vue {
   margin: auto
 
 ul
-  max-height: calc(50vh - 220px) // TODO rd87
   overflow-y: scroll // TODO rd87
+  max-height: calc(50vh - 220px) // TODO rd87
   @extend %ul
   :deep(li)
     overflow: initial // TODO rd87 weird bug with zooomed out small li icons when trying to overflow ellipsis text
+  &.current-room-users-table-header-single
+    max-height: calc(100vh - 110px)
 
 li
   @extend %li

@@ -52,7 +52,6 @@ export function getConsts(gitHash: string, command: 'build' | 'serve') {
   const buildName = command === 'build' ?  './production.json' : './development.json';
   const result = require (buildName);
   result.GIT_HASH = gitHash;
-  result.IS_SSL = true;
   // Do not use sw for dev server, it breaks hmr
   result.SERVICE_WORKER_URL = command === 'build' ? '/sw.js': null;
   result.IS_ANDROID = false;

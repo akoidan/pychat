@@ -1,5 +1,4 @@
 import json
-from datetime import datetime
 
 import logging
 
@@ -11,6 +10,8 @@ from chat.settings import ALL_REDIS_ROOM, REDIS_PORT, REDIS_HOST, REDIS_DB
 from chat.settings_base import ALL_ROOM_ID
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
+from functools import partial
+from tornado import stack_context
 
 logger = logging.getLogger(__name__)
 
@@ -24,10 +25,75 @@ def new_read(instance, *args, **kwargs):
 		raise e
 
 
+def new_readline(self, callback=None):
+	try:
+		if not self._stream:
+			self.disconnect()
+			raise ConnectionError('Tried to read from '
+								  'non-existent connection')
+		if self._stream._read_callback is None:
+			callback = stack_context.wrap(callback)
+			self.read_callbacks.add(callback)
+			callback = partial(self.read_callback, callback)
+			self._stream.read_until(b'\r\n', callback=callback)
+	except IOError:
+		self.fire_event('on_disconnect')
+
 def patch_read(tornado_redis):
-	fabric = type(tornado_redis.connection.read)
+	fabric_read = type(tornado_redis.connection.read)
 	tornado_redis.connection.old_read = tornado_redis.connection.read
-	tornado_redis.connection.read = fabric(new_read, tornado_redis.connection)
+	tornado_redis.connection.read = fabric_read(new_read, tornado_redis.connection)
+
+	# If readline is NOT patched then when redis is running in kubernetes, idk why,
+	# spamming from frontend with messages like this from chrome devtool
+
+	# function sendMessage(n) {
+	#     ws.sendPrintMessage(`as12d ${n}`, 1, [], -n, 0, null, {}, [])
+	#    if (n < 100) {
+	#     setTimeout(sendMessage, 1, n+1)
+	#    }
+	# }
+	# sendMessage(1)
+
+	# Will result
+
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/web.py", line 1468, in _stack_context_handle_exception
+	#     raise_exc_info((type, value, traceback))
+	#   File "<string>", line 4, in raise_exc_info
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/stack_context.py", line 316, in wrapped
+	#     ret = fn(*args, **kwargs)
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/gen.py", line 200, in final_callback
+	#     if future.result() is not None:
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/concurrent.py", line 238, in result
+	#     raise_exc_info(self._exc_info)
+	#   File "<string>", line 4, in raise_exc_info
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/gen.py", line 1063, in run
+	#     yielded = self.gen.throw(*exc_info)
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornadoredis/client.py", line 436, in execute_command
+	#     data = yield gen.Task(self.connection.readline)
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/gen.py", line 1055, in run
+	#     value = future.result()
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/concurrent.py", line 238, in result
+	#     raise_exc_info(self._exc_info)
+	#   File "<string>", line 4, in raise_exc_info
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/gen.py", line 622, in Task
+	#     func(*args, callback=_argument_adapter(set_result), **kwargs)
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornadoredis/connection.py", line 159, in readline
+	#     self._stream.read_until(CRLF, callback=callback)
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/iostream.py", line 285, in read_until
+	#     future = self._set_read_callback(callback)
+	#   File "/home/andrew/.pyenv/versions/pychat/lib/python3.8/site-packages/tornado/iostream.py", line 669, in _set_read_callback
+	#     assert self._read_callback is None, "Already reading"
+	# AssertionError: Already reading
+
+
+	# steps to reproduce bugs:
+	# docker run -tp 6379:6379 redis:7.0.0-alpine3.15 - works ok
+	# kubectl port-forward redis-deployment-86744b85bf-m74md 6379:6379
+	# on minikube, minimal requirement is redis.yaml pod + service on kube, nothing else is needed
+
+	fabric_readline = type(tornado_redis.connection.readline)
+	tornado_redis.connection.readline = fabric_readline(new_readline, tornado_redis.connection)
 
 
 def new_hget(instance, *args, **kwargs):
