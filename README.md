@@ -514,125 +514,41 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 
 
 # Terraform
- I'm hosting pychat with:
+Terraform will allow you to automatically create pychat infrastructure for:
  - Cloudflare as CDN and DNS (free of charge)
- - Linode as Kubernetes provider (10$ per month of total for 1 instance of 2GB ram and 1vCPU)
+ - Linode as Kubernetes provider. It has the cheapest prices  (10$ per month is gonna be enough, that will use 1 node of 2GB ram and 1vCPU) along all providers with 500MB/s SSD, 99.99% SLA, 10Gb/s in and 2Gb/s out networks.
  - Letsencrypt as SSL certificate (free of charge)
- - Domain address (you have to decide on your own )
-
+ - Domain address (10$ per year)
  
 1. Go cloudflare and copy ZoneID and API token 
  - Copy zoneID: Go to https://dash.cloudflare.com/ - create a new site (or use existing one) grab an API Zone ID and place it into `kubernetes/terraform.tfvars`
  - Copy API token: go to https://dash.cloudflare.com/profile/api-tokens and create a new api token and place it into `kubernetes/terraform.tfvars`\
 
-If github is not defined backup is not gonna be used
-if cloudflare_api_token is not defined, certmanager is not gonna be used, turn server will not work, postfix will not send emails. Site is gonna be under local certificate
-Uplon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
+1. Backups:
+ Backups are done using private git repository. It includes sql dump + photo directory
+ - Create a private repo (e.g. github)
+ - Specify `github="git@github.com:username/backup_repo.git"` in `terraform.tfvars`
+ - Generate a new keypair with `ssh-keygen -t rsa -b 4096 -C "kube backup" -f  /tmp/sshkey/id_rsa -N ""` 
+ - Put public key to your git server (for Github it's Settings (on dashboard) -> Deploy Keys -> Add deploy key)
+ - Put `id_rsa_pub="ssh-rsa aa..."` to  `terraform.tfvars`
+ - Put `id_rsa= <<-EOT -----BEGIN OPENSSH PRIVATE KEY-----... -----END OPENSSH PRIVATE KEY----- EOT` to to  `terraform.tfvars`
+ k8s wil have a cronjob backend-backup which will run each hour.
+2. Self sign certificate: 
+ If you don't own a domain and planning to use ip + self signed certificate, this will result:
+- certmanager will not deploy be used
+- turn server will not work,
+- postfix will not send emails, including registration and password reset
+- Site is gonna be under self-signed certificate and will prompt errors.
+This is still possible
 
-1. Apply terraform:
- - `cd kubernetes/terraform; terraform apply`
- 
-# Kubernetes example with [linode](https://www.linode.com/).
+Upon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
 
-Minimal requirements: 
- - kubernetes cluster
- - own a domain, that's required for webrtc video.
- - 
- 0. Go through all files in ./kubernetes directory: 
-  - postfix/main.cf
-  - frontend-old-pychat.org.json
-  - nginx-old-pychat.org.conf
-  - turnserver.conf
-  - and other and replace domain pychat.org to yours.
- 1. Go to your provider dashboard, kubernetes -> create cluster, if it's not created yet.
- 2. After provisioning has finished, download `kubectl-config.yaml` from the linode dashboard and place it either at `~/.kube/config` or do export KUBECONFIG=/file/path . Verify that you can access the cluster with `kubectl get nodes`.
- 3. Create namespace pychat. `kubectl apply -f kubernetes/namespace.yaml`
- 4. Install nginx controller:
-  I have to come up with using custom yaml file for ingress instead of helm, since I need a few tweaks like tcp/udp port mapping, and purging redundant webhooks and etc.
-  You have 2 options, use standard way, with LoadBalancer provided by your k8s provider, which it will aditionally bill you (gcp 20$/m, linode 10$/m). Or inject some hacks which will expose ingress ip to public host.
-  4.1. Provider's load balancer
- - `kubectl apply -f ./kubernetes/ingress-controller-legacy-provider-load-balancer.yaml`
- - Check that you see load-banancer on your admin dashboard now.
- - Specify load-balancer ip address in your DNS provider.
-  4.2. Custom load balancer. This method assumes that you have ingress on some of your nodes. I only checked that it worked with a k8s cluster with a single node.
- - Edit `kubernetes/ingress-controller.yaml` and replace `externalIPs` to the one that your k8s node has.
- - `kubectl apply -f ./kubernetes/ingress-controller.yaml`
- - Specify your k8s node IP address in your dns provider.
-  5. If you don't have ssl certificate, lets use letsencrypt and certmanager to generate it for us.
- 
- 5.1. Install cert-manager
- - `kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml`
- - `helm repo add jetstack https://charts.jetstack.io`
- - `helm repo update`
- - `helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f -`
- 
- 5.2. Generate cloudflare token
- - In clodflare dashboard: Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
- - put token into `kubernetes/cf-secret-yaml`. (mine is at mine private repo)
-```yaml
- apiVersion: v1
-kind: Secret
-metadata:
-  name: cloudflare-api-token-secret
-  namespace: pychat
-type: Opaque
-stringData:
-  api-token: cf-api-token
-```
- - `kubectl apply -f kubernetes/cf-secret.yaml`
- - `kubectl apply -f kubernetes/cert-manager.yaml`
- 
- 5.3. Verify certificate
- - Check that it's created `kubectl get secret pychat-tls -o yaml -n pychat`
- - save it to file: `echo base64certfrom-tls.cert |base64 -d > lol.cert`
- - Should give your domain `openssl x509 -in ./lol.cert  -noout -text`
- 6. Edit backend secret and deploy it: `kubernetes/backend-secret.yaml` (mine is at mine private repo). Check chat/settings_example.py to understand how to fill values:
-```
-apiVersion: v1
-kind: Secret
-type: Opaque
-metadata:
-  name: backend-secret
-  namespace: pychat
-stringData:
-  MYSQL_ROOT_PASSWORD: pypass
-  MYSQL_PASSWORD: pypass
-  MYSQL_USER: pychat
-  EMAIL_PORT: '25'
-  EMAIL_HOST: 'postfix-service'
-  EMAIL_HOST_USER: ''
-  EMAIL_HOST_PASSWORD: ''
-  SECRET_KEY: '***'
-  RECAPTCHA_PRIVATE_KEY: '***'
-  RECAPTCHA_PUBLIC_KEY: '****'
-  GOOGLE_OAUTH_2_CLIENT_ID: '****'
-  FACEBOOK_ACCESS_TOKEN: '****'
-  GIPHY_API_KEY: '****'
-  FIREBASE_API_KEY: '****'
-  DEFAULT_PROFILE_ID: '**'
-  SERVER_EMAIL: 'root@pychat.org'
-```
-deploy it with `kubectl apply -f kubernetes/backend-secret.yaml`. (Tip for myself For local minikube it's better to use pychat_data)
- 8. Build images and upload it to docker registry. Mine registries contain pychat.org domain:
-  - `docker build -f ./kubernetes/DockerfileOldFrontend -t deathangel908/pychat-frontend .`; `docker push deathangel908/pychat-frontend`
-  - `docker build -f ./kubernetes/DockerfileOldBackend -t deathangel908/pychat-backend .`; `docker push deathangel908/pychat-backend`
-  - `docker build -f ./kubernetes/DockerfilePostfix -t deathangel908/pychat-postfix .` ; `docker push deathangel908/pychat-postfix`
-  - `docker build -f ./kubernetes/DockerfilePostfix -t deathangel908/pychat-coturn .` ; `docker push deathangel908/pychat-coturn`
- 9. Setup kubernetes env:
-  - `kubectl apply -f kubernetes/pv-photo.yaml`
-  - `kubectl apply -f kubernetes/pv-redis.yaml`
-  - `kubectl apply -f kubernetes/pv-mariadb.yaml`
-  - `kubectl apply -f kubernetes/config-map.yaml`
-  - `kubectl apply -f kubernetes/mariadb.yaml`
-  - `kubectl apply -f kubernetes/redis.yaml`
-  - `kubectl apply -f kubernetes/migrate-backend.yaml`
-  - `kubectl apply -f kubernetes/backend.yaml`
-  - `kubectl apply -f kubernetes/frontend.yaml`
-  - `kubectl apply -f kubernetes/ingress.yaml`
-  - `kubectl apply -f kubernetes/postfix.yaml`
-  - `kubectl apply -f kubernetes/coturn.yaml`
-
- 10. For postfix (email server) do not forget to add spf record to cloudflare. Create new TXT record on cloudflare with name/alias `@` (for root domain) and value `v=spf1 ip4:34.243.61.237` where 34:243:61:237 is your NODE's ip in kube with postfix instance. Do not confuse it with ingres/nginx instance
+1. If you already own a k8s cluster.
+All helm charts are located in kubernetes/terraform/helm, we will apply terraform from this directory to exclude linode and cloudlfare resource creation
+ - cd kubernetes/terraform/helm
+ -  create `terraform.tf` in this directory and put all required content in it.
+ - `terraform init`
+ - `terraform apply`
 
 
 # Troubleshooting

@@ -4,8 +4,7 @@ module "linode" {
 }
 
 module "cloudflare" {
-  count = var.cloud_flare_api_token == "" ? 0 : 1
-  source                  = "./cloudflare"
+  source  = "./cloudflare"
   cloud_flare_api_token = var.cloud_flare_api_token
   cloud_flare_zone_id = var.cloud_flare_zone_id
   domain_name = var.domain_name
