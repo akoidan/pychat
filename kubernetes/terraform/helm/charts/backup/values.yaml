@@ -1,0 +1,11 @@
+email: $email
+pullPolicy: Always
+image:
+  repository_path: deathangel908/pychat-backup
+  pullPolicy: Always # change to IfNotPresent for minikube
+  tag: "latest"
+
+disk-size: 15Gi
+idr_rsa: $idr_rsa
+id_rsa_pub: $id_rsa_pub
+github: $github

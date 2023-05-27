@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backend-backup
+  namespace: pychat
+  labels:
+    app: backend-backup
+spec:
+  schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backend-backup
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
+            env:
+              - name: GITHUB_REPO
+                valueFrom:
+                  secretKeyRef:
+                    key: GITHUB_REPO
+                    name: git-secret
+            envFrom:
+            - secretRef:
+                name: backend-secret
+            - configMapRef:
+                name: config-map
+            volumeMounts:
+              - mountPath: "/src/git/backend/photos"
+                name: photo
+              - mountPath: "/src/git/"
+                name: backup
+              - name: git-ssh-key
+                mountPath: /src/ssh/id_rsa
+                subPath: id_rsa
+              - name: git-ssh-key
+                mountPath: /src/ssh/id_rsa.pub
+                subPath: id_rsa.pub
+            command:
+            - /bin/bash
+            - /src/backup.sh
+          restartPolicy: OnFailure
+          volumes:
+            - name: photo
+              persistentVolumeClaim:
+                claimName: pvc-photo
+            - name: backup
+              persistentVolumeClaim:
+                claimName: pvc-backup
+            - name: git-ssh-key
+              secret:
+                secretName: git-secret

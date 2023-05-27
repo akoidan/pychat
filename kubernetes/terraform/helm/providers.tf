@@ -7,8 +7,13 @@ terraform {
   }
 }
 
+resource "local_file" "kubeconfig" {
+  content  = base64decode(var.kubeconfig)
+  filename = "${path.module}/.kubeconfig"
+}
+
 provider "helm" {
   kubernetes {
-    config_context = var.kubeconfig
+    config_path = local_file.kubeconfig.filename
   }
 }

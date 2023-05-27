@@ -1,1 +1,3 @@
-email: "deathangel908@gmail.com"
+email: $email
+cf_api_token: $cf_api_token
+domain: $domain

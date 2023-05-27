@@ -1,2 +1,4 @@
 udp_port_range_start: 49152
 udp_port_range_end: 49252
+external_ip: $external_ip
+domain: $domain

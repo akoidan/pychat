@@ -6,4 +6,5 @@ metadata:
 data:
   MYSQL_PORT: '3306'
   MYSQL_DATABASE: {{ .Values.mysql_database_name }}
-
+  MYSQL_CHARSET: utf8mb4
+  MYSQL_COLLATION: utf8mb4_general_ci
