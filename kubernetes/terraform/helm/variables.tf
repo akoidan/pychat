@@ -14,6 +14,9 @@ variable "FIREBASE_API_KEY" {}
 variable "DEFAULT_PROFILE_ID" {}
 variable "kubeconfig" {}
 variable "tls_crt" {}
+variable "htpasswd" {
+  default = ""
+}
 variable "tls_key" {}
 variable "cloud_flare_api_token" {}
 variable "mysql_password" {

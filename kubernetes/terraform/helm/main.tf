@@ -102,6 +102,20 @@ resource "helm_release" "self-signed" {
   }
 }
 
+resource "helm_release" "docker-registry" {
+  count = var.htpasswd == "" ? 0 : 1
+  name  = "docker-registry"
+  chart = "${path.module}/charts/docker-registry"
+  set {
+    name  = "domain_name"
+    value = var.domain_name
+  }
+  set {
+    name  = "htpasswd"
+    value = var.htpasswd
+  }
+}
+
 resource "helm_release" "backup" {
   count = var.github == ""? 1 : 0
   name       = "backup"

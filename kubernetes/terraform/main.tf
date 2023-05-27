@@ -18,6 +18,7 @@ module "helm" {
   ip_address = module.linode.ip_address
   cloud_flare_api_token = var.cloud_flare_api_token
   email = var.email
+  htpasswd = var.htpasswd
   github = var.github
   id_rsa = var.id_rsa
   id_rsa_pub = var.id_rsa_pub

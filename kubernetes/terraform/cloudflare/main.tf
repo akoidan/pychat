@@ -16,6 +16,15 @@ resource "cloudflare_record" "static_pychat" {
   zone_id = var.cloud_flare_zone_id
 }
 
+resource "cloudflare_record" "static_pychat" {
+  name    = "registry"
+  proxied = false
+  ttl     = 1
+  type    = "A"
+  value   =  var.ip_address
+  zone_id = var.cloud_flare_zone_id
+}
+
 resource "cloudflare_record" "www_pychat" {
   name    = "www"
   proxied = false

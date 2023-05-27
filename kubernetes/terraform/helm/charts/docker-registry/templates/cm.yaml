@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-registry
+  namespace: pychat
+data:
+  REGISTRY_AUTH_HTPASSWD_PATH: '/auth/htpasswd'
+  REGISTRY_HTTP_TLS_CERTIFICATE: '/etc/tls/crt.pem'
+  REGISTRY_HTTP_TLS_KEY: '/etc/tls/key.pem'
+  REGISTRY_AUTH: 'htpasswd'
+

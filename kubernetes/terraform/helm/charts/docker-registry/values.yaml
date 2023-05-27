@@ -1,0 +1,4 @@
+domain_name: $domain_name
+disk_size: 15Gi
+htpasswd: $htpasswd
+# docker run --entrypoint htpasswd httpd:2 -Bbn testuser testpassword

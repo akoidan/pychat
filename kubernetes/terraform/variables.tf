@@ -22,7 +22,9 @@ variable "FIREBASE_API_KEY" {
 variable "DEFAULT_PROFILE_ID" {
   default = "1"
 }
-
+variable "htpasswd" {
+  default = ""
+}
 variable "linode_token" {}
 variable "cloud_flare_zone_id" {}
 variable "cloud_flare_api_token" {
