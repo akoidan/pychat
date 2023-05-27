@@ -26,7 +26,9 @@ safeRunCommand cd "$PROJECT_ROOT"
 PROJECT_ROOT=$PWD # otherwise it's gonna be `.` instead of full path
 TMP_DIR="${TMP_DIR:-/tmp/pychat_tmp_dir}"
 FE_DIRECTORY="$PROJECT_ROOT/frontend"
-BE_DIRECTORY="$PROJECT_ROOT/backend"
+if [ -z "${BE_DIRECTORY}" ]; then
+    BE_DIRECTORY="$PROJECT_ROOT/backend"
+fi
 DIST_DIRECTORY="$FE_DIRECTORY/dist"
 ASSETS_DIR="$FE_DIRECTORY/src/assets"
 FONT_DIR="$ASSETS_DIR/font"
