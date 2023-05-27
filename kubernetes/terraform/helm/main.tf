@@ -61,15 +61,20 @@ resource "helm_release" "backend" {
 resource "helm_release" "certmanager-definition" {
   name = "cert-manager-definition"
   chart = "jetstack/cert-manager"
+  version = "1.12.0"
   namespace = "cert-manager"
-  version = "1.8.0"
+  set {
+    name = "installCRDs"
+    value = true
+  }
+  depends_on = [helm_release.global]
 }
 
-resource "time_sleep" "wait_certmanager" {
-  create_duration = "3s"
-
-  depends_on = [helm_release.certmanager-definition]
-}
+#resource "time_sleep" "wait_certmanager" {
+#  create_duration = "3s"
+#
+#  depends_on = [helm_release.certmanager-definition]
+#}
 
 resource "helm_release" certmanager {
   name  = "certmanager"
@@ -86,7 +91,7 @@ resource "helm_release" certmanager {
     name  = "cloud_flare_api_token"
     value = var.cloud_flare_api_token
   }
-  depends_on = [helm_release.global, time_sleep.wait_certmanager]
+  depends_on = [helm_release.global, helm_release.certmanager-definition]
 }
 
 resource "helm_release" "backup" {
