@@ -12,7 +12,8 @@ RUN apk add --no-cache --virtual .build-deps \
                 python3-dev \
                 python3 \
                 py3-pip \
-                jpeg-dev
+                jpeg-dev \
+                bash
 COPY ./backend/requirements.txt ./
 COPY ./download_content.sh ./download_content.sh
 
