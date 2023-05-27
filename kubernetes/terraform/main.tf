@@ -1,20 +1,10 @@
-variable "linode_token" {}
-variable "cloud_flare_zone_id" {}
-variable "cloud_flare_api_token" {}
-variable "domain_name" {}
-variable "email" {}
-variable "github" {}
-variable "id_rsa" {}
-variable "id_rsa_pub" {}
-variable "ip_address" {}
-variable "cloud_flare_api_token" {}
-
 module "linode" {
   source                  = "./linode"
   linode_token = var.linode_token
 }
 
 module "cloudflare" {
+  count = var.cloud_flare_api_token == "" ? 0 : 1
   source                  = "./cloudflare"
   cloud_flare_api_token = var.cloud_flare_api_token
   cloud_flare_zone_id = var.cloud_flare_zone_id
@@ -25,7 +15,7 @@ module "cloudflare" {
 module "helm" {
   source = "./helm"
   kubeconfig = module.linode.kubeconfig
-  domain = var.domain_name
+  domain_name = var.domain_name
   ip_address = module.linode.ip_address
   cloud_flare_api_token = var.cloud_flare_api_token
   email = var.email
@@ -39,5 +29,7 @@ module "helm" {
   FACEBOOK_ACCESS_TOKEN = var.FACEBOOK_ACCESS_TOKEN
   GIPHY_API_KEY = var.GIPHY_API_KEY
   FIREBASE_API_KEY = var.FIREBASE_API_KEY
+  tls_crt = var.tls_crt
+  tls_key = var.tls_key
   DEFAULT_PROFILE_ID = var.DEFAULT_PROFILE_ID
 }

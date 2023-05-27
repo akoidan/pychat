@@ -9,8 +9,8 @@ resource "helm_release" "backend" {
   depends_on = [helm_release.global, helm_release.mariadb, helm_release.redis]
 
   set {
-    name  = "domain"
-    value = var.domain
+    name  = "domain_name"
+    value = var.domain_name
   }
   set {
     name  = "mysql_database_name"
@@ -76,12 +76,12 @@ resource "helm_release" "certmanager-definition" {
 #  depends_on = [helm_release.certmanager-definition]
 #}
 
-resource "helm_release" certmanager {
+resource "helm_release" "certmanager" {
   name  = "certmanager"
   chart = "${path.module}/charts/certmanager"
   set {
-    name  = "domain"
-    value = var.domain
+    name  = "domain_name"
+    value = var.domain_name
   }
   set {
     name  = "email"
@@ -94,7 +94,22 @@ resource "helm_release" certmanager {
   depends_on = [helm_release.global, helm_release.certmanager-definition]
 }
 
+resource "helm_release" "self-signed" {
+  count = var.cloud_flare_api_token == "" ? 1 : 0
+  name  = "self-signed"
+  chart = "${path.module}/charts/self-signed"
+  set {
+    name  = "tls_crt"
+    value = var.tls_crt
+  }
+  set {
+     name  = "tls_key"
+    value = var.tls_key
+  }
+}
+
 resource "helm_release" "backup" {
+  count = var.github == ""? 1 : 0
   name       = "backup"
   chart      = "${path.module}/charts/backup"
   depends_on = [helm_release.mariadb, helm_release.backend] // because of pvc-photo
@@ -116,8 +131,8 @@ resource "helm_release" "backup" {
     value = var.github
   }
   set {
-    name  = "domain"
-    value = var.domain
+    name  = "domain_name"
+    value = var.domain_name
   }
   set {
     name  = "mysql_database_name"
@@ -136,7 +151,7 @@ resource "helm_release" "backup" {
 resource "helm_release" "coturn" {
   name       = "coturn"
   chart      = "${path.module}/charts/coturn"
-  depends_on = [helm_release.global, helm_release.certmanager]
+  depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
 }
 
 resource "helm_release" "frontend" {
@@ -149,15 +164,15 @@ resource "helm_release" "ingress" {
   name  = "ingress"
   chart = "${path.module}/charts/ingress"
   set {
-    name  = "domain"
-    value = var.domain
+    name  = "domain_name"
+    value = var.domain_name
 
   }
   set {
     name  = "external_ip"
     value = var.ip_address
   }
-  depends_on = [helm_release.global, helm_release.certmanager]
+  depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
 }
 
 resource "helm_release" "mariadb" {
@@ -181,7 +196,7 @@ resource "helm_release" "mariadb" {
 resource "helm_release" "postfix" {
   name       = "postfix"
   chart      = "${path.module}/charts/postfix"
-  depends_on = [helm_release.global, helm_release.certmanager]
+  depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
 }
 
 resource "helm_release" "redis" {

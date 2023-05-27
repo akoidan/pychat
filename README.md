@@ -524,7 +524,11 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 1. Go cloudflare and copy ZoneID and API token 
  - Copy zoneID: Go to https://dash.cloudflare.com/ - create a new site (or use existing one) grab an API Zone ID and place it into `kubernetes/terraform.tfvars`
  - Copy API token: go to https://dash.cloudflare.com/profile/api-tokens and create a new api token and place it into `kubernetes/terraform.tfvars`\
- 
+
+If github is not defined backup is not gonna be used
+if cloudflare_api_token is not defined, certmanager is not gonna be used, turn server will not work, postfix will not send emails. Site is gonna be under local certificate
+Uplon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
+
 1. Apply terraform:
  - `cd kubernetes/terraform; terraform apply`
  

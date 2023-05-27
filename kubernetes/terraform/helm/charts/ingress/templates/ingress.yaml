@@ -10,8 +10,8 @@ spec:
   ingressClassName: nginx
   tls:
   - hosts:
-    - "{{ .Values.domain }}"
-    - "static.{{ .Values.domain }}"
+    - "{{ .Values.domain_name }}"
+    - "static.{{ .Values.domain_name }}"
     secretName: pychat-tls
   defaultBackend:
     service:
@@ -19,7 +19,7 @@ spec:
       port:
         number: 80
   rules:
-  - host: "static.{{ .Values.domain }}"
+  - host: "static.{{ .Values.domain_name }}"
     http:
       paths:
       - path: /
@@ -29,7 +29,7 @@ spec:
             name: frontend-service
             port:
               number: 80
-  - host: "{{ .Values.domain }}"
+  - host: "{{ .Values.domain_name }}"
     http:
       paths:
       - path: /api

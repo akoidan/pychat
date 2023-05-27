@@ -8,7 +8,7 @@ mysql:
   mysql_database_name: $mysql_database_name
   mysql_user: $mysql_user
   mysql_password: $mysql_password
-domain: $domain
+domain_name: $domain_name
 DEFAULT_PROFILE_ID: "${DEFAULT_PROFILE_ID}"
 FIREBASE_API_KEY: $FIREBASE_API_KEY
 GIPHY_API_KEY: $GIPHY_API_KEY

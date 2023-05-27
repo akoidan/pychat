@@ -1,4 +1,4 @@
-variable "domain" {}
+variable "domain_name" {}
 variable "email" {}
 variable "github" {}
 variable "id_rsa" {}
@@ -13,6 +13,8 @@ variable "GIPHY_API_KEY" {}
 variable "FIREBASE_API_KEY" {}
 variable "DEFAULT_PROFILE_ID" {}
 variable "kubeconfig" {}
+variable "tls_crt" {}
+variable "tls_key" {}
 variable "cloud_flare_api_token" {}
 variable "mysql_password" {
   default = "pypass"

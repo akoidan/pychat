@@ -1,3 +1,3 @@
 email: $email
 cloud_flare_api_token: $cloud_flare_api_token
-domain: $domain
+domain_name: $domain_name
