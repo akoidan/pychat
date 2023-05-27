@@ -7,7 +7,6 @@ md5
 md5-wasm-example
 test/
 dump.rdb
-backup.sh
 data.sql
 cron-bu
 trash

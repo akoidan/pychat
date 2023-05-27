@@ -20,5 +20,5 @@ variable "FIREBASE_API_KEY" {
   default = ""
 }
 variable "DEFAULT_PROFILE_ID" {
-  default = 1
+  default = "1"
 }

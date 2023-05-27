@@ -58,6 +58,19 @@ resource "helm_release" "backend" {
   }
 }
 
+resource "helm_release" "certmanager-definition" {
+  name = "cert-manager-definition"
+  chart = "jetstack/cert-manager"
+  namespace = "cert-manager"
+  version = "1.8.0"
+}
+
+resource "time_sleep" "wait_certmanager" {
+  create_duration = "3s"
+
+  depends_on = [helm_release.certmanager-definition]
+}
+
 resource "helm_release" certmanager {
   name  = "certmanager"
   chart = "${path.module}/charts/certmanager"
@@ -70,10 +83,10 @@ resource "helm_release" certmanager {
     value = var.email
   }
   set {
-    name  = "cf_api_token"
-    value = var.cf_api_token
+    name  = "cloud_flare_api_token"
+    value = var.cloud_flare_api_token
   }
-  depends_on = [helm_release.global]
+  depends_on = [helm_release.global, time_sleep.wait_certmanager]
 }
 
 resource "helm_release" "backup" {
@@ -139,7 +152,7 @@ resource "helm_release" "ingress" {
     name  = "external_ip"
     value = var.ip_address
   }
-  depends_on = [helm_release.global]
+  depends_on = [helm_release.global, helm_release.certmanager]
 }
 
 resource "helm_release" "mariadb" {

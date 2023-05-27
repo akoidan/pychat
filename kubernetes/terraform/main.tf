@@ -7,7 +7,7 @@ variable "github" {}
 variable "id_rsa" {}
 variable "id_rsa_pub" {}
 variable "ip_address" {}
-variable "cf_api_token" {}
+variable "cloud_flare_api_token" {}
 
 module "linode" {
   source                  = "./linode"
@@ -27,7 +27,7 @@ module "helm" {
   kubeconfig = module.linode.kubeconfig
   domain = var.domain_name
   ip_address = module.linode.ip_address
-  cf_api_token = var.cloud_flare_api_token
+  cloud_flare_api_token = var.cloud_flare_api_token
   email = var.email
   github = var.github
   id_rsa = var.id_rsa

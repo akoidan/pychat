@@ -13,7 +13,7 @@ variable "GIPHY_API_KEY" {}
 variable "FIREBASE_API_KEY" {}
 variable "DEFAULT_PROFILE_ID" {}
 variable "kubeconfig" {}
-variable "cf_api_token" {}
+variable "cloud_flare_api_token" {}
 variable "mysql_password" {
   default = "pypass"
 }
