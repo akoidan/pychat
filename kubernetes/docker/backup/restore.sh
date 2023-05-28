@@ -1,12 +1,7 @@
-set -x
 WORK='/src/git'
+set -x
 cd "$WORK"
 
-commitNoFail() {
-  if ! git diff-index --quiet HEAD; then
-    git commit -m "periodic refresh at `date`" || exit 1
-  fi
-}
 
 git config --global user.email "backup@pychat.org"
 git config --global user.name "cronjob"
@@ -40,14 +35,20 @@ if [ ! -d "$WORK/.git" ]; then
   git checkout master -f &&
   git branch --set-upstream-to origin/master || exit 1
 fi
-# --comments=FALSE to avoid dump-time in dump.sql that allows empty-data commit
+
 git config pull.rebase false
-git pull && \
-mysqldump -u $MYSQL_USER -P $MYSQL_PORT -p$MYSQL_PASSWORD -h $MYSQL_HOST --comments=FALSE $MYSQL_DATABASE > "$WORK/data.sql" && \
-cd "$WORK/backend/photos" && \
-find . -size +25000k  > .gitignore && \
-cd "$WORK" && \
-git add . && \
-commitNoFail && \
-git push || exit 1
+git pull || exit 2
+
+tables=$(mysql --user=$MYSQL_USER -P $MYSQL_PORT -p$MYSQL_PASSWORD -h $MYSQL_HOST $MYSQL_DATABASE -sse "show tables;")
+if [ -f "$WORK/data.sql" ]; then
+  if [ -z "$tables" ]; then
+    echo "Database is empty, restoring it"
+    mysql --user=$MYSQL_USER -P $MYSQL_PORT -p$MYSQL_PASSWORD -h $MYSQL_HOST $MYSQL_DATABASE < "$WORK/data.sql" || exit 3
+  else
+    echo "Database tables exist, no restore is required: $tables"
+  fi
+else
+  echo "Sql $WORK/data.sql file doesnt exist"
+fi
+
 

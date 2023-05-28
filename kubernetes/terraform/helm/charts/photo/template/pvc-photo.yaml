@@ -8,6 +8,6 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: {{ .Values.disk.photo_size }}
+      storage: {{ .Values.disk_size }}
   storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
   volumeName: pv-photo

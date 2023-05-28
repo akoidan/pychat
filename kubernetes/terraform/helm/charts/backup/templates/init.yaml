@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-backend-job
+  namespace: pychat
+spec:
+  template:
+    spec:
+      containers:
+      - name: restore-backup
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
+        command: ["/bin/bash", "/bin/restore.sh"]
+        envFrom:
+        - secretRef:
+            name: secret-backup
+        - configMapRef:
+            name: cm-backup
+      restartPolicy: Never
+  backoffLimit: 4

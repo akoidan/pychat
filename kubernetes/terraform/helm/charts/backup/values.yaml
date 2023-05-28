@@ -5,7 +5,10 @@ image:
   pullPolicy: Always # change to IfNotPresent for minikube
   tag: "latest"
 
-disk-size: 15Gi
+mysql_password: $mysql_password
+mysql_user: $mysql_user
+mysql_database_name: $mysql_database_name
+
 id_rsa: $id_rsa
 id_rsa_pub: $id_rsa_pub
 github: $github

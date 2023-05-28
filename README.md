@@ -531,8 +531,8 @@ You will have to create a few accounts and setup a few variables in ./kubernetes
 
 ### Backups:
 Backups are done using private git repository. It includes sql dump + photo directory
- - Create a private repo (e.g. github)
- - Place repo url e.g. `git@github.com:username/backup_repo.git` to `terraform.tfvars` with key `github`
+ - Create a private repo. 
+ - Place repo url e.g. `git@github.com:username/backup_repo.git` to `terraform.tfvars` with key `github`. Url should be in ssh format not in https. Authorization will be done by ssh key-pair
  - Generate a new keypair with `ssh-keygen -t rsa -b 4096 -C "kube backup" -f  /tmp/sshkey/id_rsa -N ""` 
  - Put public key to your git server (for Github it's Settings (on dashboard) -> Deploy Keys -> Add deploy key)
  - Put ssh public key `ssh-rsa aa...` to  `terraform.tfvars` with key `id_rsa_pub`

@@ -6,7 +6,13 @@ resource "helm_release" "global" {
 resource "helm_release" "backend" {
   name       = "backend"
   chart      = "${path.module}/charts/backend"
-  depends_on = [helm_release.global, helm_release.mariadb, helm_release.redis]
+  depends_on = [
+    helm_release.global,
+    helm_release.mariadb,
+    helm_release.redis,
+    helm_release.photo,
+    helm_release.backup // backup will restore database state if it exists, so it should go first, otherwise backend will create its own
+  ]
 
   set {
     name  = "domain_name"
@@ -122,13 +128,13 @@ resource "helm_release" "backup" {
   count      = var.github == null ? 0 : 1
   name       = "backup"
   chart      = "${path.module}/charts/backup"
-  depends_on = [helm_release.mariadb, helm_release.backend] // because of pvc-photo
+  depends_on = [helm_release.mariadb, helm_release.photo]
 
   set {
     name  = "email"
     value = var.email
   }
-  set {
+  set_sensitive {
     name  = "id_rsa"
     value = var.id_rsa
   }
@@ -152,10 +158,15 @@ resource "helm_release" "backup" {
     name  = "mysql_user"
     value = var.mysql_user
   }
-  set {
+  set_sensitive {
     name  = "mysql_password"
     value = var.mysql_password
   }
+}
+resource "helm_release" "photo" {
+  name = "photo"
+  chart  = "${path.module}/charts/photo"
+    depends_on = [helm_release.global]
 }
 
 resource "helm_release" "coturn" {
@@ -188,7 +199,7 @@ resource "helm_release" "coturn" {
 resource "helm_release" "frontend" {
   name       = "frontend"
   chart      = "${path.module}/charts/frontend"
-  depends_on = [helm_release.global, helm_release.backend] // because of pvc-photo
+  depends_on = [helm_release.global, helm_release.photo]
 }
 
 resource "helm_release" "ingress" {

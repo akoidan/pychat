@@ -16,17 +16,11 @@ spec:
           - name: backend-backup
             imagePullPolicy: {{ .Values.image.pullPolicy }}
             image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
-            env:
-              - name: GITHUB_REPO
-                valueFrom:
-                  secretKeyRef:
-                    key: GITHUB_REPO
-                    name: git-secret
             envFrom:
             - secretRef:
-                name: backend-secret
+                name: secret-backup
             - configMapRef:
-                name: config-map
+                name: cm-backup
             volumeMounts:
               - mountPath: "/src/git/backend/photos"
                 name: photo
@@ -40,7 +34,7 @@ spec:
                 subPath: id_rsa.pub
             command:
             - /bin/bash
-            - /src/backup.sh
+            - /bin/backup.sh
           restartPolicy: OnFailure
           volumes:
             - name: photo
@@ -51,4 +45,4 @@ spec:
                 claimName: pvc-backup
             - name: git-ssh-key
               secret:
-                secretName: git-secret
+                secretName: secret-backup

@@ -6,6 +6,6 @@ spec:
   accessModes:
     - ReadWriteMany
   capacity:
-    storage: {{ .Values.disk.photo_size }}
+    storage: {{ .Values.disk_size }}
   hostPath:
-    path: /data/backup/backend/photos
+    path: /data/photos
