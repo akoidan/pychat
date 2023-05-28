@@ -8,7 +8,7 @@ image:
 mysql_password: $mysql_password
 mysql_user: $mysql_user
 mysql_database_name: $mysql_database_name
-
+disk_size: "15Gi"
 id_rsa: $id_rsa
 id_rsa_pub: $id_rsa_pub
 github: $github

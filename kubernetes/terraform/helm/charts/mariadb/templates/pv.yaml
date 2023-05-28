@@ -2,6 +2,7 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: pv-mariadb
+  napespace: pychat
 spec:
   accessModes:
     - ReadWriteOnce

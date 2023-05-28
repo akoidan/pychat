@@ -1,5 +1,5 @@
 apiVersion: v2
-name: photo storage
+name: photo
 description: this chart is used by backend, backup and moved here for explicity management
 type: application
 version: 0.1.0

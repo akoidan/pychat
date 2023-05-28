@@ -561,7 +561,9 @@ Upon linode cluster creation .kubeconfig will be generated in kubernetes/terrafo
 ### If you already own a k8s cluster.
 All helm charts are located in kubernetes/terraform/helm, we will apply terraform from this directory to exclude linode and cloudlfare resource creation
  - cd kubernetes/terraform/helm
- - create `terraform.tf` in this directory and put all required content in it.
+ - create `terraform.tfvars` in this directory and put all required content in it.
+ - `cat ~/.kube/config |base64 -w 0` and place value to `terraform.tfvars` with key `kubeconfig`
+ - Put external ip address of the k8s node you are going to deploy pychat in `terraform.tfvars` with key `ip_address`. Pychat uses NodePort, if you want to use your loadbalancer you will have to tweak ingress configuration manually.
  - `terraform init`
  - `terraform apply`
 

@@ -62,6 +62,7 @@ resource "helm_release" "backend" {
     name  = "DEFAULT_PROFILE_ID"
     value = var.DEFAULT_PROFILE_ID
   }
+  timeout = 60
 }
 
 resource "helm_release" "certmanager-definition" {
@@ -166,7 +167,7 @@ resource "helm_release" "backup" {
 resource "helm_release" "photo" {
   name = "photo"
   chart  = "${path.module}/charts/photo"
-    depends_on = [helm_release.global]
+  depends_on = [helm_release.global]
 }
 
 resource "helm_release" "coturn" {
@@ -194,12 +195,14 @@ resource "helm_release" "coturn" {
     name  = "udp_port_range_end"
     value = var.udp_port_range_end
   }
+  timeout = 30
 }
 
 resource "helm_release" "frontend" {
   name       = "frontend"
   chart      = "${path.module}/charts/frontend"
   depends_on = [helm_release.global, helm_release.photo]
+  timeout = 30
 }
 
 resource "helm_release" "ingress" {
@@ -226,6 +229,7 @@ resource "helm_release" "ingress" {
     value = var.udp_port_range_end
   }
   depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
+  timeout = 30
 }
 
 resource "helm_release" "mariadb" {
@@ -254,6 +258,7 @@ resource "helm_release" "postfix" {
     name  = "domain_name"
     value = var.domain_name
   }
+  timeout = 30
 }
 
 resource "helm_release" "redis" {

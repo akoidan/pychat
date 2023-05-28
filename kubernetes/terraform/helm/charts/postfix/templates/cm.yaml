@@ -4,4 +4,4 @@ metadata:
   name: cm-postfix
   namespace: pychat
 data:
-  DOMAIN_NAME: {{ .Values.domain_name }}
+  DOMAIN_NAME: "{{ .Values.domain_name }}"

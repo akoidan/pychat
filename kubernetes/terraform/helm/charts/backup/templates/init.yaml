@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: migrate-backend-job
+  name: restore-database-job
   namespace: pychat
 spec:
   template:
@@ -16,5 +16,26 @@ spec:
             name: secret-backup
         - configMapRef:
             name: cm-backup
+        volumeMounts:
+          - mountPath: "/src/git/backend/photos"
+            name: photo
+          - mountPath: "/src/git/"
+            name: backup
+          - name: git-ssh-key
+            mountPath: /src/ssh/id_rsa
+            subPath: id_rsa
+          - name: git-ssh-key
+            mountPath: /src/ssh/id_rsa.pub
+            subPath: id_rsa.pub
       restartPolicy: Never
+      volumes:
+        - name: photo
+          persistentVolumeClaim:
+            claimName: pvc-photo
+        - name: backup
+          persistentVolumeClaim:
+            claimName: pvc-backup
+        - name: git-ssh-key
+          secret:
+            secretName: secret-backup
   backoffLimit: 4

@@ -1,5 +1,5 @@
 apiVersion: v2
-name: certmanager
+name: backup
 description: this chart automatically generates and updates ssl certificates from letsencrypt
 type: application
 version: 0.1.0

@@ -1,7 +1,11 @@
-variable "tls_key" {}
 variable "cloud_flare_api_token" {}
 variable "kubeconfig" {}
-variable "tls_crt" {}
+variable "tls_crt" {
+  default = null
+}
+variable "tls_key" {
+  default = null
+}
 
 variable "domain_name" {}
 variable "email" {}
@@ -31,7 +35,8 @@ variable "coturn_password" {
   default = "pypass"
 }
 variable "htpasswd" {
-  default = null
+  # docker run --entrypoint htpasswd httpd:2 -Bbn pychat pypass
+  default = "pychat:$2y$05$E79PTr6mfODQGVZxr6OOwOkhcGbBUX0gd5.LlSMYIhVX4TlQZ73jm"
 }
 variable "mysql_password" {
   default = "pypass"
