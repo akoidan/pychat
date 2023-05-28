@@ -10,6 +10,7 @@ module "cloudflare" {
   cloud_flare_zone_id   = var.cloud_flare_zone_id
   domain_name           = var.domain_name
   ip_address            = module.linode.ip_address
+  htpasswd              = var.htpasswd
 }
 
 module "helm" {

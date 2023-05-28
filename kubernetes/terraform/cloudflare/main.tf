@@ -17,6 +17,7 @@ resource "cloudflare_record" "static_pychat" {
 }
 
 resource "cloudflare_record" "registry_pychat" {
+  count = var.htpasswd == null ? 0 : 1
   name    = "registry"
   proxied = false
   ttl     = 1
