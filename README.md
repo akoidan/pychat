@@ -598,7 +598,10 @@ Apply terraform configuration with:
 1. Certmanager fails
  - Check the logs of the certmanager pods. 
  - Note that letsencrypt allows you max 5 cetrificates in 160 hours. If you used all tries, use another domain or subdomain
- - 
+1. Terraform apply produces errors like `Unexpected EOF`.
+ - Seems like your k8s providers API exceed limits and it cuts the k8s request. You can try it with  `terraform apply -parallelism=1`. Your cluster will deploy for a while, but it has less chance to get into this situation
+ - You can also execute `terraform apply` a few times so it finishes creating resources that it failed to inspect. Note that if you got a certificate already, I recomend you to back it up from `pychat-tls` secret in order to avoid cetrification fails describe above
+ 
 # TODO
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
 * user1 writes a message, user1 goes offline, user 2 opens a chat from 1st devices and goes offline, user 2 opens a chat from 2nd devices and responds in its thread and goes offline, user2 opens first deviecs and thread messages count = 0
