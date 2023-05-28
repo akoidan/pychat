@@ -164,7 +164,7 @@ resource "helm_release" "backup" {
     value = var.mysql_password
   }
   # Backup should restore the database state before backend goes up
-  timeout = 600
+  timeout = 1200
   wait_for_jobs = true
   wait = true
 }
@@ -199,14 +199,12 @@ resource "helm_release" "coturn" {
     name  = "udp_port_range_end"
     value = var.udp_port_range_end
   }
-  timeout = 30
 }
 
 resource "helm_release" "frontend" {
   name       = "frontend"
   chart      = "${path.module}/charts/frontend"
   depends_on = [helm_release.global, helm_release.photo]
-  timeout = 30
 }
 
 resource "helm_release" "ingress" {
@@ -218,7 +216,7 @@ resource "helm_release" "ingress" {
   }
   set_sensitive {
     name  = "htpasswd"
-    value = var.htpasswd
+    value = var.htpasswd == null ? "" : var.htpasswd
   }
   set {
     name  = "external_ip"
@@ -233,7 +231,6 @@ resource "helm_release" "ingress" {
     value = var.udp_port_range_end
   }
   depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
-  timeout = 30
 }
 
 resource "helm_release" "mariadb" {
@@ -262,7 +259,6 @@ resource "helm_release" "postfix" {
     name  = "domain_name"
     value = var.domain_name
   }
-  timeout = 30
 }
 
 resource "helm_release" "redis" {
