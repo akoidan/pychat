@@ -1,8 +1,6 @@
 # cd <root>
-# docker build --build-arg PYCHAT_GIT_HASH=`git rev-parse --short=10 HEAD`  -f ./kubernetes/docker/DockerfileOldFrontend -t deathangel908/pychat-frontend .
+# docker build --build-arg PYCHAT_GIT_HASH=`git rev-parse --short=10 HEAD`  -f ./kubernetes/docker/frontend/Dockerfile -t deathangel908/pychat-frontend .
 # docker push deathangel908/pychat-frontend
-# https://stackoverflow.com/a/49478889/3872976
-# minikube tunnel service/backend-service
 FROM node:16.15-alpine3.15 as builder
 
 WORKDIR /usr/src/frontend
@@ -15,7 +13,7 @@ RUN yarn install --frozen-lockfile
 COPY ./frontend/tsconfig.node.json ./frontend/tsconfig.json ./
 COPY ./frontend/src ./src/
 COPY ./frontend/build ./build/
-COPY ./kubernetes/docker/frontend-old-pychat.org.json ./build/production.json
+COPY ./kubernetes/docker/frontend/frontend-old-pychat.org.json ./build/production.json
 
 ARG PYCHAT_GIT_HASH
 ENV PYCHAT_GIT_HASH=${PYCHAT_GIT_HASH}
@@ -26,5 +24,5 @@ RUN yarn build
 FROM nginx:1.21.6-alpine
 
 COPY --from=builder /usr/src/frontend/dist /srv/http/dist
-COPY kubernetes/nginx-old-pychat.org.conf /etc/nginx/conf.d/pychat.conf
+COPY ./kubernetes/docker/frontend/nginx-old-pychat.org.conf /etc/nginx/conf.d/pychat.conf
 RUN rm /etc/nginx/conf.d/default.conf

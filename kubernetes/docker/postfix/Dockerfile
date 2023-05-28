@@ -1,3 +1,4 @@
+# cd <root>
 # docker build -f ./kubernetes/docker/postfix/Dockerfile -t deathangel908/pychat-postfix .
 # docker push deathangel908/pychat-postfix
 

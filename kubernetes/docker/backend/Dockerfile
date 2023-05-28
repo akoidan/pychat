@@ -1,4 +1,5 @@
-# docker build -f ./kubernetes/docker/DockerfileOldBackend -t deathangel908/pychat-backend .
+# cd <root>
+# docker build -f ./kubernetes/docker/backend/Dockerfile -t deathangel908/pychat-backend .
 # docker push deathangel908/pychat-backend
 FROM alpine:3.15
 

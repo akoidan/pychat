@@ -7,7 +7,7 @@
 !newback/tsconfig.build.json
 !newback/tsconfig.json
 !newback/src
-!backup.sh
+!kubernetes/docker/backup/backup.sh
 !common/src
 !kubernetes
 !frontend/src
@@ -20,9 +20,9 @@ frontend/build/production.json
 !frontend/tsconfig.node.json
 !docker/populate
 !docker/tornado
-!kubernetes/docker/frontend-old-pychat.org.json
-!kubernetes/docker/nginx-old-pychat.org.conf
-!kubernetes/docker/frontend-minikube.json
+!kubernetes/docker/frontend/frontend-old-pychat.org.json
+!kubernetes/docker/frontend/nginx-old-pychat.org.conf
+!kubernetes/docker/frontend/frontend-minikube.json
 !kubernetes/docker/docker/postfix/postfix_replacer.bash
 !docker/nginx.conf
 !docker/nginx

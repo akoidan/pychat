@@ -1,7 +1,6 @@
 # cd <root>
-# docker build -f ./kubernetes/docker/DockerfileFrontend -t deathangel908/pychat-frontend .
-# https://stackoverflow.com/a/49478889/3872976
-# minikube tunnel service/backend-service
+# docker build --build-arg PYCHAT_GIT_HASH=`git rev-parse --short=10 HEAD`  -f ./kubernetes/docker/frontend/DockerfileNewFrontend -t deathangel908/pychat-frontend .
+# docker push deathangel908/pychat-frontend
 FROM node:16.15-alpine3.15 as builder
 
 WORKDIR /usr/src/frontend
@@ -28,5 +27,5 @@ RUN yarn build
 FROM nginx:1.21.6-alpine
 
 COPY --from=builder /usr/src/frontend/dist /srv/http/dist
-COPY kubernetes/nginx.conf /etc/nginx/conf.d/pychat.conf
+COPY ./kubernetes/docker/frontend/nginx.conf /etc/nginx/conf.d/pychat.conf
 RUN rm /etc/nginx/conf.d/default.conf

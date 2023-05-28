@@ -8,7 +8,7 @@ commitNoFail() {
   fi
 }
 
-git config --global user.email "deathangel908@gmail.com"
+git config --global user.email "backup@pychat.org"
 git config --global user.name "cronjob"
 mkdir ~/.ssh -p
 cp /src/ssh/id_rsa ~/.ssh/id_rsa

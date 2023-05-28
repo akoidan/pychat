@@ -1,3 +1,4 @@
+# cd <root>
 # docker build -f ./kubernetes/docker/turnserver/Dockerfile -t deathangel908/pychat-coturn .
 # docker push deathangel908/pychat-coturn
 
