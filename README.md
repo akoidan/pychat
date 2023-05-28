@@ -519,39 +519,52 @@ Terraform will allow you to automatically create pychat infrastructure for:
  - Linode as Kubernetes provider. It has the cheapest prices  (10$ per month is gonna be enough, that will use 1 node of 2GB ram and 1vCPU) along all providers with 500MB/s SSD, 99.99% SLA, 10Gb/s in and 2Gb/s out networks.
  - Letsencrypt as SSL certificate (free of charge)
  - Domain address (10$ per year)
+You will have to create a few accounts and setup a few variables in ./kubernetes/terraform/terraform.tfvars below
  
-1. Go cloudflare and copy ZoneID and API token 
- - Copy zoneID: Go to https://dash.cloudflare.com/ - create a new site (or use existing one) grab an API Zone ID and place it into `kubernetes/terraform.tfvars`
- - Copy API token: go to https://dash.cloudflare.com/profile/api-tokens and create a new api token and place it into `kubernetes/terraform.tfvars`\
+### Cloudflare 
+ - Sign in to [Cloudflare](https://www.cloudflare.com/) and copy ZoneID and API token 
+ - Copy zoneID: Go to https://dash.cloudflare.com/ - create a new site (or use existing one) grab an API Zone ID and place it into `kubernetes/terraform.tfvars` with key `cloud_flare_zone_id`
+ - Copy API token: go to https://dash.cloudflare.com/profile/api-tokens and create a new api token and place it into `kubernetes/terraform.tfvars` with key `cloud_flare_api_token`
 
-1. Backups:
- Backups are done using private git repository. It includes sql dump + photo directory
+### Linode
+ Sign in to [Linode](http://linode.com/), go to Profile -> Api tokens -> Create A Personal Access Token -> Select Kubernetes & Linodes -> Create Token. Put that token to`kubernetes/terraform.tfvars` with key `linode_token`
+
+### Backups:
+Backups are done using private git repository. It includes sql dump + photo directory
  - Create a private repo (e.g. github)
- - Specify `github="git@github.com:username/backup_repo.git"` in `terraform.tfvars`
+ - Place repo url e.g. `git@github.com:username/backup_repo.git` to `terraform.tfvars` with key `github`
  - Generate a new keypair with `ssh-keygen -t rsa -b 4096 -C "kube backup" -f  /tmp/sshkey/id_rsa -N ""` 
  - Put public key to your git server (for Github it's Settings (on dashboard) -> Deploy Keys -> Add deploy key)
- - Put `id_rsa_pub="ssh-rsa aa..."` to  `terraform.tfvars`
- - Put `id_rsa= <<-EOT -----BEGIN OPENSSH PRIVATE KEY-----... -----END OPENSSH PRIVATE KEY----- EOT` to to  `terraform.tfvars`
- k8s wil have a cronjob backend-backup which will run each hour.
-2. Self sign certificate: 
- If you don't own a domain and planning to use ip + self signed certificate, this will result:
+ - Put ssh public key `ssh-rsa aa...` to  `terraform.tfvars` with key `id_rsa_pub`
+ - Put private key `-----BEGIN OPENSSH PRIVATE KEY-----... -----END OPENSSH PRIVATE KEY--` to `terraform.tfvars` with key `id_rsa`. You can use [this](https://stackoverflow.com/a/66646420/3872976) lifehack for multiline variable
+k8s wil have a cronjob backend-backup which will run each hour.
+
+### Other keys
+Other keys are required to be specified in `terraform.tfvars`
+ - put `domain_name`
+### Self sign certificate (Optional):
+Skip this if you did cloudflare step.
+If you don't own a domain (and planning to use ip + self signed certificate, this will result:
 - certmanager will not deploy be used
 - turn server will not work,
 - postfix will not send emails, including registration and password reset
 - Site is gonna be under self-signed certificate and will prompt errors.
 This is still possible
-
 Upon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
 
-1. If you already own a k8s cluster.
+### If you already own a k8s cluster.
 All helm charts are located in kubernetes/terraform/helm, we will apply terraform from this directory to exclude linode and cloudlfare resource creation
  - cd kubernetes/terraform/helm
- -  create `terraform.tf` in this directory and put all required content in it.
+ - create `terraform.tf` in this directory and put all required content in it.
  - `terraform init`
  - `terraform apply`
 
+### Other variables in terraform.tfvars
+ - domain_name - your host origin domain name. It's gonna be used in turnserver postfix static nginx, cloudflare and other configuration
+ - email - It's gonna be used in cf issuer and a few other places
+ - Other variables that's gonna be proxied as env variables for python backend. Check backend/chat/settings.example for docs. Those includes but not limited to DEFAULT_PROFILE_ID SECRET_KEY RECAPTCHA_PRIVATE_KEY RECAPTCHA_PUBLIC_KEY GOOGLE_OAUTH_2_CLIENT_ID FACEBOOK_ACCESS_TOKEN GIPHY_API_KEY FIREBASE_API_KEY 
 
-# Troubleshooting
+### Troubleshooting
 1. How to icrease maximum upload file:
  - Change nginx configuration  ``   client_max_body_size 75M;`
  - In addition to above, if you're using k8s + ingress, change `ingress.yaml` nginx.ingress.kubernetes.io/proxy-body-size: 75m 
