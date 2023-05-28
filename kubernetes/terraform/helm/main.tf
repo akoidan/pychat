@@ -164,7 +164,7 @@ resource "helm_release" "backup" {
     value = var.mysql_password
   }
   # Backup should restore the database state before backend goes up
-  timeout = 1200
+  timeout = 1800 # Practically my backup was running for 20m until it finished
   wait_for_jobs = true
   wait = true
 }

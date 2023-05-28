@@ -2,6 +2,13 @@ set -x
 WORK='/src/git'
 cd "$WORK"
 
+
+tables=$(mysql --user=$MYSQL_USER -P $MYSQL_PORT -p$MYSQL_PASSWORD -h $MYSQL_HOST $MYSQL_DATABASE -sse "show tables;")
+if [ -z "$tables" ]; then
+    echo "Database is not created yet, nothing to backup"
+    exit 1
+fi
+
 commitNoFail() {
   if ! git diff-index --quiet HEAD; then
     git commit -m "periodic refresh at `date`" || exit 1
