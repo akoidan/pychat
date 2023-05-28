@@ -15,6 +15,10 @@
 !frontend/build
 frontend/build/production.json
 !frontend/package.json
+!backend/requirements.txt
+!backend/chat
+!backend/templates
+!backend/manage.py
 !frontend/yarn.lock
 !frontend/tsconfig.json
 !frontend/tsconfig.node.json
