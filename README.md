@@ -552,6 +552,12 @@ If you don't own a domain (and planning to use ip + self signed certificate, thi
 This is still possible
 Upon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
 
+
+### Other variables in terraform.tfvars
+ - domain_name - your host origin domain name. It's gonna be used in turnserver postfix static nginx, cloudflare and other configuration
+ - email - It's gonna be used in cf issuer and a few other places
+ - Other variables that's gonna be proxied as env variables for python backend. Check backend/chat/settings.example for docs. Those includes but not limited to DEFAULT_PROFILE_ID SECRET_KEY RECAPTCHA_PRIVATE_KEY RECAPTCHA_PUBLIC_KEY GOOGLE_OAUTH_2_CLIENT_ID FACEBOOK_ACCESS_TOKEN GIPHY_API_KEY FIREBASE_API_KEY 
+
 ### If you already own a k8s cluster.
 All helm charts are located in kubernetes/terraform/helm, we will apply terraform from this directory to exclude linode and cloudlfare resource creation
  - cd kubernetes/terraform/helm
@@ -559,11 +565,30 @@ All helm charts are located in kubernetes/terraform/helm, we will apply terrafor
  - `terraform init`
  - `terraform apply`
 
-### Other variables in terraform.tfvars
- - domain_name - your host origin domain name. It's gonna be used in turnserver postfix static nginx, cloudflare and other configuration
- - email - It's gonna be used in cf issuer and a few other places
- - Other variables that's gonna be proxied as env variables for python backend. Check backend/chat/settings.example for docs. Those includes but not limited to DEFAULT_PROFILE_ID SECRET_KEY RECAPTCHA_PRIVATE_KEY RECAPTCHA_PUBLIC_KEY GOOGLE_OAUTH_2_CLIENT_ID FACEBOOK_ACCESS_TOKEN GIPHY_API_KEY FIREBASE_API_KEY 
+### Frontend
 
+Frontend can't be built during runtime, thus you will need to built it yourself. Also you need to have accesss to some docker registry, you can use dockerhub as it's free  of charge. This repo also can host private docker registry built from kubernetes/terraform/helm/charts/docker-registry so you won't have to create one.\
+Replace values in `/kubernetes/docker/frontend/frontend-old-pychat.org.json` in and run from project root directory.
+```bash
+docker build --build-arg PYCHAT_GIT_HASH=`git rev-parse --short=10 HEAD`  -f ./kubernetes/docker/frontend/Dockerfile -t deathangel908/pychat-frontend .
+docker push deathangel908/pychat-frontend
+```
+Note that tag `deathangel908/pychat-frontend` should be one pointing to your registry
+Replace value in `repository_path` in `./kubernetes/terraform/helm/charts/frontend/values.yaml` to one pointing to you registry
+In case you use private registry from this terraform image use:
+ - generate user-password with: `docker run --entrypoint htpasswd httpd:2 -Bbn testuser testpassword`
+ - put output  to `terraform.tfvars` with key `htpasswd`
+ - Fully apply terraform configuration. Most services could be down
+ - Login to your private registry with `docker login --username=testuser --password=testpassword registry.pychat.org`
+ - And do push like above `docker push deathangel908/pychat-frontend` with your tag
+ - If you kill frontend pod now, it should repull from your repo
+
+### Apply Terrraform
+Apply terraform configuration with:
+ - `terraform init`
+ - `terraform plan`
+ - `terraform apply`
+ 
 ### Troubleshooting
 1. How to icrease maximum upload file:
  - Change nginx configuration  ``   client_max_body_size 75M;`
