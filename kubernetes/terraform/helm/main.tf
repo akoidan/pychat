@@ -230,7 +230,9 @@ resource "helm_release" "ingress" {
     name  = "udp_port_range_end"
     value = var.udp_port_range_end
   }
-  depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
+  # TODO
+  #  depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
+  depends_on = [helm_release.global]
 }
 
 resource "helm_release" "mariadb" {
