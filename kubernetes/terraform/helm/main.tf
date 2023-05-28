@@ -16,19 +16,19 @@ resource "helm_release" "backend" {
     name  = "mysql_database_name"
     value = var.mysql_database_name
   }
-  set {
+  set_sensitive {
     name  = "mysql_user"
     value = var.mysql_user
   }
-  set {
+  set_sensitive {
     name  = "mysql_password"
     value = var.mysql_password
   }
-  set {
+  set_sensitive {
     name  = "SECRET_KEY"
     value = var.SECRET_KEY
   }
-  set {
+  set_sensitive {
     name  = "RECAPTCHA_PRIVATE_KEY"
     value = var.RECAPTCHA_PRIVATE_KEY
   }
@@ -36,19 +36,19 @@ resource "helm_release" "backend" {
     name  = "RECAPTCHA_PUBLIC_KEY"
     value = var.RECAPTCHA_PUBLIC_KEY
   }
-  set {
+  set_sensitive {
     name  = "GOOGLE_OAUTH_2_CLIENT_ID"
     value = var.GOOGLE_OAUTH_2_CLIENT_ID
   }
-  set {
+  set_sensitive {
     name  = "FACEBOOK_ACCESS_TOKEN"
     value = var.FACEBOOK_ACCESS_TOKEN
   }
-  set {
+  set_sensitive {
     name  = "GIPHY_API_KEY"
     value = var.GIPHY_API_KEY
   }
-  set {
+  set_sensitive {
     name  = "FIREBASE_API_KEY"
     value = var.FIREBASE_API_KEY
   }
@@ -81,7 +81,7 @@ resource "helm_release" "certmanager" {
     name  = "email"
     value = var.email
   }
-  set {
+  set_sensitive {
     name  = "cloud_flare_api_token"
     value = var.cloud_flare_api_token
   }
@@ -89,14 +89,14 @@ resource "helm_release" "certmanager" {
 }
 
 resource "helm_release" "self-signed" {
-  count = var.cloud_flare_api_token == "" ? 1 : 0
+  count = var.cloud_flare_api_token == null ? 1 : 0
   name  = "self-signed"
   chart = "${path.module}/charts/self-signed"
-  set {
+  set_sensitive {
     name  = "tls_crt"
     value = var.tls_crt
   }
-  set {
+  set_sensitive {
     name  = "tls_key"
     value = var.tls_key
   }
@@ -104,14 +104,14 @@ resource "helm_release" "self-signed" {
 }
 
 resource "helm_release" "docker-registry" {
-  count = var.htpasswd == "" ? 0 : 1
+  count = var.htpasswd == null ? 0 : 1
   name  = "docker-registry"
   chart = "${path.module}/charts/docker-registry"
   set {
     name  = "domain_name"
     value = var.domain_name
   }
-  set {
+  set_sensitive {
     name  = "htpasswd"
     value = var.htpasswd
   }
@@ -119,7 +119,7 @@ resource "helm_release" "docker-registry" {
 }
 
 resource "helm_release" "backup" {
-  count      = var.github == ""? 1 : 0
+  count      = var.github == null ? 0 : 1
   name       = "backup"
   chart      = "${path.module}/charts/backup"
   depends_on = [helm_release.mariadb, helm_release.backend] // because of pvc-photo
@@ -198,7 +198,7 @@ resource "helm_release" "ingress" {
     name  = "domain_name"
     value = var.domain_name
   }
-  set {
+  set_sensitive {
     name  = "htpasswd"
     value = var.htpasswd
   }

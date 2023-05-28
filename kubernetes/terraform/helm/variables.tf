@@ -1,3 +1,8 @@
+variable "tls_key" {}
+variable "cloud_flare_api_token" {}
+variable "kubeconfig" {}
+variable "tls_crt" {}
+
 variable "domain_name" {}
 variable "email" {}
 variable "github" {}
@@ -12,8 +17,7 @@ variable "FACEBOOK_ACCESS_TOKEN" {}
 variable "GIPHY_API_KEY" {}
 variable "FIREBASE_API_KEY" {}
 variable "DEFAULT_PROFILE_ID" {}
-variable "kubeconfig" {}
-variable "tls_crt" {}
+
 variable "udp_port_range_start" {
   default = 49152
 }
@@ -27,10 +31,8 @@ variable "coturn_password" {
   default = "pypass"
 }
 variable "htpasswd" {
-  default = ""
+  default = null
 }
-variable "tls_key" {}
-variable "cloud_flare_api_token" {}
 variable "mysql_password" {
   default = "pypass"
 }

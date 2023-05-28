@@ -6,6 +6,6 @@ spec:
   accessModes:
     - ReadWriteOnce
   capacity:
-    storage: 1Gi
+    storage: {{ .Values.disk_size }}
   hostPath:
     path: /data/redis

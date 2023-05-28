@@ -1,6 +1,7 @@
 module "linode" {
   source                  = "./linode"
   linode_token = var.linode_token
+  linode_app_label = var.linode_app_label
 }
 
 module "cloudflare" {

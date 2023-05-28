@@ -4,13 +4,13 @@ metadata:
   name: cm-backend
   namespace: pychat
 data:
-  MYSQL_PORT: '3306'
+  MYSQL_PORT: "3306"
   MYSQL_DATABASE: {{ .Values.mysql_database_name }}
   MYSQL_HOST: mariadb-service
   REDIS_HOST: redis-service
-  REDIS_PORT: '6379'
-  APPLICATION_PORT: '8888'
-  REDIS_PUBSUB: 'true'
-  EMAIL_PORT: '25'
-  EMAIL_HOST: 'postfix-service'
+  REDIS_PORT: "6379"
+  APPLICATION_PORT: "8888"
+  REDIS_PUBSUB: "true"
+  EMAIL_PORT: "25"
+  EMAIL_HOST: "postfix-service"
   DEFAULT_PROFILE_ID: "{{ .Values.DEFAULT_PROFILE_ID }}"
