@@ -163,6 +163,10 @@ resource "helm_release" "backup" {
     name  = "mysql_password"
     value = var.mysql_password
   }
+  # Backup should restore the database state before backend goes up
+  timeout = 600
+  wait_for_jobs = true
+  wait = true
 }
 resource "helm_release" "photo" {
   name = "photo"

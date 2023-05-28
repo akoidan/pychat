@@ -36,7 +36,7 @@ variable "coturn_password" {
 }
 variable "htpasswd" {
   # docker run --entrypoint htpasswd httpd:2 -Bbn pychat pypass
-  default = "pychat:$2y$05$E79PTr6mfODQGVZxr6OOwOkhcGbBUX0gd5.LlSMYIhVX4TlQZ73jm"
+  default = null
 }
 variable "mysql_password" {
   default = "pypass"
