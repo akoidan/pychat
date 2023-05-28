@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-postfix
+  namespace: pychat
+data:
+  DOMAIN_NAME: {{ .Values.domain_name }}

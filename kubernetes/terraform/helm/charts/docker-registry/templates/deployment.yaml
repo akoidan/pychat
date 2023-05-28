@@ -26,15 +26,13 @@ spec:
             path: /
             port: 5000
         envFrom:
-        - secretRef:
-            name: docker-secret
+        - configMapRef:
+            name: cm-registry
         volumeMounts:
-        - name: pychat-registry-tls
-          mountPath: "/etc/tls"
-          readOnly: true
         - mountPath: "/var/lib/registry"
           name: registry-data
         - mountPath: "/auth"
+          readOnly: true
           name: registry-auth-file
       volumes:
         - name: registry-data
@@ -46,11 +44,3 @@ spec:
             items:
               - key: htpasswd
                 path: htpasswd
-        - name: pychat-registry-tls
-          secret:
-            secretName: pychat-tls
-            items:
-              - key: tls.crt
-                path: crt.pem
-              - key: tls.key
-                path: key.pem

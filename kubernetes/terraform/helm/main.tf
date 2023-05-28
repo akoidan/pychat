@@ -162,6 +162,27 @@ resource "helm_release" "coturn" {
   name       = "coturn"
   chart      = "${path.module}/charts/coturn"
   depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
+
+  set {
+    name  = "domain_name"
+    value = var.domain_name
+  }
+  set {
+    name  = "username"
+    value = var.coturn_username
+  }
+  set {
+    name  = "password"
+    value = var.coturn_password
+  }
+  set {
+    name  = "udp_port_range_start"
+    value = var.udp_port_range_start
+  }
+  set {
+    name  = "udp_port_range_end"
+    value = var.udp_port_range_end
+  }
 }
 
 resource "helm_release" "frontend" {
@@ -184,6 +205,14 @@ resource "helm_release" "ingress" {
   set {
     name  = "external_ip"
     value = var.ip_address
+  }
+  set {
+    name  = "udp_port_range_start"
+    value = var.udp_port_range_start
+  }
+  set {
+    name  = "udp_port_range_end"
+    value = var.udp_port_range_end
   }
   depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
 }
@@ -210,6 +239,10 @@ resource "helm_release" "postfix" {
   name       = "postfix"
   chart      = "${path.module}/charts/postfix"
   depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
+  set {
+    name  = "domain_name"
+    value = var.domain_name
+  }
 }
 
 resource "helm_release" "redis" {

@@ -1,5 +1,5 @@
 # cd <root>
-# docker build -f ./kubernetes/DockerfileBackend -t deathangel908/pychat-backend .
+# docker build -f ./kubernetes/docker/DockerfileBackend -t deathangel908/pychat-backend .
 # https://stackoverflow.com/a/49478889/3872976
 # minikube tunnel service/backend-service
 # chrome http://192.168.49.2:30002/

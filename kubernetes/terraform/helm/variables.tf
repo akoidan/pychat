@@ -14,6 +14,18 @@ variable "FIREBASE_API_KEY" {}
 variable "DEFAULT_PROFILE_ID" {}
 variable "kubeconfig" {}
 variable "tls_crt" {}
+variable "udp_port_range_start" {
+  default = 49152
+}
+variable "udp_port_range_end" {
+  default = 49352
+}
+variable "coturn_username" {
+  default = "pychat"
+}
+variable "coturn_password" {
+  default = "pypass"
+}
 variable "htpasswd" {
   default = ""
 }

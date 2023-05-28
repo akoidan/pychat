@@ -1,4 +1,4 @@
-# docker build -f ./kubernetes/DockerfileBackup -t deathangel908/pychat-backup .
+# docker build -f ./kubernetes/docker/DockerfileBackup -t deathangel908/pychat-backup .
 # docker push deathangel908/pychat-backup
 
 FROM alpine:3.15

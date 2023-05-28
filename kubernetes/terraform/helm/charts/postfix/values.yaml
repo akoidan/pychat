@@ -2,3 +2,4 @@ image:
   repository_path: deathangel908/pychat-postfix
   pullPolicy: Always # change to IfNotPresent for minikube
   tag: "latest"
+domain_name: $domain_name

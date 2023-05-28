@@ -26,8 +26,11 @@ spec:
                 path: key.pem
       containers:
         - name: coturn
-          imagePullPolicy: Always
-          image: deathangel908/pychat-coturn
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
+          envFrom:
+          - configMapRef:
+              name: cm-coturn
           volumeMounts:
           - name: pychat-coturn-tls
             mountPath: "/etc/tls"

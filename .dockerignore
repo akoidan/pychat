@@ -20,9 +20,10 @@ frontend/build/production.json
 !frontend/tsconfig.node.json
 !docker/populate
 !docker/tornado
-!kubernetes/frontend-old-pychat.org.json
-!kubernetes/nginx-old-pychat.org.conf
-!kubernetes/frontend-minikube.json
+!kubernetes/docker/frontend-old-pychat.org.json
+!kubernetes/docker/nginx-old-pychat.org.conf
+!kubernetes/docker/frontend-minikube.json
+!kubernetes/docker/docker/postfix/postfix_replacer.bash
 !docker/nginx.conf
 !docker/nginx
 !docker/pychat.org/certificate.crt

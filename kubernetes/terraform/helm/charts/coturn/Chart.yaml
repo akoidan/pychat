@@ -1,5 +1,5 @@
 apiVersion: v2
-name: mariadb
+name: coturn
 description: coturn sip server
 type: application
 version: 0.1.0

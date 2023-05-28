@@ -14,7 +14,7 @@ RUN yarn install --frozen-lockfile
 COPY ./frontend/tsconfig.node.json ./frontend/tsconfig.json ./
 COPY ./frontend/src ./src/
 COPY ./frontend/build ./build/
-COPY ./kubernetes/frontend-minikube.json ./build/production.json
+COPY ./kubernetes/docker/frontend-minikube.json ./build/production.json
 
 ARG PYCHAT_GIT_HASH
 ENV PYCHAT_GIT_HASH=${PYCHAT_GIT_HASH}

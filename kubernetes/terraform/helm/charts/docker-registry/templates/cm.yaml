@@ -5,7 +5,6 @@ metadata:
   namespace: pychat
 data:
   REGISTRY_AUTH_HTPASSWD_PATH: '/auth/htpasswd'
-  REGISTRY_HTTP_TLS_CERTIFICATE: '/etc/tls/crt.pem'
-  REGISTRY_HTTP_TLS_KEY: '/etc/tls/key.pem'
   REGISTRY_AUTH: 'htpasswd'
+  REGISTRY_AUTH_HTPASSWD_REALM: "registry.{{ .Values.domain_name }}"
 
