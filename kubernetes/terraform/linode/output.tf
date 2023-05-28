@@ -1,5 +1,5 @@
 output "kubeconfig" {
-  value = linode_lke_cluster.pychat.kubeconfig
+  value     = linode_lke_cluster.pychat.kubeconfig
   sensitive = true
 }
 
