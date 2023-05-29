@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: pv-registry
-  namespace: pychat
+  name: pv-pychat-registry
 spec:
   accessModes:
     - ReadWriteOnce

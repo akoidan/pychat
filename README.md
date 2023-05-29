@@ -542,6 +542,7 @@ k8s wil have a cronjob backend-backup which will run each hour.
 ### Other keys
 Other keys are required to be specified in `terraform.tfvars`
  - put `domain_name`
+ 
 ### Self sign certificate (Optional):
 Skip this if you did cloudflare step.
 If you don't own a domain (and planning to use ip + self signed certificate, this will result:
@@ -551,7 +552,6 @@ If you don't own a domain (and planning to use ip + self signed certificate, thi
 - Site is gonna be under self-signed certificate and will prompt errors.
 This is still possible
 Upon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
-
 
 ### Other variables in terraform.tfvars
  - domain_name - your host origin domain name. It's gonna be used in turnserver postfix static nginx, cloudflare and other configuration
@@ -595,9 +595,12 @@ Apply terraform configuration with:
 1. How to icrease maximum upload file:
  - Change nginx configuration  ``   client_max_body_size 75M;`
  - In addition to above, if you're using k8s + ingress, change `ingress.yaml` nginx.ingress.kubernetes.io/proxy-body-size: 75m 
-1. Certmanager fails
+ 
+1. Certmanager fails or services that depends on SSL won't start (e.g. Postfix or Coturn)
+Certmanager should create  pychat_tls sercret in namespace pychat. It creates a private key and puts it into letsencrypt-prod secret. Then it tries to issue it against letsencrypt server. 
  - Check the logs of the certmanager pods. 
  - Note that letsencrypt allows you max 5 cetrificates in 160 hours. If you used all tries, use another domain or subdomain
+ 
 1. Terraform apply produces errors like `Unexpected EOF`.
  - Seems like your k8s providers API exceed limits and it cuts the k8s request. You can try it with  `terraform apply -parallelism=1`. Your cluster will deploy for a while, but it has less chance to get into this situation
  - You can also execute `terraform apply` a few times so it finishes creating resources that it failed to inspect. Note that if you got a certificate already, I recomend you to back it up from `pychat-tls` secret in order to avoid cetrification fails describe above

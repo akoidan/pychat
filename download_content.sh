@@ -112,9 +112,9 @@ minikube_delete_all() {
   kubectl delete -f kubernetes/redis.yaml --wait=true
   kubectl delete -f kubernetes/secret.yaml --wait=true
   kubectl delete -f kubernetes/config-map.yaml --wait=true
-  kubectl delete -f kubernetes/pv-photo.yaml --wait=true
-  kubectl delete -f kubernetes/pv-redis.yaml --wait=true
-  kubectl delete -f kubernetes/pv-mariadb.yaml --wait=true
+  kubectl delete -f kubernetes/pv-pychat-photo.yaml --wait=true
+  kubectl delete -f kubernetes/pv-pychat-redis.yaml --wait=true
+  kubectl delete -f kubernetes/pv-pychat-mariadb.yaml --wait=true
   kubectl delete -f kubernetes/namespace.yaml --wait=true
 }
 
@@ -139,9 +139,9 @@ minikube_certificate() {
 
 minikube_all() {
   safeRunCommand kubectl apply -f kubernetes/namespace.yaml
-  safeRunCommand kubectl apply -f kubernetes/pv-photo.yaml
-  safeRunCommand kubectl apply -f kubernetes/pv-redis.yaml
-  safeRunCommand kubectl apply -f kubernetes/pv-mariadb.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-pychat-photo.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-pychat-redis.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-pychat-mariadb.yaml
   safeRunCommand kubectl apply -f kubernetes/config-map.yaml
   safeRunCommand kubectl apply -f kubernetes/backend-secret.yaml
   safeRunCommand kubectl apply -f kubernetes/mariadb.yaml

@@ -10,4 +10,4 @@ spec:
      requests:
        storage: {{ .Values.disk_size }}
    storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
-   volumeName: pv-mariadb
+   volumeName: pv-pychat-mariadb
