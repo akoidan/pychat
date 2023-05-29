@@ -8,7 +8,7 @@ resource "cloudflare_record" "master_pychat" {
 }
 
 resource "cloudflare_record" "static_pychat" {
-  name    = "static.${var.domain_name}"
+  name    = var.static_domain_name
   proxied = true
   ttl     = 1
   type    = "A"
@@ -18,7 +18,7 @@ resource "cloudflare_record" "static_pychat" {
 
 resource "cloudflare_record" "registry_pychat" {
   count = var.htpasswd == null ? 0 : 1
-  name    = "registry.${var.domain_name}"
+  name    = var.docker_domain_name
   proxied = false
   ttl     = 1
   type    = "A"

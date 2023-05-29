@@ -9,6 +9,8 @@ module "cloudflare" {
   cloud_flare_api_token = var.cloud_flare_api_token
   cloud_flare_zone_id   = var.cloud_flare_zone_id
   domain_name           = var.domain_name
+  docker_domain_name    = local.docker_domain_name
+  static_domain_name    = local.static_domain_name
   ip_address            = module.linode.ip_address
   htpasswd              = var.htpasswd
 }
@@ -17,6 +19,8 @@ module "helm" {
   source                   = "./helm"
   kubeconfig               = module.linode.kubeconfig
   domain_name              = var.domain_name
+  docker_domain_name       = local.docker_domain_name
+  static_domain_name       = local.static_domain_name
   ip_address               = module.linode.ip_address
   cloud_flare_api_token    = var.cloud_flare_api_token
   email                    = var.email

@@ -10,6 +10,12 @@ variable "email" {}
 variable "linode_app_label" {
   default = "pychat"
 }
+
+locals {
+  docker_domain_name = "docker-registry.${var.domain_name}"
+  static_domain_name = "static.${var.domain_name}"
+}
+
 variable "github" {
   default = null
 }

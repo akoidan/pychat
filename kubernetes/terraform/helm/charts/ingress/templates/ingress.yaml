@@ -13,8 +13,8 @@ spec:
   tls:
   - hosts:
     - "{{ .Values.domain_name }}"
-    - "static.{{ .Values.domain_name }}"
-    - "registry.{{ .Values.domain_name }}"
+    - "{{ .Values.docker_domain_name }}"
+    - "{{ .Values.static_domain_name }}"
     secretName: pychat-tls
   defaultBackend:
     service:
@@ -22,7 +22,7 @@ spec:
       port:
         number: 80
   rules:
-  - host: "static.{{ .Values.domain_name }}"
+  - host: "{{ .Values.static_domain_name }}"
     http:
       paths:
       - path: /
@@ -57,7 +57,7 @@ spec:
             port:
               number: 80
 {{ if .Values.htpasswd }}
-  - host: "registry.{{ .Values.domain_name }}"
+  - host: "{{ .Values.docker_domain_name }}"
     http:
       paths:
       - path: /

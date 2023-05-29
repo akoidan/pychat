@@ -12,4 +12,7 @@ spec:
   renewBefore: 720h # 30d before SSL will expire, renew it
   dnsNames:
     - "{{ .Values.domain_name }}"
-    - "static.{{ .Values.domain_name }}"
+    - "{{ .Values.static_domain_name }}"
+{{ if .Values.htpasswd }}
+    - "{{ .Values.docker_domain_name }}"
+{{ end }}

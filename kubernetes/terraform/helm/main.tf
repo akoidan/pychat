@@ -85,6 +85,18 @@ resource "helm_release" "certmanager" {
     value = var.domain_name
   }
   set {
+    name  = "docker_domain_name"
+    value = var.docker_domain_name
+  }
+  set {
+    name  = "static_domain_name"
+    value = var.static_domain_name
+  }
+  set {
+    name  = "htpasswd"
+    value = var.htpasswd == null ? "" : var.htpasswd
+  }
+  set {
     name  = "email"
     value = var.email
   }
@@ -115,8 +127,8 @@ resource "helm_release" "docker-registry" {
   name  = "docker-registry"
   chart = "${path.module}/charts/docker-registry"
   set {
-    name  = "domain_name"
-    value = var.domain_name
+    name  = "docker_domain_name"
+    value = var.docker_domain_name
   }
   set_sensitive {
     name  = "htpasswd"
@@ -199,6 +211,7 @@ resource "helm_release" "coturn" {
     name  = "udp_port_range_end"
     value = var.udp_port_range_end
   }
+  wait = false # do not wait for certificate and block the execution
 }
 
 resource "helm_release" "frontend" {
@@ -230,8 +243,14 @@ resource "helm_release" "ingress" {
     name  = "udp_port_range_end"
     value = var.udp_port_range_end
   }
-  # TODO
-  #  depends_on = [helm_release.global, helm_release.certmanager, helm_release.self-signed]
+  set {
+    name  = "static_domain_name"
+    value = var.static_domain_name
+  }
+  set {
+    name  = "docker_domain_name"
+    value = var.docker_domain_name
+  }
   depends_on = [helm_release.global]
 }
 
@@ -261,6 +280,7 @@ resource "helm_release" "postfix" {
     name  = "domain_name"
     value = var.domain_name
   }
+  wait = false # do not wait for certificate and block the execution
 }
 
 resource "helm_release" "redis" {

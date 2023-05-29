@@ -6,5 +6,5 @@ metadata:
 data:
   REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
   REGISTRY_AUTH: "htpasswd"
-  REGISTRY_AUTH_HTPASSWD_REALM: "registry.{{ .Values.domain_name }}"
+  REGISTRY_AUTH_HTPASSWD_REALM: "{{ .Values.docker_domain_name }}"
 

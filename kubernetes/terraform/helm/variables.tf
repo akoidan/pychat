@@ -7,6 +7,9 @@ variable "tls_key" {
   default = null
 }
 
+variable "docker_domain_name" {}
+variable "static_domain_name" {}
+
 variable "domain_name" {}
 variable "email" {}
 variable "github" {}
