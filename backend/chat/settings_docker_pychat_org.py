@@ -4,12 +4,11 @@ import os
 from chat.settings_prod import *
 
 
-STATIC_URL = 'https://static.pychat.org/'
 # MEDIA_URL = "https://static.pychat.org/photo/"
 ADMINS = [('admin', 'deathangel908@gmail.com'), ]
 EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-SERVER_ADDRESS='pychat.org'
+SERVER_ADDRESS = os.environ['SERVER_ADDRESS']
 DEBUG=False
 EMAIL_HOST = os.environ['EMAIL_HOST']
 EMAIL_PORT = int(os.environ['EMAIL_PORT'])
@@ -18,12 +17,10 @@ SECRET_KEY = os.environ['SECRET_KEY']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 SERVER_EMAIL = os.environ['SERVER_EMAIL']
 DEFAULT_PROFILE_ID = int(os.environ['DEFAULT_PROFILE_ID'])
-RECAPTCHA_PUBLIC_KEY = os.environ['RECAPTCHA_PUBLIC_KEY']
 RECAPTCHA_PRIVATE_KEY = os.environ['RECAPTCHA_PRIVATE_KEY']
 GOOGLE_OAUTH_2_CLIENT_ID = os.environ['GOOGLE_OAUTH_2_CLIENT_ID']
 FACEBOOK_ACCESS_TOKEN = os.environ['FACEBOOK_ACCESS_TOKEN']
 FIREBASE_API_KEY = os.environ['FIREBASE_API_KEY']
-GIPHY_API_KEY = os.environ['GIPHY_API_KEY']
 REDIS_PORT = int(os.environ['REDIS_PORT'])
 REDIS_HOST = os.environ['REDIS_HOST']
 
