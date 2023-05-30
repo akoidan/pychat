@@ -1,4 +1,3 @@
-email: $email
 pullPolicy: Always
 image:
   repository_path: deathangel908/pychat-backup

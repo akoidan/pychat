@@ -136,10 +136,6 @@ resource "helm_release" "backup" {
   chart      = "${path.module}/charts/backup"
   depends_on = [helm_release.mariadb, helm_release.photo]
 
-  set {
-    name  = "email"
-    value = var.email
-  }
   set_sensitive {
     name  = "id_rsa"
     value = var.id_rsa

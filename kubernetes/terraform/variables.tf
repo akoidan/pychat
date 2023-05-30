@@ -1,11 +1,23 @@
 variable "cloud_flare_api_token" {
   description = "Go to https://dash.cloudflare.com/profile/api-tokens"
+  validation {
+    condition = can(regex("^.+$", var.cloud_flare_api_token))
+    error_message = "cloud_flare_api_token is required"
+  }
 }
 variable "linode_token" {
   description = "K8s cluster provider. http://linode.com/ go to Profile -> Api tokens -> Create A Personal Access Token -> Select Kubernetes & Linodes -> Create Token."
+  validation {
+    condition = can(regex("^.+$", var.linode_token))
+    error_message = "linode_token is required"
+  }
 }
 variable "cloud_flare_zone_id" {
   description = "Copy API Zone Id from https://dash.cloudflare.com/"
+  validation {
+    condition = can(regex("^.+$", var.cloud_flare_zone_id))
+    error_message = "cloud_flare_zone_id is required"
+  }
 }
 variable "id_rsa" {
   description = "This ssh keypair will be used to authenticate in private git repo to make backups. Feel free to leave it empty if backups not used"
@@ -17,10 +29,15 @@ variable "id_rsa_pub" {
 }
 variable "domain_name" {
   description = "Main domain address for chat"
+  validation {
+    condition = can(regex("^.+$", var.domain_name))
+    error_message = "domain_name is required"
+  }
 }
 variable "email" {
-  description = "Email that's used in certmanager"
+  description = "Email that's used in certmanager. If use_certmanager is set to false, feel free to leave empty"
 }
+
 variable "linode_app_label" {
   default = "pychat"
   description = "Linode k8s cluster name"
@@ -29,6 +46,10 @@ variable "linode_app_label" {
 variable "github" {
   default = null
   description = "git address for private backups. Url should be in ssh format e.g. git@github.com:username/backup_repo.git . Feel free to leave it empty if backups not used"
+  validation {
+    condition = var.github == null || can(regex("^git@.*$", var.github))
+    error_message = "Should start within git@, ssh only supported"
+  }
 }
 variable "htpasswd" {
   description = "If this variable is set docker registry will be created with user and pass in this value. To generate use docker run --entrypoint htpasswd httpd:2 -Bbn user password"
@@ -88,6 +109,10 @@ EOT
 variable "DEFAULT_PROFILE_ID" {
   default = "1"
   description = "Admin of main channel. First registered user"
+  validation {
+    condition = can(regex("^\\d+$", var.DEFAULT_PROFILE_ID))
+    error_message = "Only numbers"
+  }
 }
 
 locals {
