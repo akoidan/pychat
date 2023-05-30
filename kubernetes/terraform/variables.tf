@@ -37,12 +37,10 @@ variable "domain_name" {
 variable "email" {
   description = "Email that's used in certmanager. If use_certmanager is set to false, feel free to leave empty"
 }
-
 variable "linode_app_label" {
   default = "pychat"
   description = "Linode k8s cluster name"
 }
-
 variable "github" {
   default = null
   description = "git address for private backups. Url should be in ssh format e.g. git@github.com:username/backup_repo.git . Feel free to leave it empty if backups not used"
@@ -114,7 +112,6 @@ variable "DEFAULT_PROFILE_ID" {
     error_message = "Only numbers"
   }
 }
-
 locals {
   docker_domain_name = "docker-registry.${var.domain_name}"
   static_domain_name = "static.${var.domain_name}"

@@ -2,14 +2,8 @@ variable "cloud_flare_api_token" {}
 variable "kubeconfig" {}
 variable "tls_crt" {}
 variable "tls_key" {}
-
-variable "use_certmanager" {
-  default = true
-}
-
 variable "docker_domain_name" {}
 variable "static_domain_name" {}
-
 variable "domain_name" {}
 variable "email" {}
 variable "github" {}
@@ -22,7 +16,10 @@ variable "GOOGLE_OAUTH_2_CLIENT_ID" {}
 variable "FACEBOOK_ACCESS_TOKEN" {}
 variable "FIREBASE_API_KEY" {}
 variable "DEFAULT_PROFILE_ID" {}
-
+variable "htpasswd" {}
+variable "use_certmanager" {
+  default = true
+}
 variable "udp_port_range_start" {
   default = 49152
 }
@@ -34,9 +31,6 @@ variable "coturn_username" {
 }
 variable "coturn_password" {
   default = "pypass"
-}
-variable "htpasswd" {
-  # docker run --entrypoint htpasswd httpd:2 -Bbn pychat pypass
 }
 variable "mysql_password" {
   default = "pypass"
