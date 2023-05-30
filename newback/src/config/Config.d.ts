@@ -22,7 +22,6 @@ declare module "node-ts-config" {
     pass: string
   }
   interface Recaptcha {
-    publicKey: string
     privateKey: string
   }
   interface Auth {

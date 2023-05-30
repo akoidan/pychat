@@ -1,18 +1,19 @@
 variable "cloud_flare_api_token" {
-  default = null
   description = "Go to https://dash.cloudflare.com/profile/api-tokens"
 }
 variable "linode_token" {
-  description = "http://linode.com/ go to Profile -> Api tokens -> Create A Personal Access Token -> Select Kubernetes & Linodes -> Create Token."
+  description = "K8s cluster provider. http://linode.com/ go to Profile -> Api tokens -> Create A Personal Access Token -> Select Kubernetes & Linodes -> Create Token."
 }
 variable "cloud_flare_zone_id" {
   description = "Copy API Zone Id from https://dash.cloudflare.com/"
 }
 variable "id_rsa" {
   description = "This ssh keypair will be used to authenticate in private git repo to make backups. Feel free to leave it empty if backups not used"
+  default = null
 }
 variable "id_rsa_pub" {
   description = "This ssh keypair will be used to authenticate in private git repo to make backups. Feel free to leave it empty if backups not used"
+  default = null
 }
 variable "domain_name" {
   description = "Main domain address for chat"
@@ -40,6 +41,7 @@ variable "tls_crt" {
 }
 variable "use_certmanager" {
   default = true
+  type = bool
 }
 variable "tls_key" {
   default = "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlKS0FJQkFBS0NBZ0VBMHlOWDdDSWoyaGdRSWo3QytId2NEVXVremZ4aHAvN0xpWCs3YXh0NlFydWE2enhJCnZhTlBKREM3WTVodUhWRUVmcG5SWEtwWmxOY2cvMjd1MFNWUjUyOXh3YmdvSGhCY3VJajNrNWNmREY0SXhqUHEKYkFBLzllVTNaUVNuVUlwUDFJUWFmNCtzMlpZRUF6UGlnbDJWMWk0VXR3aGczNUFjN3p5RVZLY2lpWWxxeE5UaAplQ0NrMVdTcFZ5ZnFRbnJ3ZzdheGpjL204ejVWN3VnZDArdWpXV1NLanJVRktQcHRhOE1VRm1FVlpORXAxRFFFCjdFQjF2WmtIK0pnbjJmbkRTNGgzR24ySms2cFQxZUhlTWFWSVUxTmhnVkVFTmExQlBuaDY1T2RZaVdXSmxhSTIKZ1Rqc1BDT0hDajRROXVBWUFJOUZIcCt5SGc3Z2syd1RDL3FZUHpVNFlKbnEvc2dUZW5kQUVSMlJycVBwQWJPUQpRK1dsQzdwM1ZDM2tmaFh6WTJUR0NSa2VXSm92MzdtYklXemNqVGxSMmYxZ0FQSzFQSUxPK3V4QTRYM0o1TmNCCjBOSWlVZEJTdFdBRG9YNDNDdlVHWTJIaU1nZmVRS1JEVUhFc2dPZEdLclRzb3M2N3VKTzArZUQrQzNCNFBtQTUKaUV1Mk0rSjBEK2ljOEVyZlowZkpJVjJESmNiczg0L3l4Y1RKNFl4blZmRTZHN1ZFOE93c3dnN3hGeC90N0tCSgpLcVdqRklVZm4ralVZdUpCUnJsUWl0eFhrSjhNQS9kSDNlZDdHazZ1RXk3d09pQVFGTldBQmxRT2VKSWFDa0VvCnNhaUovQmcvRWFRTVRXQzNhc0MzTEEvQUtLeVRvNHIyMEVTR3lZK1R4NU50V2ZxYndDSFA3VEVjaGpzQ0F3RUEKQVFLQ0FnQVYyV3g1MVRhY2xTem1QbFJ5M25VUXN5bEUzNzlEWVV5eTEvTVBMSExFZ1NHUkFsWU11ZCt3d1JKRApSanp1NzdsbFdJbWY2MGtGN0JWUUdhekJHL21UMTZhUUEzeXpUOElvbnBQd1JBMUVmRjZ3RkNOSU5lWm9qZVhqCm9FMm9PZ2YwMkE3ZDhJSlVxZitVVFVROWRXM1NFa2EyZ2psMEtUZTFVaS9uaXJ3Nk8ydy9Ia0NPNitIaTYxM1MKMVNDYTdKb0RKMTdNYkIxY1FyRWwzZ05vTU5SZ3BkVG8yN2JDL05kaDlYZ1lzTWREL1prMGlvV1A1VVBKOFJJdwpHWjdXSWRDaCttZEk2SURhTlNBajNCSGdWVmhjdHg0NkFhWkwzN2dHdlBVS3h4NFVhZHVKRHBaUlhSQ2xVSS9pCjhYVlQ5dkRFN2c2YkVxK2VDTEFZMFhCUEp3bW1JTHVHeTMvd1FZdXZBblJKYnBJLzdBMjhaZUc3UUNUKytjQlkKN2tZZTZoMGNNYzJFK3ZNRm5lblcvbmE1S3dyVW52OCtvc2N5QWdWUjVPWS9xU3ZZWW5ZSG9zN1RWdVJLd1YxegpmYy9XMVhmUDBRSTk0MENSaktRT3hHamVCWHFDR2Y4K0ZYQlVKOE1Gd1QwT053WEppZG04b2I4SFZ2azJEdVRZCnlrL3BCZEM3a3pIcDVEUVhBWndOU0k4bWJLblRKbEVoc0RzRzlwQ1BaQkZRMGo3aGdmSkIvODZ6NzNuRHErVW0KSlVlR21QMWtTVUEzbk4wWkZZOGVVZWYxUUhGK2JXYk9IMDNMVERvbUJGVVMvM3RsNFVzYWtVenkrS0U2RW16WApCNTNrazE4NWd3UURlNStIeFExQ1NqbzJ4aUZBdVZWS0tUeFBzaCt5TWh5WnZWeVVrUUtDQVFFQTduVThsa2hLClhUalBzVGRWSXloR0RzWHJ2a1hQUWRuRyt1RDg0NUR0S0d3Z3lza2ZreGU0MkNYTWpRSUN6MGcxY0dnUlNDSkoKUEoyT1NQeEpxYnJWOVFEc1RWY284TFpOWlJrbEE2U1lSdnpYVU5XSjlHRlBZUmtRNGo1UmQ5d2N4aVh1TkRJQQpZKzlDZm9GN3ozcVQvUXQrL0VoRVM3Ymx4d3MwZmF1K29sYWlpcGsremNxMjlWdTFaWHB1Z3VmSlZEYVBVR3p0CkxvYk5FYmxNVjBpREwrRlNuUXRSM1RWaGtabWFnZW5VR2txZ0t3aEtDaWNLYTdHbGluU2ZsaHJBa2lVOFYwQ2sKNEhjYWlqTkx3ZUZQSm14MFZ1ZUhjUzR6Z21RK1ZPYmdFZjNHOXJESllFcFlYNmQ5bEtGcXBmU0YxQXI1ZklNaAo0ZU1lNE9yWUp1TDJId0tDQVFFQTRxdWF1anBPU3lZajNGVFdKR1grSCtobzhNR2VLb3FhZXpjZUN0OHZZWHh6CjhLcHhlRy9YWEppU3YxNTVoT1NiRG5LK2NKK2FobFNJS3l2N0NoS2hyaU9QVjlLOHpaUzR5Vzc3Tm14TWJuYnQKQmdkZWl1M0srZWRvWEZmTDdVcGVFaUNjV3IxeGF3NWl2eHVCaWNaNzZ5K0ErZlkxRFZiRGZ3Y0hZeEI1UEttaApveFhmdzRLUFhpd3l2a1ZZWlpVWkMybDR2aER1SlRqNGE2eTU1NjhVWmExN05Xc25JNCtneFNPbXBCUW8yRVZFClk2OUZGVm95NSsxSTN1TFR0SXdhcWt0QkR2TmFscjBOK3R1RFhTb3FodVR0akZ1NmdFYzVBazRnRWJ3YkMvNzgKUWs0Q3E3a0d0YXRTNW9sTWl0M05RcXNGM0JaWkVpMGE0YXE3SU1rVVpRS0NBUUIra09sc2xzZ3B2THE0UkRkRApKdUF3ZlNySVhrTkluMisydjI1YTF4U1pyUEttejZPYnJpNmxRMExUNFNwZW5PUUlXcVE1bGtFckZERnVXY0k3CmZYaU14MFdsTTByK29MUnBvYlA4d0FNM1FvS0NYQ1VSK2dobzhDWCsvN2E4R0srSkdKN2JRMkxqcUIyeUNjWU8KZFBCUmtpVi9nRmdIbS9kUDg0bVQzbkdidHNJbE1IdWVQU2RwQ1prNVdJZUpvYjlCbklmcTF6WDR5UUhWazNXSwpxbWsvSTZoMnhJaGFFamhNVUt3cW9sSzY5YnNYdkJtWVUrcDdDTnBscDhzQW9BaHdTYVZDWm9SY3c3cnBlWnFQCk9LaUxLMnVBcVBsQndKVUVjM0tHRzlqNGs2dGtTcWRJSFkzVWo1RGZMK0hzWGVJZWp3aW01dTgzOXhYdnFaYTYKNVNKZkFvSUJBQ0kzYjFydlZFUkoxSjM4L0hwd0h3Vm9DdmRVOHZCUERmVE5wQzVWOUl3TndsNnhEQUgzT0JaVgpQY20vbEM1NForT3RkSXdCdTh6TlUrVFlkY1BXZml1UVdLSVVRTVh6emxVeCtLQUZoeUFodWJQd1J0aEgveHpzClRyZXAxVEhUeVJHSmRMREo2aVlUL05vR1orNkpWTWx5MlZCaVZ5M1ZUQnVQenhDb092VHFVbWtROHo5TEpTTTkKSHNmVUpmem5uZWs0R2E3dlZWT3ZIdWo2SVBJVlhzbmVmenZZR2dkbk5naXNVZ3B3dEoyNUR4TFJNV2VBdnpCOQpoRU9KRUJZd0ZCSmkyOFpLL0FESE55WUlIdk5nV3gwVHo3d2hXS3ptazNlQ25acXZ2NUYzQTFOcS9VSTQ0d2RuCmZsTW9wTEpOdXg5Mk82TTJpR21TLzN6VFRmNHIvSFVDZ2dFQkFNTngxNnVtWUlLNVE0T3IyVXBDU3R5Nitsc2sKQ0RiMGhvTmJMT0svZFZWaW5wSWEzOUhveE9mWkFSSTNGR2MwRVVJZFBKTGgwL1FDQVdRaTM2MEFsYXAvOXltWApQcC9rU0pNalhtaElqcXk4Qy9XZDhkR1ptUlpyV3ZxODdlOTgySG9ZWGZxSzg3MXFrYnRGSkQ0WWI1aCtBR3I2CkM3eDJXQm0zT0IxaEl0cGhwNW9xZ3ozOGUxcTBOM0RPQkpMYTFFdEpqRmExUVVzRWpqckVqSWpnQWQvSlVIb1AKZHBrNHR0SmFzcndXQkROR1YyOWhONWhaT21JMEJxaHE5Tm9PZGZRZGtSTG9SQ3dtSWtSWkh3YXF2Q0F2a3NuLwpoclNoKzY2TG5qcThpMldIbS90a0JVeUE0Y0d1N2wrRzZFcEtDRWZ2THJxb3lZUlVia0FBaXQ2Q1VYaz0KLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0K"
@@ -51,25 +53,41 @@ variable "SECRET_KEY" {
   description = "Django secret key for password and etc"
 }
 variable "RECAPTCHA_PRIVATE_KEY" {
-  default = null
-}
-variable "RECAPTCHA_PUBLIC_KEY" {
-  default = null
+  description = <<EOT
+[OPTIONAL] Prevents spam with password guessing or email spoofing
+If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain, type is web captcha
+If you set RECAPTCHA_PRIVATE_KEY you should set RECAPTCHA_PUBLIC_KEY in frontend/development.json and frontend/production.json
+EOT
 }
 variable "GOOGLE_OAUTH_2_CLIENT_ID" {
-  default = null
+  description = "[OPTIONAL] For Google Oauth. https://developers.google.com/identity/sign-in/web/devconsole-project select webrowser"
 }
 variable "FACEBOOK_ACCESS_TOKEN" {
-  default = null
-}
-variable "GIPHY_API_KEY" {
-  default = null
+  description = "[OPTIONAL] For FB Oauth. https://developers.facebook.com/apps/ -> click on app -> settings -> basic 'App ID|App Secret' e.g. FACEBOOK_ACCESS_TOKEN = '91237|bf86sd3'"
 }
 variable "FIREBASE_API_KEY" {
-  default = null
+  description = <<EOT
+[OPTIONAL] For Notifications
+ Pychat also supports https://developers.google.com/web/fundamentals/push-notifications/ firebase notifications, like in facebook.
+ They will fire even user doesn't have opened tab. That can be turned on/off by used in his/her profile with checkbox `Notifications`.
+ The implementation is similar like https://github.com/GoogleChrome/samples/tree/gh-pages/push-messaging-and-notifications.
+    1. Create a project on the Firebase Developer Console: https://console.firebase.google.com/
+    2. Go to Settings (the cog near the top left corner), click the Cloud Messaging Tab: https://console.firebase.google.com/u/1/project/pychat-org/settings/cloudmessaging/
+    3. Put `<Your Cloud Messaging API Key ...>` to `FIREBASE_API_KEY` below.
+    4. Create `chat/static/manifest.json` with content like https://github.com/GoogleChrome/samples/blob/gh-pages/push-messaging-and-notifications/manifest.sample.json:
+
+ {
+  "name": "Pychat Push Notifications",
+  "short_name": "PyPush",
+  "start_url": "/",
+  "display": "standalone",
+  "gcm_sender_id": "<Your Sender ID from https://console.firebase.google.com>"
+ }
+EOT
 }
 variable "DEFAULT_PROFILE_ID" {
   default = "1"
+  description = "Admin of main channel. First registered user"
 }
 
 locals {

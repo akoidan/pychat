@@ -27,7 +27,6 @@
     "issueReportLink": "@@FRONTEND_ISSUE_REPORT_LINK"
   },
   "recaptcha": {
-    "publicKey": "@@RECAPTCHA_PUBLIC_KEY",
     "privateKey": "@@RECAPTCHA_PRIVATE_KEY"
   },
   "email": {

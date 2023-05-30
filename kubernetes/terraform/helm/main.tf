@@ -38,10 +38,6 @@ resource "helm_release" "backend" {
     name  = "RECAPTCHA_PRIVATE_KEY"
     value = var.RECAPTCHA_PRIVATE_KEY
   }
-  set {
-    name  = "RECAPTCHA_PUBLIC_KEY"
-    value = var.RECAPTCHA_PUBLIC_KEY
-  }
   set_sensitive {
     name  = "GOOGLE_OAUTH_2_CLIENT_ID"
     value = var.GOOGLE_OAUTH_2_CLIENT_ID
@@ -49,10 +45,6 @@ resource "helm_release" "backend" {
   set_sensitive {
     name  = "FACEBOOK_ACCESS_TOKEN"
     value = var.FACEBOOK_ACCESS_TOKEN
-  }
-  set_sensitive {
-    name  = "GIPHY_API_KEY"
-    value = var.GIPHY_API_KEY
   }
   set_sensitive {
     name  = "FIREBASE_API_KEY"
