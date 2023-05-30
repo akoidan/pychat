@@ -28,6 +28,7 @@ module "helm" {
   github                   = var.github
   id_rsa                   = var.id_rsa
   id_rsa_pub               = var.id_rsa_pub
+  use_certmanager         = var.use_certmanager
   SECRET_KEY               = var.SECRET_KEY
   RECAPTCHA_PRIVATE_KEY    = var.RECAPTCHA_PRIVATE_KEY
   RECAPTCHA_PUBLIC_KEY     = var.RECAPTCHA_PUBLIC_KEY

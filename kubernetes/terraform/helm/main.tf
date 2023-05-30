@@ -78,6 +78,7 @@ resource "helm_release" "certmanager-definition" {
 }
 
 resource "helm_release" "certmanager" {
+  count = var.use_certmanager ? 1 : 0
   name  = "certmanager"
   chart = "${path.module}/charts/certmanager"
   set {
@@ -108,7 +109,7 @@ resource "helm_release" "certmanager" {
 }
 
 resource "helm_release" "self-signed" {
-  count = var.cloud_flare_api_token == null ? 1 : 0
+  count = var.use_certmanager ? 0 : 1
   name  = "self-signed"
   chart = "${path.module}/charts/self-signed"
   set_sensitive {

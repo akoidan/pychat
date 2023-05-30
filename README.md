@@ -551,6 +551,7 @@ If you don't own a domain (and planning to use ip + self signed certificate, thi
 - postfix will not send emails, including registration and password reset
 - Site is gonna be under self-signed certificate and will prompt errors.
 This is still possible
+- set `use_certmanager = false` in  `terraform.tfvars` 
 Upon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
 
 ### Other variables in terraform.tfvars

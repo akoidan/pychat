@@ -7,6 +7,10 @@ variable "tls_key" {
   default = null
 }
 
+variable "use_certmanager" {
+  default = true
+}
+
 variable "docker_domain_name" {}
 variable "static_domain_name" {}
 
