@@ -13,4 +13,6 @@ data:
   REDIS_PUBSUB: "true"
   EMAIL_PORT: "25"
   EMAIL_HOST: "postfix-service"
+  SERVER_EMAIL: "{{ .Values.SERVER_EMAIL }}"
   DEFAULT_PROFILE_ID: "{{ .Values.DEFAULT_PROFILE_ID }}"
+  SERVER_ADDRESS: "{{ .Values.SERVER_ADDRESS }}"
