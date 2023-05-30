@@ -22,31 +22,31 @@ resource "helm_release" "backend" {
     name  = "mysql_database_name"
     value = var.mysql_database_name
   }
-  set_sensitive {
+  set {
     name  = "mysql_user"
     value = var.mysql_user
   }
-  set_sensitive {
+  set {
     name  = "mysql_password"
     value = var.mysql_password
   }
-  set_sensitive {
+  set {
     name  = "SECRET_KEY"
     value = var.SECRET_KEY
   }
-  set_sensitive {
+  set {
     name  = "RECAPTCHA_PRIVATE_KEY"
     value = var.RECAPTCHA_PRIVATE_KEY
   }
-  set_sensitive {
+  set {
     name  = "GOOGLE_OAUTH_2_CLIENT_ID"
     value = var.GOOGLE_OAUTH_2_CLIENT_ID
   }
-  set_sensitive {
+  set {
     name  = "FACEBOOK_ACCESS_TOKEN"
     value = var.FACEBOOK_ACCESS_TOKEN
   }
-  set_sensitive {
+  set {
     name  = "FIREBASE_API_KEY"
     value = var.FIREBASE_API_KEY
   }
@@ -54,6 +54,19 @@ resource "helm_release" "backend" {
     name  = "DEFAULT_PROFILE_ID"
     value = var.DEFAULT_PROFILE_ID
   }
+  set {
+    name  = "SERVER_ADDRESS"
+    value = var.domain_name
+  }
+  set {
+    name  = "SERVER_EMAIL"
+    value = local.SERVER_EMAIL
+  }
+  set {
+    name  = "SHOW_COUNTRY_CODE"
+    value = var.SHOW_COUNTRY_CODE
+  }
+
   timeout = 60
 }
 
@@ -93,7 +106,7 @@ resource "helm_release" "certmanager" {
     name  = "email"
     value = var.email
   }
-  set_sensitive {
+  set {
     name  = "cloud_flare_api_token"
     value = var.cloud_flare_api_token
   }
@@ -104,11 +117,11 @@ resource "helm_release" "self-signed" {
   count = var.use_certmanager ? 0 : 1
   name  = "self-signed"
   chart = "${path.module}/charts/self-signed"
-  set_sensitive {
+  set {
     name  = "tls_crt"
     value = var.tls_crt
   }
-  set_sensitive {
+  set {
     name  = "tls_key"
     value = var.tls_key
   }
@@ -123,7 +136,7 @@ resource "helm_release" "docker-registry" {
     name  = "docker_domain_name"
     value = var.docker_domain_name
   }
-  set_sensitive {
+  set {
     name  = "htpasswd"
     value = var.htpasswd
   }
@@ -136,7 +149,7 @@ resource "helm_release" "backup" {
   chart      = "${path.module}/charts/backup"
   depends_on = [helm_release.mariadb, helm_release.photo]
 
-  set_sensitive {
+  set {
     name  = "id_rsa"
     value = var.id_rsa
   }
@@ -160,7 +173,7 @@ resource "helm_release" "backup" {
     name  = "mysql_user"
     value = var.mysql_user
   }
-  set_sensitive {
+  set {
     name  = "mysql_password"
     value = var.mysql_password
   }
@@ -216,7 +229,7 @@ resource "helm_release" "ingress" {
     name  = "domain_name"
     value = var.domain_name
   }
-  set_sensitive {
+  set {
     name  = "htpasswd"
     value = var.htpasswd == null ? "" : var.htpasswd
   }

@@ -1,7 +1,12 @@
-variable "cloud_flare_api_token" {}
-variable "kubeconfig" {}
+variable "cloud_flare_api_token" {
+  sensitive = true
+}
+variable "kubeconfig" {
+  sensitive = true
+}
 variable "tls_crt" {
-  default = null
+  default   = null
+  sensitive = true
 }
 variable "tls_key" {
   default = null
@@ -11,17 +16,30 @@ variable "static_domain_name" {}
 variable "domain_name" {}
 variable "email" {}
 variable "github" {}
-variable "id_rsa" {}
+variable "id_rsa" {
+  sensitive = true
+}
 variable "id_rsa_pub" {}
 variable "ip_address" {}
-variable "SECRET_KEY" {}
-variable "RECAPTCHA_PRIVATE_KEY" {}
-variable "GOOGLE_OAUTH_2_CLIENT_ID" {}
-variable "FACEBOOK_ACCESS_TOKEN" {}
-variable "FIREBASE_API_KEY" {}
+variable "SECRET_KEY" {
+  sensitive = true
+}
+variable "RECAPTCHA_PRIVATE_KEY" {
+  sensitive = true
+}
+variable "GOOGLE_OAUTH_2_CLIENT_ID" {
+  sensitive = true
+}
+variable "FACEBOOK_ACCESS_TOKEN" {
+  sensitive = true
+}
+variable "FIREBASE_API_KEY" {
+  sensitive = true
+}
 variable "DEFAULT_PROFILE_ID" {}
 variable "htpasswd" {
-  default = null
+  default   = null
+  sensitive = true
 }
 variable "use_certmanager" {
   default = true
@@ -46,4 +64,12 @@ variable "mysql_database_name" {
 }
 variable "mysql_user" {
   default = "pychat"
+}
+
+variable "SHOW_COUNTRY_CODE" {
+  default = "true"
+}
+
+locals {
+  SERVER_EMAIL = "root@${var.domain_name}"
 }
