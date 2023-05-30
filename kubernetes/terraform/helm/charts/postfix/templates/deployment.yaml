@@ -16,6 +16,9 @@ spec:
         app: postfix
     spec:
       volumes:
+        - name: spool
+          persistentVolumeClaim:
+            claimName: pvc-postfix
         - name: pychat-postfix-tls
           secret:
             secretName: pychat-tls
@@ -35,3 +38,5 @@ spec:
           - name: pychat-postfix-tls
             mountPath: "/etc/tls"
             readOnly: true
+          - name: spool
+            mountPath: "/var/spool/postfix"

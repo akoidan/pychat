@@ -8,6 +8,9 @@ resource "linode_lke_cluster" "pychat" {
     count = var.node_count
     type  = var.node_type
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 data "linode_instances" "pychat_linode" {

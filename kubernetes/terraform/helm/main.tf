@@ -259,6 +259,9 @@ resource "helm_release" "mariadb" {
     name  = "mysql_password"
     value = var.mysql_password
   }
+  lifecycle {
+    prevent_destroy = true // delete database manually if required in order to not lose the data
+  }
 }
 
 resource "helm_release" "postfix" {

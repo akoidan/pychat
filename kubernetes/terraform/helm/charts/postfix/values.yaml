@@ -3,3 +3,4 @@ image:
   pullPolicy: Always # change to IfNotPresent for minikube
   tag: "latest"
 domain_name: $domain_name
+disk_size: 256Mi
