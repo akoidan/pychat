@@ -4,8 +4,8 @@ resource "helm_release" "global" {
 }
 
 resource "helm_release" "backend" {
-  name       = "backend"
-  chart      = "${path.module}/charts/backend"
+  name  = "backend"
+  chart = "${path.module}/charts/backend"
   depends_on = [
     helm_release.global,
     helm_release.mariadb,
@@ -178,13 +178,13 @@ resource "helm_release" "backup" {
     value = var.mysql_password
   }
   # Backup should restore the database state before backend goes up
-  timeout = 1800 # Practically my backup was running for 20m until it finished
+  timeout       = 1800 # Practically my backup was running for 20m until it finished
   wait_for_jobs = true
-  wait = true
+  wait          = true
 }
 resource "helm_release" "photo" {
-  name = "photo"
-  chart  = "${path.module}/charts/photo"
+  name       = "photo"
+  chart      = "${path.module}/charts/photo"
   depends_on = [helm_release.global]
 }
 
