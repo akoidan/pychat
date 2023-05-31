@@ -3,4 +3,3 @@ cloud_flare_api_token: $cloud_flare_api_token
 domain_name: $domain_name
 docker_domain_name: $docker_domain_name
 static_domain_name: $static_domain_name
-htpasswd: $htpasswd

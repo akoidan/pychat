@@ -125,6 +125,6 @@ variable "DEFAULT_PROFILE_ID" {
   }
 }
 locals {
-  docker_domain_name = "docker-registry.${var.domain_name}"
+  docker_domain_name = var.htpasswd == null ? "" : "docker-registry.${var.domain_name}"
   static_domain_name = "static.${var.domain_name}"
 }

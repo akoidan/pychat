@@ -17,3 +17,4 @@ data:
   DEFAULT_PROFILE_ID: "{{ .Values.DEFAULT_PROFILE_ID }}"
   SERVER_ADDRESS: "{{ .Values.SERVER_ADDRESS }}"
   SHOW_COUNTRY_CODE: "{{ .Values.SHOW_COUNTRY_CODE }}"
+  BE_DIRECTORY: "/usr/src/backend"

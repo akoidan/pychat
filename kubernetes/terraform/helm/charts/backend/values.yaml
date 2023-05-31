@@ -2,12 +2,12 @@ image:
   repository_path: deathangel908/pychat-backend
   pullPolicy: Always # change to IfNotPresent for minikube
   tag: "latest"
-mysql:
-  mysql_database_name: $mysql_database_name
-  mysql_user: $mysql_user
-  mysql_password: $mysql_password
+mysql_database_name: $mysql_database_name
+mysql_user: $mysql_user
+mysql_password: $mysql_password
 domain_name: $domain_name
 github: $github
+migrations_disk_size: 64Mi
 DEFAULT_PROFILE_ID: "${DEFAULT_PROFILE_ID}"
 FIREBASE_API_KEY: $FIREBASE_API_KEY
 FACEBOOK_ACCESS_TOKEN: $FACEBOOK_ACCESS_TOKEN

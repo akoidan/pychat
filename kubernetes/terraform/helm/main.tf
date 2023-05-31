@@ -5,6 +5,7 @@ resource "helm_release" "global" {
 
 resource "helm_release" "backend" {
   name  = "backend"
+  # force_update = true
   chart = "${path.module}/charts/backend"
   depends_on = [
     helm_release.global,
@@ -66,7 +67,10 @@ resource "helm_release" "backend" {
     name  = "SHOW_COUNTRY_CODE"
     value = var.SHOW_COUNTRY_CODE
   }
-
+  set {
+    name  = "github"
+    value = var.github == null ? "" : var.github
+  }
   timeout = 60
 }
 
@@ -99,10 +103,6 @@ resource "helm_release" "certmanager" {
     value = var.static_domain_name
   }
   set {
-    name  = "htpasswd"
-    value = var.htpasswd == null ? "" : var.htpasswd
-  }
-  set {
     name  = "email"
     value = var.email
   }
@@ -129,7 +129,7 @@ resource "helm_release" "self-signed" {
 }
 
 resource "helm_release" "docker-registry" {
-  count = var.htpasswd == null ? 0 : 1
+  count = var.docker_domain_name == "" ? 0 : 1
   name  = "docker-registry"
   chart = "${path.module}/charts/docker-registry"
   set {
@@ -138,7 +138,7 @@ resource "helm_release" "docker-registry" {
   }
   set {
     name  = "htpasswd"
-    value = var.htpasswd
+    value = var.htpasswd == null ? "" : var.htpasswd
   }
   depends_on = [helm_release.global]
 }
@@ -228,10 +228,6 @@ resource "helm_release" "ingress" {
   set {
     name  = "domain_name"
     value = var.domain_name
-  }
-  set {
-    name  = "htpasswd"
-    value = var.htpasswd == null ? "" : var.htpasswd
   }
   set {
     name  = "external_ip"

@@ -20,12 +20,14 @@ COPY ./backend/requirements.txt ./
 # create django tables within container init
 COPY ./download_content.sh ./download_content.sh
 
-RUN pip install -r requirements.txt && ln -s ../newback/photos ./photos
+RUN pip install -r requirements.txt
 
 COPY ./backend/chat ./chat
 COPY ./backend/templates ./templates
 COPY ./backend/manage.py ./
 COPY ./kubernetes/docker/backend/settings.py ./chat/settings.py
+
+RUN ln -s ../newback/photos ./photos && ln -s ../../backup/backend/chat/migrations ./chat/migrations
 
 CMD ["/usr/bin/python3", "manage.py", "start_tornado"]
 

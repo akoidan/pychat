@@ -13,6 +13,6 @@ spec:
   dnsNames:
     - "{{ .Values.domain_name }}"
     - "{{ .Values.static_domain_name }}"
-{{ if .Values.htpasswd }}
+{{- if .Values.docker_domain_name }}
     - "{{ .Values.docker_domain_name }}"
-{{ end }}
+{{- end }}
