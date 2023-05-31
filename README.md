@@ -595,7 +595,7 @@ Apply terraform configuration with:
 ### Troubleshooting
 1. How to icrease maximum upload file:
  - Change nginx configuration  ``   client_max_body_size 75M;`
- - In addition to above, if you're using k8s + ingress, change `ingress.yaml` nginx.ingress.kubernetes.io/proxy-body-size: 75m 
+ - In addition to above, if you're using k8s + ingress, change `ingress.yaml` nginx.ingress.kubernetes.io/proxy-body-size: 75m
  
 1. Certmanager fails or services that depends on SSL won't start (e.g. Postfix or Coturn)
 Certmanager should create  pychat_tls sercret in namespace pychat. It creates a private key and puts it into letsencrypt-prod secret. Then it tries to issue it against letsencrypt server. 
@@ -606,6 +606,10 @@ Certmanager should create  pychat_tls sercret in namespace pychat. It creates a 
  - Seems like your k8s providers API exceed limits and it cuts the k8s request. You can try it with  `terraform apply -parallelism=1`. Your cluster will deploy for a while, but it has less chance to get into this situation
  - You can also execute `terraform apply` a few times so it finishes creating resources that it failed to inspect. Note that if you got a certificate already, I recomend you to back it up from `pychat-tls` secret in order to avoid cetrification fails describe above
  
+1. Cloudflare returns too many redirect within the same time If turn it off (by setting Node's ip to /etc/hosts) it works fine. This result when using [flexible mode](https://developers.cloudflare.com/ssl/troubleshooting/too-many-redirects/#encryption-mode-misconfigurations). Since all request from http will be redirected to https, all http urls will return header location: https since result infinitive loop  
+ - Go to cloudlfare ssl/tls overview
+ - Set strict encryption mode
+ - Go to Caching Configuration. Click on Custom purge and select static.pychat.org (or static.yourmdain.com) or Purge EVerything if pychat is the only domain.
 # TODO
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
 * user1 writes a message, user1 goes offline, user 2 opens a chat from 1st devices and goes offline, user 2 opens a chat from 2nd devices and responds in its thread and goes offline, user2 opens first deviecs and thread messages count = 0

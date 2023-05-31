@@ -43,3 +43,12 @@ resource "cloudflare_record" "postfix_pychat" {
   value   = "v=spf1 ip4:${var.ip_address}"
   zone_id = var.cloud_flare_zone_id
 }
+
+
+resource "cloudflare_zone_settings_override" "example-com-settings" {
+  zone_id = var.cloud_flare_zone_id
+  settings {
+    // Otherwise it will result an infinitive loop
+    ssl = "strict"
+  }
+}
