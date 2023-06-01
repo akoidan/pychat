@@ -5,7 +5,7 @@ resource "helm_release" "global" {
 
 resource "helm_release" "backend" {
   name  = "backend"
-  # force_update = true
+  # vim force_update = true
   chart = "${path.module}/charts/backend"
   depends_on = [
     helm_release.global,

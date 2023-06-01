@@ -262,7 +262,6 @@ Useful links:
 Remember that Service Worker will work only if certificate is trusted. So flags like ignore-ceritifcate-errors won't work. But installing certifcate to root system will.
 
 ## Bootstrap files:
- 1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  1. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.**
  1. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
  1. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
