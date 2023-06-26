@@ -40,10 +40,10 @@ export class SmileysApi {
       const smileysData: SmileysStructure = (await import("@/assets/smileys.json")).default;
       Object.values(smileysData).forEach((tabValue) => {
         Object.values(tabValue).forEach((smileyInTab) => {
-          smileyInTab.src = `${PUBLIC_PATH ?? ""}/smileys/${smileyInTab.src}`;
+          smileyInTab.src = `${PUBLIC_PATH ?? "/"}smileys/${smileyInTab.src}`;
           if (smileyInTab.skinVariations) {
             Object.values(smileyInTab.skinVariations).forEach((variation) => {
-              variation.src = `${PUBLIC_PATH ?? ""}/smileys/${variation.src}`;
+              variation.src = `${PUBLIC_PATH ?? "/"}smileys/${variation.src}`;
             });
           }
         });

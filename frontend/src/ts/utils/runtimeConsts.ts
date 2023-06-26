@@ -60,4 +60,11 @@ export const WEBRTC_RUNTIME_CONFIG = (function() {
 const IS_SSL = location.protocol === "https:";
 export const WS_API_URL = `ws${IS_SSL ? "s" : ""}://${BACKEND_CURRENT_ADDRESS}/ws`;
 export const XHR_API_URL = `http${IS_SSL ? "s" : ""}://${BACKEND_CURRENT_ADDRESS}/api`;
-export const MEDIA_API_URL = PUBLIC_PATH ? PUBLIC_PATH : `http${IS_SSL ? "s" : ""}://${BACKEND_CURRENT_ADDRESS}`;
+export const MEDIA_API_URL = ((() => {
+  if (PUBLIC_PATH?.endsWith("/")) {
+    return PUBLIC_PATH.slice(0, -1);
+  } else if (PUBLIC_PATH) {
+    return PUBLIC_PATH;
+  }
+  return `http${IS_SSL ? "s" : ""}://${BACKEND_CURRENT_ADDRESS}`;
+})())
