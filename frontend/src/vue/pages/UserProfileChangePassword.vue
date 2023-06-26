@@ -69,14 +69,8 @@
   </form>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Vue} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 
@@ -97,7 +91,7 @@ export default class UserProfileChangePassword extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
 
   public get username(): string {
-    return this.userInfo.user;
+    return this.userInfo.username;
   }
 
   @ApplyGrowlErr({
@@ -108,7 +102,7 @@ export default class UserProfileChangePassword extends Vue {
     if (this.newPassword != this.confirmPassword) {
       this.$store.growlError("Passwords don't match");
     } else {
-      await this.$api.changePassword(this.oldPassword, this.newPassword);
+      await this.$api.restApi.changePassword(this.oldPassword, this.newPassword);
       this.$store.growlSuccess("Password has been changed");
     }
   }

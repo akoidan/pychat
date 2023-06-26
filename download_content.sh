@@ -75,6 +75,85 @@ update_docker() {
     safeRunCommand docker push deathangel908/pychat-test
 }
 
+minikube_reload_frontend() {
+  minikube_reload backend DockerfileBackend
+}
+
+minikube_reload_backend() {
+  minikube_reload frontend DockerfileFrontend
+}
+
+minikube_reload() {
+  image=$1
+  dockerfile=$2
+  # service can be not deployed yet, do not wait
+  kubectl delete -f ./kubernetes/$image.yaml --wait=true
+  safeRunCommand docker build -f ./kubernetes/$dockerfile -t deathangel908/pychat-$image .
+  safeRunCommand minikube image rm deathangel908/pychat-$image
+  safeRunCommand minikube image load deathangel908/pychat-$image
+}
+
+
+minikube_frontend() {
+  safeRunCommand minikube_reload_frontend
+  safeRunCommand kubectl apply -f kubernetes/frontend.yaml
+}
+
+minikube_backend() {
+  safeRunCommand minikube_reload_backend
+  safeRunCommand kubectl apply -f kubernetes/backend.yaml
+}
+
+minikube_delete_all() {
+  kubectl delete -f kubernetes/ingress.yaml --wait=true
+  kubectl delete -f kubernetes/backend.yaml --wait=true
+  kubectl delete -f kubernetes/migrate-backend.yaml --wait=true
+  kubectl delete -f kubernetes/mariadb.yaml --wait=true
+  kubectl delete -f kubernetes/redis.yaml --wait=true
+  kubectl delete -f kubernetes/secret.yaml --wait=true
+  kubectl delete -f kubernetes/config-map.yaml --wait=true
+  kubectl delete -f kubernetes/pv-pychat-photo.yaml --wait=true
+  kubectl delete -f kubernetes/pv-pychat-redis.yaml --wait=true
+  kubectl delete -f kubernetes/pv-pychat-mariadb.yaml --wait=true
+  kubectl delete -f kubernetes/namespace.yaml --wait=true
+}
+
+minikube_nginx() {
+   helm repo add stable https://charts.helm.sh/stable
+   helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+   helm install nginx-ingress ingress-nginx/ingress-nginx
+}
+minikube_certificate() {
+  # Profile → API Tokens → Create Token.  https://dash.cloudflare.com/profile/api-tokens Permissions: Zone — DNS — Edit, Zone — Zone — Read; Zone Resources: Include — All Zones
+  kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.8.0/cert-manager.yaml
+  helm repo add jetstack https://charts.jetstack.io
+  helm repo update
+  helm template cert-manager jetstack/cert-manager --namespace cert-manager --version v1.8.0| kubectl apply -f -
+  kubectl apply -f kubernetes/cf-secret.yaml
+  kubectl apply -f kubernetes/cert-manager.yaml
+  # helm --namespace cert-manager delete cert-manager
+  # kubectl delete namespace cert-manager
+  # kubectl delete -f https://github.com/jetstack/cert-manager/releases/download/v1.8.0/cert-manager.crds.yaml
+  # kubectl delete apiservice v1beta1.webhook.cert-manager.io
+}
+
+minikube_all() {
+  safeRunCommand kubectl apply -f kubernetes/namespace.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-pychat-photo.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-pychat-redis.yaml
+  safeRunCommand kubectl apply -f kubernetes/pv-pychat-mariadb.yaml
+  safeRunCommand kubectl apply -f kubernetes/config-map.yaml
+  safeRunCommand kubectl apply -f kubernetes/backend-secret.yaml
+  safeRunCommand kubectl apply -f kubernetes/mariadb.yaml
+  safeRunCommand kubectl apply -f kubernetes/redis.yaml
+  #safeRunCommand minikube_reload_backend
+  safeRunCommand kubectl apply -f kubernetes/migrate-backend.yaml
+  safeRunCommand kubectl apply -f kubernetes/backend.yaml
+  #safeRunCommand minikube_reload_frontend
+  safeRunCommand kubectl apply -f kubernetes/frontend.yaml
+  safeRunCommand kubectl apply -f kubernetes/ingress.yaml
+}
+
 rename_domain() {
     exist_domain="pychat\.org"
     your_domain="$1"
@@ -440,8 +519,11 @@ generate_secret_key() {
     fi
     echo "" >> $BE_DIRECTORY/chat/settings.py
     echo -n "SECRET_KEY = '" >> $BE_DIRECTORY/chat/settings.py
-    LC_ALL=C LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' </dev/urandom | head -c 50 >> $BE_DIRECTORY/chat/settings.py
-    echo "'" >> $BE_DIRECTORY/chat/settings.py
+    LC_ALL=C
+    LC_CTYPE=C
+    SECRET_KEY=$(tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' </dev/urandom | head -c 50)
+    echo $SECRET_KEY
+    echo  -ne "$SECRET_KEY'"  >> $BE_DIRECTORY/chat/settings.py
 }
 
 if [ "$1" = "post_fontello_conf" ]; then
@@ -492,6 +574,12 @@ elif [ "$1" = "copy_docker_prod_files" ]; then
     copy_docker_prod_files
 elif [ "$1" = "copy_root_fs" ]; then
     copy_root_fs
+elif [ "$1" = "minikube_all" ]; then
+    minikube_all
+elif [ "$1" = "minikube_frontend" ]; then
+    minikube_frontend
+elif [ "$1" = "minikube_backend" ]; then
+    minikube_backend
 elif [ "$1" = "redirect" ]; then
     safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
     safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
@@ -538,6 +626,9 @@ else
     chp copy_root_fs "Creates soft links from \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m to \e[96m/\e[0;33;40m"
     chp build_nginx "Build nginx with http-upload-module and installs it; . Usage: \e[92msh download_content.sh build_nginx 1.15.3 2.3.0  /tmp/depsFileList.txt\e[0;33;40m where 1.15 is nginx version, 2.3.0 is upload-http-module version"
     chp create_django_tables "Creates database tables and data"
+    chp minikube_all "Creates/updates kubernetes cluster"
+    chp minikube_backend "Build backend docker file and deploy/update it in minikube"
+    chp minikube_frontend "Build frontend docker file and deploy/update it in minikube"
     exit 1
 fi
 

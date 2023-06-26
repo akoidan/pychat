@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-coturn
+  namespace: pychat
+data:
+  DOMAIN_NAME: "{{ .Values.domain_name }}"
+  USERNAME: "{{ .Values.username }}"
+  PASSWORD: "{{ .Values.password }}"
+  MIN_PORT: "{{ .Values.udp_port_range_start }}"
+  MAX_PORT: "{{ .Values.udp_port_range_end }}"

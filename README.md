@@ -1,5 +1,6 @@
-[![docker](https://github.com/akoidan/pychat/actions/workflows/docker.yml/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions/workflows/docker.yml) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Upload Frontend pychat.org](https://github.com/akoidan/pychat/workflows/FE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3AFE%3Apychat.org) [![Refresh backend pychat.org](https://github.com/akoidan/pychat/workflows/BE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3ABE%3Apychat.org)
-
+[![Docker](https://github.com/akoidan/pychat/actions/workflows/docker.yml/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions/workflows/docker.yml)
+[![Newbackend test](https://github.com/akoidan/pychat/workflows/NEWBE:pychat.org/badge.svg)](https://github.com/akoidan/pychat/actions)
+[![Codecov](https://codecov.io/gh/akoidan/pychat/branch/nestjs/graph/badge.svg?token=aQlNwbpTIw)](https://codecov.io/gh/akoidan/pychat)
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 
 ## Table of contents
@@ -260,7 +261,6 @@ Useful links:
 Remember that Service Worker will work only if certificate is trusted. So flags like ignore-ceritifcate-errors won't work. But installing certifcate to root system will.
 
 ## Bootstrap files:
- 1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  1. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.**
  1. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
  1. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
@@ -510,6 +510,104 @@ Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
 http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
+
+# Terraform
+Terraform will allow you to automatically create pychat infrastructure for:
+ - Cloudflare as CDN and DNS (free of charge)
+ - Linode as Kubernetes provider. It has the cheapest prices  (10$ per month is gonna be enough, that will use 1 node of 2GB ram and 1vCPU) along all providers with 500MB/s SSD, 99.99% SLA, 10Gb/s in and 2Gb/s out networks.
+ - Letsencrypt as SSL certificate (free of charge)
+ - Domain address (10$ per year)
+You will have to create a few accounts and setup a few variables in ./kubernetes/terraform/terraform.tfvars below
+ 
+### Cloudflare 
+ - Sign in to [Cloudflare](https://www.cloudflare.com/) and copy ZoneID and API token 
+ - Copy zoneID: Go to https://dash.cloudflare.com/ - create a new site (or use existing one) grab an API Zone ID and place it into `kubernetes/terraform.tfvars` with key `cloud_flare_zone_id`
+ - Copy API token: go to https://dash.cloudflare.com/profile/api-tokens and create a new api token and place it into `kubernetes/terraform.tfvars` with key `cloud_flare_api_token`
+
+### Linode
+ Sign in to [Linode](http://linode.com/), go to Profile -> Api tokens -> Create A Personal Access Token -> Select Kubernetes & Linodes -> Create Token. Put that token to`kubernetes/terraform.tfvars` with key `linode_token`
+
+### Backups:
+Backups are done using private git repository. It includes sql dump + photo directory
+ - Create a private repo. 
+ - Place repo url e.g. `git@github.com:username/backup_repo.git` to `terraform.tfvars` with key `github`. Url should be in ssh format not in https. Authorization will be done by ssh key-pair
+ - Generate a new keypair with `ssh-keygen -t rsa -b 4096 -C "kube backup" -f  /tmp/sshkey/id_rsa -N ""` 
+ - Put public key to your git server (for Github it's Settings (on dashboard) -> Deploy Keys -> Add deploy key)
+ - Put ssh public key `ssh-rsa aa...` to  `terraform.tfvars` with key `id_rsa_pub`
+ - Put private key `-----BEGIN OPENSSH PRIVATE KEY-----... -----END OPENSSH PRIVATE KEY--` to `terraform.tfvars` with key `id_rsa`. You can use [this](https://stackoverflow.com/a/66646420/3872976) lifehack for multiline variable
+k8s wil have a cronjob backend-backup which will run each hour.
+
+### Other keys
+Other keys are required to be specified in `terraform.tfvars`
+ - put `domain_name`
+ 
+### Self sign certificate (Optional):
+Skip this if you did cloudflare step.
+If you don't own a domain (and planning to use ip + self signed certificate, this will result:
+- certmanager will not deploy be used
+- turn server will not work,
+- postfix will not send emails, including registration and password reset
+- Site is gonna be under self-signed certificate and will prompt errors.
+This is still possible
+- set `use_certmanager = false` in  `terraform.tfvars` 
+Upon linode cluster creation .kubeconfig will be generated in kubernetes/terraform/helm directory. After it all operations with helm will be using this conf. If this file is deleted helm will compain about missing kubernetes config
+
+### Other variables in terraform.tfvars
+ - domain_name - your host origin domain name. It's gonna be used in turnserver postfix static nginx, cloudflare and other configuration
+ - email - It's gonna be used in cf issuer and a few other places
+ - Other variables that's gonna be proxied as env variables for python backend. Check backend/chat/settings.example for docs. Those includes but not limited to DEFAULT_PROFILE_ID SECRET_KEY RECAPTCHA_PRIVATE_KEY RECAPTCHA_PUBLIC_KEY GOOGLE_OAUTH_2_CLIENT_ID FACEBOOK_ACCESS_TOKEN GIPHY_API_KEY FIREBASE_API_KEY 
+
+### If you already own a k8s cluster.
+All helm charts are located in kubernetes/terraform/helm, we will apply terraform from this directory to exclude linode and cloudlfare resource creation
+ - cd kubernetes/terraform/helm
+ - create `terraform.tfvars` in this directory and put all required content in it.
+ - `cat ~/.kube/config |base64 -w 0` and place value to `terraform.tfvars` with key `kubeconfig`
+ - Put external ip address of the k8s node you are going to deploy pychat in `terraform.tfvars` with key `ip_address`. Pychat uses NodePort, if you want to use your loadbalancer you will have to tweak ingress configuration manually.
+ - `terraform init`
+ - `terraform apply`
+
+### Frontend
+
+Frontend can't be built during runtime, thus you will need to built it yourself. Also you need to have accesss to some docker registry, you can use dockerhub as it's free  of charge. This repo also can host private docker registry built from kubernetes/terraform/helm/charts/docker-registry so you won't have to create one.\
+Replace values in `/kubernetes/docker/frontend/frontend-old-pychat.org.json` in and run from project root directory.
+```bash
+docker build --build-arg PYCHAT_GIT_HASH=`git rev-parse --short=10 HEAD`  -f ./kubernetes/docker/frontend/Dockerfile -t deathangel908/pychat-frontend .
+docker push deathangel908/pychat-frontend
+```
+Note that tag `deathangel908/pychat-frontend` should be one pointing to your registry
+Replace value in `repository_path` in `./kubernetes/terraform/helm/charts/frontend/values.yaml` to one pointing to you registry
+In case you use private registry from this terraform image use:
+ - generate user-password with: `docker run --entrypoint htpasswd httpd:2 -Bbn testuser testpassword`
+ - put output  to `terraform.tfvars` with key `htpasswd`
+ - Fully apply terraform configuration. Most services could be down
+ - Login to your private registry with `docker login --username=testuser --password=testpassword registry.pychat.org`
+ - And do push like above `docker push deathangel908/pychat-frontend` with your tag
+ - If you kill frontend pod now, it should repull from your repo
+
+### Apply Terrraform
+Apply terraform configuration with:
+ - `terraform init`
+ - `terraform plan`
+ - `terraform apply`
+ 
+### Troubleshooting
+1. How to icrease maximum upload file:
+ - Change nginx configuration  ``   client_max_body_size 75M;`
+ - In addition to above, if you're using k8s + ingress, change `ingress.yaml` nginx.ingress.kubernetes.io/proxy-body-size: 75m
+ 
+1. Certmanager fails or services that depends on SSL won't start (e.g. Postfix or Coturn)
+Certmanager should create  pychat_tls sercret in namespace pychat. It creates a private key and puts it into letsencrypt-prod secret. Then it tries to issue it against letsencrypt server. 
+ - Check the logs of the certmanager pods. 
+ - Note that letsencrypt allows you max 5 cetrificates in 160 hours. If you used all tries, use another domain or subdomain
+ 
+1. Terraform apply produces errors like `Unexpected EOF`.
+ - Seems like your k8s providers API exceed limits and it cuts the k8s request. You can try it with  `terraform apply -parallelism=1`. Your cluster will deploy for a while, but it has less chance to get into this situation
+ - You can also execute `terraform apply` a few times so it finishes creating resources that it failed to inspect. Note that if you got a certificate already, I recomend you to back it up from `pychat-tls` secret in order to avoid cetrification fails describe above
+ 
+1. Cloudflare returns too many redirect within the same time If turn it off (by setting Node's ip to /etc/hosts) it works fine. This result when using [flexible mode](https://developers.cloudflare.com/ssl/troubleshooting/too-many-redirects/#encryption-mode-misconfigurations). Since all request from http will be redirected to https, all http urls will return header location: https since result infinitive loop  
+ - Go to cloudlfare ssl/tls overview
+ - Set strict encryption mode
+ - Go to Caching Configuration. Click on Custom purge and select static.pychat.org (or static.yourmdain.com) or Purge EVerything if pychat is the only domain.
 # TODO
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
 * user1 writes a message, user1 goes offline, user 2 opens a chat from 1st devices and goes offline, user 2 opens a chat from 2nd devices and responds in its thread and goes offline, user2 opens first deviecs and thread messages count = 0

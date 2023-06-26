@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "country": "Ukraine",
+  "countryCode": "UA",
+  "region": "30",
+  "regionName": "Kyiv City",
+  "city": "Kyiv",
+  "zip": "01000",
+  "lat": 50.4501,
+  "lon": 30.5234,
+  "timezone": "Europe/Kiev",
+  "isp": "Kyivstar UA",
+  "org": "Kyivstar LLC",
+  "as": "AS15895 Kyivstar PJSC",
+  "query": "134.249.113.11"
+}

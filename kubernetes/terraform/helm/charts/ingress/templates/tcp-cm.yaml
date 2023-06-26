@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+data:
+  25: "pychat/postfix-service:25"
+#  587: "pychat/postfix-service:587"
+#  465: "pychat/postfix-service:465"
+  3478: "pychat/coturn-service:3478"
+  5349: "pychat/coturn-service:5349"

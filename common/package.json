@@ -1,0 +1,29 @@
+{
+  "name": "pychat-common",
+  "version": "1.0.0",
+  "description": "Opensource chat",
+  "author": "Andrew Koidan <deathangel908@gmail.com",
+  "license": "MIT",
+  "homepage": "https://github.com/akoidan/pychat#readme",
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint --ext .ts --max-warnings=0 src",
+    "lint:fix": "eslint --fix --ext .ts src"
+  },
+  "engines": {
+    "node": ">=16.0.0 <17"
+  },
+  "dependencies": {
+    "lines-logger": "^2.1.2",
+    "typescript": "^4.6.3",
+    "@typescript-eslint/eslint-plugin": "^5.17.0",
+    "@typescript-eslint/parser": "^5.17.0",
+    "eslint": "^8.12.0",
+    "eslint-find-rules": "^4.1.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-jest": "^26.1.4",
+    "eslint-plugin-only-warn": "^1.0.3",
+    "eslint-plugin-sonarjs": "^0.13.0"
+  }
+}

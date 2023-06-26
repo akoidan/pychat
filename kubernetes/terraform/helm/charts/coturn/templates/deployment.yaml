@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coturn-deployment
+  namespace: pychat
+  labels:
+    app: coturn
+spec:
+  selector:
+    matchLabels:
+      app: coturn
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: coturn
+    spec:
+      volumes:
+        - name: pychat-coturn-tls
+          secret:
+            secretName: pychat-tls
+            items:
+              - key: tls.crt
+                path: crt.pem
+              - key: tls.key
+                path: key.pem
+      containers:
+        - name: coturn
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
+          envFrom:
+          - configMapRef:
+              name: cm-coturn
+          volumeMounts:
+          - name: pychat-coturn-tls
+            mountPath: "/etc/tls"
+            readOnly: true

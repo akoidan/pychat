@@ -4,11 +4,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Ref, Vue} from "vue-property-decorator";
 import Painter from "@/vue/chat/textarea/Painter.vue";
 
 

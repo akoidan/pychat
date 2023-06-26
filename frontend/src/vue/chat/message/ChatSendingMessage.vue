@@ -26,37 +26,28 @@
         class="message-tooltip"
       />
       <i
-        v-if="isSelf && message.status === 'read'"
+        v-if="isSelf && message.status === 'READ'"
         class="icon-ok message-status-read"
         title="This message has been read by at least one user"
       />
       <i
-        v-if="isSelf && message.status === 'received'"
+        v-if="isSelf && message.status === 'RECEIVED'"
         class="icon-ok message-status-received"
         title="At least one user in this room has received this message"
       />
-      <div v-if="message.status === 'sending'" class="spinner"/>
+      <div v-if="message.status === 'SENDING'" class="spinner"/>
     </div>
   </div>
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
 import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
 import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
 
 import type {SetMessageProgressError} from "@/ts/types/types";
 import type {EditingMessage} from "@/ts/types/model";
-import {
-  CurrentUserInfoModel,
-  MessageModel,
-  RoomDictModel,
-} from "@/ts/types/model";
+import {CurrentUserInfoModel, MessageModel, MessageStatusInner, RoomDictModel} from "@/ts/types/model";
 import ChatMessageToolTip from "@/vue/chat/message/ChatMessageToolTip.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 
@@ -97,18 +88,20 @@ export default class ChatSendingMessage extends Vue {
       "message-self": this.isSelf,
       "message-others": !this.isSelf,
       "message-wrapper": true,
-      "message-is-being-sent": this.message.status === "sending",
+      "message-is-being-sent": this.message.status === MessageStatusInner.SENDING,
       "removed-message": this.message.deleted,
       "unread-message": this.message.isHighlighted,
     };
   }
 
   public get isSelf() {
-    return this.message.userId === this.userInfo.userId;
+    return this.message.userId === this.userInfo.id;
   }
 
   cancelTransfer() {
-    this.message.transfer?.xhr?.abort();
+    if (this.message.transfer?.abortFn) {
+      this.message.transfer.abortFn();
+    }
   }
 
   closeThread() {

@@ -15,6 +15,7 @@ import viteChecker from 'vite-plugin-checker'
 import {viteStaticCopy} from 'vite-plugin-static-copy'
 import viteCompression from 'vite-plugin-compression'
 import viteVisualizer from 'rollup-plugin-visualizer'
+import Inspector from "vite-plugin-vue-inspector";
 
 export default defineConfig(async({command, mode}) => {
   let key, cert, ca, gitHash;
@@ -31,14 +32,33 @@ export default defineConfig(async({command, mode}) => {
 
   const PYCHAT_CONSTS = getConsts(gitHash, command);
   const srcDir = resolve(__dirname, '..', 'src');
+  const commonDir = resolve(__dirname, '..', '..', 'common', 'src');
   const distDir = resolve(__dirname, '..', 'dist');
   const nodeModulesDir = resolve(__dirname, '..', 'node_modules');
   const swFilePath = resolve(srcDir, 'ts', 'sw.ts');
   const smileyPath = resolve(srcDir, 'assets', 'smileys.json');
+  const plugins = []
+  if (!process.env.VITE_LIGHT) {
+    plugins.push(viteChecker({
+        typescript: true,
+        vueTsc: true,
+        ...(process.env.VITE_LINT ? {
+          eslint: {
+            lintCommand: 'eslint --ext .vue --ext .ts ts vue',
+            dev: {}
+          }
+        } : null)
+      }
+    ),)
+    plugins.push(viteCompression({
+      filter: () => true,
+    }))
+  }
   return {
     resolve: {
       alias: [
         {find: '@', replacement: srcDir},
+        {find: '@common', replacement: commonDir},
       ],
     },
     ...(PYCHAT_CONSTS.PUBLIC_PATH ? {base: PYCHAT_CONSTS.PUBLIC_PATH} : null),
@@ -48,6 +68,9 @@ export default defineConfig(async({command, mode}) => {
     },
     plugins: [
       vue(),
+      Inspector({
+        vue: 3,
+      }),
       ...(!process.env.VITE_LIGHT ? [
         viteChecker({
             typescript: !process.env.VITE_LIGHT,

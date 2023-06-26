@@ -1,18 +1,12 @@
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {
-  IStorage,
-  SetFileIdsForMessage,
-  SetRoomsUsers,
-} from "@/ts/types/types";
-import type {
-  ChannelModel,
+import type {IStorage, SetFileIdsForMessage, SetRoomsUsers} from "@/ts/types/types";
+import type {ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   MessageModel,
-  MessageStatus,
   RoomSettingsModel,
   UserModel,
-} from "@/ts/types/model";
+  MessageStatusModel} from "@/ts/types/model";
 import type {Logger} from "lines-logger";
 
 interface LocalStorageMessage {
@@ -108,7 +102,7 @@ export default class LocalStorage implements IStorage {
   public setUsers(users: UserModel[]) {
   }
 
-  public setMessagesStatus(messagesIds: number[], status: MessageStatus) {
+  public setMessagesStatus(messagesIds: number[], status: MessageStatusModel) {
   }
 
   public saveUser(users: UserModel) {

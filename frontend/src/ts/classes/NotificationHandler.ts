@@ -1,36 +1,32 @@
+import type {InternetAppearMessage} from "@/ts/types/messages/inner/internet.appear";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
 import {extractError} from "@/ts/utils/pureFunctions";
-import type Api from "@/ts/message_handlers/Api";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type HttpApi from "@/ts/message_handlers/HttpApi";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import {
+  CONNECTION_ERROR,
   GIT_HASH,
   IS_DEBUG,
   SERVICE_WORKER_URL,
   SERVICE_WORKER_VERSION_LS_NAME,
 } from "@/ts/utils/consts";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import type {InternetAppearMessage} from "@/ts/types/messages/innerMessages";
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
+
 import type {MainWindow} from "@/ts/classes/MainWindow";
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
 
 
-export default class NotifierHandler extends MessageHandler {
+export default class NotifierHandler {
   protected readonly logger: Logger;
-
-  protected readonly handlers: HandlerTypes<keyof Api, "*"> = {
-    internetAppear: <HandlerType<"internetAppear", "*">> this.internetAppear,
-  };
 
   private readonly mainWindow: MainWindow;
 
   private readonly popedNotifQueue: Notification[] = [];
 
+  private retryFcm: Function | null = null;
 
   /* This is required to know if this tab is the only one and don't spam with same notification for each tab*/
   private serviceWorkedTried = false;
@@ -43,7 +39,7 @@ export default class NotifierHandler extends MessageHandler {
 
   private readonly store: DefaultStore;
 
-  private readonly api: Api;
+  private readonly api: HttpApi;
 
   private readonly browserVersion: string;
 
@@ -51,14 +47,13 @@ export default class NotifierHandler extends MessageHandler {
 
   private readonly isMobile: boolean;
 
-  private readonly ws: WsHandler;
+  private readonly ws: WsApi;
 
   private readonly documentTitle: string;
 
   private readonly sub: Subscription;
 
-  public constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
-    super();
+  public constructor(api: HttpApi, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsApi, store: DefaultStore, mainWindow: MainWindow, sub: Subscription) {
     this.api = api;
     this.browserVersion = browserVersion;
     this.isChrome = isChrome;
@@ -74,9 +69,13 @@ export default class NotifierHandler extends MessageHandler {
     this.onFocus(null);
   }
 
-  public async internetAppear(p: InternetAppearMessage) {
+  @Subscribe<InternetAppearMessage>()
+  public async internetAppear() {
     if (!this.serviceWorkedTried) {
       await this.tryAgainRegisterServiceWorker();
+    }
+    if (this.retryFcm) {
+      this.retryFcm();
     }
   }
 
@@ -249,7 +248,18 @@ export default class NotifierHandler extends MessageHandler {
 
     if (subscription.endpoint && subscription.endpoint.startsWith("https://fcm.googleapis.com/fcm/send")) {
       const registrationId = subscription.endpoint.split("/").pop();
-      await this.api.registerFCB(registrationId, this.browserVersion, this.isMobile);
+      this.retryFcm = async() => {
+        try {
+          await this.api.restApi.registerFCM(registrationId, this.browserVersion, this.isMobile);
+          this.retryFcm = null;
+        } catch (e) {
+          if (e !== CONNECTION_ERROR) {
+            this.retryFcm = null;
+          }
+          throw e;
+        }
+      };
+      this.retryFcm();
       this.logger.log("Saved subscription to server")();
     } else {
       this.logger.warn("Unsupported subscription type {}", subscription.endpoint)();

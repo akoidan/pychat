@@ -1,9 +1,5 @@
 import mobile from "is-mobile";
-import {
-  BACKEND_ADDRESS,
-  PUBLIC_PATH,
-  WEBRTC_CONFIG,
-} from "@/ts/utils/consts";
+import {BACKEND_ADDRESS, IS_SSL, PUBLIC_PATH, WEBRTC_CONFIG} from "@/ts/utils/consts";
 
 export const isMobile: boolean = mobile.isMobile();
 

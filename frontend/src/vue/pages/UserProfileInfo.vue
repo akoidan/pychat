@@ -10,7 +10,7 @@
           <th>Username:</th>
           <td>
             <input
-              v-model="model.user"
+              v-model="model.username"
               class="input"
               maxlength="30"
               type="text"
@@ -112,23 +112,20 @@
   </form>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import type {UserProfileDtoWoImage} from "@common/model/dto/user.profile.dto";
+import {Gender} from "@common/model/enum/gender";
+import type {SetUserProfileMessage} from "@common/ws/message/ws/set.user.profile";
+
+
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Vue} from "vue-property-decorator";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
-import type {SexModelString} from "@/ts/types/model";
 import {CurrentUserInfoModel} from "@/ts/types/model";
-import type {UserProfileDtoWoImage} from "@/ts/types/dto";
 
 import {currentUserInfoModelToDto} from "@/ts/types/converters";
 import AppInputDate from "@/vue/ui/AppInputDate.vue";
-import type {SetUserProfileMessage} from "@/ts/types/messages/wsInMessages";
-import type {LogoutMessage} from "@/ts/types/messages/innerMessages";
+import {LogoutMessage} from "@/ts/types/messages/inner/logout";
+
 
 @Component({
   name: "UserProfileInfo",
@@ -143,7 +140,7 @@ export default class UserProfileInfo extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  public sex: SexModelString[] = ["Male", "Female", "Secret"];
+  public sex: Gender[] = [Gender.MALE, Gender.FEMALE, Gender.OTHER];
 
   public model!: UserProfileDtoWoImage;
 
@@ -164,10 +161,11 @@ export default class UserProfileInfo extends Vue {
 
 
   public async signOut() {
-    this.$api.logout(); // Do not make user wait, logout instantly
+    this.$api.restApi.logout(); // Do not make user wait, logout instantly
     const message: LogoutMessage = {
       action: "logout",
       handler: "*",
+      data: null,
     };
     this.$messageBus.notify(message);
   }

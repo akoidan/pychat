@@ -61,22 +61,12 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
-import {
-  ChannelsDictUIModel,
-  CurrentUserInfoModel,
-} from "@/ts/types/model";
+import {ChannelsDictUIModel, CurrentUserInfoModel} from "@/ts/types/model";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";
 
@@ -139,14 +129,16 @@ export default class CreateRoom extends Vue {
       throw Error("Please add user");
     }
     const e = await this.$ws.sendAddRoom(
-      this.roomName ? this.roomName : null,
-      this.isPublic ? false : this.p2p,
-      this.sound,
-      !this.p2p && this.notifications,
-      this.currentUsers,
-      this.parentChannelId ? this.parentChannelId : null,
+      {
+        users: this.currentUsers,
+        name: this.roomName ? this.roomName : null,
+        p2p: this.isPublic ? false : this.p2p,
+        channelId: this.parentChannelId ? this.parentChannelId : null,
+        volume: this.sound,
+        notifications: !this.p2p && this.notifications,
+      },
     );
-    this.$router.replace(`/chat/${e.roomId}`);
+    this.$router.replace(`/chat/${e.id}`);
   }
 }
 </script>

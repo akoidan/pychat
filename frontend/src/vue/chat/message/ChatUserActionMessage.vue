@@ -9,11 +9,7 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import type {UserModel} from "@/ts/types/model";
 import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
 
@@ -43,7 +39,7 @@ export default class ChatUserActionMessage extends Vue {
   }
 
   public get user() {
-    return this.isMe ? "You" : this.allUsersDict[this.userId].user;
+    return this.isMe ? "You" : this.allUsersDict[this.userId].username;
   }
 
   public get isMe() {

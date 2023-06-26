@@ -56,13 +56,10 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {ImageType} from "@common/model/enum/image.type";
+
+
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
 import {
   createTag,
   encodeHTML,
@@ -81,12 +78,7 @@ import {
   savedFiles,
   timeToString,
 } from "@/ts/utils/htmlApi";
-import type {
-  EditingMessage,
-  MessageModel,
-  PastingTextAreaElement,
-  UserModel,
-} from "@/ts/types/model";
+import type {EditingMessage, MessageModel, PastingTextAreaElement, UserModel} from "@/ts/types/model";
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -96,26 +88,18 @@ import {
 } from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 
-import type {
-  MessageDataEncode,
-  MessageSender,
-} from "@/ts/types/types";
-import {
-  editMessageWs,
-  showAllowEditing,
-} from "@/ts/utils/pureFunctions";
+import type {MessageDataEncode, MessageSender} from "@/ts/types/types";
+import {editMessageWs, showAllowEditing} from "@/ts/utils/pureFunctions";
 import MediaRecorder from "@/vue/chat/textarea/MediaRecorder.vue";
 import ChatAttachments from "@/vue/chat/textarea/ChatAttachments.vue";
 import SmileyHolder from "@/vue/chat/textarea/SmileyHolder.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
-import {
-  SHOW_I_TYPING_INTERVAL,
-  USERNAME_REGEX,
-} from "@/ts/utils/consts";
+import {SHOW_I_TYPING_INTERVAL, USERNAME_REGEX} from "@/ts/utils/consts";
 import ChatTagging from "@/vue/chat/textarea/ChatTagging.vue";
 import {Throttle} from "@/ts/classes/Throttle";
 import GiphySearch from "@/vue/chat/textarea/GiphySearch.vue";
 import type {GIFObject} from "giphy-api";
+
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -256,7 +240,7 @@ export default class ChatTextArea extends Vue {
     const user = this.allUsersDict[message.userId];
     oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
     // TODO refactor quote
-    this.userMessage.innerHTML = `${encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + await encodeP(message, this.$store, this.$smileyApi) + encodeHTML(" >>>") + String.fromCharCode(13)} ${oldValue}`;
+    this.userMessage.innerHTML = `${encodeHTML(`(${timeToString(message.time)}) ${user.username}: `) + await encodeP(message, this.$store, this.$smileyApi) + encodeHTML(" >>>") + String.fromCharCode(13)} ${oldValue}`;
     placeCaretAtEnd(this.userMessage);
   }
 
@@ -433,7 +417,7 @@ export default class ChatTextArea extends Vue {
 
   public handleAddVideo(file: Blob) {
     if (file) {
-      pasteBlobVideoToTextArea(file, this.userMessage, "m", (e: string) => {
+      pasteBlobVideoToTextArea(file, this.userMessage, ImageType.MEDIA_RECORD, (e: string) => {
         this.$store.growlError(e);
       });
     }
@@ -547,13 +531,21 @@ export default class ChatTextArea extends Vue {
   overflow-y: auto
   white-space: pre-wrap
 
-  :deep(.B4j2ContentEditableImg), :deep(.giphy-img)
+  :deep(img.B4j2ContentEditableImg), :deep(.giphy-img)
     max-height: 200px
     max-width: 400px
 
     &.failed
       min-width: 200px
       min-height: 100px
+
+  :deep(picture.B4j2ContentEditableImg)
+    img
+      max-height: 200px
+      max-width: 400px
+      &.failed
+        min-width: 200px
+        min-height: 100px
 
   :deep(.audio-record)
     height: 50px

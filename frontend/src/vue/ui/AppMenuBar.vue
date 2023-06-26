@@ -4,7 +4,7 @@
       <div class="app-header">
         <span class="username">
           <img v-if="imgSrc" :src="imgSrc"/>
-          <div class="user-name">{{ userInfo.user }}</div>
+          <div class="user-name">{{ userInfo.username }}</div>
         </span>
       </div>
       <div class="app-section">
@@ -45,14 +45,8 @@
   </app-modal>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
-import {
-  GITHUB_LINK,
-  ISSUES,
-} from "@/ts/utils/consts";
+import {Component, Vue} from "vue-property-decorator";
+import {GITHUB_LINK, ISSUES} from "@/ts/utils/consts";
 import {State} from "@/ts/instances/storeInstance";
 import {CurrentUserInfoModel} from "@/ts/types/model";
 import AppModal from "@/vue/ui/AppModal.vue";
@@ -69,7 +63,7 @@ export default class AppMenuBar extends Vue {
   public readonly userInfo!: CurrentUserInfoModel;
 
   public get imgSrc() {
-    return resolveMediaUrl(this.userInfo.image);
+    return resolveMediaUrl(this.userInfo.thumbnail);
   }
 
   public get consts() {

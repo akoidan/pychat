@@ -1,0 +1,6 @@
+apiVersion: v2
+name: certificate
+description: if cert-manager is not used, we can use self-signed certificate
+type: application
+version: 0.1.0
+appVersion: "1.16.0"

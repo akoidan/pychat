@@ -10,16 +10,8 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {Component, Ref, Vue, Watch} from "vue-property-decorator";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import AppImageCropper from "@/vue/ui/AppImageCropper.vue";
@@ -50,7 +42,7 @@ export default class UserProfileImage extends Vue {
   }
 
   public created() {
-    this.srcImg = resolveMediaUrl(this.userInfo.image) || "";
+    this.srcImg = resolveMediaUrl(this.userInfo.thumbnail) || "";
   }
 
   @ApplyGrowlErr({
@@ -60,7 +52,7 @@ export default class UserProfileImage extends Vue {
   public async upload() {
     const blob = await this.cropper.cropImage();
     if (blob) {
-      await this.$api.uploadProfileImage(blob);
+      await this.$api.restApi.uploadProfileImage(blob);
       this.$store.growlSuccess("Image uploaded");
     } else {
       throw Error("Please select image first");

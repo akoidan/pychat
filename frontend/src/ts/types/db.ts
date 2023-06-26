@@ -1,9 +1,11 @@
+import type {Gender} from "@common/model/enum/gender";
 import type {LogLevel} from "lines-logger";
-import type {MessageStatus} from "@/ts/types/model";
+import type {MessageStatusInner} from "@/ts/types/model";
+
 
 export interface UserDB {
   id: number;
-  user: string;
+  username: string;
   sex: SexDB;
   last_time_online: number;
   deleted: BooleanDB;
@@ -14,10 +16,7 @@ export interface UserDB {
   city: string;
 }
 
-export type SexDB =
-  0
-  | 1
-  | 2;
+export type SexDB = Gender;
 export type BooleanDB =
   0
   | 1;
@@ -31,13 +30,13 @@ export interface RoomDB {
   channel_id: number;
   is_main_in_channel: BooleanDB;
   deleted: BooleanDB;
-  creator: number;
+  creator_id: number;
 }
 
 export interface ChannelDB {
   id: number;
   name: string;
-  creator: number;
+  creator_id: number;
 }
 
 export interface TagDB {
@@ -58,11 +57,12 @@ export interface MessageDB {
   edited: number;
   room_id: number;
   user_id: number;
-  status: MessageStatus;
+  status: MessageStatusInner;
 }
 
 export interface FileDB {
   id: number;
+  name: string;
   preview_file_id: number; //  So this is UploadFile.id for "preview" File
   file_id: number; // So this is UploadFile.id for "url" File
   server_id: number; // If we saved this file on backend, it would have its id
@@ -90,13 +90,13 @@ export interface SettingsDB {
 
 export interface ProfileDB {
   user_id: number;
-  user: string;
+  username: string;
   name: string;
   city: string;
-  image: string;
+  thumbnail: string;
   surname: string;
   email: string;
-  birthday: string;
+  birthday: Date;
   contacts: string;
   sex: SexDB;
 }

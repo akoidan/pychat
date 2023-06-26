@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Opensource chat",
   "scripts": {
-    "start": "vite --config build/vite.config.ts",
+    "start": "vite --config build/vite.config.ts --force",
     "build": "VITE_LIGHT=true vite --config build/vite.config.ts build",
     "build:light": "VITE_LIGHT=true vite --config build/vite.config.ts build",
     "start:lint": "VITE_LINT=true vite --config build/vite.config.ts",
@@ -23,6 +23,9 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/akoidan/pychat/issues"
+  },
+  "engines": {
+    "node": ">=16.0.0 <17"
   },
   "homepage": "https://github.com/akoidan/pychat#readme",
   "devDependencies": {
@@ -57,6 +60,7 @@
     "vite-plugin-checker": "^0.4.4",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-static-copy": "https://github.com/akoidan/vite-plugin-static-copy",
+    "vite-plugin-vue-inspector": "^0.3.0",
     "vue-tsc": "^0.33.9"
   },
   "dependencies": {

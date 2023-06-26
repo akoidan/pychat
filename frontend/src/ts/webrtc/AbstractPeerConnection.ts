@@ -1,28 +1,28 @@
+import type {CheckTransferDestroyMessage} from "@/ts/types/messages/inner/check.transfer.destroy";
+import type {ConnectToRemoteMessage, ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.remote";
+import {
+  SendRtcDataWsInBody,
+} from "@common/ws/message/peer-connection/send.rtc.data";
+import type {HandlerName} from "@common/ws/common";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
 
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import Subscription from "@/ts/classes/Subscription";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {HandlerName} from "@/ts/types/messages/baseMessagesInterfaces";
-import type {
-  CheckTransferDestroy,
-  ConnectToRemoteMessage,
-} from "@/ts/types/messages/innerMessages";
-import type {SendRtcDataMessage} from "@/ts/types/messages/wsInMessages";
+
 import {WEBRTC_RUNTIME_CONFIG} from "@/ts/utils/runtimeConsts";
+import {Subscribe} from "@/ts/utils/pubsub";
+import type {SendRtcDataWsInMessage} from "@common/ws/message/peer-connection/send.rtc.data";
+import {SessionHolder} from "@/ts/types/types";
+import AbstractMessageProcessor from "@/ts/message_handlers/AbstractMessageProcessor";
 
 
-export default abstract class AbstractPeerConnection extends MessageHandler {
+export default abstract class AbstractPeerConnection extends AbstractMessageProcessor {
   protected offerCreator: boolean = false;
 
-  protected sendRtcDataQueue: SendRtcDataMessage[] = [];
-
-  protected readonly opponentWsId: string;
-
-  protected readonly connectionId: string;
+  protected sendRtcDataQueue: SendRtcDataWsInBody[] = [];
 
   protected logger: Logger;
 
@@ -30,15 +30,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   protected sdpConstraints: any;
 
-  protected readonly wsHandler: WsHandler;
-
-  protected readonly store: DefaultStore;
-
-  protected readonly roomId: number;
-
   protected sendChannel: RTCDataChannel | null = null;
-
-  protected readonly sub: Subscription;
 
   private readonly pc_constraints: unknown = {
     optional: [/* Firefox*/
@@ -47,19 +39,66 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     ],
   };
 
-  public constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore, sub: Subscription) {
-    super();
-    this.roomId = roomId;
-    this.connectionId = connectionId;
-    this.opponentWsId = opponentWsId;
-    this.sub = sub;
+    public constructor(
+    private readonly roomId: number,
+    private readonly connectionId: string,
+    private readonly opponentWsId: string,
+    private readonly wsHandler: WsApi,
+    private readonly store: DefaultStore,
+    private readonly sub: Subscription,
+    private readonly sessionHolder: SessionHolder,
+  ) {
+    super("p2p");
     this.sub.subscribe(Subscription.allPeerConnectionsForTransfer(connectionId), this);
     this.sub.subscribe(this.mySubscriberId, this);
-    this.wsHandler = ws;
-    this.store = store;
     this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, "#960055");
     this.logger.log("Created {}", this.constructor.name)();
   }
+
+
+  public sendRawTextToServer(message: string): boolean {
+    if (this.isChannelOpened) {
+      this.sendChannel!.send(message);
+      return true;
+    }
+    return false;
+  }
+
+  private get isChannelOpened(): boolean {
+    return this.sendChannel?.readyState === "open";
+  }
+
+
+  protected setupEvents() {
+    this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
+    this.sendChannel!.onopen = () => {
+      this.logger.log("Channel opened")();
+      if (this.sessionHolder.wsConnectionId! > this.opponentWsId) {
+        this.syncMessages();
+      }
+      this.store.addLiveConnectionToRoom({
+        connection: this.opponentWsId,
+        roomId: this.roomId,
+      });
+    };
+    this.sendChannel!.onclose = () => {
+      // This.syncMessageLock = false; // just for the case, not nessesary
+      this.onDropConnection("Data channel closed");
+    };
+  }
+
+  onDropConnection(reason: string) {
+    this.logger.log(`Closed channel ${reason}`)();
+    super.onDropConnection(reasong);
+    if (this.store.userInfo) {
+      // Otherwise we logged out
+      this.store.removeLiveConnectionToRoom({
+        connection: this.opponentWsId,
+        roomId: this.roomId,
+      });
+    }
+  }
+
 
   abstract get connectedToRemote(): boolean;
   abstract set connectedToRemote(v: boolean);
@@ -85,16 +124,18 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     }
     this.sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
     this.sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
-    const message: CheckTransferDestroy = { // Destroy parent TransferHandler
+    const message: CheckTransferDestroyMessage = { // Destroy parent TransferHandler
       handler: Subscription.getTransferId(this.connectionId),
       action: "checkTransferDestroy",
       allowZeroSubscribers: true,
-      wsOpponentId: this.opponentWsId,
+      data: {
+        wsOpponentId: this.opponentWsId,
+      },
     };
     this.sub.notify(message);
   }
 
-  public createPeerConnection(arg?: ConnectToRemoteMessage) {
+  public createPeerConnection(arg?: ConnectToRemoteMessageBody) {
     this.logger.log("Creating RTCPeerConnection with config {} {}", WEBRTC_RUNTIME_CONFIG, this.pc_constraints)();
     if (!window.RTCPeerConnection) {
       throw Error("Your browser doesn't support RTCPeerConnection");
@@ -185,12 +226,13 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   // Destroy(Des)
 
   // This event comes from websocket from server, which is created by another PC
-  public async sendRtcData(message: SendRtcDataMessage) {
+  @Subscribe<SendRtcDataWsInMessage>()
+  public async sendRtcData(message: SendRtcDataWsInBody) {
     if (!this.connectedToRemote) {
       this.logger.warn("Putting sendrtc data event to the queue")();
       this.sendRtcDataQueue.push(message);
     } else {
-      const data: RTCIceCandidateInit | RTCSessionDescriptionInit | {message: unknown} = message.content;
+      const {content: data} = message;
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== "closed") {
         if ((<RTCSessionDescriptionInit>data).sdp) {
           this.logger.log("Creating answer")();

@@ -10,11 +10,7 @@
   </chat-message-wrapper>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import ChatMessageWrapper from "@/vue/chat/message/ChatMessageWrapper.vue";
 
 @Component({

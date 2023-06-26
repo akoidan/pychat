@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postfix-deployment
+  namespace: pychat
+  labels:
+    app: postfix
+spec:
+  selector:
+    matchLabels:
+      app: postfix
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postfix
+    spec:
+      volumes:
+        - name: spool
+          persistentVolumeClaim:
+            claimName: pvc-postfix
+        - name: pychat-postfix-tls
+          secret:
+            secretName: pychat-tls
+            items:
+              - key: tls.crt
+                path: crt.pem
+              - key: tls.key
+                path: key.pem
+      containers:
+        - name: postfix
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.image.repository_path }}:{{ .Values.image.tag }}"
+          envFrom:
+          - configMapRef:
+              name: cm-postfix
+          volumeMounts:
+          - name: pychat-postfix-tls
+            mountPath: "/etc/tls"
+            readOnly: true
+          - name: spool
+            mountPath: "/var/spool/postfix"

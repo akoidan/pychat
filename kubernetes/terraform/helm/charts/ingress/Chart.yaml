@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ingress
+description: nginx ingress edge proxy and load balancer
+type: application
+version: 0.1.0
+appVersion: "1.16.0"

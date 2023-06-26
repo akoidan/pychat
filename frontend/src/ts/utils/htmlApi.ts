@@ -1,17 +1,7 @@
-import {
-  IS_DEBUG,
-  PASTED_GIPHY_CLASS,
-  PASTED_IMG_CLASS,
-  USERNAME_REGEX,
-} from "@/ts/utils/consts";
+import {ImageType} from "@common/model/enum/image.type";
+import {IS_DEBUG, PASTED_GIPHY_CLASS, PASTED_IMG_CLASS, USERNAME_REGEX} from "@/ts/utils/consts";
 import type {MessageDataEncode} from "@/ts/types/types";
-import type {
-  BlobType,
-  CurrentUserSettingsModel,
-  FileModel,
-  MessageModel,
-  UserModel,
-} from "@/ts/types/model";
+import type {CurrentUserSettingsModel, FileModel, MessageModel, UserModel} from "@/ts/types/model";
 import recordIcon from "@/assets/img/audio.svg";
 import fileIcon from "@/assets/img/file.svg";
 import {getFlag} from "@/ts/utils/flags";
@@ -19,13 +9,12 @@ import videoIcon from "@/assets/img/icon-play-red.svg";
 import type {SmileysApi} from "@/ts/utils/smileys";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import type {Logger} from "lines-logger";
-import {
-  MEDIA_API_URL,
-  webpSupported,
-} from "@/ts/utils/runtimeConsts";
+import {MEDIA_API_URL, webpSupported} from "@/ts/utils/runtimeConsts";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {GIFObject} from "giphy-api";
 import type Subscription from "@/ts/classes/Subscription";
+import type {ScrollInnerSystemMessage} from "@/ts/types/messages/inner/scroll";
+
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement("canvas").getContext("2d")!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -223,7 +212,7 @@ function encodeTags(html: string, tags: Record<string, number> | null, store: De
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = tags[s];
       if (v) {
-        return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].user}</span>`;
+        return `<span user-id='${v}' symbol='${s}' class="tag-user">@${store.allUsersDict[v].username}</span>`;
       }
 
       return s; // If it's absent in files, it could be also in tags so return it. (don't replace )
@@ -238,17 +227,23 @@ function encodeFiles(html: string, files: Record<string, FileModel> | null) {
     html = html.replace(imageUnicodeRegex, (s) => {
       const v = files[s];
       if (v) {
-        if (v.type === "i") {
+        if (v.type === ImageType.IMAGE && v.preview) {
+          return `<picture symbol='${s}' class='${PASTED_IMG_CLASS}' serverId="${v.serverId}">
+            <source srcset="${resolveMediaUrl(v.preview!)}" type="image/webp">
+            <source srcset="${resolveMediaUrl(v.url!)}"> 
+            <img src="${resolveMediaUrl(v.url!)}">
+          </picture>`;
+        } else if (v.type === ImageType.IMAGE) {
           return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}' serverId="${v.serverId}"/>`;
-        } else if (v.type === "v" || v.type === "m") {
-          const className = v.type === "v" ? "video-player" : "video-player video-record";
+        } else if (v.type === ImageType.VIDEO || v.type === ImageType.MEDIA_RECORD) {
+          const className = v.type === ImageType.VIDEO ? "video-player" : "video-player video-record";
 
           return `<div class='${className}' serverId="${v.serverId}" associatedVideo='${v.url}'><div><img ${v.preview ? `src="${resolveMediaUrl(v.preview)}"` : ""} symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
-        } else if (v.type === "a") {
+        } else if (v.type === ImageType.AUDIO_RECORD) {
           return `<img src='${recordIcon}' serverId="${v.serverId}" symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
-        } else if (v.type === "f") {
+        } else if (v.type === ImageType.FILE) {
           return `<a href="${resolveMediaUrl(v.url!)}" serverId="${v.serverId}" target="_blank" download><img src='${fileIcon}' symbol='${s}' class='uploading-file'/></a>`;
-        } else if (v.type === "g") {
+        } else if (v.type === ImageType.GIPHY) {
           // Giphy api sometimes doesn't contain webp, so it can be null
           return `<img serverId="${v.serverId}" src='${webpSupported && v.preview ? v.preview : v.url}' ${v.preview ? `webp="${v.preview}"` : ""} url="${v.url}" symbol='${s}' class='${PASTED_IMG_CLASS} ${PASTED_GIPHY_CLASS}'/>`;
         }
@@ -274,7 +269,7 @@ export function createTag(user: UserModel) {
   const style = document.createElement("style");
   style.type = "text/css";
   const id = `usertag${getUniqueTagId()}`;
-  style.innerHTML = ` #${id}:after { content: '@${user.user}'}`;
+  style.innerHTML = ` #${id}:after { content: '@${user.username}'}`;
   document.getElementsByTagName("head")[0].appendChild(style);
   a.id = id;
 
@@ -407,9 +402,10 @@ export function setImageFailEvents(e: HTMLElement, bus: Subscription) {
         this.className += " failed";
       };
       img.onload = function() {
-        bus.notify({
+        bus.notify<ScrollInnerSystemMessage>({
           action: "scroll",
           handler: "*",
+          data: null,
         });
       };
     }(r[i]));
@@ -501,37 +497,51 @@ export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
 
 export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType: string, errCb: Function) {
   const video = document.createElement("video");
+  video.style.opacity = "0";
+  video.style.width = "0";
+  video.style.height = "0";
+  video.style.position = "absolute";
+  document.body.appendChild(video);
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
     const src = URL.createObjectURL(file);
     video.loop = false;
-    video.addEventListener("loadeddata", () => {
+    video.addEventListener("loadedmetadata", () => {
       tmpCanvasContext.canvas.width = video.videoWidth;
       tmpCanvasContext.canvas.height = video.videoHeight;
-      tmpCanvasContext.drawImage(video, 0, 0);
-      tmpCanvasContext.canvas.toBlob(
-        (blob) => {
-          const img = document.createElement("img");
-          if (!blob) {
-            logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
-            img.src = videoIcon;
-          } else {
-            const url = URL.createObjectURL(blob);
-            savedFiles[url] = blob;
-            blob.name = ".jpg";
-            img.src = url;
-          }
-          img.className = PASTED_IMG_CLASS;
-          img.setAttribute("videoType", videoType);
-          img.setAttribute("associatedVideo", src);
-          savedFiles[src] = file;
-          pasteNodeAtCaret(img, textArea);
-        },
-        "image/jpeg",
-        0.95,
-      );
+      logger.log(`Loaded video metadata ${video.videoWidth}x${video.videoHeight}`)();
+      setTimeout(() => {
+        tmpCanvasContext.drawImage(video, 0, 0);
+        tmpCanvasContext.canvas.toBlob(
+          (blob) => {
+            const img = document.createElement("img");
+            if (!blob) {
+              logger.error(`Failed to render 1st frame image for file ${file.name}, setting videoIcon instead`)();
+              img.src = videoIcon;
+            } else {
+              const url = URL.createObjectURL(blob);
+              savedFiles[url] = blob;
+              if (file.name) {
+                blob.name = `${file.name}.jpg`;
+              } else {
+                blob.name = ".jpg";
+              }
+
+              img.src = url;
+            }
+            img.className = PASTED_IMG_CLASS;
+            img.setAttribute("videoType", videoType);
+            img.setAttribute("associatedVideo", src);
+            savedFiles[src] = file;
+            pasteNodeAtCaret(img, textArea);
+          },
+          "image/jpeg",
+          0.95,
+        );
+      }, 100); // https://stackoverflow.com/a/71900837/3872976
     }, false);
     video.src = src;
+    video.load();
   } else {
     errCb(`Browser doesn't support playing ${file.type}`);
   }
@@ -573,7 +583,7 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
     const img = blobToImg(file);
     pasteNodeAtCaret(img, textArea);
   } else if (file.type.includes("video")) {
-    pasteBlobVideoToTextArea(file, textArea, "v", errCb);
+    pasteBlobVideoToTextArea(file, textArea, ImageType.VIDEO, errCb);
   } else {
     errCb(`Pasted file type ${file.type}, which is not an image`);
   }
@@ -606,7 +616,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     const serverId = parseInt(img.getAttribute("serverId")!);
     const asGiphy = img.className.includes(PASTED_GIPHY_CLASS) ? img.getAttribute("url") : null;
     const asGiphyPreview = img.className.includes(PASTED_GIPHY_CLASS) ? img.getAttribute("webp") : null;
-    const videoType: BlobType = img.getAttribute("videoType")! as BlobType;
+    const videoType: ImageType = img.getAttribute("videoType")! as ImageType;
 
     let elSymbol = oldSymbol;
     if (!elSymbol) {
@@ -624,17 +634,17 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
         return;
       }
     }
-    let type: BlobType;
+    let type: ImageType;
     if (videoType) {
       type = videoType;
     } else if (assAudio) {
-      type = "a";
+      type = ImageType.AUDIO_RECORD;
     } else if (assFile) {
-      type = "f";
+      type = ImageType.FILE;
     } else if (asGiphy) {
-      type = "g";
+      type = ImageType.GIPHY;
     } else {
-      type = "i";
+      type = ImageType.IMAGE;
     }
 
     let url: string;

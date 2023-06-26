@@ -8,22 +8,13 @@
       :class="{'tag-selected': user.id === currentSelected}"
       @mousedown.prevent="emitName(user)"
     >
-      {{ user.user }}
+      {{ user.username }}
     </div>
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Emit,
-  Prop,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
-import {
-  UserDictModel,
-  UserModel,
-} from "@/ts/types/model";
+import {Component, Emit, Prop, Vue, Watch} from "vue-property-decorator";
+import {UserDictModel, UserModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 
 @Component({name: "ChatTagging"})
@@ -45,7 +36,7 @@ export default class ChatTagging extends Vue {
   }
 
   public get userList(): UserModel[] {
-    return this.userIds.map((id) => this.allUsersDict[id]).filter((u) => u.user.toLowerCase().includes(this.onlyUserName.toLowerCase()));
+    return this.userIds.map((id) => this.allUsersDict[id]).filter((u) => u.username.toLowerCase().includes(this.onlyUserName.toLowerCase()));
   }
 
   @Watch("name")

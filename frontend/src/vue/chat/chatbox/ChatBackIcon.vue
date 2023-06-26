@@ -2,12 +2,11 @@
   <router-link :to="link" class="icon-left"/>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {ALL_ROOM_ID} from "@common/consts";
+
+
+import {Component, Vue} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
-import {ALL_ROOM_ID} from "@/ts/utils/consts";
 
 @Component({name: "ChatBackIcon"})
 export default class ChatBackIcon extends Vue {

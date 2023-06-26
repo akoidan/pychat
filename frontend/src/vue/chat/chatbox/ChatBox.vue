@@ -93,18 +93,11 @@
   </div>
 </template>
 <script lang="ts">
+import {MessageStatus} from "@common/model/enum/message.status";
 
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
+
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import ChatTextMessage from "@/vue/chat/message/ChatTextMessage.vue";
 import SearchMessages from "@/vue/chat/chatbox/SearchMessages.vue";
 import {RoomModel} from "@/ts/types/model";
@@ -120,11 +113,8 @@ import ChatThread from "@/vue/chat/message/ChatThread.vue";
 import ChatTextArea from "@/vue/chat/textarea/ChatTextArea.vue";
 import ChatShowUserTyping from "@/vue/chat/chatbox/ChatShowUserTyping.vue";
 import {isMobile} from "@/ts/utils/runtimeConsts";
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {ScrollInnerSystemMessage} from "@/ts/types/messages/inner/scroll";
 
 
 @Component({
@@ -173,8 +163,6 @@ export default class ChatBox extends Vue {
 
   @Ref()
   private readonly chatboxSearch!: HTMLElement;
-
-  private handler!: MessageHandler;
 
   public get id() {
     return this.room.id;
@@ -238,7 +226,7 @@ export default class ChatBox extends Vue {
 
   public markMessagesInCurrentRoomAsRead() {
     this.$logger.debug("Checking if we can set some messages to status read")();
-    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === "received" || m.status === "on_server")).
+    const messagesIds = Object.values(this.room!.messages).filter((m) => m.userId !== this.myId && (m.status === MessageStatus.RECEIVED || m.status === MessageStatus.ON_SERVER)).
       map((m) => m.id);
     if (messagesIds.length > 0) {
       this.messageSender.markMessagesInCurrentRoomAsRead(this.room.id, messagesIds);
@@ -285,24 +273,17 @@ export default class ChatBox extends Vue {
     }
   }
 
+  @Subscribe<ScrollInnerSystemMessage>()
+  scroll() {
+    this.onEmitScroll();
+  }
+
   created() {
-    const that = this;
-    this.handler = new class ChatBoxHandler extends MessageHandler {
-      logger = that.$logger;
-
-      protected readonly handlers: HandlerTypes<keyof ChatBoxHandler, "*"> = {
-        scroll: <HandlerType<"scroll", "*">> this.scroll,
-      };
-
-      scroll() {
-        that.onEmitScroll();
-      }
-    }();
-    this.$messageBus.subscribe("*", this.handler);
+    this.$messageBus.subscribe("*", this);
   }
 
   destroyed() {
-    this.$messageBus.unsubscribe("*", this.handler);
+    this.$messageBus.unsubscribe("*", this);
   }
 
   keyDownLoadUp(e: KeyboardEvent) {

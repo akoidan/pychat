@@ -1,0 +1,7 @@
+{
+  "recaptcha": null,
+  "email": null,
+  "frontend": {
+    "address": "https://localhost:8080"
+  }
+}

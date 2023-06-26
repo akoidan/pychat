@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-registry
+  namespace: pychat
+data:
+  REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
+  REGISTRY_AUTH: "htpasswd"
+  REGISTRY_AUTH_HTPASSWD_REALM: "{{ .Values.docker_domain_name }}"
+

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+  namespace: pychat
+  labels:
+    app: mariadb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mariadb
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+      - name: mariadb
+        image: "yobasystems/alpine-mariadb:{{ .Values.mysql_version }}"
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3306
+        envFrom:
+        - secretRef:
+            name: mariadb-secret
+        - configMapRef:
+            name: cm-mariadb
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: mariadb-data
+      volumes:
+      - name: mariadb-data
+        persistentVolumeClaim:
+          claimName: pvc-mariadb

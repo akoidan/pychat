@@ -12,12 +12,8 @@
   </button>
 </template>
 
-<script lang='ts'>
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+<script lang="ts">
+import {Component, Prop, Vue} from "vue-property-decorator";
 
 @Component({name: "AppSubmit"})
 export default class AppSubmit extends Vue {

@@ -1,0 +1,12 @@
+node_modules
+yarn-error.log
+dist
+# exclude everything
+src/data/migration/*
+coverage
+# exception to the rule
+!src/data/migration/.gitkeep
+codecov
+src/fixtures/prod
+src/config/user/*
+!src/config/user/.gitkeep
