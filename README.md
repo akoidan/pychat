@@ -2,7 +2,6 @@
 [![Newbackend test](https://github.com/akoidan/pychat/workflows/NEWBE:pychat.org/badge.svg)](https://github.com/akoidan/pychat/actions)
 [![Codecov](https://codecov.io/gh/akoidan/pychat/branch/nestjs/graph/badge.svg?token=aQlNwbpTIw)](https://codecov.io/gh/akoidan/pychat)
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
-<span>pychat.org is not available due to server location in Ukraine because of war ;(. Please support Ukraine. Russian invaders suffer in hell!</span>
 
 ## Table of contents
 - [About](#about)
