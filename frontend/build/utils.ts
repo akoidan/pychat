@@ -26,6 +26,8 @@ export function getSmileyUrls() {
       }
     })
   })
+  // check ts/utils/smileys.ts@init
+  assets.push("/smileys/smileys.json")
   return assets;
 }
 

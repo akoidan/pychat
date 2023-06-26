@@ -36,6 +36,7 @@ export default defineConfig(async({command, mode}) => {
   const distDir = resolve(__dirname, '..', 'dist');
   const nodeModulesDir = resolve(__dirname, '..', 'node_modules');
   const swFilePath = resolve(srcDir, 'ts', 'sw.ts');
+  const smileyPath = resolve(srcDir, 'assets', 'smileys.json');
   const plugins = []
   if (!process.env.VITE_LIGHT) {
     plugins.push(viteChecker({
@@ -92,6 +93,10 @@ export default defineConfig(async({command, mode}) => {
         targets: [
           {
             src: `${resolve(nodeModulesDir, 'emoji-datasource-apple/img/apple/64')}/*`,
+            dest: 'smileys'
+          },
+          {
+            src: smileyPath,
             dest: 'smileys'
           }
         ]
