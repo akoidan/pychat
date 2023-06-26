@@ -27,8 +27,8 @@ export function outputManifest({swFilePath}: PluginOptions): Plugin {
       //     (v as OutputChunk).code = (v as OutputChunk).code.replace(swValueReplace, swFile.fileName);
       //   }
       // })
-
-      let swCode = `const serviceWorkerOption = {}; serviceWorkerOption.assets = ${JSON.stringify(assets)};\n`
+      // JSON.parse is required to speed up the load https://www.youtube.com/watch?v=ff4fgQxPaO0&t=329s
+      let swCode = `const serviceWorkerOption = {}; \nserviceWorkerOption.assets = JSON.parse('${JSON.stringify(assets)}');\n`
       swFile.code = swCode + swFile.code;
     },
   };

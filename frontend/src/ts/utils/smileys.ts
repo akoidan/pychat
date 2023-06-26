@@ -36,8 +36,10 @@ export class SmileysApi {
   public async init() {
     if (!this.loading && !this.smileyCache) {
       this.loading = true;
-      // This will be transformed to .js
-      const smileysData: SmileysStructure = (await import("@/assets/smileys.json")).default;
+      // https://github.com/vitejs/vite/discussions/8242
+      // check build/utils.ts@getSmileyUrls
+      const smileyJsonUrl = await fetch(`${PUBLIC_PATH ?? "/"}smileys/smileys.json`);
+      const smileysData: SmileysStructure = await smileyJsonUrl.json();
       Object.values(smileysData).forEach((tabValue) => {
         Object.values(tabValue).forEach((smileyInTab) => {
           smileyInTab.src = `${PUBLIC_PATH ?? "/"}smileys/${smileyInTab.src}`;
