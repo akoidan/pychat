@@ -230,7 +230,7 @@ resource "helm_release" "ingress" {
     value = var.domain_name
   }
   set {
-    name  = "external_ip"
+    name  = "ip_address"
     value = var.ip_address
   }
   set {

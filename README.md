@@ -589,7 +589,49 @@ Apply terraform configuration with:
  - `terraform init`
  - `terraform plan`
  - `terraform apply`
- 
+
+### Apply helm manually
+If you render helm manually, you need to specify `ip_address` of your Node cluster in [terraform.tfvars](kubernetes/terraform/terraform.tfvars) or in [values.yaml](kubernetes/terraform/helm/values.yaml)
+You can get it from 
+```bash
+kubectl get nodes -o wide
+```
+example of output:
+```text
+: kubectl get nodes -o wide
+Warning: Use tokens from the TokenRequest API or manually created secret-based tokens instead of auto-generated secret-based tokens.
+NAME                            STATUS   ROLES    AGE     VERSION   INTERNAL-IP      EXTERNAL-IP     OS-IMAGE                         KERNEL-VERSION         CONTAINER-RUNTIME
+lke111154-165479-6474ce21ad26   Ready    <none>   7d20h   v1.31.0   192.168.175.24   192.46.236.13   Debian GNU/Linux 12 (bookworm)   6.1.0-27-cloud-amd64   containerd://1.7.22
+```
+external IP address here should match with external ip address here
+```bash
+kubectl get svc -n ingress-nginx 
+```
+example of output:
+```text
+: kubectl get svc -n ingress-nginx 
+Warning: Use tokens from the TokenRequest API or manually created secret-based tokens instead of auto-generated secret-based tokens.
+NAME                       TYPE           CLUSTER-IP       EXTERNAL-IP                     PORT(S)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      AGE
+ingress-nginx-controller   LoadBalancer   10.128.229.237   192.46.236.13   80:30841/TCP,443:30671/TCP,
+```
+It's ok so it uses extra node ports
+
+Also node IP address should be specified in DNS as well as in SPF email protection settings
+
+```bash
+cd ./kubernetes/terraform/helm
+```
+create values.yaml in this directory based on **kubernetes/terraform/helm/variables.tf** and **kubernetes/terraform/terraform.tfvars**
+Render tempalte with 
+```bash
+helm template ingress charts/ingress -f values.yaml
+```
+If your kubectl is connected to the proper cluster, you can apply it with:
+apply with
+```bash
+helm template ingress charts/ingress -f values.yaml |kubectl apply -f -
+```
+
 ### Troubleshooting
 1. How to icrease maximum upload file:
  - Change nginx configuration  ``   client_max_body_size 75M;`
@@ -609,6 +651,8 @@ Certmanager should create  pychat_tls sercret in namespace pychat. It creates a 
  - Set strict encryption mode
  - Go to Caching Configuration. Click on Custom purge and select static.pychat.org (or static.yourmdain.com) or Purge EVerything if pychat is the only domain.
 # TODO
+* Move flags to json probably and JSON.parse so it takes less compile time
+* Check chrome dev tools and Coverage (the tab is on the same spot as Console (for logs)). If not visible check 3 dots on the left to Console tab. https://www.youtube.com/watch?v=X9eRLElSW1c&t=1720&ab_channel=estellevw
 * teleport smileys https://vuejsdevelopers.com/2020/03/16/vue-js-tutorial/#teleporting-content
 * user1 writes a message, user1 goes offline, user 2 opens a chat from 1st devices and goes offline, user 2 opens a chat from 2nd devices and responds in its thread and goes offline, user2 opens first deviecs and thread messages count = 0
 * loading messages is too slow, when a lot of messages is printed to local database. It's better to load 20 last messages to chat instead of 100000, probably vuex getter but it's better to think what we should do on scroll.

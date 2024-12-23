@@ -10,6 +10,8 @@ metadata:
   name: ingress-nginx-controller
   namespace: ingress-nginx
 spec:
+  externalIPs:
+    - "{{ .Values.ip_address }}"
   externalTrafficPolicy: Cluster
   ipFamilies:
   - IPv4
@@ -19,20 +21,12 @@ spec:
     name: http
     port: 80
     protocol: TCP
-    targetPort: http
+    targetPort: 80
   - appProtocol: https
     name: https
     port: 443
     protocol: TCP
-    targetPort: https
-  - name: proxied-tcp-5349
-    port: 5349
-    targetPort: 5349
-    protocol: TCP
-  - name: proxied-tcp-3478
-    port: 3478
-    targetPort: 3478
-    protocol: TCP
+    targetPort: 443
   - name: proxied-udp-5349
     port: 5349
     targetPort: 5349
@@ -51,6 +45,4 @@ spec:
     app.kubernetes.io/component: controller
     app.kubernetes.io/instance: ingress-nginx
     app.kubernetes.io/name: ingress-nginx
-  type: NodePort
-  externalIPs:
-    - "{{ .Values.external_ip }}"
+  type: LoadBalancer
