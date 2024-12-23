@@ -14,6 +14,9 @@ function makeid(length) {
 }
 
 export function getSmileyUrls() {
+  // TODO
+  // https://www.youtube.com/watch?v=ff4fgQxPaO0&list=PLNYkxOF6rcIDA1uGhqy45bqlul0VcvKMr&index=34&t=328s&pp=iAQB&ab_channel=GoogleChromeDevelopers
+  // Either remove json and store images as smth else, either at least move json to a string, since JSON.parse is after than object literal
   const assets = [];
   Object.values(smileysData).forEach(tab => {
     Object.values(tab).forEach((v: any) => {

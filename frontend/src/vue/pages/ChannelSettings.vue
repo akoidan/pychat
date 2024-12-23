@@ -56,7 +56,7 @@
               />
             </td>
             <td v-else-if="currentAdmin">
-              {{ currentAdmin.user }}
+              {{ currentAdmin.username }}
             </td>
             <!-- TODO remove fallback in future-->
             <td v-else>
@@ -101,28 +101,18 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
-import type {
-  ChannelUIModel,
-  UserModel,
-} from "@/ts/types/model";
-import {
-  ChannelsDictUIModel,
-  CurrentUserInfoModel,
-} from "@/ts/types/model";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
+import {ALL_ROOM_ID} from "@common/consts";
+
+
+import {Component, Vue} from "vue-property-decorator";
+import type {ChannelUIModel, UserModel} from "@/ts/types/model";
+import {ChannelsDictUIModel, CurrentUserInfoModel} from "@/ts/types/model";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
-import type {RouterNavigateMessage} from "@/ts/types/messages/innerMessages";
-import {ALL_ROOM_ID} from "@/ts/utils/consts";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import AppCheckbox from "@/vue/ui/AppCheckbox.vue";
+import type {RouterNavigateMessage} from "@/ts/types/messages/inner/router.navigate";
 
 @Component({
   name: "ChannelSettings",
@@ -165,7 +155,7 @@ export default class ChannelSettings extends Vue {
     if (this.admin.length > 0) {
       return this.admin[0];
     }
-    return this.channel.creator;
+    return this.channel.creatorId;
   }
 
   public get noRooms(): boolean {
@@ -173,7 +163,7 @@ export default class ChannelSettings extends Vue {
   }
 
   public get isAdmin(): boolean {
-    return this.channel.creator === this.userInfo.userId;
+    return this.channel.creatorId === this.userInfo.id;
   }
 
   public get userIds(): number[] {
@@ -181,7 +171,7 @@ export default class ChannelSettings extends Vue {
   }
 
   public get currentAdmin(): UserModel {
-    return this.allUsersDict[this.channel.creator];
+    return this.allUsersDict[this.channel.creatorId];
   }
 
   public get channelId(): number {
@@ -230,7 +220,7 @@ export default class ChannelSettings extends Vue {
   created() {
     this.$logger.log("Updated for channel settings {} ", this.channel)();
     this.channelName = this.channel.name;
-    this.admin = [this.channel.creator];
+    this.admin = [this.channel.creatorId];
     this.sound = this.channel.mainRoom.volume;
     this.notifications = this.channel.mainRoom.notifications;
   }
@@ -239,7 +229,9 @@ export default class ChannelSettings extends Vue {
     const message1: RouterNavigateMessage = {
       handler: "router",
       action: "navigate",
-      to: `/chat/${ALL_ROOM_ID}`,
+      data: {
+        to: `/chat/${ALL_ROOM_ID}`,
+      },
     };
     this.$messageBus.notify(message1);
   }

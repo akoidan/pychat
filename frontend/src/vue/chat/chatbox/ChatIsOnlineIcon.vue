@@ -6,10 +6,7 @@
   >●</span>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 
 @Component({name: "ChatIsOnlineIcon"})

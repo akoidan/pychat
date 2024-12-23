@@ -1,34 +1,33 @@
+import {MessageStatus} from "@common/model/enum/message.status";
+import type {SendSetMessagesStatusMessage} from "@/ts/types/messages/inner/send.set.messages.status";
+import type {SyncP2PInnerSystemMessage} from "@/ts/types/messages/inner/sync.p2p";
 import BaseTransferHandler from "@/ts/webrtc/BaseTransferHandler";
-import type {
-  MessageSender,
-  UserIdConn,
-} from "@/ts/types/types";
+import type {MessageSender, UserIdConn} from "@/ts/types/types";
 import type {RoomModel} from "@/ts/types/model";
 import MessageSenderPeerConnection from "@/ts/webrtc/message/MessageSenderPeerConnection";
 import MessageReceiverPeerConnection from "@/ts/webrtc/message/MessageReceiverPeerConnection";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type NotifierHandler from "@/ts/classes/NotificationHandler";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import Subscription from "@/ts/classes/Subscription";
-import type {
-  SendSetMessagesStatusMessage,
-  SyncP2PMessage,
-} from "@/ts/types/messages/innerMessages";
-import type {HandlerTypes} from "@/ts/types/messages/baseMessagesInterfaces";
+
+
 import type {MessageHelper} from "@/ts/message_handlers/MessageHelper";
+import type {SendSetMessagesStatusInnerSystemMessage} from "@/ts/types/messages/inner/send.set.message.status";
+
 
 /**
  *
  * https://drive.google.com/file/d/1BCtFNNWprfobqQlG4n2lPyWEqroi7nJh/view
  */
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
-  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, "webrtc-message"> = {};
+  // protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, "webrtc-message"> = {};
 
   private state: "initing" | "not_inited" | "ready" = "not_inited";
 
   private readonly messageHelper: MessageHelper;
 
-  public constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper, sub: Subscription) {
+  public constructor(roomId: number, wsHandler: WsApi, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper, sub: Subscription) {
     super(roomId, wsHandler, notifier, store, sub);
     this.messageHelper = messageHelper;
   }
@@ -62,7 +61,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   async syncMessage(roomId: number, messageId: number): Promise<void> {
     this.messageHelper.processAnyMessage();
     if (this.state === "ready") {
-      const payload: SyncP2PMessage = {
+      const payload: SyncP2PInnerSystemMessage = {
         action: "syncP2pMessage",
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
         id: messageId,
@@ -181,14 +180,15 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   public async markMessagesInCurrentRoomAsRead(roomId: number, messageIds: number[]) {
     this.messageHelper.processAnyMessage();
     if (this.state === "ready") {
-      const payload: SendSetMessagesStatusMessage = {
+      this.sub.notify<SendSetMessagesStatusInnerSystemMessage>({
         action: "sendSetMessagesStatus",
         handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
-        messageIds,
-        status: "read",
+        data: {
+          messageIds,
+          status: MessageStatus.READ,
+        },
         allowZeroSubscribers: true,
-      };
-      this.sub.notify(payload);
+      });
     }
   }
 

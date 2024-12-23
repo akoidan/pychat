@@ -22,7 +22,6 @@ export const {
 export const CONNECTION_RETRY_TIME = 5000;
 export const LOAD_GIPHIES_PER_REQUEST = 12;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;
-export const RESPONSE_SUCCESS = "ok";
 export const LOG_LEVEL_LS = "logLevel";
 
 // 1 day

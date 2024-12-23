@@ -1,0 +1,13 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+   name: pvc-redis
+   namespace: pychat
+spec:
+   accessModes:
+     - ReadWriteOnce
+   resources:
+     requests:
+       storage: {{ .Values.disk_size }}
+   storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+   volumeName: pv-pychat-redis

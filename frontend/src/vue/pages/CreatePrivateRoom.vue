@@ -5,10 +5,7 @@
   />
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import CreateRoom from "@/vue/parts/CreateRoom.vue";
 import {State} from "@/ts/instances/storeInstance";
 import {PrivateRoomsIds} from "@/ts/types/types";

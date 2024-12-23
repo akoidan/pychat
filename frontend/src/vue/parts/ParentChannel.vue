@@ -13,12 +13,7 @@
   </select>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Emit,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Emit, Prop, Vue} from "vue-property-decorator";
 import {State} from "@/ts/instances/storeInstance";
 import type {ChannelUIModel} from "@/ts/types/model";
 

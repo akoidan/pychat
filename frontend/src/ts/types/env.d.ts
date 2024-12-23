@@ -1,19 +1,12 @@
-import type WsHandler from "@/ts/message_handlers/WsHandler";
-import type Api from "@/ts/message_handlers/Api";
+import type WsApi from "@/ts/message_handlers/WsApi";
+import type HttpApi from "@/ts/message_handlers/HttpApi";
 import type {Logger} from "lines-logger";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {
-  GoogleCaptcha,
-  PlatformUtil,
-} from "@/ts/types/model";
+import type {GoogleCaptcha, PlatformUtil} from "@/ts/types/model";
 import type WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
-import type {
-  IStorage,
-  JsAudioAnalyzer,
-} from "@/ts/types/types";
+import type {IStorage, JsAudioAnalyzer} from "@/ts/types/types";
 import type WebRtcApi from "@/ts/webrtc/WebRtcApi";
 import type Subscription from "@/ts/classes/Subscription";
-import type Http from "@/ts/classes/Http";
 import type {Router} from "vue-router";
 import type {MessageSenderProxy} from "@/ts/message_handlers/MessageSenderProxy";
 import type {RoomHandler} from "@/ts/message_handlers/RomHandler";
@@ -24,13 +17,13 @@ declare global {
   interface Window {
     GIT_VERSION: string | undefined;
     vue: VueApp;
+    onloadrecaptcha(): any;
     router: Router;
-    api: Api;
+    api: HttpApi;
     deferredPrompt: BeforeInstallPromptEvent;
     wsMessageHandler: WsMessageHandler;
     roomHandler: RoomHandler;
-    xhr: Http;
-    ws: WsHandler;
+    ws: WsApi;
     storage: IStorage;
     store: DefaultStore;
     webrtcApi: WebRtcApi;
@@ -45,8 +38,8 @@ declare global {
 
 declare module "@vue/runtime-core" {
   export interface ComponentCustomProperties {
-    $ws: WsHandler;
-    $api: Api;
+    $ws: WsApi;
+    $api: HttpApi;
     $store: DefaultStore;
     $logger: Logger;
     $noVerbose?: true;

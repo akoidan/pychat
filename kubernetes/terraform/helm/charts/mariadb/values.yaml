@@ -1,0 +1,5 @@
+disk_size: "5Gi"
+mysql_version: "10.6.7"
+mysql_database_name: $mysql_database_name
+mysql_user: $mysql_user
+mysql_password: $mysql_password

@@ -23,10 +23,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 
 @Component({name: "ConfirmMail"})
@@ -43,7 +40,7 @@ export default class ConfirmMail extends Vue {
     message: "Confirming email error ",
   })
   public async created() {
-    await this.$api.confirmEmail(this.$route.query.token as string);
+    await this.$api.verifyApi.confirmEmail({token: this.$route.query.token as string});
     this.message = "Email has been confirmed";
   }
 }

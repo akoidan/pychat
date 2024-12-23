@@ -6,11 +6,7 @@
   </p>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import {timeToString} from "@/ts/utils/htmlApi";
 
 @Component({name: "ChatMessageWrapper"})

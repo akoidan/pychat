@@ -1,11 +1,11 @@
 <template>
   <div class="user-image-holder">
     <div class="online-marker"/>
-    <img v-if="userImg" :src="userImg" :title="user.user"/>
+    <img v-if="userImg" :src="userImg" :title="user.username"/>
     <div
       v-else
       :style="{'background-color': color}"
-      :title="user.user"
+      :title="user.username"
       class="image-missing"
     >
       {{ twoLetter }}
@@ -13,11 +13,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import {UserModel} from "@/ts/types/model";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import loggerFactory from "@/ts/instances/loggerFactory";
@@ -28,15 +24,15 @@ export default class UserImageIcon extends Vue {
   public readonly user!: UserModel;
 
   public get twoLetter() {
-    return this.user.user.substring(0, 2);
+    return this.user.username.substring(0, 2);
   }
 
   public get color() {
-    return loggerFactory.getRandomColor(this.user.user);
+    return loggerFactory.getRandomColor(this.user.username);
   }
 
   public get userImg() {
-    return resolveMediaUrl(this.user.image);
+    return resolveMediaUrl(this.user.thumbnail);
   }
 }
 </script>

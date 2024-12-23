@@ -1,3 +1,5 @@
+import type {SaveFileResponse} from "@common/http/file/save.file";
+import type {DefaultWsInMessage, HandlerName} from "@common/ws/common";
 import type {
   CallInfoModel,
   ChannelModel,
@@ -6,7 +8,7 @@ import type {
   FileModel,
   FileTransferStatus,
   MessageModel,
-  MessageStatus,
+  MessageStatusModel,
   RoomLog,
   RoomModel,
   RoomSettingsModel,
@@ -14,16 +16,17 @@ import type {
   UploadProgressModel,
   UserModel,
 } from "@/ts/types/model";
-import type {
-  SaveFileResponse,
-  SetStateFromStorage,
-} from "@/ts/types/dto";
+import type {SetStateFromStorage} from "@/ts/types/dto";
+import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
+import {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import type {PrintMessageWsInMessage} from "@common/ws/message/ws-message/print.message";
+import type {MessageModelDto} from "@common/model/dto/message.model.dto";
+import {
+  AddChannelWsInBody,
+  AddChannelWsInMessage
+} from "@common/ws/message/room/add.channel";
 
-
-export interface UploadFile {
-  key: string;
-  file: Blob | File;
-}
 
 export type ValueFilterForKey<T extends object, U> = {
   [K in keyof T]: U extends T[K] ? K : never;
@@ -31,11 +34,6 @@ export type ValueFilterForKey<T extends object, U> = {
 
 
 type StuctureMappedType<K extends string> = Record<K, K>;
-
-const sample: StuctureMappedType<string> = {
-  any3: "andy3",
-};
-
 
 export interface UserIdConn {
   connectionId: string;
@@ -88,7 +86,7 @@ export interface SetUploadProgress {
 }
 
 export interface SetUploadXHR {
-  xhr: XMLHttpRequest;
+  abortFunction(): void;
   roomId: number;
   messageId: number;
 }
@@ -162,7 +160,7 @@ export interface SetMessageProgressError {
 export interface SetFileIdsForMessage {
   messageId: number;
   roomId: number;
-  fileIds: SaveFileResponse;
+  files: SaveFileResponse[];
 }
 
 export interface RoomMessageIds {
@@ -176,11 +174,6 @@ export interface RoomMessagesIds {
   roomId: number;
 }
 
-export interface MessageSupplier {
-  sendRawTextToServer(message: string): boolean;
-
-  getWsConnectionId(): string;
-}
 
 export interface IStorage {
   // GetIds(cb: SingleParamCB<object>);
@@ -216,7 +209,7 @@ export interface IStorage {
 
   setUsers(users: UserModel[]): void;
 
-  setMessagesStatus(messagesIds: number[], status: MessageStatus): void;
+  setMessagesStatus(messagesIds: number[], status: MessageStatusModel): void;
 
   saveUser(users: UserModel): void;
 
@@ -234,24 +227,15 @@ export interface IStorage {
 
 export interface PostData {
   url: string;
-  params?: Record<string, Blob | boolean | number | string | null>;
-  formData?: FormData;
-  isJsonEncoded?: boolean;
-  isJsonDecoded?: boolean;
-  checkOkString?: boolean;
-  errorDescription?: string;
-
-  process?(R: XMLHttpRequest): void;
+  params: any;
+  onSetAbortFunction?(c: () => void): void;
 }
 
-export interface GetData {
+export interface UploadData {
   url: string;
-  isJsonDecoded?: boolean;
-  checkOkString?: boolean;
-  baseUrl?: string;
-  skipAuth?: boolean;
-
-  process?(R: XMLHttpRequest): void;
+  data: Record<string, any>;
+  onSetAbortFunction?(e: () => void): void;
+  onProgress?(i: number): void;
 }
 
 export interface AddSendingFileTransfer {
@@ -313,6 +297,14 @@ export interface PrivateRoomsIds {
   roomUsers: Record<number, number>;
 }
 
+export interface IMessageHandler {
+  handle<H extends HandlerName>(message: DefaultWsInMessage<string, H, HandlerName>): void;
+
+  // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
+  getHandler<H extends HandlerName, A extends string>(message: DefaultWsInMessage<A, H, any>): HandlerType<any, any> | undefined;
+}
+
+
 export interface SetRoomsUsers {
   roomId: number;
   users: number[];
@@ -343,4 +335,5 @@ export enum IconColor {
 
 export interface SessionHolder {
   session: string | null;
+  wsConnectionId: string|null;
 }

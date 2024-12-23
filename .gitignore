@@ -1,0 +1,17 @@
+.project
+.pydevproject
+.idea
+test/
+rootfs/etc/nginx/ssl/*
+backend/data.sql
+rootfs/etc/nginx/ssl/server.key
+rootfs/etc/nginx/ssl/certificate.key
+backend/chat/migrations/*
+backend/chat/production.py
+backend/chat/settings.py
+backend/photos/*
+!backend/photos/.gitkeep
+newback/photos/*
+!newback/photos/.gitkeep
+frontend/build/production.json
+newback/src/config/env/default.json

@@ -1,0 +1,45 @@
+{
+ "exclude": [
+    "node_modules",
+//    "**/*.spec.ts", // otherwise eslintdoesn't work for this files
+    "dist"
+  ],
+//  "ts-node": {
+//    "files": true
+//  },
+//  "files": [
+//    "src/main.ts",
+//    "src/data/types/patch.d.ts"
+//  ],
+  "compilerOptions": {
+     "paths": {
+      "@/*": ["src/*"],
+      "@common/*": ["../common/src/*"]
+    },
+    "plugins": [
+      { "transform": "typescript-transform-paths" },
+      {
+        "transform": "tsruntime/dist/transform/transformer.js",
+        "type": "program"
+      }
+    ],
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2017",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
+}

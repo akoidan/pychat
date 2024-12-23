@@ -1,31 +1,22 @@
-import "@/assets/sass/common.sass";
 import * as constants from "@/ts/utils/consts";
 
 import * as runtimeConsts from "@/ts/utils/runtimeConsts";
-import {
-  browserVersion,
-  isChrome,
-  isMobile,
-  WS_API_URL,
-} from "@/ts/utils/runtimeConsts";
+import {browserVersion, isChrome, isMobile, WS_API_URL} from "@/ts/utils/runtimeConsts";
 // Should be after initStore
 import App from "@/vue/App.vue";
 import {createApp} from "vue";
 import {store} from "@/ts/instances/storeInstance";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import sessionHolder from "@/ts/instances/sessionInstance";
 import type {App as VueApp} from "@vue/runtime-core";
 import type {PlatformUtil} from "@/ts/types/model";
-import Xhr from "@/ts/classes/Xhr";
 import "@/assets/icon.png"; // eslint-disable-line import/no-unassigned-import
-import WsHandler from "@/ts/message_handlers/WsHandler";
+import WsApi from "@/ts/message_handlers/WsApi";
 import WsMessageHandler from "@/ts/message_handlers/WsMessageHandler";
 import DatabaseWrapper from "@/ts/classes/DatabaseWrapper";
 import LocalStorage from "@/ts/classes/LocalStorage";
-import Api from "@/ts/message_handlers/Api";
+import HttpApi from "@/ts/message_handlers/HttpApi";
 import NotifierHandler from "@/ts/classes/NotificationHandler";
-import type Http from "@/ts/classes/Http";
 import WebRtcApi from "@/ts/webrtc/WebRtcApi";
 import {routerFactory} from "@/ts/instances/routerInstance";
 import {AudioPlayer} from "@/ts/classes/AudioPlayer";
@@ -37,12 +28,11 @@ import {RoomHandler} from "@/ts/message_handlers/RomHandler";
 import {mainWindow} from "@/ts/instances/mainWindow";
 import {SmileysApi} from "@/ts/utils/smileys";
 import {loggerMixin} from "@/ts/utils/mixins";
-import {
-  switchDirective,
-  validityDirective,
-} from "@/ts/utils/directives";
+import {switchDirective, validityDirective} from "@/ts/utils/directives";
 import Subscription from "@/ts/classes/Subscription";
 import type {Router} from "vue-router";
+import {SessionHolderImpl} from "@/ts/classes/SessionHolderImpl";
+import type {SessionHolder} from "@/ts/types/types";
 
 
 const logger: Logger = loggerFactory.getLoggerColor("main", "#007a70");
@@ -52,8 +42,8 @@ logger.log(`Evaluating main script ${constants.GIT_HASH}`)();
 // eslint-disable-next-line max-params
 function bootstrapVue(
   messageBus: Subscription,
-  api: Api,
-  ws: WsHandler,
+  api: HttpApi,
+  ws: WsApi,
   webrtcApi: WebRtcApi,
   platformUtil: PlatformUtil,
   messageSenderProxy: MessageSenderProxy,
@@ -80,9 +70,6 @@ function bootstrapVue(
      no-underscore-dangle
      */
     const message = `Error occurred in ${vm?.$options?.__file}:${err}:\n${info}`;
-    if (store?.userSettings?.sendLogs && api) {
-      void api.sendLogs(`${vm?.$options?.__file}:${err}:${info}`, browserVersion, constants.GIT_HASH);
-    }
     /* eslint-enable
      @typescript-eslint/restrict-template-expressions,
      @typescript-eslint/restrict-template-expressions,
@@ -117,9 +104,9 @@ function init(): void {
     event.preventDefault();
   });
 
+  const sessionHolder: SessionHolder = new SessionHolderImpl();
   const sub = new Subscription();
-  const xhr: Http = /* Window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
-  const api: Api = new Api(xhr, sub);
+  const api: HttpApi = new HttpApi(sessionHolder);
 
   let storage;
   try {
@@ -133,7 +120,7 @@ function init(): void {
   store.setStorage(storage);
   const smileyApi = new SmileysApi(store);
   void smileyApi.init();
-  const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store, sub);
+  const ws: WsApi = new WsApi(WS_API_URL, sessionHolder, store, sub);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store, mainWindow, sub);
   const messageHelper: MessageHelper = new MessageHelper(store, notifier, sub, audioPlayer);
   const wsMessageHandler: WsMessageHandler = new WsMessageHandler(store, api, ws, messageHelper, sub);
@@ -141,25 +128,17 @@ function init(): void {
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper, sub);
   const platformUtil: PlatformUtil = constants.IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, wsMessageHandler);
-  const router = routerFactory(sub);
+  const router = routerFactory(sub, sessionHolder);
   const vue = bootstrapVue(sub, api, ws, webrtcApi, platformUtil, messageSenderProxy, smileyApi, router);
 
   vue.mount(document.body);
 
   window.onerror = function onerror(msg, url, linenumber, column, errorObj): boolean {
     const message = `Error occurred in ${url!}:${linenumber!}\n${JSON.stringify(msg)}`;
-    if (store?.userSettings?.sendLogs && api) {
-      void api.sendLogs(
-        `${url!}:${linenumber!}:${column ?? "?"}\n${JSON.stringify(msg)}\n\nOBJ:  ${JSON.stringify(errorObj) ?? "?"}`,
-        browserVersion,
-        constants.GIT_HASH,
-      );
-    }
     void store.growlError(message);
 
     return false;
   };
-
 
   window.GIT_VERSION = constants.GIT_HASH;
   if (constants.IS_DEBUG) {
@@ -168,7 +147,6 @@ function init(): void {
     window.roomHandler = roomHandler;
     window.ws = ws;
     window.api = api;
-    window.xhr = xhr;
     window.storage = storage;
     window.webrtcApi = webrtcApi;
     window.sub = sub;

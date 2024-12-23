@@ -1,47 +1,30 @@
-import {
-  createMicrophoneLevelVoice,
-  getAverageAudioLevel,
-  removeAudioProcesssor,
-} from "@/ts/utils/audioprocc";
+import type {ChangeStreamMessage} from "@/ts/types/messages/inner/change.stream";
+import type {ConnectToRemoteMessage} from "@/ts/types/messages/inner/connect.to.remote";
+import type {DestroyPeerConnectionMessage} from "@/ts/types/messages/inner/destroy.peer.connection";
+
+import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor} from "@/ts/utils/audioprocc";
 import AbstractPeerConnection from "@/ts/webrtc/AbstractPeerConnection";
 import type {
   JsAudioAnalyzer,
   SetCallOpponent,
   SetOpponentAnchor,
-  SetOpponentVoice,
+  SetOpponentVoice
 } from "@/ts/types/types";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {
-  ChangeStreamMessage,
-  ConnectToRemoteMessage,
-  DestroyPeerConnectionMessage,
-} from "@/ts/types/messages/innerMessages";
-import type {DestroyCallConnection} from "@/ts/types/messages/wsInMessages";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import {
-  getStreamLog,
-  getTrackLog,
-} from "@/ts/utils/pureFunctions";
-import type {
-  CallInfoModel,
-  RoomModel,
-} from "@/ts/types/model";
+
+import {getStreamLog, getTrackLog} from "@/ts/utils/pureFunctions";
+import type {CallInfoModel, RoomModel} from "@/ts/types/model";
 import {stopVideo} from "@/ts/utils/htmlApi";
 import type Subscription from "@/ts/classes/Subscription";
+import {ConnectToRemoteMessageBody} from "@/ts/types/messages/inner/connect.to.remote";
+import {LoginMessage} from "@/ts/types/messages/inner/login";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {DestroyCallConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.call.connection";
+import {ChangeStreamMessageBody} from "@/ts/types/messages/inner/change.stream";
+
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
-  protected readonly handlers: HandlerTypes<keyof CallPeerConnection, "peerConnection:*"> = {
-    destroy: <HandlerType<"destroy", "peerConnection:*">> this.destroy,
-    streamChanged: <HandlerType<"streamChanged", "peerConnection:*">> this.streamChanged,
-    connectToRemote: <HandlerType<"connectToRemote", "peerConnection:*">> this.connectToRemote,
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    destroyCallConnection: <HandlerType<"destroyCallConnection", "peerConnection:*">> this.destroyCallConnection,
-  };
-
   private audioProcessor: any;
 
   // Ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
@@ -56,7 +39,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     connId: string,
     opponentWsId: string,
     userId: number,
-    wsHandler: WsHandler,
+    wsHandler: WsApi,
     store: DefaultStore,
     sub: Subscription,
   ) {
@@ -112,7 +95,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
 
-  public connectToRemote(stream: ConnectToRemoteMessage) {
+  public connectToRemote(stream: ConnectToRemoteMessageBody) {
     this.logger.log("Connect to remote")();
     this.store.roomsDict[this.roomId].callInfo.calls[this.opponentWsId].connected = true;
     this.connectedToRemote = true;
@@ -138,7 +121,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     }
   }
 
-  public createPeerConnection(event: ConnectToRemoteMessage) {
+  public createPeerConnection(event: ConnectToRemoteMessageBody) {
     super.createPeerConnection();
 
     if (this.streamTrackApi === "stream") {
@@ -166,7 +149,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.changeStreams(event.stream);
   }
 
-  public streamChanged(payload: ChangeStreamMessage) {
+  public streamChanged(payload: ChangeStreamMessageBody) {
     this.logger.log("onStreamChanged {}", payload)();
     if (this.pc) {
       this.changeStreams(payload.newStream);
@@ -215,11 +198,13 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     };
   }
 
-  public destroy(message: DestroyPeerConnectionMessage) { // Called by transfer
+  @Subscribe<DestroyPeerConnectionMessage>()
+  public destroy() { // Called by transfer
     this.unsubscribeAndRemoveFromParent();
   }
 
-  destroyCallConnection(m: DestroyCallConnection) { // Called by opponent devices via ws
+  @Subscribe<DestroyCallConnectionWsInMessage>()
+  public destroyCallConnection() {
     this.unsubscribeAndRemoveFromParent();
   }
 

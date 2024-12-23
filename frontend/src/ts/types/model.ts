@@ -1,7 +1,15 @@
+import type {Gender} from "@common/model/enum/gender";
+import type {ImageType} from "@common/model/enum/image.type";
+import type {MessageStatus} from "@common/model/enum/message.status";
 import type {LogLevel} from "lines-logger";
+
 
 export enum GrowlType {
   SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error",
+}
+
+export enum WsState {
+  NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED,
 }
 
 export interface GrowlModel {
@@ -29,7 +37,6 @@ export interface CurrentUserSettingsModel {
   incomingFileCallSound: boolean;
   messageSound: boolean;
   onlineChangeSound: boolean;
-  sendLogs: boolean;
   showWhenITyping: boolean;
   suggestions: boolean;
   theme: string;
@@ -37,7 +44,7 @@ export interface CurrentUserSettingsModel {
 }
 
 export interface GoogleCaptcha {
-  render(div: HTMLElement): void;
+  render(div: HTMLElement, options: any): void;
 
   reset(): void;
 }
@@ -51,31 +58,27 @@ export interface PastingTextAreaElement {
 }
 
 export interface CurrentUserInfoModel extends CurrentUserInfoWoImage {
-  image: string | null;
+  thumbnail: string | null;
 }
 
 export interface CurrentUserInfoWoImage {
-  userId: number;
-  user: string;
+  id: number;
+  username: string;
   name: string;
   city: string;
   surname: string;
   email: string;
-  birthday: string;
+  birthday: Date;
   contacts: string;
-  sex: SexModelString;
+  sex: Gender;
 }
 
-export type SexModelString =
-  "Female"
-  | "Male"
-  | "Secret";
 
 export interface UserModel {
-  user: string;
+  username: string;
   id: number;
-  sex: SexModelString;
-  image: string;
+  sex: Gender;
+  thumbnail: string;
   lastTimeOnline: number;
   location: Location;
 }
@@ -87,25 +90,10 @@ export interface Location {
   region: string | null;
 }
 
-/*
- * F - file
- * g - giphy
- * i - image
- * v - video
- * a - audio
- * m - media (same as video, but you need to click on image, in order to load video)
- */
-export type BlobType =
-  "a"
-  | "f"
-  | "g"
-  | "i"
-  | "m"
-  | "v";
-
 export interface FileModel {
   url: string | null;
-  type: BlobType;
+  type: ImageType;
+  name?: string; // TODO
   serverId: number | null;
   previewFileId: number | null;
   fileId: number | null;
@@ -121,14 +109,8 @@ export interface UploadProgressModel {
 export interface MessageTransferInfo {
   upload: UploadProgressModel | null;
   error: string | null;
-  xhr: XMLHttpRequest | null;
+  abortFn: (() => void) | null;
 }
-
-export type MessageStatus =
-  "on_server"
-  | "read"
-  | "received"
-  | "sending";
 
 export interface MessageModel {
   id: number;
@@ -143,12 +125,18 @@ export interface MessageModel {
   symbol: string | null;
   threadMessagesCount: number;
   deleted: boolean;
-  status: MessageStatus;
+  status: MessageStatusModel;
   edited: number;
   roomId: number;
   userId: number;
   transfer: MessageTransferInfo | null;
 }
+
+export enum MessageStatusInner {
+  SENDING = "SENDING",
+}
+export type MessageStatusModel = MessageStatus | MessageStatusInner;
+
 
 export interface RoomSettingsModel {
   id: number;
@@ -158,7 +146,7 @@ export interface RoomSettingsModel {
   isMainInChannel: boolean;
   notifications: boolean;
   volume: number;
-  creator: number;
+  creatorId: number;
 }
 
 export type UserDictModel = Record<string, UserModel>;
@@ -253,7 +241,7 @@ export interface ChannelModel {
   expanded: boolean;
   id: number;
   name: string;
-  creator: number;
+  creatorId: number;
 }
 
 export interface ChannelUIModel extends ChannelModel {

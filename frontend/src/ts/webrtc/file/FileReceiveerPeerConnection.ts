@@ -1,37 +1,23 @@
-import type {
-  SetReceivingFileStatus,
-  SetReceivingFileUploaded,
-} from "@/ts/types/types";
+import type {DestroyFileConnectionWsInMessage} from "@common/ws/message/peer-connection/destroy.file.connection";
+import type {RetryFileWsInMessage} from "@common/ws/message/peer-connection/retry.file";
+import type {SetReceivingFileStatus, SetReceivingFileUploaded} from "@/ts/types/types";
 import type {ReceivingFile} from "@/ts/types/model";
 import {FileTransferStatus} from "@/ts/types/model";
 import {bytesToSize} from "@/ts/utils/pureFunctions";
-import type WsHandler from "@/ts/message_handlers/WsHandler";
+import type WsApi from "@/ts/message_handlers/WsApi";
 import {requestFileSystem} from "@/ts/utils/htmlApi";
-import {
-  MAX_ACCEPT_FILE_SIZE_WO_FS_API,
-  MAX_BUFFER_SIZE,
-} from "@/ts/utils/consts";
+import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from "@/ts/utils/consts";
 import FilePeerConnection from "@/ts/webrtc/file/FilePeerConnection";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import type {
-  DestroyFileConnectionMessage,
-  RetryFileMessage,
-} from "@/ts/types/messages/wsInMessages";
 import type Subscription from "@/ts/classes/Subscription";
+import {Subscribe} from "@/ts/utils/pubsub";
+import {DestroyFileConnectionWsInBody} from "@common/ws/message/peer-connection/destroy.file.connection";
+import {RetryFileReply} from "@/ts/types/messages/peer-connection/retry.file.reply";
+import {AcceptFileReply} from "@/ts/types/messages/peer-connection/accept.file.reply";
+import {DeclineFileReply} from "@/ts/types/messages/peer-connection/decline.file.reply";
+
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
-  protected readonly handlers: HandlerTypes<keyof FileReceiverPeerConnection, "peerConnection:*"> = {
-    sendRtcData: <HandlerType<"sendRtcData", "peerConnection:*">> this.sendRtcData,
-    retryFile: <HandlerType<"retryFile", "peerConnection:*">> this.retryFile,
-    retryFileReply: <HandlerType<"retryFileReply", "peerConnection:*">> this.retryFileReply,
-    acceptFileReply: <HandlerType<"acceptFileReply", "peerConnection:*">> this.acceptFileReply,
-    declineFileReply: <HandlerType<"declineFileReply", "peerConnection:*">> this.declineFileReply,
-    destroyFileConnection: <HandlerType<"destroyFileConnection", "peerConnection:*">> this.destroyFileConnection,
-  };
 
   private readonly fileSize: number;
 
@@ -49,7 +35,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
 
   private retryFileSend: number = 0;
 
-  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, size: number, sub: Subscription) {
+  public constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsApi, store: DefaultStore, size: number, sub: Subscription) {
     super(roomId, connId, opponentWsId, wsHandler, store, sub);
     this.fileSize = size;
   }
@@ -58,6 +44,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     return this.store.roomsDict[this.roomId].receivingFiles[this.connectionId];
   }
 
+  @Subscribe<RetryFileReply>()
   public retryFileReply() {
     const now = Date.now();
     if (now - this.retryFileSend > 5000) {
@@ -66,6 +53,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     }
   }
 
+  @Subscribe<DeclineFileReply>()
   public declineFileReply() {
     this.wsHandler.destroyFileConnection(this.connectionId, "decline");
     const rf: SetReceivingFileStatus = {
@@ -77,6 +65,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.unsubscribeAndRemoveFromParent();
   }
 
+
+  @Subscribe<AcceptFileReply>()
   public async acceptFileReply() {
     try {
       await this.initFileSystemApi();
@@ -94,7 +84,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.waitForAnswer();
   }
 
-  public destroyFileConnection(message: DestroyFileConnectionMessage) {
+  @Subscribe<DestroyFileConnectionWsInMessage>()
+  public destroyFileConnection(message: DestroyFileConnectionWsInBody) {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.DECLINED_BY_OPPONENT,
@@ -105,7 +96,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.unsubscribeAndRemoveFromParent();
   }
 
-  public retryFile(message: RetryFileMessage) {
+  @Subscribe<RetryFileWsInMessage>()
+  public retryFile() {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.IN_PROGRESS,

@@ -1,0 +1,9 @@
+export enum ImageType {
+  VIDEO = "VIDEO",
+  FILE = "FILE",
+  MEDIA_RECORD = "MEDIA_RECORD",
+  AUDIO_RECORD = "AUDIO_RECORD",
+  IMAGE = "IMAGE",
+  PREVIEW = "PREVIEW",
+  GIPHY = "GIPHY",
+}

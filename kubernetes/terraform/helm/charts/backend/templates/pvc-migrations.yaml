@@ -1,0 +1,17 @@
+{{ if not (.Values.github) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-migrations
+  namespace: pychat
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: {{ .Values.migrations_disk_size }}
+  storageClassName: "" # Empty string must be explicitly set otherwise default StorageClass will be set
+  volumeName: pv-migrations
+{{ end }}
+
+

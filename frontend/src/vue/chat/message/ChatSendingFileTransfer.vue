@@ -19,19 +19,11 @@
   </tbody>
 </template>
 <script lang="ts">
-
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import AppProgressBar from "@/vue/ui/AppProgressBar.vue";
 import type {UserModel} from "@/ts/types/model";
-import {
-  FileTransferStatus,
-  SendingFileTransfer,
-} from "@/ts/types/model";
+import {FileTransferStatus, SendingFileTransfer} from "@/ts/types/model";
 
 
 const fileStatusDict: Record<FileTransferStatus, string> = {
@@ -74,7 +66,7 @@ export default class ChatSendingFileTransfer extends Vue {
   }
 
   public get user() {
-    return this.allUsersDict[this.transfer.userId].user;
+    return this.allUsersDict[this.transfer.userId].username;
   }
 
   public get status() {

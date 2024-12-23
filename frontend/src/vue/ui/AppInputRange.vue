@@ -9,7 +9,8 @@
 </template>
 <script lang="ts">
 import {
-  Component, Emit,
+  Component,
+  Emit,
   Prop,
   Ref,
   Vue,

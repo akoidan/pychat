@@ -28,20 +28,11 @@
   </app-nav-wrapper>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Emit,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Emit, Prop, Vue} from "vue-property-decorator";
 import AppNavWrapper from "@/vue/ui/AppNavWrapper.vue";
 import {State} from "@/ts/instances/storeInstance";
 import type {UserModel} from "@/ts/types/model";
-import {
-  ChannelsDictUIModel,
-  RoomModel,
-  UserDictModel,
-} from "@/ts/types/model";
+import {ChannelsDictUIModel, RoomModel, UserDictModel} from "@/ts/types/model";
 import ChatIsOnlineIcon from "@/vue/chat/chatbox/ChatIsOnlineIcon.vue";
 import {PrivateRoomsIds} from "@/ts/types/types";
 import UserNavInfo from "@/vue/chat/right/UserNavInfo.vue";
@@ -81,7 +72,7 @@ export default class ChatNavBar extends Vue {
       return this.channelsDictUI[this.activeRoom.channelId!].name;
     }
     if (this.user) {
-      return this.user.user;
+      return this.user.username;
     }
     throw Error("Invalid structure");
   }

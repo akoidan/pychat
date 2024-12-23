@@ -1,0 +1,4 @@
+image:
+  repository_path: deathangel908/pychat-frontend
+  pullPolicy: Always # change to IfNotPresent for minikube
+  tag: "latest"

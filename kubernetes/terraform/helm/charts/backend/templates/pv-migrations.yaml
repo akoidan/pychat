@@ -1,0 +1,13 @@
+{{ if not (.Values.github) }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-migrations
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: {{ .Values.migrations_disk_size }}
+  hostPath:
+    path: /data/migrations
+{{ end }}

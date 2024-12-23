@@ -3,11 +3,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Ref, Vue} from "vue-property-decorator";
 
 import loggerFactory from "@/ts/instances/loggerFactory";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";

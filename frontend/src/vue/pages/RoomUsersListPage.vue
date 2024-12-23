@@ -29,19 +29,9 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
-import {
-  ChannelsDictUIModel,
-  RoomDictModel,
-  UserDictModel,
-} from "@/ts/types/model";
+import {Component, Vue} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
+import {ChannelsDictUIModel, RoomDictModel, UserDictModel} from "@/ts/types/model";
 import AppSubmit from "@/vue/ui/AppSubmit.vue";
 import PickUser from "@/vue/parts/PickUser.vue";
 import UserFlagRow from "@/vue/chat/right/UserFlagRow.vue";
@@ -106,7 +96,7 @@ export default class RoomUsersListPage extends Vue {
   async add() {
     if (this.userdToAdd.length > 0) {
       const e = await this.$ws.inviteUser(this.roomId, this.userdToAdd);
-      this.$router.replace(`/chat/${e.roomId}`);
+      this.$router.replace(`/chat/${e.id}`);
     } else {
       this.$store.growlError("Please select at least one user");
     }

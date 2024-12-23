@@ -1,0 +1,9 @@
+udp_port_range_start: $udp_port_range_start
+udp_port_range_end: $udp_port_range_end
+password: $password
+username: $username
+domain_name: $domain_name
+image:
+  repository_path: deathangel908/pychat-coturn
+  pullPolicy: Always # change to IfNotPresent for minikube
+  tag: "latest"

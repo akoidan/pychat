@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-registry-deployment
+  namespace: pychat
+  labels:
+    app: docker-registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-registry
+  template:
+    metadata:
+      labels:
+        app: docker-registry
+    spec:
+      containers:
+      - name: docker-registry
+        imagePullPolicy: IfNotPresent
+        image: registry:2.8.2
+        ports:
+        - containerPort: 5000
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 5000
+        envFrom:
+        - configMapRef:
+            name: cm-registry
+        volumeMounts:
+        - mountPath: "/var/lib/registry"
+          name: registry-data
+        - mountPath: "/auth"
+          readOnly: true
+          name: registry-auth-file
+      volumes:
+        - name: registry-data
+          persistentVolumeClaim:
+            claimName: pvc-registry-data
+        - name: registry-auth-file
+          secret:
+            secretName: docker-secret
+            items:
+              - key: htpasswd
+                path: htpasswd

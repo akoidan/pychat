@@ -41,16 +41,9 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import type {UserModel} from "@/ts/types/model";
-import {
-  IncomingCallModel,
-  RoomDictModel,
-} from "@/ts/types/model";
+import {IncomingCallModel, RoomDictModel} from "@/ts/types/model";
 
 
 @Component({name: "IncomingCall"})
@@ -64,7 +57,7 @@ export default class IncomingCall extends Vue {
   public readonly roomsDict!: RoomDictModel;
 
   public get caller() {
-    return this.allUsersDict[this.call.userId].user;
+    return this.allUsersDict[this.call.userId].username;
   }
 
   public get room(): string {

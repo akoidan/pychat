@@ -15,16 +15,8 @@
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-} from "vue-property-decorator";
-import {
-  CurrentUserSettingsModel,
-  MessageModel,
-} from "@/ts/types/model";
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
+import {CurrentUserSettingsModel, MessageModel} from "@/ts/types/model";
 import {
   encodeHTML,
   encodeMessageInited,
@@ -239,9 +231,13 @@ export default class ChatTextMessage extends Vue {
       width: 100px
       height: 36px
 
-  :deep(.B4j2ContentEditableImg)
+  :deep(img.B4j2ContentEditableImg)
     @include margin-img-def
     @include margin-img
+  :deep(picture.B4j2ContentEditableImg)
+    @include margin-img-def
+    img
+      @include margin-img-def
 
     &.failed
       min-width: 200px

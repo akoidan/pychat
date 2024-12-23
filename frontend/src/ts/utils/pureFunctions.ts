@@ -1,10 +1,10 @@
-import type {
-  FileModel,
-  MessageModel,
-} from "@/ts/types/model";
+import {MessageStatus} from "@common/model/enum/message.status";
+import type {FileModel, MessageModel} from "@/ts/types/model";
+import {MessageStatusInner} from "@/ts/types/model";
 import type {DefaultStore} from "@/ts/classes/DefaultStore";
 import type {MessageSender} from "@/ts/types/types";
 import {ALLOW_EDIT_MESSAGE_IF_UPDATE_HAPPENED_MS_AGO} from "@/ts/utils/consts";
+
 
 export function bytesToSize(bytes: number): string {
   const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
@@ -115,7 +115,7 @@ export function editMessageWs(
     transfer: Boolean(messageContent) || messageId > 0 ? { // TODO can this be simplified?
       error: null,
       upload: null,
-      xhr: null,
+      abortFn: null,
     } : null,
     time,
     tags,
@@ -123,12 +123,12 @@ export function editMessageWs(
     isEditingActive: oldMessage ? oldMessage.isEditingActive : false,
     isThreadOpened: oldMessage ? oldMessage.isThreadOpened : false,
     parentMessage,
-    status: shouldBeSynced ? "sending" : "on_server",
+    status: shouldBeSynced ? MessageStatusInner.SENDING : MessageStatus.ON_SERVER,
     content: messageContent,
     symbol,
     edited,
     files,
-    userId: store.userInfo?.userId!,
+    userId: store.userInfo?.id!,
   };
   store.addMessage(mm);
   if (shouldBeSynced) { // Message hasn't been sync to server and was deleted localy

@@ -1,17 +1,15 @@
-import {
-  createRouter,
-  createWebHashHistory,
-} from "vue-router";
-import sessionHolder from "@/ts/instances/sessionInstance";
+import type {LoginMessage, LoginMessageBody} from "@/ts/types/messages/inner/login";
+import type {LogoutMessage} from "@/ts/types/messages/inner/logout";
+import type {RouterNavigateMessage, RouterNavigateMessageBody} from "@/ts/types/messages/inner/router.navigate";
+import {createRouter, createWebHashHistory} from "vue-router";
 import {store} from "@/ts/instances/storeInstance";
 import MainPage from "@/vue/pages/MainPage.vue";
 import ChannelsPage from "@/vue/pages/ChannelsPage.vue";
-import AuthPage from "@/vue/singup/AuthPage.vue";
-import ResetPassword from "@/vue/singup/ResetPassword.vue";
-import Login from "@/vue/singup/Login.vue";
-import SignUp from "@/vue/singup/SignUp.vue";
+import AuthPage from "@/vue/auth/AuthPage.vue";
+import ResetPassword from "@/vue/auth/ResetPassword.vue";
+import SignIn from "@/vue/auth/SignIn.vue";
+import SignUp from "@/vue/auth/SignUp.vue";
 import UserProfile from "@/vue/pages/UserProfile.vue";
-import ReportIssue from "@/vue/pages/ReportIssue.vue";
 import UserProfileChangePassword from "@/vue/pages/UserProfileChangePassword.vue";
 import UserProfileImage from "@/vue/pages/UserProfileImage.vue";
 import UserProfileInfo from "@/vue/pages/UserProfileInfo.vue";
@@ -19,11 +17,8 @@ import UserProfileSettings from "@/vue/pages/UserProfileSettings.vue";
 import CreatePrivateRoom from "@/vue/pages/CreatePrivateRoom.vue";
 import ViewProfilePage from "@/vue/pages/ViewProfilePage.vue";
 import RoomSettings from "@/vue/pages/RoomSettings.vue";
-import ApplyResetPassword from "@/vue/singup/ApplyResetPassword.vue";
-import {
-  ACTIVE_ROOM_ID_LS_NAME,
-  ALL_ROOM_ID,
-} from "@/ts/utils/consts";
+import ApplyResetPassword from "@/vue/auth/ApplyResetPassword.vue";
+import {ACTIVE_ROOM_ID_LS_NAME, ALL_ROOM_ID} from "@/ts/utils/consts";
 import ConfirmMail from "@/vue/pages/ConfirmMail.vue";
 import UserProfileChangeEmail from "@/vue/pages/UserProfileChangeEmail.vue";
 import CreateChannel from "@/vue/pages/CreateChannel.vue";
@@ -31,23 +26,17 @@ import ChannelSettings from "@/vue/pages/ChannelSettings.vue";
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import type {Logger} from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
-import type {
-  HandlerType,
-  HandlerTypes,
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import type {
-  LoginMessage,
-  LogoutMessage,
-  RouterNavigateMessage,
-} from "@/ts/types/messages/innerMessages";
+
 import UserProfileOauthSettings from "@/vue/pages/UserProfileOauthSettings.vue";
 import PainterPage from "@/vue/pages/PainterPage.vue";
 import RoomUsersListPage from "@/vue/pages/RoomUsersListPage.vue";
 import ChannelAddRoom from "@/vue/pages/ChannelAddRoom.vue";
 import type Subscription from "@/ts/classes/Subscription";
+import type {SessionHolder} from "@/ts/types/types";
+import {Subscribe} from "@/ts/utils/pubsub";
 
 
-export function routerFactory(sub: Subscription) {
+export function routerFactory(sub: Subscription, sessionHolder: SessionHolder) {
   const logger: Logger = loggerFactory.getLogger("router");
   const router = createRouter({
     history: createWebHashHistory(), // Seems like createWebHistory is really hard for sw to detect what to cache, so use this one
@@ -57,7 +46,7 @@ export function routerFactory(sub: Subscription) {
         component: MainPage,
         beforeEnter: (to, from) => {
           if (!sessionHolder.session) {
-            return "/auth/login";
+            return "/auth/sign-in";
           }
         },
         children: [
@@ -151,10 +140,6 @@ export function routerFactory(sub: Subscription) {
             component: CreatePrivateRoom,
             path: "/create-private-room",
           },
-          {
-            component: ReportIssue,
-            path: "/report-issue",
-          },
         ],
       }, {
         path: "/auth",
@@ -162,11 +147,11 @@ export function routerFactory(sub: Subscription) {
         children: [
           {
             path: "",
-            redirect: "/auth/login",
+            redirect: "/auth/sign-in",
           },
           {
-            path: "login",
-            component: Login,
+            path: "sign-in",
+            component: SignIn,
           },
           {
             path: "reset-password",
@@ -182,7 +167,7 @@ export function routerFactory(sub: Subscription) {
           },
         ],
       }, {
-        path: "/confirm_email",
+        path: "/confirm-email",
         component: ConfirmMail,
       }, {
         path: "/:catchAll(.*)",
@@ -193,7 +178,7 @@ export function routerFactory(sub: Subscription) {
 
   router.beforeEach((to, from, next) => {
     if (to.matched[0]?.meta?.loginRequired && !sessionHolder.session) {
-      next("/auth/login");
+      next("/auth/sign-in");
     } else {
       if (to?.meta?.beforeEnter) {
         (to.meta.beforeEnter as any)(to, from, next);
@@ -202,32 +187,31 @@ export function routerFactory(sub: Subscription) {
     }
   });
 
-  sub.subscribe("router", new class RouterProcessor extends MessageHandler {
+   class RouterProcessor {
     protected readonly logger: Logger = logger;
 
-    protected readonly handlers: HandlerTypes<keyof RouterProcessor, "router"> = {
-      login: <HandlerType<"login", "router">> this.login,
-      logout: <HandlerType<"logout", "router">> this.logout,
-      navigate: <HandlerType<"navigate", "router">> this.navigate,
-    };
-
-    logout(a: LogoutMessage) {
-      router.replace("/auth/login");
+    @Subscribe<LogoutMessage>()
+    public logout() {
+      router.replace("/auth/sign-in");
     }
 
-    navigate(a: RouterNavigateMessage) {
+    @Subscribe<RouterNavigateMessage>()
+    public navigate(a: RouterNavigateMessageBody) {
       if (router.currentRoute.value.path !== a.to) {
         router.replace(a.to);
       }
     }
 
-    login(a: LoginMessage) {
+    @Subscribe<LoginMessage>()
+    public login(a: LoginMessageBody) {
       if (!a.session) {
         throw Error(`Invalid session ${a.session}`);
       }
       sessionHolder.session = a.session;
       router.replace(`/chat/${ALL_ROOM_ID}`);
     }
-  }());
+  }
+
+  sub.subscribe("router", new RouterProcessor());
   return router;
 }

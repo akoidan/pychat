@@ -11,10 +11,7 @@
 </template>
 
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Vue} from "vue-property-decorator";
 import {ApplyGrowlErr} from "@/ts/instances/storeInstance";
 
 @Component({name: "ConfirmMail"})
@@ -29,7 +26,7 @@ export default class ConfirmMail extends Vue {
     message: "Error changing mail",
   })
   public async created() {
-    this.message = await this.$api.changeEmail(<string> this.$route.query.token);
+    this.message = await this.$api.restApi.changeEmail(<string> this.$route.query.token);
   }
 }
 </script>

@@ -1,0 +1,3 @@
+Hi {{ username }} you have registered pychat
+To complete your registration please click on the url bellow: {{ magicLink }}
+If you find any bugs or propositions you can post them {{ issueReportLink }}

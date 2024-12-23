@@ -4,22 +4,15 @@
   >
     <div class="user-name-sex">
       <user-image-icon :user="user"/>
-      <span>{{ user.user }}</span>
+      <span>{{ user.username }}</span>
     </div>
     <slot/>
   </div>
 </template>
 <script lang="ts">
 import {State} from "@/ts/instances/storeInstance";
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
-import {
-  RoomModel,
-  UserModel,
-} from "@/ts/types/model";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {RoomModel, UserModel} from "@/ts/types/model";
 import UserImageIcon from "@/vue/chat/chatbox/UserImageIcon.vue";
 
 

@@ -57,14 +57,8 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Vue,
-} from "vue-property-decorator";
-import {
-  ApplyGrowlErr,
-  State,
-} from "@/ts/instances/storeInstance";
+import {Component, Vue} from "vue-property-decorator";
+import {ApplyGrowlErr, State} from "@/ts/instances/storeInstance";
 import {resolveMediaUrl} from "@/ts/utils/htmlApi";
 import type {UserModel} from "@/ts/types/model";
 import type {ViewUserProfileDto} from "@/ts/types/dto";
@@ -85,7 +79,7 @@ export default class ViewProfilePage extends Vue {
   }
 
   public get username(): string {
-    return this.allUsersDict[this.id].user;
+    return this.allUsersDict[this.id].username;
   }
 
   public resolveMediaUrl(src: string) {
@@ -98,7 +92,7 @@ export default class ViewProfilePage extends Vue {
     runningProp: "loading",
   })
   public async created() {
-    this.userProfileInfo = await this.$api.showProfile(this.id);
+    this.userProfileInfo = await this.$api.restApi.showProfile(this.id);
   }
 }
 </script>

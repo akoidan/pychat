@@ -6,7 +6,7 @@
         v-for="currentUser in valueUsers"
         :key="currentUser.id"
         class="spann"
-      >{{ currentUser.user }}
+      >{{ currentUser.username }}
         <i
           class="icon-cancel"
           @click="removeUser(currentUser.id)"
@@ -30,11 +30,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Vue,
-} from "vue-property-decorator";
+import {Component, Prop, Vue} from "vue-property-decorator";
 import type {UserModel} from "@/ts/types/model";
 import {State} from "@/ts/instances/storeInstance";
 import UserRow from "@/vue/chat/right/UserRow.vue";
@@ -77,7 +73,7 @@ export default class PickUser extends Vue {
     this.$logger.debug("Reeval filter CreatePrivateRoom")();
     const s = this.search.toLowerCase();
 
-    return this.displayedUsers.filter((u) => u.user.toLowerCase().includes(s));
+    return this.displayedUsers.filter((u) => u.username.toLowerCase().includes(s));
   }
 
   public removeUser(id: number) {

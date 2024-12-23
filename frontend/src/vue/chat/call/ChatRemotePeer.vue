@@ -19,13 +19,7 @@
   </div>
 </template>
 <script lang="ts">
-import {
-  Component,
-  Prop,
-  Ref,
-  Vue,
-  Watch,
-} from "vue-property-decorator";
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
 import {CallInfoModel} from "@/ts/types/model";
 import AppInputRange from "@/vue/ui/AppInputRange.vue";
 import VideoObject from "@/vue/chat/chatbox/VideoObject.vue";

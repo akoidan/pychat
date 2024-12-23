@@ -1,0 +1,72 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/proxy-body-size: "200m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "6000"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "6000"
+  name: ingress
+  namespace: pychat
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - "{{ .Values.domain_name }}"
+    - "{{ .Values.static_domain_name }}"
+{{- if .Values.docker_domain_name }}
+    - "{{ .Values.docker_domain_name }}"
+{{- end }}
+    secretName: pychat-tls
+  defaultBackend:
+    service:
+      name: frontend-service
+      port:
+        number: 80
+  rules:
+  - host: "{{ .Values.static_domain_name }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+  - host: "{{ .Values.domain_name }}"
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8888
+      - path: /ws
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-service
+            port:
+              number: 8888
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-service
+            port:
+              number: 80
+{{- if .Values.docker_domain_name }}
+  - host: "{{ .Values.docker_domain_name }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: registry-service
+            port:
+              number: 5000
+{{ end }}
