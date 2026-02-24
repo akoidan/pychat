@@ -1,6 +1,6 @@
 [![docker](https://github.com/akoidan/pychat/actions/workflows/docker.yml/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions/workflows/docker.yml) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Upload Frontend pychat.org](https://github.com/akoidan/pychat/workflows/FE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3AFE%3Apychat.org) [![Refresh backend pychat.org](https://github.com/akoidan/pychat/workflows/BE:pychat.org/badge.svg?branch=master)](https://github.com/akoidan/pychat/actions?query=workflow%3ABE%3Apychat.org)
 
-# Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
+[video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 
 ## Table of contents
 - [About](#about)
